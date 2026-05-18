@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Logs
+*.log
+
+# Node / frontend future
+node_modules/
+dist/
+build/
+
+# Cache
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
