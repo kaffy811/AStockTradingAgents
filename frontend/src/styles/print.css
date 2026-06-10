@@ -1,0 +1,202 @@
+/*
+ * Print / PDF export styles.
+ * Covers both screen preview (white-background print page) and @media print.
+ * Must be imported globally in main.js.
+ */
+
+/* ── Screen preview: simulate A4 white page ───────────────────────────── */
+
+.print-shell {
+  background: #fff;
+  color: #111;
+  min-height: 100vh;
+}
+
+.print-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 24px;
+  background: #f3f4f6;
+  border-bottom: 1px solid #d1d5db;
+  flex-wrap: wrap;
+}
+
+.print-toolbar-hint {
+  flex: 1;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.print-body {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 48px 60px;
+  font-family: "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB",
+               "Noto Sans CJK SC", "Source Han Sans SC", sans-serif;
+  font-size: 14px;
+  line-height: 1.8;
+  color: #111;
+}
+
+.print-doc-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+.print-doc-meta {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 28px;
+}
+
+.print-divider {
+  border: none;
+  border-top: 1px solid #d1d5db;
+  margin: 20px 0;
+}
+
+/* Agent status table */
+.print-agents-title,
+.print-warnings-title,
+.print-section-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e3a5f;
+  margin: 24px 0 10px;
+}
+
+.print-agents-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.print-agents-table th,
+.print-agents-table td {
+  border: 1px solid #d1d5db;
+  padding: 6px 10px;
+  text-align: left;
+}
+
+.print-agents-table th {
+  background: #f9fafb;
+  font-weight: 600;
+  color: #374151;
+}
+
+.print-agents-table td { color: #374151; }
+
+/* Warnings */
+.print-warnings-list {
+  padding-left: 20px;
+  margin: 0 0 8px;
+  color: #92400e;
+}
+
+.print-warnings-list li { margin-bottom: 4px; font-size: 13px; }
+
+.print-no-warnings {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+/* Section spacer */
+.print-section {
+  margin-top: 32px;
+}
+
+/* ── @media print ─────────────────────────────────────────────────────── */
+
+@media print {
+  /* Hide all non-print elements */
+  .no-print { display: none !important; }
+
+  /* Page setup */
+  @page {
+    size: A4;
+    margin: 20mm 18mm 20mm 18mm;
+  }
+
+  body {
+    background: #fff !important;
+    color: #111 !important;
+  }
+
+  /* Override deep-dark-theme CSS custom properties */
+  :root {
+    --text:    #111    !important;
+    --muted:   #555    !important;
+    --accent:  #2563eb !important;
+    --accent2: #1d4ed8 !important;
+    --border:  #d1d5db !important;
+  }
+
+  /* Fix h1 gradient + -webkit-text-fill-color (invisible on white paper) */
+  .report-markdown h1 {
+    background: none !important;
+    -webkit-background-clip: unset !important;
+    background-clip: unset !important;
+    -webkit-text-fill-color: #111 !important;
+    color: #111 !important;
+  }
+
+  /* Fix light-on-dark heading colors */
+  .report-markdown h2 { color: #1e40af !important; }
+  .report-markdown h3 { color: #1d4ed8 !important; }
+
+  /* Prevent headings from appearing alone at bottom of page */
+  h1, h2, h3, h4 { page-break-after: avoid; }
+
+  /* Prevent orphaned lines inside paragraphs and list items */
+  .report-markdown p,
+  .report-markdown li { page-break-inside: avoid; }
+
+  /* Each sub-report section starts on a new page (skip the first) */
+  .print-section + .print-section { page-break-before: always; }
+
+  /* Remove link href decoration that some browsers append in print */
+  a::after { content: none !important; }
+
+  /* Inline-report table styles for print */
+  .report-markdown table {
+    display: table;
+    width: 100%;
+  }
+  .report-markdown th {
+    background: #f3f4f6 !important;
+    color: #111 !important;
+  }
+  .report-markdown td {
+    color: #111 !important;
+  }
+  .report-markdown tr:nth-child(even) td {
+    background: #fafafa !important;
+  }
+  .report-markdown code {
+    background: #f3f4f6 !important;
+    color: #1d4ed8 !important;
+  }
+  .report-markdown blockquote {
+    background: #f9fafb !important;
+    border-left-color: #2563eb !important;
+    color: #374151 !important;
+  }
+
+  /* Keep table header visible on multi-page tables */
+  .print-agents-table thead { display: table-header-group; }
+  .print-agents-table tr    { page-break-inside: avoid; }
+
+  .print-body {
+    padding: 0;
+    max-width: 100%;
+  }
+}

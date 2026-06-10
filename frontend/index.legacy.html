@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TradingAgents — 综合分析</title>
+
+  <!-- Vue 3 & marked (CDN, no build step needed) -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0f1117;
+      --surface:  #1a1d27;
+      --surface2: #22263a;
+      --border:   #2e3347;
+      --accent:   #4f8ef7;
+      --accent2:  #7c5cfc;
+      --success:  #2dd98b;
+      --warn:     #f5a623;
+      --danger:   #f5554a;
+      --text:     #e2e8f0;
+      --muted:    #7a859c;
+      --radius:   10px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                   "Microsoft YaHei", sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── Layout ── */
+    .app-shell {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px 16px 64px;
+    }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .app-title {
+      font-size: 20px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .user-badge {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .user-badge span {
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 18px;
+      color: var(--text);
+    }
+
+    /* ── Form ── */
+    .form-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .form-group input,
+    .form-group select {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      padding: 8px 12px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.15s;
+      min-width: 120px;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: var(--accent);
+    }
+
+    .form-group input.symbol-input {
+      width: 140px;
+      font-family: monospace;
+      font-size: 16px;
+      letter-spacing: 0.05em;
+    }
+
+    .form-group.hours-group input {
+      width: 90px;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      border: none;
+      border-radius: 6px;
+      padding: 9px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+      white-space: nowrap;
+    }
+
+    .btn:active:not(:disabled) { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+    }
+
+    .btn-primary:hover:not(:disabled) { opacity: 0.88; }
+
+    .btn-secondary {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover:not(:disabled) { border-color: var(--accent); }
+
+    .btn-sm {
+      padding: 5px 12px;
+      font-size: 12px;
+    }
+
+    /* ── Loading ── */
+    .loading-bar {
+      width: 100%;
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .loading-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 2px;
+      animation: shimmer 1.6s ease-in-out infinite;
+      width: 40%;
+    }
+
+    @keyframes shimmer {
+      0%   { margin-left: -40%; }
+      100% { margin-left: 100%; }
+    }
+
+    .loading-hint {
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      padding: 12px 0;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Metadata bar ── */
+    .meta-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .generated-at {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* ── Agent badges ── */
+    .agent-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .agent-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid transparent;
+    }
+
+    .badge-success {
+      background: rgba(45, 217, 139, 0.12);
+      color: var(--success);
+      border-color: rgba(45, 217, 139, 0.25);
+    }
+
+    .badge-failed {
+      background: rgba(245, 85, 74, 0.12);
+      color: var(--danger);
+      border-color: rgba(245, 85, 74, 0.25);
+    }
+
+    .badge-timeout {
+      background: rgba(245, 166, 35, 0.12);
+      color: var(--warn);
+      border-color: rgba(245, 166, 35, 0.25);
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    /* ── Warnings ── */
+    .warnings {
+      background: rgba(245, 166, 35, 0.08);
+      border: 1px solid rgba(245, 166, 35, 0.3);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+    }
+
+    .warnings-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--warn);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .warnings ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .warnings li {
+      font-size: 13px;
+      color: var(--warn);
+      padding-left: 14px;
+      position: relative;
+    }
+
+    .warnings li::before {
+      content: "⚠";
+      position: absolute;
+      left: 0;
+      font-size: 11px;
+    }
+
+    /* ── Report (Markdown) ── */
+    .report-markdown {
+      line-height: 1.8;
+      color: var(--text);
+    }
+
+    .report-markdown h1 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .report-markdown h2 {
+      font-size: 15px;
+      font-weight: 700;
+      margin: 22px 0 10px;
+      color: #a5b4fc;
+    }
+
+    .report-markdown h3 {
+      font-size: 14px;
+      font-weight: 600;
+      margin: 14px 0 8px;
+      color: #93c5fd;
+    }
+
+    .report-markdown p {
+      margin-bottom: 10px;
+    }
+
+    .report-markdown ul, .report-markdown ol {
+      padding-left: 20px;
+      margin-bottom: 10px;
+    }
+
+    .report-markdown li {
+      margin-bottom: 4px;
+    }
+
+    .report-markdown strong {
+      color: #e2e8f0;
+    }
+
+    .report-markdown hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 16px 0;
+    }
+
+    .report-markdown blockquote {
+      border-left: 3px solid var(--accent);
+      padding-left: 12px;
+      color: var(--muted);
+      margin: 8px 0;
+    }
+
+    /* ── Collapsible sections ── */
+    .section-accordion {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 20px;
+    }
+
+    .section-item {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: border-color 0.15s;
+    }
+
+    .section-item:hover { border-color: #3a4060; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .section-header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-icon {
+      font-size: 16px;
+    }
+
+    .section-name {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .section-chars {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .section-status {
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+
+    .section-chevron {
+      font-size: 12px;
+      color: var(--muted);
+      transition: transform 0.2s;
+    }
+
+    .section-chevron.open { transform: rotate(180deg); }
+
+    .section-body {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+      max-height: 520px;
+      overflow-y: auto;
+    }
+
+    /* ── Error ── */
+    .error-box {
+      background: rgba(245, 85, 74, 0.1);
+      border: 1px solid rgba(245, 85, 74, 0.35);
+      border-radius: 8px;
+      padding: 14px 16px;
+      color: var(--danger);
+      font-size: 13px;
+    }
+
+    .error-box strong { display: block; margin-bottom: 4px; font-size: 14px; }
+
+    /* ── Divider ── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 20px 0;
+    }
+
+    /* ── Login card ── */
+    .login-card {
+      max-width: 400px;
+      margin: 60px auto 0;
+    }
+
+    .login-card .card-title {
+      font-size: 17px;
+      text-align: center;
+      margin-bottom: 22px;
+    }
+
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .login-form .form-group {
+      width: 100%;
+    }
+
+    .login-form input {
+      width: 100%;
+    }
+
+    /* ── Quick examples ── */
+    .examples {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .example-chip {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: 12px;
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .example-chip:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ── Logout link ── */
+    .logout-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 12px;
+      text-decoration: underline;
+    }
+
+    .logout-btn:hover { color: var(--danger); }
+
+    /* ── Responsive ── */
+    @media (max-width: 540px) {
+      .form-row { flex-direction: column; }
+      .form-group input.symbol-input { width: 100%; }
+    }
+  </style>
+</head>
+
+<body>
+<div id="app">
+
+  <!-- ── Login ── -->
+  <div v-if="!token" class="app-shell">
+    <div class="login-card card">
+      <div class="card-title">🤖 TradingAgents — 登录</div>
+      <div class="login-form">
+        <div class="form-group">
+          <label>用户名</label>
+          <input v-model="loginForm.username" placeholder="username"
+                 @keyup.enter="login" :disabled="loginLoading" />
+        </div>
+        <div class="form-group">
+          <label>密码</label>
+          <input v-model="loginForm.password" type="password" placeholder="password"
+                 @keyup.enter="login" :disabled="loginLoading" />
+        </div>
+        <button class="btn btn-primary" @click="login" :disabled="loginLoading">
+          <span v-if="loginLoading"><span class="spinner"></span>登录中...</span>
+          <span v-else">登录</span>
+        </button>
+        <div v-if="loginError" class="error-box">{{ loginError }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Main app ── -->
+  <div v-else class="app-shell">
+
+    <!-- Header -->
+    <div class="app-header">
+      <div class="app-title">🤖 TradingAgents 综合分析</div>
+      <div class="user-badge">
+        <span>{{ currentUser }}</span>
+        <button class="logout-btn" @click="logout" style="margin-left:8px">退出</button>
+      </div>
+    </div>
+
+    <!-- Analysis form -->
+    <div class="card">
+      <div class="card-title">生成综合分析报告</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>市场</label>
+          <select v-model="form.market" :disabled="loading">
+            <option value="CN">CN — A股</option>
+            <option value="HK">HK — 港股</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>股票代码</label>
+          <input class="symbol-input" v-model="form.symbol"
+                 placeholder="如 600519" :disabled="loading"
+                 @keyup.enter="analyze" maxlength="10" />
+        </div>
+        <div class="form-group hours-group">
+          <label>新闻时效 (小时)</label>
+          <input type="number" v-model.number="form.hoursBack"
+                 min="1" max="720" :disabled="loading" />
+        </div>
+        <div class="form-group" style="justify-content:flex-end">
+          <button class="btn btn-primary" @click="analyze"
+                  :disabled="loading || !form.symbol.trim()">
+            <span v-if="loading"><span class="spinner"></span>分析中...</span>
+            <span v-else>生成综合分析</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick examples -->
+      <div class="examples" style="margin-top:14px">
+        <span style="font-size:12px;color:var(--muted);line-height:26px">快速示例：</span>
+        <span v-for="ex in examples" :key="ex.label"
+              class="example-chip" @click="fillExample(ex)">
+          {{ ex.label }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div v-if="loading" class="card">
+      <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+      <div class="loading-hint">
+        <span class="spinner"></span>
+        正在并行调用技术面、基本面、同行对比、新闻面四个 Agent，通常需要 60–180 秒，请耐心等待...
+      </div>
+      <div style="margin-top:16px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center">
+        <span v-for="a in agentNames" :key="a" class="agent-badge badge-timeout">
+          <span class="spinner" style="width:10px;height:10px;border-width:1.5px"></span>
+          {{ agentLabel(a) }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div v-if="errorMsg" class="error-box" style="margin-bottom:20px">
+      <strong>请求失败</strong>{{ errorMsg }}
+    </div>
+
+    <!-- Results -->
+    <template v-if="result">
+
+      <!-- Metadata bar -->
+      <div class="card">
+        <div class="meta-bar">
+          <div class="generated-at">
+            📅 生成时间：{{ formatTime(result.metadata.generated_at) }}
+            &nbsp;·&nbsp; {{ result.market }} / {{ result.symbol }}
+          </div>
+        </div>
+
+        <!-- Agent status badges -->
+        <div class="agent-badges">
+          <span v-for="(info, name) in result.metadata.agents" :key="name"
+                :class="['agent-badge', badgeClass(info.status)]">
+            <span class="dot"></span>
+            {{ agentLabel(name) }}
+            <span style="opacity:0.7;font-weight:400">({{ info.status }})</span>
+            <span v-if="info.message" :title="info.message" style="cursor:help">ⓘ</span>
+          </span>
+        </div>
+
+        <!-- Warnings -->
+        <div v-if="result.metadata.warnings.length" class="warnings">
+          <div class="warnings-title">数据质量提示</div>
+          <ul>
+            <li v-for="w in result.metadata.warnings" :key="w">{{ translateWarning(w) }}</li>
+          </ul>
+        </div>
+
+        <hr class="divider" />
+
+        <!-- Main report -->
+        <div class="report-markdown" v-html="renderMarkdown(result.report)"></div>
+      </div>
+
+      <!-- Sub-report accordion -->
+      <div class="card">
+        <div class="card-title">📂 各维度子报告（点击展开）</div>
+        <div class="section-accordion">
+          <div v-for="sec in sectionDefs" :key="sec.key" class="section-item">
+            <div class="section-header" @click="toggleSection(sec.key)">
+              <div class="section-header-left">
+                <span class="section-icon">{{ sec.icon }}</span>
+                <span class="section-name">{{ sec.label }}</span>
+                <span class="section-chars">
+                  ({{ (result.sections[sec.key] || '').length }} 字)
+                </span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span :class="['agent-badge','btn-sm',
+                       badgeClass(result.metadata.agents[sec.key]?.status)]"
+                      style="padding:2px 8px;font-size:11px">
+                  {{ result.metadata.agents[sec.key]?.status || 'unknown' }}
+                </span>
+                <span :class="['section-chevron', openSections[sec.key] ? 'open' : '']">▼</span>
+              </div>
+            </div>
+            <div v-if="openSections[sec.key]" class="section-body">
+              <div class="report-markdown"
+                   v-html="renderMarkdown(result.sections[sec.key] || '（无内容）')">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </template>
+
+  </div><!-- end main app -->
+</div><!-- end #app -->
+
+<script>
+const { createApp, ref, reactive, computed } = Vue;
+
+const API_BASE = 'http://localhost:8000/api/v1';
+
+const AGENT_LABELS = {
+  technical:       '技术面',
+  fundamental:     '基本面',
+  peer_comparison: '同行对比',
+  news:            '新闻面',
+};
+
+const WARNING_MAP = {
+  'HK fundamentals coverage is limited.':       'HK 港股基本面数据覆盖有限，财务字段多为缺失。',
+  'valuation fields are missing.':               'PE / PB 等估值字段缺失，无法进行估值评价。',
+  'peer comparison is unavailable.':             '暂无同行配置，无法进行横向对比。',
+  'news data is unavailable.':                   '当前时间窗口内无可用新闻数据。',
+  'news relevance may be limited.':              '港股新闻通过关键词搜索获取，相关性可能较弱。',
+};
+
+createApp({
+  setup() {
+    // ── Auth state ─────────────────────────────────────────────────────────
+    const token       = ref(localStorage.getItem('ta_token') || '');
+    const currentUser = ref(localStorage.getItem('ta_user') || '');
+    const loginForm   = reactive({ username: '', password: '' });
+    const loginLoading = ref(false);
+    const loginError   = ref('');
+
+    async function login() {
+      if (!loginForm.username || !loginForm.password) return;
+      loginLoading.value = true;
+      loginError.value = '';
+      try {
+        const res = await fetch(`${API_BASE}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: loginForm.username, password: loginForm.password }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          loginError.value = data.detail || `HTTP ${res.status}`;
+          return;
+        }
+        token.value = data.access_token;
+        currentUser.value = loginForm.username;
+        localStorage.setItem('ta_token', data.access_token);
+        localStorage.setItem('ta_user', loginForm.username);
+      } catch (e) {
+        loginError.value = `网络错误：${e.message}`;
+      } finally {
+        loginLoading.value = false;
+      }
+    }
+
+    function logout() {
+      token.value = '';
+      currentUser.value = '';
+      result.value = null;
+      errorMsg.value = '';
+      localStorage.removeItem('ta_token');
+      localStorage.removeItem('ta_user');
+    }
+
+    // ── Analysis form ───────────────────────────────────────────────────────
+    const form = reactive({
+      market:    'CN',
+      symbol:    '',
+      hoursBack: 72,
+    });
+
+    const examples = [
+      { label: 'CN / 贵州茅台 600519', market: 'CN', symbol: '600519' },
+      { label: 'CN / 平安银行 000001', market: 'CN', symbol: '000001' },
+      { label: 'CN / 宁德时代 300750', market: 'CN', symbol: '300750' },
+      { label: 'HK / 腾讯控股 700',    market: 'HK', symbol: '700'    },
+      { label: 'HK / 阿里巴巴 9988',   market: 'HK', symbol: '9988'   },
+    ];
+
+    function fillExample(ex) {
+      form.market = ex.market;
+      form.symbol = ex.symbol;
+    }
+
+    // ── Analysis state ──────────────────────────────────────────────────────
+    const loading  = ref(false);
+    const errorMsg = ref('');
+    const result   = ref(null);
+    const agentNames = ['technical', 'fundamental', 'peer_comparison', 'news'];
+
+    async function analyze() {
+      const sym = form.symbol.trim();
+      if (!sym || loading.value) return;
+      loading.value  = true;
+      errorMsg.value = '';
+      result.value   = null;
+
+      try {
+        const res = await fetch(`${API_BASE}/analysis/comprehensive`, {
+          method: 'POST',
+          headers: {
+            'Content-Type':  'application/json',
+            'Authorization': `Bearer ${token.value}`,
+          },
+          body: JSON.stringify({
+            market: form.market,
+            symbol: sym,
+          }),
+        });
+
+        if (res.status === 401) {
+          logout();
+          loginError.value = '登录已过期，请重新登录';
+          return;
+        }
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          errorMsg.value = data.detail || `HTTP ${res.status}`;
+          return;
+        }
+
+        result.value = data;
+        // Auto-open the report section only
+        openSections.value = { technical: false, fundamental: false,
+                                peer_comparison: false, news: false };
+      } catch (e) {
+        errorMsg.value = `网络错误：${e.message}`;
+      } finally {
+        loading.value = false;
+      }
+    }
+
+    // ── Accordion ───────────────────────────────────────────────────────────
+    const openSections = ref({});
+
+    function toggleSection(key) {
+      openSections.value[key] = !openSections.value[key];
+    }
+
+    const sectionDefs = [
+      { key: 'technical',       label: '技术面分析',   icon: '📈' },
+      { key: 'fundamental',     label: '基本面分析',   icon: '📊' },
+      { key: 'peer_comparison', label: '同行对比分析', icon: '🏢' },
+      { key: 'news',            label: '新闻面分析',   icon: '📰' },
+    ];
+
+    // ── Helpers ─────────────────────────────────────────────────────────────
+    function agentLabel(name) {
+      return AGENT_LABELS[name] || name;
+    }
+
+    function badgeClass(status) {
+      return status === 'success' ? 'badge-success'
+           : status === 'timeout' ? 'badge-timeout'
+           : 'badge-failed';
+    }
+
+    function translateWarning(w) {
+      return WARNING_MAP[w] || w;
+    }
+
+    function renderMarkdown(text) {
+      if (!text) return '';
+      const raw = marked.parse(text);
+      return typeof DOMPurify !== 'undefined' ? DOMPurify.sanitize(raw) : raw;
+    }
+
+    function formatTime(iso) {
+      if (!iso) return '—';
+      try {
+        return new Date(iso).toLocaleString('zh-CN', {
+          year: 'numeric', month: '2-digit', day: '2-digit',
+          hour: '2-digit', minute: '2-digit', second: '2-digit',
+          hour12: false,
+        });
+      } catch { return iso; }
+    }
+
+    return {
+      token, currentUser, loginForm, loginLoading, loginError,
+      login, logout,
+      form, examples, fillExample,
+      loading, errorMsg, result, agentNames,
+      analyze,
+      openSections, toggleSection, sectionDefs,
+      agentLabel, badgeClass, translateWarning,
+      renderMarkdown, formatTime,
+    };
+  },
+}).mount('#app');
+</script>
+</body>
+</html>

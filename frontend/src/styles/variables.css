@@ -1,0 +1,270 @@
+/*
+ * CSS Variables — Theme System (M32)
+ *
+ * Three themes applied via html[data-theme]:
+ *   light-holo   流光幻岛 (light default)
+ *   dark-dive    极夜深潜 (dark professional)
+ *   paper-lilac  晨暮丁香 (reading warm)
+ *
+ * :root provides the dark-dive fallback for any case where JS fails to
+ * set data-theme before first paint.
+ *
+ * Legacy aliases (--bg, --surface, --surface2, --text, --muted, --border,
+ * --accent, --accent2, --success, --danger, --warn, --radius) are mapped
+ * per-theme so existing scoped components keep working without changes.
+ */
+
+/* ── Shape / motion tokens (theme-independent) ─────────────────────────── */
+:root {
+  --radius-card:     10px;
+  --radius-control:  6px;
+  --motion-fast:     0.15s;
+  --motion-normal:   0.25s;
+  --line-height-body: 1.6;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   dark-dive  极夜深潜
+   Also serves as the :root fallback when data-theme is absent.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root,
+html[data-theme="dark-dive"] {
+  /* ── Background ── */
+  --bg-page:          #0b1120;
+  --bg-page-gradient: radial-gradient(circle at top left, rgba(124,58,237,0.12), transparent 30%),
+                      #0b1120;
+
+  /* ── Surfaces ── */
+  --surface-card:        #111827;
+  --surface-card-strong: #151f32;
+  --surface-glass:       rgba(17,24,39,0.78);
+  --surface-muted:       #1f2937;
+
+  /* ── Text ── */
+  --text-primary:   #f3f4f6;
+  --text-secondary: #cbd5e1;
+  --text-muted:     #94a3b8;
+  --text-inverse:   #0f1117;
+
+  /* ── Borders ── */
+  --border-soft: rgba(255,255,255,0.06);
+  --border-glow: rgba(168,85,247,0.22);
+
+  /* ── Shadows ── */
+  --shadow-soft: none;
+  --shadow-card: none;
+
+  /* ── Accent ── */
+  --accent-primary:   #8b5cf6;
+  --accent-secondary: #6366f1;
+  --accent-gradient:  linear-gradient(135deg, #6366f1, #8b5cf6);
+  --accent-glow:      rgba(139,92,246,0.20);
+
+  /* ── Stock colors (Chinese convention: red = up, green = down) ── */
+  --up-color:      #ef5350;
+  --down-color:    #26a69a;
+  --neutral-color: #94a3b8;
+
+  /* ── Status tint backgrounds & rings ── */
+  --status-up-bg:     rgba(239,83,80,0.12);
+  --status-up-ring:   rgba(239,83,80,0.32);
+  --status-down-bg:   rgba(38,166,154,0.12);
+  --status-down-ring: rgba(38,166,154,0.30);
+  --status-warn-bg:   rgba(245,166,35,0.10);
+  --status-warn-ring: rgba(245,166,35,0.32);
+  --status-info-bg:   rgba(139,92,246,0.10);
+  --status-info-ring: rgba(139,92,246,0.28);
+
+  /* ── Interactive surface states ── */
+  --surface-hover:  rgba(255,255,255,0.04);
+  --surface-active: rgba(255,255,255,0.07);
+
+  /* ── Chart ── */
+  --chart-grid:           #1f2937;
+  --chart-bg:             #0b1120;
+  --chart-volume-up:      rgba(239,83,80,0.45);
+  --chart-volume-down:    rgba(38,166,154,0.45);
+  --chart-ma5:            #4f8ef7;
+  --chart-ma10:           #f5a623;
+  --chart-ma20:           #f5554a;
+  --chart-ma60:           #a78bfa;
+  --chart-rsi-overbought: rgba(239,83,80,0.40);
+  --chart-rsi-oversold:   rgba(38,166,154,0.40);
+
+  /* ── Legacy aliases ── */
+  --bg:      #0b1120;
+  --surface: #111827;
+  --surface2:#1f2937;
+  --text:    #f3f4f6;
+  --muted:   #94a3b8;
+  --border:  #2e3347;
+  --accent:  #8b5cf6;
+  --accent2: #6366f1;
+  --success: #26a69a;
+  --warn:    #f5a623;
+  --danger:  #ef5350;
+  --radius:  10px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   light-holo  流光幻岛  (浅色默认)
+   ═══════════════════════════════════════════════════════════════════════════ */
+html[data-theme="light-holo"] {
+  /* ── Background ── */
+  --bg-page:          #f0f4fa;
+  --bg-page-gradient: radial-gradient(circle at top left, rgba(79,142,247,0.10), transparent 32%),
+                      radial-gradient(circle at bottom right, rgba(139,92,246,0.08), transparent 36%),
+                      #f0f4fa;
+
+  /* ── Surfaces ── */
+  --surface-card:        #ffffff;
+  --surface-card-strong: #ffffff;
+  --surface-glass:       rgba(255,255,255,0.80);
+  --surface-muted:       #e8edf5;
+
+  /* ── Text ── */
+  --text-primary:   #111827;
+  --text-secondary: #4b5563;
+  --text-muted:     #8a94a6;
+  --text-inverse:   #ffffff;
+
+  /* ── Borders ── */
+  --border-soft: rgba(79,142,247,0.14);
+  --border-glow: rgba(139,92,246,0.20);
+
+  /* ── Shadows ── */
+  --shadow-soft: 0 18px 48px rgba(79,142,247,0.10);
+  --shadow-card: 0 2px 12px rgba(15,23,42,0.07);
+
+  /* ── Accent ── */
+  --accent-primary:   #2563eb;
+  --accent-secondary: #8b5cf6;
+  --accent-gradient:  linear-gradient(135deg, #2563eb, #8b5cf6);
+  --accent-glow:      rgba(37,99,235,0.12);
+
+  /* ── Stock colors ── */
+  --up-color:      #e5485d;
+  --down-color:    #16a085;
+  --neutral-color: #64748b;
+
+  /* ── Status tint backgrounds & rings ── */
+  --status-up-bg:     rgba(229,72,93,0.10);
+  --status-up-ring:   rgba(229,72,93,0.28);
+  --status-down-bg:   rgba(22,160,133,0.10);
+  --status-down-ring: rgba(22,160,133,0.26);
+  --status-warn-bg:   rgba(217,119,6,0.09);
+  --status-warn-ring: rgba(217,119,6,0.26);
+  --status-info-bg:   rgba(37,99,235,0.08);
+  --status-info-ring: rgba(37,99,235,0.24);
+
+  /* ── Interactive surface states ── */
+  --surface-hover:  rgba(0,0,0,0.04);
+  --surface-active: rgba(0,0,0,0.08);
+
+  /* ── Chart ── */
+  --chart-grid:           #dde3ed;
+  --chart-bg:             #ffffff;
+  --chart-volume-up:      rgba(229,72,93,0.35);
+  --chart-volume-down:    rgba(22,160,133,0.35);
+  --chart-ma5:            #2563eb;
+  --chart-ma10:           #d97706;
+  --chart-ma20:           #e5485d;
+  --chart-ma60:           #7c3aed;
+  --chart-rsi-overbought: rgba(229,72,93,0.40);
+  --chart-rsi-oversold:   rgba(22,160,133,0.40);
+
+  /* ── Legacy aliases ── */
+  --bg:      #f0f4fa;
+  --surface: #ffffff;
+  --surface2:#e8edf5;
+  --text:    #111827;
+  --muted:   #8a94a6;
+  --border:  #d1d9e6;
+  --accent:  #2563eb;
+  --accent2: #8b5cf6;
+  --success: #16a085;
+  --warn:    #d97706;
+  --danger:  #e5485d;
+  --radius:  10px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   paper-lilac  晨暮丁香  (护眼阅读)
+   ═══════════════════════════════════════════════════════════════════════════ */
+html[data-theme="paper-lilac"] {
+  /* ── Background ── */
+  --bg-page:          #f6f2ec;
+  --bg-page-gradient: radial-gradient(circle at top left, rgba(196,181,253,0.12), transparent 30%),
+                      #f6f2ec;
+
+  /* ── Surfaces ── */
+  --surface-card:        #fffdf9;
+  --surface-card-strong: #fffdf9;
+  --surface-glass:       rgba(255,253,249,0.85);
+  --surface-muted:       #ede8e0;
+
+  /* ── Text ── */
+  --text-primary:   #3f3a36;
+  --text-secondary: #6f6760;
+  --text-muted:     #9a9188;
+  --text-inverse:   #fffdf9;
+
+  /* ── Borders ── */
+  --border-soft: rgba(93,82,72,0.12);
+  --border-glow: rgba(196,181,253,0.18);
+
+  /* ── Shadows ── */
+  --shadow-soft: 0 12px 32px rgba(91,72,60,0.06);
+  --shadow-card: 0 2px 12px rgba(91,72,60,0.06);
+
+  /* ── Accent ── */
+  --accent-primary:   #9f8ad7;
+  --accent-secondary: #c4b5fd;
+  --accent-gradient:  linear-gradient(135deg, #b9a5e8, #d8c8ff);
+  --accent-glow:      rgba(159,138,215,0.15);
+
+  /* ── Stock colors ── */
+  --up-color:      #c86f75;
+  --down-color:    #6f9f91;
+  --neutral-color: #8c837a;
+
+  /* ── Status tint backgrounds & rings ── */
+  --status-up-bg:     rgba(200,111,117,0.10);
+  --status-up-ring:   rgba(200,111,117,0.26);
+  --status-down-bg:   rgba(111,159,145,0.10);
+  --status-down-ring: rgba(111,159,145,0.26);
+  --status-warn-bg:   rgba(194,136,58,0.09);
+  --status-warn-ring: rgba(194,136,58,0.26);
+  --status-info-bg:   rgba(159,138,215,0.10);
+  --status-info-ring: rgba(159,138,215,0.26);
+
+  /* ── Interactive surface states ── */
+  --surface-hover:  rgba(0,0,0,0.03);
+  --surface-active: rgba(0,0,0,0.06);
+
+  /* ── Chart ── */
+  --chart-grid:           #e4ddd4;
+  --chart-bg:             #fffdf9;
+  --chart-volume-up:      rgba(200,111,117,0.35);
+  --chart-volume-down:    rgba(111,159,145,0.35);
+  --chart-ma5:            #9f8ad7;
+  --chart-ma10:           #c2883a;
+  --chart-ma20:           #c86f75;
+  --chart-ma60:           #8b5cf6;
+  --chart-rsi-overbought: rgba(200,111,117,0.40);
+  --chart-rsi-oversold:   rgba(111,159,145,0.40);
+
+  /* ── Legacy aliases ── */
+  --bg:      #f6f2ec;
+  --surface: #fffdf9;
+  --surface2:#ede8e0;
+  --text:    #3f3a36;
+  --muted:   #9a9188;
+  --border:  #d8d0c5;
+  --accent:  #9f8ad7;
+  --accent2: #c4b5fd;
+  --success: #6f9f91;
+  --warn:    #c2883a;
+  --danger:  #c86f75;
+  --radius:  10px;
+}

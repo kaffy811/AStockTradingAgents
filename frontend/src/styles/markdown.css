@@ -1,0 +1,109 @@
+/*
+ * Markdown rendering styles — must be imported globally.
+ * v-html injected content does not receive Vue scoped data-v-* attributes,
+ * so scoped CSS cannot style elements inside v-html. These rules must be global.
+ */
+
+.report-markdown {
+  line-height: 1.8;
+  color: var(--text);
+}
+
+.report-markdown h1 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.report-markdown h2 {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 22px 0 10px;
+  color: #a5b4fc;
+}
+
+.report-markdown h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 14px 0 8px;
+  color: #93c5fd;
+}
+
+.report-markdown p {
+  margin-bottom: 10px;
+}
+
+.report-markdown ul,
+.report-markdown ol {
+  padding-left: 20px;
+  margin-bottom: 10px;
+}
+
+.report-markdown li {
+  margin-bottom: 4px;
+}
+
+.report-markdown strong {
+  color: #e2e8f0;
+}
+
+.report-markdown hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 16px 0;
+}
+
+.report-markdown blockquote {
+  border-left: 3px solid var(--accent);
+  padding: 6px 12px;
+  color: var(--muted);
+  margin: 8px 0;
+  background: rgba(165, 180, 252, 0.05);
+  border-radius: 0 4px 4px 0;
+}
+
+.report-markdown table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  font-size: 13px;
+  overflow-x: auto;
+  display: block;
+}
+
+.report-markdown th,
+.report-markdown td {
+  border: 1px solid var(--border);
+  padding: 6px 10px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.report-markdown th {
+  background: rgba(165, 180, 252, 0.1);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.report-markdown td {
+  color: var(--text);
+}
+
+.report-markdown tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.report-markdown code {
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-size: 12px;
+  background: rgba(165, 180, 252, 0.1);
+  border-radius: 3px;
+  padding: 1px 5px;
+  color: #c4b5fd;
+}

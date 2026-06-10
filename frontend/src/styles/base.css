@@ -1,0 +1,203 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg-page-gradient, var(--bg));
+  background-attachment: fixed;
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+               "Microsoft YaHei", sans-serif;
+  font-size: 14px;
+  line-height: var(--line-height-body, 1.6);
+  min-height: 100vh;
+}
+
+/* ── Layout ── */
+.app-shell {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px 16px 64px;
+}
+
+/* ── Card ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+
+/* ── Form ── */
+.form-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.form-group input,
+.form-group select {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  padding: 8px 12px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s;
+  min-width: 120px;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: var(--accent);
+}
+
+/* ── Buttons ── */
+.btn {
+  border: none;
+  border-radius: 6px;
+  padding: 9px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  white-space: nowrap;
+}
+
+.btn:active:not(:disabled) { transform: scale(0.97); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.btn-primary {
+  background: var(--accent-gradient, linear-gradient(135deg, var(--accent), var(--accent2)));
+  color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) { opacity: 0.88; }
+
+.btn-secondary {
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover:not(:disabled) { border-color: var(--accent); }
+
+.btn-sm {
+  padding: 5px 12px;
+  font-size: 12px;
+}
+
+/* ── Spinner ── */
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Agent Badges (shared: AgentStatusBar + SectionAccordion) ── */
+.agent-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid transparent;
+}
+
+.badge-success {
+  background: rgba(45, 217, 139, 0.12);
+  color: var(--success);
+  border-color: rgba(45, 217, 139, 0.25);
+}
+
+.badge-failed {
+  background: rgba(245, 85, 74, 0.12);
+  color: var(--danger);
+  border-color: rgba(245, 85, 74, 0.25);
+}
+
+.badge-timeout {
+  background: rgba(245, 166, 35, 0.12);
+  color: var(--warn);
+  border-color: rgba(245, 166, 35, 0.25);
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* ── Error Box (shared: LoginCard + ErrorBox) ── */
+.error-box {
+  background: rgba(245, 85, 74, 0.1);
+  border: 1px solid rgba(245, 85, 74, 0.35);
+  border-radius: 8px;
+  padding: 14px 16px;
+  color: var(--danger);
+  font-size: 13px;
+}
+
+.error-box strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+/* ── Divider ── */
+.divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 20px 0;
+}
+
+/* ── Responsive ──
+   Breakpoint convention:
+   - 480px  phone-first fixes (iPhone SE 375px → iPhone 15 Plus 430px)
+   - 540px  legacy small-tablet breakpoint; kept for existing components
+   - 640px  BottomTabBar breakpoint (M6)
+   Prefer 480px for new mobile-only rules unless the component already uses 540px.
+*/
+@media (max-width: 540px) {
+  .form-row { flex-direction: column; }
+}
+
+/* ── M6: Extra bottom padding so content isn't hidden behind BottomTabBar ── */
+@media (max-width: 640px) {
+  .app-shell {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom));
+  }
+}

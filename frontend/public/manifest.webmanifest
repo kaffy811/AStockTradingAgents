@@ -1,0 +1,11 @@
+{
+  "name": "TradingAgents",
+  "short_name": "TradingAgents",
+  "description": "AI 多 Agent 股票研究系统",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "lang": "zh-CN",
+  "icons": []
+}

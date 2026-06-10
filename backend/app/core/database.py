@@ -44,9 +44,37 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 
 
 async def init_db() -> None:
-    """Create all tables. Called once at startup (dev/staging)."""
+    """Ensure tables exist at startup.
+
+    Development / staging (default):
+        create_all is a safe no-op for tables that already exist, and creates
+        any new table that was added since the last manual migration.  It is
+        intentionally kept as a convenience for local development.
+
+    Production (ENABLE_CREATE_ALL=false):
+        Set this env var to skip create_all and rely exclusively on Alembic.
+        Run ``uv run alembic upgrade head`` before starting the server.
+
+    NOTE (D2-c baseline):
+        Alembic has been initialised (revision 4b49004d01a6).  The DB has
+        been stamped to ``head``.  Future schema changes should be made via
+        ``alembic revision --autogenerate`` + ``alembic upgrade head``.
+        See docs/deployment_docker.md §Alembic 迁移管理.
+    """
+    if not settings.enable_create_all:
+        import logging
+        logging.getLogger(__name__).info(
+            "ENABLE_CREATE_ALL=false — skipping create_all; "
+            "run 'alembic upgrade head' before first start."
+        )
+        return
+
     # Import all ORM models so Base.metadata is fully populated before create_all.
-    from app.models import user  # noqa: F401
+    from app.models import user             # noqa: F401
+    from app.models import analysis_report  # noqa: F401
+    from app.models import industry           # noqa: F401
+    from app.models import industry_hot_stock # noqa: F401
+    from app.models import watchlist_item     # noqa: F401
 
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)

@@ -1,0 +1,116 @@
+# ── TradingAgents — Docker Compose ───────────────────────────────────────────
+#
+# Services:
+#   redis    — in-memory cache (internal only, not exposed to host)
+#   migrate  — one-shot Alembic runner (exits 0 after upgrade head)
+#   backend  — FastAPI + uvicorn (internal only, fronted by Nginx)
+#   frontend — Nginx: serves Vue SPA + reverse-proxies /api/v1 to backend
+#
+# PostgreSQL is NOT included here — continue using Supabase cloud (DATABASE_URL
+# in .env points to the Supabase Transaction Pooler endpoint).
+#
+# First deploy:
+#   cp .env.example .env
+#   # Fill in DATABASE_URL, SECRET_KEY, DEEPSEEK_API_KEY
+#   docker compose up -d redis
+#   docker compose run --rm migrate
+#   docker compose up -d backend frontend
+#
+# Subsequent deploys (after code changes):
+#   git pull
+#   docker compose build
+#   docker compose run --rm migrate
+#   docker compose up -d
+#
+# Day-to-day restart (no schema changes):
+#   docker compose up -d
+
+services:
+
+  # ── Redis ──────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    # No ports: section — Redis is intentionally NOT exposed to the host.
+    # Only the backend container needs access, via the internal Docker network.
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - internal
+
+  # ── Migrate (one-shot Alembic runner) ─────────────────────────────────────
+  migrate:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      # Always run in production mode — no create_all, Alembic manages schema.
+      - ENABLE_CREATE_ALL=false
+      - APP_ENV=production
+      - REDIS_URL=redis://redis:6379
+    command: uv run alembic upgrade head
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - internal
+    # restart: no is the default for one-shot containers — do not add restart policy.
+
+  # ── Backend ────────────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      # Ensure the compose-internal Redis service name is always used.
+      # This overrides any REDIS_URL value in .env.
+      - REDIS_URL=redis://redis:6379
+      - APP_ENV=production
+      - DEBUG=false
+      # Analysis Run Registry mode. Default: memory (in-process, single-worker only).
+      # Set to redis for multi-worker / cross-process state sharing (M40-b).
+      # Requires REDIS_URL to be reachable; Redis unavailable = fail-fast (HTTP 503).
+      # - ANALYSIS_RUN_REGISTRY=redis
+      # Default Analysis Engine (M42 G2 灰度). Default: custom_coordinator.
+      # Set to langgraph to grey-release LangGraph as default when no engine is
+      # explicitly provided in the request body. Explicit engine in request always wins.
+      # - DEFAULT_ANALYSIS_ENGINE=custom_coordinator
+      # - DEFAULT_ANALYSIS_ENGINE=langgraph
+    expose:
+      # Expose port 8000 to other containers on the internal network only.
+      # Do NOT add a "ports:" section here — traffic comes through Nginx.
+      - "8000"
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - internal
+
+  # ── Frontend (Nginx) ───────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # Bake the relative API base into the Vite bundle so the browser
+        # calls /api/v1/* — Nginx proxies these to backend:8000.
+        - VITE_API_BASE=/api/v1
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge
