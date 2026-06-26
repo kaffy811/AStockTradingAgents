@@ -27,6 +27,27 @@ class Settings(BaseSettings):
     deepseek_model: str = "deepseek-v4-flash"
     openai_api_key: str | None = None
 
+    # Embedding (Phase 2C / 2D.5)
+    # Supported values: mock (default, CI-safe) | openai | deepseek
+    embedding_provider: str = "mock"
+    embedding_model: str | None = None          # override default model per provider
+    embedding_batch_size: int = 64              # max texts per embed_texts() API call
+    # Batch-level retry for OpenAI provider (Phase 2D.5)
+    embedding_batch_retry_count: int = 2        # retries per batch (0 = no retry)
+    embedding_batch_retry_backoff_seconds: float = 1.5  # initial backoff; doubles each retry
+    embedding_batch_timeout_seconds: float = 30.0       # per-batch HTTP timeout
+
+    # RAG hybrid search weights (Phase 2D)
+    # combined = vector_weight*v + keyword_weight*k + source_boost + recency_boost
+    # When one score is absent the weights are auto-normalised (see financial_rag_tool.py)
+    rag_vector_weight: float = 0.6
+    rag_keyword_weight: float = 0.3
+    rag_source_boost_weight: float = 0.07       # max additive boost for official sources
+    rag_recency_boost_weight: float = 0.03      # max additive boost for very recent docs
+    rag_mmr_enabled: bool = True                # Maximal Marginal Relevance diversity
+    rag_mmr_lambda: float = 0.7                 # relevance/diversity trade-off (0=diverse,1=relevant)
+    rag_mmr_max_per_doc: int = 2               # max chunks per document in MMR output
+
     # Database
     database_url: str = Field(..., description="postgresql+asyncpg://...")
     redis_url: str | None = "redis://localhost:6379"
@@ -49,6 +70,13 @@ class Settings(BaseSettings):
     # 设置 DEFAULT_ANALYSIS_ENGINE=langgraph 可将 staging 灰度至 LangGraph。
     # 非法值自动 fallback 至 custom_coordinator，不影响服务启动。
     default_analysis_engine: str = "custom_coordinator"
+
+    # Multi-Agent Orchestrator (Phase 2E-1)
+    # 默认关闭。设置 ENABLE_MULTI_AGENT_ORCHESTRATOR=true 后对复杂金融研究问题
+    # 启用多 Agent 编排（FundamentalAgent / MarketAgent / NewsAgent / RiskReview / Synthesis）。
+    # 简单行情查询仍走原 FinancialAgent 单 Agent 路径。
+    # Orchestrator 内部异常时自动 fallback 至原 FinancialAgent。
+    enable_multi_agent_orchestrator: bool = False
 
     # Auth
     secret_key: str = Field(..., min_length=16)

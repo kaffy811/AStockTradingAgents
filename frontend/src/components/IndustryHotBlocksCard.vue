@@ -52,6 +52,7 @@
       <button
         v-for="(ind, idx) in visibleIndustries"
         :key="ind.industry_code"
+        :data-industry-code="ind.industry_code"
         :class="['ihbc-row', ind.industry_code === selectedCode ? 'ihbc-row--selected' : '']"
         @click="emit('select', ind.industry_code)"
       >

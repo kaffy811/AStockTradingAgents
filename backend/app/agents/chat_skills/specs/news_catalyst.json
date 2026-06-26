@@ -1,0 +1,40 @@
+{
+  "name": "news_catalyst_skill",
+  "display_name": "新闻催化剂拆解",
+  "display_name_en": "News Catalyst Analysis",
+  "version": "c9_v1",
+  "description": "分析近期新闻催化剂，区分已发生事实与市场预期，评估利好利空的实质性与持续性。",
+  "enabled": true,
+  "category": "financial_research",
+  "permission_level": "read_only",
+  "required_tools": [
+    "resolve_stock_tool",
+    "get_latest_news_tool",
+    "get_quote_tool"
+  ],
+  "optional_tools": [],
+  "intent_examples": [
+    "有没有实质利好？",
+    "新闻有什么影响？",
+    "订单兑现了吗？",
+    "消息影响怎么样？"
+  ],
+  "output_sections": [
+    "新闻催化剂摘要",
+    "关键发现",
+    "后续观察",
+    "免责声明"
+  ],
+  "safety_rules": [
+    "no_trading_advice",
+    "no_price_target",
+    "external_content_untrusted",
+    "must_include_disclaimer",
+    "news_text_not_stored_in_memory"
+  ],
+  "failure_handling": [
+    "missing_stock_requires_clarification",
+    "news_empty_must_be_disclosed",
+    "tool_failure_returns_partial_result"
+  ]
+}

@@ -197,12 +197,12 @@ async def get_industry_constituents(
 async def get_industry_hot_stocks(
     market:        str,
     industry_code: str,
-    limit:         int          = Query(20, ge=1, le=50),
+    limit:         int          = Query(20, ge=1, le=100),
     user:          User         = Depends(get_current_user),
     db:            AsyncSession = Depends(get_db),
 ) -> HotStockResponse:
     """
-    查询行业最新 trade_date 的热门股 Top-N。
+    查询行业最新 trade_date 的热门股 Top-N（上限 100）。
 
     无快照时返回 items=[]，HTTP 200，data_quality.message 说明原因。
     """
@@ -215,6 +215,7 @@ async def get_industry_hot_stocks(
         industry_name = result["industry_name"],
         trade_date    = result["trade_date"],
         score_version = result["score_version"],
+        total         = result.get("total", 0),
         items         = [HotStockItem.model_validate(i) for i in result["items"]],
         data_quality  = HotStockDataQuality(**result["data_quality"]),
     )

@@ -1,6 +1,6 @@
 # TradingAgents Demo 演示指南
 
-> 状态：M22 完成版（2026-06-06）  
+> 状态：C5 Chat Copilot Action Tools + ConfirmationManager 完成（2026-06-18）  
 > 定位：研究辅助工具，不提供投资建议。
 
 ---
@@ -45,9 +45,11 @@ npm run dev
   - 底部风险提示："仅供研究参考，不构成投资建议。"
 - 展示 **HomeDashboardPanel** 仪表盘（首屏无需分析即可看到）：
   - Stats bar：最近报告数 / 自选股数 / 最近搜索数 / 行业热门数
-  - 最近报告、自选快跳、最近搜索 chips、行业热门 5 条
+  - 左列：最近报告（top 3）、自选快跳（top 4，含"批量对比"入口）
+  - 右列：行业热门板块（top 6，按 hot_score 降序）、行业热股（compact）
   - 底部 compare bar（有对比列表时显示）
 - 点击自选快跳"填入"或行业热门股 → 填入 StockInputPanel（不自动分析）
+- 点击自选快跳"批量对比" → /watchlist?mode=compare，自动进入批量选择模式
 
 ### Step 2：搜索 CN/000001 并确认身份（20s）
 
@@ -139,6 +141,55 @@ npm run dev
 - 说明：生产环境用户无此选项，默认始终为 custom_coordinator
 - 说明 LangGraph 架构：Send API fan-out → collect_node fan-in，已通过 A/B 对比验证
 
+### Step 13：Chat Copilot — Agentic AI 体验（60s）
+
+- 点击 BottomTabBar 最右侧"Chat"tab，进入 `/chat`
+- **演示异动分析场景：**
+  - 输入："中船特气今天为什么涨了这么多？"
+  - 展示 **ChatToolTrace**：resolve_stock → get_quote → get_kline_summary → get_latest_news（4 工具链）
+  - 展示 **ChatResultCard**：行情摘要 + 新闻摘要 + 免责声明
+- **演示加入自选场景：**
+  - 输入："把中船特气加入我的自选股"
+  - 展示 **ConfirmActionCard**：确认卡片
+  - 说明：C4 阶段 mock confirmation；C5 阶段接入真实写操作
+- **演示行业热点场景：**
+  - 输入："今天哪些行业热度最高"
+  - 展示 **ChatResultCard** industry_hot 卡片
+
+**讲解要点：**
+- Tool Registry 架构：BaseTool ABC → ToolResult → ToolRegistry，9 只工具，权限 4 级（read_only/write_user_data/long_running/sensitive）
+- 写操作全部走 ConfirmationManager，永不自动执行
+- 安全边界：所有 answer 含免责声明，禁止买入/卖出/持有/目标价
+- OpenClaw-inspired 全链路：C5 Action Tools → C6 Financial Skills → C7 Planner → C8 Memory + Audit → **C9 OpenClaw-style Skill Registry ✅**
+- "这是当前 Agent 可用金融技能列表（GET /chat/skills）—— 技能并非前端按钮，而是后端可注册、可发现、可禁用、可审计的 Agent 能力"
+- SkillSpec JSON 文件化：每个技能声明 required_tools、safety_rules、enabled 状态，SkillRegistry 启动时校验工具可用性
+
+### Step 14：SSE Streaming 演示（60s，C13-a 新增）
+
+- **演示正常研究问题的流式响应：**
+  - 输入："帮我分析一下贵州茅台的技术面"
+  - 展示消息气泡**立即出现**（agent_started 事件触发）
+  - 展示**研究步骤**逐步更新（intent_detected / skill_started 事件）
+  - 展示 **tool_completed 事件**在工具执行后追加到步骤列表
+  - 展示 **answer_delta**：答案文字逐块出现（打字机效果，25字/块）
+  - 整个过程无需等待完整响应返回
+
+- **演示 Stop 按钮：**
+  - 输入较复杂问题并立即点击"停止"按钮
+  - 展示响应立即中断（AbortController.abort() 取消 fetch + 后端 task 取消）
+
+- **演示 Fallback：**
+  - （可在 DevTools 中 block stream 端点触发）
+  - 展示 fallback 提示（`chat_stream_fallback`）出现后切换为同步模式正常返回答案
+
+**讲解要点：**
+- SSE 使用 `fetch + ReadableStream`（不用 EventSource），原因：需要 POST 请求 + Authorization header
+- 后端 asyncio.Queue + background Task 模式：task 持有 db session，generator 只从 queue 读 SSE 字符串
+- `asyncio.shield(queue.get())` 防止 keepalive 超时取消底层 get 操作
+- `event_callback` 可选参数透传到 process_message / SkillContext，失败静默，不影响主流程
+- answer_delta payload 仅含最终 answer 文本分块，不含私有 CoT 或系统 prompt
+- 禁用词覆盖流式响应（answer 已经过 Safety Guardrails 过滤）
+
 ---
 
 ## 四、面试讲解重点
@@ -159,11 +210,12 @@ npm run dev
 
 1. **多 Agent 并行分析**：Technical / Fundamental / Peer / News 四路 Agent，coordinator 汇总
 2. **LangGraph 灰度**：Send API fan-out + collect_node fan-in，开发者可对比两引擎结果
-3. **stock_master 主数据表**：5,166 只 A 股 + 申万行业 CSV 映射，港股手工维护
-4. **Hot Score 行业体系**：`log(成交额)×0.4 + |涨跌幅|×0.6` 动态计算
-5. **数据质量评分**：纯前端四维度，帮助用户理解报告边界，不依赖新 API
-6. **compareStorage 对比链路**：localStorage + CustomEvent 跨页面同步，URL query 为 source of truth
-7. **移动端 PWA 风格**：BottomTabBar + safe-area 自适应，≤640px 单列布局
+3. **Chat Copilot Tool Registry**：BaseTool ABC → ToolResult → ToolRegistry，9 只只读金融工具，权限 4 级；OpenClaw-inspired C5–C9 路线图就绪
+4. **stock_master 主数据表**：5,166 只 A 股 + 申万行业 CSV 映射，港股手工维护
+5. **Hot Score 行业体系**：`log(成交额)×0.4 + |涨跌幅|×0.6` 动态计算
+6. **数据质量评分**：纯前端四维度，帮助用户理解报告边界，不依赖新 API
+7. **compareStorage 对比链路**：localStorage + CustomEvent 跨页面同步，URL query 为 source of truth
+8. **移动端 PWA 风格**：BottomTabBar + safe-area 自适应，≤640px 单列布局
 
 ### 数据源体系
 
@@ -358,3 +410,297 @@ curl -X POST .../analysis/runs \
 
 ### output_language 独立设计
 > "AI 报告输出语言和 UI 语言是两个独立设置。前者通过 output_language 字段透传给每个 Agent 的 system prompt；后者通过自定义 i18n.js 控制界面文本。两者互不干扰，用户可以看中文 UI 但生成英文报告。"
+
+---
+
+## 七、未来演示路径：通过聊天完成股票研究任务（Phase C 规划）
+
+> 本节为规划阶段，对应 Phase C2~C8，尚未实现。
+
+### Chat Copilot 演示路径（5 分钟，规划版）
+
+| # | 用户输入 | Agent 行动 | 展示重点 |
+|---|---------|-----------|---------|
+| 1 | "中船特气今天为什么大涨" | resolve_stock → get_quote → get_latest_news → 综合回答 | 自然语言 → 多工具编排 |
+| 2 | "帮我生成一份综合分析报告" | 确认弹窗 → create_analysis_run → SSE 进度 → 报告摘要 | 写操作确认 + SSE 复用 |
+| 3 | "这个报告里均线多头排列是什么意思" | get_report_detail → 提取技术面段落 → 通俗解释 | 历史报告追问能力 |
+| 4 | "把它加入我的自选股" | 确认弹窗 → add_to_watchlist → 跳转链接 | 自然语言 → 写操作 → 现有页面落地 |
+| 5 | "帮我对比 600519 和 000858" | 确认弹窗 → create_compare_selection → /compare URL | 多步骤 + 页面联动 |
+
+### Chat Copilot 技术亮点说明（规划版）
+
+**Agentic 设计**
+> "Chat 不仅是聊天框，核心是 Agent 能调用工具、记忆上下文、执行多步骤任务，把结果落到现有页面和用户资产中。工具层直接复用现有 11 个后端 API，零重复实现。"
+
+**安全与合规**
+> "所有写操作必须用户确认，永不输出买入/卖出/持有建议。新闻等外部内容视为不可信，防止 prompt injection。工具白名单机制确保 LLM 无法调用未授权功能。"
+
+**复用现有基础设施**
+> "Chat API 的报告生成工具直接调用现有 /analysis/runs 接口，SSE 进度复用 AnalysisRunRegistry；认证复用 Bearer token；i18n 复用现有 6 语言系统——Chat 层没有重复造轮子。"
+
+**记忆层**
+> "三层记忆：短期记忆（消息历史，20轮窗口）、结构化记忆（最近股票/用户偏好/自选股快照，从 DB 加载）、任务状态记忆（Planner 执行状态，含 pending_action TTL）。记忆严格按 session_id + user_id 隔离。"
+
+
+---
+
+## 八、Chat Copilot C5 演示脚本（已实现，3-5 分钟）
+
+> **适用范围：** Phase C5 + C5-b 完成后（2026-06-18）。写操作均为真实执行，ConfirmationManager 全状态追踪。
+
+### 演示前准备
+
+```bash
+# 确保 Redis 运行（AnalysisRunRegistry）
+redis-server &
+
+# 后端（4 worker）
+cd backend && uvicorn app.main:app --reload
+
+# 前端
+cd frontend && npm run dev
+```
+
+### 演示步骤（13 步，~4 分钟）
+
+| # | 操作 | 说明 | 时长 |
+|---|------|------|------|
+| 1 | 打开 `/chat`，确认底部 Tab 高亮「聊天」 | C2 路由 + BottomTabBar | 10s |
+| 2 | 输入「中船特气最近为什么涨这么多」 | anomaly 意图：resolve → quote → kline → news 四工具链 | 20s |
+| 3 | 观察 tool_events 展开，展示工具调用链 | ToolProgressPanel 可折叠 | 10s |
+| 4 | 输入「帮我生成 688146 的综合分析报告」 | report 意图 → ConfirmationCard 弹出 | 10s |
+| 5 | 点击「确认」，观察 ConfirmationCard 状态变化：pending → executing → executed | C5 ConfirmationManager 完整生命周期 | 15s |
+| 6 | analysis_run 卡片出现：展示 run_id、「查看报告中心」链接 | C5 ActionResult cards 渲染 | 10s |
+| 7 | 点击「查看报告中心」→ 跳转 `/history` | 链路验证：报告中心 | 10s |
+| 8 | 返回 `/chat`，输入「把它加入我的自选股」（或「把中船特气加入自选」） | watchlist_add 意图 → ConfirmationCard | 15s |
+| 9 | 点击「确认」→ watchlist_action 卡片，already_exists=False | execute_add_to_watchlist 真实 DB 写入 | 10s |
+| 10 | 重复步骤 8/9（幂等测试）→ watchlist_action 卡片，already_exists=True | 幂等保护，无重复插入 | 10s |
+| 11 | 输入「帮我买入 688146」→ 安全拒绝消息 | C5-b 交易守卫，无 confirmation 弹出 | 10s |
+| 12 | 输入「对比宁德时代和贵州茅台」→ compare_link 卡片 | create_compare_selection（同步，无 DB） | 10s |
+| 13 | 点击「进入对比页」→ 跳转 `/compare?stocks=CN:300750,...` | 链路验证：对比页 | 10s |
+
+**总计：~4 分钟**，留 1 分钟演示 ConfirmationCard 「取消」分支（步骤 8 重做，点「取消」，状态变 `cancelled`）。
+
+### 技术亮点讲解词（C5 版）
+
+**ConfirmationManager 设计**
+> "写操作不直接执行，而是生成 pending confirmation dict 存入 ChatMessage.confirmation JSONB 字段（零 migration）。Router confirm 端点执行三重守卫：status != pending → 409 幂等拒绝；is_expired → 写 DB expired 状态，不执行；confirmed=false → 写 DB cancelled。整个生命周期 pending/executing/executed/cancelled/failed/expired 全部可追踪。"
+
+**savepoint 幂等设计**
+> "execute_add_to_watchlist 先 SELECT 检查，新增时用 SQLAlchemy `async with db.begin_nested()` 创建 savepoint。IntegrityError（并发竞争）只回滚 savepoint，外层事务保持，后续 update_confirmation_status 和 save_assistant_message 正常执行。这是对比简单 db.rollback() 的关键区别。"
+
+**Vue 3 深层响应式**
+> "confirmation 是嵌套在 messages 数组里的 dict，直接赋值 `origMsg.confirmation.status = 'executing'` 不会触发深层 watcher。修复是对象替换：`origMsg.confirmation = { ...origMsg.confirmation, status: 'executing' }`，Vue 检测到对象引用变化，prop 更新正确触发。"
+
+**模块级 import 与可测试性**
+> "action_tools.py 把 get_llm_client / get_run_registry / RealtimeAnalysisRunner 放在模块顶部 import（非函数内局部 import），这是 pytest `patch()` 能工作的前提。函数内 import 会让 patch 目标路径失效，单元测试无法隔离真实服务调用。"
+
+
+---
+
+## 九、Chat Copilot C6 Skills 演示脚本（已实现，3-4 分钟）
+
+> **适用范围：** Phase C6 完成后（2026-06-18）。展示 SkillRegistry 路由与 6 只 Financial Skills。
+
+### 演示步骤（10 步，~3.5 分钟）
+
+| # | 输入 | 走哪个 Skill | 展示重点 | 时长 |
+|---|------|------------|---------|------|
+| 1 | 「中船特气最近为什么涨这么多」 | StockAnomalySkill（priority=40）| 4 工具链：resolve→quote→kline→news；结构化 Markdown（异动摘要/关键发现/后续观察） | 20s |
+| 2 | 展开 tool_events 面板 | — | ChatToolTrace 展示 4 个工具调用链，含 status 图标 | 10s |
+| 3 | 「帮我重点看中船特气的风险」 | RiskFirstSkill（priority=35）| 风险优先输出：技术面风险 + 新闻面风险 + 数据缺口 | 20s |
+| 4 | 「688146 最近新闻有什么实质影响」 | NewsCatalystSkill（priority=45）| 区分已发生事实/市场预期/未兑现风险 | 15s |
+| 5 | 「看看我的自选股，哪些需要关注」 | WatchlistReviewSkill（priority=20）| 巡检最多 5 只，生成研究线索；空自选股→引导添加 | 20s |
+| 6 | 「今天哪些行业值得重点研究」 | IndustryHotspotSkill（priority=30）| 行业热度排行 + 研究线索（不说"值得买"） | 15s |
+| 7 | 「解释我最近一份报告的结论」 | ReportExplanationSkill（priority=10）| 报告摘要+核心结论+风险（不复制原文） | 15s |
+| 8 | 「帮我买入688146」 | 安全守卫（不走 Skill）| Safety Guard 优先拦截，无 confirmation 弹出 | 10s |
+| 9 | 「帮我生成688146综合报告」 | Action Intent（不走 Skill）| C5 ConfirmationCard 正常弹出 | 10s |
+| 10 | 「把中船特气加入自选」 | Action Intent（不走 Skill）| C5 watchlist confirmation 正常执行 | 10s |
+
+**总计：~3.5 分钟**
+
+### 技术亮点讲解词（C6 版）
+
+**SkillRegistry 设计**
+> "SkillRegistry 持有 6 个 BaseSkill 实例，按 priority 排序（值越小优先级越高）。select_skill() 遍历 can_handle()，首个匹配的 Skill 获得执行权。这比随机 if/elif 链可维护——新增一个 Skill 只需实现 can_handle + run，register 一次即可。"
+
+**Orchestrator 4 层优先级**
+> "process_message 有 4 层分发：1) 交易安全守卫（永远第一）→ 2) Action 意图（加自选/生成报告/对比）→ 3) SkillRegistry（6 只研究 Skills）→ 4) C4 直接工具 fallback。Skills 不会抢走 Action 意图，也无法绕过安全守卫。"
+
+**SkillContext 依赖注入**
+> "SkillContext 是 Skill 获取外部依赖的唯一入口：db、user_id、tool_registry。这让 Skill 完全可测试——测试只需 mock tool_registry.call，不需要真实数据库或外部 API。module-level import 是关键：确保 patch() 能正确定位目标。"
+
+**Skill 工具失败降级**
+> "每个 Skill 对工具失败有明确处理：kline 失败 → 说明'K 线数据不足'，news 失败 → 说明'暂无新闻数据'，整体不崩溃。这遵循 OpenClaw 的 Graceful Degradation 原则——局部数据缺失不影响其他维度的研究输出。"
+
+---
+
+## 十、Chat Copilot C7 Controlled Planner 演示路径
+
+> **适用范围：** Phase C7 完成后（2026-06-18）。展示 RuleBasedPlanner 复合任务检测与 PlannerExecutor 多步执行。
+
+### 演示步骤（6 步，~3 分钟）
+
+| # | 输入 | 触发类型 | 展示重点 | 时长 |
+|---|------|---------|---------|------|
+| 1 | 「688146为什么涨这么多然后重点看风险」 | anomaly_then_risk | metadata.planner_used=True；步骤摘要：异动分析→风险研究→综合结论 | 25s |
+| 2 | 展开 tool_events 面板 | — | 来自两个 Skills 的工具调用链合并显示 | 10s |
+| 3 | 「解释这份报告并告诉我主要风险」 | report_then_risk | ReportExplanationSkill → RiskFirstSkill → 最终摘要 | 20s |
+| 4 | 「688146为什么涨这么多顺便加自选」 | research_then_action | Planner 先运行 StockAnomalySkill → 再弹出 add_watchlist confirmation | 25s |
+| 5 | 确认自选股添加 | — | ConfirmationManager 执行写操作，卡片显示成功 | 10s |
+| 6 | 「比较宁德时代和紫金矿业然后帮我生成报告」 | compare_then_report | Planner 弹出对比确认 + 澄清步骤（请指定为哪只股票生成报告） | 20s |
+
+**总计：~3 分钟**
+
+### 技术亮点讲解词（C7 版）
+
+**RuleBasedPlanner 设计原则**
+> "Planner 采用纯正则规则，无 LLM 参与——两个信号：连接词检测（然后/之后/并且/如果等）和多意图信号计数（≥2 个意图域同时出现）。无 LLM 的好处：响应时间降为零（纯正则匹配），行为完全可预测，100% 单元可测试。"
+
+**Orchestrator 6 层分发**
+> "C7 新增第 3 层 Planner，分发优先级：1) Safety Guard → 2) Action 意图 → 3) Controlled Planner（复合任务）→ 4) SkillRegistry（单步研究）→ 5) C4 fallback → 6) Default。Planner 在 Action 层之后，确保明确的加自选/生成报告意图不被 Planner 劫持。"
+
+**PlannerExecutor 安全边界**
+> "action step 在 PlannerExecutor 里永远只调用 make_confirmation()，绝不执行写操作。真正的写操作只发生在用户点击确认后，经由 ConfirmationManager 的独立生命周期（pending→executing→executed）来管理。这是一个关键的安全约束：Planner 的'规划'不能绕过确认流程。"
+
+**多步骤结果聚合**
+> "_synthesize() 从所有 skill_results 中提取关键行 —— 综合结论（第一个 Skill 的前 4 行）、主要风险（第二个 Skill 的前 3 行）、后续观察（所有 Skill 的编号观察项）—— 组装成 ## 多步骤研究摘要 格式。每个 Skill 的输出互为补充，Planner 把它们变成一个连贯的研究叙事。"
+
+---
+
+## 十一、C8–C10 综合演示脚本（官方推荐路线，Phase C11）
+
+> **版本：** C11 整理（2026-06-20）  
+> **适用：** Phase C10 完成后正式演示。含 4 条路线，总时长约 12 分钟。  
+> **推荐演示股票：** CN/688146（中船特气）— 异动、风险、多步骤 Planner 效果最佳。
+
+---
+
+### Route A：基础 Agent 研究能力（约 3 分钟）
+
+**目标：** 展示单步 Skill 路由、Tool Trace、免责声明。
+
+| # | 操作 | 讲解词 |
+|---|------|--------|
+| 1 | 打开 `/chat`，展示 ChatContextPanel 技能列表 | "右侧是 Agent 技能列表，来自后端 GET /chat/skills，不是前端硬编码。" |
+| 2 | 输入：`中船特气最近为什么涨这么多？` | 发送后约 2-3 秒返回结果 |
+| 3 | 展开 Tool Trace | "Agent 自动调用了 resolve_stock → get_quote → get_kline_summary → get_latest_news，用户无需指定工具。" |
+| 4 | 指出 StockAnomalySkill | "这条消息路由到了 StockAnomalySkill，因为 '为什么涨' 匹配了异动意图信号。" |
+| 5 | 指出底部免责声明 | "_仅供研究参考，不构成投资建议。_ 这是系统硬编码的，每条答案都有。" |
+| 6 | 输入：`帮我买入688146` | "看看安全守卫..." |
+| 7 | 展示拒绝响应 | "买入意图被 _TRADING_PATTERN 拦截，不调用任何工具，直接返回研究边界说明。" |
+
+---
+
+### Route B：Planner + Risk 多步骤研究（约 4 分钟）
+
+**目标：** 展示 RuleBasedPlanner 复合意图检测、PlannerExecutor 顺序执行、两步结果聚合。
+
+| # | 操作 | 讲解词 |
+|---|------|--------|
+| 1 | 输入：`帮我分析中船特气为什么涨，然后重点看风险` | "关键词是'然后'—— 这是复合连接词。" |
+| 2 | 等待结果（约 4-5 秒） | |
+| 3 | 指出答案结构 | "答案包含两个部分：异动分析 + 风险梳理。这是 Planner 执行两步的结果。" |
+| 4 | 展开 Tool Trace | "Step 1：StockAnomalySkill（4 个工具）。Step 2：RiskFirstSkill（3 个工具）。两步合计 7 次工具调用。" |
+| 5 | 解释 Planner | "RuleBasedPlanner 是纯正则规则，无 LLM。'然后' + 异动信号 + 风险信号 → anomaly_then_risk 计划。零延迟，行为完全可预测。" |
+| 6 | 指出 metadata | "OrchestratorResult.metadata 中有 skill_spec_version=c9_v1，记录了技能版本。" |
+
+---
+
+### Route C：Action + Confirmation（约 3 分钟）
+
+**目标：** 展示写操作确认流程、ConfirmationManager、watchlist_action card。
+
+| # | 操作 | 讲解词 |
+|---|------|--------|
+| 1 | 输入：`把中船特气加入自选` | |
+| 2 | 展示确认卡（ConfirmationCard） | "Agent 不会直接执行写操作。它先返回一张确认卡，等待用户明确同意。" |
+| 3 | 指出确认卡内容 | "卡片显示：股票信息 + 操作说明 + '是否确认' + 10 分钟超时提示。" |
+| 4 | 点击「确认」 | |
+| 5 | 展示成功卡片 | "后端执行 POST /watchlist，返回 watchlist_action card，操作可回溯。" |
+| 6 | 说明安全设计 | "写操作永远是二阶段：pending → confirmed。用户点确认前什么都不会改变。这是 OpenClaw Action Layer 的核心设计。" |
+| 7 | 跳转自选股页 | "点击卡片上的'查看自选股'跳转到 /watchlist，刚加入的股票已在列表中。" |
+
+---
+
+### Route D：SkillSpec 技能发现（约 2 分钟）
+
+**目标：** 展示 OpenClaw-style Skill Registry、SkillSpec JSON 元数据、GET /chat/skills。
+
+| # | 操作 | 讲解词 |
+|---|------|--------|
+| 1 | 展示 ChatContextPanel 技能区域 | "右侧 'Agent 技能' 区域列出了当前可用技能，含 enabled/available 状态。" |
+| 2 | 用 curl 或 API 工具调用 `GET /chat/skills`（需 Bearer token） | "这些数据来自后端的 SkillSpec JSON 文件。" |
+| 3 | 展示返回的 JSON | "每个技能有 name / enabled / required_tools / permission_level / safety_rules / version=c9_v1。" |
+| 4 | 打开 `specs/stock_anomaly.json` | "这是 StockAnomalySkill 的声明式配置。技能不是 if/elif，而是可注册、可发现、可禁用、可审计的能力单元。" |
+| 5 | 说明 enabled gate | "`enabled=false` 的技能不会出现在 select_skill() 结果中，运行时可调用 `set_skill_enabled()` 动态禁用，无需重启服务。" |
+
+---
+
+### 技术问答速查（演示中可能被追问）
+
+| 问题 | 30 秒回答 |
+|------|----------|
+| "这和 ChatGPT 有什么区别？" | ChatGPT 是通用 LLM。TradingAgents 是针对金融研究的 Agentic 系统：有工具白名单、技能注册表、受控 Planner、写操作确认、安全护栏、30 golden tasks 验收。 |
+| "为什么 Planner 不用 LLM？" | 金融场景确定性比灵活性重要。规则 Planner 零延迟、行为可预测、100% 可单元测试。后续可升级为 LLM-assisted Planner，但执行层保持规则控制。 |
+| "系统稳定吗？" | 389/389 tests PASS，30 golden tasks 覆盖全部 6 层能力，evaluation script 可复现。 |
+| "会不会给出投资建议？" | 不会。`_TRADING_PATTERN` 在 Orchestrator 入口拦截买入/卖出/目标价，所有答案有硬编码免责声明。 |
+
+---
+
+### 快速启动演示环境
+
+```bash
+# 后端
+cd backend
+uv run uvicorn app.main:app --reload --port 8000
+
+# 前端（另一终端）
+cd frontend
+npm run dev   # http://localhost:3001
+
+# 验证测试
+cd backend
+uv run pytest tests/ -q          # 447/447 PASS
+uv run python scripts/evaluate_chat_agent.py --suite all  # 30/30 PASS
+```
+
+---
+
+## 第十二节：C11-b 演示路线（RAG / Internal Agents / Chat UX）
+
+### Route E — RAG 可信度审查（3 min）
+
+1. 输入 `中船特气最近为什么涨这么多？`
+2. 等待 StockAnomalySkill 返回，展开工具调用 trace
+3. 找到 `rag_retrieve`（检索文档数）和 `rag_review`（可信度评级）两个事件
+4. 查看答案末尾的 **资料来源与可信度** 小节
+5. 讲解要点：RAG 不依赖向量数据库，使用现有 ToolRegistry，rule-based 三审，无幻觉风险
+
+### Route F — 分析并保存报告 Intent（2 min）
+
+1. 输入 `分析 688146 并保存到历史报告`
+2. 展示确认卡（`create_analysis_run` + `save_to_history=true`）
+3. 讲解要点：比"生成综合报告"多了 save_to_history 参数，演示 orchestrator intent 分离
+
+### Route G — 外部渠道礼貌拒绝（1 min）
+
+1. 输入 `把报告发到我的邮箱`
+2. 展示拒绝回复："暂不支持向外部渠道推送"
+3. 展示 `docs/external_agent_channels_design.md` 说明未来设计路线
+
+### Route H — Chat UX 展示（2 min）（C12 更新）
+
+1. 展示 ChatSessionSidebar（历史对话列表，新建/切换/删除 session）
+2. 展示 **研究步骤**（ChatReasoningSteps，有 running/pending 步骤时自动展开）
+3. 输入一个耗时请求，展示 15s soft timeout 提示 + 停止按钮
+4. 展示 QuickActions：**5 条快捷问句 + "换一换"循环切换**（C12 精简自 4 组 × 4 题）
+5. 点击快捷问句：**填入输入框但不自动发送**（用户可继续编辑）
+
+### Route I — C12 即时研究步骤演示（1 min）
+
+1. 输入任意股票问题（如 `中船特气最近为什么涨这么多？`）
+2. 观察：发送后 **100ms 内** 立即显示 5 个 placeholder 研究步骤：
+   - 问题分析（running）/ RAG 资料检索 / 资料审查 / 工具调用 / 结论生成（均 pending）
+3. API 响应后：placeholder 替换为真实 tool_events，动画流入
+4. 讲解要点：用户感知到 AI 正在"思考"，无空白等待感

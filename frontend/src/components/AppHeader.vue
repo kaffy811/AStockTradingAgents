@@ -15,6 +15,9 @@
       <RouterLink to="/industries" class="nav-link" active-class="nav-link--active">
         {{ t('nav_industries') }}
       </RouterLink>
+      <RouterLink to="/chat" class="nav-link" active-class="nav-link--active">
+        {{ t('nav_chat') }}
+      </RouterLink>
       <RouterLink to="/me" class="nav-link" active-class="nav-link--active">
         {{ t('nav_me') }}
       </RouterLink>

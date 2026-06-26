@@ -1,0 +1,37 @@
+{
+  "name": "industry_hotspot_skill",
+  "display_name": "行业热点研究",
+  "display_name_en": "Industry Hotspot Research",
+  "version": "c9_v1",
+  "description": "查询申万行业热度排行，整理当前热门板块研究线索，支持指定行业深度展开。",
+  "enabled": true,
+  "category": "financial_research",
+  "permission_level": "read_only",
+  "required_tools": [
+    "get_industry_hot_tool"
+  ],
+  "optional_tools": [
+    "get_industry_stocks_tool"
+  ],
+  "intent_examples": [
+    "今天哪些行业值得重点研究？",
+    "行业热点是什么？",
+    "板块热度排行",
+    "哪个行业最热？"
+  ],
+  "output_sections": [
+    "行业热点摘要",
+    "热度排行",
+    "研究线索",
+    "免责声明"
+  ],
+  "safety_rules": [
+    "no_trading_advice",
+    "no_price_target",
+    "must_include_disclaimer"
+  ],
+  "failure_handling": [
+    "tool_failure_returns_partial_result",
+    "optional_tools_gracefully_degraded"
+  ]
+}

@@ -91,5 +91,6 @@ class HotStockResponse(BaseModel):
     industry_name: str | None
     trade_date:    date | None
     score_version: str
+    total:         int = 0      # 行业在 stock_industry_map 中的真实成分股总数
     items:         list[HotStockItem]
     data_quality:  HotStockDataQuality

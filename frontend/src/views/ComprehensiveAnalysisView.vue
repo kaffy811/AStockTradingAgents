@@ -13,6 +13,8 @@
       :recent-searches="dashRecentSearches"
       :hot-items="dashHotItems"
       :industry-name="dashIndustryName"
+      :industry-list="dashIndustryList"
+      :industry-list-error="dashIndustryListError"
       :compare-list="dashCompareList"
       :loading="dashboardLoading"
       @pick-stock="onDashPickStock"
@@ -20,7 +22,9 @@
       @go-stock="onDashGoStock"
       @go-history="onDashGoHistory"
       @go-watchlist="onDashGoWatchlist"
+      @go-watchlist-compare="onDashGoWatchlistCompare"
       @go-industries="onDashGoIndustries"
+      @go-industry-block="onDashGoIndustryBlock"
       @go-compare="onDashGoCompare"
     />
 
@@ -253,7 +257,9 @@ const dashWatchlistItems  = ref([])
 const dashRecentSearches  = ref(getRecentSearches())
 const dashHotItems        = ref([])
 const dashIndustryName    = ref('')
-const dashCompareList     = ref(getCompareList())
+const dashIndustryList      = ref([])
+const dashIndustryListError = ref('')
+const dashCompareList       = ref(getCompareList())
 
 async function loadDashboardData() {
   dashboardLoading.value = true
@@ -274,17 +280,24 @@ async function loadDashboardData() {
     dashWatchlistItems.value = (watchlistRes.value?.items || watchlistRes.value || []).slice(0, 4)
   }
 
-  // Pick the first industry with stocks and load its hot list
+  // Load industry list sorted by hot_score desc; pick the first for hot stocks
   if (industriesRes.status === 'fulfilled') {
+    dashIndustryListError.value = ''
     const industries = industriesRes.value || []
-    const first = industries[0]
+    // Sort by hot_score descending for the industry blocks panel
+    const sorted = [...industries].sort((a, b) => (b.hot_score ?? 0) - (a.hot_score ?? 0))
+    dashIndustryList.value = sorted.slice(0, 6)
+
+    const first = sorted[0] || industries[0]
     if (first) {
       dashIndustryName.value = first.industry_name || first.name || ''
       try {
-        const hotData = await getIndustryHotStocks('CN', first.industry_code || first.code, { limit: 5 })
-        dashHotItems.value = (hotData?.items || []).slice(0, 5)
+        const hotData = await getIndustryHotStocks('CN', first.industry_code || first.code, { limit: 20 })
+        dashHotItems.value = (hotData?.items || []).slice(0, 20)
       } catch { /* non-fatal */ }
     }
+  } else {
+    dashIndustryListError.value = industriesRes.reason?.message || '行业数据加载失败'
   }
 
   dashboardLoading.value = false
@@ -311,8 +324,17 @@ function onDashGoWatchlist() {
   router.push('/watchlist')
 }
 
+function onDashGoWatchlistCompare() {
+  router.push('/watchlist?mode=compare')
+}
+
 function onDashGoIndustries() {
   router.push('/industries')
+}
+
+function onDashGoIndustryBlock(ind) {
+  const code = ind.industry_code || ind.code
+  router.push(code ? { path: '/industries', query: { focus: code } } : '/industries')
 }
 
 function onDashGoCompare() {

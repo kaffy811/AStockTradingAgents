@@ -269,10 +269,13 @@ async def run(
             ind_name = ind_info["industry_name"]
             symbols  = ind_info["symbols"]
 
-            # 将行业成分股与行情快照 join
-            candidates = [
-                spot_map[sym] for sym in symbols if sym in spot_map
-            ]
+            # 将行业成分股与行情快照 join（对同一 symbol 去重，避免 UniqueViolation）
+            seen_syms: set[str] = set()
+            candidates = []
+            for sym in symbols:
+                if sym in spot_map and sym not in seen_syms:
+                    seen_syms.add(sym)
+                    candidates.append(spot_map[sym])
 
             if not candidates:
                 stats["skipped_industries"].append(

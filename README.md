@@ -1,8 +1,7 @@
-# TradingAgents — AI 多 Agent 股票研究助手
+# TradingAgents — OpenClaw-inspired 金融智能 Agents 系统
 
-> 多 Agent 并行分析 · 技术面 / 基本面 / 同行对比 / 新闻面  
-> A 股与港股 · SSE 实时进度 · 双 engine 灰度 · 多 worker Redis 支持  
-> 6 种 UI 语言 · 6 种报告语言 · 3 套主题 · 移动端 PWA 风格
+> **研究工作台**：多 Agent 并行分析 · 技术面 / 基本面 / 同行对比 / 新闻面 · A 股 + 港股  
+> **Chat Copilot**：Tool Registry · Skill Registry · Controlled Planner · Memory · Action Confirmation · Audit · Safety · SSE Streaming
 
 **本项目不提供投资建议，所有报告仅供研究参考。**
 
@@ -10,7 +9,45 @@
 
 ## 项目简介
 
-TradingAgents 是一个基于大语言模型的 AI 股票研究辅助系统。用户输入股票代码后，系统通过多路并行 Agent 分别采集行情、财务、行业对比与新闻信息，由 synthesis LLM 汇总生成结构化分析报告，并通过 SSE 实时推送分析进度。系统支持报告保存、历史中心、自选股工作台、行业热度研究与股票横向对比。
+TradingAgents 是一个 **OpenClaw-inspired 金融智能 Agents 系统**，包含两个核心层次：
+
+1. **研究工作台**：多 Agent 并行分析平台。用户输入股票代码，系统通过 Technical / Fundamental / Peer / News 四路 Agent 并行采集数据，由 synthesis LLM 汇总生成结构化研究报告，并通过 SSE 实时推送分析进度。支持报告中心、自选股工作台、行业热度研究与股票横向对比。
+
+2. **Chat Copilot（C1–C13-b）**：自然语言驱动的 Agent Orchestrator。用户以自然语言输入研究目标，系统自动路由工具、技能、规划步骤，结果落地到报告 / 自选股 / 对比页，全过程可审计、可确认、安全可控。C12 引入**即时研究步骤可见性**，C13-a 引入 **SSE 流式响应**（asyncio.Queue + background Task，fetch + ReadableStream，answer_delta 打字机，Stop 按钮，fallback），C13-b 升级为**工具级实时流式**（每个 tool_started/completed、rag_retrieve_started/completed、rag_review_started/completed、skill_started/completed、planner_step_started/completed 在执行瞬间推送到前端，Phase 5 dedup 防止重复显示）。
+
+> **这不是普通聊天框** — Chat Copilot 具备完整的 Agentic AI 工程实践：Tool Registry、Skill Registry、Controlled Planner、Action Confirmation、Structured Memory、Audit Trail、Safety Guardrails、RAG + Review Agents、Agent Evaluation、Real-time SSE Streaming 和 **Tool-level Realtime Execution Trace**（**754/754 tests**）。
+
+---
+
+## OpenClaw-inspired Agent Architecture
+
+```mermaid
+flowchart TD
+    U[User Chat] --> O[Chat Orchestrator]
+    O --> S[Safety Guard\n买入/卖出/目标价拦截]
+    S --> P[Controlled Planner\nRuleBasedPlanner + PlannerExecutor]
+    P --> SK[Financial Skill Registry\n6 SkillSpecs: c9_v1]
+    SK --> T[Tool Registry\n9 read-only tools]
+    T --> D[Market / Report / Watchlist / Industry Services]
+    P --> A[Action Tools\nadd_watchlist / create_report / compare]
+    A --> C[ConfirmationManager\npending → confirmed]
+    O --> M[Structured Memory\nsession_metadata JSONB]
+    O --> AU[Audit Trail\nduration_ms / started_at / permission_level]
+    O --> R[Cards / Reports / Watchlist / Compare]
+```
+
+| OpenClaw 层 | TradingAgents 实现 |
+|-------------|-------------------|
+| Chat Channel | `/chat` 路由 + Vue 前端 6 组件 |
+| Tool Registry | 9 只只读金融工具（AkShare/DB） |
+| Skill Registry | 6 只 SkillSpec JSON 技能（c9_v1） |
+| Controlled Planner | RuleBasedPlanner（纯正则）+ PlannerExecutor |
+| Memory | chat_memory.py（session JSONB，fire-and-forget）|
+| Action Execution | 3 类写操作 + ConfirmationManager 二阶段 |
+| Audit Trail | ToolResult.duration_ms/started_at + OrchestratorResult.metadata |
+| Safety | _TRADING_PATTERN + injection guard + 全局 disclaimer |
+| Skill Discovery | GET /chat/skills（SkillSpec JSON 可发现）|
+| Evaluation | 30 golden tasks + capability_manifest.json + evaluate_chat_agent.py |
 
 ---
 
@@ -155,11 +192,38 @@ Nginx 在 `:80` 提供服务，`/api/v1/*` 反向代理至 backend:8000。
 
 ---
 
+## 测试与评估
+
+```bash
+# 全量测试（754/754 PASS）
+cd backend && pytest tests/ -q
+
+# Agent Golden Task 评测（30/30 PASS）
+cd backend && python scripts/evaluate_chat_agent.py --suite all
+
+# Python 语法检查
+cd backend && python -m compileall app -q
+
+# 数据库迁移状态
+cd backend && alembic current   # → d7e3a9b5c2f8 (head)
+```
+
+---
+
 ## 演示路径
 
-参见 [`docs/demo_walkthrough.md`](docs/demo_walkthrough.md)
+参见 [`docs/demo_walkthrough.md`](docs/demo_walkthrough.md) — 包含 4 条演示路线：
+
+- **Route A**（3 min）：股票异动分析 → Tool Trace → StockAnomalySkill
+- **Route B**（4 min）：Planner 复合任务 → anomaly + risk 两步规划
+- **Route C**（3 min）：加入自选 → 确认卡 → 执行 → watchlist card
+- **Route D**（2 min）：SkillSpec 技能发现 → GET /chat/skills
+
+完整导师演示材料：[`docs/advisor_demo_package.md`](docs/advisor_demo_package.md)  
+技术问答参考：[`docs/advisor_qa.md`](docs/advisor_qa.md)
 
 推荐演示股票：
+- `CN/688146`（中船特气）— 推荐，异动分析、多步 Planner 效果好
 - `CN/000001`（平安银行）— 完整 A 股演示，含技术面/基本面/新闻面
 - `CN/600519`（贵州茅台）— 知名标的，适合行业对比演示
 - `HK/00700`（腾讯控股）— 港股特殊处理演示

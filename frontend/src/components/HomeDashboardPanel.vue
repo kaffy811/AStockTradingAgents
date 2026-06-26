@@ -93,6 +93,12 @@
               </div>
             </div>
           </div>
+          <!-- Batch compare entry: only show when ≥2 stocks -->
+          <div v-if="!loading && watchlistItems.length >= 2" class="hdp-wl-footer">
+            <button class="hdp-link hdp-compare-entry" @click="emit('go-watchlist-compare')">
+              ⊞ {{ t('dash_compare_bulk') }}
+            </button>
+          </div>
         </div>
 
       </div>
@@ -100,30 +106,37 @@
       <!-- ── Right column ── -->
       <div class="hdp-col">
 
-        <!-- Recent searches -->
+        <!-- Industry blocks (hot sectors) -->
         <div class="hdp-section">
           <div class="hdp-section-header">
-            <span class="hdp-section-title">{{ t('dash_section_searches') }}</span>
+            <span class="hdp-section-title">{{ t('ind_blocks_title') }}</span>
+            <button class="hdp-link" @click="emit('go-industries')">{{ t('ind_blocks_expand') }} ›</button>
           </div>
+          <div class="hdp-section-sub">{{ t('ind_blocks_subtitle') }}</div>
 
-          <div v-if="recentSearches.length === 0" class="hdp-empty">{{ t('dash_empty_searches') }}</div>
-          <div v-else class="hdp-search-chips">
+          <div v-if="loading && industryList.length === 0" class="hdp-state"><span class="spinner"></span>{{ t('ind_loading_heat') }}</div>
+          <div v-else-if="industryListError" class="hdp-empty hdp-error">{{ t('ind_blocks_err') }}</div>
+          <div v-else-if="industryList.length === 0" class="hdp-empty">{{ t('dash_empty_industry') }}</div>
+          <div v-else class="hdp-iblk-list">
             <div
-              v-for="item in recentSearches.slice(0, 6)"
-              :key="`${item.market}/${item.symbol}`"
-              class="hdp-search-chip"
+              v-for="(ind, idx) in industryList.slice(0, 6)"
+              :key="ind.industry_code || ind.code || idx"
+              class="hdp-iblk-row"
+              @click="emit('go-industry-block', ind)"
             >
-              <span class="hdp-sc-inner" @click="emit('pick-stock', item)">
-                <span class="hdp-mkt-badge">{{ item.market }}</span>
-                <span class="hdp-sc-sym">{{ item.symbol }}</span>
-                <span v-if="item.stock_name" class="hdp-sc-name">{{ item.stock_name }}</span>
+              <span :class="['hdp-iblk-rank', idx < 3 ? 'hdp-iblk-rank--top' : '']">{{ idx + 1 }}</span>
+              <span class="hdp-iblk-name">{{ ind.industry_name || ind.name || t('ind_unknown') }}</span>
+              <span :class="['hdp-change', ind.avg_change_pct > 0 ? 'up' : ind.avg_change_pct < 0 ? 'down' : '']">
+                {{ ind.avg_change_pct != null
+                  ? (ind.avg_change_pct > 0 ? '+' : '') + Number(ind.avg_change_pct).toFixed(2) + '%'
+                  : '—' }}
               </span>
-              <button class="hdp-sc-detail" title="股票详情" @click.stop="emit('go-stock', item)">›</button>
+              <span class="hdp-iblk-score">{{ ind.hot_score != null ? fmtScore(ind.hot_score) : '—' }}</span>
             </div>
           </div>
         </div>
 
-        <!-- Industry hot -->
+        <!-- Industry hot stocks -->
         <div class="hdp-section">
           <div class="hdp-section-header">
             <span class="hdp-section-title">
@@ -199,7 +212,9 @@ const props = defineProps({
   recentSearches: { type: Array,   default: () => [] },
   hotItems:       { type: Array,   default: () => [] },
   industryName:   { type: String,  default: '' },
-  compareList:    { type: Array,   default: () => [] },
+  industryList:      { type: Array,   default: () => [] },
+  industryListError: { type: String,  default: '' },
+  compareList:       { type: Array,   default: () => [] },
   loading:        { type: Boolean, default: false },
 })
 
@@ -209,7 +224,9 @@ const emit = defineEmits([
   'go-stock',
   'go-history',
   'go-watchlist',
+  'go-watchlist-compare',
   'go-industries',
+  'go-industry-block',
   'go-compare',
 ])
 
@@ -234,7 +251,7 @@ function fmtTime(ts) {
 
 function fmtScore(v) {
   if (v == null || !Number.isFinite(Number(v))) return '—'
-  return Number(v).toFixed(1)
+  return Number(v).toFixed(2)
 }
 
 function rankClass(rank) {
@@ -361,6 +378,8 @@ function rankClass(rank) {
   padding: 6px 0;
 }
 
+.hdp-error { color: var(--danger); }
+
 /* ── Shared ── */
 .hdp-mkt-badge {
   background: var(--status-info-bg);
@@ -457,6 +476,19 @@ function rankClass(rank) {
 }
 
 /* ── Watchlist quick-jump ── */
+.hdp-wl-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
+}
+
+.hdp-compare-entry {
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+
 .hdp-wl-list { display: flex; flex-direction: column; gap: 5px; }
 
 .hdp-wl-row {
@@ -500,64 +532,63 @@ function rankClass(rank) {
 
 .hdp-pick-btn:hover { color: var(--accent); }
 
-/* ── Recent searches ── */
-.hdp-search-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-}
-
-.hdp-search-chip {
-  display: inline-flex;
-  align-items: center;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-  font-size: 11px;
-  cursor: pointer;
-  transition: border-color 0.12s;
-}
-
-.hdp-search-chip:hover { border-color: var(--accent); }
-
-.hdp-sc-inner {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  padding: 3px 6px;
-}
-
-.hdp-sc-sym {
-  font-family: monospace;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.hdp-sc-name {
+/* ── Industry blocks (hot sectors) ── */
+.hdp-section-sub {
   font-size: 10px;
   color: var(--muted);
-  max-width: 60px;
+  margin-top: -4px;
+}
+
+.hdp-iblk-list { display: flex; flex-direction: column; gap: 4px; }
+
+.hdp-iblk-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.hdp-iblk-row:hover { background: var(--surface-hover); }
+
+.hdp-iblk-rank {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+  background: var(--surface2);
+  color: var(--muted);
+}
+
+.hdp-iblk-rank--top { background: rgba(255, 215, 0, 0.2); color: #b8860b; }
+
+.hdp-iblk-name {
+  font-size: 12px;
+  color: var(--text);
+  flex: 1;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.hdp-sc-detail {
-  background: none;
-  border: none;
-  border-left: 1px solid var(--border);
-  cursor: pointer;
+.hdp-iblk-score {
+  font-size: 10px;
   color: var(--muted);
-  padding: 3px 7px;
-  font-size: 12px;
-  line-height: 1;
+  font-family: monospace;
+  flex-shrink: 0;
 }
 
-.hdp-sc-detail:hover { color: var(--accent); }
-
-/* ── Industry hot ── */
+/* ── Industry hot stocks ── */
 .hdp-hot-list { display: flex; flex-direction: column; gap: 4px; }
 
 .hdp-hot-row {

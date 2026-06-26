@@ -1,0 +1,41 @@
+{
+  "name": "risk_first_skill",
+  "display_name": "风险优先研究",
+  "display_name_en": "Risk-First Research",
+  "version": "c9_v1",
+  "description": "从风险优先视角分析股票，梳理技术面回调风险、新闻面不确定性，以及历史报告中已记录的风险警示。",
+  "enabled": true,
+  "category": "financial_research",
+  "permission_level": "read_only",
+  "required_tools": [
+    "resolve_stock_tool",
+    "get_kline_summary_tool",
+    "get_latest_news_tool"
+  ],
+  "optional_tools": [
+    "get_recent_reports_tool"
+  ],
+  "intent_examples": [
+    "最大风险是什么？",
+    "重点看风险",
+    "风险优先研究",
+    "主要风险有哪些？"
+  ],
+  "output_sections": [
+    "风险研究摘要",
+    "关键风险",
+    "后续观察",
+    "免责声明"
+  ],
+  "safety_rules": [
+    "no_trading_advice",
+    "no_price_target",
+    "external_content_untrusted",
+    "must_include_disclaimer"
+  ],
+  "failure_handling": [
+    "missing_stock_requires_clarification",
+    "tool_failure_returns_partial_result",
+    "optional_tools_gracefully_degraded"
+  ]
+}

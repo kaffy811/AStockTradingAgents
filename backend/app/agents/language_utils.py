@@ -49,7 +49,7 @@ def normalize_output_language(output_language: str | None) -> str:
 
 # ── Report section label registry ────────────────────────────────────────────
 #
-# 13 keys used by exportMarkdown.js / PrintReportView.vue and any future caller
+# 25 keys used by exportMarkdown.js / PrintReportView.vue and any future caller
 # that needs localised section headings.
 #
 # Keys:
@@ -58,6 +58,19 @@ def normalize_output_language(output_language: str | None) -> str:
 #   agent_status       — "Agent 执行状态" heading
 #   data_quality       — "数据质量提示" heading
 #   no_warnings        — empty-warnings placeholder text
+#   M51 additions:
+#   h_summary_conclusion  — single-agent "摘要结论" section heading
+#   h_synthesis_card      — comprehensive "综合结论卡片" section heading
+#   h_four_dimensions     — comprehensive "四面结论汇总" section heading
+#   card_overall          — "综合判断" card field label
+#   card_one_line         — "一句话结论" card field label
+#   card_contradiction    — "核心矛盾" card field label
+#   card_positive         — "正面因素" card field label
+#   card_risks            — "主要风险" card field label
+#   card_followup         — "后续观察重点" card field label
+#   card_completeness     — "数据完整度" card field label
+#   agent_conclusion      — "本面结论" single-agent card field label
+#   agent_credibility     — "数据可信度" single-agent card field label
 
 REPORT_SECTION_LABELS: dict[str, dict[str, str]] = {
     "zh-CN": {
@@ -74,6 +87,19 @@ REPORT_SECTION_LABELS: dict[str, dict[str, str]] = {
         "agent_status":                "Agent 执行状态",
         "data_quality":                "数据质量提示",
         "no_warnings":                 "暂无数据质量提示。",
+        # M51 additions
+        "h_summary_conclusion":        "摘要结论",
+        "h_synthesis_card":            "综合结论卡片",
+        "h_four_dimensions":           "四面结论汇总",
+        "card_overall":                "综合判断",
+        "card_one_line":               "一句话结论",
+        "card_contradiction":          "核心矛盾",
+        "card_positive":               "正面因素",
+        "card_risks":                  "主要风险",
+        "card_followup":               "后续观察重点",
+        "card_completeness":           "数据完整度",
+        "agent_conclusion":            "本面结论",
+        "agent_credibility":           "数据可信度",
     },
     "en-US": {
         "scope_comprehensive":         "Comprehensive Analysis Report",
@@ -89,6 +115,19 @@ REPORT_SECTION_LABELS: dict[str, dict[str, str]] = {
         "agent_status":                "Agent Execution Status",
         "data_quality":                "Data Quality Notes",
         "no_warnings":                 "No data quality issues.",
+        # M51 additions
+        "h_summary_conclusion":        "Summary Conclusion",
+        "h_synthesis_card":            "Synthesis Conclusion Card",
+        "h_four_dimensions":           "Four-Dimension Summary",
+        "card_overall":                "Overall Judgment",
+        "card_one_line":               "One-line Conclusion",
+        "card_contradiction":          "Key Contradiction",
+        "card_positive":               "Positive Factors",
+        "card_risks":                  "Main Risks",
+        "card_followup":               "Follow-up Focus",
+        "card_completeness":           "Data Completeness",
+        "agent_conclusion":            "Dimension Conclusion",
+        "agent_credibility":           "Data Credibility",
     },
     "zh-TW": {
         "scope_comprehensive":         "綜合分析報告",
@@ -104,6 +143,19 @@ REPORT_SECTION_LABELS: dict[str, dict[str, str]] = {
         "agent_status":                "Agent 執行狀態",
         "data_quality":                "數據質量提示",
         "no_warnings":                 "暫無數據質量提示。",
+        # M51 additions
+        "h_summary_conclusion":        "摘要結論",
+        "h_synthesis_card":            "綜合結論卡片",
+        "h_four_dimensions":           "四面結論彙總",
+        "card_overall":                "綜合判斷",
+        "card_one_line":               "一句話結論",
+        "card_contradiction":          "核心矛盾",
+        "card_positive":               "正面因素",
+        "card_risks":                  "主要風險",
+        "card_followup":               "後續觀察重點",
+        "card_completeness":           "數據完整度",
+        "agent_conclusion":            "本面結論",
+        "agent_credibility":           "數據可信度",
     },
     "ja-JP": {
         "scope_comprehensive":         "総合分析レポート",
@@ -119,6 +171,19 @@ REPORT_SECTION_LABELS: dict[str, dict[str, str]] = {
         "agent_status":                "エージェント実行状況",
         "data_quality":                "データ品質メモ",
         "no_warnings":                 "データ品質の問題はありません。",
+        # M51 additions
+        "h_summary_conclusion":        "要約結論",
+        "h_synthesis_card":            "総合結論カード",
+        "h_four_dimensions":           "四次元結論サマリー",
+        "card_overall":                "総合判断",
+        "card_one_line":               "一言結論",
+        "card_contradiction":          "主要矛盾",
+        "card_positive":               "プラス要因",
+        "card_risks":                  "主なリスク",
+        "card_followup":               "フォローアップ重点",
+        "card_completeness":           "データ完全性",
+        "agent_conclusion":            "次元結論",
+        "agent_credibility":           "データ信頼性",
     },
     "ko-KR": {
         "scope_comprehensive":         "종합 분석 보고서",
@@ -134,6 +199,19 @@ REPORT_SECTION_LABELS: dict[str, dict[str, str]] = {
         "agent_status":                "에이전트 실행 상태",
         "data_quality":                "데이터 품질 메모",
         "no_warnings":                 "데이터 품질 문제 없음.",
+        # M51 additions
+        "h_summary_conclusion":        "요약 결론",
+        "h_synthesis_card":            "종합 결론 카드",
+        "h_four_dimensions":           "4차원 결론 요약",
+        "card_overall":                "종합 판단",
+        "card_one_line":               "한 줄 결론",
+        "card_contradiction":          "핵심 모순",
+        "card_positive":               "긍정적 요인",
+        "card_risks":                  "주요 위험",
+        "card_followup":               "후속 관찰 중점",
+        "card_completeness":           "데이터 완전성",
+        "agent_conclusion":            "차원 결론",
+        "agent_credibility":           "데이터 신뢰성",
     },
     "es-ES": {
         "scope_comprehensive":         "Informe de Análisis Integral",
@@ -149,6 +227,19 @@ REPORT_SECTION_LABELS: dict[str, dict[str, str]] = {
         "agent_status":                "Estado de los Agentes",
         "data_quality":                "Notas de Calidad de Datos",
         "no_warnings":                 "Sin problemas de calidad de datos.",
+        # M51 additions
+        "h_summary_conclusion":        "Conclusión Resumida",
+        "h_synthesis_card":            "Tarjeta de Conclusión Integral",
+        "h_four_dimensions":           "Resumen de Cuatro Dimensiones",
+        "card_overall":                "Juicio General",
+        "card_one_line":               "Conclusión en Una Línea",
+        "card_contradiction":          "Contradicción Clave",
+        "card_positive":               "Factores Positivos",
+        "card_risks":                  "Riesgos Principales",
+        "card_followup":               "Enfoque de Seguimiento",
+        "card_completeness":           "Completitud de Datos",
+        "agent_conclusion":            "Conclusión Dimensional",
+        "agent_credibility":           "Credibilidad de Datos",
     },
 }
 

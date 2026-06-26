@@ -1,0 +1,93 @@
+SSE 架构诊断与修复记录 — Phase C25 Frontend Passthrough
+============================================================
+
+## 诊断结论
+
+### 前端实现确认（正确）
+- 使用 fetch + ReadableStream（非 EventSource），支持 POST body + Authorization header ✓
+- SSE 解析：event: / data: / 空行触发 dispatch，keepalive 注释行正确忽略 ✓
+- FastAPI StreamingResponse 已设置 X-Accel-Buffering: no, Cache-Control: no-cache ✓
+
+### 真正的架构漏洞（已修复）
+旧 chat.js 使用静态分发表（closed dispatch map）：
+
+  const map = {
+    agent_started:   handlers.onAgentStarted,
+    tool_call_start: handlers.onToolCallStart,
+    ...  // 共 ~30 个固定条目
+  }
+  const fn = map[eventType]
+  if (fn) fn(payload)  // 不在表里的事件被静默丢弃
+
+问题：后端每次新增 event type，必须同时改三处才能到达 UI：
+  1. chat.js 的 _dispatch map（加新条目）
+  2. ChatCopilotView.vue 的 _handlers（加 onXxx 回调）
+  3. chatEventNormalizer.js（加 case 处理）
+任何一处遗漏 → 静默丢弃，前端永远收不到该事件。
+
+## 修复方案（C25 Frontend Passthrough）
+
+### chat.js
+新增 handlers.onEvent(eventType, payload) 通用回调：
+
+  const _dispatch = (eventType, payload) => {
+    // 1. 通用处理器 — 接收所有事件，无论类型
+    if (handlers.onEvent) {
+      try { handlers.onEvent(eventType, payload) } catch { }
+    }
+    // 2. 旧版命名回调（向后兼容）
+    const fn = _legacyMap[eventType]
+    if (fn) try { fn(payload) } catch { }
+  }
+
+所有事件现在都强制经过 onEvent，未知类型不再被静默丢弃。
+
+### ChatCopilotView.vue
+从 30 个命名回调缩减为 1 个通用处理器：
+
+  // 旧（脆弱）：
+  const _handlers = {
+    onAgentStarted: (p) => _handleEvent('agent_started', p),
+    onToolCallStart: (p) => _handleEvent('tool_call_start', p),
+    ... // 30 个
+  }
+
+  // 新（健壮）：
+  const _handlers = {
+    onEvent: (eventType, payload) => _handleEvent(eventType, payload),
+  }
+
+_handleEvent 内部走 normalizeChatEvent → applyChatUiEvent，已处理所有已知类型。
+未知类型通过 normalizeChatEvent 返回 null，被 applyChatUiEvent 静默忽略。
+新增后端 event type 只需改 chatEventNormalizer.js 一处。
+
+## Nginx 缓冲诊断（如果 EventStream 标签无数据）
+
+如果 DevTools Network → EventStream 标签完全空白直到请求结束：
+
+  location /api/chat/stream {
+      proxy_pass http://backend;
+      proxy_buffering off;           # 关键 — 禁止 Nginx 缓冲
+      proxy_cache off;
+      proxy_set_header X-Accel-Buffering no;
+      proxy_read_timeout 300s;       # DeepSeek 最长需要 120s
+      chunked_transfer_encoding on;
+  }
+
+注意：FastAPI StreamingResponse 已在响应头设置 X-Accel-Buffering: no，
+Nginx 应自动识别并禁用缓冲。若仍有问题，在 nginx.conf 显式配置上述选项。
+
+## 超时配置
+
+前端超时：
+  _SOFT_TIMEOUT_MS = 30_000   // 30s 后显示"AI 正在分析中"提示
+  _HARD_TIMEOUT_MS = 120_000  // 120s 后强制中断（DeepSeek 最长需要此时间）
+
+后端 LLM 超时：
+  _LLM_TIMEOUT = 60.0   // financial_agent.py
+
+C25 流式保证：
+  任何情况（成功/工具失败/LLM 失败/超时/异常）都会发送：
+    1. final_answer（真实或 fallback）
+    2. agent_completed
+    3. None 哨兵（关闭流）

@@ -26,6 +26,7 @@ const TABS = computed(() => [
   { path: '/watchlist',  icon: '⭐', label: t('tab_watchlist') },
   { path: '/industries', icon: '🏢', label: t('tab_industries') },
   { path: '/history',    icon: '📋', label: t('tab_history') },
+  { path: '/chat',       icon: '💬', label: t('tab_chat') },
   { path: '/me',         icon: '👤', label: t('tab_me') },
 ])
 
@@ -58,7 +59,7 @@ function isActive(tab) {
   padding-bottom: env(safe-area-inset-bottom);
   /* 5 equal columns */
   display: none;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   align-items: stretch;
 }
 

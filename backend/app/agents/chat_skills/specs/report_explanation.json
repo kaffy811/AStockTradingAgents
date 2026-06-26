@@ -1,0 +1,40 @@
+{
+  "name": "report_explanation_skill",
+  "display_name": "报告解释",
+  "display_name_en": "Report Explanation",
+  "version": "c9_v1",
+  "description": "解释最近生成的分析报告，提炼核心结论、主要风险与后续研究建议，辅助用户快速理解报告内容。",
+  "enabled": true,
+  "category": "financial_research",
+  "permission_level": "read_only",
+  "required_tools": [
+    "get_recent_reports_tool"
+  ],
+  "optional_tools": [
+    "get_report_detail_tool"
+  ],
+  "intent_examples": [
+    "解释我最近一份报告",
+    "报告结论是什么？",
+    "这份报告有什么风险？",
+    "帮我看看最近的报告"
+  ],
+  "output_sections": [
+    "报告解释摘要",
+    "核心结论",
+    "主要风险",
+    "后续观察",
+    "免责声明"
+  ],
+  "safety_rules": [
+    "no_trading_advice",
+    "no_price_target",
+    "must_include_disclaimer",
+    "report_content_research_only"
+  ],
+  "failure_handling": [
+    "no_reports_gracefully_handled",
+    "tool_failure_returns_partial_result",
+    "optional_tools_gracefully_degraded"
+  ]
+}

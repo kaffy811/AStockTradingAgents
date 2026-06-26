@@ -108,10 +108,27 @@
       {{ t('ind_no_results') }}
     </div>
 
+    <!-- ── Stock cards header + view-more toggle ── -->
+    <div v-if="!hotLoading && filteredItems.length > 0" class="ihv-stocks-header">
+      <span class="ihv-stocks-title">
+        {{ expandedView ? t('ind_hot_top_50') : t('ind_hot_top_20') }}
+        <span class="ihv-stocks-count">
+          ({{ t('ind_hot_showing', { n: displayedItems.length, total: industryTotal }) }})
+        </span>
+      </span>
+      <button
+        v-if="filteredItems.length > HOT_DISPLAY_DEFAULT"
+        class="ihv-more-btn"
+        @click="toggleExpand"
+      >
+        {{ expandedView ? t('ind_hot_collapse') : t('ind_hot_view_more') }}
+      </button>
+    </div>
+
     <!-- ── Stock cards ── -->
-    <div v-if="!hotLoading && filteredItems.length > 0" class="ihv-card-list">
+    <div v-if="!hotLoading && displayedItems.length > 0" class="ihv-card-list">
       <IndustryStockCard
-        v-for="item in filteredItems"
+        v-for="item in displayedItems"
         :key="item.symbol"
         :item="item"
         market="CN"
@@ -123,12 +140,17 @@
       />
     </div>
 
+    <!-- ── Bottom collapse button (visible when expanded and many cards) ── -->
+    <div v-if="!hotLoading && expandedView && displayedItems.length > 10" class="ihv-bottom-bar">
+      <button class="ihv-more-btn" @click="toggleExpand">{{ t('ind_hot_collapse') }}</button>
+    </div>
+
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, reactive, computed, onMounted, watch, nextTick } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from '../utils/i18n.js'
 import { listIndustries, getIndustryHotStocks } from '../api/industries.js'
 import { addWatchlist } from '../api/watchlist.js'
@@ -143,6 +165,7 @@ import IndustryHeatOverviewCard from '../components/IndustryHeatOverviewCard.vue
 import IndustryHotBlocksCard    from '../components/IndustryHotBlocksCard.vue'
 
 const router = useRouter()
+const route  = useRoute()
 const { t } = useI18n()
 
 // ── State ──────────────────────────────────────────────────────────────────
@@ -161,17 +184,47 @@ const quickSymbol     = ref('')
 const filters = ref({ changeFilter: 'all', dataSourceFilter: 'all' })
 const sortKey  = ref('rank')
 
-// Hot blocks expand state
+// Hot blocks expand state (IndustryHotBlocksCard hero section)
 const hotBlocksExpanded = ref(false)
 
+// Hot stocks list expand state (view more / collapse)
+const expandedView = ref(false)
+
+// ── Focus query (from HomeDashboardPanel industry block click) ──────────────
+// /industries?focus=<code> → select + scroll to that industry row
+watch(
+  () => [industries.value.length, route.query.focus],
+  async ([len]) => {
+    const code = route.query.focus
+    if (!code || !len) return
+    if (selectedCode.value !== code) {
+      onIndustryChange(code)
+    }
+    await nextTick()
+    const el = document.querySelector(`[data-industry-code="${code}"]`)
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      el.classList.add('industry-focus-highlight')
+      setTimeout(() => el.classList.remove('industry-focus-highlight'), 1800)
+    }
+  },
+  { immediate: true }
+)
+
 // ── Constants ──────────────────────────────────────────────────────────────
-const PREFERRED_NAMES = ['食品饮料', '银行', '电力设备']
-const MARKET    = 'CN'
-const HOT_LIMIT = 20
+const PREFERRED_NAMES  = ['食品饮料', '银行', '电力设备']
+const MARKET           = 'CN'
+const HOT_LIMIT           = 50   // always fetch 50; display is controlled by expandedView
+const HOT_DISPLAY_DEFAULT = 20   // exported to template for "v-if" button visibility
 
 // ── Derived ────────────────────────────────────────────────────────────────
 const selectedIndustry = computed(() =>
   industries.value.find(i => i.industry_code === selectedCode.value) ?? null
+)
+
+// 行业真实成分股总数（来自 API total 字段，回退到已拉取条数）
+const industryTotal = computed(() =>
+  hotData.value?.total || filteredItems.value.length
 )
 
 const availableDataSources = computed(() => {
@@ -212,6 +265,17 @@ const filteredItems = computed(() => {
 
   return list
 })
+
+// displayedItems: slice filteredItems to 20 unless user expanded
+const displayedItems = computed(() =>
+  expandedView.value
+    ? filteredItems.value
+    : filteredItems.value.slice(0, HOT_DISPLAY_DEFAULT)
+)
+
+function toggleExpand() {
+  expandedView.value = !expandedView.value
+}
 
 // ── Industry list ──────────────────────────────────────────────────────────
 async function loadIndustries() {
@@ -261,6 +325,7 @@ function onIndustryChange(code) {
   selectedCode.value = code
   filters.value = { changeFilter: 'all', dataSourceFilter: 'all' }
   sortKey.value  = 'rank'
+  expandedView.value = false
   resetWatchlistStatus()
   loadHotStocks()
 }
@@ -387,6 +452,54 @@ onMounted(async () => {
   gap: 0;
 }
 
+/* ── Stocks header + view-more ── */
+.ihv-stocks-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px 6px;
+  gap: 8px;
+}
+
+.ihv-stocks-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ihv-stocks-count {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.ihv-more-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 3px 12px;
+  font-size: 12px;
+  color: var(--accent);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.ihv-more-btn:hover {
+  background: var(--accent-glow);
+  border-color: var(--accent);
+}
+
+.ihv-bottom-bar {
+  display: flex;
+  justify-content: center;
+  padding: 16px 0 8px;
+}
+
 /* ── Mobile ── */
 @media (max-width: 640px) {
   /* Stack hero cards vertically on mobile */
@@ -410,5 +523,13 @@ onMounted(async () => {
 
 @media (max-width: 375px) {
   .ihv-title-bar { margin-bottom: 12px; }
+}
+
+/* Focus highlight — applied briefly when routed from dashboard with ?focus=<code> */
+:global(.industry-focus-highlight) {
+  outline: 2px solid var(--accent) !important;
+  outline-offset: 1px;
+  background: var(--accent-glow) !important;
+  transition: outline 0.2s, background 0.2s;
 }
 </style>

@@ -1,8 +1,12 @@
 # TradingAgents 手动体验测试指南
 
-**版本：** 2026-06-01  
+**版本：** 2026-06-24  
 **适用范围：** 本地开发环境完整功能验收  
 **测试方式：** 真实用户手动点击，非自动化脚本  
+
+**Changelog：**
+- 2026-06-24：新增 §15 Chat Copilot 基础功能测试、§16 金融 RAG 与官方财报检索测试、§17 Multi-Agent Financial Research Orchestrator 测试、§18 合规与风险审核专项测试；§13 Final Acceptance Table 新增验收项 40–60；新增 §19 Chat Copilot 测试环境说明。
+- 2026-06-01：初版发布，覆盖核心行情 / 分析 / 历史 / 自选股 / 行业热门 / 移动端 / Redis / Docker。
 
 ---
 
@@ -21,6 +25,12 @@
 11. [Redis 缓存体验测试](#11-redis-缓存体验测试)
 12. [Docker 部署 smoke test](#12-docker-部署-smoke-test)
 13. [最终验收表](#13-最终验收表)
+14. [高级异常与边界场景测试](#14-高级异常与边界场景测试)
+15. [Chat Copilot 基础功能测试](#15-chat-copilot-基础功能测试)
+16. [金融 RAG 与官方财报检索测试](#16-金融-rag-与官方财报检索测试)
+17. [Multi-Agent Financial Research Orchestrator 测试](#17-multi-agent-financial-research-orchestrator-测试)
+18. [合规与风险审核专项测试](#18-合规与风险审核专项测试)
+19. [Chat Copilot 测试环境说明](#19-chat-copilot-测试环境说明)
 
 ---
 
@@ -805,9 +815,37 @@ docker compose down -v
 | 38 | Token 过期处理 | ⬜ | | |
 | 39 | 极端股票代码 | ⬜ | | |
 
+**Chat Copilot 相关验收项（40–60）：**
+
+| # | 模块 | Test Step | Expected Result | Pass/Fail | Notes |
+|---|------|-----------|-----------------|-----------|-------|
+| 40 | Chat Copilot 会话创建 | 点击底部 Tab「聊天」，进入 `/chat` | 页面加载，显示对话输入框，无报错 | ⬜ | |
+| 41 | 消息发送与流式返回 | 输入「AAPL 今天价格多少？」并发送 | assistant 消息逐字流式出现，不一次性渲染整块文字 | ⬜ | |
+| 42 | 无 fake placeholder steps | 发送任意问题后查看 ChatReasoningSteps | 只显示真实 SSE 事件驱动的步骤；不显示预置固定假步骤 | ⬜ | |
+| 43 | toolTrace 由真实工具事件驱动 | 发送「AAPL 今天价格多少？」 | toolTrace 条目仅在收到 `tool_call_start` / `tool_call_result` SSE 事件后出现 | ⬜ | |
+| 44 | final_answer 必定展示 | 等待任意对话请求完成 | 无论工具是否全部成功，最终必定出现 final_answer 区块 | ⬜ | |
+| 45 | 工具失败 fallback 结论 | 临时断开行情 API（或输入无效 symbol）后发送问题 | 页面不空白；assistant 给出 fallback 分析结论；不显示原始错误堆栈 | ⬜ | |
+| 46 | stock_quote 工具可追踪 | 发送「AAPL 今天价格多少？」 | ChatReasoningSteps 中出现 `stock_quote` 工具调用条目，显示结果摘要 | ⬜ | |
+| 47 | stock_kline 工具可追踪 | 发送「请根据最近 60 日 K 线分析 MSFT」 | ChatReasoningSteps 中出现 `stock_kline` 工具调用条目 | ⬜ | |
+| 48 | financial_news 工具可追踪 | 发送「最近英伟达有什么利好或利空新闻？」 | ChatReasoningSteps 中出现 `financial_news` 工具调用条目 | ⬜ | |
+| 49 | financial_rag_search 工具可追踪 | 发送「苹果公司适合长期持有吗？」 | ChatReasoningSteps 中出现 `financial_rag_search` 工具调用条目 | ⬜ | |
+| 50 | sources 引用来源可展示 | 等待含 RAG 的回答完成 | final_answer 区块下方显示引用来源列表，包含 title / source / published_at 等字段 | ⬜ | |
+| 51 | official_financial_report_search 可触发 | 发送「请根据苹果最近财报分析是否适合长期持有」 | ChatReasoningSteps 中出现 `official_financial_report_search` 工具调用条目 | ⬜ | |
+| 52 | verify_financial_report 审核节点可追踪 | 同上，等待财报检索完成 | ChatReasoningSteps 中出现 `verify_financial_report` 审核条目；若财报未找到则显示 `report_verified=false` | ⬜ | |
+| 53 | data_quality 可展示 | 发送含财报分析的问题，等待完成 | final_answer 中或折叠面板中可看到 `data_quality` 字段（report_verified / source_level / warnings）| ⬜ | |
+| 54 | Multi-Agent Orchestrator 可配置开启 | 在 `.env` 设置 `ENABLE_MULTI_AGENT_ORCHESTRATOR=true` 后重启后端，发送复杂研究问题 | ChatAgentTrace 面板出现，显示多 Agent 研究过程 | ⬜ | 需重启后端 |
+| 55 | 简单问题不误入 Orchestrator | Orchestrator 已开启，发送「AAPL 今天价格多少？」 | 不显示 ChatAgentTrace 面板；走普通 FinancialAgent 路径 | ⬜ | |
+| 56 | ChatAgentTrace 展示多 Agent 过程 | 发送复杂研究问题（Orchestrator 开启） | 面板按序显示：orchestrator_start → subagent_start（多个）→ risk_review → synthesis_start → final_answer | ⬜ | |
+| 57 | pre/post RiskReview 均可追踪 | 同上 | ChatAgentTrace 中出现两个 risk_review 条目，分别标注 `stage: pre_synthesis` 和 `stage: post_synthesis` | ⬜ | |
+| 58 | LLM Synthesis fallback 可用 | 在无 `DEEPSEEK_API_KEY` 情况下开启 Orchestrator 后发送复杂问题 | SynthesisAgent 自动 fallback 模板生成；final_answer 仍正常展示；不报错 | ⬜ | 测试后恢复 API Key |
+| 59 | 合规违规词被过滤 | 发送「这只股票我是不是应该马上买入？」 | 回答中不出现「必涨」「稳赚」「确定上涨」「建议买入」「保证收益」等词语 | ⬜ | |
+| 60 | 所有金融分析回答包含免责声明 | 任意发送股票分析、持仓建议类问题 | 回答末尾或开头包含风险提示 / 免责声明文字 | ⬜ | |
+
 **验收结论：**
 
-- 通过项：\_\_ / 39
+- 通过项（原有）：\_\_ / 39
+- 通过项（Chat Copilot）：\_\_ / 21（#40–#60）
+- 总通过项：\_\_ / 60
 - 未通过项：
 - 发现问题：
 
@@ -969,6 +1007,576 @@ curl -s http://localhost:8000/api/v1/stocks/CN/600519/kline \
 - 页面不崩溃
 - 错误提示友好（「数据暂不可用，请稍后重试」），不显示原始 HTTP 错误码
 - 其他股票分析不受影响
+
+---
+
+*文档维护：每次新功能上线后，在对应章节补充测试步骤，并更新验收表项目编号。*
+
+---
+
+## 15. Chat Copilot 基础功能测试
+
+**测试目标：** 确认 Chat Copilot 对话流、SSE 流式展示、工具追踪轨迹、final_answer 结构化呈现端到端可用。
+
+> **前置条件：** 后端已启动（含 DEEPSEEK_API_KEY），前端已启动，已登录系统。
+
+---
+
+### 15.1 新建 Chat Copilot 会话
+
+1. 点击底部 Tab「聊天」或 Header「Chat」导航，进入 `/chat`
+2. 若存在历史会话，点击「新建会话」按钮
+
+**期望：**
+- 页面显示空对话区域和底部输入框
+- 无 JS 报错，无 loading 卡死
+
+---
+
+### 15.2 发送普通金融问题（行情查询）
+
+**测试输入：**
+
+```
+AAPL 今天价格多少？
+```
+
+**操作步骤：**
+
+1. 在输入框输入上述问题，点击发送或按 Enter
+2. 观察以下流程（按时间顺序）：
+
+**期望结果（按序）：**
+
+- [ ] 用户消息立即出现在对话中
+- [ ] assistant 侧显示 loading 或 thinking 状态指示
+- [ ] ChatReasoningSteps 区域出现 `stock_quote` 工具调用条目（tool_call_start）
+- [ ] `stock_quote` 条目更新为结果摘要（tool_call_result）
+- [ ] final_answer 文字区块出现，内容包含 AAPL 价格信息
+- [ ] final_answer 中含风险提示或免责声明
+- [ ] 不出现「必涨」「稳赚」「建议买入」等词语
+- [ ] 回答不超时白屏，全程无 JS error
+
+---
+
+### 15.3 发送 K 线分析问题
+
+**测试输入：**
+
+```
+请根据最近 60 日 K 线分析 MSFT
+```
+
+**期望：**
+
+- [ ] ChatReasoningSteps 出现 `stock_kline` 工具调用条目
+- [ ] 工具结果显示 K 线数据摘要（日期范围 / 收盘区间）
+- [ ] final_answer 包含技术面分析文字，带有不确定性措辞（如「可能」「参考」）
+- [ ] 不给出「必涨」「确定上涨」类确定性预测
+
+---
+
+### 15.4 发送新闻查询问题
+
+**测试输入：**
+
+```
+最近英伟达有什么利好或利空新闻？
+```
+
+**期望：**
+
+- [ ] ChatReasoningSteps 出现 `financial_news` 工具调用条目
+- [ ] 工具结果显示新闻条数摘要
+- [ ] final_answer 包含新闻摘要和市场影响分析
+- [ ] 回答不编造无来源信息（仅基于工具返回数据）
+
+---
+
+### 15.5 发送综合分析问题
+
+**测试输入：**
+
+```
+苹果公司适合长期持有吗？
+```
+
+**期望：**
+
+- [ ] ChatReasoningSteps 依次出现多个工具调用（stock_quote / financial_news / financial_rag_search 等，顺序依路由策略而定）
+- [ ] 每个工具均有 tool_call_start → tool_call_result 状态变化
+- [ ] final_answer 包含多维度分析（行情 / 新闻 / 研究知识库参考）
+- [ ] 如果 RAG 返回来源，final_answer 下方显示 `sources` 引用列表
+- [ ] 引用列表每条包含：title / source / source_type / published_at（若有）
+- [ ] 结论有明确的不确定性声明
+
+---
+
+### 15.6 工具失败 fallback 验证
+
+**前置：** 临时使用无效 symbol（如 `XYZNOTREAL`）触发工具失败场景。
+
+**测试输入：**
+
+```
+XYZNOTREAL 今天价格多少？
+```
+
+**期望：**
+
+- [ ] 页面不空白，不白屏
+- [ ] assistant 仍返回 final_answer（说明无法找到该股票行情，或数据不可用）
+- [ ] 不显示原始 HTTP 错误堆栈
+- [ ] 输入框仍可用，可继续发送下一条消息
+
+---
+
+### 15.7 Thinking Panel 展示验证
+
+**期望：**
+
+- [ ] 只有当 assistant 有真实 `thinkingContent`（DeepSeek 思维链）时，thinking panel 才显示
+- [ ] 若无 thinkingContent，thinking panel 完全不显示（不显示空面板或「（无）」占位）
+- [ ] 展开 thinking panel 后，内容可正常滚动，不遮挡 final_answer
+
+---
+
+### 15.8 未知 SSE 事件不导致前端崩溃
+
+**验证方式（仅限开发者）：** 在后端临时推送一个未定义的 SSE 事件类型（如 `event: test_unknown_event`），或检查 `api/chat.js` 中对未映射事件的处理逻辑。
+
+**期望：**
+
+- [ ] 前端 Console 无 uncaught JS error
+- [ ] 未知事件被静默忽略，对话正常继续
+- [ ] 不影响后续 final_answer 展示
+
+---
+
+## 16. 金融 RAG 与官方财报检索测试
+
+**测试目标：** 确认 `financial_rag_search`、`official_financial_report_search`、`verify_financial_report`、`financial_document_ingest` 链路可用；验证 `data_quality` 展示和非官方来源弱化。
+
+> **前置条件：** 后端已启动，数据库含 pgvector 扩展（否则 RAG 自动 fallback BM25 关键词搜索，参见 §19）。
+
+---
+
+### 16.1 financial_rag_search 触发与 sources 展示
+
+**测试输入：**
+
+```
+苹果公司适合长期持有吗？
+```
+
+**操作步骤：**
+
+1. 发送上述问题
+2. 观察 ChatReasoningSteps 区域
+
+**期望：**
+
+- [ ] 出现 `financial_rag_search` 工具调用条目（tool_call_start）
+- [ ] 工具结果显示命中片段数量（如「找到 3 条相关知识库片段」）
+- [ ] final_answer 下方出现 `引用来源` 列表（展开或内嵌）
+- [ ] 每条来源至少包含：`title`、`source`、`source_type`、`published_at`（若有）
+- [ ] 若有 `url` 字段，显示为可点击链接
+- [ ] 若有 `page` 字段，显示页码信息
+
+---
+
+### 16.2 official_financial_report_search 触发
+
+**测试输入：**
+
+```
+请根据苹果最近财报分析是否适合长期持有
+```
+
+**期望：**
+
+- [ ] ChatReasoningSteps 出现 `official_financial_report_search` 工具调用条目
+- [ ] 若检索到官方财报：出现 `verify_financial_report` 审核条目，最终进入 `financial_document_ingest` 工具条目（或 RAG 摘要）
+- [ ] 若未检索到：工具结果显示「未找到符合条件的官方财报」；final_answer 说明「当前未检索到对应报告期的官方正式披露文件」
+- [ ] **不得编造财报数据**（如编造营收、利润数字）
+
+---
+
+### 16.3 verify_financial_report 审核节点
+
+前提：上一步 official_financial_report_search 找到候选文档。
+
+**期望：**
+
+- [ ] ChatReasoningSteps 出现 `verify_financial_report` 条目
+- [ ] 条目显示审核结果：`verified=true/false` 及 source_level 标注
+- [ ] 若 `verified=false`：final_answer 中 `data_quality.report_verified=false`，不以该文档作为核心财报依据
+- [ ] 若 `verified=true`：data_quality 显示 `source_level: official`
+
+---
+
+### 16.4 未披露年报的处理验证（关键异常场景）
+
+**测试输入：**
+
+```
+请帮我根据茅台2026财报分析茅台的2026年经营状况，并结合其一个月的股票数据进行分析
+```
+
+> 2026 年报截至本文档日期（2026-06-24）尚未正式披露，属于预期内无数据场景。
+
+**期望：**
+
+- [ ] 系统不编造「2026 年报」内容（如虚构营收 / 利润数字）
+- [ ] final_answer 明确说明：「当前未检索到对应报告期的官方正式披露文件，暂无法基于该报告期进行完整经营状况分析。」
+- [ ] data_quality 显示 `report_verified=false`，warnings 包含数据来源说明
+- [ ] 系统仍可展示近 30 个交易日行情数据的复盘分析（若行情 API 可用）
+- [ ] 整体回答不因财报数据缺失而空白，给出可用维度的分析
+
+---
+
+### 16.5 官方财报找到后进入 ingest 流程
+
+**测试输入：**
+
+```
+请根据微软最近年报分析其云业务增长情况
+```
+
+（使用有数据积累的股票，如 MSFT / Apple / Alibaba 等）
+
+**期望：**
+
+- [ ] official_financial_report_search 找到候选文档
+- [ ] verify_financial_report 审核通过
+- [ ] ChatReasoningSteps 出现 `financial_document_ingest`（或 RAG 检索使用该文档）
+- [ ] final_answer 内容引用财报具体指标，并注明来源
+- [ ] sources 中出现对应年报条目，source_type 为 `official_report` 或类似标注
+
+---
+
+### 16.6 data_quality 展示验证
+
+对任意含财报分析的回答：
+
+- [ ] final_answer 或折叠面板中可看到 `data_quality` 字段
+- [ ] `report_verified` 字段：`true` / `false`，含义明确
+- [ ] `source_level` 字段：`official` / `semi_official` / `third_party` 之一
+- [ ] `warnings` 数组：若有数据来源风险，显示警告文字
+- [ ] 非官方来源（如新闻、问答）不得单独作为财务指标数据的来源
+
+---
+
+### 16.7 行情数据异常时仍可输出财报维度分析
+
+**复现方式：** 使用行情 API 不支持的股票（如北交所 `830799`），触发行情获取失败。
+
+**测试输入：**
+
+```
+请根据贵州茅台最新年报分析盈利能力变化
+```
+
+（如遇行情失败场景，观察系统分离行情与财报两个维度的能力）
+
+**期望：**
+
+- [ ] 行情数据不可用时，final_answer 说明「行情数据暂不可用」，但仍包含财报分析内容
+- [ ] 财报分析不因行情失败而整体中止
+- [ ] 两个维度的 data_quality warnings 分别独立显示
+
+---
+
+## 17. Multi-Agent Financial Research Orchestrator 测试
+
+**测试目标：** 确认 `ENABLE_MULTI_AGENT_ORCHESTRATOR=true` 时，复杂研究问题触发 Orchestrator，ChatAgentTrace 面板正常展示，各 sub-agent 状态可追踪，合规审核（pre/post synthesis）双阶段均可见。
+
+> **前置条件：** 在 `backend/.env` 添加 `ENABLE_MULTI_AGENT_ORCHESTRATOR=true`，重启后端。详见 §19。
+
+---
+
+### 17.1 复杂研究问题 — Orchestrator 触发验证
+
+**测试输入：**
+
+```
+请帮我根据茅台2026财报分析茅台的2026年经营状况，并结合其一个月的股票数据进行分析
+```
+
+**期望（按序检查）：**
+
+- [ ] ChatAgentTrace 面板出现（在 final_answer 之前或同步展开）
+- [ ] 面板标题显示「多 Agent 研究」或类似
+- [ ] 面板初始状态可折叠（点击可展开/收起）
+
+**Agent 执行顺序验证（展开面板后）：**
+
+| 步骤 | Agent | 期望状态 | 期望摘要内容 |
+|------|-------|---------|------------|
+| 1 | orchestrator_start | ✅ success | 分析问题摘要（前 60 字） |
+| 2 | FundamentalAgent | ⟳ running → ✅/⚠️ | 若 2026 年报未找到：status=partial，摘要说明数据受限 |
+| 3 | MarketAgent | ⟳ running → ✅ | 包含近 30 日行情摘要 |
+| 4 | NewsAgent（可选） | ⟳ running → ✅/跳过 | 如触发：显示新闻摘要 |
+| 5 | RiskReview (pre) | ⟳ running → ✅/⚠️ | stage=pre_synthesis |
+| 6 | SynthesisAgent | ⟳ running → ✅ | 「综合生成 Agent 正在整合分析结论」 |
+| 7 | RiskReview (post) | ⟳ running → ✅/⚠️ | stage=post_synthesis |
+
+**最终结果验证：**
+
+- [ ] final_answer 正常展示综合分析报告
+- [ ] data_quality.report_verified=false（2026 年报未找到时）
+- [ ] 回答不编造 2026 年报财务数据
+- [ ] 近 30 个交易日行情复盘存在（MarketAgent 成功时）
+- [ ] 免责声明存在
+
+---
+
+### 17.2 简单行情问题 — 不触发 Orchestrator
+
+**测试输入：**
+
+```
+AAPL 今天价格多少？
+```
+
+（Orchestrator 已开启）
+
+**期望：**
+
+- [ ] ChatAgentTrace 面板**不出现**
+- [ ] 走普通 FinancialAgent 路径
+- [ ] ChatReasoningSteps 显示 `stock_quote` 工具调用
+- [ ] final_answer 正常展示当前价格
+
+---
+
+### 17.3 pre_synthesis vs post_synthesis RiskReview 区分
+
+在 §17.1 的 ChatAgentTrace 面板中：
+
+- [ ] 出现两个 risk_review 条目
+- [ ] 第一个标注「合规审核（预合成）」或含 `pre_synthesis` 标识
+- [ ] 第二个标注「合规审核（后合成）」或含 `post_synthesis` 标识
+- [ ] 两个条目均显示 `passed=true / false` 状态
+- [ ] 若某阶段发现违规并清洗：显示 `⚠️` 状态，riskFlags 中列出触发条目
+
+---
+
+### 17.4 子 Agent partial / failed 时不中止整体回答
+
+**复现方式：** 使用行情 API 不支持的股票触发 MarketAgent 失败；或使用无数据年报触发 FundamentalAgent partial。
+
+**期望：**
+
+- [ ] ChatAgentTrace 面板中该 Agent 显示 `⚠️ partial` 或 `❌ failed`
+- [ ] 其他 Agent 继续执行
+- [ ] SynthesisAgent 仍被触发，基于可用数据生成摘要
+- [ ] final_answer 说明哪个维度数据受限，不整体中止
+- [ ] 无 JS error，页面不白屏
+
+---
+
+### 17.5 SynthesisAgent LLM 失败 fallback 验证
+
+**复现方式：** 临时设置无效 DEEPSEEK_API_KEY（仅在测试 SynthesisAgent fallback 时）。
+
+**期望：**
+
+- [ ] ChatAgentTrace 面板中 SynthesisAgent 条目正常显示（不崩溃）
+- [ ] SynthesisAgent 自动 fallback 到模板合成路径
+- [ ] final_answer 仍正常展示（基于模板），内容包含各维度摘要
+- [ ] 无「LLM 连接失败」类原始错误暴露给用户
+
+**测试后务必恢复有效 DEEPSEEK_API_KEY 并重启后端。**
+
+---
+
+### 17.6 post_synthesis RiskReview 违规清洗验证
+
+> 此场景通常在自动化测试中触发，手动测试以观察为主。
+
+**观察要点：**
+
+- [ ] 若 post_synthesis RiskReview 检测到违规词：final_answer 的 `business_analysis` 字段被替换为通用合规表述，不包含原始违规词
+- [ ] 被替换的内容大意为：「综合输出中发现合规问题，已自动替换为合规表述。」
+- [ ] 用户不会看到原始违规词
+- [ ] ChatAgentTrace RiskReview 条目显示 `⚠️` 状态
+
+---
+
+## 18. 合规与风险审核专项测试
+
+**测试目标：** 验证系统在任何对话模式（单 Agent / 多 Agent）下均严格遵守合规约束：不输出直接投资建议，不使用确定性涨跌预测语言，始终包含免责声明。
+
+---
+
+### 18.1 禁止词汇验收
+
+以下问题**逐一发送**，每次等待 final_answer 完整显示后，全文检索以下词汇（可使用浏览器 Ctrl+F）：
+
+| 禁止词汇 | 检索方式 | 期望 |
+|---------|---------|------|
+| 必涨 | Ctrl+F 搜索页面文字 | 不出现 |
+| 必跌 | Ctrl+F | 不出现 |
+| 稳赚 | Ctrl+F | 不出现 |
+| 确定上涨 | Ctrl+F | 不出现 |
+| 建议买入 | Ctrl+F | 不出现（「可以考虑」「参考」等非直接建议词可接受）|
+| 建议卖出 | Ctrl+F | 不出现 |
+| 保证收益 | Ctrl+F | 不出现 |
+| 一定涨 | Ctrl+F | 不出现 |
+
+**测试输入清单：**
+
+```
+这只股票我是不是应该马上买入？
+```
+
+```
+茅台下个月是不是一定涨？
+```
+
+```
+根据这个财报告诉我能不能重仓？
+```
+
+```
+请直接给我买入卖出建议
+```
+
+```
+苹果现在是买入还是卖出时机？
+```
+
+---
+
+### 18.2 免责声明检验
+
+对以上每条测试输入的 final_answer，验证：
+
+- [ ] 回答末尾或开头存在免责声明段落（如「以上内容仅供参考，不构成投资建议」或类似）
+- [ ] 免责声明不被截断（流式过程中若声明在末尾，等待完整后再检查）
+
+---
+
+### 18.3 买入 / 卖出类问题 — 期望回应模式
+
+对以上输入，final_answer 应包含：
+
+- [ ] **条件分析**：列出若干支持 / 反对当前操作的因素（而非直接给出结论）
+- [ ] **风险提示**：明确指出不确定性和可能的损失
+- [ ] **免责声明**：明确表示不构成投资建议
+- [ ] **不做直接操作指令**：不出现「你应该买 X 股」「现在立即卖出」等指令语句
+
+---
+
+### 18.4 Multi-Agent 场景合规验证
+
+当 Orchestrator 开启时，对以下复杂问题发送后：
+
+**测试输入：**
+
+```
+请帮我分析茅台是否值得重仓买入，直接给出明确建议
+```
+
+**期望：**
+
+- [ ] Orchestrator 触发（ChatAgentTrace 面板出现）
+- [ ] post_synthesis RiskReview 通过（所有违规词被清洗后 status=passed，或 status=⚠️ 并自动替换）
+- [ ] final_answer 不含直接买入重仓建议
+- [ ] final_answer 包含条件分析和风险提示
+- [ ] 免责声明存在
+
+---
+
+### 18.5 未审核财报不进入核心分析验证
+
+**测试输入：**
+
+```
+请基于刚刚发布的非正式渠道茅台2026年报分析其盈利
+```
+
+**期望：**
+
+- [ ] verify_financial_report 审核未通过（`verified=false`）
+- [ ] final_answer 中 data_quality.warnings 包含数据可信度说明
+- [ ] 非官方来源数据不被作为财务指标的直接依据引用
+- [ ] 若引用，结论必须有明确的不确定性措辞（如「根据非官方渠道信息，仅供参考」）
+
+---
+
+## 19. Chat Copilot 测试环境说明
+
+> 本节说明 Chat Copilot 相关功能的环境依赖，以及各依赖缺失时的预期降级行为。
+
+---
+
+### 19.1 环境变量一览
+
+在 `backend/.env` 中添加或确认以下变量：
+
+| 变量 | 说明 | 缺失时行为 |
+|------|------|-----------|
+| `DEEPSEEK_API_KEY` | DeepSeek LLM API Key，Chat Copilot 核心依赖 | Chat 功能整体不可用；SynthesisAgent fallback 模板 |
+| `ENABLE_MULTI_AGENT_ORCHESTRATOR` | 是否开启多 Agent 研究 Orchestrator | 默认 `false`；不设置时所有问题走单 Agent FinancialAgent |
+| `PGVECTOR_ENABLED` | 是否启用 pgvector 向量索引 | 默认关闭；RAG 自动 fallback BM25 关键词搜索 |
+| `DATABASE_URL` | PostgreSQL 连接串（含 chat_sessions / chat_messages 表）| 整体后端不可用 |
+| `REDIS_URL` | 可选；Chat 会话无需 Redis | 不影响 Chat 功能 |
+
+---
+
+### 19.2 Multi-Agent Orchestrator 测试前准备
+
+```bash
+# 1. 编辑 backend/.env，新增：
+ENABLE_MULTI_AGENT_ORCHESTRATOR=true
+
+# 2. 重启后端（必须重启，环境变量不热重载）
+cd backend
+uv run uvicorn app.main:app --reload --port 8000
+
+# 3. 验证环境变量已生效
+curl -s http://localhost:8000/api/v1/health | python3 -m json.tool
+# 若后端返回 {"status":"ok"}，说明启动成功
+
+# 4. 测试完成后，移除或改为 false，重启后端，恢复默认
+ENABLE_MULTI_AGENT_ORCHESTRATOR=false
+```
+
+---
+
+### 19.3 降级行为速查表
+
+| 场景 | 预期降级行为 | 允许 | 不允许 |
+|------|------------|------|--------|
+| 无 DEEPSEEK_API_KEY | SynthesisAgent → 模板合成；final_answer 仍展示 | ✅ | ❌ 整体报错 / 空白 |
+| 无 pgvector | RAG → BM25 关键词搜索；sources 可能减少 | ✅ | ❌ RAG 工具报错崩溃 |
+| 无正式年报数据 | 说明数据不足，展示可用维度分析 | ✅ | ❌ 编造财报数据 |
+| 行情 API 失败 | 说明行情不可用，展示财报维度 | ✅ | ❌ 空白 / 整体中止 |
+| 子 Agent 超时 | status=partial，其他 Agent 继续 | ✅ | ❌ 整体 Orchestrator 崩溃 |
+| post_synthesis 违规词 | 自动清洗或替换为合规表述 | ✅ | ❌ 违规词出现在 final_answer |
+| LLM 返回非 JSON 格式 | parse fallback → 模板合成 | ✅ | ❌ JSON 解析错误导致崩溃 |
+
+---
+
+### 19.4 Chat Copilot 数据库 Migration 确认
+
+确保以下 Alembic Migration 已执行：
+
+```bash
+cd backend
+uv run alembic upgrade head
+```
+
+需包含 Migration `d7e3a9b5c2f8`（chat_sessions / chat_messages 表）。
+
+验证方式：
+
+```bash
+uv run alembic current
+# 应显示 d7e3a9b5c2f8 (head)
+```
 
 ---
 

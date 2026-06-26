@@ -184,7 +184,42 @@ DEFAULT_ANALYSIS_ENGINE=langgraph uvicorn app.main:app --port 8000
 
 ---
 
-## 9. 后续低优先级路线
+## 9. Post-RC Roadmap — OpenClaw-inspired Chat Copilot（2026-06-18 更新）
+
+### 下一代产品方向
+
+RC 完成后，项目进入 **Phase C 系列（Chat Copilot）**，在现有工作台基础上构建 OpenClaw-inspired 金融智能 Agents 系统。
+
+**核心价值：** 从"用户自己找功能"变成"用户提出研究目标，Agent 调用工具完成任务"。Chat Copilot 是金融垂直场景的 Agent Orchestrator，工作台页面成为 Agent 的数据基座和结果落地层。
+
+**阶段规划（已完成 + 规划中）：**
+
+| 阶段 | 内容 | 状态 | OpenClaw 层级 |
+|------|------|------|--------------|
+| C1 | PRD + 架构设计（6 文档）| ✅ 完成 | 设计 |
+| C2 | Chat UI MVP（`/chat`，8 组件，6 语言，213 modules）| ✅ 完成 | Chat Channel |
+| C3 | Chat API（session + messages，DB migration d7e3a9b5c2f8，6 端点）| ✅ 完成 | Chat Channel |
+| C4 | Tool Registry（9 只只读工具，BaseTool→ToolResult→ToolRegistry，11/11 PASS）| ✅ 完成 | Tools 工具层 |
+| C5 | Action Tools + ConfirmationManager 真实执行 | ✅ 完成 | Action 执行层 |
+| C6 | Financial Skills Layer（6 只金融研究技能）| 规划中 | Skills 技能层 |
+| C7 | Planner + 多步骤任务编排（最多 5 步）| 规划中 | Planner 任务规划 |
+| C8 | Memory + Audit Hardening | 规划中 | Memory + Audit 层 |
+| C9 | OpenClaw-style Skill Registry（可扩展框架）| 规划中 | 全层整合 |
+
+**安全要求（永久）：**
+- 不输出买入/卖出/持有/目标价
+- 所有写操作需用户确认
+- 不支持真实交易
+
+**相关文档：**
+- `docs/chat_agent_prd.md` / `docs/chat_agent_architecture.md`
+- `docs/chat_agent_tool_spec.md` / `docs/chat_agent_build_plan.md`
+- `docs/chat_agent_skills.md`（6 只 Financial Skills 完整规范）
+- `docs/openclaw_inspired_roadmap.md`（导师版技术路线图）
+
+---
+
+## 10. 后续低优先级路线
 
 | 优先级 | 项目 | 条件/说明 |
 |--------|------|----------|

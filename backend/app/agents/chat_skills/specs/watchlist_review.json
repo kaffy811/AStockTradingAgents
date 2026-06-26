@@ -1,0 +1,37 @@
+{
+  "name": "watchlist_review_skill",
+  "display_name": "自选股巡检",
+  "display_name_en": "Watchlist Patrol",
+  "version": "c9_v1",
+  "description": "巡检用户自选股列表，逐只拉取最新行情，整理研究线索，识别异常波动标的。",
+  "enabled": true,
+  "category": "financial_research",
+  "permission_level": "read_only",
+  "required_tools": [
+    "get_watchlist_tool",
+    "get_quote_tool"
+  ],
+  "optional_tools": [],
+  "intent_examples": [
+    "看看我的自选股",
+    "帮我巡检自选股",
+    "自选股研究线索",
+    "自选股哪些值得关注？"
+  ],
+  "output_sections": [
+    "自选股研究摘要",
+    "行情一览",
+    "研究线索",
+    "免责声明"
+  ],
+  "safety_rules": [
+    "no_trading_advice",
+    "no_price_target",
+    "must_include_disclaimer",
+    "user_data_read_only"
+  ],
+  "failure_handling": [
+    "empty_watchlist_gracefully_handled",
+    "tool_failure_returns_partial_result"
+  ]
+}

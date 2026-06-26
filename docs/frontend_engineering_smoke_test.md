@@ -3482,3 +3482,229 @@ engine: engineParam,  // undefined → JSON 序列化时省略此键
 ### 主题 × 语言矩阵（构建级验证）
 
 三套主题（light-holo / dark-dive / paper-lilac）× 六语言（zh-CN / zh-TW / en-US / ja-JP / ko-KR / de-DE）CSS 变量均通过 `html[data-theme]` 属性选择器隔离，无冲突，build 正常。
+
+---
+
+## Phase M47 / M47-b：综合分析页行业热门板块验证
+
+**日期：** 2026-06-11  
+**构建：** ✅ 195 modules, 0 errors
+
+### 改动内容
+
+| 改动 | 文件 | 说明 |
+|------|------|------|
+| 删除"最近搜索"小卡片 | HomeDashboardPanel.vue | 右列上区域移除 |
+| 新增"行业热门板块"卡片 | HomeDashboardPanel.vue | top 6 行业按 hot_score 排列 |
+| 传入 industryList + error | ComprehensiveAnalysisView.vue | 排序后注入 |
+| 点击行业跳转 /industries?focus= | ComprehensiveAnalysisView.vue | onDashGoIndustryBlock |
+| hot stocks limit 5 → 20 | ComprehensiveAnalysisView.vue | 仪表盘 compact 仍 slice(0,5) |
+| focus query 高亮滚动 | IndustryHotView.vue | watch + data-industry-code |
+| data-industry-code 属性 | IndustryHotBlocksCard.vue | 供 focus DOM 查询 |
+| fmtScore 1dp → 2dp | HomeDashboardPanel.vue | 与 IndustryHotBlocksCard 一致 |
+| ind_unknown 缺字段 fallback | HomeDashboardPanel.vue + 6 locales | 行业名为空时展示 |
+| ind_blocks_* keys | zh-TW/ja-JP/ko-KR/es-ES | 4 语言补齐 |
+
+### M47-b 验证项
+
+| # | 验证点 | 结果 |
+|---|--------|------|
+| 1 | 右上区域不再显示"最近搜索" | ✅ 已删除 |
+| 2 | 下方大块"最近搜索"(RecentSearchList)仍保留 | ✅ 未改动 |
+| 3 | 右上区域显示"行业热门板块" | ✅ ind_blocks_title |
+| 4 | 最多显示 6 个行业 | ✅ slice(0,6) |
+| 5 | hot_score 降序排列 | ✅ sort desc in ComprehensiveAnalysisView |
+| 6 | 排名 1/2/3 弱高亮 | ✅ hdp-iblk-rank--top (gold) |
+| 7 | avg_change_pct 正负颜色 | ✅ up/down CSS vars |
+| 8 | hot_score 2dp 格式 | ✅ fmtScore toFixed(2) |
+| 9 | 行业名为空不崩溃 | ✅ || t('ind_unknown') fallback |
+| 10 | hot_score/avg_change_pct 缺失显示 — | ✅ ternary fallback |
+| 11 | 点击"展示全部"跳转 /industries | ✅ emit go-industries |
+| 12 | 点击行业跳转 /industries?focus=<code> | ✅ onDashGoIndustryBlock |
+| 13 | 行业页 focus 高亮+滚动 | ✅ watch + scrollIntoView |
+| 14 | 行业热门股 limit 20 | ✅ HOT_LIMIT=20 (IndustryHotView 已有), ComprehensiveAnalysisView.vue 改为 20 |
+| 15 | loading/empty/error 状态 | ✅ 3 态均覆盖 |
+| 16 | i18n 6 语言 ind_blocks_* + ind_unknown | ✅ 全补齐 |
+| 17 | npm run build | ✅ 195 modules |
+| 18 | python compileall | ✅ 0 errors |
+| 19 | alembic current | ✅ c5e9f12a3b87 (head) |
+
+---
+
+## Phase M48：行业热股查看更多与首页 Loading Polish
+
+**日期：** 2026-06-11  
+**构建：** ✅ 195 modules, 0 errors
+
+### 改动内容
+
+| 改动 | 文件 | 说明 |
+|------|------|------|
+| HOT_LIMIT 20 → 50 | IndustryHotView.vue | 单次 fetch 50，前端 slice 控制展示 |
+| expandedView + displayedItems | IndustryHotView.vue | 默认 slice(0,20)，展开显示全部 |
+| toggleExpand + reset on change | IndustryHotView.vue | 切换行业自动收起 |
+| 股票列表头部 + 切换按钮 | IndustryHotView.vue | ihv-stocks-header / ihv-more-btn |
+| 底部收起按钮 | IndustryHotView.vue | 展开 > 10 条时底部显示 |
+| 行业块加载文案 | HomeDashboardPanel.vue | `ind_loading_heat` 补充文字 |
+| i18n 9 个新 key | 6 locales | ind_loading_heat/ind_hot_view_more/ind_hot_collapse/ind_hot_top_20/ind_hot_top_50/ind_hot_showing |
+
+### M48 验证项
+
+| # | 验证点 | 结果 |
+|---|--------|------|
+| 1 | 默认显示 Top 20 股票（slice） | ✅ HOT_DISPLAY_DEFAULT=20 |
+| 2 | 点击"查看更多"展开 Top 50 | ✅ expandedView=true |
+| 3 | "收起"恢复 Top 20 | ✅ expandedView=false |
+| 4 | 切换行业自动收起 | ✅ onIndustryChange reset |
+| 5 | 股票数 ≤ 20 不显示按钮 | ✅ v-if="filteredItems.length > 20" |
+| 6 | 显示计数 "显示 N / total 支" | ✅ ind_hot_showing param |
+| 7 | 底部收起按钮（展开 > 10 条） | ✅ ihv-bottom-bar |
+| 8 | 行业热度加载文案 | ✅ ind_loading_heat |
+| 9 | 首页空状态：报告/自选/热股/板块 | ✅ 全部已有空状态 |
+| 10 | 6 语言 i18n 覆盖 | ✅ zh-CN/en-US/zh-TW/ja-JP/ko-KR/es-ES |
+| 11 | /industries?focus=<code> 回归 | ✅ 未改动 focus 逻辑 |
+| 12 | npm run build | ✅ 195 modules |
+| 13 | python compileall | ✅ 0 errors |
+| 14 | alembic current | ✅ c5e9f12a3b87 (head) |
+| 15 | 零新依赖，零 migration | ✅ |
+
+---
+
+## Phase M49：自选股批量对比入口优化
+
+**日期：** 2026-06-11  
+**构建：** ✅ 195 modules, 0 errors
+
+### 改动内容
+
+| 改动 | 文件 | 说明 |
+|------|------|------|
+| `useRoute` + `mode=compare` 自动进入批量模式 | WatchlistView.vue | route.query.mode === 'compare' → bulkMode=true |
+| "批量对比"入口按钮 | HomeDashboardPanel.vue | 自选快跳底部，≥2 股才显示 |
+| `go-watchlist-compare` emit + handler | HomeDashboardPanel.vue + ComprehensiveAnalysisView.vue | router.push('/watchlist?mode=compare') |
+| `dash_compare_bulk` key | 6 locales | 中英日韩西繁 |
+
+### 已有功能确认（M17 已实现）
+
+| 功能 | 文件 | 状态 |
+|------|------|------|
+| WatchlistToolbar 批量选择按钮 | WatchlistToolbar.vue | ✅ wl_tb_bulk |
+| "加入对比"按钮 disabled < 2 or > 4 | WatchlistToolbar.vue | ✅ :disabled="selectedCount<2\|\|>4" |
+| selectedCount 展示 | WatchlistToolbar.vue | ✅ wl_tb_selected {count} |
+| "清空选择" "退出批量" | WatchlistToolbar.vue | ✅ |
+| handleCompare() → /compare?stocks=... | WatchlistView.vue | ✅ |
+| StockCompareView URL 解析 | StockCompareView.vue | ✅ |
+
+### M49 验证项
+
+| # | 验证点 | 结果 |
+|---|--------|------|
+| 1 | 综合分析页自选快跳显示"批量对比"入口（≥2 只时） | ✅ |
+| 2 | 点击"批量对比" → /watchlist?mode=compare | ✅ |
+| 3 | WatchlistView 自动进入批量选择模式 | ✅ route.query.mode |
+| 4 | 勾选 < 2 只，"加入对比"按钮 disabled | ✅ :disabled |
+| 5 | 勾选 2-4 只，"加入对比"可用 | ✅ |
+| 6 | 点击"加入对比" → /compare?stocks=CN:000001,... | ✅ handleCompare() |
+| 7 | StockCompareView 自动加载所选股票 | ✅ URL query 解析 |
+| 8 | 勾选 > 4 只，"加入对比"按钮 disabled | ✅ :disabled > 4 |
+| 9 | "清空选择" "退出批量"可用 | ✅ |
+| 10 | 自选快跳 < 2 只时不显示入口 | ✅ v-if ≥ 2 |
+| 11 | 原有自选管理（添加/删除/备注）不受影响 | ✅ 未改动相关逻辑 |
+| 12 | 6 语言 dash_compare_bulk 覆盖 | ✅ |
+| 13 | npm run build | ✅ 195 modules |
+| 14 | python compileall | ✅ 0 errors |
+| 15 | alembic current | ✅ c5e9f12a3b87 |
+
+---
+
+## Phase M50：A 股全量行业归类与行业页数据扩容（2026-06-11）
+
+### 根本原因定位
+
+| 问题 | 位置 | 说明 |
+|------|------|------|
+| 行业页只显示 5 支 | `industry_hot_stock_snapshot` 表 | `refresh_industry_hot_stocks.py` 历史上以 `--top-n 5`（默认值）运行，快照只存 rank 1-5 |
+| API 返回 5 是数据问题 | `industry_hot_stock_service.py` | `rank <= limit` 过滤，但快照里只有 rank 1-5 |
+| 前端请求 limit=50 但只得到 5 | 数据链路 | 数据瓶颈在 DB，非前端问题 |
+| 历史上 `--top-n 5` 触发原因 | `scripts/refresh_industry_hot_stocks.py` | argparse default=5，未显式传 --top-n |
+
+### 修复内容
+
+| 修改 | 文件 | 说明 |
+|------|------|------|
+| 重新运行刷新脚本 `--top-n 50` | 数据层 | 30/30 行业写入 Top-50 快照 |
+| 修复 symbol 重复 bug | `refresh_industry_hot_stocks.py` | candidates 按 symbol 去重，避免 UniqueViolation |
+| 后端 `le=50` → `le=100` | `industry.py` router | 为未来 Top-100 留余量 |
+| 服务层默认 `limit=5` → `limit=20` | `industry_hot_stock_service.py` | 默认返回 Top 20 |
+| 新增 `total` 字段 | `HotStockResponse`, service | 行业在 stock_industry_map 中的真实成分股总数 |
+| 前端用 `hotData.total` 显示总数 | `IndustryHotView.vue` | "显示 20 / 369 支" 格式 |
+| API 默认 limit 5→20 | `api/industries.js` | `getIndustryHotStocks` 默认 limit |
+
+### DB 数据统计（2026-06-11）
+
+| 指标 | 数量 |
+|------|------|
+| stock_master 总数 | 5196 |
+| CN（A股）股票数 | 5166 |
+| HK 股票数 | 30 |
+| industry_master 行业数 | 32 |
+| stock_industry_map 映射总数 | 5185 |
+| 有行业标签的 A 股数 | 5166（覆盖率 ~100%） |
+| 无行业标签的 A 股数 | ≈0（极少） |
+
+### 行业热股快照数量（刷新后 Top 代表行业）
+
+| 行业 | 快照股票数 | 行业成分股总数 |
+|------|-----------|--------------|
+| 电力设备 | 50 | 369 |
+| 计算机 | 50 | 334 |
+| 医药生物 | 50 | 336 |
+| 银行 | 42 | 42 |
+| 综合 | 14 | ~14 |
+
+### M50 验证项
+
+| # | 验证点 | 结果 |
+|---|--------|------|
+| 1 | 行业页默认显示 Top 20 | ✅ HOT_DISPLAY_DEFAULT=20 |
+| 2 | 点击"查看更多"展开到 Top 50 | ✅ expandedView toggle |
+| 3 | 显示格式："显示 N / industry_total 支" | ✅ hotData.total |
+| 4 | 主流行业可看到 50 支热股 | ✅ 电力设备/计算机等 50 支 |
+| 5 | 冷门行业显示真实数量 | ✅ 综合 14 支/钢铁 43 支 |
+| 6 | API total 字段返回行业成分股总数 | ✅ 电力设备=369 |
+| 7 | 后端 limit 最大 100 | ✅ le=100 |
+| 8 | /industries?focus=<code> 仍正常 | ✅ 未改动 |
+| 9 | npm run build | ✅ 195 modules |
+| 10 | python compileall | ✅ 0 errors |
+| 11 | alembic current | ✅ c5e9f12a3b87 |
+| 12 | 零新依赖 / 零 migration | ✅ |
+
+---
+
+## Phase M51-b reportText.js extractSummary 修复验证（2026-06-12）
+
+**问题：** LLM 生成 en-US 报告时将 `### 摘要结论` 翻译为 `### Summary & Conclusions`（含 "&"），而旧 `extractSummary()` 仅匹配 `### Summary Conclusion`，导致 en-US 单面报告摘要提取回落到 `I. Summary`（样板包装文字），返回 "This report analyzes..." 而非实际 Agent 结论。
+
+**修复：** `frontend/src/utils/reportText.js` `extractSummary()` en-US 路径新增 4 个变体：
+
+```javascript
+const m3b = _extract('### Summary & Conclusions')  // LLM 最常用变体
+const m3c = _extract('### Summary & Conclusion')
+const m3d = _extract('### Summary Conclusions')
+const m3e = _extract('### Summary')                 // 广播兜底（任何 Summary 子节）
+```
+
+**验证结果（8/8 PASS）：**
+
+| # | 测试用例 | 结果 |
+|---|---------|------|
+| 1 | `### Summary & Conclusions` 变体命中 | ✅ |
+| 2 | `### Summary Conclusion` 精确匹配保留 | ✅ |
+| 3 | `### Summary Conclusions` 变体命中 | ✅ |
+| 4 | `### Summary & Conclusion` 变体命中 | ✅ |
+| 5 | zh-CN `### 摘要结论` 回归 | ✅ |
+| 6 | zh-CN `一、综合结论卡片` 回归 | ✅ |
+| 7 | Legacy `I. Summary` 回归 | ✅ |
+| 8 | 无 `###` 时 `I. Summary` 正常回落 | ✅ |
+
+**静态检查：** npm run build ✅ 195 modules / python compileall ✅ 0 errors

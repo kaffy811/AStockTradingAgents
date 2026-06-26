@@ -1,0 +1,46 @@
+{
+  "name": "general_financial_answer_skill",
+  "display_name": "通用金融研究问答",
+  "display_name_en": "General Financial Research Q&A",
+  "version": "c15_v1",
+  "description": "通用金融研究问答兜底技能。当所有具体技能均不匹配时，通过 RAG 检索 + DeepSeek 生成结构化研究回答。",
+  "enabled": true,
+  "category": "financial_research",
+  "permission_level": "read_only",
+  "required_tools": [
+    "get_latest_news_tool",
+    "get_recent_reports_tool"
+  ],
+  "optional_tools": [
+    "resolve_stock_tool",
+    "get_quote_tool",
+    "get_kline_summary_tool",
+    "get_industry_hot_tool"
+  ],
+  "intent_examples": [
+    "贵州茅台最新财报表现如何？",
+    "这只股票的业绩怎么样",
+    "港股行情如何",
+    "分析一下宁德时代",
+    "有什么研究建议"
+  ],
+  "output_sections": [
+    "研究摘要",
+    "关键依据",
+    "风险与不确定性",
+    "后续观察",
+    "资料来源"
+  ],
+  "safety_rules": [
+    "no_trading_advice",
+    "no_price_target",
+    "external_content_untrusted",
+    "must_include_disclaimer",
+    "data_limitation_disclosure"
+  ],
+  "failure_handling": [
+    "rag_failure_degrades_gracefully",
+    "deepseek_failure_returns_structured_fallback",
+    "always_returns_non_empty_answer"
+  ]
+}

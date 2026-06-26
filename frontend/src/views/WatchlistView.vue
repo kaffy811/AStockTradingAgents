@@ -143,7 +143,7 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted, nextTick } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from '../utils/i18n.js'
 
 const { t } = useI18n()
@@ -164,6 +164,7 @@ import WatchlistToolbar  from '../components/WatchlistToolbar.vue'
 import WatchlistStockCard from '../components/WatchlistStockCard.vue'
 
 const router = useRouter()
+const route  = useRoute()
 
 // ── List state ────────────────────────────────────────────────────────────────
 const loading   = ref(false)
@@ -462,7 +463,13 @@ function goHistory(item) {
   router.push({ path: '/history', query: { market: item.market, symbol: item.symbol } })
 }
 
-onMounted(loadItems)
+onMounted(async () => {
+  await loadItems()
+  // Auto-enter bulk mode when navigating from HomeDashboardPanel "批量对比" button
+  if (route.query.mode === 'compare') {
+    bulkMode.value = true
+  }
+})
 </script>
 
 <style scoped>

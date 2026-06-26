@@ -1,0 +1,40 @@
+{
+  "name": "stock_anomaly_skill",
+  "display_name": "股票异动分析",
+  "display_name_en": "Stock Anomaly Analysis",
+  "version": "c9_v1",
+  "description": "分析股票近期异动原因，结合技术面行情与近72小时新闻，梳理上涨/下跌驱动力。",
+  "enabled": true,
+  "category": "financial_research",
+  "permission_level": "read_only",
+  "required_tools": [
+    "resolve_stock_tool",
+    "get_quote_tool",
+    "get_kline_summary_tool",
+    "get_latest_news_tool"
+  ],
+  "optional_tools": [],
+  "intent_examples": [
+    "中船特气最近为什么涨这么多？",
+    "688146 为什么异动？",
+    "这只股票最近为什么跌？",
+    "近期表现怎么样"
+  ],
+  "output_sections": [
+    "异动研究摘要",
+    "关键发现",
+    "后续观察",
+    "免责声明"
+  ],
+  "safety_rules": [
+    "no_trading_advice",
+    "no_price_target",
+    "external_content_untrusted",
+    "must_include_disclaimer"
+  ],
+  "failure_handling": [
+    "missing_stock_requires_clarification",
+    "tool_failure_returns_partial_result",
+    "news_empty_must_be_disclosed"
+  ]
+}

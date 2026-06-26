@@ -1,0 +1,216 @@
+{
+  "version": "c10_v1",
+  "generated_at": "2026-06-18",
+  "phase": "C10",
+  "status": "production_ready",
+  "architecture": {
+    "layers": [
+      "safety_guard",
+      "planner",
+      "skill_registry",
+      "intent_matchers",
+      "tool_registry",
+      "action_tools",
+      "memory",
+      "audit"
+    ],
+    "intent_classification": "rule_based_regex",
+    "llm_in_loop": false
+  },
+  "tools": {
+    "count": 9,
+    "action_count": 3,
+    "items": [
+      {
+        "name": "resolve_stock_tool",
+        "description": "Resolve ticker to market/symbol",
+        "permission_level": "read_only",
+        "markets": ["CN", "HK", "US"]
+      },
+      {
+        "name": "get_quote_tool",
+        "description": "Real-time quote (price, change, volume)",
+        "permission_level": "read_only",
+        "markets": ["CN", "HK", "US"]
+      },
+      {
+        "name": "get_kline_summary_tool",
+        "description": "K-line summary with range statistics",
+        "permission_level": "read_only",
+        "markets": ["CN", "HK", "US"]
+      },
+      {
+        "name": "get_latest_news_tool",
+        "description": "Recent news headlines",
+        "permission_level": "read_only",
+        "markets": ["CN"]
+      },
+      {
+        "name": "get_recent_reports_tool",
+        "description": "User's recent analysis reports",
+        "permission_level": "read_only",
+        "markets": ["all"]
+      },
+      {
+        "name": "get_report_detail_tool",
+        "description": "Full report content by ID",
+        "permission_level": "read_only",
+        "markets": ["all"]
+      },
+      {
+        "name": "get_watchlist_tool",
+        "description": "User's watchlist items",
+        "permission_level": "read_only",
+        "markets": ["all"]
+      },
+      {
+        "name": "get_industry_hot_tool",
+        "description": "Industry heat scores and change stats",
+        "permission_level": "read_only",
+        "markets": ["CN"]
+      },
+      {
+        "name": "get_industry_stocks_tool",
+        "description": "Hot stocks by industry",
+        "permission_level": "read_only",
+        "markets": ["CN"]
+      }
+    ],
+    "action_items": [
+      {
+        "name": "add_to_watchlist",
+        "description": "Add stock to user watchlist",
+        "permission_level": "write_action",
+        "requires_confirmation": true
+      },
+      {
+        "name": "create_analysis_run",
+        "description": "Trigger comprehensive analysis report",
+        "permission_level": "write_action",
+        "requires_confirmation": true
+      },
+      {
+        "name": "create_compare_selection",
+        "description": "Create stock comparison",
+        "permission_level": "write_action",
+        "requires_confirmation": true
+      }
+    ]
+  },
+  "skills": {
+    "count": 6,
+    "spec_version": "c9_v1",
+    "items": [
+      {
+        "name": "stock_anomaly",
+        "enabled": true,
+        "permission_level": "read_only",
+        "required_tools": ["resolve_stock_tool", "get_quote_tool", "get_kline_summary_tool", "get_latest_news_tool"],
+        "safety_rules": ["no_trading_advice", "must_include_disclaimer"]
+      },
+      {
+        "name": "risk_first",
+        "enabled": true,
+        "permission_level": "read_only",
+        "required_tools": ["resolve_stock_tool", "get_kline_summary_tool", "get_latest_news_tool"],
+        "optional_tools": ["get_recent_reports_tool"],
+        "safety_rules": ["no_trading_advice", "must_include_disclaimer"]
+      },
+      {
+        "name": "news_catalyst",
+        "enabled": true,
+        "permission_level": "read_only",
+        "required_tools": ["resolve_stock_tool", "get_latest_news_tool", "get_quote_tool"],
+        "safety_rules": ["no_trading_advice", "must_include_disclaimer"]
+      },
+      {
+        "name": "watchlist_review",
+        "enabled": true,
+        "permission_level": "read_only",
+        "required_tools": ["get_watchlist_tool", "get_quote_tool"],
+        "safety_rules": ["no_trading_advice", "must_include_disclaimer"]
+      },
+      {
+        "name": "industry_hotspot",
+        "enabled": true,
+        "permission_level": "read_only",
+        "required_tools": ["get_industry_hot_tool"],
+        "optional_tools": ["get_industry_stocks_tool"],
+        "safety_rules": ["no_trading_advice", "must_include_disclaimer"]
+      },
+      {
+        "name": "report_explanation",
+        "enabled": true,
+        "permission_level": "read_only",
+        "required_tools": ["get_recent_reports_tool"],
+        "optional_tools": ["get_report_detail_tool"],
+        "safety_rules": ["no_trading_advice", "must_include_disclaimer"]
+      }
+    ]
+  },
+  "planner": {
+    "type": "rule_based",
+    "max_steps": 5,
+    "compound_intent_count": 6,
+    "compound_intents": [
+      "anomaly_then_risk",
+      "report_then_risk",
+      "watchlist_scan",
+      "industry_then_stocks",
+      "research_then_action",
+      "compare_then_report"
+    ]
+  },
+  "memory": {
+    "scope": "session",
+    "storage": "session_metadata_jsonb",
+    "types": ["recent_symbols", "recent_queries", "flagged_topics", "session_start"],
+    "recent_symbols_capacity": 10,
+    "recent_queries_capacity": 20,
+    "fire_and_forget": true
+  },
+  "audit": {
+    "per_tool_fields": ["duration_ms", "started_at", "permission_level"],
+    "result_metadata_fields": ["tools_used", "safety_flags", "skill_spec_version", "skill_enabled", "skill_available"]
+  },
+  "safety": {
+    "trading_guard": {
+      "blocked_patterns": ["买入", "卖出", "持有", "建仓", "减仓", "清仓", "目标价", "止损", "止盈"],
+      "pattern_count": 9,
+      "response": "safety_refusal"
+    },
+    "skill_safety_rules": ["no_trading_advice", "must_include_disclaimer"],
+    "injection_guard": true,
+    "disclaimer_required": true,
+    "disclaimer_text": "仅供研究参考，不构成投资建议。"
+  },
+  "api": {
+    "base_path": "/chat",
+    "endpoints": [
+      {"method": "POST", "path": "/chat/sessions", "auth": true, "description": "Create session"},
+      {"method": "GET", "path": "/chat/sessions", "auth": true, "description": "List sessions"},
+      {"method": "POST", "path": "/chat/{session_id}/messages", "auth": true, "description": "Send message"},
+      {"method": "POST", "path": "/chat/{session_id}/confirm", "auth": true, "description": "Confirm action"},
+      {"method": "GET", "path": "/chat/skills", "auth": true, "description": "Skill discovery (C9)"},
+      {"method": "GET", "path": "/chat/{session_id}/memory", "auth": true, "description": "Session memory"},
+      {"method": "DELETE", "path": "/chat/{session_id}/memory", "auth": true, "description": "Clear memory"}
+    ]
+  },
+  "i18n": {
+    "locales": ["zh-CN", "zh-TW", "en-US", "ja-JP", "ko-KR", "es-ES"]
+  },
+  "test_coverage": {
+    "phases": ["C4", "C5", "C6", "C7", "C8", "C9", "C10"],
+    "total_passing": 317,
+    "golden_tasks": 30
+  },
+  "known_limitations": [
+    "Intent classification is rule-based — novel phrasings may fall through",
+    "No LLM synthesis — answers are template-assembled",
+    "CN market focus — HK/US have reduced tool coverage",
+    "Memory is session-scoped — no cross-session persistence",
+    "Planner MAX_STEPS = 5",
+    "No streaming for chat messages",
+    "Skill availability checked at startup only"
+  ]
+}

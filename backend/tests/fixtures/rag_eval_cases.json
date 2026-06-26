@@ -1,0 +1,452 @@
+[
+  {
+    "id": "aapl_services_revenue",
+    "query": "苹果服务业务收入增长情况如何？",
+    "symbol": "AAPL",
+    "market": "US",
+    "expected_keywords": ["services", "revenue"],
+    "expected_source_type": "annual_report",
+    "doc": {
+      "title": "Apple FY2025 Annual Report",
+      "source_type": "annual_report",
+      "source": "SEC",
+      "url": "https://www.sec.gov/Archives/edgar/data/320193/0000320193-25.htm",
+      "published_at": "2025-10-30",
+      "symbol": "AAPL",
+      "market": "US",
+      "text": "Apple Inc. services revenue grew 14% year-over-year to $96.2 billion in fiscal 2025. Services segment includes App Store, Apple Music, iCloud, Apple Pay, and Apple TV+. The segment now represents 24% of total company revenue. Gross margin for services reached 73.9%, significantly higher than products gross margin of 37.2%."
+    }
+  },
+  {
+    "id": "moutai_gross_margin",
+    "query": "茅台毛利率变化如何？",
+    "symbol": "600519",
+    "market": "CN",
+    "expected_keywords": ["毛利率", "营业收入"],
+    "expected_source_type": "annual_report",
+    "doc": {
+      "title": "贵州茅台2025年度报告",
+      "source_type": "annual_report",
+      "source": "上交所",
+      "url": "https://www.sse.com.cn/disclosure/listedinfo/announcement/c/2026-01-15/600519_annual.pdf",
+      "published_at": "2026-01-15",
+      "symbol": "600519",
+      "market": "CN",
+      "text": "贵州茅台2025年度营业收入达到1756亿元，同比增长18.2%。综合毛利率为92.1%，较上年同期提升0.8个百分点，主要受益于飞天茅台出厂价格调整及产品结构优化。净利润为860亿元，净利润率为48.9%。公司继续保持高毛利率水平，在白酒行业中位居前列。"
+    }
+  },
+  {
+    "id": "msft_cloud_revenue",
+    "query": "Microsoft cloud revenue growth Azure",
+    "symbol": "MSFT",
+    "market": "US",
+    "expected_keywords": ["cloud", "azure", "revenue"],
+    "expected_source_type": "annual_report",
+    "doc": {
+      "title": "Microsoft FY2025 Annual Report",
+      "source_type": "annual_report",
+      "source": "SEC",
+      "url": "https://www.sec.gov/Archives/edgar/data/789019/0000789019-25-annual.htm",
+      "published_at": "2025-07-30",
+      "symbol": "MSFT",
+      "market": "US",
+      "text": "Microsoft Intelligent Cloud revenue grew 21% to $135 billion in fiscal 2025. Azure and other cloud services revenue grew 29% year-over-year, driven by strong enterprise AI adoption. Commercial cloud revenue run rate exceeded $200 billion annualised. Operating income for Intelligent Cloud was $60 billion with operating margin of 44%."
+    }
+  },
+  {
+    "id": "aapl_iphone_segment",
+    "query": "iPhone revenue fiscal 2025",
+    "symbol": "AAPL",
+    "market": "US",
+    "expected_keywords": ["iphone", "revenue"],
+    "expected_source_type": "annual_report",
+    "doc": {
+      "title": "Apple FY2025 Annual Report",
+      "source_type": "annual_report",
+      "source": "SEC",
+      "url": "https://www.sec.gov/Archives/edgar/data/320193/0000320193-25.htm",
+      "published_at": "2025-10-30",
+      "symbol": "AAPL",
+      "market": "US",
+      "text": "iPhone revenue totalled $221.2 billion in fiscal 2025, representing 55.2% of total Apple revenue. iPhone 17 series launched in September 2025 with strong early demand. Units sold increased 6% compared to fiscal 2024. iPhone average selling price rose to $895 driven by Pro model mix shift."
+    }
+  },
+  {
+    "id": "moutai_eps",
+    "query": "茅台每股收益和分红",
+    "symbol": "600519",
+    "market": "CN",
+    "expected_keywords": ["每股收益", "分红"],
+    "expected_source_type": "annual_report",
+    "doc": {
+      "title": "贵州茅台2025年度报告",
+      "source_type": "annual_report",
+      "source": "上交所",
+      "url": "https://www.sse.com.cn/disclosure/listedinfo/announcement/c/2026-01-15/600519_annual.pdf",
+      "published_at": "2026-01-15",
+      "symbol": "600519",
+      "market": "CN",
+      "text": "贵州茅台2025年基本每股收益为68.35元，同比增长17.8%。董事会建议每股派发现金股利48.00元（含税），分红总额约为604亿元，分红比例达70%。公司连续十五年保持较高分红水平，累计分红超过3000亿元，回报股东力度持续居行业前列。"
+    }
+  },
+  {
+    "id": "nvda_data_center",
+    "query": "NVIDIA data center revenue AI chips 2025",
+    "symbol": "NVDA",
+    "market": "US",
+    "expected_keywords": ["data center", "revenue"],
+    "expected_source_type": "annual_report",
+    "doc": {
+      "title": "NVIDIA FY2026 Annual Report",
+      "source_type": "annual_report",
+      "source": "SEC",
+      "url": "https://www.sec.gov/Archives/edgar/data/1045810/0001045810-26-annual.htm",
+      "published_at": "2026-02-28",
+      "symbol": "NVDA",
+      "market": "US",
+      "text": "NVIDIA Data Center revenue reached $115.2 billion for fiscal 2026, a 142% increase year-over-year. H100 and H200 GPUs drove record demand from cloud hyperscalers and enterprise AI customers. Blackwell architecture shipments began in Q3 FY2026, contributing $18 billion in revenue. Gross margin for Data Center segment was 74.6%."
+    }
+  },
+  {
+    "id": "tsla_automotive_margin",
+    "query": "Tesla automotive gross margin 2025",
+    "symbol": "TSLA",
+    "market": "US",
+    "expected_keywords": ["automotive", "margin"],
+    "expected_source_type": "annual_report",
+    "doc": {
+      "title": "Tesla 2025 Annual Report",
+      "source_type": "annual_report",
+      "source": "SEC",
+      "url": "https://www.sec.gov/Archives/edgar/data/1318605/0001318605-26-annual.htm",
+      "published_at": "2026-01-29",
+      "symbol": "TSLA",
+      "market": "US",
+      "text": "Tesla automotive gross margin was 18.2% in fiscal 2025, recovering from 2024 lows due to improved manufacturing efficiency and reduced raw material costs. Vehicle deliveries reached 2.1 million units, a 7% increase. The Model 3 Highland and Model Y refresh drove volume growth. Energy Generation and Storage revenue grew 67% to $12.8 billion."
+    }
+  },
+  {
+    "id": "cmb_net_interest_margin",
+    "query": "招商银行净息差和贷款增长",
+    "symbol": "600036",
+    "market": "CN",
+    "expected_keywords": ["净息差", "贷款"],
+    "expected_source_type": "annual_report",
+    "doc": {
+      "title": "招商银行2025年度报告",
+      "source_type": "annual_report",
+      "source": "上交所",
+      "url": "https://www.sse.com.cn/disclosure/listedinfo/announcement/c/2026-03-20/600036_annual.pdf",
+      "published_at": "2026-03-20",
+      "symbol": "600036",
+      "market": "CN",
+      "text": "招商银行2025年净息差为2.18%，较上年收窄12个基点，主要受LPR下调影响。贷款总额突破8.2万亿元，同比增长9.3%。零售贷款占比提升至54%。不良贷款率保持在0.95%的低位，拨备覆盖率为452%。净利润1520亿元，同比增长8.1%。"
+    }
+  },
+  {
+    "id": "byd_ev_sales",
+    "query": "比亚迪新能源汽车销量和市场份额",
+    "symbol": "002594",
+    "market": "CN",
+    "expected_keywords": ["新能源", "销量"],
+    "expected_source_type": "annual_report",
+    "doc": {
+      "title": "比亚迪2025年度报告",
+      "source_type": "annual_report",
+      "source": "深交所",
+      "url": "https://www.szse.cn/disclosure/listedinfo/announcement/c/2026-03-28/002594_annual.pdf",
+      "published_at": "2026-03-28",
+      "symbol": "002594",
+      "market": "CN",
+      "text": "比亚迪2025年新能源汽车销量达到420万辆，同比增长35%，全球市场份额约14%。纯电动车型销量218万辆，插电混动车型202万辆。出口销量突破60万辆，覆盖80个国家和地区。营业收入8800亿元，同比增长29%，净利润420亿元，同比增长31%。"
+    }
+  },
+  {
+    "id": "tencent_gaming_revenue",
+    "query": "腾讯游戏业务收入和增长",
+    "symbol": "0700",
+    "market": "HK",
+    "expected_keywords": ["游戏", "收入"],
+    "expected_source_type": "annual_report",
+    "doc": {
+      "title": "腾讯控股2025年年报",
+      "source_type": "annual_report",
+      "source": "港交所",
+      "url": "https://www.hkexnews.hk/listedco/listconews/sehk/2026/0319/2026031900424.pdf",
+      "published_at": "2026-03-19",
+      "symbol": "0700",
+      "market": "HK",
+      "text": "腾讯2025年游戏业务总收入为3680亿元，同比增长12%。国内游戏收入2150亿元，增长8%，《王者荣耀》《和平精英》保持稳定。国际游戏收入1530亿元，增长19%，《PUBG Mobile》和《荣耀之剑》贡献显著。微信月活用户达到13.7亿，视频号广告收入快速增长。"
+    }
+  },
+  {
+    "id": "alibaba_cloud_profit",
+    "query": "阿里云盈利状况和增长",
+    "symbol": "9988",
+    "market": "HK",
+    "expected_keywords": ["阿里云", "盈利"],
+    "expected_source_type": "annual_report",
+    "doc": {
+      "title": "阿里巴巴集团2025财年年报",
+      "source_type": "annual_report",
+      "source": "港交所",
+      "url": "https://www.hkexnews.hk/listedco/listconews/sehk/2025/0815/2025081500298.pdf",
+      "published_at": "2025-08-15",
+      "symbol": "9988",
+      "market": "HK",
+      "text": "阿里云2025财年收入达到1180亿元，同比增长22%。经调整EBITA利润率提升至13%，实现连续第五年盈利增长。公共云收入占比提升至68%。AI相关产品收入同比三位数增长，通义系列大模型付费用户超过百万。阿里国际商业收入520亿元，增长32%，速卖通和Lazada快速增长。"
+    }
+  },
+  {
+    "id": "msft_operating_income",
+    "query": "Microsoft operating income productivity segment",
+    "symbol": "MSFT",
+    "market": "US",
+    "expected_keywords": ["operating", "income"],
+    "expected_source_type": "annual_report",
+    "doc": {
+      "title": "Microsoft FY2025 Annual Report",
+      "source_type": "annual_report",
+      "source": "SEC",
+      "url": "https://www.sec.gov/Archives/edgar/data/789019/0000789019-25-annual.htm",
+      "published_at": "2025-07-30",
+      "symbol": "MSFT",
+      "market": "US",
+      "text": "Microsoft Productivity and Business Processes segment generated $83 billion in revenue with operating income of $40 billion, representing an operating margin of 48%. Microsoft 365 commercial products and cloud services grew 14% year-over-year. LinkedIn revenue increased 10% driven by hiring solutions and marketing solutions. Dynamics 365 grew 21% as enterprise adoption accelerated."
+    }
+  },
+  {
+    "id": "aapl_wearables",
+    "query": "Apple wearables home accessories revenue",
+    "symbol": "AAPL",
+    "market": "US",
+    "expected_keywords": ["wearables", "revenue"],
+    "expected_source_type": "annual_report",
+    "doc": {
+      "title": "Apple FY2025 Annual Report",
+      "source_type": "annual_report",
+      "source": "SEC",
+      "url": "https://www.sec.gov/Archives/edgar/data/320193/0000320193-25.htm",
+      "published_at": "2025-10-30",
+      "symbol": "AAPL",
+      "market": "US",
+      "text": "Apple Wearables, Home and Accessories revenue was $41.8 billion in fiscal 2025, down 3% year-over-year due to normalisation of Apple Watch demand. AirPods Pro 3 launched in Q4 FY2025 with improved noise cancellation and health monitoring features. Apple Vision Pro contributed approximately $2 billion to wearables revenue in its first full year of availability."
+    }
+  },
+  {
+    "id": "nvda_gaming_segment",
+    "query": "NVIDIA gaming GPU revenue consumer 2025",
+    "symbol": "NVDA",
+    "market": "US",
+    "expected_keywords": ["gaming", "revenue"],
+    "expected_source_type": "annual_report",
+    "doc": {
+      "title": "NVIDIA FY2026 Annual Report",
+      "source_type": "annual_report",
+      "source": "SEC",
+      "url": "https://www.sec.gov/Archives/edgar/data/1045810/0001045810-26-annual.htm",
+      "published_at": "2026-02-28",
+      "symbol": "NVDA",
+      "market": "US",
+      "text": "NVIDIA Gaming revenue was $11.4 billion for fiscal 2026, growing 18% as the RTX 50 series launch drove consumer GPU upgrades. GeForce NOW cloud gaming subscribers exceeded 35 million. DLSS 4 adoption across AAA titles contributed to strong GPU demand. Average selling price increased 22% reflecting shift toward higher-tier GeForce RTX cards."
+    }
+  },
+  {
+    "id": "byd_blade_battery",
+    "query": "比亚迪刀片电池技术优势",
+    "symbol": "002594",
+    "market": "CN",
+    "expected_keywords": ["刀片电池", "安全"],
+    "expected_source_type": "research_report",
+    "doc": {
+      "title": "比亚迪技术研究报告2025",
+      "source_type": "research_report",
+      "source": "东方财富研究",
+      "url": "https://eastmoney.com/research/002594/blade-battery-2025.pdf",
+      "published_at": "2025-06-10",
+      "symbol": "002594",
+      "market": "CN",
+      "text": "比亚迪刀片电池采用磷酸铁锂化学体系，体积能量密度达到330Wh/L，针刺测试无起火无爆炸。循环寿命超过3000次，80%容量保持率。2025年刀片电池产能提升至250GWh，支撑新能源汽车自供需求并对外销售。第三代刀片电池能量密度提升15%，快充性能支持20分钟充至80%。安全性能和成本优势持续强化竞争壁垒。"
+    }
+  },
+  {
+    "id": "tencent_weixin_dau",
+    "query": "腾讯微信日活跃用户数据",
+    "symbol": "0700",
+    "market": "HK",
+    "expected_keywords": ["微信", "用户"],
+    "expected_source_type": "earnings_release",
+    "doc": {
+      "title": "腾讯2025Q4业绩公告",
+      "source_type": "earnings_release",
+      "source": "港交所",
+      "url": "https://www.hkexnews.hk/listedco/listconews/sehk/2026/0319/weixin-q4-2025.pdf",
+      "published_at": "2026-03-19",
+      "symbol": "0700",
+      "market": "HK",
+      "text": "微信及WeChat合并月活跃账户数达13.71亿，同比增长2.7%。视频号日活用户突破5.8亿，视频号总用户使用时长同比增长超过60%。企业微信活跃用户达2.8亿，服务企业超过1000万家。微信小程序年交易额超过3万亿元，同比增长24%。"
+    }
+  },
+  {
+    "id": "tsla_autopilot_fsd",
+    "query": "Tesla Full Self-Driving revenue recognition",
+    "symbol": "TSLA",
+    "market": "US",
+    "expected_keywords": ["full self-driving", "revenue"],
+    "expected_source_type": "annual_report",
+    "doc": {
+      "title": "Tesla 2025 Annual Report",
+      "source_type": "annual_report",
+      "source": "SEC",
+      "url": "https://www.sec.gov/Archives/edgar/data/1318605/0001318605-26-annual.htm",
+      "published_at": "2026-01-29",
+      "symbol": "TSLA",
+      "market": "US",
+      "text": "Tesla Full Self-Driving (FSD) subscription revenue was $1.8 billion in 2025. As of year-end, 780,000 customers subscribed to FSD at $99/month. Tesla deferred $4.2 billion in revenue related to FSD capability upgrades, to be recognized as software updates are delivered. Robotaxi network pilot launched in Austin and San Francisco with 1,500 vehicles in Q4 2025."
+    }
+  },
+  {
+    "id": "cmb_credit_card",
+    "query": "招商银行信用卡业务规模",
+    "symbol": "600036",
+    "market": "CN",
+    "expected_keywords": ["信用卡", "消费"],
+    "expected_source_type": "annual_report",
+    "doc": {
+      "title": "招商银行2025年度报告",
+      "source_type": "annual_report",
+      "source": "上交所",
+      "url": "https://www.sse.com.cn/disclosure/listedinfo/announcement/c/2026-03-20/600036_annual.pdf",
+      "published_at": "2026-03-20",
+      "symbol": "600036",
+      "market": "CN",
+      "text": "招商银行信用卡流通卡量达到1.02亿张，累计消费金额4.1万亿元，同比增长6.8%。信用卡贷款余额8760亿元，不良率1.75%，较上年下降0.12个百分点。掌上生活App月活用户5680万，推出AI智能消费推荐功能，带动高附加值场景消费占比提升。"
+    }
+  },
+  {
+    "id": "alibaba_ecommerce_gmv",
+    "query": "阿里巴巴电商GMV和淘宝天猫增长",
+    "symbol": "9988",
+    "market": "HK",
+    "expected_keywords": ["gmv", "淘宝"],
+    "expected_source_type": "earnings_release",
+    "doc": {
+      "title": "阿里巴巴FY2025Q4业绩公告",
+      "source_type": "earnings_release",
+      "source": "港交所",
+      "url": "https://www.hkexnews.hk/listedco/listconews/sehk/2025/0815/alibaba-q4-fy2025.pdf",
+      "published_at": "2025-08-15",
+      "symbol": "9988",
+      "market": "HK",
+      "text": "阿里巴巴中国商业板块GMV全年突破10万亿元，淘宝天猫88VIP会员突破4500万，同比增长超40%。购买频次提升带动ARPU（每用户平均收入）增长11%。「双11」总成交额再创历史新高。直播电商GMV占总GMV比重提升至28%，内容化改造成效显现。"
+    }
+  },
+  {
+    "id": "nvda_gross_margin",
+    "query": "NVIDIA gross margin record high 2026",
+    "symbol": "NVDA",
+    "market": "US",
+    "expected_keywords": ["gross margin", "eps"],
+    "expected_source_type": "earnings_release",
+    "doc": {
+      "title": "NVIDIA Q4 FY2026 Earnings Release",
+      "source_type": "earnings_release",
+      "source": "SEC",
+      "url": "https://www.sec.gov/Archives/edgar/data/1045810/0001045810-26-q4-earnings.htm",
+      "published_at": "2026-02-28",
+      "symbol": "NVDA",
+      "market": "US",
+      "text": "NVIDIA reported Q4 FY2026 gross margin of 73.5%, a record high driven by Data Center product mix and software attach. Full year gross margin was 72.1% compared to 56.9% in FY2025. Non-GAAP gross margin was 74.6%. Operating expenses grew 42% as NVIDIA invested in next-generation GPU architecture and AI research. EPS grew 145% year-over-year to $2.87 per diluted share."
+    }
+  },
+  {
+    "id": "moutai_channel_reform",
+    "query": "茅台直销渠道改革进展",
+    "symbol": "600519",
+    "market": "CN",
+    "expected_keywords": ["直销", "渠道"],
+    "expected_source_type": "research_report",
+    "doc": {
+      "title": "贵州茅台渠道改革深度报告",
+      "source_type": "research_report",
+      "source": "东方财富研究",
+      "url": "https://eastmoney.com/research/600519/channel-reform-2025.pdf",
+      "published_at": "2025-09-15",
+      "symbol": "600519",
+      "market": "CN",
+      "text": "贵州茅台2025年直销渠道占比提升至45%，较2022年的8%大幅提升。茅台商城线上直销收入增长62%，i茅台App注册用户超过4200万。经销商数量由高峰期的3000余家精简至1950家，聚焦优质渠道合作。直销占比提升直接推动综合吨酒价提升，支撑营收和利润超预期增长。"
+    }
+  },
+  {
+    "id": "hsbc_hk_net_interest_income",
+    "query": "HSBC Hong Kong net interest income 2025",
+    "symbol": "0005",
+    "market": "HK",
+    "expected_keywords": ["net interest", "income"],
+    "expected_source_type": "annual_report",
+    "doc": {
+      "title": "HSBC Holdings 2025 Annual Results",
+      "source_type": "annual_report",
+      "source": "港交所",
+      "url": "https://www.hkexnews.hk/listedco/listconews/sehk/2026/0218/0005_annual_2025.pdf",
+      "published_at": "2026-02-18",
+      "symbol": "0005",
+      "market": "HK",
+      "text": "HSBC reported net interest income of $33.9 billion for 2025, down 7% as interest rate cuts impacted net interest margin which fell to 1.62%. Hong Kong retail banking net interest income declined 12% to $8.2 billion. Wealth management revenue grew 18% to $11.4 billion offsetting some of the NII decline. Cost efficiency ratio improved to 47.8% driven by restructuring initiatives."
+    }
+  },
+  {
+    "id": "cmb_wealth_management",
+    "query": "招商银行财富管理AUM规模",
+    "symbol": "600036",
+    "market": "CN",
+    "expected_keywords": ["财富管理", "aum"],
+    "expected_source_type": "annual_report",
+    "doc": {
+      "title": "招商银行2025年度报告",
+      "source_type": "annual_report",
+      "source": "上交所",
+      "url": "https://www.sse.com.cn/disclosure/listedinfo/announcement/c/2026-03-20/600036_annual.pdf",
+      "published_at": "2026-03-20",
+      "symbol": "600036",
+      "market": "CN",
+      "text": "招商银行零售财富管理AUM（资产管理规模）达到14.7万亿元，同比增长12.6%。其中基金保有规模3.2万亿元，保险保费收入780亿元。私行客户（资产1000万元以上）达到17.8万户，管理私行AUM突破5万亿元。招银理财管理资产4.1万亿元，实现稳健增长。"
+    }
+  },
+  {
+    "id": "tsla_energy_storage",
+    "query": "Tesla Megapack energy storage deployments 2025",
+    "symbol": "TSLA",
+    "market": "US",
+    "expected_keywords": ["megapack", "energy"],
+    "expected_source_type": "annual_report",
+    "doc": {
+      "title": "Tesla 2025 Annual Report",
+      "source_type": "annual_report",
+      "source": "SEC",
+      "url": "https://www.sec.gov/Archives/edgar/data/1318605/0001318605-26-annual.htm",
+      "published_at": "2026-01-29",
+      "symbol": "TSLA",
+      "market": "US",
+      "text": "Tesla deployed 31.4 GWh of energy storage in 2025, nearly triple the 2024 volume of 10.6 GWh. Megapack orders exceeded 50 GWh backlog valued at over $10 billion. The Lathrop Megapack factory operated at full capacity with annual production of 40 GWh. Energy Generation and Storage gross margin reached 29.6%, with Megapack achieving profitability at scale."
+    }
+  },
+  {
+    "id": "byd_overseas_expansion",
+    "query": "比亚迪海外市场布局和出口战略",
+    "symbol": "002594",
+    "market": "CN",
+    "expected_keywords": ["海外", "销售"],
+    "expected_source_type": "research_report",
+    "doc": {
+      "title": "比亚迪全球化战略分析报告",
+      "source_type": "research_report",
+      "source": "东方财富研究",
+      "url": "https://eastmoney.com/research/002594/global-expansion-2025.pdf",
+      "published_at": "2025-11-20",
+      "symbol": "002594",
+      "market": "CN",
+      "text": "比亚迪2025年海外销售汽车62.8万辆，同比增长71%。在欧洲市场销量突破8万辆，在匈牙利建设的欧洲工厂预计2026年投产。东南亚市场份额持续提升，泰国工厂年产能15万辆已达产。在巴西、墨西哥等拉美市场积极布局。海外业务营收约1500亿元，占集团总营收17%，毛利率优于国内平均水平。"
+    }
+  }
+]

@@ -14,6 +14,7 @@ from datetime import date
 from sqlalchemy import case, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.models.industry import StockIndustryMap
 from app.models.industry_hot_stock import IndustryHotStockSnapshot
 
 
@@ -24,7 +25,7 @@ class IndustryHotStockService:
         db:            AsyncSession,
         market:        str,
         industry_code: str,
-        limit:         int = 5,
+        limit:         int = 20,
     ) -> dict:
         """
         返回该行业最新 trade_date 的 Top-limit 热门股。
@@ -44,12 +45,22 @@ class IndustryHotStockService:
         latest_date: date | None = (await db.execute(date_stmt)).scalar_one_or_none()
 
         if latest_date is None:
+            # 仍返回 total（行业成分股数量）即使没有快照
+            total_stmt = (
+                select(func.count(func.distinct(StockIndustryMap.symbol)))
+                .where(
+                    StockIndustryMap.market        == market,
+                    StockIndustryMap.industry_code == industry_code,
+                )
+            )
+            total: int = (await db.execute(total_stmt)).scalar_one() or 0
             return {
                 "market":        market,
                 "industry_code": industry_code,
                 "industry_name": None,
                 "trade_date":    None,
                 "score_version": "v1",
+                "total":         total,
                 "items":         [],
                 "data_quality":  {"message": "No hot stock snapshot available"},
             }
@@ -74,6 +85,7 @@ class IndustryHotStockService:
                 "industry_name": None,
                 "trade_date":    latest_date,
                 "score_version": "v1",
+                "total":         0,
                 "items":         [],
                 "data_quality":  {"message": "Snapshot found but no items returned"},
             }
@@ -97,12 +109,23 @@ class IndustryHotStockService:
             for r in rows
         ]
 
+        # 查询行业在 stock_industry_map 中的真实成分股总数
+        total_stmt = (
+            select(func.count(func.distinct(StockIndustryMap.symbol)))
+            .where(
+                StockIndustryMap.market        == market,
+                StockIndustryMap.industry_code == industry_code,
+            )
+        )
+        total: int = (await db.execute(total_stmt)).scalar_one() or 0
+
         return {
             "market":        market,
             "industry_code": industry_code,
             "industry_name": industry_name,
             "trade_date":    latest_date,
             "score_version": score_version,
+            "total":         total,
             "items":         items,
             "data_quality":  {"message": None},
         }

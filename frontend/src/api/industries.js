@@ -13,7 +13,7 @@ export function getStockIndustry(market, symbol) {
  * Returns items=[] if no snapshot exists (HTTP 200, not an error).
  */
 export function getIndustryHotStocks(market, industryCode, options = {}) {
-  const { limit = 5 } = options
+  const { limit = 20 } = options
   const params = new URLSearchParams({ limit: String(limit) })
   return baseFetch(`/industries/${market}/${industryCode}/hot-stocks?${params}`)
 }

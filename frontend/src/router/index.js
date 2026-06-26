@@ -39,6 +39,11 @@ const routes = [
     name: 'StockCompare',
     component: () => import('../views/StockCompareView.vue'),
   },
+  {
+    path: '/chat',
+    name: 'ChatCopilot',
+    component: () => import('../views/ChatCopilotView.vue'),
+  },
 ]
 
 const router = createRouter({
@@ -48,7 +53,7 @@ const router = createRouter({
 
 router.beforeEach((to) => {
   const token = localStorage.getItem('ta_token')
-  const protectedPrefixes = ['/history', '/watchlist', '/industries', '/stocks', '/me', '/compare']
+  const protectedPrefixes = ['/history', '/watchlist', '/industries', '/stocks', '/me', '/compare', '/chat']
   if (!token && protectedPrefixes.some(p => to.path.startsWith(p))) {
     return { path: '/' }
   }

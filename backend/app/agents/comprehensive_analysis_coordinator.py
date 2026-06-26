@@ -117,7 +117,7 @@ _SYSTEM_PROMPT = """\
 - 报告 Markdown 第一行标题必须使用该完整标识，格式为：
     # 综合分析报告：{股票字段完整内容}
   例如：# 综合分析报告：平安银行（CN/000001）
-- 核心摘要的第一句话必须以"本报告分析对象为 {股票字段完整内容}。"开头。
+- 综合结论卡片中【一句话结论】必须以"本报告分析对象为 {股票字段完整内容}。"开头，随后一句话概括综合判断。
 - 如果股票字段内容仅为"市场/代码"格式（即无中文名称），则保持该格式，不得凭空添加名称。
 - 正文每个章节第一次提及本股票时，必须使用完整标识（含中文名，如已提供），后续可简称。
 
@@ -180,44 +180,38 @@ _SYSTEM_PROMPT = """\
 
 # 综合分析报告：{【分析目标】中"股票："字段的完整内容}
 
-## 一、核心摘要
-第一句话必须以"本报告分析对象为 {【分析目标】中股票字段完整内容}。"开头，随后 2～4 句话概括四个维度的综合观察。不得超过 5 句话。
+## 一、综合结论卡片
+- **综合判断**：偏强 / 偏弱 / 分歧 / 数据不足 / 需观察（基于四面信号综合选择最符合的一项）
+- **一句话结论**：本报告分析对象为 {股票字段完整内容}。（随后用一句话概括综合判断，不得超过 30 字）
+- **核心矛盾**：若各维度信号存在分歧，列举主要矛盾点（1-2 条）；若方向基本一致，写"各维度信号方向基本一致"。
+- **正面因素**：1. ... 2. ...（各维度中的正面观察，限 2-3 条，只引用子报告已有内容）
+- **主要风险**：1. ... 2. ...（各维度中的风险信号，限 2-3 条，只引用子报告已有内容）
+- **后续观察重点**：1. ... 2. ...（2-3 个中性后续观察点，不写方向预测，不写操作建议）
+- **数据完整度**：说明本次分析覆盖哪些维度、哪些字段缺失，以及对结论可信度的影响。
 
-## 二、数据来源与覆盖范围
-用 3～5 个简短条目说明本次分析实际使用了哪些数据，以及哪些字段或维度不可用。
-必须覆盖以下方面（每项不超过 1 句话）：
-- 技术面：数据来源（如 akshare/历史行情）及覆盖的时间窗口
-- 基本面：已获取的字段范围；若字段不全，说明哪类字段缺失（如"估值字段当前数据源未返回"）
-- 同行对比：同行样本来源（手动配置 PEER_MAP），样本数量
-- 新闻面：新闻来源及时间窗口；若无新闻，说明"本时间窗口内暂无相关新闻数据"
-- 字段缺失总结：列出本次分析中未能覆盖的关键字段（若有）
+## 二、四面结论汇总
 
-## 三、多维度整合观察
+### 1. 技术面结论
+提炼技术面子报告的 1-3 个关键技术信号，不得引入基本面或新闻面数据。
 
-### 1. 技术面要点
-基于技术面子报告的关键信号，不得引入基本面或新闻面数据。
+### 2. 基本面结论
+提炼基本面子报告的主要发现，缺失字段不得评价。
+必须声明字段边界："在当前可用字段范围内""由于估值/行业字段缺失，基本面判断有限"等。
 
-### 2. 基本面要点
-基于基本面子报告的关键指标，缺失字段不得评价。
-必须声明字段边界，例如："基于已获取的可用财务字段""在当前可用字段范围内"\
-"由于估值、行业或主营业务字段缺失，当前基本面判断不代表完整基本面覆盖"。
-不得将 ROE、毛利率、现金流等局部字段结论扩展为完整基本面判断。
+### 3. 同行对比结论
+提炼同行对比子报告的主要发现，说明目标公司相对可比样本的相对位置。
+无同行时说明"暂无可用同行数据"；样本来源须明确（PEER_MAP 手动配置 或 动态热门股）。
 
-### 3. 同行对比要点
-基于同行对比子报告，无同行时说明暂无配置，可用字段少时说明可比性受限。
-必须说明样本边界：同行样本来自手动配置的 PEER_MAP，不代表完整行业覆盖；\
-横向对比仅限当前可用字段，不得写成全行业排名结论。
-
-### 4. 新闻面要点
-基于新闻面子报告的关键结论。
-- 若新闻 section 说明暂无数据，写"本时间窗口内暂无新闻数据"。
-- 若 HK 新闻为关键词搜索结果，说明相关性需谨慎判断。
+### 4. 新闻面结论
+提炼新闻面子报告的关键结论。
+- 暂无新闻数据时，写"本时间窗口内暂无新闻数据"。
+- HK 关键词搜索结果须说明相关性需谨慎判断。
 - 不得编造新闻，只能整合 section 中已有结论。
 
-## 四、主要数据局限
-列出本次分析缺失或受限的关键字段及原因（含新闻时间窗口限制）。
+## 三、主要数据局限
+列出本次分析缺失或受限的关键字段及原因（含新闻时间窗口限制和数据源覆盖）。
 
-## 五、后续观察要点
+## 四、后续观察清单
 2～3 个中性观察点，不写方向预测，不写操作建议。
 
 ## 风险提示
@@ -855,8 +849,8 @@ class ComprehensiveAnalysisCoordinator:
 ⚠️ 报告 Markdown 标题必须为：
 # 综合分析报告：{stock_identity}
 
-核心摘要第一句话必须为：
-本报告分析对象为 {stock_identity}。
+综合结论卡片中【一句话结论】必须以：
+本报告分析对象为 {stock_identity}。开头
 
 ---
 【子报告 1 — 技术面分析】
@@ -1069,9 +1063,9 @@ def _build_metadata(
 _FALLBACK_STRINGS: dict[str, dict[str, str]] = {
     "zh-CN": {
         "title":      "综合分析报告",
-        "h_summary":  "一、核心摘要",
-        "t_summary":  "本报告分析对象为 {identity}。综合摘要生成失败（LLM 调用异常：{exc}），以下为各子模块状态。",
-        "h_sources":  "二、数据来源与覆盖范围",
+        "h_summary":  "一、综合结论卡片",
+        "t_summary":  "- **综合判断**：数据不足\n- **一句话结论**：本报告分析对象为 {identity}。综合摘要生成失败（LLM 调用异常：{exc}），以下为各子模块状态。",
+        "h_sources":  "二、四面结论汇总",
         "t_sources":  (
             "- 技术面：akshare 历史行情数据\n"
             "- 基本面：akshare/Sina/yfinance 财务字段（字段覆盖视数据源返回而定）\n"
@@ -1079,19 +1073,19 @@ _FALLBACK_STRINGS: dict[str, dict[str, str]] = {
             "- 新闻面：AkShare 新闻接口（时间窗口内数据）\n"
             "- 注：综合 LLM 模块当前不可用，具体字段覆盖详见各子报告"
         ),
-        "h_multi":    "三、多维度整合观察",
-        "h_limits":   "四、主要数据局限",
+        "h_multi":    "子模块执行状态",
+        "h_limits":   "三、主要数据局限",
         "t_limits":   "综合摘要模块暂时不可用，请参阅 sections 中各子报告的完整内容。",
-        "h_followup": "五、后续观察要点",
+        "h_followup": "四、后续观察清单",
         "t_followup": "暂无（等综合 LLM 恢复后重试）。",
         "h_risk":     "风险提示",
         "t_risk":     "仅供研究参考，不构成投资建议。技术面、基本面、同行对比与新闻面分析均存在局限性，市场存在不确定性，投资者需自行判断并承担投资风险。",
     },
     "en-US": {
         "title":      "Comprehensive Analysis Report",
-        "h_summary":  "I. Core Summary",
-        "t_summary":  "This report covers {identity}. Synthesis generation failed (LLM error: {exc}). Below is the status of each sub-module.",
-        "h_sources":  "II. Data Sources & Coverage",
+        "h_summary":  "I. Synthesis Conclusion Card",
+        "t_summary":  "- **Overall Judgment**: Insufficient Data\n- **One-line Conclusion**: This report covers {identity}. Synthesis generation failed (LLM error: {exc}). Below is the status of each sub-module.",
+        "h_sources":  "II. Four-Dimension Summary",
         "t_sources":  (
             "- Technical: AkShare historical quotes\n"
             "- Fundamental: AkShare/Sina/yfinance financial fields (coverage depends on data source)\n"
@@ -1099,19 +1093,19 @@ _FALLBACK_STRINGS: dict[str, dict[str, str]] = {
             "- News: AkShare news API (within time window)\n"
             "- Note: Synthesis LLM module is currently unavailable; see individual sections."
         ),
-        "h_multi":    "III. Multi-dimensional Observations",
-        "h_limits":   "IV. Data Limitations",
+        "h_multi":    "Sub-module Execution Status",
+        "h_limits":   "III. Data Limitations",
         "t_limits":   "Synthesis module is temporarily unavailable. Please refer to individual sub-reports.",
-        "h_followup": "V. Follow-up Observations",
+        "h_followup": "IV. Follow-up Checklist",
         "t_followup": "None available (retry after synthesis LLM recovers).",
         "h_risk":     "Risk Disclaimer",
         "t_risk":     "For research reference only. Not investment advice. All analysis dimensions have limitations. Markets are uncertain; investors should exercise independent judgment.",
     },
     "zh-TW": {
         "title":      "綜合分析報告",
-        "h_summary":  "一、核心摘要",
-        "t_summary":  "本報告分析對象為 {identity}。綜合摘要生成失敗（LLM 調用異常：{exc}），以下為各子模塊狀態。",
-        "h_sources":  "二、數據來源與覆蓋範圍",
+        "h_summary":  "一、綜合結論卡片",
+        "t_summary":  "- **綜合判斷**：數據不足\n- **一句話結論**：本報告分析對象為 {identity}。綜合摘要生成失敗（LLM 調用異常：{exc}），以下為各子模塊狀態。",
+        "h_sources":  "二、四面結論彙總",
         "t_sources":  (
             "- 技術面：AkShare 歷史行情數據\n"
             "- 基本面：AkShare/Sina/yfinance 財務字段\n"
@@ -1119,19 +1113,19 @@ _FALLBACK_STRINGS: dict[str, dict[str, str]] = {
             "- 新聞面：AkShare 新聞接口\n"
             "- 注：綜合 LLM 模塊當前不可用"
         ),
-        "h_multi":    "三、多維度整合觀察",
-        "h_limits":   "四、主要數據局限",
+        "h_multi":    "子模塊執行狀態",
+        "h_limits":   "三、主要數據局限",
         "t_limits":   "綜合摘要模塊暫時不可用，請參閱各子報告完整內容。",
-        "h_followup": "五、後續觀察要點",
+        "h_followup": "四、後續觀察清單",
         "t_followup": "暫無（等綜合 LLM 恢復後重試）。",
         "h_risk":     "風險提示",
         "t_risk":     "僅供研究參考，不構成投資建議。市場存在不確定性，投資者需自行判斷並承擔投資風險。",
     },
     "ja-JP": {
         "title":      "総合分析レポート",
-        "h_summary":  "I. 要約",
-        "t_summary":  "本レポートは {identity} を分析対象とします。総合要約生成に失敗しました（LLMエラー：{exc}）。各サブモジュールの状況は以下の通りです。",
-        "h_sources":  "II. データソースと適用範囲",
+        "h_summary":  "I. 総合結論カード",
+        "t_summary":  "- **総合判断**: データ不足\n- **一言結論**: 本レポートは {identity} を分析対象とします。総合要約生成に失敗しました（LLMエラー：{exc}）。各サブモジュールの状況は以下の通りです。",
+        "h_sources":  "II. 四次元結論サマリー",
         "t_sources":  (
             "- テクニカル：AkShare 歴史データ\n"
             "- ファンダメンタル：AkShare/Sina/yfinance 財務データ\n"
@@ -1139,19 +1133,19 @@ _FALLBACK_STRINGS: dict[str, dict[str, str]] = {
             "- ニュース：AkShare ニュース API\n"
             "- 注：総合 LLM モジュールは現在利用不可"
         ),
-        "h_multi":    "III. 多次元統合観察",
-        "h_limits":   "IV. データ制限",
+        "h_multi":    "サブモジュール実行状況",
+        "h_limits":   "III. データ制限",
         "t_limits":   "総合要約モジュールは一時的に利用できません。各サブレポートを参照してください。",
-        "h_followup": "V. フォローアップ",
+        "h_followup": "IV. フォローアップチェックリスト",
         "t_followup": "なし（総合 LLM 回復後に再試行）。",
         "h_risk":     "リスク免責事項",
         "t_risk":     "研究参照のみを目的としており、投資アドバイスではありません。",
     },
     "ko-KR": {
         "title":      "종합 분석 보고서",
-        "h_summary":  "I. 핵심 요약",
-        "t_summary":  "이 보고서의 분석 대상은 {identity}입니다. 종합 요약 생성에 실패했습니다（LLM 오류：{exc}）。각 하위 모듈 상태는 아래와 같습니다.",
-        "h_sources":  "II. 데이터 소스 및 범위",
+        "h_summary":  "I. 종합 결론 카드",
+        "t_summary":  "- **종합 판단**: 데이터 부족\n- **한 줄 결론**: 이 보고서의 분석 대상은 {identity}입니다. 종합 요약 생성에 실패했습니다（LLM 오류：{exc}）。각 하위 모듈 상태는 아래와 같습니다.",
+        "h_sources":  "II. 4차원 결론 요약",
         "t_sources":  (
             "- 기술: AkShare 역사 데이터\n"
             "- 기본: AkShare/Sina/yfinance 재무 데이터\n"
@@ -1159,19 +1153,19 @@ _FALLBACK_STRINGS: dict[str, dict[str, str]] = {
             "- 뉴스: AkShare 뉴스 API\n"
             "- 참고: 종합 LLM 모듈 현재 이용 불가"
         ),
-        "h_multi":    "III. 다차원 통합 관찰",
-        "h_limits":   "IV. 데이터 제한",
+        "h_multi":    "하위 모듈 실행 상태",
+        "h_limits":   "III. 데이터 제한",
         "t_limits":   "종합 요약 모듈을 임시로 사용할 수 없습니다. 각 하위 보고서를 참조하세요.",
-        "h_followup": "V. 후속 관찰",
+        "h_followup": "IV. 후속 체크리스트",
         "t_followup": "없음 (LLM 복구 후 재시도).",
         "h_risk":     "위험 고지",
         "t_risk":     "연구 참조 목적으로만 제공됩니다. 투자 조언이 아닙니다.",
     },
     "es-ES": {
         "title":      "Informe de Análisis Integral",
-        "h_summary":  "I. Resumen Principal",
-        "t_summary":  "Este informe analiza {identity}. La generación del resumen falló (error LLM: {exc}). Estado de cada submódulo:",
-        "h_sources":  "II. Fuentes de Datos y Cobertura",
+        "h_summary":  "I. Tarjeta de Conclusión Integral",
+        "t_summary":  "- **Juicio General**: Datos Insuficientes\n- **Conclusión en Una Línea**: Este informe analiza {identity}. La generación del resumen falló (error LLM: {exc}). Estado de cada submódulo:",
+        "h_sources":  "II. Resumen de Cuatro Dimensiones",
         "t_sources":  (
             "- Técnico: datos históricos de AkShare\n"
             "- Fundamental: campos financieros de AkShare/Sina/yfinance\n"
@@ -1179,10 +1173,10 @@ _FALLBACK_STRINGS: dict[str, dict[str, str]] = {
             "- Noticias: API de noticias AkShare\n"
             "- Nota: módulo LLM de síntesis no disponible"
         ),
-        "h_multi":    "III. Observaciones Multidimensionales",
-        "h_limits":   "IV. Limitaciones de Datos",
+        "h_multi":    "Estado de los Submódulos",
+        "h_limits":   "III. Limitaciones de Datos",
         "t_limits":   "El módulo de resumen no está disponible. Consulte los subinformes individuales.",
-        "h_followup": "V. Puntos de Seguimiento",
+        "h_followup": "IV. Lista de Seguimiento",
         "t_followup": "Ninguno (reintente tras recuperar el módulo LLM).",
         "h_risk":     "Aviso de Riesgo",
         "t_risk":     "Solo para referencia de investigación. No es asesoramiento de inversión.",

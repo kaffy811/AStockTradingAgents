@@ -1,13 +1,17 @@
 # TradingAgents — 项目技术全景
 
 > 适用场景：面试技术说明、作品集展示、团队交接文档  
-> 状态：M23 质量收口完成（2026-06-06）
+> 状态：**C13-b Real-time Tool/RAG/Skill Event Streaming 完成（2026-06-22）**；C1–C13-b 全部完成，754/754 tests PASS
 
 ---
 
 ## 一、项目一句话介绍
 
-TradingAgents 是一个基于多 Agent 并行分析的 AI 股票研究工作台，支持 A 股与港股，生成包含技术面、基本面、同行对比与新闻面的综合研究报告，并提供数据质量评分、股票对比、行业研究、自选股工作台、报告中心与个人研究中心。
+TradingAgents 是一个 OpenClaw-inspired 金融智能 Agents 系统，包含两个核心层次：
+
+1. **研究工作台（M1–M51）**：多 Agent 并行分析 AI 股票研究平台，支持 A 股与港股，生成包含技术面、基本面、同行对比与新闻面的综合研究报告，并提供数据质量评分、股票对比、行业研究、自选股工作台、报告中心与个人研究中心。
+
+2. **Chat Copilot（C1–C13-b 全部完成）**：自然语言驱动的 Agent Orchestrator，通过 Tool Registry（9 只只读金融工具）、Action Tools + ConfirmationManager（3 类真实写操作，10 分钟超时/幂等保护）、**Financial Skills Layer（6 类研究技能：异动/风险/新闻/自选/行业/报告，均已集成 RAG）**、**Controlled Planner（RuleBasedPlanner + PlannerExecutor，6 种复合任务类型，最多 5 步）**、**Memory + Audit（结构化 session 记忆，注入检测，audit trail）**、**OpenClaw-style Skill Registry（6 SkillSpec JSON 文件，spec_loader，enabled/available gate，GET /chat/skills 技能发现 API）**、**Agent Evaluation + Capability Manifest（30 golden tasks，capability_manifest.md/.json，evaluate_chat_agent.py，readiness_checklist.md）**、**C11 RAG + Review Agents（内部数据检索，SourceReviewAgent/FreshnessReviewAgent/ConsistencyReviewAgent，可信度三级评级）**、**C11 Internal Agents（分析并保存报告 intent，外部渠道礼貌拒绝）**、**C11 Chat UX（ChatSessionSidebar，超时保护 15s/45s，停止按钮，ChatReasoningSteps）**、**C12 UX Refactor（即时 5 步 placeholder 研究步骤、2 列布局、5+换一换快捷问句、填入不自动发送、错误气泡）**、**C13-a SSE Streaming（asyncio.Queue + background Task + fetch+ReadableStream + answer_delta 打字机 + fallback）**、**C13-b 工具级实时流式（safe_emit + ToolRegistry tool_started/completed + RAG rag_retrieve/review 实时 + 6 Skills skill_started/completed + PlannerExecutor planner_step 事件 + Phase 5 dedup）** 实现完整 Agentic AI 研究体验。
 
 **定位**：研究辅助工具，不提供投资建议。
 
@@ -393,3 +397,158 @@ ComprehensiveAnalysisView
 | M43 关键链路烟测（M43-1~M43-8）| ✅ M43：全 PASS |
 | 文档一致性审查与修复（10 文档）| ✅ M43 |
 | 已知限制最终确认（known_limitations.md）| ✅ M43 |
+
+---
+
+## Phase M47 / M47-b 更新（2026-06-11）
+
+### 首页 Dashboard 信息架构重排
+
+**重排前（M26 冻结版）：**
+- 右列上区：最近搜索（chip 风格，6 个）
+- 右列下区：行业热股（1 个行业的个股列表，5 个）
+
+**重排后（M47-b）：**
+- 右列上区：行业热门板块（top 6 行业，hot_score 降序，含排名/涨跌幅/热度分）
+- 右列下区：行业热股（1 个行业的个股列表，仍保留，compact）
+- 下方独立区：RecentSearchList 组件保留（用户仍可访问历史搜索）
+
+信息逻辑：左列=个人工作台（报告/自选），右列=市场数据（行业板块/热股）。
+
+### 最新模块统计（M47-b）
+
+| 维度 | 数量 |
+|------|------|
+| Vite 构建模块 | 195 |
+| Alembic migration head | c5e9f12a3b87 |
+| i18n 语言数 | 6（zh-CN / zh-TW / en-US / ja-JP / ko-KR / es-ES） |
+| ind_blocks_* keys 覆盖 | 6/6 语言 ✅ |
+
+---
+
+## Phase M48 更新（2026-06-11）
+
+### 行业模块交互能力（M48 补充）
+
+| 功能 | 状态 | 说明 |
+|------|------|------|
+| 行业热股 Top 20 默认展示 | ✅ | IndustryHotView HOT_DISPLAY_DEFAULT=20 |
+| 行业热股"查看更多" → Top 50 | ✅ M48 | expandedView toggle，无重新请求 |
+| 热股"收起"复原 Top 20 | ✅ M48 | 顶部/底部双按钮 |
+| 切换行业自动收起 | ✅ M48 | onIndustryChange reset |
+| 股票数量不足时隐藏按钮 | ✅ M48 | v-if filteredItems > 20 |
+| 行业块 loading 文字 | ✅ M48 | ind_loading_heat |
+| 6 语言 ind_hot_* key 覆盖 | ✅ M48 | 9 个新 key 全语言 |
+
+---
+
+## Phase M49 更新（2026-06-11）
+
+### 自选股与对比页联动能力（M49 补充）
+
+| 功能 | 状态 | 说明 |
+|------|------|------|
+| 首页"批量对比"入口 | ✅ M49 | HomeDashboardPanel 自选快跳底部，≥2 只才显示 |
+| /watchlist?mode=compare 自动 bulk 模式 | ✅ M49 | route.query.mode 检测 |
+| 2-4 只批量勾选 → 对比 | ✅ M17 | WatchlistToolbar + handleCompare() |
+| URL 驱动对比页加载 | ✅ M20 | /compare?stocks=CN:000001 |
+| 研究工作台完整闭环 | ✅ M49 | 首页→自选→对比 全路径打通 |
+
+---
+
+## Phase C4 更新（2026-06-18）— Chat Copilot 真实只读工具接入完成
+
+### TradingAgents Chat Copilot 当前能力（C4 已完成）
+
+| 能力 | 阶段 | 说明 | 状态 |
+|------|------|------|------|
+| Chat UI（`/chat` 页面） | C2 | 消息列表 + 输入框 + 快捷 chips + 结果卡片 | ✅ 已完成 |
+| Chat API（session + message） | C3 | 6 个接口，2 个 DB 表，mock orchestrator | ✅ 已完成 |
+| 9 个只读查询工具 + Tool Registry | C4 | 行情/新闻/行业/报告/自选股真实服务接入 | ✅ 已完成 |
+| Action Tools + ConfirmationManager | C5 | 3 类真实写操作（加自选/生成报告/创建对比），10 分钟超时，幂等保护 | ✅ 已实现 |
+| Financial Skills Layer | C6 | 6 类研究技能（异动/风险/新闻/自选/行业/报告），SkillRegistry，4 层分发 | ✅ 已实现 |
+| Controlled Planner（多步骤任务） | C7 | RuleBasedPlanner + PlannerExecutor，6 复合类型，最多 5 步，纯规则无 LLM | ✅ 已实现 |
+| 结构化记忆层 | C8 | session_metadata JSONB，recent_symbols/queries/flagged_topics，fire-and-forget | ✅ 已实现 |
+| 安全护栏 + Audit Trail | C8 | _TRADING_PATTERN 拦截 + injection guard + ToolResult duration_ms/started_at | ✅ 已实现 |
+| SkillSpec Registry（可发现技能） | C9 | 6 个 SkillSpec JSON（c9_v1），spec_loader，enabled/available gate，GET /chat/skills | ✅ 已实现 |
+| Agent Evaluation（能力验收） | C10 | 30 golden tasks（A-F），capability_manifest.json，evaluate_chat_agent.py，389/389 PASS | ✅ 已实现 |
+
+### C4 实现的真实只读工具（9 个）
+
+| 工具 | 复用服务 | 卡片类型 |
+|------|---------|---------|
+| resolve_stock_tool | IndustryClassificationService | — |
+| get_quote_tool | stock_data_service | stock_summary |
+| get_kline_summary_tool | stock_data_service | — |
+| get_latest_news_tool | news_data_service | — |
+| get_industry_hot_tool | industry_hot_stock_service | industry_hot |
+| get_industry_stocks_tool | industry_hot_stock_service | — |
+| get_watchlist_tool | DB（WatchlistItem） | watchlist_list |
+| get_recent_reports_tool | DB（AnalysisReport） | report_list |
+| get_report_detail_tool | DB（AnalysisReport） | — |
+
+**核心设计原则：**
+- 不是荐股机器人，是 agentic research copilot
+- 现有页面能力封装为工具，Chat 作为统一入口
+- 所有写操作需用户确认，全程可审计
+- 永不输出买入/卖出/持有/目标价
+
+**相关文档（C1 阶段新增，共 6 个）：**
+- [`docs/chat_agent_prd.md`](chat_agent_prd.md) — 产品需求文档（10 场景 + MVP 范围）
+- [`docs/chat_agent_architecture.md`](chat_agent_architecture.md) — 技术架构（Mermaid + 11 模块说明）
+- [`docs/chat_agent_tool_spec.md`](chat_agent_tool_spec.md) — 工具清单（17 工具规范）
+- [`docs/chat_agent_memory_design.md`](chat_agent_memory_design.md) — 记忆设计（3 层 + 安全注意）
+- [`docs/chat_agent_safety_policy.md`](chat_agent_safety_policy.md) — 安全合规（金融边界 + 10 项安全测试）
+- [`docs/chat_agent_build_plan.md`](chat_agent_build_plan.md) — 分阶段搭建计划（C2~C8）
+
+---
+
+## Phase M51 更新（2026-06-11）— 结论先行报告结构
+
+### AI 报告生成能力（M51 补充）
+
+| 功能 | 状态 | 说明 |
+|------|------|------|
+| 单面报告 `### 摘要结论` 首节 | ✅ M51 | 4 个 Agent 均在详情节前输出摘要结论 |
+| 综合报告 `## 一、综合结论卡片` | ✅ M51 | 7 字段卡片：判断/结论/矛盾/正面/风险/观察/完整度 |
+| `## 二、四面结论汇总` 结构化汇总 | ✅ M51 | 综合报告分 4 个 ### 子节呈现各维度结论 |
+| language_utils.py 25 键扩容 | ✅ M51 | M51 新增 12 摘要/卡片字段键 × 6 语言 |
+| 6 语言 fallback 报告节标题更新 | ✅ M51 | _FALLBACK_STRINGS 全量更新 |
+| `extractSummary()` M51 路径新增 | ✅ M51 | zh-CN `摘要结论` / 综合 `综合结论卡片` / en-US 多变体 |
+| en-US `### Summary & Conclusions` 变体修复 | ✅ M51-b | 4 个 `### Summary…` 变体 + 广播兜底，8/8 测试 PASS |
+| 真实报告结构回归（CN/688146） | ✅ M51-b | comprehensive+4 单面 全部合规，可读性 4.8/5 |
+
+---
+
+## Chat Copilot 阶段成果表（C1–C13-b）
+
+| Phase | 核心成果 | 测试 | 状态 |
+|-------|---------|------|------|
+| C1 | PRD + 架构设计（6 文档） | — | ✅ |
+| C2 | Chat 前端 MVP（8 组件，6 语言，mock 场景） | — | ✅ |
+| C3 | Chat API + Session/Message DB（migration d7e3a9b5c2f8）| — | ✅ |
+| C4 | Read-only Tool Registry（9 工具，意图路由，11 tests）| 11 | ✅ |
+| C5 | Action Tools + ConfirmationManager（3 写操作，33 tests）| 44 | ✅ |
+| C6 | Financial Skills Layer（6 Skills，SkillRegistry，72 tests）| 116 | ✅ |
+| C7 | Controlled Planner（RuleBasedPlanner + PlannerExecutor，6 复合，137 tests）| 253 | ✅ |
+| C8 | Memory + Audit Hardening（chat_memory + chat_safety + ToolResult 审计，83 tests）| 317 | ✅ |
+| C9 | SkillSpec Registry（6 JSON + spec_loader + GET /chat/skills，88 tests）| 317 | ✅ |
+| C10 | Agent Evaluation（30 golden tasks + capability_manifest + evaluate_chat_agent，72 tests）| 389 | ✅ |
+| C11 | Advisor Demo Package + RAG + E2E Hardening（scope key 修复/ChatReasoningSteps/硬超时 error card）| 489 | ✅ |
+| C12 | UX Refactor（即时研究步骤/2列布局/5快捷问句+换一换/错误气泡/59 tests）| 548 | ✅ |
+| C13-a | SSE Streaming（/messages/stream + asyncio.Queue + fetch+ReadableStream + answer_delta + fallback，56 tests）| 604 | ✅ |
+| C13-b | Tool/RAG/Skill 实时事件流（safe_emit + ToolRegistry + RAG + 6 Skills + Planner + dedup，44 tests）| 648 | ✅ |
+
+**当前总测试：754/754 PASS。0 新增 migration。0 新增依赖（C6–C13-b）。**
+
+---
+
+## 核心设计原则（最终版）
+
+1. **不是荐股机器人** — 永不输出买入/卖出/持有/目标价/价格预测
+2. **Agentic，不是聊天框** — Tool Registry + Skill Registry + Planner + Action Confirmation + Memory + Audit
+3. **写操作必须确认** — ConfirmationManager 二阶段，用户永远可取消
+4. **安全优先** — Safety Guard 在 Orchestrator 入口第一层，任何路由不能绕过
+5. **可测试设计** — 所有模块 mock-based 单元测试，30 golden tasks 覆盖全链路
+6. **声明式能力** — SkillSpec JSON 外置元数据，capability_manifest.json 机器可读
+7. **零新依赖原则** — C6–C11 全部使用 stdlib，无新 pip 包依赖
