@@ -38,6 +38,7 @@ from typing import Any, AsyncGenerator, Callable
 import logging
 
 from app.agents.chat_orchestrator import process_message
+from app.agents.financial_safety_postprocessor import sanitize_financial_answer
 from app.services.chat_service import (
     save_user_message,
     save_assistant_message,
@@ -248,7 +249,9 @@ async def stream_chat_message(
                     if event_type == "answer_delta":
                         _realtime_answer_delta_emitted[0] = True
                     # C25: track sentinel events so finally-block can fill gaps
+                    # C26: sanitize all final_answer payloads before emitting
                     if event_type in ("final_answer", ETYPE_FINAL_ANSWER):
+                        payload = sanitize_financial_answer(payload)
                         final_answer_sent[0] = True
                     if event_type in ("agent_completed", ETYPE_COMPLETED):
                         done_sent[0] = True

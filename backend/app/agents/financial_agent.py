@@ -38,6 +38,7 @@ from app.agents.schemas import (
     ThinkingStep,
     ToolCallRecord,
 )
+from app.agents.financial_safety_postprocessor import sanitize_financial_answer
 
 log = logging.getLogger(__name__)
 
@@ -1181,6 +1182,8 @@ class FinancialAgent:
 
         raw_answer = "".join(answer_chunks)
         answer_text = _filter_banned(raw_answer)
+        # C26: unified safety post-processing
+        answer_text = sanitize_financial_answer(answer_text)
         if "仅供研究参考" not in answer_text:
             answer_text += f"\n\n_{_DISCLAIMER}_"
 

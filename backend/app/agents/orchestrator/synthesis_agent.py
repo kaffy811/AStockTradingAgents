@@ -30,6 +30,7 @@ from app.agents.orchestrator.schemas import (
     make_orchestrator_response,
     _DISCLAIMER,
 )
+from app.agents.financial_safety_postprocessor import sanitize_financial_answer
 
 log = logging.getLogger(__name__)
 
@@ -258,15 +259,16 @@ class SynthesisAgent:
         Never raises; returns a safe fallback response on any error.
         """
         try:
-            return await self._synthesize(evidence_pack, risk_review, event_callback)
+            result = await self._synthesize(evidence_pack, risk_review, event_callback)
+            return sanitize_financial_answer(result)  # C26
         except Exception as exc:
             log.error("SynthesisAgent: synthesis failed: %s", exc)
-            return make_orchestrator_response(
+            return sanitize_financial_answer(make_orchestrator_response(  # C26
                 summary="综合分析生成时发生内部错误，请稍后重试。",
                 risk_points=["synthesis_error"],
                 data_quality=evidence_pack.get("data_quality", {}),
                 disclaimer=_DISCLAIMER,
-            )
+            ))
 
     async def _synthesize(
         self,

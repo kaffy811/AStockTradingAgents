@@ -15,6 +15,7 @@ from __future__ import annotations
 import logging
 
 from app.agents.chat_skills.base import BaseSkill, SkillContext, SkillResult
+from app.agents.financial_safety_postprocessor import sanitize_financial_answer
 from app.agents.chat_skills.spec_loader import (
     check_skill_available,
     load_skill_specs,
@@ -170,6 +171,9 @@ class SkillRegistry:
                 "skill_enabled":      self.is_skill_enabled(skill.name),
                 "skill_available":    self.is_skill_available(skill.name),
             }
+            # C26: sanitize answer text before returning to orchestrator
+            if result.answer:
+                result.answer = sanitize_financial_answer(result.answer)
             return result
         except Exception as exc:
             log.exception("SkillRegistry: unexpected error in skill %s", skill.name)
