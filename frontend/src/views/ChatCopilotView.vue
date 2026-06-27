@@ -59,6 +59,8 @@
               @confirm="onConfirm"
               @cancel="onCancel"
               @action="onCardAction"
+              @edit-user="onEditUser"
+              @retry-ai="onRetryAi"
             />
           </div>
 
@@ -306,10 +308,15 @@ function _restoreMessages(sessionDetail) {
 }
 
 // Update the sidebar session preview with the first user message
+// C29.3: also move the active session to the top (optimistic ordering)
 function _updateSessionTitle(text) {
   const title = text.replace(/[<>\n\r]/g, '').slice(0, 25).trim()
   const s = sessions.value.find(s => s.id === sessionId.value)
-  if (s && !s.preview) s.preview = title
+  if (s) {
+    if (!s.preview) s.preview = title
+    // Move to top
+    sessions.value = [s, ...sessions.value.filter(x => x.id !== s.id)]
+  }
 }
 
 // ── Timeout helpers ────────────────────────────────────────────────────────────
@@ -372,11 +379,15 @@ function onStop() {
 async function _loadSessions() {
   try {
     const data = await listChatSessions(20, 0)
-    sessions.value = (data.items ?? data ?? []).map(s => ({
+    const mapped = (data.items ?? data ?? []).map(s => ({
       id:         String(s.session_id ?? s.id),
       preview:    s.title ?? s.preview ?? '',
+      updated_at: s.updated_at ?? s.created_at ?? '',
       created_at: s.created_at ?? '',
     }))
+    // C29.3: sort by updated_at DESC so most-recently-active is first
+    mapped.sort((a, b) => (b.updated_at > a.updated_at ? 1 : -1))
+    sessions.value = mapped
   } catch {
     // non-fatal
   }
@@ -412,6 +423,13 @@ async function onSelectSession(id) {
   if (isSending.value) return   // don't switch while a stream is in-flight
   isLoadingSession.value = true
   messages.value = []           // clear early while loading flag suppresses welcome
+
+  // C29.3: optimistic move-to-top so sidebar order reflects most-recently-active
+  const existing = sessions.value.find(s => s.id === id)
+  if (existing) {
+    sessions.value = [existing, ...sessions.value.filter(s => s.id !== id)]
+  }
+
   try {
     const detail = await getChatSession(id)
     // Guard: if user clicked another session while this was loading, bail out
@@ -947,6 +965,26 @@ function onCardAction(_msgId, link) {
     router.push(link.path)
   }
 }
+
+// C29.4: backfill user message into input for editing
+function onEditUser(_msgId, content) {
+  if (isSending.value) return
+  inputText.value = content
+  nextTick(() => inputBoxRef.value?.focus())
+}
+
+// C29.5: retry — find the user message before this AI message and resend
+function onRetryAi(msgId) {
+  if (isSending.value) return
+  const idx = messages.value.findIndex(m => m.id === msgId)
+  if (idx <= 0) return
+  // Walk backwards to find the preceding user message
+  const userMsg = messages.value.slice(0, idx).reverse().find(m => m.role === 'user')
+  if (!userMsg) return
+  // Remove messages from the user message onward and resend
+  messages.value = messages.value.slice(0, messages.value.indexOf(userMsg))
+  onSend(userMsg.content)
+}
 </script>
 
 <style scoped>
@@ -1117,13 +1155,13 @@ function onCardAction(_msgId, link) {
   max-width: 400px;
 }
 
-/* ── Messages area (scrollable) ──────────────────────────────────────────────── */
+/* ── Messages area — C29.2: pure flex container; inner .message-list scrolls ── */
 .chat-messages-area {
   flex: 1;
-  overflow-y: auto;
   min-height: 0;
-  scrollbar-width: thin;
-  scrollbar-color: var(--border) transparent;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 /* ── Footer: disclaimer + input ──────────────────────────────────────────────── */

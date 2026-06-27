@@ -18,6 +18,11 @@
         <!-- User bubble -->
         <div v-if="msg.role === 'user'" class="msg-bubble msg-bubble--user">
           <p class="msg-text">{{ msg.content }}</p>
+          <!-- C29.4: user message actions -->
+          <div class="msg-actions msg-actions--user">
+            <button class="msg-action-btn" @click="onCopyUser(msg.content)" :title="t('chat_copy')">⎘</button>
+            <button class="msg-action-btn" @click="$emit('edit-user', msg.id, msg.content)" :title="t('chat_edit')">✎</button>
+          </div>
         </div>
 
         <!-- Assistant bubble -->
@@ -27,8 +32,9 @@
 
           <!-- Bubble content -->
           <div class="msg-content">
-            <!-- Phase 2E-3: Unified reasoning panel (replaces thinking + agentTrace + toolTrace) -->
+            <!-- C29.1: Reasoning panel — debug-only; hidden in production -->
             <ChatReasoningPanel
+              v-if="SHOW_REASONING_PANEL"
               :isStreaming="msg.isStreaming"
               :status="msg.status ?? (msg.isStreaming ? 'streaming' : 'done')"
               :reasoningSteps="msg.reasoningSteps ?? []"
@@ -38,9 +44,9 @@
               :thinkingItems="msg.thinkingItems ?? []"
             />
 
-            <!-- Section I: DEV-only stream debug panel -->
+            <!-- C29.1: Stream debug panel — debug-only -->
             <div
-              v-if="isDev && (msg.isStreaming || msg.streamDebug?.eventsReceived > 0)"
+              v-if="SHOW_STREAM_DEBUG && (msg.isStreaming || msg.streamDebug?.eventsReceived > 0)"
               class="stream-debug-panel"
             >
               <div class="sdp-title">[Stream Debug]</div>
@@ -120,7 +126,7 @@
             <!-- Text content -->
             <div v-if="msg.content" class="msg-text-md" v-html="renderMarkdown(msg.content)"></div>
 
-            <!-- Streaming indicator -->
+            <!-- Streaming indicator (when no content yet) -->
             <div v-else-if="msg.isStreaming" class="msg-typing">
               <span></span><span></span><span></span>
             </div>
@@ -140,19 +146,25 @@
               @action="(link) => $emit('action', msg.id, link)"
             />
 
-            <!-- C27: Data quality card (skill path uses msg.dataQuality;
-                  financial_agent path uses msg.finalAnswer.data_quality) -->
+            <!-- C29.1: Data quality card — debug-only -->
             <DataQualityCard
-              v-if="msg.dataQuality || msg.finalAnswer?.data_quality"
+              v-if="SHOW_DATA_QUALITY && (msg.dataQuality || msg.finalAnswer?.data_quality)"
               :dq="msg.dataQuality ?? msg.finalAnswer?.data_quality"
             />
 
-            <!-- C27: Unified source list (agent path: finalAnswer.sources; skill path: skillSources) -->
+            <!-- C29.1: Source list — debug-only -->
             <ChatSourceList
+              v-if="SHOW_SOURCES"
               :sources="msg.finalAnswer?.sources?.length
                 ? msg.finalAnswer.sources
                 : (msg.skillSources ?? [])"
             />
+
+            <!-- C29.5: AI message actions (copy + retry) — shown after streaming ends -->
+            <div v-if="!msg.isStreaming && msg.content" class="msg-actions msg-actions--ai">
+              <button class="msg-action-btn" @click="onCopyAi(msg.content)" :title="t('chat_copy')">⎘</button>
+              <button class="msg-action-btn" @click="$emit('retry-ai', msg.id)" :title="t('chat_retry')">↺</button>
+            </div>
           </div>
         </div>
       </div>
@@ -170,25 +182,30 @@ import ChatConfirmationCard  from './ChatConfirmationCard.vue'
 import DataQualityCard       from './DataQualityCard.vue'
 import ChatSourceList        from './ChatSourceList.vue'
 
+// C29.1 — production/debug display flags
+import {
+  SHOW_DATA_QUALITY,
+  SHOW_SOURCES,
+  SHOW_REASONING_PANEL,
+  SHOW_STREAM_DEBUG,
+} from '../../config/chatUiFlags.js'
+
 const props = defineProps({
   messages: { type: Array, default: () => [] },
 })
 
-const emit = defineEmits(['confirm', 'cancel', 'action'])
+const emit = defineEmits(['confirm', 'cancel', 'action', 'edit-user', 'retry-ai'])
 
 const { t } = useI18n()
 const listRef = ref(null)
 
-// Section I: stream debug panel — only visible when CHAT_STREAM_DEBUG=1 in localStorage.
-// Toggle on:  localStorage.setItem('CHAT_STREAM_DEBUG', '1'); location.reload()
-// Toggle off: localStorage.removeItem('CHAT_STREAM_DEBUG'); location.reload()
-const isDev   = import.meta.env.DEV && localStorage.getItem('CHAT_STREAM_DEBUG') === '1'
+// Stream debug tick (only active when SHOW_STREAM_DEBUG is on)
 const nowTick = ref(Date.now())
 let _tickTimer = null
 watch(
   () => props.messages.some(m => m.isStreaming),
   (hasStreaming) => {
-    if (hasStreaming && !_tickTimer) {
+    if (hasStreaming && !_tickTimer && SHOW_STREAM_DEBUG) {
       _tickTimer = setInterval(() => { nowTick.value = Date.now() }, 500)
     } else if (!hasStreaming && _tickTimer) {
       clearInterval(_tickTimer)
@@ -219,19 +236,148 @@ function scrollToBottom() {
   })
 }
 
-// Very basic markdown renderer (bold + newlines only — no external dep)
+// C29.4: copy user message
+async function onCopyUser(text) {
+  try { await navigator.clipboard.writeText(text ?? '') } catch { /* non-fatal */ }
+}
+
+// C29.5: copy AI message (strips HTML tags from rendered markdown)
+async function onCopyAi(text) {
+  try { await navigator.clipboard.writeText(text ?? '') } catch { /* non-fatal */ }
+}
+
+// C29.6 — Improved markdown renderer (headings / lists / tables / code / inline)
+// Processes line by line to avoid mid-sentence keyword conflicts.
+function _inlineMd(text) {
+  return text
+    .replace(/`([^`\n]+)`/g, '<code>$1</code>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*([^*\n]+?)\*/g, '<em>$1</em>')
+    .replace(/_([^_\n]+?)_/g, '<em>$1</em>')
+}
+
 function renderMarkdown(text) {
   if (!text) return ''
-  return text
+
+  // HTML-escape the raw text up-front (per-field, before inline processing)
+  const esc = s => s
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/_(.+?)_/g, '<em>$1</em>')
-    .replace(/\n{2,}/g, '</p><p>')
-    .replace(/\n/g, '<br>')
-    .replace(/^(.+)$/, '<p>$1</p>')
+
+  const lines = text.split('\n')
+  const out   = []
+  let i       = 0
+  let inPara  = false
+
+  const flushPara = () => {
+    if (inPara) { out.push('</p>'); inPara = false }
+  }
+  const openPara = () => {
+    if (!inPara) { out.push('<p>'); inPara = true }
+  }
+
+  while (i < lines.length) {
+    const raw  = lines[i]
+    const line = raw.trim()
+
+    // ── Fenced code block ```...``` ───────────────────────────────────────────
+    if (line.startsWith('```')) {
+      flushPara()
+      const codeLines = []
+      i++
+      while (i < lines.length && !lines[i].trim().startsWith('```')) {
+        codeLines.push(esc(lines[i]))
+        i++
+      }
+      out.push(`<pre class="md-pre"><code>${codeLines.join('\n')}</code></pre>`)
+      i++
+      continue
+    }
+
+    // ── ATX Headings # ## ### ─────────────────────────────────────────────────
+    const hMatch = line.match(/^(#{1,3})\s+(.+)$/)
+    if (hMatch) {
+      flushPara()
+      const lvl = hMatch[1].length
+      out.push(`<h${lvl} class="md-h">${_inlineMd(esc(hMatch[2]))}</h${lvl}>`)
+      i++
+      continue
+    }
+
+    // ── Unordered list (- or *) ───────────────────────────────────────────────
+    if (/^[-*]\s/.test(line)) {
+      flushPara()
+      out.push('<ul class="md-ul">')
+      while (i < lines.length && /^[-*]\s/.test(lines[i].trim())) {
+        out.push(`<li>${_inlineMd(esc(lines[i].trim().slice(2).trim()))}</li>`)
+        i++
+      }
+      out.push('</ul>')
+      continue
+    }
+
+    // ── Ordered list (1. 2. …) ───────────────────────────────────────────────
+    if (/^\d+\.\s/.test(line)) {
+      flushPara()
+      out.push('<ol class="md-ol">')
+      while (i < lines.length && /^\d+\.\s/.test(lines[i].trim())) {
+        out.push(`<li>${_inlineMd(esc(lines[i].trim().replace(/^\d+\.\s/, '')))}</li>`)
+        i++
+      }
+      out.push('</ol>')
+      continue
+    }
+
+    // ── Table  | col | col | ─────────────────────────────────────────────────
+    if (line.startsWith('|') && line.endsWith('|')) {
+      flushPara()
+      const tableRows = []
+      while (i < lines.length && lines[i].trim().startsWith('|')) {
+        tableRows.push(lines[i].trim())
+        i++
+      }
+      // Detect header + separator pattern
+      const hasHeader = tableRows.length >= 2 && /^\|[\s|:-]+\|$/.test(tableRows[1])
+      out.push('<div class="md-table-wrap"><table class="md-table">')
+      tableRows.forEach((row, ri) => {
+        if (hasHeader && ri === 1) return  // skip separator row
+        const isHead = hasHeader && ri === 0
+        const parts  = row.split('|')
+        const cells  = parts.slice(1, parts.length - 1).map(c => c.trim())
+        const tag    = isHead ? 'th' : 'td'
+        out.push('<tr>' + cells.map(c => `<${tag}>${_inlineMd(esc(c))}</${tag}>`).join('') + '</tr>')
+      })
+      out.push('</table></div>')
+      continue
+    }
+
+    // ── Horizontal rule ───────────────────────────────────────────────────────
+    if (/^---+$/.test(line) || /^\*\*\*+$/.test(line)) {
+      flushPara()
+      out.push('<hr class="md-hr">')
+      i++
+      continue
+    }
+
+    // ── Blank line → close paragraph ──────────────────────────────────────────
+    if (line === '') {
+      flushPara()
+      i++
+      continue
+    }
+
+    // ── Normal paragraph line ─────────────────────────────────────────────────
+    openPara()
+    out.push(_inlineMd(esc(raw)) + '<br>')
+    i++
+  }
+
+  flushPara()
+
+  return out.join('')
+    .replace(/<br><\/p>/g, '</p>')
+    .replace(/<p><\/p>/g, '')
 }
 </script>
 
@@ -272,7 +418,7 @@ function renderMarkdown(text) {
   background: var(--accent-gradient, var(--accent));
   color: white;
   border-radius: 18px 18px 4px 18px;
-  padding: 10px 16px;
+  padding: 10px 16px 6px;
   box-shadow: 0 2px 8px var(--accent-glow);
 }
 
@@ -321,33 +467,71 @@ function renderMarkdown(text) {
 .msg-text-md :deep(strong) { font-weight: 700; color: var(--text); }
 .msg-text-md :deep(em)     { color: var(--muted); }
 
-/* ── Thinking panel (Phase 1) ─────────────────────────────────────────────────── */
-.msg-thinking {
-  margin: 6px 0 8px;
+/* C29.6: extended markdown elements */
+.msg-text-md :deep(.md-h)  { font-weight: 700; color: var(--text); margin: 12px 0 6px; line-height: 1.3; }
+.msg-text-md :deep(h1.md-h) { font-size: 1.15em; }
+.msg-text-md :deep(h2.md-h) { font-size: 1.05em; }
+.msg-text-md :deep(h3.md-h) { font-size: 0.97em; }
+
+.msg-text-md :deep(.md-ul),
+.msg-text-md :deep(.md-ol)  { padding-left: 20px; margin: 6px 0 8px; }
+.msg-text-md :deep(.md-ul li),
+.msg-text-md :deep(.md-ol li) { margin-bottom: 3px; line-height: 1.5; }
+
+.msg-text-md :deep(.md-hr) {
+  border: none;
+  border-top: 1px solid var(--border-soft);
+  margin: 12px 0;
+}
+
+.msg-text-md :deep(.md-pre) {
+  background: var(--surface2);
   border: 1px solid var(--border-soft);
   border-radius: 6px;
-  background: var(--surface2);
+  padding: 10px 12px;
+  overflow-x: auto;
   font-size: 12px;
-  overflow: hidden;
-}
-.msg-thinking-label {
-  padding: 5px 10px;
-  cursor: pointer;
-  user-select: none;
-  color: var(--muted);
-  font-weight: 600;
-  list-style: none;
-}
-.msg-thinking-label::-webkit-details-marker { display: none; }
-.msg-thinking-body {
-  padding: 6px 10px 8px;
-  color: var(--muted);
   line-height: 1.5;
-  white-space: pre-wrap;
-  word-break: break-word;
-  border-top: 1px solid var(--border-soft);
-  max-height: 200px;
-  overflow-y: auto;
+  margin: 6px 0 8px;
+}
+.msg-text-md :deep(.md-pre code) {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  background: none;
+  padding: 0;
+  border-radius: 0;
+}
+.msg-text-md :deep(code) {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border-soft);
+  border-radius: 3px;
+  padding: 1px 4px;
+}
+
+.msg-text-md :deep(.md-table-wrap) {
+  overflow-x: auto;
+  margin: 8px 0;
+}
+.msg-text-md :deep(.md-table) {
+  border-collapse: collapse;
+  font-size: 13px;
+  min-width: 100%;
+}
+.msg-text-md :deep(.md-table th),
+.msg-text-md :deep(.md-table td) {
+  border: 1px solid var(--border-soft);
+  padding: 5px 10px;
+  text-align: left;
+  white-space: nowrap;
+}
+.msg-text-md :deep(.md-table th) {
+  background: var(--surface2);
+  font-weight: 600;
+  font-size: 12px;
+}
+.msg-text-md :deep(.md-table tr:nth-child(even) td) {
+  background: var(--surface2, rgba(0,0,0,0.02));
 }
 
 /* ── Typing animation ─────────────────────────────────────────────────────────── */
@@ -368,12 +552,54 @@ function renderMarkdown(text) {
 
 @keyframes typing { 0%,80%,100%{transform:scale(0.7);opacity:0.4} 40%{transform:scale(1);opacity:1} }
 
+/* ── C29.4/C29.5: Message action bars ────────────────────────────────────────── */
+.msg-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  margin-top: 4px;
+}
+.msg-row:hover .msg-actions {
+  opacity: 1;
+}
+
+.msg-actions--user  { justify-content: flex-end; }
+.msg-actions--ai    { justify-content: flex-start; }
+
+.msg-action-btn {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 3px 7px;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--muted);
+  line-height: 1;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+.msg-action-btn:hover {
+  background: var(--surface2);
+  border-color: var(--border-soft);
+  color: var(--text);
+}
+
+/* User bubble action bar: show in white since bg is accent color */
+.msg-bubble--user .msg-action-btn {
+  color: rgba(255,255,255,0.65);
+}
+.msg-bubble--user .msg-action-btn:hover {
+  background: rgba(255,255,255,0.2);
+  border-color: rgba(255,255,255,0.35);
+  color: white;
+}
+
 /* ── Transition ────────────────────────────────────────────────────────────────── */
 .msg-appear-enter-active { transition: all 0.25s ease; }
 .msg-appear-enter-from   { opacity: 0; transform: translateY(8px); }
 .msg-appear-enter-to     { opacity: 1; transform: translateY(0); }
 
-/* ── Section I: Stream debug panel (DEV only, hidden in prod) ────────────────────── */
+/* ── Stream debug panel (DEV only, hidden in prod via SHOW_STREAM_DEBUG flag) ─── */
 .stream-debug-panel {
   margin: 6px 0 8px;
   padding: 8px 10px;
@@ -398,15 +624,9 @@ function renderMarkdown(text) {
   gap: 1px 10px;
   row-gap: 2px;
 }
-.sdp-k {
-  color: #888;
-  white-space: nowrap;
-}
-.sdp-v {
-  color: #333;
-  word-break: break-all;
-}
-.sdp-mono { font-family: monospace; }
+.sdp-k  { color: #888; white-space: nowrap; }
+.sdp-v  { color: #333; word-break: break-all; }
+.sdp-mono  { font-family: monospace; }
 .sdp-warn  { color: #b45309; font-weight: 700; }
 .sdp-error { color: #dc2626; font-weight: 700; }
 .sdp-no-events-alert {
@@ -457,14 +677,8 @@ function renderMarkdown(text) {
   font-weight: 500;
 }
 .msg-sources-link:hover { text-decoration: underline; }
-.msg-sources-title {
-  color: var(--text);
-  font-weight: 500;
-}
-.msg-sources-meta {
-  color: var(--muted);
-  font-size: 11px;
-}
+.msg-sources-title  { color: var(--text); font-weight: 500; }
+.msg-sources-meta   { color: var(--muted); font-size: 11px; }
 
 /* C27: confidence badge on skill sources */
 .msg-sources-confidence {
