@@ -252,7 +252,7 @@ _NEWS_OVERINFERENCE_PATTERNS: list[tuple[re.Pattern, str]] = [
 ]
 
 
-# C28.2: dividend over-inference — only applies when verified news detail / financial data absent
+# C28.2/C28.3: dividend over-inference — only applies when verified news detail / financial data absent
 _DIVIDEND_OVERINFERENCE_PATTERNS: list[tuple[re.Pattern, str]] = [
     (
         re.compile(r"(?:高额|大额|大规模|超额)分红"),
@@ -275,41 +275,115 @@ _DIVIDEND_OVERINFERENCE_PATTERNS: list[tuple[re.Pattern, str]] = [
         "（工具仅返回新闻标题，无法确认公司分红能力，请查阅完整公告）",
     ),
     (
-        re.compile(r"基于前期利润分配"),
+        re.compile(r"基于前期利润(?:分配|支撑|水平)?"),
         "（注：利润分配情况需有财报数据确认）",
+    ),
+    # C28.3: additional patterns observed in browser validation
+    (
+        re.compile(r"历史(?:高|丰厚|稳定)?分红(?:延续|继续|传统|惯例|记录)"),
+        "（注：历史分红规律需有历年财报数据支撑，工具仅返回新闻标题）",
+    ),
+    (
+        re.compile(r"留存收益(?:充足|较多|丰富|充裕)"),
+        "（注：留存收益情况需有财报数据确认，工具仅返回新闻标题）",
+    ),
+    (
+        re.compile(r"分红现金(?:较高|较大|充足)[^，。\n]{0,20}说明"),
+        "（工具仅返回新闻标题，无法通过分红金额推断财务状况）",
+    ),
+    (
+        re.compile(r"分红(?:体现|说明|反映)[^，。\n]{0,30}(?:盈利|利润|现金流|财务)"),
+        "（工具仅返回新闻标题，无法通过分红新闻推断盈利或现金流状况）",
+    ),
+    (
+        re.compile(r"(?:盈利质量|现金流状况)[^，。\n]{0,30}(?:较好|较强|充裕|良好|优质)"),
+        "（注：盈利质量和现金流状况需财报数据支撑，工具仅返回新闻标题）",
+    ),
+    (
+        re.compile(r"前期利润(?:支撑|支持|积累)[^，。\n]{0,20}分红"),
+        "（注：利润支撑判断需有财报数据，工具仅返回新闻标题）",
     ),
 ]
 
-# C28.2: AI/theme strong-attribution patterns — only applies when no verified_theme_classification
+_DIVIDEND_DISCLAIMER = (
+    "\n\n_工具仅返回新闻标题，未提供完整公告原文或财务数据，"
+    "因此不能进一步判断分红能力、盈利质量或现金流状况。_"
+)
+
+# C28.2/C28.3: AI/theme strong-attribution patterns — only applies when no verified_theme_classification
 _THEME_ATTRIBUTION_PATTERNS: list[tuple[re.Pattern, str]] = [
+    # Generic strong-attribution terms
     (re.compile(r"核心供应商"),   "关联供应商（需公告或研报确认）"),
     (re.compile(r"关键耗材"),     "相关耗材（需公告或研报确认）"),
     (re.compile(r"主力供应商"),   "供应商（需公告或研报确认）"),
     (re.compile(r"核心标的"),     "相关个股（需公告或研报确认）"),
     (re.compile(r"直接受益(?:方|者)?"), "可能关联受益方（需公告或研报确认）"),
     (re.compile(r"强相关(?:个股|标的|公司)?"), "存在初步关联（需公告或研报确认）"),
+    # C28.3: AI chip / device specific strong attributions observed in browser validation
+    (
+        re.compile(r"AI终端设备核心部件(?:供应商|制造商)?"),
+        "可能与AI终端显示或部件存在间接关联（需公告、研报或主题标签进一步确认）",
+    ),
+    (
+        re.compile(r"AI可穿戴(?:设备)?[^，。\n]{0,10}(?:材料|供应商|制造商)"),
+        "可能与可穿戴设备材料环节存在间接关联（需公告或研报确认）",
+    ),
+    (
+        re.compile(r"AI芯片基材"),
+        "可能与半导体基材材料环节存在间接关联（需公告或研报确认）",
+    ),
+    (
+        re.compile(r"AI芯片封装"),
+        "可能与封测环节存在间接关联（需公告或研报确认）",
+    ),
+    (
+        re.compile(r"AI芯片后道环节"),
+        "可能与芯片后道工序存在间接关联（需公告或研报确认）",
+    ),
+    (
+        re.compile(r"AI(?:上游|下游)[^，。\n]{0,15}(?:材料|设备|需求预期)"),
+        "可能与AI产业链上下游存在间接关联（需公告或研报确认）",
+    ),
+    (
+        re.compile(r"AI芯片(?:制造)?上游"),
+        "可能与AI芯片制造上游材料或设备存在间接关联（需公告或研报确认）",
+    ),
+    (
+        re.compile(r"AI设备直接关联"),
+        "可能与AI设备产业链存在间接关联（需公告或研报确认）",
+    ),
 ]
 
 _THEME_DISCLAIMER = (
-    "\n\n_当前仅能基于热门股榜单和一般行业认知初步归类，"
+    "\n\n_当前结果主要基于热门股榜单和一般行业认知初步归类，"
+    "不代表这些公司已被工具确认为AI设备主题股；"
     "需进一步通过公告或研报确认具体产业链关系。_"
 )
 
 
 def sanitize_dividend_overinference(text: str, context: dict | None = None) -> str:
     """
-    C28.2: Filter dividend over-inferences when only news titles are available.
+    C28.2/C28.3: Filter dividend over-inferences when only news titles are available.
 
     Skipped (returns text unchanged) when context has:
       - verified_news_detail=True  (full article body retrieved), OR
       - verified_financial_data=True (financial report data retrieved)
+
+    When any pattern fires, appends _DIVIDEND_DISCLAIMER if not already present.
     """
     if context and (
         context.get("verified_news_detail") or context.get("verified_financial_data")
     ):
         return text
+    modified = False
     for pat, replacement in _DIVIDEND_OVERINFERENCE_PATTERNS:
-        text = pat.sub(replacement, text)
+        new_text = pat.sub(replacement, text)
+        if new_text != text:
+            modified = True
+            text = new_text
+    # C28.3: append boundary disclaimer when any dividend over-inference was filtered
+    if modified and _DIVIDEND_DISCLAIMER.strip() not in text:
+        text = text + _DIVIDEND_DISCLAIMER
     return text
 
 

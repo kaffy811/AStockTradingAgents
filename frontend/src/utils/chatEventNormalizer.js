@@ -9,6 +9,20 @@
 
 // ── Display name tables ────────────────────────────────────────────────────────
 
+// C28.3: skill internal names → Chinese display labels (never show snake_case to users)
+export const SKILL_DISPLAY_NAMES = {
+  'general_financial_answer_skill': '智能问答',
+  'report_explanation_skill':       '报告解读',
+  'industry_hotspot_skill':         '行业热点分析',
+  'stock_anomaly_skill':            '股票异动分析',
+  'risk_first_skill':               '风险优先分析',
+  'news_catalyst_skill':            '新闻催化分析',
+  'watchlist_review_skill':         '自选股研究',
+  'analysis_run_skill':             'AI研报生成',
+  'comparison_skill':               '多股对比',
+  'financial_report_skill':         '财报分析',
+}
+
 export const TOOL_DISPLAY_NAMES = {
   stock_quote:                       '查询实时行情',
   stock_kline:                       '查询 K 线数据',
@@ -139,23 +153,30 @@ export function normalizeChatEvent(rawEventType, rawPayload) {
     }
 
     // ── Skill routing events ───────────────────────────────────────────────────
-    case 'skill_started':
+    case 'skill_started': {
+      // C28.3: map internal skill name to Chinese before it reaches the UI
+      const _sName = p.skill_name ?? p.skill_spec ?? 'unknown'
+      const _sDisplay = SKILL_DISPLAY_NAMES[_sName] ?? _sName
       return {
         type:    'ui_tool_start',
-        stepKey: `tool:skill:${p.skill_name ?? p.skill_spec ?? 'unknown'}`,
-        title:   '技能路由',
+        stepKey: `tool:skill:${_sName}`,
+        title:   `技能：${_sDisplay}`,
         status:  'running',
-        detail:  p.skill_name ?? p.source ?? '',
+        detail:  _sDisplay,   // friendly display name, never raw snake_case
       }
+    }
 
-    case 'skill_completed':
+    case 'skill_completed': {
+      const _scName = p.skill_name ?? 'unknown'
+      const _scDisplay = SKILL_DISPLAY_NAMES[_scName] ?? _scName
       return {
         type:    'ui_tool_done',
-        stepKey: `tool:skill:${p.skill_name ?? 'unknown'}`,
-        title:   '技能路由',
+        stepKey: `tool:skill:${_scName}`,
+        title:   `技能：${_scDisplay}`,
         status:  'success',
-        summary: p.skill_name ?? '完成',
+        summary: _scDisplay,  // Chinese display, never raw snake_case
       }
+    }
 
     // ── Planner step events ────────────────────────────────────────────────────
     case 'planner_step_started':

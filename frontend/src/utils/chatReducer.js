@@ -241,6 +241,38 @@ export function applyChatUiEvent(message, uiEvent) {
           message.content = [fa.summary, fa.analysis].filter(Boolean).join('\n\n')
         }
         // If answerContent already present and no full_text, keep it (streaming path)
+
+        // C28.3: sync data_quality_review thinking item with final card level
+        // This guarantees thinking panel and DataQualityCard always agree.
+        const _dq = fa.data_quality
+        if (_dq?.level) {
+          const _DQ_THINKING_TEXT = {
+            high:         '数据质量：数据完整。已获取多维度数据，信息完整度高。',
+            medium:       '数据质量：数据部分完整。仍有部分关键数据缺失。',
+            low:          '数据质量：数据有限。仅获取到行情或新闻数据，缺少财务及深度研究数据。',
+            insufficient: '数据质量：数据不足。当前缺少可靠数据，无法完整判断。',
+          }
+          const _dqText = _DQ_THINKING_TEXT[_dq.level]
+          if (_dqText) {
+            if (!message.thinkingItems) message.thinkingItems = []
+            const _dqItem = {
+              source:     'data_quality_review',
+              stage:      'data_quality',
+              title:      '检查数据质量',
+              content:    _dqText,
+              importance: (_dq.level === 'low' || _dq.level === 'insufficient') ? 'high' : 'medium',
+              timestamp:  Date.now(),
+            }
+            const _existIdx = message.thinkingItems.findIndex(
+              t => t.source === 'data_quality_review' && t.stage === 'data_quality'
+            )
+            if (_existIdx >= 0) {
+              message.thinkingItems[_existIdx] = _dqItem
+            } else {
+              message.thinkingItems.push(_dqItem)
+            }
+          }
+        }
       }
       break
     }

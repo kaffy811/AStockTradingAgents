@@ -55,13 +55,15 @@ describe('skill stepKey scoped by skill_name', () => {
     expect(result.detail).toBeTruthy()
   })
 
-  it('T8b: skill_completed uses skill_name in stepKey', () => {
+  it('T8b: skill_completed uses Chinese display name in summary (C28.3: never raw snake_case)', () => {
     const result = normalizeChatEvent('skill_completed', {
       skill_name: 'report_explanation_skill',
     })
     expect(result.type).toBe('ui_tool_done')
     expect(result.stepKey).toBe('tool:skill:report_explanation_skill')
-    expect(result.summary).toBe('report_explanation_skill')
+    // C28.3: summary must be Chinese label, not raw snake_case
+    expect(result.summary).toBe('报告解读')
+    expect(result.summary).not.toContain('report_explanation_skill')
   })
 
   it('T8c: two different skills produce different stepKeys (no collision)', () => {

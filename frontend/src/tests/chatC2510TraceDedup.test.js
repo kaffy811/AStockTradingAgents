@@ -155,15 +155,16 @@ describe('Chinese tool display names in trace', () => {
     expect(entry?.title).toBe('读取报告详情')
   })
 
-  it('T7c: skill step title includes Chinese skill name from normalizer detail', () => {
+  it('T7c: skill step title shows Chinese display name (C28.3: no raw snake_case)', () => {
     const msg = makeMsg()
     applyChatUiEvent(msg, normalizeChatEvent('skill_started', {
       skill_name: 'report_explanation_skill',
     }))
     const entry = msg.toolTrace.find(t => t.key.startsWith('tool:skill:'))
-    // title should be '技能路由' (from normalizer); Chinese mapping is in ChatReasoningPanel
-    expect(entry?.title).toBe('技能路由')
-    // But the stepKey has the skill name embedded
+    // C28.3: title is now "技能：报告解读" (Chinese label from normalizer)
+    expect(entry?.title).toBe('技能：报告解读')
+    expect(entry?.title).not.toContain('report_explanation_skill')
+    // stepKey still encodes the original skill name for dedup
     expect(entry?.key).toBe('tool:skill:report_explanation_skill')
   })
 })
