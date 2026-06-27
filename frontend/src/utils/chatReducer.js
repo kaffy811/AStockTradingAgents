@@ -217,10 +217,16 @@ export function applyChatUiEvent(message, uiEvent) {
       const fa = uiEvent.data
       if (fa && typeof fa === 'object') {
         message.finalAnswer = fa
-        // Fill content from finalAnswer if no streaming answer text arrived
-        if (!message.answerContent && (fa.summary || fa.analysis || fa.disclaimer)) {
+        // C28.1: prefer sanitized full_text from backend (preamble-free);
+        // falls back to accumulated answerContent or structured fields.
+        if (fa.full_text) {
+          // full_text is the backend-sanitized, preamble-stripped answer
+          message.answerContent = fa.full_text
+          message.content       = fa.full_text
+        } else if (!message.answerContent && (fa.summary || fa.analysis || fa.disclaimer)) {
           message.content = [fa.summary, fa.analysis].filter(Boolean).join('\n\n')
         }
+        // If answerContent already present and no full_text, keep it (streaming path)
       }
       break
     }

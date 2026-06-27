@@ -43,6 +43,22 @@ _STRIP_LINE_PREFIXES: tuple[str, ...] = (
 
 # ── Lightweight financial-safety filter ───────────────────────────────────────
 
+# ── Skill name → Chinese label (C28.1) ────────────────────────────────────────
+
+_SKILL_NAME_PATTERNS: list[tuple[re.Pattern, str]] = [
+    (re.compile(r"\bgeneral_financial_answer_skill\b"), "智能问答"),
+    (re.compile(r"\breport_explanation_skill\b"),       "报告解读"),
+    (re.compile(r"\bindustry_hotspot_skill\b"),         "行业热点分析"),
+    (re.compile(r"\bstock_anomaly_skill\b"),            "股票异动分析"),
+    (re.compile(r"\brisk_first_skill\b"),               "风险优先分析"),
+    (re.compile(r"\bnews_catalyst_skill\b"),            "新闻催化分析"),
+    (re.compile(r"\bwatchlist_review_skill\b"),         "自选股研究"),
+    (re.compile(r"\banalysis_run_skill\b"),             "AI研报生成"),
+    (re.compile(r"\bfinancial_rag_search\b"),           "金融知识库检索"),
+    (re.compile(r"\buniversal_market_search\b"),        "市场热点搜索"),
+    (re.compile(r"\bofficial_report_search\b"),         "官方财报检索"),
+]
+
 _FINANCE_PATTERNS: list[tuple[re.Pattern, str]] = [
     # Hard price targets
     (re.compile(r"目标价\s*[\d.]+\s*元?",           re.IGNORECASE), "目标价[已过滤]"),
@@ -95,6 +111,10 @@ def sanitize_thinking_content(
 
     # Apply lightweight financial safety to thinking content
     for pat, replacement in _FINANCE_PATTERNS:
+        text = pat.sub(replacement, text)
+
+    # Apply skill name → Chinese label mapping
+    for pat, replacement in _SKILL_NAME_PATTERNS:
         text = pat.sub(replacement, text)
 
     # Collapse excessive blank lines (3+ → 2)

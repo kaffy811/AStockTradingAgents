@@ -30,6 +30,19 @@ TOOL_SOURCE_MAP: dict[str, tuple[str, str]] = {
     "universal_market_search_tool": ("tool_result",      "市场热点搜索"),
     "get_fundamental_data_tool":    ("financial_report", "基本面数据"),
     "get_financials_tool":          ("financial_report", "财务数据"),
+    # financial_agent.py internal tool names (C28.1)
+    "stock_quote_tool":             ("market_quote",      "实时行情"),
+    "stock_kline_tool":             ("market_quote",      "行情K线"),
+    "financial_news_tool":          ("news",              "财经新闻"),
+    "financial_rag_search":         ("rag",               "金融知识库"),
+    "verify_financial_report":      ("official_report",   "财报来源审核"),
+    "financial_document_ingest":    ("official_report",   "财报知识库导入"),
+    "get_industry_news_tool":       ("news",              "行业新闻"),
+    "search_realtime_news":         ("news",              "实时新闻"),
+    # Internal event names that sometimes leak into source refs (C28.1: Issue 5)
+    "rag_retrieve":                 ("rag",               "金融知识库资料"),
+    "rag_review":                   ("rag",               "资料质量审查"),
+    "unknown":                      ("unknown",           "来源未标注"),
 }
 
 # Chinese labels for source_type categories (used in verified_data / missing_data)
@@ -93,7 +106,13 @@ def compute_data_quality(
     verified_data = [_TYPE_LABEL.get(t, t) for t in sorted(successful_types)]
     missing_data  = [_TYPE_LABEL.get(t, t) for t in sorted(failed_types)]
 
-    has_critical_success = bool(successful_types & _CRITICAL_SOURCE_TYPES)
+    # C28.1: rag counts as critical only if rag_results has items
+    # (tool "success" with 0 results should not elevate level)
+    effective_critical = _CRITICAL_SOURCE_TYPES.copy()
+    if "rag" in successful_types and (rag_results is not None) and len(rag_results) == 0:
+        effective_critical = effective_critical - {"rag"}
+
+    has_critical_success = bool(successful_types & effective_critical)
     has_critical_failure = bool(failed_types     & _CRITICAL_SOURCE_TYPES)
     n_success = len(successful_types)
 
@@ -125,6 +144,11 @@ def compute_data_quality(
     else:
         level = "insufficient"
         reason = "数据获取不足，无法提供完整分析。"
+
+    # C28.1: append "最新已披露定期报告" to missing_data when level is low
+    # and no financial/official/rag data was available
+    if level == "low" and "最新已披露定期报告" not in missing_data:
+        missing_data.append("最新已披露定期报告")
 
     # warning_flags
     warning_flags: list[str] = []
@@ -193,8 +217,9 @@ def build_source_refs(
         if status != "success":
             continue  # failed tools do not generate a SourceRef
 
-        src_type, display = TOOL_SOURCE_MAP.get(name, ("tool_result", name))
-        title = display or name
+        src_type, display = TOOL_SOURCE_MAP.get(name, ("tool_result", None))
+        # C28.1: never show raw snake_case as title; use friendly display name or generic label
+        title = display or _TYPE_LABEL.get(src_type, "工具结果")
         dedup_key = f"{src_type}:{title}"
         if dedup_key in seen_keys:
             continue
@@ -208,7 +233,8 @@ def build_source_refs(
         ref = SourceRef(
             title        = title,
             source_type  = src_type,
-            source       = display,
+            source       = display or "",   # C28.1: use friendly display, not raw name
+            provider     = display or "",
             retrieved_at = now_iso,
             confidence   = confidence,  # type: ignore[arg-type]
             snippet      = snippet,

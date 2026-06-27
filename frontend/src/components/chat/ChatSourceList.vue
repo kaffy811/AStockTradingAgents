@@ -18,8 +18,8 @@
           target="_blank"
           rel="noopener noreferrer"
           class="csl-title csl-link"
-        >{{ src.title || _typeLabel(src.source_type) }}</a>
-        <span v-else class="csl-title">{{ src.title || _typeLabel(src.source_type) }}</span>
+        >{{ _safeTitle(src) }}</a>
+        <span v-else class="csl-title">{{ _safeTitle(src) }}</span>
 
         <!-- Type badge -->
         <span class="csl-type-badge">{{ _typeLabel(src.source_type) }}</span>
@@ -78,6 +78,16 @@ const _TYPE_LABELS = {
   tool_result:      '工具结果',
   manual:           '手动资料',
   document:         '文档',
+  // C28.1: internal event names → friendly labels
+  unknown:          '来源未标注',
+}
+
+// C28.1: friendly title overrides for internal/raw names that should never be shown as-is
+const _TITLE_OVERRIDES = {
+  'rag_retrieve':    '金融知识库资料',
+  'rag_review':      '资料质量审查',
+  'unknown':         '来源未标注',
+  'tool_result':     '工具结果',
 }
 
 const _CONF_LABELS = {
@@ -87,7 +97,17 @@ const _CONF_LABELS = {
 }
 
 function _typeLabel(type) {
-  return _TYPE_LABELS[type] || type || '来源'
+  return _TYPE_LABELS[type] || '参考资料'
+}
+
+function _safeTitle(src) {
+  // C28.1: never show raw snake_case names or internal event names
+  const raw = src.title || ''
+  if (!raw || _TITLE_OVERRIDES[raw] || /^[a-z][a-z0-9_]+$/.test(raw)) {
+    // raw is empty or is a snake_case internal name
+    return _TITLE_OVERRIDES[raw] || _typeLabel(src.source_type) || '参考资料'
+  }
+  return raw
 }
 
 function _confLabel(conf) {

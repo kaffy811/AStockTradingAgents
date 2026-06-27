@@ -289,6 +289,36 @@ def _filter_banned(text: str) -> str:
     return text
 
 
+# C28.1: Strip model self-talk preamble that appears before the first section header
+_PREAMBLE_RE = re.compile(r"^.+?(?=^#{2,3}\s)", re.DOTALL | re.MULTILINE)
+_SELFREF_PREAMBLE = re.compile(
+    r"^(?:我们?分析|我们?来分析|让我分析|根据工具数据[，,]|根据以上工具[，,]|"
+    r"好的[，,]|以下是(?:针对)?[^#\n]{0,20}(?:的分析|的研究|结果)[：:。，,\n])"
+    r".*?\n\n",
+    re.DOTALL,
+)
+
+
+def _strip_model_preamble(text: str) -> str:
+    """Remove model self-talk intro before the first markdown section header (###).
+
+    E.g. "我们分析用户问题：茅台... 根据工具数据……\n\n### 研究摘要\n..."
+    becomes "### 研究摘要\n..."
+    """
+    if "###" not in text:
+        # No section headers — try stripping explicit self-reference openers
+        cleaned = _SELFREF_PREAMBLE.sub("", text, count=1)
+        return cleaned.strip() if cleaned.strip() else text
+    # Has section headers — strip everything before the first ###
+    m = _PREAMBLE_RE.match(text)
+    if m:
+        stripped = text[m.end():]
+        # Safety: only keep the stripped version if substantial content remains
+        if stripped.strip() and len(stripped) > len(text) * 0.3:
+            return stripped.lstrip("\n")
+    return text
+
+
 # Industry keywords for news search (Phase 2E-4)
 _INDUSTRY_KEYWORDS = [
     "新能源", "光伏", "储能", "风电", "核电",
@@ -1188,11 +1218,29 @@ class FinancialAgent:
         # ── Assemble final answer ─────────────────────────────────────────────
 
         raw_answer = "".join(answer_chunks)
+        # C28.1: strip model self-talk preamble before the first section header
+        raw_answer = _strip_model_preamble(raw_answer)
         answer_text = _filter_banned(raw_answer)
         # C26: unified safety post-processing
         answer_text = sanitize_financial_answer(answer_text)
         if "仅供研究参考" not in answer_text:
             answer_text += f"\n\n_{_DISCLAIMER}_"
+
+        # C28.1: compute proper C27-style DataQuality level from tool_calls
+        from app.agents.answer_metadata import compute_data_quality as _compute_dq  # noqa: PLC0415
+        _tool_events_for_dq = [
+            {"name": tc.tool_name, "status": tc.status, "detail": tc.result_summary or ""}
+            for tc in tool_calls
+        ]
+        _computed_dq = _compute_dq(_tool_events_for_dq, rag_results or [])
+        data_quality.level         = _computed_dq.level
+        data_quality.reason        = _computed_dq.reason
+        data_quality.verified_data = _computed_dq.verified_data
+        data_quality.missing_data  = _computed_dq.missing_data
+        data_quality.failed_tools  = _computed_dq.failed_tools
+        data_quality.warning_flags = _computed_dq.warning_flags
+        data_quality.source_count  = _computed_dq.source_count
+        data_quality.tool_count    = _computed_dq.tool_count
 
         # Parse structured sections from markdown answer
         final_answer = _parse_final_answer(answer_text, tool_calls, rag_results, data_quality)
@@ -1210,6 +1258,7 @@ class FinancialAgent:
         fa_dict = final_answer.model_dump()
         await _emit("final_answer", {
             "request_id":        request_id,
+            "full_text":         answer_text,          # C28.1: sanitized preamble-free text
             "summary":           fa_dict.get("summary", ""),
             "analysis":          fa_dict.get("analysis", ""),
             "business_analysis": fa_dict.get("business_analysis", ""),

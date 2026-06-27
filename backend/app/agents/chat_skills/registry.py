@@ -180,7 +180,21 @@ class SkillRegistry:
             )
             from app.agents.thinking_sanitizer import sanitize_thinking_content  # noqa: PLC0415
 
-            planning_content = f'将使用技能\u300c{skill.name}\u300d处理此问题，开始检索相关数据。'
+            # C28.1: map internal skill names to user-friendly Chinese labels
+            _SKILL_DISPLAY_NAMES = {
+                "general_financial_answer_skill": "智能问答",
+                "report_explanation_skill":       "报告解读",
+                "industry_hotspot_skill":         "行业热点分析",
+                "stock_anomaly_skill":            "股票异动分析",
+                "risk_first_skill":               "风险优先分析",
+                "news_catalyst_skill":            "新闻催化分析",
+                "watchlist_review_skill":         "自选股研究",
+                "analysis_run_skill":             "AI研报生成",
+                "comparison_skill":               "多股对比",
+                "financial_report_skill":         "财报分析",
+            }
+            skill_display = _SKILL_DISPLAY_NAMES.get(skill.name, skill.name.replace("_skill", "").replace("_", ""))
+            planning_content = f'\u300c{skill_display}\u300d开始检索相关数据。'
             sanitized_plan = sanitize_thinking_content(planning_content, source="tool_planning")
             if sanitized_plan:
                 ev = make_tool_planning(sanitized_plan)

@@ -36,13 +36,20 @@ _METRIC_PATTERNS: dict[str, list[re.Pattern]] = {
         re.compile(r"归母净利润.*?约?\s*\d[\d.]*\s*[亿万元百千]+"),
     ],
     "dividend_yield": [
+        re.compile(r"股息率约?为?\s*\d[\d.]*\s*%"),
         re.compile(r"股息率约?\s*\d[\d.]*\s*%"),
-        re.compile(r"派息率约?\s*\d[\d.]*\s*%"),
-        re.compile(r"分红率约?\s*\d[\d.]*\s*%"),
-        re.compile(r"对应约\s*\d[\d.]*\s*%的股息率"),
-        re.compile(r"按当前价粗算.*?股息率"),
+        re.compile(r"派息率约?为?\s*\d[\d.]*\s*%"),
+        re.compile(r"分红率约?为?\s*\d[\d.]*\s*%"),
+        re.compile(r"对应约\s*\d[\d.]*\s*%(?:的股息率)?"),
+        re.compile(r"按当前[股]?价粗算.*?股息率"),
+        re.compile(r"以当前[股]?价[格]?(?:粗)?计算.*?股息率"),
         re.compile(r"简单计算.*?股息率"),
         re.compile(r"股息率.*?对应.*?\d[\d.]*\s*%"),
+        # Raw arithmetic that constitutes implicit calculation: e.g. "28.024 ÷ 1168.63"
+        re.compile(r"\d[\d.]*\s*[÷/]\s*\d[\d.]*\s*(?:=|≈|约)?\s*\d[\d.]*\s*%"),
+        # Explicit calculation phrases
+        re.compile(r"(?:按|以)当前股价计算"),
+        re.compile(r"粗算(?:股息率|收益率|派息率)"),
     ],
     "price": [
         re.compile(r"目标价(?:位)?约?\s*\d[\d.]*\s*元"),
@@ -55,7 +62,7 @@ _METRIC_REPLACEMENT = {
     "pb": "（市净率数据需通过工具获取，此处不自行估算）",
     "revenue": "（营收数据需通过工具获取，此处不自行估算）",
     "profit": "（净利润数据需通过工具获取，此处不自行估算）",
-    "dividend_yield": "（股息率需通过工具获取，不自行计算）",
+    "dividend_yield": "（工具未返回完整公告原文或相关比率字段，因此不计算具体股息率、派息率或收益率）",
     "price": "（目标价需通过工具获取，此处不自行估算）",
 }
 
