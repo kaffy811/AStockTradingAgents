@@ -141,7 +141,30 @@ let _hardTimerId = null
 // C29.1.5: analysis run polling intervals (msgId → intervalId)
 const _runPolls = new Map()
 
-const _SESSION_KEY = 'ta_chat_session_id'
+const _SESSION_KEY        = 'ta_chat_session_id'
+// C29.2.7: per-session click timestamps stored in localStorage
+const _SESSION_ACCESS_KEY = 'ta_chat_access'
+
+function _readAccessMap() {
+  try { return JSON.parse(localStorage.getItem(_SESSION_ACCESS_KEY) ?? '{}') } catch { return {} }
+}
+function _writeAccessMap(map) {
+  try { localStorage.setItem(_SESSION_ACCESS_KEY, JSON.stringify(map)) } catch {}
+}
+function _touchAccess(id) {
+  const map = _readAccessMap()
+  map[id] = Date.now()
+  _writeAccessMap(map)
+  return map
+}
+function _effectiveTime(s, accessMap) {
+  const local = accessMap?.[s.id]
+  if (local) return local  // number timestamp (ms)
+  return new Date(s.last_accessed_at || s.updated_at || s.created_at || 0).getTime()
+}
+function _sortSessions(arr, accessMap) {
+  return [...arr].sort((a, b) => _effectiveTime(b, accessMap) - _effectiveTime(a, accessMap))
+}
 
 // Problem 3 fix: creation lock prevents double-session on rapid clicks
 const isCreatingChat   = ref(false)
@@ -310,6 +333,14 @@ function _restoreMessages(sessionDetail) {
     }
   }
   messages.value = restored
+
+  // C29.2.5: resume / refresh polling for analysis run cards
+  for (const m of restored) {
+    if (m.role === 'assistant' && m.resultCard?.type === 'analysis_run') {
+      const { run_id, status } = m.resultCard.data ?? {}
+      if (run_id) _startRunPolling(m.id, run_id)  // handles both active + terminal (refresh once)
+    }
+  }
 }
 
 // Update the sidebar session preview with the first user message
@@ -384,15 +415,16 @@ function onStop() {
 async function _loadSessions() {
   try {
     const data = await listChatSessions(20, 0)
+    const accessMap = _readAccessMap()
     const mapped = (data.items ?? data ?? []).map(s => ({
-      id:         String(s.session_id ?? s.id),
-      preview:    s.title ?? s.preview ?? '',
-      updated_at: s.updated_at ?? s.created_at ?? '',
-      created_at: s.created_at ?? '',
+      id:               String(s.session_id ?? s.id),
+      preview:          s.title ?? s.preview ?? '',
+      last_accessed_at: s.last_accessed_at ?? null,
+      updated_at:       s.updated_at ?? s.created_at ?? '',
+      created_at:       s.created_at ?? '',
     }))
-    // C29.3: sort by updated_at DESC so most-recently-active is first
-    mapped.sort((a, b) => (b.updated_at > a.updated_at ? 1 : -1))
-    sessions.value = mapped
+    // C29.2.7: sort by effective time (localStorage click time > backend times)
+    sessions.value = _sortSessions(mapped, accessMap)
   } catch {
     // non-fatal
   }
@@ -415,6 +447,7 @@ async function onNewSession() {
     sessionId.value = newId
     localStorage.setItem(_SESSION_KEY, newId)
     messages.value = []
+    _touchAccess(newId)   // C29.2.7: new session → top of list
     await _loadSessions()
   } catch {
     messages.value = []
@@ -429,11 +462,9 @@ async function onSelectSession(id) {
   isLoadingSession.value = true
   messages.value = []           // clear early while loading flag suppresses welcome
 
-  // C29.3: optimistic move-to-top so sidebar order reflects most-recently-active
-  const existing = sessions.value.find(s => s.id === id)
-  if (existing) {
-    sessions.value = [existing, ...sessions.value.filter(s => s.id !== id)]
-  }
+  // C29.2.7: record access time + re-sort (stable optimistic move-to-top)
+  const accessMap = _touchAccess(id)
+  sessions.value = _sortSessions(sessions.value, accessMap)
 
   try {
     const detail = await getChatSession(id)
@@ -562,11 +593,15 @@ async function _sendApi(text) {
     toolTrace:   [],
     agentTrace:  [],   // populated by orchestrator events (Phase 2E-2)
   })
+  assistantMsg._query = text   // C29.2.6: passed to MiniPanel for intent detection
 
   // Update session title on first message
   if (messages.value.filter(m => m.role === 'user').length === 1) {
     _updateSessionTitle(text)
   }
+
+  // C29.2.7: touch access so this session stays at top
+  if (sessionId.value) _touchAccess(sessionId.value)
 
   // 3. Start timeout guards
   _abortController = new AbortController()
@@ -924,17 +959,23 @@ async function onConfirm(msgId, confirmation) {
       })
     }
 
+    const card = result.resultCard
+    // C29.2.3: for analysis_run cards, override content with a clean user message
+    // (backend may return run_id or technical text we don't want to surface)
+    const content = card?.type === 'analysis_run'
+      ? '正在为您创建分析报告，请稍候…'
+      : (result.content ?? '')
+
     Object.assign(followUp, {
-      content:     result.content ?? '',
-      resultCard:  result.resultCard ?? null,
+      content,
+      resultCard:  card ?? null,
       isStreaming: false,
     })
 
-    // C29.1.5: commit to Vue's reactive system (Object.assign bypasses Proxy)
+    // Commit to Vue's reactive system (Object.assign bypasses Proxy)
     commitAssistantMessage(getLiveAssistantMsg(followUp.id) ?? followUp)
 
-    // C29.1.5: start polling if an analysis run was created
-    const card = result.resultCard
+    // Start polling if an analysis run was created
     if (card?.type === 'analysis_run' && card.data?.run_id) {
       _startRunPolling(followUp.id, card.data.run_id)
     }
@@ -977,38 +1018,90 @@ function onCardAction(_msgId, link) {
   if (link.action === 'generate_report') {
     const prompt = `帮我生成 ${link.name}（${link.market}/${link.symbol}）的综合分析报告`
     onSend(prompt)
+  } else if (link.action === 'retry_analysis') {
+    // C29.2.3: rebuild the analysis request for the same stock
+    const prompt = link.name && link.market && link.symbol
+      ? `帮我分析 ${link.name}（${link.market}/${link.symbol}）并保存到历史报告`
+      : '请重新生成分析报告'
+    onSend(prompt)
   } else if (link.path) {
     router.push(link.path)
   }
 }
 
-// C29.1.5: poll analysis run status every 4s until terminal (completed/failed/cancelled)
-function _startRunPolling(msgId, runId) {
-  if (_runPolls.has(msgId)) return  // already polling
-  const iid = setInterval(async () => {
-    try {
-      const snap = await getAnalysisRun(runId)
-      const liveMsg = getLiveAssistantMsg(msgId)
-      if (!liveMsg) { clearInterval(iid); _runPolls.delete(msgId); return }
+// C29.2: poll helpers — immediate first tick + interval; handles terminal links
+const _TERMINAL_STATUSES = new Set(['completed', 'failed', 'cancelled'])
 
-      const isTerminal = snap.status === 'completed' || snap.status === 'failed' || snap.status === 'cancelled'
-      if (liveMsg.resultCard?.type === 'analysis_run') {
-        liveMsg.resultCard = {
-          ...liveMsg.resultCard,
-          data: {
-            ...liveMsg.resultCard.data,
-            status:   snap.status,
-            progress: snap.progress ?? liveMsg.resultCard.data.progress,
-          },
-        }
-        commitAssistantMessage(liveMsg)
-      }
-      if (isTerminal) { clearInterval(iid); _runPolls.delete(msgId) }
-    } catch {
-      // non-fatal — keep polling
+async function _pollRunTick(msgId, runId, iid) {
+  try {
+    const snap = await getAnalysisRun(runId)
+    const liveMsg = getLiveAssistantMsg(msgId)
+    if (!liveMsg) {
+      if (iid != null) { clearInterval(iid); _runPolls.delete(msgId) }
+      return 'gone'
     }
-  }, 4000)
-  _runPolls.set(msgId, iid)
+
+    const isTerminal = _TERMINAL_STATUSES.has(snap.status)
+    const cardData   = liveMsg.resultCard?.data ?? {}
+
+    // Build updated links for terminal states
+    let newLinks = cardData.links ?? []
+    if (snap.status === 'completed') {
+      // C29.2.4: prefer direct report link; fallback to history center
+      const reportId = snap.report_id ?? snap.result?.report_id ?? snap.result?.id ?? null
+      newLinks = reportId
+        ? [{ label: '查看报告', path: { name: 'HistoryDetail', params: { id: String(reportId) }, query: { from: 'chat', session_id: sessionId.value ?? '' } } }]
+        : [{ label: '查看报告中心', path: '/history' }]
+    } else if (isTerminal) {
+      // C29.2.3: failed/cancelled — offer retry action (no path link)
+      newLinks = [{ label: '重试分析', action: 'retry_analysis', name: cardData.name, market: cardData.market, symbol: cardData.symbol, scope: cardData.scope }]
+    }
+
+    if (liveMsg.resultCard?.type === 'analysis_run') {
+      // C29.2.5: backend status always wins — overwrite optimistic state
+      liveMsg.resultCard = {
+        ...liveMsg.resultCard,
+        data: {
+          ...cardData,
+          status:   snap.status,
+          progress: snap.progress ?? cardData.progress,
+          links:    isTerminal ? newLinks : cardData.links ?? [],
+        },
+      }
+      // C29.2.3: update message content on terminal state
+      if (snap.status === 'completed') {
+        liveMsg.content = '分析报告已生成，点击下方按钮查看完整报告。'
+      } else if (isTerminal) {
+        liveMsg.content = '本次分析未能完成，请稍后重试。'
+      }
+      commitAssistantMessage(liveMsg)
+    }
+
+    if (isTerminal && iid != null) { clearInterval(iid); _runPolls.delete(msgId) }
+    return snap.status
+  } catch {
+    return 'error'
+  }
+}
+
+function _startRunPolling(msgId, runId) {
+  if (_runPolls.has(msgId)) return   // already polling this message
+
+  // Sentinel so duplicate calls during the async first-tick are rejected
+  _runPolls.set(msgId, null)
+
+  ;(async () => {
+    // Immediate first check (also refreshes stale state on session restore)
+    const status = await _pollRunTick(msgId, runId, null)
+    if (_TERMINAL_STATUSES.has(status) || status === 'gone') {
+      _runPolls.delete(msgId)
+      return
+    }
+
+    // Set up 4s interval for ongoing polls
+    const iid = setInterval(() => _pollRunTick(msgId, runId, iid), 4000)
+    _runPolls.set(msgId, iid)
+  })()
 }
 
 // Clean up polling intervals on unmount

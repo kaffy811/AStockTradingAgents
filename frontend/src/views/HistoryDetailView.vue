@@ -2,11 +2,16 @@
   <div class="app-shell">
     <AppHeader />
 
+    <!-- C29.2.4: "返回聊天" banner when navigated from chat copilot -->
+    <div v-if="fromChat" class="back-to-chat-bar">
+      <button class="btn-back-chat" @click="router.push('/chat')">← 返回聊天</button>
+    </div>
+
     <!-- ── Report header ────────────────────────────────────────────────────── -->
     <ReportDetailHeader
       :report="result"
       :loading="loading"
-      @back="router.push('/history')"
+      @back="handleBack"
       @go-stock="goStock"
       @reanalyze="goReanalyze"
       @delete="openConfirm"
@@ -50,7 +55,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getReport, deleteReport } from '../api/reports.js'
 import AppHeader            from '../components/AppHeader.vue'
@@ -63,6 +68,12 @@ import ReportMetaSummary    from '../components/ReportMetaSummary.vue'
 
 const route  = useRoute()
 const router = useRouter()
+
+// C29.2.4: detect navigation from chat copilot
+const fromChat = computed(() => route.query.from === 'chat')
+function handleBack() {
+  router.push(fromChat.value ? '/chat' : '/history')
+}
 
 const loading     = ref(false)
 const errorMsg    = ref('')
@@ -118,6 +129,25 @@ onMounted(loadDetail)
 </script>
 
 <style scoped>
+/* C29.2.4: back-to-chat banner */
+.back-to-chat-bar {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  background: var(--status-info-bg);
+  border-bottom: 1px solid var(--border-soft);
+}
+.btn-back-chat {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 0;
+}
+.btn-back-chat:hover { text-decoration: underline; }
+
 .btn-danger {
   background: var(--status-up-bg);
   color: var(--danger);

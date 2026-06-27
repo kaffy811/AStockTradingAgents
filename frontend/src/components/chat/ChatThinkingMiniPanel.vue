@@ -45,6 +45,7 @@ const props = defineProps({
   thinkingItems:  { type: Array,   default: () => [] },
   reasoningSteps: { type: Array,   default: () => [] },
   toolTrace:      { type: Array,   default: () => [] },
+  query:          { type: String,  default: '' },
 })
 
 // Toggle expanded when done
@@ -79,6 +80,73 @@ function _isExcludedSource(item) {
 function _isExcludedTool(tool) {
   const name = (tool.key ?? '').replace(/^[^:]+:/, '') || tool.name || ''
   return _EXCLUDE_TOOLS.has(name) || _isDqContent(tool.title) || _isDqContent(tool.summary)
+}
+
+// ── C29.2.6: Intent detection for AI thinking-style fallback steps ────────────
+
+/** Detect query intent to generate context-aware thinking steps */
+function _detectIntent(query) {
+  if (!query) return 'general'
+  // p3_agent must be checked before report_explain (both match "报告")
+  if (/分析.*保存|创建.*报告|综合分析.*保存|深度分析.*保存|保存.*报告/.test(query)) return 'p3_agent'
+  if (/财报|年报|季报|营收|利润|营业额|每股|EPS|ROE|市盈率|PE/.test(query))        return 'financial_report'
+  if (/热门|热股|涨停|龙头|板块热|行业热|市场热点/.test(query))                    return 'hot_stocks'
+  if (/报告|解读|分析报告|历史报告|查看报告/.test(query))                          return 'report_explain'
+  if (/新闻|公告|消息|最新.*消息/.test(query))                                     return 'news'
+  if (/技术|MACD|RSI|K线|均线|支撑|压力|形态|布林/.test(query))                    return 'technical'
+  if (/对比|比较|vs|versus/.test(query))                                           return 'compare'
+  return 'general'
+}
+
+/** Intent → ordered list of human-readable AI thinking steps */
+const _INTENT_STEPS = {
+  financial_report: [
+    '正在理解您的问题',
+    '正在检索财报和公告',
+    '正在整理财务数据',
+    '正在生成回答',
+  ],
+  hot_stocks: [
+    '正在理解您的问题',
+    '正在检索市场热点',
+    '正在分析行业热度',
+    '正在生成回答',
+  ],
+  report_explain: [
+    '正在理解您的问题',
+    '正在读取历史报告',
+    '正在整理分析结果',
+    '正在生成回答',
+  ],
+  p3_agent: [
+    '正在理解您的问题',
+    '正在创建分析任务',
+    '正在等待报告生成',
+  ],
+  news: [
+    '正在理解您的问题',
+    '正在检索最新新闻',
+    '正在整理信息',
+    '正在生成回答',
+  ],
+  technical: [
+    '正在理解您的问题',
+    '正在获取行情数据',
+    '正在分析技术指标',
+    '正在生成回答',
+  ],
+  compare: [
+    '正在理解您的问题',
+    '正在检索对比数据',
+    '正在整理对比结果',
+    '正在生成回答',
+  ],
+  general: [
+    '正在理解您的问题',
+    '正在检索相关数据',
+    '正在整理可用信息',
+    '正在生成回答',
+  ],
 }
 
 // ── Label mapping ──────────────────────────────────────────────────────────────
@@ -189,7 +257,19 @@ const visibleSteps = computed(() => {
     push(label)
   }
 
-  // Default: always at least one step when streaming
+  // C29.2.6: Intent-based fallback steps when real steps are sparse
+  if (steps.length === 0 && props.isStreaming) {
+    const intent = _detectIntent(props.query)
+    const fallbacks = _INTENT_STEPS[intent] ?? _INTENT_STEPS.general
+    for (const label of fallbacks) {
+      if (!seen.has(label)) {
+        seen.add(label)
+        steps.push({ label })
+      }
+    }
+  }
+
+  // Absolute fallback when not streaming or query-detection gave nothing
   if (steps.length === 0) {
     steps.push({ label: t('chat_analyzing') })
   }

@@ -168,13 +168,17 @@
           <span v-if="card.data.progress > 0 && isRunActive(card.data.status)"> · {{ card.data.progress }}%</span>
         </span>
       </div>
-      <p v-if="isRunActive(card.data.status)" class="rc-run-hint">报告生成需约 30～60 秒，完成后可在报告中心查看。</p>
-      <p v-else-if="card.data.status === 'failed'" class="rc-run-hint rc-run-hint--error">分析任务执行失败，请稍后重试或前往分析页重新生成。</p>
-      <div class="rc-actions">
+      <p v-if="isRunActive(card.data.status)" class="rc-run-hint">报告生成需约 30～60 秒，完成后点击下方按钮查看报告。</p>
+      <p v-else-if="card.data.status === 'failed' || card.data.status === 'cancelled'" class="rc-run-hint rc-run-hint--error">本次分析未能完成，请稍后重试。</p>
+      <div v-if="card.data.links?.length" class="rc-actions">
         <template v-for="link in card.data.links" :key="link.label">
-          <RouterLink :to="link.path" class="rc-btn rc-btn--primary">
+          <!-- C29.2.4: path links use RouterLink; action links use button -->
+          <RouterLink v-if="link.path" :to="link.path" class="rc-btn rc-btn--primary">
             {{ link.label }}
           </RouterLink>
+          <button v-else-if="link.action" class="rc-btn rc-btn--primary" @click="$emit('action', link)">
+            {{ link.label }}
+          </button>
         </template>
       </div>
     </template>

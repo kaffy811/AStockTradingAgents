@@ -21,7 +21,7 @@
           <div class="msg-bubble msg-bubble--user">
             <p class="msg-text">{{ msg.content }}</p>
           </div>
-          <!-- C29.1.2: action bar BELOW the bubble, right-aligned -->
+          <!-- C29.2.1: action bar — copy always visible; edit only for latest user msg -->
           <div class="msg-action-bar msg-action-bar--user">
             <button
               class="msg-action-btn"
@@ -32,7 +32,9 @@
               <span v-else>{{ t('chat_copy') }}</span>
             </button>
             <button
+              v-if="msg.id === latestUserMsgId"
               class="msg-action-btn"
+              :disabled="isSending"
               @click="$emit('edit-user', msg.id, msg.content)"
               :title="t('chat_edit')"
             >{{ t('chat_edit') }}</button>
@@ -53,6 +55,7 @@
                 :thinkingItems="msg.thinkingItems ?? []"
                 :reasoningSteps="msg.reasoningSteps ?? []"
                 :toolTrace="msg.toolTrace ?? []"
+                :query="msg._query ?? ''"
               />
 
               <!-- C29.1.1: Full reasoning panel (debug mode only) -->
@@ -155,7 +158,7 @@
             </div>
           </div>
 
-          <!-- C29.1.2: action bar BELOW the assistant bubble, left-aligned (offset past avatar) -->
+          <!-- C29.2.1: action bar — copy always; retry only for latest assistant msg -->
           <div v-if="!msg.isStreaming && msg.content" class="msg-action-bar msg-action-bar--ai">
             <button
               class="msg-action-btn"
@@ -166,6 +169,7 @@
               <span v-else>{{ t('chat_copy') }}</span>
             </button>
             <button
+              v-if="msg.id === latestAssistantMsgId"
               class="msg-action-btn"
               :disabled="isSending"
               @click="$emit('retry-ai', msg.id)"
@@ -181,7 +185,7 @@
 </template>
 
 <script setup>
-import { ref, watch, nextTick, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, nextTick, onBeforeUnmount } from 'vue'
 import { useI18n } from '../../utils/i18n.js'
 import ChatThinkingMiniPanel from './ChatThinkingMiniPanel.vue'
 import ChatReasoningPanel    from './ChatReasoningPanel.vue'
@@ -208,6 +212,16 @@ const emit = defineEmits(['confirm', 'cancel', 'action', 'edit-user', 'retry-ai'
 
 const { t } = useI18n()
 const listRef = ref(null)
+
+// C29.2.1: latest message ids — controls edit/retry visibility
+const latestUserMsgId = computed(() => {
+  const users = props.messages.filter(m => m.role === 'user')
+  return users.length ? users[users.length - 1].id : null
+})
+const latestAssistantMsgId = computed(() => {
+  const ais = props.messages.filter(m => m.role === 'assistant')
+  return ais.length ? ais[ais.length - 1].id : null
+})
 
 // C29.1.2: copy feedback — shows "已复制" briefly
 const copiedId = ref(null)
@@ -525,17 +539,12 @@ function renderMarkdown(text) {
 .msg-typing span:nth-child(3) { animation-delay: 0.4s; }
 @keyframes typing { 0%,80%,100%{transform:scale(0.7);opacity:0.4} 40%{transform:scale(1);opacity:1} }
 
-/* ── C29.1.2: Action bars BELOW bubbles ──────────────────────────────────── */
+/* ── C29.2.2: Action bars BELOW bubbles — always visible ─────────────────── */
 .msg-action-bar {
   display: flex;
   gap: 4px;
-  opacity: 0;
-  transition: opacity 0.15s ease;
-  min-height: 22px;
-}
-.msg-row:hover .msg-action-bar,
-.msg-row:focus-within .msg-action-bar {
   opacity: 1;
+  min-height: 22px;
 }
 /* User bar: right-aligned (row already aligns to flex-end) */
 .msg-action-bar--user {
@@ -568,10 +577,7 @@ function renderMarkdown(text) {
   cursor: not-allowed;
 }
 
-/* Mobile: always show action buttons (no hover on touch) */
-@media (max-width: 640px) {
-  .msg-action-bar { opacity: 1; }
-}
+/* Mobile: buttons already always visible (opacity: 1 globally above) */
 
 /* ── Transition ───────────────────────────────────────────────────────────── */
 .msg-appear-enter-active { transition: all 0.25s ease; }
