@@ -88,6 +88,19 @@ def has_verified_metric(context: dict | None, metric_type: str) -> bool:
     return False
 
 
+# C28.5: cleanup patterns that remove yield-calculation remnants AFTER disclaimer insertion.
+# These run only when dividend_yield is unverified to prevent "...不计算收益率）约为2.40%..." leakage.
+_YIELD_CLEANUP_PATTERNS: list[re.Pattern] = [
+    # Standalone percentage remnants: "约为2.40%" / "对应约2.4%"
+    re.compile(r"约为?\s*\d[\d.]*\s*%"),
+    re.compile(r"对应约?\s*\d[\d.]*\s*%"),
+    # Parenthetical arithmetic: （28.024/1168.63） or (28.024÷1168.63)
+    re.compile(r"[（(]\d[\d.]*\s*[÷/]\s*\d[\d.]*[）)]"),
+    # Inline decimal arithmetic not followed by text (pure fraction)
+    re.compile(r"\d+\.\d+\s*[÷/]\s*\d+\.\d+"),
+]
+
+
 def sanitize_unverified_financial_metrics(text: str, context: dict | None = None) -> str:
     """Remove or replace financial metric numbers that are not backed by tool data."""
     for metric_type, patterns in _METRIC_PATTERNS.items():
@@ -96,6 +109,11 @@ def sanitize_unverified_financial_metrics(text: str, context: dict | None = None
         replacement = _METRIC_REPLACEMENT[metric_type]
         for pat in patterns:
             text = pat.sub(replacement, text)
+    # C28.5: remove yield calculation remnants (%, fractions) that survive after
+    # disclaimer insertion — prevents "...不计算收益率）约为2.40%（28.024/1168.63）"
+    if not has_verified_metric(context, "dividend_yield"):
+        for pat in _YIELD_CLEANUP_PATTERNS:
+            text = pat.sub('', text)
     return text
 
 
@@ -341,6 +359,16 @@ _DIVIDEND_OVERINFERENCE_PATTERNS: list[tuple[re.Pattern, str]] = [
     (
         re.compile(r"分红能力(?:充足|较强|稳定|良好|充裕|优秀)"),
         "（注：分红能力判断需有完整财报数据，工具仅返回新闻标题）",
+    ),
+    # C28.5: "分红行为不能等同于当期财务表现提升" type — even cautionary inference removed
+    (
+        re.compile(r"[^，。\n]*分红[^，。\n]*(?:不能|无法)[^，。\n]*(?:等同|代表)[^，。\n]*(?:当期|当前)?(?:财务表现|盈利能力|业绩)[^，。\n]*"),
+        "（工具仅返回新闻标题，不做财务表现关联推断）",
+    ),
+    # C28.5: "仅依据分红金额和历史经验推断公司盈利能力存在偏差风险" type
+    (
+        re.compile(r"[^，。\n]*(?:仅)?依据[^，。\n]*(?:分红|派息)[^，。\n]*(?:推断|判断)[^，。\n]*(?:盈利能力|分红能力|现金流|财务状况)[^，。\n]*"),
+        "（工具仅返回新闻标题，不做盈利能力推断）",
     ),
 ]
 

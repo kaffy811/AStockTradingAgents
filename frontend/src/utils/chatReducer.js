@@ -256,13 +256,18 @@ export function applyChatUiEvent(message, uiEvent) {
           const _dqText = _DQ_THINKING_TEXT[_dq.level]
           if (_dqText) {
             if (!message.thinkingItems) message.thinkingItems = []
-            // Remove ALL stale data-quality thinking items by any of 4 heuristics
+            // Remove ALL stale data-quality thinking items by any of 6 heuristics (C28.5)
             message.thinkingItems = message.thinkingItems.filter(t =>
               t.source !== 'data_quality_review' &&
               !String(t.stage  ?? '').includes('data_quality') &&
               !String(t.title  ?? '').includes('数据质量') &&
               !String(t.title  ?? '').includes('检查数据质量') &&
-              !String(t.content ?? '').startsWith('数据质量：')
+              !String(t.content ?? '').startsWith('数据质量：') &&
+              // C28.5: also catch items carrying any DQ-level keyword in content
+              !String(t.content ?? '').includes('数据完整') &&
+              !String(t.content ?? '').includes('数据有限') &&
+              !String(t.content ?? '').includes('数据不足') &&
+              !String(t.content ?? '').includes('数据部分完整')
             )
             // Insert the authoritative final item
             message.thinkingItems.push({
