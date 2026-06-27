@@ -278,6 +278,39 @@ export function applyChatUiEvent(message, uiEvent) {
               importance: (_dq.level === 'low' || _dq.level === 'insufficient') ? 'high' : 'medium',
               timestamp:  Date.now(),
             })
+
+            // C28.6: also sync reasoningSteps and toolTrace so all panels agree
+            const _isDqEntry = (s) =>
+              String(s.title   ?? '').includes('数据质量') ||
+              String(s.title   ?? '').includes('检查数据质量') ||
+              String(s.title   ?? '').includes('资料质量审查') ||
+              String(s.summary ?? '').includes('数据质量：') ||
+              String(s.summary ?? '').includes('数据完整') ||
+              String(s.summary ?? '').includes('数据有限') ||
+              String(s.summary ?? '').includes('数据不足') ||
+              String(s.summary ?? '').includes('数据部分完整')
+
+            if (message.reasoningSteps) {
+              message.reasoningSteps = message.reasoningSteps.map(step =>
+                _isDqEntry(step)
+                  ? { ...step, summary: _dqText, status: step.status === 'running' ? 'success' : step.status }
+                  : step
+              )
+            }
+            if (message.toolTrace) {
+              message.toolTrace = message.toolTrace.map(tool =>
+                _isDqEntry(tool)
+                  ? { ...tool, summary: _dqText, status: 'success' }
+                  : tool
+              )
+            }
+            if (message.agentTrace) {
+              message.agentTrace = message.agentTrace.map(agent =>
+                _isDqEntry(agent)
+                  ? { ...agent, summary: _dqText, status: 'success' }
+                  : agent
+              )
+            }
           }
         }
       }

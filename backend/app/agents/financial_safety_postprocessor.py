@@ -512,6 +512,185 @@ def sanitize_theme_attribution(text: str, context: dict | None = None) -> str:
     return text
 
 
+# ---------------------------------------------------------------------------
+# C28.6  Sentence-level dividend over-inference cleanup
+# ---------------------------------------------------------------------------
+
+_DIVIDEND_SENTENCE_RISK_TERMS: frozenset[str] = frozenset({
+    '高额分红', '大额分红', '现金分红能力', '分红能力', '留存收益',
+    '现金流充裕', '现金流状况', '盈利能力', '盈利质量', '历史高分红',
+    '历史经验', '股东权益分配行为', '历史盈利的结果', '当期财务表现',
+    '前期利润', '反映公司盈利', '表明公司', '说明公司',
+})
+
+# Regex for dividend facts that should be preserved when rewriting mixed sentences
+_DIVIDEND_FACT_RE: re.Pattern = re.compile(
+    r'每\s*\d+\s*股[派发送][\d.]+\s*元|今日分红|实施分红|分红公告'
+)
+
+_SENTENCE_DISCLAIMER_MARKER = '工具仅返回新闻标题'
+
+
+def _split_sentences(text: str) -> list[str]:
+    """Split text on sentence boundaries (。；;\n), preserving terminators in each chunk."""
+    parts = re.split(r'(。|；|;|\n)', text)
+    result: list[str] = []
+    i = 0
+    while i < len(parts):
+        chunk = parts[i]
+        if i + 1 < len(parts) and parts[i + 1] in ('。', '；', ';', '\n'):
+            result.append(chunk + parts[i + 1])
+            i += 2
+        else:
+            if chunk:
+                result.append(chunk)
+            i += 1
+    return result or [text]
+
+
+def sanitize_dividend_overinference_sentence_level(
+    text: str, context: dict | None = None
+) -> str:
+    """
+    C28.6: Sentence-level dividend over-inference cleanup.
+
+    For each sentence in *text*:
+      - If it contains a risk-inference term AND a dividend fact → rewrite to fact only.
+      - If it contains only risk-inference terms (no fact) → delete the whole sentence.
+      - Sentences that are the boundary disclaimer are never touched.
+
+    Appends the standard disclaimer when any dividend reference was found and
+    no verified data is present.
+    """
+    if context and (
+        context.get("verified_news_detail")
+        or context.get("verified_financial_data")
+        or context.get("verified_dividend_data")
+    ):
+        return text
+
+    sentences = _split_sentences(text)
+    output: list[str] = []
+    has_dividend_ref = False
+
+    for sentence in sentences:
+        # Never delete the boundary disclaimer sentence itself
+        if _SENTENCE_DISCLAIMER_MARKER in sentence:
+            output.append(sentence)
+            continue
+
+        has_risk = any(term in sentence for term in _DIVIDEND_SENTENCE_RISK_TERMS)
+        fact_match = _DIVIDEND_FACT_RE.search(sentence)
+
+        if '分红' in sentence or '派息' in sentence:
+            has_dividend_ref = True
+
+        if not has_risk:
+            output.append(sentence)
+            continue
+
+        # Sentence contains risk inference term(s)
+        if fact_match:
+            # Rewrite: strip inference, keep only the dividend fact
+            fact = fact_match.group(0)
+            term = sentence[-1] if sentence and sentence[-1] in '。；;' else '。'
+            output.append(f'新闻提到分红，{fact}{term}')
+            has_dividend_ref = True
+        # else: pure inference → delete (append nothing)
+
+    result = ''.join(output).strip()
+
+    # Append disclaimer when a dividend mention was found and disclaimer not already present
+    if has_dividend_ref and _SENTENCE_DISCLAIMER_MARKER not in result:
+        result += _DIVIDEND_DISCLAIMER
+
+    return result
+
+
+# ---------------------------------------------------------------------------
+# C28.6  Sentence-level AI theme attribution rewrite
+# ---------------------------------------------------------------------------
+
+_AI_THEME_SENTENCE_RISK_TERMS: frozenset[str] = frozenset({
+    'AI显示', 'AI玻璃基板', 'AI算力芯片上游', 'AI芯片制造上游', 'AI芯片封测龙头',
+    'AI芯片封装', 'AI芯片后道环节', 'AI终端显示设备', 'AI设备耗材', 'AI基础设施',
+    'AI产业链中上游', 'AI业务占比', '真受益', '关联度高', '直接关联',
+    '资金重点追逐', '受益于AI芯片', 'AI芯片需求拉动', 'AI穿戴', 'AI眼镜', 'AR/VR',
+})
+
+# Already-safe sentence prefixes that should not be re-processed (idempotency)
+_THEME_SAFE_PREFIXES: tuple[str, ...] = (
+    '可能与', '当前仅能基于', '热门股榜单', '需公告', '需进一步', '仍需',
+)
+
+_ENTITY_AT_START_RE = re.compile(r'^([^\s，。；]{2,8})(?:作为|是|被视为|被认为是)')
+
+_GENERIC_THEME_REWRITE = (
+    '当前仅能基于热门股榜单和一般行业认知做初步归类，'
+    '具体产业链关系仍需公告、研报或主题标签确认'
+)
+
+
+def sanitize_theme_attribution_sentence_level(
+    text: str, context: dict | None = None
+) -> str:
+    """
+    C28.6: Sentence-level AI theme attribution rewrite.
+
+    Rewrites (never partially replaces) sentences containing strong AI attribution
+    claims to softer alternatives.  Idempotent: sentences that are already safe
+    and contain no further risk terms pass through unchanged.
+
+    Deduplicates accidental "可能与可能与" left by prior keyword-level passes.
+    """
+    if context and context.get("verified_theme_classification"):
+        return text
+
+    sentences = _split_sentences(text)
+    output: list[str] = []
+    modified = False
+
+    for sentence in sentences:
+        # Never rewrite the boundary disclaimer
+        if _THEME_DISCLAIMER.strip()[:15] in sentence:
+            output.append(sentence)
+            continue
+
+        stripped = sentence.lstrip()
+        is_safe_prefix = any(stripped.startswith(p) for p in _THEME_SAFE_PREFIXES)
+        has_risk = any(term in sentence for term in _AI_THEME_SENTENCE_RISK_TERMS)
+
+        # Already-safe sentence with no residual risk → keep as-is (idempotency)
+        if is_safe_prefix and not has_risk:
+            output.append(sentence)
+            continue
+
+        if not has_risk:
+            output.append(sentence)
+            continue
+
+        # Sentence has AI-theme risk → rewrite the whole sentence
+        modified = True
+        term = sentence[-1] if sentence and sentence[-1] in '。；;' else '。'
+
+        entity_m = _ENTITY_AT_START_RE.match(stripped)
+        if entity_m:
+            entity = entity_m.group(1)
+            output.append(f'{entity}可能与相关产业链方向存在间接关联，仍需进一步核验{term}')
+        else:
+            output.append(f'{_GENERIC_THEME_REWRITE}{term}')
+
+    result = ''.join(output).strip()
+
+    # Deduplicate "可能与可能与" produced by prior keyword-level runs
+    result = re.sub(r'(可能与)\s*\1+', r'\1', result)
+
+    if modified and _THEME_DISCLAIMER.strip() not in result:
+        result += _THEME_DISCLAIMER
+
+    return result
+
+
 def sanitize_news_overinterpretation(text: str, context: dict | None = None) -> str:
     """Prevent over-inference from news titles when full article body is unavailable."""
     for pat, replacement in _NEWS_OVERINFERENCE_PATTERNS:
@@ -543,8 +722,12 @@ def _sanitize_text(text: str, context: dict | None, append_footer: bool = False)
     text = sanitize_internal_enums(text)
     text = sanitize_certainty_claims(text)
     text = sanitize_unverified_financial_metrics(text, context)
+    # C28.6: sentence-level cleanup FIRST — prevents mid-sentence keyword insertion
+    text = sanitize_dividend_overinference_sentence_level(text, context)
+    text = sanitize_theme_attribution_sentence_level(text, context)
+    # Legacy keyword-level passes catch any residual fragments
     text = sanitize_news_overinterpretation(text, context)
-    text = sanitize_theme_attribution(text, context)  # C28.2
+    text = sanitize_theme_attribution(text, context)
     text = sanitize_investment_advice(text, context)
     if append_footer and "_仅供研究参考" not in text:
         text = text + _ADVICE_COMPLIANCE
