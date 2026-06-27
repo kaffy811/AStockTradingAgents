@@ -58,7 +58,23 @@
           </div>
         </div>
 
-        <!-- Thinking panel (collapsible, auto-open while streaming) -->
+        <!-- C28.6: Structured thinking items (agent_step / tool_planning / etc.) -->
+        <div v-if="structuredThinkingItems.length" class="rp-thinking-items">
+          <div
+            v-for="(item, idx) in structuredThinkingItems"
+            :key="`ti-${idx}`"
+            class="rp-ti"
+            :class="`rp-ti--${item.importance ?? 'medium'}`"
+          >
+            <span class="rp-ti-icon" aria-hidden="true">{{ thinkingItemIcon(item.source) }}</span>
+            <div class="rp-ti-body">
+              <span class="rp-ti-title">{{ item.title || thinkingItemLabel(item.source) }}</span>
+              <span v-if="item.content" class="rp-ti-content">{{ item.content }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Raw DeepSeek reasoning panel (collapsible, auto-open while streaming) -->
         <details v-if="thinkingContent" class="rp-thinking" :open="isStreaming">
           <summary class="rp-thinking-label">💭 思考过程</summary>
           <div class="rp-thinking-body">{{ thinkingContent }}</div>
@@ -83,8 +99,10 @@ const props = defineProps({
   toolTrace:       { type: Array,   default: () => [] },
   /** Phase 2E-2 agentTrace (backward compat, shown when reasoningSteps empty) */
   agentTrace:      { type: Array,   default: () => [] },
-  /** DeepSeek thinking content */
+  /** DeepSeek thinking content (raw, legacy accumulator) */
   thinkingContent: { type: String,  default: '' },
+  /** C28.6: Structured thinking items (agent_step / tool_planning / etc.) */
+  thinkingItems:   { type: Array,   default: () => [] },
 })
 
 // ── Collapse control: open while streaming, no forced close on done ───────────
@@ -160,13 +178,48 @@ const unifiedSteps = computed(() => {
   return all
 })
 
+// ── C28.6: Structured thinking items ─────────────────────────────────────────
+
+/** Filter out deepseek_reasoning items from the structured list (they go to raw panel). */
+const structuredThinkingItems = computed(() =>
+  (props.thinkingItems ?? []).filter(item => item.source !== 'deepseek_reasoning')
+)
+
+const _THINKING_SOURCE_ICONS = {
+  agent_step:          '🔍',
+  tool_planning:       '📋',
+  data_quality_review: '📊',
+  risk_review:         '🛡️',
+  synthesis:           '✍️',
+  deepseek_reasoning:  '💭',
+}
+
+const _THINKING_SOURCE_LABELS = {
+  agent_step:          '研究步骤',
+  tool_planning:       '数据检索规划',
+  data_quality_review: '数据质量检查',
+  risk_review:         '风险审查',
+  synthesis:           '综合生成',
+  deepseek_reasoning:  '模型思考',
+}
+
+function thinkingItemIcon(source) {
+  return _THINKING_SOURCE_ICONS[source] ?? '○'
+}
+
+function thinkingItemLabel(source) {
+  return _THINKING_SOURCE_LABELS[source] ?? source
+}
+
 // ── Derived state ─────────────────────────────────────────────────────────────
 
 /** True when the overall stream is finished — used as a spinner kill-switch. */
 const isDone = computed(() => props.status === 'done' || props.status === 'error')
 
 const hasSteps = computed(() =>
-  unifiedSteps.value.length > 0 || !!props.thinkingContent
+  unifiedSteps.value.length > 0 ||
+  !!props.thinkingContent ||
+  structuredThinkingItems.value.length > 0
 )
 
 const isActivelyRunning = computed(() =>
@@ -417,7 +470,57 @@ function stepIcon(status) {
   border: 1px solid var(--status-warn-ring, rgba(234,179,8,0.25));
 }
 
-/* ── Thinking panel ───────────────────────────────────────────────────────────── */
+/* ── C28.6: Structured thinking items ────────────────────────────────────────── */
+.rp-thinking-items {
+  padding: 2px 0 4px;
+}
+
+.rp-ti {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  padding: 4px 14px;
+  border-left: 2px solid transparent;
+  transition: border-color 0.15s;
+}
+.rp-ti--high   { border-left-color: var(--danger,   #dc2626); }
+.rp-ti--medium { border-left-color: var(--accent,   #4a90e2); }
+.rp-ti--low    { border-left-color: var(--border-soft); }
+
+.rp-ti-icon {
+  font-size: 12px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  opacity: 0.75;
+}
+
+.rp-ti-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.rp-ti-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary, var(--text));
+  line-height: 1.4;
+}
+
+.rp-ti-content {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.4;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── Thinking panel (raw DeepSeek reasoning) ──────────────────────────────────── */
 .rp-thinking {
   margin: 5px 10px;
   border: 1px solid var(--border-soft);

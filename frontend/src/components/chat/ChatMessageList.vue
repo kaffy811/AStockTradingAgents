@@ -35,6 +35,7 @@
               :toolTrace="msg.toolTrace ?? []"
               :agentTrace="msg.agentTrace ?? []"
               :thinkingContent="msg.thinkingContent ?? ''"
+              :thinkingItems="msg.thinkingItems ?? []"
             />
 
             <!-- Section I: DEV-only stream debug panel -->

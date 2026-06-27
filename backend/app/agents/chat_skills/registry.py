@@ -161,7 +161,31 @@ class SkillRegistry:
         skill = self.select_skill(message, context)
         if skill is None:
             return None
+
+        # C28.3: helper to emit thinking events via context.event_callback
+        async def _emit_thinking(payload: dict) -> None:
+            if context.event_callback:
+                try:
+                    await context.event_callback("thinking", payload)
+                except Exception:
+                    pass
+
         try:
+            # C28.3: emit tool_planning thinking before skill executes
+            from app.agents.thinking_events import (  # noqa: PLC0415
+                make_tool_planning,
+                make_data_quality_review,
+                make_risk_review,
+                make_synthesis_thinking,
+            )
+            from app.agents.thinking_sanitizer import sanitize_thinking_content  # noqa: PLC0415
+
+            planning_content = f'将使用技能\u300c{skill.name}\u300d处理此问题，开始检索相关数据。'
+            sanitized_plan = sanitize_thinking_content(planning_content, source="tool_planning")
+            if sanitized_plan:
+                ev = make_tool_planning(sanitized_plan)
+                await _emit_thinking(ev)
+
             result = await skill.run(message, context)
             # C9: inject spec metadata into SkillResult
             spec = self._specs.get(skill.name, {})
@@ -176,7 +200,7 @@ class SkillRegistry:
                 result.answer = sanitize_financial_answer(result.answer)
             # C27: enrich data_quality and sources from tool_events
             if result.tool_events:
-                from app.agents.answer_metadata import (
+                from app.agents.answer_metadata import (  # noqa: PLC0415
                     build_answer_metadata,
                     add_data_boundary_declaration,
                 )
@@ -187,6 +211,27 @@ class SkillRegistry:
                     result.answer = add_data_boundary_declaration(
                         result.answer, meta["data_quality"]
                     )
+
+                # C28.3: emit data_quality_review thinking
+                dq = meta.get("data_quality", {})
+                if isinstance(dq, dict) and dq.get("level"):
+                    dq_ev = make_data_quality_review(
+                        level=dq.get("level", "medium"),
+                        reason=dq.get("reason", ""),
+                        missing=dq.get("missing_data", []),
+                    )
+                    await _emit_thinking(dq_ev)
+
+            # C28.3: emit risk_review thinking from safety_flags
+            risk_flags = getattr(result, "safety_flags", []) or []
+            risk_ev = make_risk_review(risk_flags)
+            await _emit_thinking(risk_ev)
+
+            # C28.3: emit synthesis thinking
+            has_data = bool(result.answer and len(result.answer) > 50)
+            synth_ev = make_synthesis_thinking(has_data)
+            await _emit_thinking(synth_ev)
+
             return result
         except Exception as exc:
             log.exception("SkillRegistry: unexpected error in skill %s", skill.name)

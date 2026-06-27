@@ -1138,7 +1138,14 @@ class FinancialAgent:
                     content = chunk.get("content", "")
                     if ctype == "thinking" and content:
                         thinking_steps.append(ThinkingStep(content=content))
-                        await _emit("thinking", {"content": content})
+                        # C28.2: sanitize before emitting; add source for structured display
+                        from app.agents.thinking_sanitizer import sanitize_thinking_content  # noqa: PLC0415
+                        sanitized = sanitize_thinking_content(content, source="deepseek_reasoning")
+                        if sanitized:
+                            await _emit("thinking", {
+                                "content": sanitized,
+                                "source":  "deepseek_reasoning",
+                            })
                     elif ctype == "answer" and content:
                         answer_chunks.append(content)
                         await _emit("answer_delta", {"delta": content})

@@ -188,6 +188,25 @@ export function applyChatUiEvent(message, uiEvent) {
       message.thinkingContent = (message.thinkingContent ?? '') + (uiEvent.content ?? '')
       break
 
+    // C28.5: structured thinking item (agent_step / tool_planning / deepseek_reasoning …)
+    case 'ui_thinking_item': {
+      if (!message.thinkingItems) message.thinkingItems = []
+      message.thinkingItems.push({
+        source:     uiEvent.source,
+        stage:      uiEvent.stage      ?? '',
+        title:      uiEvent.title      ?? '',
+        content:    uiEvent.content    ?? '',
+        importance: uiEvent.importance ?? 'medium',
+        timestamp:  Date.now(),
+      })
+      // DeepSeek reasoning also feeds the legacy thinkingContent accumulator for the
+      // raw thinking panel (backward compat with existing tests / ChatReasoningPanel).
+      if (uiEvent.source === 'deepseek_reasoning' && uiEvent.content) {
+        message.thinkingContent = (message.thinkingContent ?? '') + uiEvent.content
+      }
+      break
+    }
+
     case 'ui_answer_delta':
       message.answerContent = (message.answerContent ?? '') + (uiEvent.content ?? '')
       message.content       = message.answerContent

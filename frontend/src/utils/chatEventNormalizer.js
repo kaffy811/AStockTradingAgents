@@ -180,6 +180,17 @@ export function normalizeChatEvent(rawEventType, rawPayload) {
 
     // ── Streaming content ──────────────────────────────────────────────────────
     case 'thinking':
+      // C28.5: structured thinking (with source) → ui_thinking_item; raw → ui_thinking_delta
+      if (p.source) {
+        return {
+          type:       'ui_thinking_item',
+          source:     p.source,
+          stage:      p.stage      ?? '',
+          title:      p.title      ?? '',
+          content:    p.content    ?? '',
+          importance: p.importance ?? 'medium',
+        }
+      }
       return {
         type:    'ui_thinking_delta',
         content: p.content ?? '',
