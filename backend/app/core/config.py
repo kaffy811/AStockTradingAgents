@@ -16,7 +16,18 @@ class Settings(BaseSettings):
     app_title: str = "TradingAgents API"
     app_version: str = "0.1.0"
     debug: bool = True
-    cors_origins: list[str] = ["*"]
+    cors_origins: list[str] = [
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://localhost:3002",
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:3001",
+        "http://127.0.0.1:3002",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:5174",
+    ]
 
     # LLM
     llm_provider: str = "deepseek"
