@@ -36,7 +36,7 @@ class DataPoint(BaseModel):
 class SourceRef(BaseModel):
     """A reference to a financial document chunk returned by RAG search."""
     title: str
-    source_type: str = "document"   # annual_report | research_report | announcement | document
+    source_type: str = "document"   # annual_report | research_report | announcement | document | market_quote | news | rag | historical_report | official_report | financial_report | tool_result
     source: str = ""                # e.g. "SEC", "HKEX", "内部研报"
     published_at: str = ""
     url: str = ""
@@ -50,6 +50,13 @@ class SourceRef(BaseModel):
     page_start: Optional[int] = None
     page_end: Optional[int] = None
     search_mode_used: str = ""      # vector | keyword | hybrid
+    # C27.2: new fields
+    id: str = ""
+    provider: Optional[str] = None
+    retrieved_at: Optional[str] = None
+    confidence: Literal["high", "medium", "low"] = "medium"
+    snippet: Optional[str] = None
+    supports: list[str] = []
 
 
 class DataQuality(BaseModel):
@@ -58,6 +65,16 @@ class DataQuality(BaseModel):
     report_source_level:   str  = ""    # official_exchange | official_company | authoritative_media | general
     market_data_available: bool = False
     warnings: list[str]       = []
+    # C27.1: new fields
+    level: Literal["high", "medium", "low", "insufficient"] = "insufficient"
+    reason: str = ""
+    verified_data: list[str] = []
+    missing_data: list[str] = []
+    failed_tools: list[str] = []
+    stale_data: list[str] = []
+    source_count: int = 0
+    tool_count: int = 0
+    warning_flags: list[str] = []
 
 
 class FinalAnswer(BaseModel):

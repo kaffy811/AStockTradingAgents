@@ -311,6 +311,24 @@ async def stream_chat_message(
                     mid=assistant_placeholder_id,
                 ))
 
+            # ── Phase 7b: C27 data_quality_update for skill path ─────────────
+            # For the financial_agent path, data_quality is already embedded in
+            # the final_answer SSE event emitted by the agent.  For skills, we
+            # emit a separate data_quality_update event so the frontend can show
+            # the DataQuality card even when there is no structured final_answer.
+            if not final_answer_sent[0]:
+                dq_payload = result.metadata.get("data_quality")
+                sources_payload = result.metadata.get("sources_c27")
+                if dq_payload:
+                    await queue.put(_make_sse(
+                        "data_quality_update",
+                        {
+                            "data_quality": dq_payload,
+                            "sources":      sources_payload or [],
+                        },
+                        mid=assistant_placeholder_id,
+                    ))
+
             # ── Phase 8: answer delta (chunked) ───────────────────────────────
             # Skip replay if FinancialAgent already streamed answer_delta in
             # real-time via event_callback — replaying would double the text.

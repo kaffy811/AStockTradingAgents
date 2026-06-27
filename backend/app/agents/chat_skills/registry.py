@@ -174,6 +174,19 @@ class SkillRegistry:
             # C26: sanitize answer text before returning to orchestrator
             if result.answer:
                 result.answer = sanitize_financial_answer(result.answer)
+            # C27: enrich data_quality and sources from tool_events
+            if result.tool_events:
+                from app.agents.answer_metadata import (
+                    build_answer_metadata,
+                    add_data_boundary_declaration,
+                )
+                meta = build_answer_metadata(result.tool_events)
+                result.metadata["data_quality"] = meta["data_quality"]
+                result.metadata["sources_c27"]  = meta["sources"]
+                if result.answer:
+                    result.answer = add_data_boundary_declaration(
+                        result.answer, meta["data_quality"]
+                    )
             return result
         except Exception as exc:
             log.exception("SkillRegistry: unexpected error in skill %s", skill.name)

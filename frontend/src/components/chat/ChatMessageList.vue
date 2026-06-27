@@ -139,32 +139,19 @@
               @action="(link) => $emit('action', msg.id, link)"
             />
 
-            <!-- Phase 2A: RAG citation sources -->
-            <div
-              v-if="msg.finalAnswer && msg.finalAnswer.sources && msg.finalAnswer.sources.length"
-              class="msg-sources"
-            >
-              <div class="msg-sources-label">参考来源</div>
-              <ul class="msg-sources-list">
-                <li
-                  v-for="(src, i) in msg.finalAnswer.sources"
-                  :key="i"
-                  class="msg-sources-item"
-                >
-                  <a
-                    v-if="src.url"
-                    :href="src.url"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="msg-sources-link"
-                  >{{ src.title }}</a>
-                  <span v-else class="msg-sources-title">{{ src.title }}</span>
-                  <span class="msg-sources-meta">
-                    {{ [src.source, src.published_at, src.page ? `p.${src.page}` : ''].filter(Boolean).join(' · ') }}
-                  </span>
-                </li>
-              </ul>
-            </div>
+            <!-- C27: Data quality card (skill path uses msg.dataQuality;
+                  financial_agent path uses msg.finalAnswer.data_quality) -->
+            <DataQualityCard
+              v-if="msg.dataQuality || msg.finalAnswer?.data_quality"
+              :dq="msg.dataQuality ?? msg.finalAnswer?.data_quality"
+            />
+
+            <!-- C27: Unified source list (agent path: finalAnswer.sources; skill path: skillSources) -->
+            <ChatSourceList
+              :sources="msg.finalAnswer?.sources?.length
+                ? msg.finalAnswer.sources
+                : (msg.skillSources ?? [])"
+            />
           </div>
         </div>
       </div>
@@ -179,6 +166,8 @@ import { useI18n } from '../../utils/i18n.js'
 import ChatReasoningPanel    from './ChatReasoningPanel.vue'
 import ChatResultCard        from './ChatResultCard.vue'
 import ChatConfirmationCard  from './ChatConfirmationCard.vue'
+import DataQualityCard       from './DataQualityCard.vue'
+import ChatSourceList        from './ChatSourceList.vue'
 
 const props = defineProps({
   messages: { type: Array, default: () => [] },
@@ -475,4 +464,15 @@ function renderMarkdown(text) {
   color: var(--muted);
   font-size: 11px;
 }
+
+/* C27: confidence badge on skill sources */
+.msg-sources-confidence {
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+.conf--high   { background: rgba(34,197,94,0.12); color: #16a34a; }
+.conf--medium { background: rgba(245,158,11,0.12); color: #b45309; }
+.conf--low    { background: rgba(239,68,68,0.12);  color: #dc2626; }
 </style>

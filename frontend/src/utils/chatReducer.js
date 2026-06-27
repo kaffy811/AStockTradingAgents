@@ -261,6 +261,21 @@ export function applyChatUiEvent(message, uiEvent) {
       break
     }
 
+    // ── C27: data quality card (skill path) ───────────────────────────────────
+    case 'ui_data_quality_update': {
+      if (uiEvent.dataQuality) {
+        message.dataQuality = uiEvent.dataQuality
+      }
+      // Merge sources if not already provided by final_answer
+      if (uiEvent.sources && uiEvent.sources.length > 0) {
+        if (!message.finalAnswer) {
+          if (!message.skillSources) message.skillSources = []
+          message.skillSources = uiEvent.sources
+        }
+      }
+      break
+    }
+
     // Unknown UI events — silently ignore
     default:
       break

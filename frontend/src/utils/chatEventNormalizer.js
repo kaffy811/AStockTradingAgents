@@ -264,6 +264,14 @@ export function normalizeChatEvent(rawEventType, rawPayload) {
       }
     }
 
+    // ── C27: data quality update (skill path — no final_answer event) ─────────
+    case 'data_quality_update':
+      return {
+        type:        'ui_data_quality_update',
+        dataQuality: p.data_quality ?? null,
+        sources:     p.sources ?? [],
+      }
+
     // ── Terminal events ────────────────────────────────────────────────────────
     // C25: treat all done-like variants as ui_done for robustness
     case 'agent_completed':
