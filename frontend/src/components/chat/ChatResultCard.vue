@@ -154,17 +154,22 @@
       </div>
     </template>
 
-    <!-- ── analysis_run (C5) ───────────────────────────────────────────── -->
+    <!-- ── analysis_run (C5 / C29.1.5) ─────────────────────────────────── -->
     <template v-else-if="card.type === 'analysis_run'">
       <div class="rc-header">
-        <span class="rc-tag rc-tag--report">分析任务已提交</span>
+        <span class="rc-tag" :class="runTagClass(card.data.status)">{{ runTagText(card.data.status) }}</span>
         <span class="rc-stock-name">{{ card.data.name }}（{{ card.data.market }}/{{ card.data.symbol }}）</span>
       </div>
       <div class="rc-report-meta">
         <span class="rc-badge">{{ card.data.scope }}</span>
-        <span class="rc-badge rc-badge--run">{{ card.data.status }}</span>
+        <span class="rc-run-status-pill" :class="runPillClass(card.data.status)">
+          <span v-if="isRunActive(card.data.status)" class="rc-run-spinner"></span>
+          {{ runStatusLabel(card.data.status) }}
+          <span v-if="card.data.progress > 0 && isRunActive(card.data.status)"> · {{ card.data.progress }}%</span>
+        </span>
       </div>
-      <p class="rc-run-hint">报告生成需约 30～60 秒，完成后可在报告中心查看。</p>
+      <p v-if="isRunActive(card.data.status)" class="rc-run-hint">报告生成需约 30～60 秒，完成后可在报告中心查看。</p>
+      <p v-else-if="card.data.status === 'failed'" class="rc-run-hint rc-run-hint--error">分析任务执行失败，请稍后重试或前往分析页重新生成。</p>
       <div class="rc-actions">
         <template v-for="link in card.data.links" :key="link.label">
           <RouterLink :to="link.path" class="rc-btn rc-btn--primary">
@@ -197,6 +202,30 @@ function verdictClass(verdict) {
   if (/偏强|strong/i.test(verdict)) return 'is-up'
   if (/偏弱|weak/i.test(verdict))   return 'is-down'
   return 'is-neutral'
+}
+
+// C29.1.5: analysis_run status helpers
+function isRunActive(status) {
+  return status === 'queued' || status === 'running'
+}
+function runTagText(status) {
+  if (status === 'completed') return '✓ 分析完成'
+  if (status === 'failed')    return '✗ 分析失败'
+  return '分析任务已提交'
+}
+function runTagClass(status) {
+  if (status === 'completed') return 'rc-tag--success'
+  if (status === 'failed')    return 'rc-tag--error'
+  return 'rc-tag--report'
+}
+function runStatusLabel(status) {
+  const map = { queued: '排队中', running: '生成中', completed: '已完成', failed: '失败', cancelled: '已取消' }
+  return map[status] ?? status
+}
+function runPillClass(status) {
+  if (status === 'completed') return 'pill--done'
+  if (status === 'failed')    return 'pill--error'
+  return 'pill--active'
 }
 </script>
 
@@ -426,4 +455,53 @@ function verdictClass(verdict) {
   border: 1px solid var(--border-soft);
 }
 .rc-btn--secondary:hover { background: var(--surface-hover); }
+
+/* ── analysis_run status pill ── */
+.rc-run-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+  margin-bottom: 10px;
+}
+.rc-run-status-pill.pill--active {
+  background: var(--status-info-bg);
+  color: var(--accent);
+}
+.rc-run-status-pill.pill--done {
+  background: var(--status-up-bg, #ecfdf5);
+  color: var(--up-color);
+}
+.rc-run-status-pill.pill--error {
+  background: var(--status-warn-bg);
+  color: var(--warn);
+}
+
+.rc-run-spinner {
+  width: 10px;
+  height: 10px;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: rc-spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes rc-spin {
+  to { transform: rotate(360deg); }
+}
+
+.rc-tag--error {
+  background: var(--status-warn-bg);
+  color: var(--warn);
+}
+
+.rc-run-hint--error {
+  color: var(--warn);
+  font-size: 12px;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
 </style>

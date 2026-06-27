@@ -56,6 +56,7 @@
           <div class="chat-messages-area">
             <ChatMessageList
               :messages="messages"
+              :isSending="isSending"
               @confirm="onConfirm"
               @cancel="onCancel"
               @action="onCardAction"
@@ -84,7 +85,7 @@
 </template>
 
 <script setup>
-import { ref, nextTick, onMounted } from 'vue'
+import { ref, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import AppHeader          from '../components/AppHeader.vue'
 import ChatMessageList    from '../components/chat/ChatMessageList.vue'
@@ -109,6 +110,7 @@ import {
   sendChatMessageStream,
   confirmChatAction,
 } from '../api/chat.js'
+import { getAnalysisRun } from '../api/analysis.js'
 
 // Timeout constants (ms)
 // DeepSeek can take 60-120 s for complex questions — give it room
@@ -135,6 +137,9 @@ const softTimeout    = ref(false)   // "thinking" notice shown after 15s
 let _abortController = null
 let _softTimerId = null
 let _hardTimerId = null
+
+// C29.1.5: analysis run polling intervals (msgId → intervalId)
+const _runPolls = new Map()
 
 const _SESSION_KEY = 'ta_chat_session_id'
 
@@ -924,6 +929,15 @@ async function onConfirm(msgId, confirmation) {
       resultCard:  result.resultCard ?? null,
       isStreaming: false,
     })
+
+    // C29.1.5: commit to Vue's reactive system (Object.assign bypasses Proxy)
+    commitAssistantMessage(getLiveAssistantMsg(followUp.id) ?? followUp)
+
+    // C29.1.5: start polling if an analysis run was created
+    const card = result.resultCard
+    if (card?.type === 'analysis_run' && card.data?.run_id) {
+      _startRunPolling(followUp.id, card.data.run_id)
+    }
   } catch {
     if (origMsg.confirmation) {
       origMsg.confirmation = { ...origMsg.confirmation, status: 'failed' }
@@ -933,6 +947,8 @@ async function onConfirm(msgId, confirmation) {
       content:     t('chat_error'),
       isStreaming: false,
     })
+    // Commit error state
+    commitAssistantMessage(getLiveAssistantMsg(followUp.id) ?? followUp)
   } finally {
     isSending.value = false
   }
@@ -966,6 +982,41 @@ function onCardAction(_msgId, link) {
   }
 }
 
+// C29.1.5: poll analysis run status every 4s until terminal (completed/failed/cancelled)
+function _startRunPolling(msgId, runId) {
+  if (_runPolls.has(msgId)) return  // already polling
+  const iid = setInterval(async () => {
+    try {
+      const snap = await getAnalysisRun(runId)
+      const liveMsg = getLiveAssistantMsg(msgId)
+      if (!liveMsg) { clearInterval(iid); _runPolls.delete(msgId); return }
+
+      const isTerminal = snap.status === 'completed' || snap.status === 'failed' || snap.status === 'cancelled'
+      if (liveMsg.resultCard?.type === 'analysis_run') {
+        liveMsg.resultCard = {
+          ...liveMsg.resultCard,
+          data: {
+            ...liveMsg.resultCard.data,
+            status:   snap.status,
+            progress: snap.progress ?? liveMsg.resultCard.data.progress,
+          },
+        }
+        commitAssistantMessage(liveMsg)
+      }
+      if (isTerminal) { clearInterval(iid); _runPolls.delete(msgId) }
+    } catch {
+      // non-fatal — keep polling
+    }
+  }, 4000)
+  _runPolls.set(msgId, iid)
+}
+
+// Clean up polling intervals on unmount
+onBeforeUnmount(() => {
+  _runPolls.forEach(iid => clearInterval(iid))
+  _runPolls.clear()
+})
+
 // C29.4: backfill user message into input for editing
 function onEditUser(_msgId, content) {
   if (isSending.value) return
@@ -988,11 +1039,24 @@ function onRetryAi(msgId) {
 </script>
 
 <style scoped>
-/* ── Override app-shell bottom padding for chat layout ──────────────────────── */
+/* ── C29.1.3: Full-screen fixed chat layout — override ALL global app-shell defaults ── */
 .chat-shell {
+  /* Reset global app-shell (max-width, margins, padding) */
+  max-width: 100% !important;
+  width: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
+  /* Fixed full-viewport column */
   display: flex;
   flex-direction: column;
-  padding-bottom: 0 !important;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* Remove AppHeader's default margin-bottom in the chat context */
+.chat-shell :deep(.app-header) {
+  margin-bottom: 0 !important;
+  flex-shrink: 0;
 }
 
 /* ── Two-column layout: sidebar + chat ───────────────────────────────────────── */
@@ -1001,7 +1065,7 @@ function onRetryAi(msgId) {
   gap: 0;
   flex: 1;
   min-height: 0;
-  height: calc(100dvh - 60px);
+  /* No hardcoded height — parent is 100dvh, flex: 1 fills the rest */
 }
 
 /* ── Chat column (fills remaining space) ─────────────────────────────────────── */
@@ -1183,9 +1247,10 @@ function onRetryAi(msgId) {
 
 /* ── Mobile ──────────────────────────────────────────────────────────────────── */
 @media (max-width: 640px) {
-  /* Problem 4 fix: subtract BottomTabBar (56px fixed) so input isn't hidden */
-  .chat-layout {
-    height: calc(100dvh - 56px - 56px - env(safe-area-inset-bottom));
+  /* BottomTabBar is position:fixed at bottom, 56px tall — shrink chat-shell so
+     the input area is not hidden beneath it */
+  .chat-shell {
+    height: calc(100dvh - 56px - env(safe-area-inset-bottom));
   }
 
   .chat-inner {
