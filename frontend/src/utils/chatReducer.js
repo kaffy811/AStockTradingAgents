@@ -242,8 +242,9 @@ export function applyChatUiEvent(message, uiEvent) {
         }
         // If answerContent already present and no full_text, keep it (streaming path)
 
-        // C28.3: sync data_quality_review thinking item with final card level
-        // This guarantees thinking panel and DataQualityCard always agree.
+        // C28.3/C28.4: sync data_quality_review thinking item with final card level.
+        // C28.4: use broad filter (not exact findIndex) — removes ALL stale dq items
+        // regardless of source/stage variation, then inserts the authoritative final item.
         const _dq = fa.data_quality
         if (_dq?.level) {
           const _DQ_THINKING_TEXT = {
@@ -255,22 +256,23 @@ export function applyChatUiEvent(message, uiEvent) {
           const _dqText = _DQ_THINKING_TEXT[_dq.level]
           if (_dqText) {
             if (!message.thinkingItems) message.thinkingItems = []
-            const _dqItem = {
+            // Remove ALL stale data-quality thinking items by any of 4 heuristics
+            message.thinkingItems = message.thinkingItems.filter(t =>
+              t.source !== 'data_quality_review' &&
+              !String(t.stage  ?? '').includes('data_quality') &&
+              !String(t.title  ?? '').includes('数据质量') &&
+              !String(t.title  ?? '').includes('检查数据质量') &&
+              !String(t.content ?? '').startsWith('数据质量：')
+            )
+            // Insert the authoritative final item
+            message.thinkingItems.push({
               source:     'data_quality_review',
               stage:      'data_quality',
               title:      '检查数据质量',
               content:    _dqText,
               importance: (_dq.level === 'low' || _dq.level === 'insufficient') ? 'high' : 'medium',
               timestamp:  Date.now(),
-            }
-            const _existIdx = message.thinkingItems.findIndex(
-              t => t.source === 'data_quality_review' && t.stage === 'data_quality'
-            )
-            if (_existIdx >= 0) {
-              message.thinkingItems[_existIdx] = _dqItem
-            } else {
-              message.thinkingItems.push(_dqItem)
-            }
+            })
           }
         }
       }

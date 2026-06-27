@@ -303,6 +303,45 @@ _DIVIDEND_OVERINFERENCE_PATTERNS: list[tuple[re.Pattern, str]] = [
         re.compile(r"前期利润(?:支撑|支持|积累)[^，。\n]{0,20}分红"),
         "（注：利润支撑判断需有财报数据，工具仅返回新闻标题）",
     ),
+    # C28.4: additional sentence-level patterns observed in browser validation
+    # "反映公司盈利后现金流状况" / "反映现金流充沛" type
+    (
+        re.compile(r"反映(?:公司|该公司|其)?[^，。\n]{0,25}(?:盈利后)?现金流(?:状况|水平|充裕|充沛)?"),
+        "（工具仅返回新闻标题，无法通过分红推断现金流状况）",
+    ),
+    # "历史经验推断公司盈利能力"
+    (
+        re.compile(r"历史(?:经验|数据|表现)?[^，。\n]{0,10}推断[^，。\n]{0,25}(?:盈利能力|分红能力|现金流|财务状况)"),
+        "（工具仅返回新闻标题，历史数据推断需有完整财报支撑）",
+    ),
+    # "股东权益分配行为"
+    (
+        re.compile(r"股东权益分配(?:行为|活动|事项)?"),
+        "分红（注：具体分配细节需有完整公告确认）",
+    ),
+    # Sentence-level: contains 分红/派息 + inference keyword in same clause
+    (
+        re.compile(
+            r"[^，。\n]*(?:分红|派息)[^，。\n]{0,40}"
+            r"(?:盈利能力|分红能力|现金流状况|留存收益|盈利质量|财务状况)[^，。\n]*",
+        ),
+        "（工具仅返回新闻标题，无法通过分红新闻推断公司盈利能力或财务状况）",
+    ),
+    # "反映盈利能力" / "说明盈利能力"
+    (
+        re.compile(r"(?:反映|说明|体现|表明)[^，。\n]{0,20}盈利(?:能力|质量|水平|状况)"),
+        "（注：盈利能力判断需有完整财报数据，工具仅返回新闻标题）",
+    ),
+    # Standalone "盈利能力" when used as conclusion from dividend
+    (
+        re.compile(r"(?:说明|反映|意味着).*?盈利(?:能力|质量)(?:较强|稳健|较好)?"),
+        "（注：盈利能力/质量判断需财报数据，工具仅返回新闻标题）",
+    ),
+    # C28.4: "分红能力充足/较强" — direct inference from dividend → ability
+    (
+        re.compile(r"分红能力(?:充足|较强|稳定|良好|充裕|优秀)"),
+        "（注：分红能力判断需有完整财报数据，工具仅返回新闻标题）",
+    ),
 ]
 
 _DIVIDEND_DISCLAIMER = (
@@ -352,6 +391,39 @@ _THEME_ATTRIBUTION_PATTERNS: list[tuple[re.Pattern, str]] = [
         re.compile(r"AI设备直接关联"),
         "可能与AI设备产业链存在间接关联（需公告或研报确认）",
     ),
+    # C28.4: additional AI theme patterns observed in browser validation
+    (
+        re.compile(r"AI(?:显示|面板|玻璃基板)[^，。\n]{0,10}概念"),
+        "可能与显示或玻璃基板材料方向存在间接关联（需公告或研报确认）",
+    ),
+    (
+        re.compile(r"AI算力芯片上游"),
+        "可能与AI算力相关产业链上游材料或设备环节存在间接关联（需公告或研报确认）",
+    ),
+    (
+        re.compile(r"AI芯片封测(?:龙头|企业|公司|标的)?"),
+        "可能与芯片封测环节存在间接关联（需公告或研报确认）",
+    ),
+    (
+        re.compile(r"(?:AI[^，。\n]{0,15})?关联度高"),
+        "可能存在间接关联（需公告或研报确认）",
+    ),
+    (
+        re.compile(r"真受益(?:方|者|股)?"),
+        "可能关联受益方（需公告或研报确认）",
+    ),
+    (
+        re.compile(r"资金重点追逐[^，。\n]{0,30}(?:上游材料|关键设备|材料.{0,5}设备)"),
+        "市场资金关注AI相关产业链（建议通过主题标签或研报确认具体归类）",
+    ),
+    (
+        re.compile(r"AI(?:穿戴|眼镜|可穿戴)[^，。\n]{0,15}(?:关联度高|强相关|直接关联|直接受益)"),
+        "可能与AI可穿戴设备存在间接关联（需公告或研报确认）",
+    ),
+    (
+        re.compile(r"AR/VR[^，。\n]{0,15}(?:关联度高|终端设备关联|直接受益)"),
+        "可能与AR/VR设备存在间接关联（需公告或研报确认）",
+    ),
 ]
 
 _THEME_DISCLAIMER = (
@@ -374,6 +446,9 @@ def sanitize_dividend_overinference(text: str, context: dict | None = None) -> s
     if context and (
         context.get("verified_news_detail") or context.get("verified_financial_data")
     ):
+        return text
+    # Idempotency guard: if disclaimer already present, skip all patterns
+    if _DIVIDEND_DISCLAIMER.strip() in text:
         return text
     modified = False
     for pat, replacement in _DIVIDEND_OVERINFERENCE_PATTERNS:

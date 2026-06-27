@@ -155,26 +155,29 @@ export function normalizeChatEvent(rawEventType, rawPayload) {
     // ── Skill routing events ───────────────────────────────────────────────────
     case 'skill_started': {
       // C28.3: map internal skill name to Chinese before it reaches the UI
-      const _sName = p.skill_name ?? p.skill_spec ?? 'unknown'
-      const _sDisplay = SKILL_DISPLAY_NAMES[_sName] ?? _sName
+      // C28.4: treat missing/unknown name as generic "技能路由"
+      const _sName = p.skill_name ?? p.skill_spec ?? ''
+      const _sIsUnknown = !_sName || _sName === 'unknown'
+      const _sDisplay = _sIsUnknown ? null : (SKILL_DISPLAY_NAMES[_sName] ?? _sName)
       return {
         type:    'ui_tool_start',
-        stepKey: `tool:skill:${_sName}`,
-        title:   `技能：${_sDisplay}`,
+        stepKey: `tool:skill:${_sName || 'skill'}`,
+        title:   _sDisplay ? `技能：${_sDisplay}` : '技能路由',
         status:  'running',
-        detail:  _sDisplay,   // friendly display name, never raw snake_case
+        detail:  _sDisplay ?? '已选择合适的分析技能',
       }
     }
 
     case 'skill_completed': {
-      const _scName = p.skill_name ?? 'unknown'
-      const _scDisplay = SKILL_DISPLAY_NAMES[_scName] ?? _scName
+      const _scName = p.skill_name ?? ''
+      const _scIsUnknown = !_scName || _scName === 'unknown'
+      const _scDisplay = _scIsUnknown ? null : (SKILL_DISPLAY_NAMES[_scName] ?? _scName)
       return {
         type:    'ui_tool_done',
-        stepKey: `tool:skill:${_scName}`,
-        title:   `技能：${_scDisplay}`,
+        stepKey: `tool:skill:${_scName || 'skill'}`,
+        title:   _scDisplay ? `技能：${_scDisplay}` : '技能路由',
         status:  'success',
-        summary: _scDisplay,  // Chinese display, never raw snake_case
+        summary: _scDisplay ?? '已完成',
       }
     }
 
