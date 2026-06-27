@@ -60,6 +60,9 @@ _TYPE_LABEL: dict[str, str] = {
 _CRITICAL_SOURCE_TYPES = {"financial_report", "official_report", "historical_report", "rag"}
 _MARKET_TYPES = {"market_quote", "news", "tool_result"}
 
+# Types that must never appear in verified_data (uninformative / internal event names)
+_SKIP_FROM_VERIFIED: set[str] = {"unknown"}
+
 # ---------------------------------------------------------------------------
 # C27.2  compute_data_quality
 # ---------------------------------------------------------------------------
@@ -103,7 +106,12 @@ def compute_data_quality(
             deduped_failed.append(f)
             seen.add(f)
 
-    verified_data = [_TYPE_LABEL.get(t, t) for t in sorted(successful_types)]
+    # C28.2: exclude uninformative types (unknown) from verified_data
+    verified_data = [
+        _TYPE_LABEL.get(t, t)
+        for t in sorted(successful_types)
+        if t not in _SKIP_FROM_VERIFIED
+    ]
     missing_data  = [_TYPE_LABEL.get(t, t) for t in sorted(failed_types)]
 
     # C28.1: rag counts as critical only if rag_results has items

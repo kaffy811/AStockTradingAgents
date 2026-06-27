@@ -225,7 +225,7 @@ def sanitize_tool_error_messages(text: str) -> str:
 
 
 # ---------------------------------------------------------------------------
-# C26.5  News over-interpretation
+# C26.5  News over-interpretation (always-on) + C28.2 dividend & theme filters
 # ---------------------------------------------------------------------------
 
 _NEWS_OVERINFERENCE_PATTERNS: list[tuple[re.Pattern, str]] = [
@@ -252,10 +252,95 @@ _NEWS_OVERINFERENCE_PATTERNS: list[tuple[re.Pattern, str]] = [
 ]
 
 
+# C28.2: dividend over-inference — only applies when verified news detail / financial data absent
+_DIVIDEND_OVERINFERENCE_PATTERNS: list[tuple[re.Pattern, str]] = [
+    (
+        re.compile(r"(?:高额|大额|大规模|超额)分红"),
+        "分红（注：大额分红判断需有完整公告数据支撑）",
+    ),
+    (
+        re.compile(r"(?:已)?实施(?:了)?(?:大额|高额|超额|大规模)?大[额规模]+分红"),
+        "（注：分红实施情况需有完整公告数据确认）",
+    ),
+    (
+        re.compile(r"现金分红(?:能力)?(?:较强|充沛|强劲)"),
+        "（工具仅返回新闻标题，无法确认现金分红能力，请查阅完整公告）",
+    ),
+    (
+        re.compile(r"(?:反映|体现|表明|说明)[^。\n]{0,30}(?:盈利稳定|现金流充沛|财务健康)"),
+        "（注：财务状况判断需有完整财报数据支撑，当前仅有新闻标题）",
+    ),
+    (
+        re.compile(r"(?:表明|说明|意味着)公司(?:具备|拥有)?[^。\n]{0,20}分红(?:能力|意愿)"),
+        "（工具仅返回新闻标题，无法确认公司分红能力，请查阅完整公告）",
+    ),
+    (
+        re.compile(r"基于前期利润分配"),
+        "（注：利润分配情况需有财报数据确认）",
+    ),
+]
+
+# C28.2: AI/theme strong-attribution patterns — only applies when no verified_theme_classification
+_THEME_ATTRIBUTION_PATTERNS: list[tuple[re.Pattern, str]] = [
+    (re.compile(r"核心供应商"),   "关联供应商（需公告或研报确认）"),
+    (re.compile(r"关键耗材"),     "相关耗材（需公告或研报确认）"),
+    (re.compile(r"主力供应商"),   "供应商（需公告或研报确认）"),
+    (re.compile(r"核心标的"),     "相关个股（需公告或研报确认）"),
+    (re.compile(r"直接受益(?:方|者)?"), "可能关联受益方（需公告或研报确认）"),
+    (re.compile(r"强相关(?:个股|标的|公司)?"), "存在初步关联（需公告或研报确认）"),
+]
+
+_THEME_DISCLAIMER = (
+    "\n\n_当前仅能基于热门股榜单和一般行业认知初步归类，"
+    "需进一步通过公告或研报确认具体产业链关系。_"
+)
+
+
+def sanitize_dividend_overinference(text: str, context: dict | None = None) -> str:
+    """
+    C28.2: Filter dividend over-inferences when only news titles are available.
+
+    Skipped (returns text unchanged) when context has:
+      - verified_news_detail=True  (full article body retrieved), OR
+      - verified_financial_data=True (financial report data retrieved)
+    """
+    if context and (
+        context.get("verified_news_detail") or context.get("verified_financial_data")
+    ):
+        return text
+    for pat, replacement in _DIVIDEND_OVERINFERENCE_PATTERNS:
+        text = pat.sub(replacement, text)
+    return text
+
+
+def sanitize_theme_attribution(text: str, context: dict | None = None) -> str:
+    """
+    C28.2: Downgrade strong AI-theme attributions when theme classification is unverified.
+
+    If context.verified_theme_classification is True, returns text unchanged.
+    Otherwise replaces "核心供应商 / 关键耗材 / 主力供应商 / 核心标的 / 直接受益 / 强相关"
+    with softer alternatives and appends a boundary disclaimer if any substitution occurred.
+    """
+    if context and context.get("verified_theme_classification"):
+        return text
+    modified = False
+    for pat, replacement in _THEME_ATTRIBUTION_PATTERNS:
+        new_text = pat.sub(replacement, text)
+        if new_text != text:
+            modified = True
+            text = new_text
+    # T10: ensure boundary disclaimer is present when any attribution was downgraded
+    if modified and _THEME_DISCLAIMER.strip() not in text:
+        text = text + _THEME_DISCLAIMER
+    return text
+
+
 def sanitize_news_overinterpretation(text: str, context: dict | None = None) -> str:
     """Prevent over-inference from news titles when full article body is unavailable."""
     for pat, replacement in _NEWS_OVERINFERENCE_PATTERNS:
         text = pat.sub(replacement, text)
+    # C28.2: dividend-specific over-inference (context-aware)
+    text = sanitize_dividend_overinference(text, context)
     return text
 
 
@@ -282,6 +367,7 @@ def _sanitize_text(text: str, context: dict | None, append_footer: bool = False)
     text = sanitize_certainty_claims(text)
     text = sanitize_unverified_financial_metrics(text, context)
     text = sanitize_news_overinterpretation(text, context)
+    text = sanitize_theme_attribution(text, context)  # C28.2
     text = sanitize_investment_advice(text, context)
     if append_footer and "_仅供研究参考" not in text:
         text = text + _ADVICE_COMPLIANCE

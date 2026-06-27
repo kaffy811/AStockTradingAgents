@@ -11,11 +11,11 @@
     <p v-if="dq.reason" class="dqc-reason">{{ dq.reason }}</p>
 
     <!-- Verified / missing columns -->
-    <div v-if="dq.verified_data?.length || dq.missing_data?.length" class="dqc-grid">
-      <div v-if="dq.verified_data?.length" class="dqc-col dqc-col--ok">
+    <div v-if="safeVerifiedData.length || dq.missing_data?.length" class="dqc-grid">
+      <div v-if="safeVerifiedData.length" class="dqc-col dqc-col--ok">
         <div class="dqc-col-title">已获取</div>
         <ul>
-          <li v-for="item in dq.verified_data" :key="item">{{ item }}</li>
+          <li v-for="item in safeVerifiedData" :key="item">{{ item }}</li>
         </ul>
       </div>
       <div v-if="dq.missing_data?.length" class="dqc-col dqc-col--miss">
@@ -55,6 +55,14 @@ const _LEVEL_ICONS = {
 
 const _levelLabel = computed(() => _LEVEL_LABELS[props.dq?.level] ?? props.dq?.level ?? '')
 const _icon       = computed(() => _LEVEL_ICONS[props.dq?.level] ?? '?')
+
+// C28.2: filter out internal/unknown entries that should never reach the UI
+const _SKIP_VERIFIED = new Set(['unknown'])
+const safeVerifiedData = computed(() =>
+  (props.dq?.verified_data || []).filter(
+    item => item && !_SKIP_VERIFIED.has(item) && !/^[a-z][a-z0-9_]+$/.test(item)
+  )
+)
 </script>
 
 <style scoped>
