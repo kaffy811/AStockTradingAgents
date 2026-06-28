@@ -804,11 +804,7 @@ async def process_message(
         await _emit("intent_detected", {"intent": "safety_blocked", "handler": "_handle_trading_request"})
         return await _handle_trading_request(msg, db, user_id)
 
-    # 1.5. C30.1.4: IntentDecisionAgent — classify intent for SSE telemetry.
-    #   The decision is emitted for frontend reasoning-panel display only.
-    #   Routing is still governed by the existing regex waterfall (C30.5 already
-    #   fixed compare/industry confusion; _handle_analysis_save_report already
-    #   handles explicit save intent via _match_analysis_save_report).
+    # 1.5. C30.2.3: IntentDecisionAgent — classify intent, emit telemetry, drive routing.
     _intent_decision = classify_intent(content)
     await _emit("intent_detected", {
         "intent":     _intent_decision.intent,
@@ -817,8 +813,18 @@ async def process_message(
         "handler":    "intent_decision_agent",
     })
 
+    # C30.2.3: direct_answer → skip report-generation action intents.
+    # "帮我分析茅台基本面" is a Q&A request, NOT a report-generation trigger.
+    # _handle_report / _handle_analysis_save_report both start a 30-60s pipeline
+    # and show a confirmation card — wrong for plain analysis questions.
+    # Watchlist, compare, and external-channel intents still run normally.
+    _REPORT_ACTION_HANDLERS = frozenset({"_handle_report", "_handle_analysis_save_report"})
+    _skip_report_actions = (_intent_decision.intent == "direct_answer")
+
     # 2. Action intents (write ops → confirmation)
     for matcher, handler in _ACTION_INTENTS:
+        if _skip_report_actions and handler.__name__ in _REPORT_ACTION_HANDLERS:
+            continue
         if matcher(msg):
             try:
                 await _emit("intent_detected", {"intent": "action", "handler": handler.__name__})

@@ -31,6 +31,7 @@ from app.models.analysis_report import (
     ReportListResponse,
 )
 from app.models.user import User
+from app.repositories.report_repository import ReportRepository
 
 router = APIRouter(prefix="/reports", tags=["reports"])
 
@@ -42,7 +43,8 @@ async def create_report(
     db: AsyncSession = Depends(get_db),
 ) -> ReportCreateResponse:
     """保存一份综合分析报告。user_id 从 JWT 中读取，不接受请求体传入。"""
-    report = AnalysisReport(
+    repo = ReportRepository(db)
+    report = await repo.create_report(
         user_id         = user.id,
         market          = body.market,
         symbol          = body.symbol,
@@ -50,15 +52,13 @@ async def create_report(
         stock_name      = body.stock_name or None,
         auto_saved      = body.auto_saved,
         analysis_scope  = body.analysis_scope,
+        output_language = body.output_language if hasattr(body, "output_language") else "zh-CN",
         report_md       = body.report_md,
         sections        = body.sections,
         report_metadata = body.report_metadata,
         warnings        = body.warnings,
         agents          = body.agents,
     )
-    db.add(report)
-    await db.commit()
-    await db.refresh(report)
     return ReportCreateResponse.model_validate(report)
 
 
@@ -76,50 +76,19 @@ async def list_reports(
     db: AsyncSession = Depends(get_db),
 ) -> ReportListResponse:
     """查询当前用户的历史报告列表（不含大字段 report_md / sections）。"""
-    # Base filter: 只看自己的报告
-    filters = [AnalysisReport.user_id == user.id]
-
-    if market:
-        filters.append(AnalysisReport.market == market.upper())
-    if symbol:
-        filters.append(AnalysisReport.symbol == symbol.strip())
-    if analysis_scope:
-        filters.append(AnalysisReport.analysis_scope == analysis_scope.strip())
-    if auto_saved is not None:
-        filters.append(AnalysisReport.auto_saved == auto_saved)
-    if start_date:
-        dt_start = datetime(start_date.year, start_date.month, start_date.day, tzinfo=timezone.utc)
-        filters.append(AnalysisReport.created_at >= dt_start)
-    if end_date:
-        dt_end = datetime(end_date.year, end_date.month, end_date.day, tzinfo=timezone.utc) + timedelta(days=1)
-        filters.append(AnalysisReport.created_at < dt_end)
-
-    # 总数查询
-    count_stmt = select(func.count()).select_from(AnalysisReport).where(*filters)
-    total: int = (await db.execute(count_stmt)).scalar_one()
-
-    # 列表查询（只取轻量字段，JSONB 仍会返回 warnings/agents，但不返回 report_md/sections）
-    list_stmt = (
-        select(
-            AnalysisReport.id,
-            AnalysisReport.market,
-            AnalysisReport.symbol,
-            AnalysisReport.report_type,
-            AnalysisReport.stock_name,
-            AnalysisReport.auto_saved,
-            AnalysisReport.analysis_scope,
-            AnalysisReport.warnings,
-            AnalysisReport.agents,
-            AnalysisReport.created_at,
-        )
-        .where(*filters)
-        .order_by(AnalysisReport.created_at.desc())
-        .limit(limit)
-        .offset(offset)
+    repo = ReportRepository(db)
+    total, reports = await repo.list_reports(
+        user.id,
+        market         = market,
+        symbol         = symbol,
+        analysis_scope = analysis_scope,
+        auto_saved     = auto_saved,
+        start_date     = start_date,
+        end_date       = end_date,
+        limit          = limit,
+        offset         = offset,
     )
-    rows = (await db.execute(list_stmt)).mappings().all()
-    items = [ReportListItem.model_validate(dict(row)) for row in rows]
-
+    items = [ReportListItem.model_validate(r) for r in reports]
     return ReportListResponse(total=total, items=items)
 
 
@@ -130,11 +99,8 @@ async def get_report(
     db: AsyncSession = Depends(get_db),
 ) -> ReportDetailResponse:
     """查看单份报告详情。不属于当前用户的 report_id 返回 404。"""
-    stmt = select(AnalysisReport).where(
-        AnalysisReport.id      == report_id,
-        AnalysisReport.user_id == user.id,
-    )
-    report = (await db.execute(stmt)).scalar_one_or_none()
+    repo = ReportRepository(db)
+    report = await repo.get_report(user.id, report_id)
     if not report:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Report not found")
     return ReportDetailResponse.model_validate(report)
@@ -147,13 +113,8 @@ async def delete_report(
     db: AsyncSession = Depends(get_db),
 ) -> Response:
     """删除报告。不属于当前用户的 report_id 返回 404。"""
-    stmt = select(AnalysisReport).where(
-        AnalysisReport.id      == report_id,
-        AnalysisReport.user_id == user.id,
-    )
-    report = (await db.execute(stmt)).scalar_one_or_none()
-    if not report:
+    repo = ReportRepository(db)
+    deleted = await repo.delete_report(user.id, report_id)
+    if not deleted:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Report not found")
-    await db.delete(report)
-    await db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)

@@ -19,7 +19,7 @@ from typing import Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.analysis_report import AnalysisReport
+from app.repositories.report_repository import ReportRepository
 from app.services.run_registry_protocol import AnalysisRunRef
 
 log = logging.getLogger(__name__)
@@ -76,9 +76,10 @@ async def save_generated_report(
                       run_ref.user_id, run_ref.run_id)
             return None
 
-        report = AnalysisReport(
+        repo = ReportRepository(db)
+        report = await repo.create_report(
             user_id         = user_uuid,
-            market          = full_result.get("market", run_ref.market).upper(),
+            market          = full_result.get("market", run_ref.market),
             symbol          = full_result.get("symbol", run_ref.symbol),
             stock_name      = full_result.get("stock_name") or None,
             report_type     = "comprehensive",
@@ -91,10 +92,6 @@ async def save_generated_report(
             warnings        = warnings,
             agents          = agents,
         )
-
-        db.add(report)
-        await db.commit()
-        await db.refresh(report)
         report_id = str(report.id)
         log.info(
             "C30.3 report saved: run=%s → report_id=%s market=%s symbol=%s",
