@@ -37,6 +37,7 @@ from datetime import datetime, timezone
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.agents.langgraph_analysis_graph import build_analysis_graph
+from app.agents.report_persistence import save_generated_report
 from app.services.run_registry_protocol import AnalysisRunRef, AnalysisRunRegistry
 
 log = logging.getLogger(__name__)
@@ -259,8 +260,23 @@ class LangGraphRealtimeRunner:
             "output_language": output_language,
         }
 
-        await registry.update_status(run_ref.run_id, "completed", result=result)
-        await self._emit(run_ref, registry, "report_ready", progress=100, result=result)
+        # C30.1.1: persist report to analysis_reports table BEFORE marking completed
+        report_id = await save_generated_report(run_ref, result, db, auto_saved=True)
+
+        if report_id is None:
+            log.error("LangGraphRealtimeRunner: report persistence failed [%s]", run_ref.run_id)
+            await registry.update_status(
+                run_ref.run_id, "failed",
+                error="报告生成完成，但保存到历史记录时失败。请稍后在报告中心手动保存。",
+            )
+            await self._emit(run_ref, registry, "analysis_failed", progress=0,
+                             error="report persistence failed")
+            await registry.push_event(run_ref.run_id, None)
+            return
+
+        result["report_id"] = report_id
+        await registry.update_status(run_ref.run_id, "completed", result=result, report_id=report_id)
+        await self._emit(run_ref, registry, "report_ready", progress=100, result=result, report_id=report_id)
         await registry.push_event(run_ref.run_id, None)  # sentinel
 
     # ── Emit helper ───────────────────────────────────────────────────────────

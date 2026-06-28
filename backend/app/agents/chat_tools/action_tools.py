@@ -225,18 +225,17 @@ async def execute_create_analysis_run(
         ok=True,
         action="create_analysis_run",
         answer=(
-            f"✓ 已为 **{name}（{market}/{symbol}）** 创建分析任务。\n\n"
-            f"Run ID：`{run_ref.run_id}`。报告生成需要约 30～60 秒，"
-            "完成后可在**报告中心**查看。"
+            f"✓ 已为 **{name}（{market}/{symbol}）** 创建分析任务，"
+            "报告生成需要约 30～60 秒，完成后可在**报告中心**查看。"
             + _DISCLAIMER
         ),
         tool_events=[
             _tool_event(
                 "create_analysis_run_tool",
                 (
-                    f"{name} {scope} 分析已提交（run_id={run_ref.run_id}"
+                    f"{name} {scope} 分析已提交"
                     + (", save_to_history=true" if save_to_history else "")
-                    + f", from={requested_from}）"
+                    + f"（from={requested_from}）"
                 ),
             )
         ],

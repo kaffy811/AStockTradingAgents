@@ -55,6 +55,7 @@ from app.agents.chat_skills.report_explanation_skill import ReportExplanationSki
 from app.agents.chat_skills.general_financial_answer_skill import GeneralFinancialAnswerSkill
 from app.agents.chat_planner.rule_based_planner import RuleBasedPlanner
 from app.agents.chat_planner.executor import PlannerExecutor
+from app.agents.intent_decision_agent import classify_intent
 import app.agents.chat_memory as _mem
 
 log = logging.getLogger(__name__)
@@ -802,6 +803,19 @@ async def process_message(
     if _match_trading_request(msg):
         await _emit("intent_detected", {"intent": "safety_blocked", "handler": "_handle_trading_request"})
         return await _handle_trading_request(msg, db, user_id)
+
+    # 1.5. C30.1.4: IntentDecisionAgent — classify intent for SSE telemetry.
+    #   The decision is emitted for frontend reasoning-panel display only.
+    #   Routing is still governed by the existing regex waterfall (C30.5 already
+    #   fixed compare/industry confusion; _handle_analysis_save_report already
+    #   handles explicit save intent via _match_analysis_save_report).
+    _intent_decision = classify_intent(content)
+    await _emit("intent_detected", {
+        "intent":     _intent_decision.intent,
+        "confidence": _intent_decision.confidence,
+        "reason":     _intent_decision.reason,
+        "handler":    "intent_decision_agent",
+    })
 
     # 2. Action intents (write ops → confirmation)
     for matcher, handler in _ACTION_INTENTS:
