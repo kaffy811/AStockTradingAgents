@@ -165,7 +165,7 @@
         <span class="rc-run-status-pill" :class="runPillClass(card.data.status)">
           <span v-if="isRunActive(card.data.status)" class="rc-run-spinner"></span>
           {{ runStatusLabel(card.data.status) }}
-          <span v-if="card.data.progress > 0 && isRunActive(card.data.status)"> · {{ card.data.progress }}%</span>
+          <span v-if="card.data.progress && isRunActive(card.data.status)"> · {{ card.data.progress }}%</span>
         </span>
       </div>
       <p v-if="isRunActive(card.data.status)" class="rc-run-hint">报告生成需约 30～60 秒，完成后点击下方按钮查看报告。</p>

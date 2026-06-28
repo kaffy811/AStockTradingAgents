@@ -1,32 +1,40 @@
 <template>
-  <!-- C29.1.1: Minimal thinking panel — visible in production (not debug) mode.
-       Shows 3-5 high-level human-readable steps; no DQ cards, raw reasoning, or debug detail. -->
-  <div v-if="shouldShow" class="think-mini" :class="{ 'think-mini--done': isDone, 'think-mini--expanded': isExpanded }">
+  <!-- C29.3.1: Rich "深度思考" card — business-level 5-step thinking summary (not raw chain-of-thought) -->
+  <div v-if="shouldShow" class="think-mini">
 
-    <!-- Done state: collapsible "已完成分析" badge -->
-    <button v-if="isDone" class="think-mini-done" @click="isExpanded = !isExpanded">
-      <span class="think-mini-done-icon">✓</span>
-      <span class="think-mini-done-text">{{ t('chat_analysis_done') }}</span>
-      <span class="think-mini-expand-arrow" :class="{ rotated: isExpanded }">›</span>
-    </button>
+    <!-- ── Status header ─────────────────────────────────────────────────────── -->
+    <div
+      class="think-mini-header"
+      :class="{ 'think-mini-header--clickable': isDone }"
+      @click="isDone && (isExpanded = !isExpanded)"
+    >
+      <span class="think-mini-icon">
+        <span v-if="!isDone" class="dot-spin"></span>
+        <span v-else class="think-done-check">✓</span>
+      </span>
+      <span class="think-mini-title">{{ isDone ? t('chat_analysis_done') : thinkingTitle }}</span>
+      <span v-if="isDone" class="think-mini-toggle" :class="{ rotated: isExpanded }">›</span>
+    </div>
 
-    <!-- Step list: shown while streaming, or when expanded after done -->
-    <div v-if="!isDone || isExpanded" class="think-mini-steps">
+    <!-- ── Step list: streaming (progressive) or done + expanded ─────────────── -->
+    <div v-if="!isDone || isExpanded" class="think-steps-list">
       <div
         v-for="(step, idx) in visibleSteps"
-        :key="idx"
-        class="think-mini-step"
+        :key="step.title"
+        class="think-step"
         :class="{
-          'think-mini-step--active': !isDone && idx === visibleSteps.length - 1,
-          'think-mini-step--done':   isDone || idx < visibleSteps.length - 1,
+          'think-step--active': !isDone && idx === visibleSteps.length - 1,
+          'think-step--done':   isDone || idx < visibleSteps.length - 1,
         }"
       >
-        <!-- Spinner on active step, check on done steps -->
-        <span class="think-mini-dot">
-          <span v-if="!isDone && idx === visibleSteps.length - 1" class="dot-spin"></span>
-          <span v-else class="dot-done">✓</span>
-        </span>
-        <span class="think-mini-label">{{ step.label }}</span>
+        <div class="think-step-indicator">
+          <span v-if="!isDone && idx === visibleSteps.length - 1" class="dot-spin-sm"></span>
+          <span v-else class="dot-check">✓</span>
+        </div>
+        <div class="think-step-body">
+          <div class="think-step-title">{{ step.title }}</div>
+          <div class="think-step-content">{{ step.content }}</div>
+        </div>
       </div>
     </div>
 
@@ -48,46 +56,35 @@ const props = defineProps({
   query:          { type: String,  default: '' },
 })
 
-// Toggle expanded when done
 const isExpanded = ref(false)
 
-// ── Filtering ──────────────────────────────────────────────────────────────────
+// ── Noise filtering (same as C29.1/C29.2) ────────────────────────────────────
 
-/** Items to exclude from the mini panel (internal/debug categories) */
-const _EXCLUDE_SOURCES = new Set([
-  'data_quality_review',
-  'deepseek_reasoning',
-])
-/** Internal tool names that are not user-facing */
-const _EXCLUDE_TOOLS = new Set([
+const _EXCLUDE_SOURCES = new Set(['data_quality_review', 'deepseek_reasoning'])
+const _EXCLUDE_TOOLS   = new Set([
   'general_financial_answer_skill',
   'report_explanation_skill',
-  'financial_rag_search',  // show as "正在检索研究报告" via step instead
+  'financial_rag_search',
   'compute_data_quality',
 ])
-/** Strings that indicate data-quality internal content */
 const _DQ_KEYWORDS = ['数据质量', '数据完整', '数据有限', '数据不足', '数据部分完整', 'data_quality', 'DataQuality']
 
-function _isDqContent(text) {
-  return _DQ_KEYWORDS.some(kw => String(text ?? '').includes(kw))
-}
+function _isDqContent(text) { return _DQ_KEYWORDS.some(kw => String(text ?? '').includes(kw)) }
 function _isExcludedSource(item) {
   return _EXCLUDE_SOURCES.has(item.source) ||
          String(item.stage ?? '').includes('data_quality') ||
-         _isDqContent(item.title) ||
-         _isDqContent(item.content)
+         _isDqContent(item.title) || _isDqContent(item.content)
 }
 function _isExcludedTool(tool) {
   const name = (tool.key ?? '').replace(/^[^:]+:/, '') || tool.name || ''
   return _EXCLUDE_TOOLS.has(name) || _isDqContent(tool.title) || _isDqContent(tool.summary)
 }
 
-// ── C29.2.6: Intent detection for AI thinking-style fallback steps ────────────
+// ── C29.3.1: Intent detection ─────────────────────────────────────────────────
 
-/** Detect query intent to generate context-aware thinking steps */
 function _detectIntent(query) {
   if (!query) return 'general'
-  // p3_agent must be checked before report_explain (both match "报告")
+  // p3_agent checked before report_explain (both contain "报告")
   if (/分析.*保存|创建.*报告|综合分析.*保存|深度分析.*保存|保存.*报告/.test(query)) return 'p3_agent'
   if (/财报|年报|季报|营收|利润|营业额|每股|EPS|ROE|市盈率|PE/.test(query))        return 'financial_report'
   if (/热门|热股|涨停|龙头|板块热|行业热|市场热点/.test(query))                    return 'hot_stocks'
@@ -98,286 +95,240 @@ function _detectIntent(query) {
   return 'general'
 }
 
-/** Intent → ordered list of human-readable AI thinking steps */
-const _INTENT_STEPS = {
+// ── C29.3.1: 5-step thinking templates per intent (business-level summaries) ─
+
+const _THINKING_TEMPLATES = {
   financial_report: [
-    '正在理解您的问题',
-    '正在检索财报和公告',
-    '正在整理财务数据',
-    '正在生成回答',
+    { title: '问题分析',     content: '我正在理解你的问题，判断这是财报分析类请求，需要检索官方财务数据和公告信息。' },
+    { title: '关键数据检索', content: '我会优先检索官方财报、行情数据、相关新闻和知识库资料，确保数据来源可靠。' },
+    { title: '深度思考',     content: '我会比较已获取数据和缺失数据，避免编造未验证的财务指标或业绩预测。' },
+    { title: '风险审查',     content: '我会检查是否存在直接买卖建议、无来源估值数字或过度推断。' },
+    { title: '回答生成',     content: '我会基于已验证信息生成最终回答，并说明无法确认的部分。' },
   ],
   hot_stocks: [
-    '正在理解您的问题',
-    '正在检索市场热点',
-    '正在分析行业热度',
-    '正在生成回答',
+    { title: '问题分析',     content: '我正在理解你的问题，判断这是市场热点类请求，需要检索行业热度和相关股票表现。' },
+    { title: '关键数据检索', content: '我会检索市场热点、行业线索、相关股票的涨幅和成交量数据。' },
+    { title: '深度思考',     content: '我会区分短期市场热度和真实产业链关联，避免把热门股直接等同于主题股。' },
+    { title: '风险审查',     content: '我会检查是否存在直接买卖建议、无来源估值数字或过度推断。' },
+    { title: '回答生成',     content: '我会基于已验证信息生成最终回答，并说明无法确认的部分。' },
   ],
   report_explain: [
-    '正在理解您的问题',
-    '正在读取历史报告',
-    '正在整理分析结果',
-    '正在生成回答',
+    { title: '问题分析',     content: '我正在理解你的问题，判断这是历史报告解读请求，需要查找对应的报告内容。' },
+    { title: '关键数据检索', content: '我会查找历史报告并读取报告详情，提取其中的关键结论和数据。' },
+    { title: '深度思考',     content: '我会把报告里的技术面、基本面和风险提示转成更容易理解的语言。' },
+    { title: '风险审查',     content: '我会检查是否存在直接买卖建议、无来源估值数字或过度推断。' },
+    { title: '回答生成',     content: '我会基于已验证信息生成最终回答，并说明无法确认的部分。' },
   ],
   p3_agent: [
-    '正在理解您的问题',
-    '正在创建分析任务',
-    '正在等待报告生成',
+    { title: '问题分析',     content: '我正在理解你的问题，判断这是分析任务创建请求，需要提交后台报告生成任务。' },
+    { title: '关键数据检索', content: '我会创建分析任务，配置分析范围和参数，确认目标股票信息。' },
+    { title: '深度思考',     content: '我会根据任务状态判断报告是否真正生成完成，不会在无报告时显示成功。' },
+    { title: '风险审查',     content: '我会验证任务提交状态，确保不误报已完成的任务。' },
+    { title: '回答生成',     content: '我会持续跟踪报告生成状态，完成后提供直接查看链接。' },
   ],
   news: [
-    '正在理解您的问题',
-    '正在检索最新新闻',
-    '正在整理信息',
-    '正在生成回答',
+    { title: '问题分析',     content: '我正在理解你的问题，判断这是新闻资讯类请求，需要检索最新市场新闻。' },
+    { title: '关键数据检索', content: '我会检索最新新闻、公告和市场事件，按时间和相关性排序。' },
+    { title: '深度思考',     content: '我会区分市场传言和官方公告，避免把未经证实的消息作为事实引用。' },
+    { title: '风险审查',     content: '我会检查是否存在直接买卖建议、无来源估值数字或过度推断。' },
+    { title: '回答生成',     content: '我会基于已验证信息生成最终回答，并说明无法确认的部分。' },
   ],
   technical: [
-    '正在理解您的问题',
-    '正在获取行情数据',
-    '正在分析技术指标',
-    '正在生成回答',
+    { title: '问题分析',     content: '我正在理解你的问题，判断这是技术分析类请求，需要获取行情和技术指标数据。' },
+    { title: '关键数据检索', content: '我会获取行情数据、计算技术指标，包括均线、MACD、RSI 等关键信号。' },
+    { title: '深度思考',     content: '我会综合技术信号判断当前趋势，但不会给出确定性的涨跌结论。' },
+    { title: '风险审查',     content: '我会检查是否存在直接买卖建议、无来源估值数字或过度推断。' },
+    { title: '回答生成',     content: '我会基于已验证信息生成最终回答，并说明无法确认的部分。' },
   ],
   compare: [
-    '正在理解您的问题',
-    '正在检索对比数据',
-    '正在整理对比结果',
-    '正在生成回答',
+    { title: '问题分析',     content: '我正在理解你的问题，判断这是股票对比类请求，需要获取多支股票的数据。' },
+    { title: '关键数据检索', content: '我会获取各股票的行情、财务数据进行横向对比，确保数据口径一致。' },
+    { title: '深度思考',     content: '我会分析各股票的异同，避免仅用涨跌幅做简单排名。' },
+    { title: '风险审查',     content: '我会检查是否存在直接买卖建议、无来源估值数字或过度推断。' },
+    { title: '回答生成',     content: '我会基于已验证信息生成最终回答，并说明无法确认的部分。' },
   ],
   general: [
-    '正在理解您的问题',
-    '正在检索相关数据',
-    '正在整理可用信息',
-    '正在生成回答',
+    { title: '问题分析',     content: '我正在理解你的问题，判断需要哪类信息来提供准确回答。' },
+    { title: '关键数据检索', content: '我会检索相关数据，优先使用官方来源和已验证的市场信息。' },
+    { title: '深度思考',     content: '我会综合已获取的信息，区分已验证的事实和需要进一步确认的内容。' },
+    { title: '风险审查',     content: '我会检查是否存在直接买卖建议、无来源估值数字或过度推断。' },
+    { title: '回答生成',     content: '我会基于已验证信息生成最终回答，并说明无法确认的部分。' },
   ],
 }
 
-// ── Label mapping ──────────────────────────────────────────────────────────────
-
-/** Tool name → human-readable label */
-const _TOOL_LABELS = {
-  get_stock_price:          '正在检索行情数据',
-  get_stock_quote:          '正在检索行情数据',
-  get_stock_market_data:    '正在检索行情数据',
-  get_stock_news:           '正在检索新闻',
-  search_realtime_news:     '正在检索实时新闻',
-  get_industry_news:        '正在检索行业新闻',
-  get_industry_hot:         '正在检索行业热度',
-  get_industry_stocks:      '正在检索行业股票',
-  financial_rag_search:     '正在检索研究报告',
-  get_report_detail_tool:   '正在获取报告详情',
-  get_financial_data:       '正在检索财务数据',
-  get_fundamental_data:     '正在分析基本面数据',
-  get_technical_indicators: '正在分析技术指标',
-  universal_market_search:  '正在检索市场数据',
-  get_watchlist_items:      '正在读取自选股',
-  list_reports:             '正在读取历史报告',
-}
-
-/** Reasoning step title → human-readable label (fallback: use title directly if already Chinese) */
-const _STEP_LABELS = {
-  '理解问题':   '正在理解问题',
-  '分析意图':   '正在理解问题',
-  '规划分析':   '正在规划分析步骤',
-  '选择分析方式': '正在选择分析方式',
-  '路由':       '正在规划分析步骤',
-  '基本面分析': '正在分析基本面',
-  '技术面分析': '正在分析技术面',
-  '新闻分析':   '正在分析新闻',
-  '同行对比':   '正在进行同行对比',
-  '综合分析':   '正在整理分析结果',
-  '合成报告':   '正在整理分析结果',
-  '风险评估':   '正在评估风险',
-  '风险审核':   '正在评估风险',
-  '生成回答':   '正在生成回答',
-  '检索数据':   '正在检索数据',
-  '数据检索':   '正在检索数据',
-}
-
-function _labelForStep(title) {
-  if (!title) return null
-  // Direct match
-  if (_STEP_LABELS[title]) return _STEP_LABELS[title]
-  // Fuzzy match: if title contains a key
-  for (const [k, v] of Object.entries(_STEP_LABELS)) {
-    if (title.includes(k)) return v
-  }
-  // If looks like snake_case internal name, skip it
-  if (/^[a-z_]+$/.test(title)) return null
-  // Otherwise use as-is (already Chinese)
-  return title
-}
-
-function _labelForTool(tool) {
-  const name = (tool.key ?? '').replace(/^[^:]+:/, '') || tool.name || ''
-  if (_TOOL_LABELS[name]) return _TOOL_LABELS[name]
-  // Fuzzy: tool.title if it's human-readable (contains Chinese)
-  if (tool.title && /[\u4e00-\u9fff]/.test(tool.title) && !_isDqContent(tool.title)) return tool.title
-  return null
-}
-
-// ── Computed steps ────────────────────────────────────────────────────────────
+// ── Computed ──────────────────────────────────────────────────────────────────
 
 const isDone = computed(() =>
   props.status === 'done' || (!props.isStreaming && props.status !== 'connecting' && props.status !== 'streaming')
 )
 
-const shouldShow = computed(() => {
-  // Show when streaming, or when done with steps to display
-  if (props.isStreaming) return true
-  if (isDone.value && visibleSteps.value.length > 0) return true
-  return false
+const shouldShow = computed(() => props.isStreaming || isDone.value)
+
+/** 5-step template for the detected intent */
+const thinkingSteps = computed(() => {
+  const intent = _detectIntent(props.query)
+  return _THINKING_TEMPLATES[intent] ?? _THINKING_TEMPLATES.general
 })
 
-const visibleSteps = computed(() => {
-  const seen   = new Set()
-  const steps  = []
+/** Count non-noise real events to determine step progression */
+const _filteredEventCount = computed(() => {
+  const fromThinking = (props.thinkingItems ?? []).filter(item => !_isExcludedSource(item))
+  const fromTools    = (props.toolTrace    ?? []).filter(tool => !_isExcludedTool(tool))
+  return fromThinking.length + fromTools.length
+})
 
-  const push = (label) => {
-    if (!label || seen.has(label)) return
-    seen.add(label)
-    steps.push({ label })
-  }
+/** Which step (0-4) we're currently on — based on event count heuristic */
+const currentStepIdx = computed(() => {
+  if (isDone.value) return thinkingSteps.value.length - 1
+  const n = _filteredEventCount.value
+  if (n === 0) return 0   // 问题分析
+  if (n <= 2)  return 1   // 关键数据检索
+  if (n <= 5)  return 2   // 深度思考
+  if (n <= 7)  return 3   // 风险审查
+  return 4                 // 回答生成
+})
 
-  // 1. thinkingItems (agent_step / tool_planning, non-DQ)
-  for (const item of props.thinkingItems) {
-    if (_isExcludedSource(item)) continue
-    const label = _labelForStep(item.title)
-    push(label)
-  }
+/** Steps to render: progressive reveal during streaming; all when done (toggle hides via v-if) */
+const visibleSteps = computed(() =>
+  thinkingSteps.value.slice(0, isDone.value ? undefined : currentStepIdx.value + 1)
+)
 
-  // 2. reasoningSteps (non-DQ)
-  for (const step of props.reasoningSteps) {
-    if (_isDqContent(step.title) || _isDqContent(step.summary)) continue
-    const label = _labelForStep(step.title)
-    push(label)
-  }
-
-  // 3. toolTrace (non-excluded, mapped)
-  for (const tool of props.toolTrace) {
-    if (_isExcludedTool(tool)) continue
-    const label = _labelForTool(tool)
-    push(label)
-  }
-
-  // C29.2.6: Intent-based fallback steps when real steps are sparse
-  if (steps.length === 0 && props.isStreaming) {
-    const intent = _detectIntent(props.query)
-    const fallbacks = _INTENT_STEPS[intent] ?? _INTENT_STEPS.general
-    for (const label of fallbacks) {
-      if (!seen.has(label)) {
-        seen.add(label)
-        steps.push({ label })
-      }
-    }
-  }
-
-  // Absolute fallback when not streaming or query-detection gave nothing
-  if (steps.length === 0) {
-    steps.push({ label: t('chat_analyzing') })
-  }
-
-  // Cap at 5 most recent
-  return steps.slice(-5)
+/** Header title during streaming: "正在 · <current step title>" */
+const thinkingTitle = computed(() => {
+  const step = thinkingSteps.value[currentStepIdx.value]
+  return step ? `正在 · ${step.title}` : t('chat_analyzing')
 })
 </script>
 
 <style scoped>
 /* ── Container ─────────────────────────────────────────────────────────────── */
 .think-mini {
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  background: var(--surface2, rgba(0,0,0,0.02));
+  overflow: hidden;
   font-size: 13px;
 }
 
-/* ── Done badge (collapsible) ──────────────────────────────────────────────── */
-.think-mini-done {
-  display: inline-flex;
+/* ── Header ────────────────────────────────────────────────────────────────── */
+.think-mini-header {
+  display: flex;
   align-items: center;
-  gap: 5px;
-  border: none;
-  background: var(--status-up-bg, rgba(34, 197, 94, 0.08));
-  border-radius: 20px;
-  padding: 3px 10px 3px 8px;
-  font-size: 12px;
-  color: var(--success, #16a34a);
+  gap: 8px;
+  padding: 8px 12px;
+  user-select: none;
+}
+.think-mini-header--clickable {
   cursor: pointer;
-  margin-bottom: 2px;
-  transition: background 0.15s;
+  transition: background 0.12s;
 }
-.think-mini-done:hover {
-  background: var(--status-up-bg, rgba(34, 197, 94, 0.14));
-}
-.think-mini-done-icon {
-  font-size: 11px;
-  font-weight: 700;
-}
-.think-mini-done-text {
-  font-weight: 600;
-}
-.think-mini-expand-arrow {
-  font-size: 12px;
-  transition: transform 0.2s ease;
-  display: inline-block;
-}
-.think-mini-expand-arrow.rotated {
-  transform: rotate(90deg);
+.think-mini-header--clickable:hover {
+  background: var(--surface-hover, rgba(0,0,0,0.04));
 }
 
-/* ── Step list ─────────────────────────────────────────────────────────────── */
-.think-mini-steps {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 2px 0;
-}
-
-.think-mini-step {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  line-height: 1.4;
-}
-
-.think-mini-dot {
-  width: 14px;
-  height: 14px;
+.think-mini-icon {
+  width: 16px;
+  height: 16px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
 }
+.think-done-check {
+  color: var(--up-color, #16a34a);
+  font-weight: 700;
+  font-size: 12px;
+}
 
-/* Animated spinner dot (active step) */
+.think-mini-title {
+  flex: 1;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.think-mini-toggle {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform 0.2s ease;
+  display: inline-block;
+}
+.think-mini-toggle.rotated { transform: rotate(90deg); }
+
+/* ── Step list ─────────────────────────────────────────────────────────────── */
+.think-steps-list {
+  border-top: 1px solid var(--border-soft);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.think-step {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.think-step-indicator {
+  width: 16px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+}
+
+.dot-check {
+  color: var(--up-color, #16a34a);
+  font-weight: 700;
+  font-size: 11px;
+  line-height: 1;
+}
+
+.think-step-body { flex: 1; min-width: 0; }
+
+.think-step-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+  margin-bottom: 2px;
+}
+.think-step-content {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* Active step: accent color + spinner */
+.think-step--active .think-step-title  { color: var(--accent); }
+
+/* Done / past steps: muted */
+.think-step--done .think-step-title   { color: var(--muted); font-weight: 500; }
+.think-step--done .think-step-content { opacity: 0.7; }
+
+/* ── Spinners ──────────────────────────────────────────────────────────────── */
 .dot-spin {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border: 2px solid var(--border-soft);
   border-top-color: var(--accent);
   border-radius: 50%;
   animation: think-spin 0.8s linear infinite;
   display: inline-block;
 }
+.dot-spin-sm {
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid var(--border-soft);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: think-spin 0.8s linear infinite;
+  display: inline-block;
+}
 @keyframes think-spin { to { transform: rotate(360deg); } }
-
-/* Check mark (done steps) */
-.dot-done {
-  font-size: 10px;
-  color: var(--success, #16a34a);
-  font-weight: 700;
-  line-height: 1;
-}
-
-/* Active step label — accent color + slightly bold */
-.think-mini-step--active .think-mini-label {
-  color: var(--text);
-  font-weight: 500;
-}
-
-/* Done / past step labels — muted */
-.think-mini-step--done .think-mini-label {
-  color: var(--muted);
-  font-size: 12px;
-}
-
-.think-mini-label {
-  color: var(--muted);
-  font-size: 13px;
-}
 </style>

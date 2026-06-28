@@ -31,10 +31,10 @@
               <span v-if="copiedId === msg.id">{{ t('chat_copied') }}</span>
               <span v-else>{{ t('chat_copy') }}</span>
             </button>
+            <!-- C29.3.4: edit enabled even during streaming — clicking aborts current generation -->
             <button
               v-if="msg.id === latestUserMsgId"
               class="msg-action-btn"
-              :disabled="isSending"
               @click="$emit('edit-user', msg.id, msg.content)"
               :title="t('chat_edit')"
             >{{ t('chat_edit') }}</button>

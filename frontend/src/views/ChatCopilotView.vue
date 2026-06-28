@@ -959,9 +959,18 @@ async function onConfirm(msgId, confirmation) {
       })
     }
 
-    const card = result.resultCard
-    // C29.2.3: for analysis_run cards, override content with a clean user message
-    // (backend may return run_id or technical text we don't want to surface)
+    let card = result.resultCard
+    // C29.3.2: for analysis_run cards — sanitize initial state
+    if (card?.type === 'analysis_run' && card.data) {
+      // Initial status must be queued/running/submitted (never optimistic completed)
+      const VALID_INITIAL = new Set(['queued', 'running', 'submitted', 'pending'])
+      if (!VALID_INITIAL.has(card.data.status)) {
+        card = { ...card, data: { ...card.data, status: 'queued', links: [] } }
+      }
+      // Never show fabricated progress — only use backend value
+      card = { ...card, data: { ...card.data, progress: card.data.progress ?? null } }
+    }
+    // C29.2.3: override content with clean user message (remove run_id/technical text)
     const content = card?.type === 'analysis_run'
       ? '正在为您创建分析报告，请稍候…'
       : (result.content ?? '')
@@ -1064,7 +1073,8 @@ async function _pollRunTick(msgId, runId, iid) {
         data: {
           ...cardData,
           status:   snap.status,
-          progress: snap.progress ?? cardData.progress,
+          // C29.3.2: only show progress if backend explicitly returns it
+          progress: snap.progress !== undefined ? snap.progress : null,
           links:    isTerminal ? newLinks : cardData.links ?? [],
         },
       }
@@ -1110,9 +1120,39 @@ onBeforeUnmount(() => {
   _runPolls.clear()
 })
 
-// C29.4: backfill user message into input for editing
+// C29.3.4: edit latest user message — aborts any active stream, fills input
 function onEditUser(_msgId, content) {
-  if (isSending.value) return
+  // 1. Cancel any pending confirmation on the last assistant message
+  const lastAssistant = [...messages.value].reverse().find(m => m.role === 'assistant')
+  if (lastAssistant?.confirmation &&
+      !['executed', 'cancelled'].includes(lastAssistant.confirmation.status)) {
+    const liveMsg = getLiveAssistantMsg(lastAssistant.id)
+    if (liveMsg) {
+      liveMsg.confirmation = { ...liveMsg.confirmation, status: 'cancelled' }
+      commitAssistantMessage(liveMsg)
+    }
+  }
+
+  // 2. Abort stream + finalise the streaming assistant message
+  if (isSending.value) {
+    if (_abortController) _abortController.abort()
+    _clearTimeouts()
+
+    // Mark streaming assistant message as stopped (not error)
+    const streamingMsg = messages.value.find(m => m.role === 'assistant' && m.isStreaming)
+    if (streamingMsg) {
+      const liveMsg = getLiveAssistantMsg(streamingMsg.id)
+      if (liveMsg) {
+        liveMsg.isStreaming = false
+        liveMsg.status      = 'done'
+        if (!liveMsg.content) liveMsg.content = t('chat_stopped')
+        commitAssistantMessage(liveMsg)
+      }
+    }
+    isSending.value = false
+  }
+
+  // 3. Refill input and focus
   inputText.value = content
   nextTick(() => inputBoxRef.value?.focus())
 }
