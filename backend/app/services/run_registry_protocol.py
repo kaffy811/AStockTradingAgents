@@ -69,6 +69,7 @@ class AnalysisRunSnapshot:
     created_at:      datetime
     updated_at:      datetime
     finished_at:     Optional[datetime] = None
+    report_id:       Optional[str]      = None   # C30.3: set after DB persist
 
     def is_terminal(self) -> bool:
         """True if run has reached a final state (completed / failed / cancelled)."""
@@ -113,13 +114,15 @@ class AnalysisRunRegistry(ABC):
         run_id: str,
         status: str,
         *,
-        result: Optional[dict] = None,
-        error:  Optional[str]  = None,
+        result:    Optional[dict] = None,
+        error:     Optional[str]  = None,
+        report_id: Optional[str]  = None,   # C30.3: DB report UUID
     ) -> None:
         """
         更新运行状态。
         status: "running" | "completed" | "failed" | "cancelled"
         terminal 状态自动记录 finished_at。
+        report_id: set on completed to enable direct navigation to report.
         """
 
     @abstractmethod

@@ -195,7 +195,23 @@ def _match_watchlist_view(msg: str) -> bool:
 
 
 def _match_compare(msg: str) -> bool:
-    return bool(re.search(r"对比|比较", msg))
+    """
+    C30.5: Explicit multi-stock comparison intent.
+    '对比' is always explicit. 'vs/versus' is explicit.
+    '比较' must NOT be an adjective modifier (比较火/热/好/…) and must appear
+    with multi-entity separators (、,，和/还是) suggesting ≥2 stocks.
+    This prevents '最近哪些行业比较火' from routing to compare.
+    """
+    # Unambiguously explicit compare words
+    if re.search(r"对比|vs\.?\b|versus", msg, re.IGNORECASE):
+        return True
+    # "比较" as adjective/adverb is NOT a compare trigger
+    if re.search(r"比较[火热冷强弱好差高低多少大小贵便]", msg):
+        return False
+    # "比较" as verb only when separators suggest multiple entities
+    if re.search(r"比较", msg) and re.search(r"[、,，和]|还是", msg):
+        return True
+    return False
 
 
 def _match_industry(msg: str) -> bool:

@@ -128,3 +128,118 @@ def sanitize_thinking_content(
         text = text[:max_chars].rstrip() + "…"
 
     return text
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# C30.6 — DeepSeek reasoning_content → public thinking summary
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Maps each of the 5 public thinking steps to extraction heuristics
+_STEP_HINTS = [
+    ("问题分析",     re.compile(r"问题|理解|判断|请求类型|intent|用户意图",    re.IGNORECASE)),
+    ("关键数据检索", re.compile(r"检索|查询|数据|获取|工具|搜索|找到|API",      re.IGNORECASE)),
+    ("深度思考",     re.compile(r"思考|分析|比较|评估|权衡|推理|考虑|综合",      re.IGNORECASE)),
+    ("风险审查",     re.compile(r"风险|审查|合规|建议|不确定|边界|注意|警告",    re.IGNORECASE)),
+    ("回答生成",     re.compile(r"回答|生成|总结|输出|最终|结论|基于",           re.IGNORECASE)),
+]
+
+# Max chars to take from a single sentence for public display
+_STEP_EXCERPT_MAX = 80
+
+
+def convert_reasoning_to_public_summary(
+    reasoning_content: str,
+    intent: str = "general",
+    *,
+    max_chars: int = 2000,
+) -> list[dict]:
+    """
+    C30.6: Convert DeepSeek reasoning_content to a list of public thinking-step
+    summaries.  Raw chain-of-thought is NEVER passed through intact.
+
+    Args:
+        reasoning_content: raw text from DeepSeek's reasoning_content field
+        intent:            detected intent (from intent_decision_agent)
+        max_chars:         cap on reasoning_content before processing
+
+    Returns:
+        List of dicts: [{title, content, status}] — the "visible steps" for
+        ChatThinkingMiniPanel, in business-level language.
+        Falls back to template steps when reasoning_content is empty/None.
+    """
+    from app.agents.intent_decision_agent import classify_intent  # local import to avoid cycle
+
+    # Sanitize first — removes raw artefacts, tool args, system prompts
+    sanitized = sanitize_thinking_content(reasoning_content or "", max_chars=max_chars)
+
+    if not sanitized.strip():
+        # No usable reasoning → return template-based steps
+        return _template_steps_for_intent(intent)
+
+    # Extract one representative sentence per step from the sanitized text
+    sentences = re.split(r"[。！？\n]+", sanitized)
+    sentences = [s.strip() for s in sentences if len(s.strip()) > 10]
+
+    steps: list[dict] = []
+    for step_title, hint_re in _STEP_HINTS:
+        # Find a sentence that matches the hint pattern
+        excerpt = next(
+            (s[:_STEP_EXCERPT_MAX] for s in sentences if hint_re.search(s)),
+            None,
+        )
+        if excerpt is None and sentences:
+            # No hint match — use position-based fallback
+            idx = len(steps) * max(1, len(sentences) // 5)
+            excerpt = sentences[min(idx, len(sentences) - 1)][:_STEP_EXCERPT_MAX]
+        if excerpt:
+            steps.append({"title": step_title, "content": excerpt, "status": "done"})
+
+    # Pad with template steps for missing positions
+    template = _template_steps_for_intent(intent)
+    for i, tpl in enumerate(template):
+        if i >= len(steps):
+            steps.append({**tpl, "status": "done"})
+
+    return steps[:5]  # always exactly 5 steps
+
+
+def _template_steps_for_intent(intent: str) -> list[dict]:
+    """Return template 5-step summaries for a given intent (fallback)."""
+    _TEMPLATES: dict[str, list[tuple[str, str]]] = {
+        "financial_report": [
+            ("问题分析",     "我正在理解你的问题，判断这是财报分析类请求。"),
+            ("关键数据检索", "我会优先检索官方财报、行情数据和知识库资料。"),
+            ("深度思考",     "我会比较已获取数据，避免编造未验证的财务指标。"),
+            ("风险审查",     "我会检查是否存在买卖建议或无来源估值数字。"),
+            ("回答生成",     "我会基于已验证信息生成最终回答。"),
+        ],
+        "hot_stocks": [
+            ("问题分析",     "我正在理解你的问题，判断这是市场热点类请求。"),
+            ("关键数据检索", "我会检索市场热点、行业线索和相关股票涨幅数据。"),
+            ("深度思考",     "我会区分短期热度和真实产业链关联。"),
+            ("风险审查",     "我会检查是否存在买卖建议或无来源估值数字。"),
+            ("回答生成",     "我会基于已验证信息生成最终回答。"),
+        ],
+        "industry_research": [
+            ("问题分析",     "我正在理解你的问题，判断这是行业研究类请求。"),
+            ("关键数据检索", "我会检索行业热度数据和代表性公司列表。"),
+            ("深度思考",     "我会分析行业机会与风险，不直接等同于买入推荐。"),
+            ("风险审查",     "我会说明数据边界，避免过度推断。"),
+            ("回答生成",     "我会提供行业概览和代表公司供参考。"),
+        ],
+        "report_generation": [
+            ("问题分析",     "我正在理解你的问题，判断这是报告生成任务请求。"),
+            ("关键数据检索", "我会创建分析任务，配置分析范围和参数。"),
+            ("深度思考",     "我会根据任务状态判断报告是否真正生成完成。"),
+            ("风险审查",     "我会验证任务提交状态，不误报已完成任务。"),
+            ("回答生成",     "我会持续跟踪报告状态，完成后提供查看链接。"),
+        ],
+    }
+    raw = _TEMPLATES.get(intent, _TEMPLATES.get("general_research", [
+        ("问题分析",     "我正在理解你的问题，判断所需信息类型。"),
+        ("关键数据检索", "我会检索相关数据，优先使用官方来源。"),
+        ("深度思考",     "我会综合已获取信息，区分事实与待确认内容。"),
+        ("风险审查",     "我会检查是否存在买卖建议或无来源推断。"),
+        ("回答生成",     "我会基于已验证信息生成最终回答。"),
+    ]))
+    return [{"title": t, "content": c, "status": "done"} for t, c in raw]

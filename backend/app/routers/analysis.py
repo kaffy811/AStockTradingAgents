@@ -820,6 +820,7 @@ async def get_analysis_run(
         "progress":        snap.progress,
         "latest_event":    snap.latest_event,
         "result":          snap.result,
+        "report_id":       snap.report_id,    # C30.3: direct report navigation
         "error":           snap.error,
         "created_at":      snap.created_at.isoformat(),
         "updated_at":      snap.updated_at.isoformat(),

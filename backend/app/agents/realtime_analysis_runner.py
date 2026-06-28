@@ -48,6 +48,7 @@ from app.agents.comprehensive_analysis_coordinator import (
     _fallback_report,
 )
 from app.services.run_registry_protocol import AnalysisRunRef, AnalysisRunRegistry
+from app.agents.report_persistence import save_generated_report
 
 log = logging.getLogger(__name__)
 
@@ -262,8 +263,31 @@ class RealtimeAnalysisRunner:
             "output_language": output_language,
         }
 
-        await registry.update_status(run_ref.run_id, "completed", result=full_result)
-        await self._emit(run_ref, registry, "report_ready", progress=100, result=full_result)
+        # C30.3: persist report to analysis_reports table BEFORE marking completed
+        report_id = await save_generated_report(run_ref, full_result, db, auto_saved=True)
+
+        if report_id is None:
+            # Save failed — mark run as failed so frontend shows error, not success
+            log.error("RealtimeAnalysisRunner: report persistence failed [%s]", run_ref.run_id)
+            await registry.update_status(
+                run_ref.run_id, "failed",
+                error="报告生成完成，但保存到历史记录时失败。请稍后在报告中心手动保存。",
+            )
+            await self._emit(run_ref, registry, "analysis_failed", progress=0,
+                             error="report persistence failed")
+            await registry.push_event(run_ref.run_id, None)
+            return
+
+        # Attach report_id to full_result for SSE consumers
+        full_result["report_id"] = report_id
+
+        await registry.update_status(
+            run_ref.run_id, "completed",
+            result=full_result,
+            report_id=report_id,
+        )
+        await self._emit(run_ref, registry, "report_ready", progress=100,
+                         result=full_result, report_id=report_id)
         await registry.push_event(run_ref.run_id, None)  # sentinel
 
     # ── Named agent wrapper ────────────────────────────────────────────────────

@@ -54,6 +54,7 @@ class AnalysisRun:
     status:           str                   = "queued"
     result:           Optional[dict]        = None
     error:            Optional[str]         = None
+    report_id:        Optional[str]         = None   # C30.3: DB report UUID after persistence
     event_queue:      asyncio.Queue         = field(default_factory=asyncio.Queue)
     events:           list                  = field(default_factory=list)
     event_id_counter: int                   = field(default=0)
@@ -116,11 +117,12 @@ def get_run(run_id: str) -> Optional[AnalysisRun]:
 
 
 def update_run_status(
-    run:    AnalysisRun,
-    status: str,
+    run:       AnalysisRun,
+    status:    str,
     *,
-    result: Optional[dict] = None,
-    error:  Optional[str]  = None,
+    result:    Optional[dict] = None,
+    error:     Optional[str]  = None,
+    report_id: Optional[str]  = None,   # C30.3
 ) -> None:
     run.status     = status
     run.updated_at = datetime.now(timezone.utc)
@@ -128,6 +130,8 @@ def update_run_status(
         run.result = result
     if error is not None:
         run.error = error
+    if report_id is not None:
+        run.report_id = report_id
     if status in ("completed", "failed", "cancelled"):
         run.finished_at = datetime.now(timezone.utc)
 
@@ -213,6 +217,7 @@ class MemoryAnalysisRunRegistry(AnalysisRunRegistry):
             latest_event    = run.latest_event,
             result          = run.result,
             error           = run.error,
+            report_id       = run.report_id,   # C30.3
             created_at      = run.created_at,
             updated_at      = run.updated_at,
             finished_at     = run.finished_at,
@@ -222,16 +227,17 @@ class MemoryAnalysisRunRegistry(AnalysisRunRegistry):
 
     async def update_status(
         self,
-        run_id: str,
-        status: str,
+        run_id:    str,
+        status:    str,
         *,
-        result: Optional[dict] = None,
-        error:  Optional[str]  = None,
+        result:    Optional[dict] = None,
+        error:     Optional[str]  = None,
+        report_id: Optional[str]  = None,   # C30.3
     ) -> None:
         run = _runs.get(run_id)
         if run is None:
             return
-        update_run_status(run, status, result=result, error=error)
+        update_run_status(run, status, result=result, error=error, report_id=report_id)
 
     async def push_event(self, run_id: str, event: Optional[dict]) -> None:
         """

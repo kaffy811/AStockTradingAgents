@@ -189,6 +189,7 @@ class RedisAnalysisRunRegistry(AnalysisRunRegistry):
             latest_event    = latest_event,
             result          = result,
             error           = data.get("error") or None,
+            report_id       = data.get("report_id") or None,   # C30.3
             created_at      = _parse_dt(data.get("created_at")) or datetime.now(timezone.utc),
             updated_at      = _parse_dt(data.get("updated_at")) or datetime.now(timezone.utc),
             finished_at     = _parse_dt(data.get("finished_at")),
@@ -198,11 +199,12 @@ class RedisAnalysisRunRegistry(AnalysisRunRegistry):
 
     async def update_status(
         self,
-        run_id: str,
-        status: str,
+        run_id:    str,
+        status:    str,
         *,
-        result: Optional[dict] = None,
-        error:  Optional[str]  = None,
+        result:    Optional[dict] = None,
+        error:     Optional[str]  = None,
+        report_id: Optional[str]  = None,   # C30.3: DB report UUID
     ) -> None:
         now = datetime.now(timezone.utc).isoformat()
         mapping: dict = {"status": status, "updated_at": now}
@@ -211,6 +213,8 @@ class RedisAnalysisRunRegistry(AnalysisRunRegistry):
             mapping["result_json"] = _json_dumps(result)
         if error is not None:
             mapping["error"] = error
+        if report_id is not None:
+            mapping["report_id"] = report_id   # C30.3
         if status in ("completed", "failed", "cancelled"):
             mapping["finished_at"] = now
         if status == "cancelled":
