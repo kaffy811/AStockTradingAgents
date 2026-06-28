@@ -169,6 +169,7 @@
         </span>
       </div>
       <p v-if="isRunActive(card.data.status)" class="rc-run-hint">报告生成需约 30～60 秒，完成后点击下方按钮查看报告。</p>
+      <p v-else-if="card.data.status === 'completed' && !hasDirectReportLink(card.data.links)" class="rc-run-hint">报告生成完成，但暂未获取到报告链接，请前往报告中心查看。</p>
       <p v-else-if="card.data.status === 'failed' || card.data.status === 'cancelled'" class="rc-run-hint rc-run-hint--error">本次分析未能完成，请稍后重试。</p>
       <div v-if="card.data.links?.length" class="rc-actions">
         <template v-for="link in card.data.links" :key="link.label">
@@ -208,9 +209,9 @@ function verdictClass(verdict) {
   return 'is-neutral'
 }
 
-// C29.1.5: analysis_run status helpers
+// C29.1.5 / C29.3.2: analysis_run status helpers
 function isRunActive(status) {
-  return status === 'queued' || status === 'running'
+  return status === 'queued' || status === 'running' || status === 'submitted' || status === 'pending'
 }
 function runTagText(status) {
   if (status === 'completed') return '✓ 分析完成'
@@ -223,8 +224,14 @@ function runTagClass(status) {
   return 'rc-tag--report'
 }
 function runStatusLabel(status) {
-  const map = { queued: '排队中', running: '生成中', completed: '已完成', failed: '失败', cancelled: '已取消' }
+  const map = {
+    queued: '排队中', submitted: '排队中', pending: '等待中',
+    running: '生成中', completed: '已完成', failed: '失败', cancelled: '已取消',
+  }
   return map[status] ?? status
+}
+function hasDirectReportLink(links) {
+  return (links ?? []).some(l => l.path?.name === 'HistoryDetail')
 }
 function runPillClass(status) {
   if (status === 'completed') return 'pill--done'

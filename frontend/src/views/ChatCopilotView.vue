@@ -1080,7 +1080,10 @@ async function _pollRunTick(msgId, runId, iid) {
       }
       // C29.2.3: update message content on terminal state
       if (snap.status === 'completed') {
-        liveMsg.content = '分析报告已生成，点击下方按钮查看完整报告。'
+        const reportId = snap.report_id ?? snap.result?.report_id ?? snap.result?.id ?? null
+        liveMsg.content = reportId
+          ? '分析报告已生成，点击下方按钮查看完整报告。'
+          : '分析报告已生成，但暂未获取到报告链接，请前往报告中心查看。'
       } else if (isTerminal) {
         liveMsg.content = '本次分析未能完成，请稍后重试。'
       }

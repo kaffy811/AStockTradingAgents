@@ -389,3 +389,55 @@ describe('C29.3.5 Message action rules', () => {
     expect(actionBarVisible).toBeFalsy()
   })
 })
+
+// ── C29.3.2 extended: submitted/pending + completed-no-report-id ─────────────
+describe('C29.3.2 extended — submitted status & no-report-id hint', () => {
+  function isRunActive(status) {
+    return status === 'queued' || status === 'running' || status === 'submitted' || status === 'pending'
+  }
+  function runStatusLabel(status) {
+    const map = {
+      queued: '排队中', submitted: '排队中', pending: '等待中',
+      running: '生成中', completed: '已完成', failed: '失败', cancelled: '已取消',
+    }
+    return map[status] ?? status
+  }
+  function hasDirectReportLink(links) {
+    return (links ?? []).some(l => l.path?.name === 'HistoryDetail')
+  }
+
+  it('T33: submitted is treated as active (spinner shown)', () => {
+    expect(isRunActive('submitted')).toBe(true)
+    expect(isRunActive('pending')).toBe(true)
+  })
+
+  it('T34: submitted maps to 排队中; pending maps to 等待中', () => {
+    expect(runStatusLabel('submitted')).toBe('排队中')
+    expect(runStatusLabel('pending')).toBe('等待中')
+  })
+
+  it('T35: completed with HistoryDetail link → hasDirectReportLink = true (no extra hint)', () => {
+    const links = [{ label: '查看报告', path: { name: 'HistoryDetail', params: { id: 'rpt-1' } } }]
+    expect(hasDirectReportLink(links)).toBe(true)
+  })
+
+  it('T36: completed with /history fallback → hasDirectReportLink = false (hint shown)', () => {
+    const links = [{ label: '查看报告中心', path: '/history' }]
+    expect(hasDirectReportLink(links)).toBe(false)
+  })
+
+  it('T37: message content for completed-with-report_id differs from completed-without', () => {
+    function buildContent(snap) {
+      if (snap.status === 'completed') {
+        const reportId = snap.report_id ?? snap.result?.report_id ?? null
+        return reportId
+          ? '分析报告已生成，点击下方按钮查看完整报告。'
+          : '分析报告已生成，但暂未获取到报告链接，请前往报告中心查看。'
+      }
+      return ''
+    }
+    expect(buildContent({ status: 'completed', report_id: 'rpt-9' })).toContain('点击下方按钮')
+    expect(buildContent({ status: 'completed' })).toContain('报告中心')
+    expect(buildContent({ status: 'completed', report_id: 'rpt-9' })).not.toContain('报告中心')
+  })
+})
