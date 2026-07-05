@@ -26,7 +26,10 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
+
+if TYPE_CHECKING:
+    from app.services.conversation_memory_service import MemoryContext
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -98,7 +101,10 @@ class IntentDecision:
 # Classifier
 # ─────────────────────────────────────────────────────────────────────────────
 
-def classify_intent(query: str) -> IntentDecision:
+def classify_intent(
+    query: str,
+    memory_context: "MemoryContext | None" = None,
+) -> IntentDecision:
     """
     Rule-based intent classifier.
 
@@ -107,10 +113,18 @@ def classify_intent(query: str) -> IntentDecision:
     backward compatibility; this function is advisory for callers that want
     a structured intent result.
 
+    C32.2: If memory_context is provided, use the resolved_query (with pronouns
+    expanded) for classification, and enrich target_entities from active_entities
+    when the query doesn't mention them explicitly.
+
     Returns:
         IntentDecision with intent, need_agent, need_confirmation.
     """
-    q = query.strip()
+    # C32.2: use coreference-resolved query when available
+    if memory_context is not None and memory_context.resolved_query:
+        q = memory_context.resolved_query.strip()
+    else:
+        q = query.strip()
 
     # ── Safety / trading block ────────────────────────────────────────────────
     if _RE_TRADING.search(q):
@@ -125,6 +139,9 @@ def classify_intent(query: str) -> IntentDecision:
     # ── Report generation (explicit save / generate) ──────────────────────────
     if _RE_REPORT_GEN.search(q):
         entities = _extract_stock_entities(q)
+        # C32.2: if no entities found in query, fall back to memory active entities
+        if not entities and memory_context:
+            entities = _entities_from_memory(memory_context)
         return IntentDecision(
             intent            = "report_generation",
             need_agent        = True,
@@ -147,6 +164,8 @@ def classify_intent(query: str) -> IntentDecision:
     # ── Multi-stock compare (must have explicit compare signal, not adjective) ─
     if _is_compare_intent(q):
         entities = _extract_stock_entities(q)
+        if not entities and memory_context:
+            entities = _entities_from_memory(memory_context)
         return IntentDecision(
             intent            = "compare_stocks",
             need_agent        = True,
@@ -236,3 +255,14 @@ def _extract_stock_entities(query: str) -> list[str]:
         if name not in entities:
             entities.append(name)
     return entities
+
+
+def _entities_from_memory(memory_context: "MemoryContext") -> list[str]:
+    """C32.2: Extract entity names/codes from memory active_entities as fallback."""
+    result: list[str] = []
+    for e in (memory_context.active_entities or [])[:3]:
+        if e.code:
+            result.append(e.code)
+        elif e.name:
+            result.append(e.name)
+    return result

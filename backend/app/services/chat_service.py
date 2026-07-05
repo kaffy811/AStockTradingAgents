@@ -6,11 +6,14 @@ cross between users.
 """
 from __future__ import annotations
 
+import logging
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import desc, func, select
+from sqlalchemy import desc, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
+
+log = logging.getLogger(__name__)
 
 from app.models.chat import (
     ChatMessage,
@@ -18,6 +21,7 @@ from app.models.chat import (
     ChatSession,
     ChatSessionCreateResponse,
     ChatSessionListItem,
+    ChatSessionSearchItem,
 )
 
 
@@ -172,6 +176,178 @@ async def soft_delete_session(
     return True
 
 
+# ── C32.4: Session search ─────────────────────────────────────────────────────
+
+_DATE_RANGE_MAP = {
+    "today":     0,
+    "yesterday": 1,
+    "7days":     7,
+    "30days":    30,
+    "month":     30,
+}
+
+
+async def search_sessions(
+    db: AsyncSession,
+    user_id: uuid.UUID,
+    q: str | None = None,
+    date_from: datetime | None = None,
+    date_to:   datetime | None = None,
+    date_ranges: list[str] | None = None,
+    limit:  int = 20,
+    offset: int = 0,
+) -> tuple[list[ChatSessionSearchItem], int]:
+    """
+    Search user's chat sessions by keyword and/or time range.
+
+    q            — keyword searched in session title + message content
+    date_ranges  — list of preset strings: "today" | "yesterday" | "7days" | "30days" | "month"
+    date_from/to — explicit ISO date range (overrides date_ranges)
+    Returns (items, total).
+    """
+    from datetime import timedelta  # noqa: PLC0415
+
+    # ── Resolve date window ────────────────────────────────────────────────
+    if date_from is None and date_ranges:
+        # Compute earliest start date from all selected ranges
+        now = datetime.now(timezone.utc)
+        earliest = now
+        for dr in date_ranges:
+            days = _DATE_RANGE_MAP.get(dr, 0)
+            if dr == "today":
+                start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+            elif dr == "yesterday":
+                start = (now - timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+            else:
+                start = now - timedelta(days=days)
+            if start < earliest:
+                earliest = start
+        date_from = earliest
+    if date_to is None and date_from is not None:
+        date_to = datetime.now(timezone.utc)
+
+    # ── Base filter (always: correct user, not deleted) ────────────────────
+    base_filters = [
+        ChatSession.user_id == user_id,
+        ChatSession.status != "deleted",
+    ]
+    if date_from is not None:
+        base_filters.append(
+            or_(
+                ChatSession.last_message_at >= date_from,
+                ChatSession.created_at >= date_from,
+            )
+        )
+    if date_to is not None:
+        base_filters.append(
+            or_(
+                ChatSession.last_message_at <= date_to,
+                ChatSession.created_at <= date_to,
+            )
+        )
+
+    # ── Keyword filter ────────────────────────────────────────────────────
+    if q and q.strip():
+        q_stripped = q.strip()
+        title_match = ChatSession.title.ilike(f"%{q_stripped}%")
+        # Subquery: sessions that have at least one message matching q
+        msg_subq = (
+            select(ChatMessage.session_id)
+            .where(ChatMessage.content.ilike(f"%{q_stripped}%"))
+            .scalar_subquery()
+        )
+        content_match = ChatSession.id.in_(msg_subq)
+        base_filters.append(or_(title_match, content_match))
+
+    # ── Count ─────────────────────────────────────────────────────────────
+    count_stmt = (
+        select(func.count())
+        .select_from(ChatSession)
+        .where(*base_filters)
+    )
+    total: int = (await db.execute(count_stmt)).scalar_one()
+
+    if total == 0:
+        return [], 0
+
+    # ── List ──────────────────────────────────────────────────────────────
+    list_stmt = (
+        select(ChatSession)
+        .where(*base_filters)
+        .order_by(
+            ChatSession.last_message_at.desc().nullslast(),
+            desc(ChatSession.created_at),
+        )
+        .limit(limit)
+        .offset(offset)
+    )
+    rows = (await db.execute(list_stmt)).scalars().all()
+
+    items: list[ChatSessionSearchItem] = []
+    for row in rows:
+        preview = await _get_session_preview(db, row.id)
+        snippet = await _get_match_snippet(db, row.id, q or "")
+        items.append(ChatSessionSearchItem(
+            session_id      = row.id,
+            title           = row.title,
+            status          = row.status,
+            last_message_at = row.last_message_at,
+            preview         = preview,
+            matched_snippet = snippet,
+        ))
+
+    return items, total
+
+
+async def _get_match_snippet(
+    db: AsyncSession,
+    session_id: uuid.UUID,
+    q: str,
+) -> str:
+    """Return the first 80 chars of the first message matching q, or ''."""
+    if not q or not q.strip():
+        return ""
+    stmt = (
+        select(ChatMessage.content)
+        .where(
+            ChatMessage.session_id == session_id,
+            ChatMessage.content.ilike(f"%{q.strip()}%"),
+        )
+        .order_by(ChatMessage.created_at.asc())
+        .limit(1)
+    )
+    content: str | None = (await db.execute(stmt)).scalar_one_or_none()
+    if not content:
+        return ""
+    # Find the keyword position and return surrounding context
+    lower_content = content.lower()
+    lower_q = q.lower().strip()
+    idx = lower_content.find(lower_q)
+    if idx < 0:
+        return content[:80] + ("…" if len(content) > 80 else "")
+    start = max(0, idx - 20)
+    end   = min(len(content), idx + len(lower_q) + 60)
+    snippet = ("…" if start > 0 else "") + content[start:end] + ("…" if end < len(content) else "")
+    return snippet[:100]
+
+
+# ── Transaction helpers ────────────────────────────────────────────────────────
+
+async def safe_flush(db: AsyncSession, *, context: str) -> None:
+    """
+    C30.3.2: Flush pending ORM changes; on failure rollback and re-raise.
+
+    Guarantees that after an exception the session is clean (no
+    PendingRollback state) so callers can decide how to recover.
+    """
+    try:
+        await db.flush()
+    except Exception:
+        await db.rollback()
+        log.exception("DB flush failed in %s", context)
+        raise
+
+
 # ── Message CRUD ───────────────────────────────────────────────────────────────
 
 async def save_user_message(
@@ -193,7 +369,7 @@ async def save_user_message(
         msg_metadata={"output_language": output_language},
     )
     db.add(msg)
-    await db.flush()  # get id without committing
+    await safe_flush(db, context="save_user_message")  # C30.3.2: clean rollback on failure
     return msg
 
 
@@ -236,7 +412,7 @@ async def save_assistant_message(
         msg_metadata=base_meta,
     )
     db.add(msg)
-    await db.flush()
+    await safe_flush(db, context="save_assistant_message")  # C30.3.2: clean rollback on failure
     return msg
 
 

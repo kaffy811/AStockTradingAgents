@@ -1,0 +1,131 @@
+{
+  "snapshot": {
+    "market": "CN",
+    "symbol": "600519",
+    "ts_code": "600519.SH",
+    "module_key": "snapshot",
+    "module_name": "基础信息与行情",
+    "group": "概览",
+    "group_seq": 1,
+    "data": {
+      "name": "贵州茅台",
+      "industry": "食品饮料",
+      "price": 1688.0,
+      "pe_ttm": 28.5,
+      "pb": 9.2,
+      "total_mv": 212256000.0,
+      "circ_mv": 212256000.0,
+      "change_pct": 0.85,
+      "source": "tushare"
+    },
+    "errors": [],
+    "partial": false,
+    "stale": false,
+    "generated_at": "2026-07-05T10:23:45+08:00",
+    "source": {
+      "primary": "tushare",
+      "fallback": null,
+      "akshare_enabled": false,
+      "actual": "tushare"
+    },
+    "meta": {
+      "render_type": "metric_cards",
+      "chart_type": "none",
+      "unit_hints": {
+        "price": "元",
+        "total_mv": "万元",
+        "circ_mv": "万元",
+        "pe_ttm": "倍",
+        "pb": "倍",
+        "change_pct": "%"
+      },
+      "field_labels": {
+        "name": "公司名称",
+        "industry": "行业",
+        "price": "最新价",
+        "pe_ttm": "PE(TTM)",
+        "pb": "PB",
+        "total_mv": "总市值",
+        "circ_mv": "流通市值",
+        "change_pct": "涨跌幅"
+      },
+      "empty_state": "暂无数据"
+    }
+  },
+  "financial_summary": {
+    "market": "CN",
+    "symbol": "600519",
+    "ts_code": "600519.SH",
+    "module_key": "financial_summary",
+    "module_name": "财报核心数据",
+    "group": "概览",
+    "group_seq": 1,
+    "data": {
+      "series": [
+        {
+          "end_date": "20231231",
+          "revenue": 150560000000.0,
+          "net_profit": 74734000000.0,
+          "roe": 35.2,
+          "eps": 59.49,
+          "gross_margin": 91.8
+        },
+        {
+          "end_date": "20220930",
+          "revenue": 101260000000.0,
+          "net_profit": 50008000000.0,
+          "roe": 25.1,
+          "eps": 39.83,
+          "gross_margin": 91.5
+        },
+        {
+          "end_date": "20220630",
+          "revenue": 66020000000.0,
+          "net_profit": 32990000000.0,
+          "roe": 16.7,
+          "eps": 26.28,
+          "gross_margin": 91.3
+        },
+        {
+          "end_date": "20220331",
+          "revenue": 36670000000.0,
+          "net_profit": 18640000000.0,
+          "roe": 9.4,
+          "eps": 14.85,
+          "gross_margin": 91.6
+        }
+      ],
+      "source": "tushare"
+    },
+    "errors": [],
+    "partial": false,
+    "stale": false,
+    "generated_at": "2026-07-05T10:23:45+08:00",
+    "source": {
+      "primary": "tushare",
+      "fallback": null,
+      "akshare_enabled": false,
+      "actual": "tushare"
+    },
+    "meta": {
+      "render_type": "metric_cards",
+      "chart_type": "none",
+      "unit_hints": {
+        "revenue": "元",
+        "net_profit": "元",
+        "roe": "%",
+        "gross_margin": "%",
+        "eps": "元/股"
+      },
+      "field_labels": {
+        "end_date": "报告期",
+        "revenue": "营收",
+        "net_profit": "净利润",
+        "roe": "ROE",
+        "eps": "EPS",
+        "gross_margin": "毛利率"
+      },
+      "empty_state": "暂无数据"
+    }
+  }
+}

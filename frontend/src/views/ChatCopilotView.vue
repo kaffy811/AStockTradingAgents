@@ -5,11 +5,13 @@
     <div class="chat-layout">
       <!-- ── Left: Session sidebar (collapsible) ──────────────────────────── -->
       <ChatSessionSidebar
+        ref="sidebarRef"
         :sessions="sessions"
         :activeSessionId="sessionId"
         @new-session="onNewSession"
         @select-session="onSelectSession"
         @delete-session="onDeleteSession"
+        @search="onSidebarSearch"
       />
 
       <!-- ── Center: Main chat column ─────────────────────────────────────── -->
@@ -52,16 +54,24 @@
             <ChatQuickActions @fill="onQuickFill" />
           </div>
 
-          <!-- Message list (scrollable) -->
-          <div class="chat-messages-area">
+          <!-- Message list (scrollable) + C32.3 markers overlay -->
+          <div class="chat-messages-area" style="position: relative;">
             <ChatMessageList
+              ref="chatListRef"
               :messages="messages"
               :isSending="isSending"
+              :highlightedId="markersRef?.highlightedId ?? null"
               @confirm="onConfirm"
               @cancel="onCancel"
               @action="onCardAction"
               @edit-user="onEditUser"
               @retry-ai="onRetryAi"
+            />
+            <!-- C32.3: Conversation marker rail (right side of message area) -->
+            <ConversationMarkers
+              ref="markersRef"
+              :messages="messages"
+              :scrollContainer="chatListRef?.listRef ?? null"
             />
           </div>
 
@@ -87,11 +97,12 @@
 <script setup>
 import { ref, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
-import AppHeader          from '../components/AppHeader.vue'
-import ChatMessageList    from '../components/chat/ChatMessageList.vue'
-import ChatQuickActions   from '../components/chat/ChatQuickActions.vue'
-import ChatInputBox       from '../components/chat/ChatInputBox.vue'
-import ChatSessionSidebar from '../components/chat/ChatSessionSidebar.vue'
+import AppHeader             from '../components/AppHeader.vue'
+import ChatMessageList        from '../components/chat/ChatMessageList.vue'
+import ChatQuickActions       from '../components/chat/ChatQuickActions.vue'
+import ChatInputBox           from '../components/chat/ChatInputBox.vue'
+import ChatSessionSidebar     from '../components/chat/ChatSessionSidebar.vue'
+import ConversationMarkers    from '../components/chat/ConversationMarkers.vue'
 import { useI18n }        from '../utils/i18n.js'
 import { useAuthStore }   from '../stores/auth.js'
 import { normalizeChatEvent } from '../utils/chatEventNormalizer.js'
@@ -109,6 +120,7 @@ import {
   sendChatMessage,
   sendChatMessageStream,
   confirmChatAction,
+  searchChatSessions,
 } from '../api/chat.js'
 import { getAnalysisRun } from '../api/analysis.js'
 
@@ -130,6 +142,9 @@ const fallbackMode   = ref(false)  // true = no backend session available
 const sessionId      = ref(null)   // current backend session UUID
 const messages       = ref([])
 const inputBoxRef    = ref(null)
+const chatListRef    = ref(null)   // C32.3: ref to ChatMessageList component
+const markersRef     = ref(null)   // C32.3: ref to ConversationMarkers component
+const sidebarRef     = ref(null)   // C32.5: ref to ChatSessionSidebar
 const sessions       = ref([])      // sidebar session list
 const softTimeout    = ref(false)   // "thinking" notice shown after 15s
 
@@ -214,9 +229,11 @@ function commitAssistantMessage(msg) {
   // Replace the item with a shallow-spread copy so Vue's Proxy setter fires
   messages.value[idx] = {
     ...msg,
-    reasoningSteps: [...(msg.reasoningSteps ?? [])],
-    toolTrace:      [...(msg.toolTrace      ?? [])],
-    agentTrace:     [...(msg.agentTrace     ?? [])],
+    reasoningSteps:  [...(msg.reasoningSteps  ?? [])],
+    toolTrace:       [...(msg.toolTrace       ?? [])],
+    agentTrace:      [...(msg.agentTrace      ?? [])],
+    thinkingItems:   [...(msg.thinkingItems   ?? [])],
+    thinkingEvents:  [...(msg.thinkingEvents  ?? [])],
     streamDebug:    msg.streamDebug  ? { ...msg.streamDebug  } : msg.streamDebug,
     finalAnswer:    msg.finalAnswer  ? { ...msg.finalAnswer  } : msg.finalAnswer,
   }
@@ -257,6 +274,8 @@ function pushAssistantMsg(overrides = {}) {
     // Legacy fields (still used by ChatReasoningPanel / ChatMessageList)
     toolTrace:       [],
     thinkingContent: '',
+    thinkingItems:   [],
+    thinkingEvents:  [],
     finalAnswer:     null,
     agentTrace:      [],
     resultCard:      null,
@@ -322,13 +341,19 @@ function _restoreMessages(sessionDetail) {
     } else {
       const conf = m.confirmation ? { ...m.confirmation, resolved: true } : null
       restored.push({
-        id:           String(m.message_id),
-        role:         'assistant',
-        content:      m.content,
-        toolTrace:    m.tool_events ?? [],
-        resultCard:   (m.cards ?? [])[0] ?? null,
-        confirmation: conf,
-        isStreaming:  false,
+        id:              String(m.message_id),
+        role:            'assistant',
+        content:         m.content,
+        toolTrace:       m.tool_events ?? [],
+        resultCard:      (m.cards ?? [])[0] ?? null,
+        confirmation:    conf,
+        isStreaming:     false,
+        status:          'done',
+        thinkingItems:   [],
+        thinkingEvents:  [],
+        thinkingContent: '',
+        reasoningSteps:  [],
+        agentTrace:      [],
       })
     }
   }
@@ -489,6 +514,35 @@ async function onDeleteSession(id) {
     }
   } catch {
     // non-fatal
+  }
+}
+
+// ── C32.5: Sidebar search handler ─────────────────────────────────────────────
+
+async function onSidebarSearch(params) {
+  if (!sidebarRef.value) return
+
+  if (!params) {
+    // Clear search — restore normal list
+    sidebarRef.value.setSearchResults([], false)
+    return
+  }
+
+  sidebarRef.value.setSearchResults([], true)  // show loading
+  try {
+    const result = await searchChatSessions(params.q, {
+      date_ranges: params.date_ranges,
+      date_from: params.date_from,
+      date_to: params.date_to,
+    })
+    // Map session_id → id for compatibility with session-item rendering
+    const items = (result.items || []).map(s => ({
+      ...s,
+      id: String(s.session_id),
+    }))
+    sidebarRef.value.setSearchResults(items, false)
+  } catch {
+    sidebarRef.value.setSearchResults([], false)
   }
 }
 
@@ -960,6 +1014,25 @@ async function onConfirm(msgId, confirmation) {
     }
 
     let card = result.resultCard
+    // C32.1.4: for compare_link cards — inject session_id into compare URL
+    // so the compare page can show a "Return to chat" button for this session
+    if (card?.type === 'compare_link' && card.data?.links) {
+      const sid = sessionId.value ? `&session_id=${sessionId.value}` : ''
+      card = {
+        ...card,
+        data: {
+          ...card.data,
+          links: card.data.links.map(link => ({
+            ...link,
+            path: link.path + (link.path.includes('?') ? sid : (sid ? '?' + sid.slice(1) : '')),
+          })),
+        },
+      }
+    }
+    // C32.1.4: clear any residual error on compare success
+    if (card?.type === 'compare_link') {
+      followUp.error = null
+    }
     // C29.3.2: for analysis_run cards — sanitize initial state
     if (card?.type === 'analysis_run' && card.data) {
       // Initial status must be queued/running/submitted (never optimistic completed)
@@ -1084,6 +1157,9 @@ async function _pollRunTick(msgId, runId, iid) {
         liveMsg.content = reportId
           ? '分析报告已生成，点击下方按钮查看完整报告。'
           : '分析报告已生成，但暂未获取到报告链接，请前往报告中心查看。'
+        // C30.5.1: clear any agent_error that fired mid-stream — the run actually completed
+        if (liveMsg.error) liveMsg.error = null
+        if (liveMsg.status === 'error') liveMsg.status = 'done'
       } else if (isTerminal) {
         liveMsg.content = '本次分析未能完成，请稍后重试。'
       }
@@ -1124,7 +1200,7 @@ onBeforeUnmount(() => {
 })
 
 // C29.3.4: edit latest user message — aborts any active stream, fills input
-function onEditUser(_msgId, content) {
+function onEditUser(msgId, content) {
   // 1. Cancel any pending confirmation on the last assistant message
   const lastAssistant = [...messages.value].reverse().find(m => m.role === 'assistant')
   if (lastAssistant?.confirmation &&
@@ -1153,6 +1229,13 @@ function onEditUser(_msgId, content) {
       }
     }
     isSending.value = false
+  }
+
+  // C30.5.5: remove the edited user message and all subsequent messages so that
+  // re-sending produces a clean conversation without stale assistant output.
+  const editIdx = messages.value.findIndex(m => m.id === msgId)
+  if (editIdx >= 0) {
+    messages.value = messages.value.slice(0, editIdx)
   }
 
   // 3. Refill input and focus

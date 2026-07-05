@@ -1,0 +1,57 @@
+{
+  "market": "CN",
+  "symbol": "600519",
+  "ts_code": "600519.SH",
+  "module_key": "industry_rank",
+  "module_name": "行业排名",
+  "group": "同行对比",
+  "group_seq": 4,
+  "data": {
+    "ts_code": "600519.SH",
+    "trade_date": "20260705",
+    "end_date": "20231231",
+    "rankings": [
+      {"metric": "roe", "value": 35.2, "peer_count": 142, "rank": 3, "percentile": 97.9, "industry": "食品饮料"},
+      {"metric": "gross_margin", "value": 91.8, "peer_count": 142, "rank": 1, "percentile": 99.3, "industry": "食品饮料"},
+      {"metric": "net_margin", "value": 49.6, "peer_count": 142, "rank": 2, "percentile": 98.6, "industry": "食品饮料"},
+      {"metric": "revenue_yoy", "value": 18.0, "peer_count": 142, "rank": 18, "percentile": 87.3, "industry": "食品饮料"},
+      {"metric": "net_profit_yoy", "value": 19.2, "peer_count": 142, "rank": 15, "percentile": 89.4, "industry": "食品饮料"},
+      {"metric": "debt_to_assets", "value": 27.1, "peer_count": 142, "rank": 12, "percentile": 91.5, "industry": "食品饮料"},
+      {"metric": "current_ratio", "value": 5.42, "peer_count": 142, "rank": 8, "percentile": 94.4, "industry": "食品饮料"},
+      {"metric": "asset_turnover", "value": 0.52, "peer_count": 142, "rank": 85, "percentile": 40.1, "industry": "食品饮料"},
+      {"metric": "inv_turnover", "value": 2.3, "peer_count": 142, "rank": 110, "percentile": 22.5, "industry": "食品饮料"},
+      {"metric": "cash_cover_ratio", "value": 102.8, "peer_count": 142, "rank": 25, "percentile": 82.4, "industry": "食品饮料"},
+      {"metric": "pe_ttm", "value": 28.5, "peer_count": 142, "rank": 52, "percentile": 63.4, "industry": "食品饮料"},
+      {"metric": "pb", "value": 9.2, "peer_count": 142, "rank": 10, "percentile": 93.0, "industry": "食品饮料"},
+      {"metric": "roa", "value": 25.7, "peer_count": 142, "rank": 4, "percentile": 97.2, "industry": "食品饮料"}
+    ],
+    "source": "tushare"
+  },
+  "errors": [],
+  "partial": false,
+  "stale": false,
+  "generated_at": "2026-07-05T10:23:45+08:00",
+  "source": {
+    "primary": "tushare",
+    "fallback": null,
+    "akshare_enabled": false,
+    "actual": "tushare"
+  },
+  "meta": {
+    "render_type": "chart_table",
+    "chart_type": "radar",
+    "unit_hints": {
+      "percentile": "%",
+      "rank": "名"
+    },
+    "field_labels": {
+      "metric": "指标",
+      "value": "当期值",
+      "peer_count": "同行数量",
+      "rank": "行业排名",
+      "percentile": "行业分位",
+      "industry": "行业"
+    },
+    "empty_state": "暂无数据"
+  }
+}

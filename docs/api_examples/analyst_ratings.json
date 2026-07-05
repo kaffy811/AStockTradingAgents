@@ -1,0 +1,58 @@
+{
+  "market": "CN",
+  "symbol": "600519",
+  "ts_code": "600519.SH",
+  "module_key": "analyst_ratings",
+  "module_name": "研报评级汇总",
+  "group": "事件观点",
+  "group_seq": 6,
+  "data": {
+    "forecast_items": [
+      {"ann_date": "20240131", "type": "预增", "sentiment": "positive", "p_change_min": 15.0, "p_change_max": 20.0},
+      {"ann_date": "20230801", "type": "预增", "sentiment": "positive", "p_change_min": 18.0, "p_change_max": 22.0},
+      {"ann_date": "20230201", "type": "略增", "sentiment": "neutral", "p_change_min": 5.0, "p_change_max": 10.0},
+      {"ann_date": "20220801", "type": "预增", "sentiment": "positive", "p_change_min": 16.0, "p_change_max": 20.0}
+    ],
+    "express_items": [
+      {"ann_date": "20240125", "yoy_net_profit": 19.2, "sentiment": "positive"},
+      {"ann_date": "20230125", "yoy_net_profit": 17.5, "sentiment": "positive"}
+    ],
+    "sentiment_summary": {
+      "positive": 5,
+      "neutral": 1,
+      "negative": 0,
+      "dominant": "positive"
+    },
+    "comment": "近期业绩预告整体呈正面倾向，净利润同比持续增长",
+    "data_note": "本模块基于业绩预告类型映射情绪倾向，非机构买卖评级，不代表投资建议。",
+    "source": "tushare"
+  },
+  "errors": [],
+  "partial": false,
+  "stale": false,
+  "generated_at": "2026-07-05T10:23:45+08:00",
+  "source": {
+    "primary": "tushare",
+    "fallback": null,
+    "akshare_enabled": false,
+    "actual": "tushare"
+  },
+  "meta": {
+    "render_type": "mixed",
+    "chart_type": "bar",
+    "unit_hints": {
+      "p_change_min": "%",
+      "p_change_max": "%",
+      "yoy_net_profit": "%"
+    },
+    "field_labels": {
+      "type": "预告类型",
+      "sentiment": "情绪倾向",
+      "p_change_min": "净利润变化下限",
+      "p_change_max": "净利润变化上限",
+      "ann_date": "披露日",
+      "yoy_net_profit": "快报净利润同比"
+    },
+    "empty_state": "暂无数据"
+  }
+}

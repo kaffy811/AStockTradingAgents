@@ -202,5 +202,21 @@ class ChatConfirmRequest(BaseModel):
 class ChatConfirmResponse(BaseModel):
     status: str
     answer: str
-    tool_events: list
-    cards: list
+    tool_events: list = []
+    cards: list = []
+
+
+# ── C32.4: Session search ─────────────────────────────────────────────────────
+
+class ChatSessionSearchItem(BaseModel):
+    session_id:      uuid.UUID
+    title:           str | None
+    status:          str
+    last_message_at: datetime | None
+    preview:         str
+    matched_snippet: str = ""
+
+
+class ChatSessionSearchResponse(BaseModel):
+    items: list[ChatSessionSearchItem]
+    total: int

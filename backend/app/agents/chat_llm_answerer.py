@@ -153,6 +153,7 @@ async def generate_answer(
     output_language: str = "zh-CN",
     stock_context: dict | None = None,
     timeout_seconds: float = 30.0,
+    memory_context: object | None = None,  # MemoryContext | None — C32.1.1
 ) -> str:
     """
     Generate a DeepSeek-backed financial research answer.
@@ -161,6 +162,10 @@ async def generate_answer(
     Raises ValueError if DEEPSEEK_API_KEY is not set.
     Raises asyncio.TimeoutError if generation exceeds timeout_seconds.
     Raises RuntimeError on LLM API error or empty response.
+
+    C32.1.1: When memory_context is provided, injects conversation history
+    and entity context into the messages array so DeepSeek can understand
+    multi-turn coreferences (「它」「这个行业」「上份报告」).
     """
     from app.llm.factory import get_llm_client
 
@@ -190,10 +195,22 @@ async def generate_answer(
         "请基于以上数据生成研究报告，严格遵守系统提示中的回答结构和安全规则。"
     )
 
-    messages = [
-        {"role": "system", "content": _SYSTEM_PROMPT},
-        {"role": "user",   "content": user_prompt},
-    ]
+    # C32.1.1: inject conversation history when memory context is available
+    if memory_context is not None and not memory_context.is_empty():
+        from app.services.conversation_memory_service import (  # noqa: PLC0415
+            build_llm_messages_with_memory,
+        )
+        messages = build_llm_messages_with_memory(
+            system_prompt=_SYSTEM_PROMPT,
+            memory_context=memory_context,
+            current_query=user_prompt,
+            max_recent_messages=6,
+        )
+    else:
+        messages = [
+            {"role": "system", "content": _SYSTEM_PROMPT},
+            {"role": "user",   "content": user_prompt},
+        ]
 
     llm = get_llm_client()
 

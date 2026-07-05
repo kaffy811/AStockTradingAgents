@@ -56,7 +56,10 @@ from app.agents.chat_skills.general_financial_answer_skill import GeneralFinanci
 from app.agents.chat_planner.rule_based_planner import RuleBasedPlanner
 from app.agents.chat_planner.executor import PlannerExecutor
 from app.agents.intent_decision_agent import classify_intent
+from app.agents.central_planning_agent import CentralPlanningAgent as _CentralPlanningAgent
 import app.agents.chat_memory as _mem
+
+_central_planner = _CentralPlanningAgent()
 
 log = logging.getLogger(__name__)
 
@@ -197,14 +200,18 @@ def _match_watchlist_view(msg: str) -> bool:
 
 def _match_compare(msg: str) -> bool:
     """
-    C30.5: Explicit multi-stock comparison intent.
+    C30.5 / C32.2.2: Explicit multi-stock comparison intent.
     '对比' is always explicit. 'vs/versus' is explicit.
+    '相比' with ≥2 entities is explicit (handles "那它和五粮液相比呢？").
     '比较' must NOT be an adjective modifier (比较火/热/好/…) and must appear
     with multi-entity separators (、,，和/还是) suggesting ≥2 stocks.
     This prevents '最近哪些行业比较火' from routing to compare.
     """
     # Unambiguously explicit compare words
     if re.search(r"对比|vs\.?\b|versus", msg, re.IGNORECASE):
+        return True
+    # "相比" as comparison verb: "A和B相比" / "A与B相比" / "A跟B相比"
+    if re.search(r"相比", msg) and re.search(r"[和与跟、,，]", msg):
         return True
     # "比较" as adjective/adverb is NOT a compare trigger
     if re.search(r"比较[火热冷强弱好差高低多少大小贵便]", msg):
@@ -244,16 +251,31 @@ def _match_recent_report(msg: str) -> bool:
 # ── Stock extraction helper ────────────────────────────────────────────────────
 
 def _extract_stock_hint(msg: str) -> dict:
-    """Best-effort extraction of {market, symbol, name_query} from user message."""
-    # Explicit code patterns
+    """
+    Best-effort extraction of {market, symbol, name_query} from user message.
+    C32.2.3: expanded A-share name mapping.
+    """
+    # Explicit code / name patterns (order: more specific first)
     if re.search(r"688146|中船特气", msg):
         return {"market": "CN", "symbol": "688146", "name": "中船特气", "query": "688146"}
-    if re.search(r"600519|茅台", msg):
+    if re.search(r"600519|贵州茅台|茅台", msg):
         return {"market": "CN", "symbol": "600519", "name": "贵州茅台", "query": "600519"}
+    if re.search(r"000858|五粮液", msg):
+        return {"market": "CN", "symbol": "000858", "name": "五粮液", "query": "000858"}
     if re.search(r"300750|宁德时代", msg):
         return {"market": "CN", "symbol": "300750", "name": "宁德时代", "query": "300750"}
     if re.search(r"601899|紫金矿业", msg):
         return {"market": "CN", "symbol": "601899", "name": "紫金矿业", "query": "601899"}
+    if re.search(r"301269|华大九天", msg):
+        return {"market": "CN", "symbol": "301269", "name": "华大九天", "query": "301269"}
+    if re.search(r"002594|比亚迪", msg):
+        return {"market": "CN", "symbol": "002594", "name": "比亚迪", "query": "002594"}
+    if re.search(r"601012|隆基绿能", msg):
+        return {"market": "CN", "symbol": "601012", "name": "隆基绿能", "query": "601012"}
+    if re.search(r"002475|立讯精密", msg):
+        return {"market": "CN", "symbol": "002475", "name": "立讯精密", "query": "002475"}
+    if re.search(r"688981|中芯国际|SMIC", msg, re.IGNORECASE):
+        return {"market": "CN", "symbol": "688981", "name": "中芯国际", "query": "688981"}
     # Generic CN code: 6-digit number
     m = re.search(r"\b(\d{6})\b", msg)
     if m:
@@ -580,24 +602,117 @@ async def _handle_watchlist_add(msg: str, db: AsyncSession, user_id: uuid.UUID) 
     )
 
 
-async def _handle_compare(msg: str, db: AsyncSession, user_id: uuid.UUID) -> OrchestratorResult:
-    """Compare intent: build stock list from message then confirm."""
-    stocks = [
-        {"name": "宁德时代", "market": "CN", "symbol": "300750"},
-        {"name": "紫金矿业", "market": "CN", "symbol": "601899"},
-        {"name": "华大九天", "market": "CN", "symbol": "301269"},
-    ]
-    if re.search(r"600519|茅台", msg):
-        stocks = [
-            {"name": "贵州茅台", "market": "CN", "symbol": "600519"},
-            {"name": "紫金矿业", "market": "CN", "symbol": "601899"},
-        ]
+def _extract_compare_candidates(msg: str, memory_context=None) -> list[str]:
+    """
+    Extract candidate stock names/codes from a compare query.
+    Returns up to 4 candidates (names or 5-6-digit codes).
+
+    C32.2.2/C32.2.3: handles:
+    - "那它和五粮液相比呢？" after coreference → "那贵州茅台（CN/600519）和五粮液相比呢？"
+    - "请对比五粮液和贵州茅台的股票" (with "的股票" suffix noise)
+    - Numeric code extraction
+
+    C32.3.1: When text has stock pronouns AND memory has active_entities, inject
+    the entity as a candidate even if coreference resolution didn't fire.
+    """
+    # Step 1: extract codes from coreference-injected parentheticals: "（CN/600519）"
+    paren_codes = re.findall(r'[（(](?:CN|HK)[:/](\d{4,6})[）)]', msg)
+    # Also extract bare 5-6-digit codes
+    bare_codes = re.findall(r'\b(\d{5,6})\b', msg)
+    all_codes = list(dict.fromkeys(paren_codes + bare_codes))  # dedup, preserve order
+    if len(all_codes) >= 2:
+        return all_codes[:4]
+
+    # Step 2: clean noise words (keep names, remove intent/trailing noise)
+    cleaned = re.sub(
+        r"对比|比较|帮我|请|还是|vs\.?\s*|versus\s*|相比|之间|进行|那|吗|呢|啊|啦"
+        r"|的\s*股票|的\s*研究",
+        " ", msg, flags=re.IGNORECASE,
+    )
+    # Remove coreference parentheticals like "（CN/600519）" — name already kept before them
+    cleaned = re.sub(r'[（(](?:CN|HK)[:/]\d{4,6}[）)]', ' ', cleaned)
+
+    # Step 3: split on all separators including "和"/"与" (treated as delimiters)
+    parts = re.split(r"[、，,和与\s]+", cleaned.strip())
+    result = list(dict.fromkeys(  # dedup while preserving order
+        p.strip() for p in parts if 2 <= len(p.strip()) <= 20
+    ))
+
+    # C32.3.1: Fallback — if still < 2 candidates AND the message contains a
+    # stock pronoun, inject the most recent active entity from memory.
+    # This handles cases where coreference resolution didn't fire (empty memory
+    # at build time) but the intent is clearly a compare with a prior stock.
+    if len(result) < 2 and memory_context is not None:
+        _STOCK_PRONOUNS = re.compile(
+            r"它(?:的|们)?|这只|这支|该股|这家公司|这家|这个股票"
+            r"|这只股|此股|那只|那支|该公司",
+            re.IGNORECASE,
+        )
+        if _STOCK_PRONOUNS.search(msg):
+            stocks = [
+                e for e in (getattr(memory_context, "active_entities", None) or [])
+                if getattr(e, "type", "") == "stock"
+            ]
+            for ent in stocks:
+                code = getattr(ent, "code", "")
+                name = getattr(ent, "name", "")
+                # Only inject if not already in result
+                if code and code not in result and name not in result:
+                    result.insert(0, code)
+                    break
+
+    return result[:4]
+
+
+async def _handle_compare(msg: str, db: AsyncSession, user_id: uuid.UUID, **kw) -> OrchestratorResult:
+    """
+    Compare intent: extract stocks dynamically from user message then confirm.
+    C32.1.4: replaced hardcoded stub with real ResolveStockTool resolution.
+    C32.3.1: accepts memory_context kwarg to enable entity fallback injection.
+    """
+    events: list = []
+    candidates = _extract_compare_candidates(msg, memory_context=kw.get("memory_context"))
+
+    if len(candidates) < 2:
+        return OrchestratorResult(
+            answer=(
+                "抱歉，我需要至少 2 只股票才能进行对比。"
+                "请提供股票名称或代码，例如：「对比贵州茅台和五粮液」。"
+                + _DISCLAIMER
+            ),
+            tool_events=events,
+        )
+
+    stocks: list = []
+    for cand in candidates[:4]:
+        resolve = await _registry.call("resolve_stock_tool", db, query=cand)
+        events.append(_result_tool_event(resolve))
+        if resolve.ok and resolve.data:
+            stocks.append({
+                "name":   resolve.data.get("name", cand),
+                "market": resolve.data.get("market", "CN"),
+                "symbol": resolve.data.get("symbol", ""),
+            })
+
+    if len(stocks) < 2:
+        return OrchestratorResult(
+            answer=(
+                f"我尝试识别了以下关键词：{'、'.join(candidates[:4])}，"
+                "但未能找到足够的股票信息。"
+                "请提供完整名称或6位股票代码，例如：「对比 600519 和 300750」。"
+                + _DISCLAIMER
+            ),
+            tool_events=events,
+        )
 
     compare_url = "/compare?stocks=" + ",".join(
-        f"{s['market']}:{s['symbol']}" for s in stocks
+        f"{s['market']}:{s['symbol']}" for s in stocks if s["symbol"]
     )
-    stock_desc = "、".join(f"{s['name']}（{s['symbol']}）" for s in stocks)
-    events = [_tool_event("create_compare_selection_tool", f"已准备 {len(stocks)} 只股票对比")]
+    stock_desc = "、".join(
+        (f"{s['name']}（{s['symbol']}）" if s["symbol"] else s["name"])
+        for s in stocks
+    )
+    events.append(_tool_event("create_compare_selection_tool", f"已准备 {len(stocks)} 只股票对比"))
 
     return OrchestratorResult(
         answer="",
@@ -804,14 +919,51 @@ async def process_message(
         await _emit("intent_detected", {"intent": "safety_blocked", "handler": "_handle_trading_request"})
         return await _handle_trading_request(msg, db, user_id)
 
+    # C31.3 — Emit problem_analysis thinking event BEFORE intent classification
+    # so the frontend can show the first step immediately while we compute.
+    # The content is a lightweight query analysis; full plan follows below.
+    await _emit("thinking_event", {
+        "phase":      "problem_analysis",
+        "title":      "问题分析",
+        "content":    f"正在理解用户问题：{content[:80].strip()}",
+        "status":     "running",
+        "agent":      "",
+        "importance": "high",
+    })
+
+    # C32.1: Build memory context (fire-and-forget on failure; returns empty ctx on error)
+    from app.services.conversation_memory_service import build_memory_context  # noqa: PLC0415
+    _memory_ctx = await build_memory_context(db, session_id, user_id, content)
+    # Use the coreference-resolved query for routing when available
+    _effective_content = _memory_ctx.resolved_query or content
+
     # 1.5. C30.2.3: IntentDecisionAgent — classify intent, emit telemetry, drive routing.
-    _intent_decision = classify_intent(content)
+    _intent_decision = classify_intent(_effective_content, memory_context=_memory_ctx)
     await _emit("intent_detected", {
         "intent":     _intent_decision.intent,
         "confidence": _intent_decision.confidence,
         "reason":     _intent_decision.reason,
         "handler":    "intent_decision_agent",
     })
+
+    # C31.3 — CentralPlanningAgent: generate entity-aware plan for all 9 phases.
+    # Pure computation (no LLM/DB). Used only for thinking_event emission.
+    _central_plan = _central_planner.create_plan(
+        _effective_content, _intent_decision, memory_context=_memory_ctx
+    )
+
+    # C31.3 — Emit problem_analysis (completed, entity-aware content)
+    await _emit("thinking_event", _central_plan.get_phase_event("problem_analysis"))
+
+    # C31.3 — Emit intent_decision
+    await _emit("thinking_event", _central_plan.get_phase_event("intent_decision"))
+
+    # C31.3 — Emit planning
+    await _emit("thinking_event", _central_plan.get_phase_event("planning"))
+
+    # C31.3 — Emit task_decomposition (only if agents are needed)
+    if _central_plan.tasks:
+        await _emit("thinking_event", _central_plan.get_phase_event("task_decomposition"))
 
     # C30.2.3: direct_answer → skip report-generation action intents.
     # "帮我分析茅台基本面" is a Q&A request, NOT a report-generation trigger.
@@ -822,13 +974,20 @@ async def process_message(
     _skip_report_actions = (_intent_decision.intent == "direct_answer")
 
     # 2. Action intents (write ops → confirmation)
+    # C32.2.2: check both original msg AND resolved _effective_content so that
+    # pronoun-resolved queries (e.g. "那贵州茅台和五粮液相比呢？") route correctly.
     for matcher, handler in _ACTION_INTENTS:
         if _skip_report_actions and handler.__name__ in _REPORT_ACTION_HANDLERS:
             continue
-        if matcher(msg):
+        if matcher(msg) or (msg != _effective_content.strip().lower() and matcher(_effective_content)):
             try:
                 await _emit("intent_detected", {"intent": "action", "handler": handler.__name__})
-                result = await handler(msg, db, user_id)
+                # C32.1.2: use resolved query so handlers receive de-pronominalized content.
+                # C32.3.1: compare handler also receives memory_context for entity fallback.
+                if handler.__name__ == "_handle_compare":
+                    result = await handler(_effective_content, db, user_id, memory_context=_memory_ctx)
+                else:
+                    result = await handler(_effective_content, db, user_id)
                 # C8: write memory (fire-and-forget)
                 await _write_memory_from_result(db, session_id, user_id, msg, result, output_language)
                 return result
@@ -897,12 +1056,15 @@ async def process_message(
             context = SkillContext(
                 db=db,
                 user_id=str(user_id),
+                session_id=str(session_id) if session_id else "",
                 output_language=output_language,
                 tool_registry=_registry,
                 event_callback=event_callback,
+                memory_context=_memory_ctx,  # C32.1.1
             )
             try:
-                exec_result = await _executor.execute(plan, msg, context)
+                # C32.1.2: use resolved query
+                exec_result = await _executor.execute(plan, _effective_content, context)
                 result = OrchestratorResult(
                     answer=exec_result.answer,
                     tool_events=exec_result.tool_events,
@@ -918,17 +1080,34 @@ async def process_message(
 
     # 4. SkillRegistry — Financial Research Skills (C6)
     await _emit("intent_detected", {"intent": "skill_registry"})
+
+    # C31.3 — Emit agent_dispatch before SkillRegistry executes
+    await _emit("thinking_event", _central_plan.get_agent_dispatch_event(status="running"))
+
     context = SkillContext(
         db=db,
         user_id=str(user_id),
+        session_id=str(session_id) if session_id else "",
         output_language=output_language,
         tool_registry=_registry,
         event_callback=event_callback,
+        memory_context=_memory_ctx,  # C32.1.1
     )
     await _emit("skill_started", {"source": "skill_registry"})
-    skill_result = await _skill_registry.run(msg, context)
+    # C32.1.2: use resolved query so skills receive de-pronominalized content
+    skill_result = await _skill_registry.run(_effective_content, context)
     if skill_result is not None:
         await _emit("skill_completed", {"skill_name": skill_result.skill_name})
+
+        # C31.3 — Emit agent_observation, deep_reasoning, risk_review, synthesis
+        await _emit("thinking_event", _central_plan.get_agent_observation_event(
+            agent   = skill_result.skill_name or "",
+            summary = f"已通过「{skill_result.skill_name or '智能技能'}」获取分析数据，正在综合评估。",
+        ))
+        await _emit("thinking_event", _central_plan.get_phase_event("deep_reasoning"))
+        await _emit("thinking_event", _central_plan.get_phase_event("risk_review"))
+        await _emit("thinking_event", _central_plan.get_phase_event("synthesis"))
+
         result = OrchestratorResult(
             answer=skill_result.answer,
             tool_events=skill_result.tool_events,
@@ -947,6 +1126,9 @@ async def process_message(
         return result
 
     # 5. C4 direct fallback intents
+    # C31.3 — Emit agent_dispatch (no heavy agents needed here)
+    await _emit("thinking_event", _central_plan.get_phase_event("agent_dispatch"))
+
     for matcher, handler in _DIRECT_INTENTS:
         if matcher(msg):
             try:
@@ -1027,6 +1209,17 @@ async def _write_memory_from_result(
                 db, session_id, user_id,
                 result.confirmation.get("id"),
             )
+
+        # C32.1: update extended memory (active_entities, trigger summarization)
+        try:
+            from app.services.conversation_memory_service import update_memory_after_message  # noqa: PLC0415
+            await update_memory_after_message(
+                db, session_id, user_id,
+                user_msg=msg,
+                assistant_answer=result.answer or "",
+            )
+        except Exception:
+            pass  # fire-and-forget
 
     except Exception:
         log.warning("Orchestrator: C8 memory write failed for session %s (non-fatal)", session_id)

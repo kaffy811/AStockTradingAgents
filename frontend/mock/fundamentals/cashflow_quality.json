@@ -1,0 +1,50 @@
+{
+  "market": "CN",
+  "symbol": "600519",
+  "ts_code": "600519.SH",
+  "module_key": "cashflow_quality",
+  "module_name": "现金流质量",
+  "group": "财务分析",
+  "group_seq": 2,
+  "data": {
+    "series": [
+      {"end_date": "20231231", "ocf": 76820000000.0, "net_profit": 74734000000.0, "cash_cover_ratio": 102.8, "free_cashflow": 74100000000.0},
+      {"end_date": "20221231", "ocf": 65320000000.0, "net_profit": 62716000000.0, "cash_cover_ratio": 104.1, "free_cashflow": 63200000000.0},
+      {"end_date": "20211231", "ocf": 58450000000.0, "net_profit": 52460000000.0, "cash_cover_ratio": 111.4, "free_cashflow": 56800000000.0},
+      {"end_date": "20201231", "ocf": 52100000000.0, "net_profit": 46700000000.0, "cash_cover_ratio": 111.6, "free_cashflow": 50600000000.0},
+      {"end_date": "20191231", "ocf": 48600000000.0, "net_profit": 40400000000.0, "cash_cover_ratio": 120.3, "free_cashflow": 47200000000.0},
+      {"end_date": "20181231", "ocf": 40200000000.0, "net_profit": 35200000000.0, "cash_cover_ratio": 114.2, "free_cashflow": 39100000000.0},
+      {"end_date": "20171231", "ocf": 31500000000.0, "net_profit": 26000000000.0, "cash_cover_ratio": 121.2, "free_cashflow": 30600000000.0},
+      {"end_date": "20161231", "ocf": 25800000000.0, "net_profit": 16700000000.0, "cash_cover_ratio": 154.5, "free_cashflow": 25100000000.0}
+    ],
+    "source": "tushare"
+  },
+  "errors": [],
+  "partial": false,
+  "stale": false,
+  "generated_at": "2026-07-05T10:23:45+08:00",
+  "source": {
+    "primary": "tushare",
+    "fallback": null,
+    "akshare_enabled": false,
+    "actual": "tushare"
+  },
+  "meta": {
+    "render_type": "chart_table",
+    "chart_type": "bar",
+    "unit_hints": {
+      "ocf": "元",
+      "net_profit": "元",
+      "free_cashflow": "元",
+      "cash_cover_ratio": "%"
+    },
+    "field_labels": {
+      "end_date": "报告期",
+      "ocf": "经营现金流",
+      "net_profit": "净利润",
+      "cash_cover_ratio": "现金含量",
+      "free_cashflow": "自由现金流"
+    },
+    "empty_state": "暂无数据"
+  }
+}

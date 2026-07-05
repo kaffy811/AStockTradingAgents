@@ -304,6 +304,29 @@ export default {
   chat_step_tool:         'Ejecución de herramientas',
   chat_step_conclude:     'Generando respuesta',
 
+  // ── C32.3 Conversation Markers ────────────────────────────────────────────
+  chat_markers_jump:      'Ir a esta pregunta',
+
+  // ── C32.4/C32.5 Session Search ────────────────────────────────────────────
+  chat_search_placeholder: 'Buscar conversaciones…',
+  chat_search_clear:       'Limpiar búsqueda',
+  chat_search_no_results:  'No se encontraron conversaciones.',
+  chat_search_loading:     'Buscando…',
+  chat_filter_title:       'Filtro de tiempo',
+  chat_filter_today:       'Hoy',
+  chat_filter_yesterday:   'Ayer',
+  chat_filter_7days:       'Últimos 7 días',
+  chat_filter_30days:      'Últimos 30 días',
+  chat_filter_month:       'Este mes',
+  chat_filter_clear:       'Limpiar filtro',
+
+  // ── Sidebar resize + calendar date picker ─────────────────────────────────
+  chat_calendar_btn:       'Filtrar por fecha',
+  chat_date_select_hint:   'Haz clic para seleccionar la fecha de inicio',
+  chat_date_start_label:   'Desde:',
+  chat_date_end_label:     'Hasta:',
+  chat_apply_filter:       'Aplicar filtro',
+
   // ── M36 report output language ────────────────────────────────────────────
   settings_rpt_lang:      'Idioma del Informe',
   settings_rpt_lang_hint: 'Idioma del texto del informe generado por IA (independiente del idioma de UI)',

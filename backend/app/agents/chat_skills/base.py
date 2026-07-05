@@ -28,6 +28,8 @@ class SkillContext:
     # Signature: async (event_type: str, payload: dict) -> None
     # Never raises — failures are silently ignored by the streaming layer.
     event_callback: Any = None
+    # C32.1.1: conversation memory context for multi-turn understanding
+    memory_context: Any = None  # MemoryContext | None
 
 
 @dataclass

@@ -459,6 +459,7 @@ export default {
   cmp_stat_report:   '有最近报告',
   cmp_stat_industry: '涉及行业',
   // StockCompareView
+  cmp_back_to_chat: '返回 AI 助手',
   cmp_clear_all: '清空全部',
   cmp_min_hint:  '请再添加至少 1 只股票以查看完整对比',
   cmp_empty:     '请在上方搜索并添加 2～4 只股票开始对比',
@@ -568,6 +569,29 @@ export default {
   chat_step_review:       '资料审查',
   chat_step_tool:         '工具调用',
   chat_step_conclude:     '结论生成',
+
+  // ── C32.3 Conversation Markers ────────────────────────────────────────────
+  chat_markers_jump:      '跳转到此问题',
+
+  // ── C32.4/C32.5 Session Search ────────────────────────────────────────────
+  chat_search_placeholder: '搜索历史对话…',
+  chat_search_clear:       '清除搜索',
+  chat_search_no_results:  '没有找到相关对话。',
+  chat_search_loading:     '搜索中…',
+  chat_filter_title:       '时间筛选',
+  chat_filter_today:       '今天',
+  chat_filter_yesterday:   '昨天',
+  chat_filter_7days:       '近 7 天',
+  chat_filter_30days:      '近 30 天',
+  chat_filter_month:       '本月',
+  chat_filter_clear:       '清除筛选',
+
+  // ── Sidebar resize + calendar date picker ─────────────────────────────────
+  chat_calendar_btn:       '按日期筛选',
+  chat_date_select_hint:   '点击选择开始日期',
+  chat_date_start_label:   '开始：',
+  chat_date_end_label:     '结束：',
+  chat_apply_filter:       '应用筛选',
 
   // ── M36 report output language ────────────────────────────────────────────
   settings_rpt_lang:      '报告输出语言',

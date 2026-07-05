@@ -1,0 +1,55 @@
+{
+  "market": "CN",
+  "symbol": "600519",
+  "ts_code": "600519.SH",
+  "module_key": "major_holders",
+  "module_name": "大股东持股",
+  "group": "股东分红",
+  "group_seq": 5,
+  "data": {
+    "top10_float_holders": [
+      {"holder_name": "中国贵州茅台酒厂(集团)有限责任公司", "hold_amount": 678140000, "hold_ratio_pct": 54.0, "end_date": "20240331"},
+      {"holder_name": "香港中央结算有限公司", "hold_amount": 85600000, "hold_ratio_pct": 6.81, "end_date": "20240331"},
+      {"holder_name": "中国证券金融股份有限公司", "hold_amount": 32100000, "hold_ratio_pct": 2.56, "end_date": "20240331"},
+      {"holder_name": "贵州省国有资本运营有限责任公司", "hold_amount": 18800000, "hold_ratio_pct": 1.50, "end_date": "20240331"},
+      {"holder_name": "中央汇金资产管理有限责任公司", "hold_amount": 9600000, "hold_ratio_pct": 0.76, "end_date": "20240331"}
+    ],
+    "latest_period": "20240331",
+    "holder_num_series": [
+      {"end_date": "20240331", "holder_num": 158200, "holder_num_change": -3800},
+      {"end_date": "20231231", "holder_num": 162000, "holder_num_change": -4500},
+      {"end_date": "20230930", "holder_num": 166500, "holder_num_change": -2800},
+      {"end_date": "20230630", "holder_num": 169300, "holder_num_change": -1200},
+      {"end_date": "20230331", "holder_num": 170500, "holder_num_change": 800}
+    ],
+    "source": "tushare"
+  },
+  "errors": [],
+  "partial": false,
+  "stale": false,
+  "generated_at": "2026-07-05T10:23:45+08:00",
+  "source": {
+    "primary": "tushare",
+    "fallback": null,
+    "akshare_enabled": false,
+    "actual": "tushare"
+  },
+  "meta": {
+    "render_type": "table",
+    "chart_type": "bar",
+    "unit_hints": {
+      "hold_amount": "股",
+      "hold_ratio_pct": "%",
+      "holder_num": "户"
+    },
+    "field_labels": {
+      "holder_name": "股东名称",
+      "hold_amount": "持股数量",
+      "hold_ratio_pct": "持股比例",
+      "end_date": "披露日",
+      "holder_num": "股东户数",
+      "holder_num_change": "户数变化"
+    },
+    "empty_state": "暂无数据"
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "market": "CN",
+  "symbol": "600519",
+  "ts_code": "600519.SH",
+  "module_key": "solvency",
+  "module_name": "偿债能力",
+  "group": "资产负债",
+  "group_seq": 3,
+  "data": {
+    "series": [
+      {"end_date": "20231231", "debt_to_assets": 27.1, "current_ratio": 5.42, "quick_ratio": 4.89, "interest_coverage": null},
+      {"end_date": "20221231", "debt_to_assets": 26.8, "current_ratio": 5.18, "quick_ratio": 4.61, "interest_coverage": null},
+      {"end_date": "20211231", "debt_to_assets": 26.3, "current_ratio": 4.98, "quick_ratio": 4.43, "interest_coverage": null},
+      {"end_date": "20201231", "debt_to_assets": 25.9, "current_ratio": 4.75, "quick_ratio": 4.21, "interest_coverage": null},
+      {"end_date": "20191231", "debt_to_assets": 25.5, "current_ratio": 4.51, "quick_ratio": 3.98, "interest_coverage": null},
+      {"end_date": "20181231", "debt_to_assets": 25.1, "current_ratio": 4.28, "quick_ratio": 3.76, "interest_coverage": null},
+      {"end_date": "20171231", "debt_to_assets": 24.7, "current_ratio": 4.05, "quick_ratio": 3.55, "interest_coverage": null},
+      {"end_date": "20161231", "debt_to_assets": 24.2, "current_ratio": 3.82, "quick_ratio": 3.34, "interest_coverage": null}
+    ],
+    "source": "tushare"
+  },
+  "errors": [],
+  "partial": false,
+  "stale": false,
+  "generated_at": "2026-07-05T10:23:45+08:00",
+  "source": {
+    "primary": "tushare",
+    "fallback": null,
+    "akshare_enabled": false,
+    "actual": "tushare"
+  },
+  "meta": {
+    "render_type": "chart_table",
+    "chart_type": "line",
+    "unit_hints": {
+      "debt_to_assets": "%",
+      "current_ratio": "倍",
+      "quick_ratio": "倍",
+      "interest_coverage": "倍"
+    },
+    "field_labels": {
+      "end_date": "报告期",
+      "debt_to_assets": "资产负债率",
+      "current_ratio": "流动比率",
+      "quick_ratio": "速动比率",
+      "interest_coverage": "利息保障倍数"
+    },
+    "empty_state": "暂无数据"
+  }
+}

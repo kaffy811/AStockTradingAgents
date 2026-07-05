@@ -184,6 +184,34 @@ export function applyChatUiEvent(message, uiEvent) {
     }
 
     // ── Streaming content ──────────────────────────────────────────────────────
+
+    // C31.6: Phase-based thinking events — upsert into message.thinkingEvents[]
+    // Dedup key: phase + agent (same phase + same agent = update in-place)
+    case 'ui_thinking_event': {
+      if (!message.thinkingEvents) message.thinkingEvents = []
+      const newEv = {
+        phase:      uiEvent.phase      ?? '',
+        title:      uiEvent.title      ?? '',
+        content:    uiEvent.content    ?? '',
+        status:     uiEvent.status     ?? 'completed',
+        agent:      uiEvent.agent      ?? '',
+        importance: uiEvent.importance ?? 'medium',
+        timestamp:  uiEvent.timestamp  ?? Date.now(),
+      }
+      // Upsert: running → completed updates the same slot
+      const dedupKey = `${newEv.phase}::${newEv.agent}`
+      const existIdx = message.thinkingEvents.findIndex(
+        e => `${e.phase}::${e.agent}` === dedupKey
+      )
+      if (existIdx >= 0) {
+        // Always overwrite: completed supersedes running for same phase+agent
+        message.thinkingEvents[existIdx] = newEv
+      } else {
+        message.thinkingEvents.push(newEv)
+      }
+      break
+    }
+
     case 'ui_thinking_delta':
       message.thinkingContent = (message.thinkingContent ?? '') + (uiEvent.content ?? '')
       break
@@ -324,6 +352,14 @@ export function applyChatUiEvent(message, uiEvent) {
       const _now = Date.now()
       message.status      = 'done'
       message.isStreaming = false
+      // C30.5.1: clear transient error set by agent_error when the run actually completed.
+      // If the resultCard is an analysis_run with a non-failure status, the error popup is
+      // a false negative — the analysis is running or done, not broken.
+      if (message.error &&
+          message.resultCard?.type === 'analysis_run' &&
+          !['failed', 'cancelled'].includes(message.resultCard?.data?.status ?? '')) {
+        message.error = null
+      }
       // C25.11: also recover steps that were marked failed/error+中断 by a transient ui_error
       // (happens when agent_error fires mid-stream but agent_completed follows it).
       // reasoningSteps get status:'failed'; toolTrace gets status:'error' — cover both.

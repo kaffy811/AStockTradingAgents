@@ -1,0 +1,140 @@
+多轮对话
+本指南将介绍如何使用 DeepSeek /chat/completions API 进行多轮对话。
+
+DeepSeek /chat/completions API 是一个“无状态” API，即服务端不记录用户请求的上下文，用户在每次请求时，需将之前所有对话历史拼接好后，传递给对话 API。
+
+下面的代码以 Python 语言，展示了如何进行上下文拼接，以实现多轮对话。
+
+from openai import OpenAI
+client = OpenAI(api_key="<DeepSeek API Key>", base_url="https://api.deepseek.com")
+
+# Round 1
+messages = [{"role": "user", "content": "What's the highest mountain in the world?"}]
+response = client.chat.completions.create(
+    model="deepseek-v4-pro",
+    messages=messages
+)
+
+messages.append(response.choices[0].message)
+print(f"Messages Round 1: {messages}")
+
+# Round 2
+messages.append({"role": "user", "content": "What is the second?"})
+response = client.chat.completions.create(
+    model="deepseek-v4-pro",
+    messages=messages
+)
+
+messages.append(response.choices[0].message)
+print(f"Messages Round 2: {messages}")
+
+在第一轮请求时，传递给 API 的 messages 为：
+
+[
+    {"role": "user", "content": "What's the highest mountain in the world?"}
+]
+
+在第二轮请求时：
+
+要将第一轮中模型的输出添加到 messages 末尾
+将新的提问添加到 messages 末尾
+最终传递给 API 的 messages 为：
+
+[
+    {"role": "user", "content": "What's the highest mountain in the world?"},
+    {"role": "assistant", "content": "The highest mountain in the world is Mount Everest."},
+    {"role": "user", "content": "What is the second?"}
+]
+DeepSeek 的对话 API 是“无状态”的，这意味着**服务端不会自动记录你们的对话历史**。要实现带记忆的多轮对话，核心思路就是**由客户端（你们的代码）来负责记住所有的聊天记录**，并在每次发起新请求时，将完整的对话历史重新发送给 API。
+
+### 🧠 核心机制：客户端维护“消息列表”
+
+你需要在前端或后端维护一个“消息列表”（`messages` 数组），它就像AI的“记忆”。
+*   **初始**：列表里可以有一条系统指令（`system`）来设定AI的角色。
+*   **每一轮**：把你的问题（`user`）和AI的回答（`assistant`）都按顺序添加到这个列表里。
+*   **下一次请求**：把完整的列表作为 `messages` 参数，再次发送给 API。
+
+这就像一场对话的“剧本”，每次都要把“剧本”从头到尾给AI看一遍，它才能明白前因后果。
+
+### 📝 Python 代码示例
+
+下面是一个使用官方 `OpenAI` 库的完整示例，它完整演示了如何维护记忆：
+
+```python
+from openai import OpenAI
+
+# 1. 初始化客户端
+client = OpenAI(
+    api_key="<你的DeepSeek API Key>",  # 建议从环境变量读取
+    base_url="https://api.deepseek.com"
+)
+
+# 2. 初始化“记忆”——一个空的对话历史列表
+messages = []
+
+# 3. 模拟多轮对话
+def chat_with_deepseek(user_input):
+    global messages  # 在函数内使用全局的 messages 列表
+    
+    # 3a. 将用户的新问题添加到“记忆”中
+    messages.append({"role": "user", "content": user_input})
+    
+    # 3b. 将完整的“记忆”发送给 API
+    response = client.chat.completions.create(
+        model="deepseek-chat",  # 或 deepseek-v4-pro 等
+        messages=messages,
+    )
+    
+    # 3c. 获取 AI 的回答
+    assistant_message = response.choices[0].message
+    print(f"AI: {assistant_message.content}")
+    
+    # 3d. 关键一步：将 AI 的回答也添加到“记忆”中，准备下一轮
+    messages.append(assistant_message)
+
+# --- 开始对话 ---
+chat_with_deepseek("世界上最高的山是什么？")
+chat_with_deepseek("那第二高的呢？")  # AI 会结合历史，理解“第二高”是指山
+chat_with_deepseek("它有多高？")      # AI 会知道“它”指的是第二高的山
+```
+
+#### 工作流程详解
+
+1.  **第一轮**：发送 `[{"role": "user", "content": "世界上最高的山是什么？"}]`。
+2.  **API返回**：`{"role": "assistant", "content": "珠穆朗玛峰"}`，你将其存入`messages`。
+3.  **第二轮**：发送 `[用户问山, AI答珠峰, 用户问第二高]`。
+4.  **如此往复**，`messages`列表越来越长，AI的“记忆”也越来越完整。
+
+### 💡 进阶优化与最佳实践
+
+#### 1. 管理“记忆”长度：控制上下文窗口
+
+`messages` 列表不能无限增长。当对话过长，总字数超过模型的上下文长度（如 DeepSeek-V4 的 **100万 tokens**）时，请求会失败。
+
+*   **策略一：滑动窗口**：只保留最近 N 轮对话。例如，设置 `max_rounds = 10`，当历史超过10轮时，只取最后10轮发给 API。
+*   **策略二：总结压缩**：当对话过长时，先用一次API调用总结之前的对话，然后用总结替代原始冗长的历史。
+
+#### 2. 管理“记忆”范围：会话ID (Session ID)
+
+对于多用户、多场景的系统，你需要为每个独立的对话分配一个唯一的 `session_id`。在后端，可以用一个字典或 Redis 这样的缓存数据库来管理：
+
+```python
+conversations = {}  # 键是 session_id，值是 messages 列表
+
+def get_session(session_id):
+    if session_id not in conversations:
+        conversations[session_id] = []  # 初始化新会话的记忆
+    return conversations[session_id]
+```
+
+这样就能轻松支持成百上千个并发用户的独立对话。
+
+#### 3. 高级策略：分层存储
+
+对于追求极致性能的应用，可以借鉴“**短期记忆 + 长期记忆**”的分层策略：
+*   **短期记忆**：使用 Redis 等高速缓存，存储最近的 N 轮对话。
+*   **长期记忆**：使用向量数据库（如 Milvus），将重要的历史信息、用户偏好等编码存储，在需要时检索并注入到上下文中。
+
+### 💎 总结
+
+实现DeepSeek API的多轮对话记忆，关键在于**客户端主动管理和传递完整的对话历史**。通过维护 `messages` 列表并配合会话ID等管理策略，就能构建出功能强大的多轮对话应用。

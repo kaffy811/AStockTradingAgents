@@ -89,6 +89,30 @@ ETYPE_SYNTHESIS_START     = "synthesis_start"
 _TERMINAL_TYPES = {ETYPE_COMPLETED, ETYPE_ERROR}
 
 
+# ── Error sanitization ────────────────────────────────────────────────────────
+
+_DB_ERROR_PATTERNS = (
+    "PendingRollback", "InFailedSQLTransaction", "sqlalchemy",
+    "asyncpg", "psycopg", "connection", "IntegrityError",
+    "OperationalError", "DatabaseError",
+)
+
+def _sanitize_error_for_user(exc: BaseException) -> str:
+    """
+    C30.3.6: Return a user-safe error description.
+
+    Raw SQLAlchemy / DB error messages must never reach the user — they
+    may contain connection strings, table schemas, or SQL fragments.
+    Replace them with a generic, friendly message.
+    """
+    raw = str(exc)
+    if any(pat in raw for pat in _DB_ERROR_PATTERNS) or any(
+        pat in type(exc).__name__ for pat in _DB_ERROR_PATTERNS
+    ):
+        return "服务暂时不可用"
+    return raw[:200]  # cap length for non-DB errors
+
+
 # ── Fallback final answer ──────────────────────────────────────────────────────
 
 def build_fallback_final_answer(reason: str = "") -> dict:
@@ -196,26 +220,41 @@ async def stream_chat_message(
         # C25: track whether these critical events have been emitted
         final_answer_sent = [False]
         done_sent         = [False]
+        # Track the orchestration result so we can persist it even on error
+        _result_ref: list = [None]
+        # C32.1.4: True when result is confirmation-only (no answer expected).
+        # The finally/except blocks must NOT emit a fallback final_answer in
+        # this case — the confirmation card IS the result, not an error.
+        _has_confirmation_only = [False]
 
         try:
             # ── Phase 1: persist user message ─────────────────────────────────
             user_msg = await save_user_message(
                 db, session_id, user_id, content, output_language
             )
+            # C30.3.1: commit user message immediately so it is durable
+            # regardless of what happens in later phases, and so that the
+            # session starts Phase 1b and Phase 4 with zero pending state.
+            await db.commit()
             await queue.put(_make_sse(
                 ETYPE_USER_SAVED,
                 {"message_id": str(user_msg.id)},
             ))
 
             # ── Phase 1b: auto-update session title on first message ──────────
+            # C30.3.1: title update runs in its own mini-transaction.  If it
+            # fails we explicitly rollback so the session is clean before the
+            # orchestrator (Phase 4) starts — no PendingRollback can leak.
             try:
                 new_title = await maybe_update_session_title(db, session_id, content)
                 if new_title:
+                    await db.commit()  # C30.3.1: commit title in own mini-tx
                     await queue.put(_make_sse(
                         "session_title_updated",
                         {"session_id": str(session_id), "title": new_title},
                     ))
             except Exception:
+                await db.rollback()  # C30.3.1: clean up poisoned session
                 log.debug("chat_streaming: session title update failed (non-fatal)")
 
             # ── Phase 2: emit immediate phase events ──────────────────────────
@@ -261,7 +300,7 @@ async def stream_chat_message(
                     log.debug("stream emit failed for %s", event_type)
 
             # ── Phase 4: run orchestrator ─────────────────────────────────────
-            result = await process_message(
+            result = _result_ref[0] = await process_message(
                 content=content,
                 db=db,
                 user_id=user_id,
@@ -269,6 +308,11 @@ async def stream_chat_message(
                 session_id=session_id,
                 event_callback=_emit,
             )
+
+            # C32.1.4: flag confirmation-only results so finally doesn't send
+            # fallback final_answer (which would show "本次请求未能完成" to the user)
+            if result.confirmation is not None and not result.answer:
+                _has_confirmation_only[0] = True
 
             # ── Phase 5: stream tool events from result (fallback for non-real-time) ──
             for te in result.tool_events:
@@ -375,10 +419,13 @@ async def stream_chat_message(
             log.exception("chat_streaming: orchestration error")
             # C25: guarantee final_answer + done are emitted even on exception
             try:
-                if not final_answer_sent[0]:
+                # C32.1.4: skip fallback for confirmation-only flows
+                if not final_answer_sent[0] and not _has_confirmation_only[0]:
                     await queue.put(_make_sse(
                         ETYPE_FINAL_ANSWER,
-                        build_fallback_final_answer(str(exc)),
+                        build_fallback_final_answer(
+                            _sanitize_error_for_user(exc)  # C30.3.6: no raw DB errors
+                        ),
                         mid=assistant_placeholder_id,
                     ))
                     final_answer_sent[0] = True
@@ -401,10 +448,35 @@ async def stream_chat_message(
                     done_sent[0] = True
             except Exception:
                 pass
+            # C32-fix: persist assistant message even on error so it survives reload.
+            # Use the real answer if orchestration ran; otherwise save an error note.
+            try:
+                await db.rollback()  # clear any pending rollback from failed tx
+                _err_result = _result_ref[0]
+                _err_answer = (
+                    _err_result.answer
+                    if _err_result is not None and _err_result.answer
+                    else "请求处理遇到错误，无法生成完整分析。请稍后重试。"
+                )
+                await save_assistant_message(
+                    db=db,
+                    session_id=session_id,
+                    user_id=user_id,
+                    answer=_err_answer,
+                    tool_events=_err_result.tool_events if _err_result else [],
+                    cards=[],
+                    confirmation=None,
+                    output_language=output_language,
+                    extra_metadata={"streamed": True, "error": True},
+                )
+                await db.commit()
+            except Exception:
+                log.debug("chat_streaming: could not persist assistant message on error (non-fatal)")
         finally:
             # C25: last-resort guarantee — if anything above crashed silently
             try:
-                if not final_answer_sent[0]:
+                # C32.1.4: confirmation-only results don't need a final_answer
+                if not final_answer_sent[0] and not _has_confirmation_only[0]:
                     await queue.put(_make_sse(
                         ETYPE_FINAL_ANSWER,
                         build_fallback_final_answer(""),

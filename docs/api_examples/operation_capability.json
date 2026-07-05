@@ -1,0 +1,50 @@
+{
+  "market": "CN",
+  "symbol": "600519",
+  "ts_code": "600519.SH",
+  "module_key": "operation_capability",
+  "module_name": "营运能力",
+  "group": "资产负债",
+  "group_seq": 3,
+  "data": {
+    "series": [
+      {"end_date": "20231231", "asset_turnover": 0.52, "ar_turnover": 112.5, "inv_turnover": 2.3, "op_cycle": 158.7},
+      {"end_date": "20221231", "asset_turnover": 0.51, "ar_turnover": 108.2, "inv_turnover": 2.2, "op_cycle": 165.3},
+      {"end_date": "20211231", "asset_turnover": 0.50, "ar_turnover": 103.8, "inv_turnover": 2.1, "op_cycle": 172.1},
+      {"end_date": "20201231", "asset_turnover": 0.48, "ar_turnover": 98.5, "inv_turnover": 2.0, "op_cycle": 181.3},
+      {"end_date": "20191231", "asset_turnover": 0.47, "ar_turnover": 95.1, "inv_turnover": 1.9, "op_cycle": 189.5},
+      {"end_date": "20181231", "asset_turnover": 0.46, "ar_turnover": 91.7, "inv_turnover": 1.8, "op_cycle": 201.2},
+      {"end_date": "20171231", "asset_turnover": 0.45, "ar_turnover": 88.3, "inv_turnover": 1.7, "op_cycle": 213.8},
+      {"end_date": "20161231", "asset_turnover": 0.44, "ar_turnover": 84.9, "inv_turnover": 1.6, "op_cycle": 225.4}
+    ],
+    "source": "tushare"
+  },
+  "errors": [],
+  "partial": false,
+  "stale": false,
+  "generated_at": "2026-07-05T10:23:45+08:00",
+  "source": {
+    "primary": "tushare",
+    "fallback": null,
+    "akshare_enabled": false,
+    "actual": "tushare"
+  },
+  "meta": {
+    "render_type": "chart_table",
+    "chart_type": "line",
+    "unit_hints": {
+      "asset_turnover": "次/年",
+      "ar_turnover": "次/年",
+      "inv_turnover": "次/年",
+      "op_cycle": "天"
+    },
+    "field_labels": {
+      "end_date": "报告期",
+      "asset_turnover": "总资产周转率",
+      "ar_turnover": "应收账款周转率",
+      "inv_turnover": "存货周转率",
+      "op_cycle": "营业周期"
+    },
+    "empty_state": "暂无数据"
+  }
+}

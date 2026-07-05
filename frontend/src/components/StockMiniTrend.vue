@@ -1,5 +1,5 @@
 <template>
-  <div class="smt-wrap">
+  <div class="smt-wrap" ref="containerRef">
 
     <!-- Loading -->
     <div v-if="state === 'loading'" class="smt-skeleton"></div>
@@ -62,8 +62,8 @@ let   _mounted  = true
 let ro = null
 
 onMounted(() => {
-  // Use the parent wrapper to measure width
-  const el = document.querySelector('.smt-wrap')
+  // C30.5.3: use the component's own ref instead of a global querySelector (which picked up the wrong element when multiple sparklines existed on the same page)
+  const el = containerRef.value
   if (el && typeof ResizeObserver !== 'undefined') {
     ro = new ResizeObserver(entries => {
       const w = entries[0]?.contentRect?.width
@@ -95,7 +95,8 @@ async function loadKline() {
     })
     if (!_mounted) return
 
-    const items = data?.items ?? data?.kline ?? []
+    // C32.2.5: KlineResponse uses "data" field (not "items" or "kline")
+    const items = data?.data ?? data?.items ?? data?.kline ?? []
     const c = items
       .map(d => Number(d.close ?? d.c ?? d[4]))
       .filter(v => Number.isFinite(v))

@@ -1,0 +1,52 @@
+{
+  "market": "CN",
+  "symbol": "600519",
+  "ts_code": "600519.SH",
+  "module_key": "expense_analysis",
+  "module_name": "费用结构",
+  "group": "财务分析",
+  "group_seq": 2,
+  "data": {
+    "series": [
+      {"end_date": "20231231", "sell_exp_ratio": 2.1, "admin_exp_ratio": 1.8, "fin_exp_ratio": -0.5, "rd_exp_ratio": 0.0, "total_exp_ratio": 3.4},
+      {"end_date": "20221231", "sell_exp_ratio": 2.3, "admin_exp_ratio": 1.9, "fin_exp_ratio": -0.4, "rd_exp_ratio": 0.0, "total_exp_ratio": 3.8},
+      {"end_date": "20211231", "sell_exp_ratio": 2.4, "admin_exp_ratio": 2.0, "fin_exp_ratio": -0.3, "rd_exp_ratio": 0.0, "total_exp_ratio": 4.1},
+      {"end_date": "20201231", "sell_exp_ratio": 2.6, "admin_exp_ratio": 2.1, "fin_exp_ratio": -0.2, "rd_exp_ratio": 0.0, "total_exp_ratio": 4.5},
+      {"end_date": "20191231", "sell_exp_ratio": 2.8, "admin_exp_ratio": 2.3, "fin_exp_ratio": -0.2, "rd_exp_ratio": 0.0, "total_exp_ratio": 4.9},
+      {"end_date": "20181231", "sell_exp_ratio": 3.0, "admin_exp_ratio": 2.5, "fin_exp_ratio": -0.1, "rd_exp_ratio": 0.0, "total_exp_ratio": 5.4},
+      {"end_date": "20171231", "sell_exp_ratio": 3.2, "admin_exp_ratio": 2.6, "fin_exp_ratio": -0.1, "rd_exp_ratio": 0.0, "total_exp_ratio": 5.7},
+      {"end_date": "20161231", "sell_exp_ratio": 3.5, "admin_exp_ratio": 2.9, "fin_exp_ratio": 0.0, "rd_exp_ratio": 0.0, "total_exp_ratio": 6.4}
+    ],
+    "source": "tushare"
+  },
+  "errors": [],
+  "partial": false,
+  "stale": false,
+  "generated_at": "2026-07-05T10:23:45+08:00",
+  "source": {
+    "primary": "tushare",
+    "fallback": null,
+    "akshare_enabled": false,
+    "actual": "tushare"
+  },
+  "meta": {
+    "render_type": "chart_table",
+    "chart_type": "stacked_bar",
+    "unit_hints": {
+      "sell_exp_ratio": "%",
+      "admin_exp_ratio": "%",
+      "fin_exp_ratio": "%",
+      "rd_exp_ratio": "%",
+      "total_exp_ratio": "%"
+    },
+    "field_labels": {
+      "end_date": "报告期",
+      "sell_exp_ratio": "销售费用率",
+      "admin_exp_ratio": "管理费用率",
+      "fin_exp_ratio": "财务费用率",
+      "rd_exp_ratio": "研发费用率",
+      "total_exp_ratio": "合计费用率"
+    },
+    "empty_state": "暂无数据"
+  }
+}

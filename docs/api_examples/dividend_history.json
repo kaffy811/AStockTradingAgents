@@ -1,0 +1,58 @@
+{
+  "market": "CN",
+  "symbol": "600519",
+  "ts_code": "600519.SH",
+  "module_key": "dividend_history",
+  "module_name": "分红历史",
+  "group": "股东分红",
+  "group_seq": 5,
+  "data": {
+    "records": [
+      {"end_date": "20231231", "ex_date": "20240628", "pay_date": "20240629", "cash_div": 259.11, "cash_div_tax": 259.11, "stk_div": 0.0, "div_proc": "实施"},
+      {"end_date": "20221231", "ex_date": "20230630", "pay_date": "20230703", "cash_div": 216.78, "cash_div_tax": 216.78, "stk_div": 0.0, "div_proc": "实施"},
+      {"end_date": "20211231", "ex_date": "20220630", "pay_date": "20220701", "cash_div": 181.44, "cash_div_tax": 181.44, "stk_div": 0.0, "div_proc": "实施"},
+      {"end_date": "20201231", "ex_date": "20210630", "pay_date": "20210701", "cash_div": 164.02, "cash_div_tax": 164.02, "stk_div": 0.0, "div_proc": "实施"},
+      {"end_date": "20191231", "ex_date": "20200701", "pay_date": "20200702", "cash_div": 145.45, "cash_div_tax": 145.45, "stk_div": 0.0, "div_proc": "实施"},
+      {"end_date": "20181231", "ex_date": "20190702", "pay_date": "20190703", "cash_div": 110.94, "cash_div_tax": 110.94, "stk_div": 0.0, "div_proc": "实施"},
+      {"end_date": "20171231", "ex_date": "20180702", "pay_date": "20180703", "cash_div": 86.92, "cash_div_tax": 86.92, "stk_div": 0.0, "div_proc": "实施"},
+      {"end_date": "20161231", "ex_date": "20170630", "pay_date": "20170703", "cash_div": 61.71, "cash_div_tax": 61.71, "stk_div": 0.0, "div_proc": "实施"},
+      {"end_date": "20151231", "ex_date": "20160701", "pay_date": "20160704", "cash_div": 61.71, "cash_div_tax": 61.71, "stk_div": 0.0, "div_proc": "实施"},
+      {"end_date": "20141231", "ex_date": "20150701", "pay_date": "20150702", "cash_div": 61.71, "cash_div_tax": 61.71, "stk_div": 0.0, "div_proc": "实施"}
+    ],
+    "summary": {
+      "total_records": 10,
+      "avg_cash_div": 138.99,
+      "latest_div_yield_pct": 1.54
+    },
+    "source": "tushare"
+  },
+  "errors": [],
+  "partial": false,
+  "stale": false,
+  "generated_at": "2026-07-05T10:23:45+08:00",
+  "source": {
+    "primary": "tushare",
+    "fallback": null,
+    "akshare_enabled": false,
+    "actual": "tushare"
+  },
+  "meta": {
+    "render_type": "table",
+    "chart_type": "bar",
+    "unit_hints": {
+      "cash_div": "元/股",
+      "cash_div_tax": "元/股",
+      "stk_div": "股/股"
+    },
+    "field_labels": {
+      "end_date": "报告期",
+      "ex_date": "除权日",
+      "pay_date": "派息日",
+      "cash_div": "每股现金分红(税前)",
+      "cash_div_tax": "每股现金分红(税后)",
+      "stk_div": "每股送股",
+      "div_proc": "状态"
+    },
+    "empty_state": "暂无数据"
+  }
+}

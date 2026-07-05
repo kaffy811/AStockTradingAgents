@@ -1,0 +1,52 @@
+{
+  "market": "CN",
+  "symbol": "600519",
+  "ts_code": "600519.SH",
+  "module_key": "valuation",
+  "module_name": "估值分位",
+  "group": "财务分析",
+  "group_seq": 2,
+  "data": {
+    "series": [
+      {"trade_date": "20260705", "pe_ttm": 28.5, "pb": 9.2, "ps_ttm": 12.1, "pe_percentile": 32.4, "pb_percentile": 28.7},
+      {"trade_date": "20260601", "pe_ttm": 27.8, "pb": 8.9, "ps_ttm": 11.8, "pe_percentile": 30.1, "pb_percentile": 26.3},
+      {"trade_date": "20260501", "pe_ttm": 29.2, "pb": 9.5, "ps_ttm": 12.5, "pe_percentile": 35.2, "pb_percentile": 31.1},
+      {"trade_date": "20260401", "pe_ttm": 31.0, "pb": 10.1, "ps_ttm": 13.2, "pe_percentile": 42.5, "pb_percentile": 38.9},
+      {"trade_date": "20260301", "pe_ttm": 33.4, "pb": 10.8, "ps_ttm": 14.1, "pe_percentile": 51.3, "pb_percentile": 46.7},
+      {"trade_date": "20260201", "pe_ttm": 30.1, "pb": 9.7, "ps_ttm": 12.8, "pe_percentile": 37.8, "pb_percentile": 33.4},
+      {"trade_date": "20260101", "pe_ttm": 28.9, "pb": 9.3, "ps_ttm": 12.3, "pe_percentile": 33.6, "pb_percentile": 29.8},
+      {"trade_date": "20251201", "pe_ttm": 26.5, "pb": 8.5, "ps_ttm": 11.2, "pe_percentile": 25.4, "pb_percentile": 22.1}
+    ],
+    "source": "tushare"
+  },
+  "errors": [],
+  "partial": false,
+  "stale": false,
+  "generated_at": "2026-07-05T10:23:45+08:00",
+  "source": {
+    "primary": "tushare",
+    "fallback": null,
+    "akshare_enabled": false,
+    "actual": "tushare"
+  },
+  "meta": {
+    "render_type": "chart_table",
+    "chart_type": "line",
+    "unit_hints": {
+      "pe_ttm": "倍",
+      "pb": "倍",
+      "ps_ttm": "倍",
+      "pe_percentile": "%",
+      "pb_percentile": "%"
+    },
+    "field_labels": {
+      "trade_date": "交易日",
+      "pe_ttm": "PE(TTM)",
+      "pb": "PB",
+      "ps_ttm": "PS(TTM)",
+      "pe_percentile": "PE历史分位",
+      "pb_percentile": "PB历史分位"
+    },
+    "empty_state": "暂无数据"
+  }
+}

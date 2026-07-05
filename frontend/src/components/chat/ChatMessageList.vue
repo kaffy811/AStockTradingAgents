@@ -13,7 +13,8 @@
         v-for="msg in messages"
         :key="msg.id"
         class="msg-row"
-        :class="`msg-row--${msg.role}`"
+        :class="[`msg-row--${msg.role}`, { 'msg-row--highlighted': msg.id === highlightedId }]"
+        :data-message-id="msg.id"
       >
 
         <!-- ── User message ─────────────────────────────────────────────────── -->
@@ -52,10 +53,12 @@
                 v-if="SHOW_THINKING_MINI"
                 :isStreaming="msg.isStreaming ?? false"
                 :status="msg.status ?? (msg.isStreaming ? 'streaming' : 'done')"
+                :thinkingEvents="msg.thinkingEvents ?? []"
                 :thinkingItems="msg.thinkingItems ?? []"
                 :reasoningSteps="msg.reasoningSteps ?? []"
                 :toolTrace="msg.toolTrace ?? []"
                 :query="msg._query ?? ''"
+                :thinkingContent="msg.thinkingContent ?? ''"
               />
 
               <!-- C29.1.1: Full reasoning panel (debug mode only) -->
@@ -204,8 +207,10 @@ import {
 } from '../../config/chatUiFlags.js'
 
 const props = defineProps({
-  messages:  { type: Array,   default: () => [] },
-  isSending: { type: Boolean, default: false },
+  messages:     { type: Array,   default: () => [] },
+  isSending:    { type: Boolean, default: false },
+  // C32.3: id of the message currently being highlighted by ConversationMarkers
+  highlightedId: { type: String, default: null },
 })
 
 const emit = defineEmits(['confirm', 'cancel', 'action', 'edit-user', 'retry-ai'])
@@ -278,8 +283,15 @@ function scrollToBottom() {
   })
 }
 
-// C29.1.3: Expose scrollToBottom for parent use
-defineExpose({ scrollToBottom })
+// C29.1.3 + C32.3: Expose scrollToBottom and listRef for parent use.
+// C32.3-fix: expose the DOM element directly (via getter) instead of the raw Ref<HTMLElement>.
+// When defineExpose exposes a ref, the parent receives the Ref object — NOT the unwrapped
+// DOM element — so chatListRef?.listRef in the parent template would be a Ref, not an HTMLElement.
+// Using a getter ensures chatListRef.value.listRef returns the actual DOM node.
+defineExpose({
+  scrollToBottom,
+  get listRef() { return listRef.value },
+})
 
 // ── C29.6: Markdown renderer ────────────────────────────────────────────────
 function _inlineMd(text) {
@@ -452,6 +464,17 @@ function renderMarkdown(text) {
 }
 .msg-row--user      { align-items: flex-end; }
 .msg-row--assistant { align-items: flex-start; }
+
+/* C32.3: scroll-target highlight */
+@keyframes msg-highlight-pulse {
+  0%   { box-shadow: 0 0 0 3px var(--accent-glow); }
+  70%  { box-shadow: 0 0 0 6px transparent; }
+  100% { box-shadow: none; }
+}
+.msg-row--highlighted {
+  animation: msg-highlight-pulse 1.4s ease-out forwards;
+  border-radius: 8px;
+}
 
 /* ── User bubble ──────────────────────────────────────────────────────────── */
 .msg-bubble--user {

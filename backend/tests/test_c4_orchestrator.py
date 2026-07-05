@@ -176,9 +176,30 @@ async def test_industry_intent():
 
 @pytest.mark.asyncio
 async def test_compare_intent():
+    """
+    C32.1.4: _handle_compare now calls resolve_stock_tool for each candidate.
+    Mock the registry call so the test doesn't need real DB / stock data.
+    """
+    from app.agents import chat_orchestrator as _oc
+    from app.agents.chat_tools.base import ToolResult
+
+    def _mock_resolve(name: str) -> ToolResult:
+        # Return a successful resolve result for any name
+        symbol = "300750" if "宁德" in name else "601899"
+        return ToolResult(
+            ok=True, tool_name="resolve_stock_tool", summary=f"已解析 {name}",
+            data={"name": name, "market": "CN", "symbol": symbol},
+        )
+
+    async def _fake_registry_call(tool_name, db, **kwargs):
+        if tool_name == "resolve_stock_tool":
+            return _mock_resolve(kwargs.get("query", ""))
+        return ToolResult(ok=False, tool_name=tool_name, summary="not mocked")
+
     db = AsyncMock()
     uid = uuid.uuid4()
-    result = await process_message("对比宁德时代和紫金矿业", db, uid)
+    with patch.object(_oc._registry, "call", side_effect=_fake_registry_call):
+        result = await process_message("对比宁德时代和紫金矿业", db, uid)
     assert result.confirmation is not None
     assert result.confirmation["type"] == "create_compare"
 

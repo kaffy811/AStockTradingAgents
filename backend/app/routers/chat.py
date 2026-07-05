@@ -22,6 +22,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
 
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -40,6 +41,7 @@ from app.models.chat import (
     ChatSessionCreateResponse,
     ChatSessionDetailResponse,
     ChatSessionListResponse,
+    ChatSessionSearchResponse,
 )
 from app.models.user import User
 from app.services import chat_service
@@ -78,6 +80,47 @@ async def list_chat_sessions(
 ) -> ChatSessionListResponse:
     items, total = await chat_service.list_sessions(db, user.id, limit, offset)
     return ChatSessionListResponse(items=items, total=total)
+
+
+# ── GET /chat/sessions/search ─────────────────────────────────────────────────
+# NOTE: this route MUST be declared before /{session_id} so FastAPI doesn't
+# treat "search" as a session UUID.
+
+@router.get(
+    "/sessions/search",
+    response_model=ChatSessionSearchResponse,
+    summary="C32.4: 搜索 Chat Sessions（关键词 + 时间筛选）",
+)
+async def search_chat_sessions(
+    q:           str | None       = Query(default=None, max_length=200, description="关键词"),
+    date_ranges: list[str] | None = Query(default=None, description="today/yesterday/7days/30days/month"),
+    start_date:  datetime | None  = Query(default=None, description="自定义起始时间 (ISO)"),
+    end_date:    datetime | None  = Query(default=None, description="自定义结束时间 (ISO)"),
+    limit:  int = Query(default=20, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
+    user: User         = Depends(get_current_user),
+    db:   AsyncSession = Depends(get_db),
+) -> ChatSessionSearchResponse:
+    # Validate date_ranges values
+    _VALID_RANGES = {"today", "yesterday", "7days", "30days", "month"}
+    if date_ranges:
+        invalid = [r for r in date_ranges if r not in _VALID_RANGES]
+        if invalid:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"无效的 date_ranges 值：{invalid}。支持：{sorted(_VALID_RANGES)}",
+            )
+    items, total = await chat_service.search_sessions(
+        db,
+        user.id,
+        q           = q,
+        date_from   = start_date,
+        date_to     = end_date,
+        date_ranges = date_ranges,
+        limit       = limit,
+        offset      = offset,
+    )
+    return ChatSessionSearchResponse(items=items, total=total)
 
 
 # ── GET /chat/sessions/{session_id} ───────────────────────────────────────────

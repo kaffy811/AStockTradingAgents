@@ -304,6 +304,29 @@ export default {
   chat_step_tool:         'ツール実行',
   chat_step_conclude:     '回答生成',
 
+  // ── C32.3 Conversation Markers ────────────────────────────────────────────
+  chat_markers_jump:      'この質問に移動',
+
+  // ── C32.4/C32.5 Session Search ────────────────────────────────────────────
+  chat_search_placeholder: '会話を検索…',
+  chat_search_clear:       '検索をクリア',
+  chat_search_no_results:  '関連する会話が見つかりませんでした。',
+  chat_search_loading:     '検索中…',
+  chat_filter_title:       '時間フィルター',
+  chat_filter_today:       '今日',
+  chat_filter_yesterday:   '昨日',
+  chat_filter_7days:       '過去7日間',
+  chat_filter_30days:      '過去30日間',
+  chat_filter_month:       '今月',
+  chat_filter_clear:       'フィルターをクリア',
+
+  // ── Sidebar resize + calendar date picker ─────────────────────────────────
+  chat_calendar_btn:       '日付でフィルター',
+  chat_date_select_hint:   '開始日をクリックして選択',
+  chat_date_start_label:   '開始：',
+  chat_date_end_label:     '終了：',
+  chat_apply_filter:       'フィルターを適用',
+
   // ── M36 report output language ────────────────────────────────────────────
   settings_rpt_lang:      'レポート出力言語',
   settings_rpt_lang_hint: 'AI生成レポートの本文言語（UI言語とは独立）',

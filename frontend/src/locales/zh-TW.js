@@ -374,6 +374,29 @@ export default {
   chat_step_tool:         '工具調用',
   chat_step_conclude:     '結論生成',
 
+  // ── C32.3 Conversation Markers ────────────────────────────────────────────
+  chat_markers_jump:      '跳轉至此問題',
+
+  // ── C32.4/C32.5 Session Search ────────────────────────────────────────────
+  chat_search_placeholder: '搜尋歷史對話…',
+  chat_search_clear:       '清除搜尋',
+  chat_search_no_results:  '找不到相關對話。',
+  chat_search_loading:     '搜尋中…',
+  chat_filter_title:       '時間篩選',
+  chat_filter_today:       '今天',
+  chat_filter_yesterday:   '昨天',
+  chat_filter_7days:       '近 7 天',
+  chat_filter_30days:      '近 30 天',
+  chat_filter_month:       '本月',
+  chat_filter_clear:       '清除篩選',
+
+  // ── Sidebar resize + calendar date picker ─────────────────────────────────
+  chat_calendar_btn:       '按日期篩選',
+  chat_date_select_hint:   '點擊選擇開始日期',
+  chat_date_start_label:   '開始：',
+  chat_date_end_label:     '結束：',
+  chat_apply_filter:       '套用篩選',
+
   // ── M36 report output language ────────────────────────────────────────────
   settings_rpt_lang:      '報告輸出語言',
   settings_rpt_lang_hint: 'AI 生成報告的正文語言（獨立於界面語言）',

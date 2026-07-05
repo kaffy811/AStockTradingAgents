@@ -1,0 +1,52 @@
+{
+  "market": "CN",
+  "symbol": "600519",
+  "ts_code": "600519.SH",
+  "module_key": "capital_occupation",
+  "module_name": "资金占用",
+  "group": "资产负债",
+  "group_seq": 3,
+  "data": {
+    "series": [
+      {"end_date": "20231231", "accounts_receivable": 980000000.0, "prepayments": 650000000.0, "accounts_payable": 2150000000.0, "advance_receipts": 18500000000.0, "net_capital_occupied": -19020000000.0},
+      {"end_date": "20221231", "accounts_receivable": 870000000.0, "prepayments": 580000000.0, "accounts_payable": 1980000000.0, "advance_receipts": 16800000000.0, "net_capital_occupied": -17330000000.0},
+      {"end_date": "20211231", "accounts_receivable": 760000000.0, "prepayments": 510000000.0, "accounts_payable": 1750000000.0, "advance_receipts": 15200000000.0, "net_capital_occupied": -15680000000.0},
+      {"end_date": "20201231", "accounts_receivable": 650000000.0, "prepayments": 440000000.0, "accounts_payable": 1520000000.0, "advance_receipts": 13600000000.0, "net_capital_occupied": -14030000000.0},
+      {"end_date": "20191231", "accounts_receivable": 540000000.0, "prepayments": 370000000.0, "accounts_payable": 1290000000.0, "advance_receipts": 12000000000.0, "net_capital_occupied": -12380000000.0},
+      {"end_date": "20181231", "accounts_receivable": 430000000.0, "prepayments": 300000000.0, "accounts_payable": 1060000000.0, "advance_receipts": 10400000000.0, "net_capital_occupied": -10730000000.0},
+      {"end_date": "20171231", "accounts_receivable": 320000000.0, "prepayments": 230000000.0, "accounts_payable": 830000000.0, "advance_receipts": 8800000000.0, "net_capital_occupied": -9080000000.0},
+      {"end_date": "20161231", "accounts_receivable": 210000000.0, "prepayments": 160000000.0, "accounts_payable": 600000000.0, "advance_receipts": 7200000000.0, "net_capital_occupied": -7430000000.0}
+    ],
+    "source": "tushare"
+  },
+  "errors": [],
+  "partial": false,
+  "stale": false,
+  "generated_at": "2026-07-05T10:23:45+08:00",
+  "source": {
+    "primary": "tushare",
+    "fallback": null,
+    "akshare_enabled": false,
+    "actual": "tushare"
+  },
+  "meta": {
+    "render_type": "chart_table",
+    "chart_type": "bar",
+    "unit_hints": {
+      "accounts_receivable": "元",
+      "prepayments": "元",
+      "accounts_payable": "元",
+      "advance_receipts": "元",
+      "net_capital_occupied": "元"
+    },
+    "field_labels": {
+      "end_date": "报告期",
+      "accounts_receivable": "应收账款",
+      "prepayments": "预付款项",
+      "accounts_payable": "应付账款",
+      "advance_receipts": "预收款项",
+      "net_capital_occupied": "净资金占用"
+    },
+    "empty_state": "暂无数据"
+  }
+}

@@ -448,6 +448,7 @@ export default {
   cmp_stat_quote:    'Quotes Available',
   cmp_stat_report:   'Has Report',
   cmp_stat_industry: 'Sectors',
+  cmp_back_to_chat: 'Back to AI Assistant',
   cmp_clear_all: 'Clear All',
   cmp_min_hint:  'Add at least 1 more stock to see a full comparison',
   cmp_empty:     'Search and add 2–4 stocks above to start comparing',
@@ -555,6 +556,29 @@ export default {
   chat_step_review:       'Source review',
   chat_step_tool:         'Tool execution',
   chat_step_conclude:     'Generating answer',
+
+  // ── C32.3 Conversation Markers ────────────────────────────────────────────
+  chat_markers_jump:      'Jump to this question',
+
+  // ── C32.4/C32.5 Session Search ────────────────────────────────────────────
+  chat_search_placeholder: 'Search conversations…',
+  chat_search_clear:       'Clear search',
+  chat_search_no_results:  'No conversations found.',
+  chat_search_loading:     'Searching…',
+  chat_filter_title:       'Time filter',
+  chat_filter_today:       'Today',
+  chat_filter_yesterday:   'Yesterday',
+  chat_filter_7days:       'Last 7 days',
+  chat_filter_30days:      'Last 30 days',
+  chat_filter_month:       'This month',
+  chat_filter_clear:       'Clear filter',
+
+  // ── Sidebar resize + calendar date picker ─────────────────────────────────
+  chat_calendar_btn:       'Filter by date',
+  chat_date_select_hint:   'Click to select start date',
+  chat_date_start_label:   'From:',
+  chat_date_end_label:     'To:',
+  chat_apply_filter:       'Apply filter',
 
   // ── M36 report output language ────────────────────────────────────────────
   settings_rpt_lang:      'Report Language',

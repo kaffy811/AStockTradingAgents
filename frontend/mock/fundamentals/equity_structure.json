@@ -1,0 +1,53 @@
+{
+  "market": "CN",
+  "symbol": "600519",
+  "ts_code": "600519.SH",
+  "module_key": "equity_structure",
+  "module_name": "股权结构",
+  "group": "股东分红",
+  "group_seq": 5,
+  "data": {
+    "trade_date": "20260705",
+    "total_share_wan": 125618.8,
+    "float_share_wan": 125618.8,
+    "free_share_wan": 57784.6,
+    "total_mv_wan": 21204072.0,
+    "circ_mv_wan": 21204072.0,
+    "float_ratio_pct": 100.0,
+    "free_ratio_pct": 46.0,
+    "source": "tushare"
+  },
+  "errors": [],
+  "partial": false,
+  "stale": false,
+  "generated_at": "2026-07-05T10:23:45+08:00",
+  "source": {
+    "primary": "tushare",
+    "fallback": null,
+    "akshare_enabled": false,
+    "actual": "tushare"
+  },
+  "meta": {
+    "render_type": "metric_cards",
+    "chart_type": "donut",
+    "unit_hints": {
+      "total_share_wan": "万股",
+      "float_share_wan": "万股",
+      "free_share_wan": "万股",
+      "total_mv_wan": "万元",
+      "circ_mv_wan": "万元",
+      "float_ratio_pct": "%",
+      "free_ratio_pct": "%"
+    },
+    "field_labels": {
+      "total_share_wan": "总股本",
+      "float_share_wan": "流通股本",
+      "free_share_wan": "自由流通股",
+      "total_mv_wan": "总市值",
+      "circ_mv_wan": "流通市值",
+      "float_ratio_pct": "流通比例",
+      "free_ratio_pct": "自由流通比例"
+    },
+    "empty_state": "暂无数据"
+  }
+}

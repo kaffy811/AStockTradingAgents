@@ -69,7 +69,13 @@
       </div>
       <p class="rc-disclaimer-mini">研究维度对比，不代表投资价值判断。</p>
       <div class="rc-actions">
-        <RouterLink v-for="link in card.data.links" :key="link.label" :to="link.path" class="rc-btn rc-btn--primary">
+        <!-- C30.3.4: append from=chat so compare page can show back button -->
+        <RouterLink
+          v-for="link in card.data.links"
+          :key="link.label"
+          :to="link.path + (link.path.includes('?') ? '&from=chat' : '?from=chat')"
+          class="rc-btn rc-btn--primary"
+        >
           {{ link.label }}
         </RouterLink>
       </div>

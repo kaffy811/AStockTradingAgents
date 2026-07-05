@@ -1,0 +1,54 @@
+{
+  "market": "CN",
+  "symbol": "600519",
+  "ts_code": "600519.SH",
+  "module_key": "asset_structure",
+  "module_name": "资产结构",
+  "group": "资产负债",
+  "group_seq": 3,
+  "data": {
+    "series": [
+      {"end_date": "20231231", "total_assets": 289600000000.0, "current_assets": 254300000000.0, "non_current_assets": 35300000000.0, "current_asset_ratio_pct": 87.8, "goodwill": 0.0, "intangible_assets": 1250000000.0},
+      {"end_date": "20221231", "total_assets": 254200000000.0, "current_assets": 221800000000.0, "non_current_assets": 32400000000.0, "current_asset_ratio_pct": 87.3, "goodwill": 0.0, "intangible_assets": 1180000000.0},
+      {"end_date": "20211231", "total_assets": 215900000000.0, "current_assets": 186500000000.0, "non_current_assets": 29400000000.0, "current_asset_ratio_pct": 86.4, "goodwill": 0.0, "intangible_assets": 1100000000.0},
+      {"end_date": "20201231", "total_assets": 186500000000.0, "current_assets": 159100000000.0, "non_current_assets": 27400000000.0, "current_asset_ratio_pct": 85.3, "goodwill": 0.0, "intangible_assets": 1020000000.0},
+      {"end_date": "20191231", "total_assets": 163300000000.0, "current_assets": 137600000000.0, "non_current_assets": 25700000000.0, "current_asset_ratio_pct": 84.3, "goodwill": 0.0, "intangible_assets": 950000000.0},
+      {"end_date": "20181231", "total_assets": 140800000000.0, "current_assets": 116100000000.0, "non_current_assets": 24700000000.0, "current_asset_ratio_pct": 82.5, "goodwill": 0.0, "intangible_assets": 900000000.0},
+      {"end_date": "20171231", "total_assets": 118600000000.0, "current_assets": 95500000000.0, "non_current_assets": 23100000000.0, "current_asset_ratio_pct": 80.5, "goodwill": 0.0, "intangible_assets": 860000000.0},
+      {"end_date": "20161231", "total_assets": 97500000000.0, "current_assets": 75300000000.0, "non_current_assets": 22200000000.0, "current_asset_ratio_pct": 77.2, "goodwill": 0.0, "intangible_assets": 820000000.0}
+    ],
+    "source": "tushare"
+  },
+  "errors": [],
+  "partial": false,
+  "stale": false,
+  "generated_at": "2026-07-05T10:23:45+08:00",
+  "source": {
+    "primary": "tushare",
+    "fallback": null,
+    "akshare_enabled": false,
+    "actual": "tushare"
+  },
+  "meta": {
+    "render_type": "chart_table",
+    "chart_type": "stacked_bar",
+    "unit_hints": {
+      "total_assets": "元",
+      "current_assets": "元",
+      "non_current_assets": "元",
+      "current_asset_ratio_pct": "%",
+      "goodwill": "元",
+      "intangible_assets": "元"
+    },
+    "field_labels": {
+      "end_date": "报告期",
+      "total_assets": "总资产",
+      "current_assets": "流动资产",
+      "non_current_assets": "非流动资产",
+      "current_asset_ratio_pct": "流动资产比例",
+      "goodwill": "商誉",
+      "intangible_assets": "无形资产"
+    },
+    "empty_state": "暂无数据"
+  }
+}

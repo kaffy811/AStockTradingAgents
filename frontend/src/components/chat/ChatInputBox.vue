@@ -7,8 +7,10 @@
       :placeholder="t('chat_input_placeholder')"
       :disabled="isSending"
       rows="1"
-      @keydown.enter.exact.prevent="onEnter"
+      @keydown.enter.exact="onEnter"
       @keydown.enter.shift.exact="onShiftEnter"
+      @compositionstart="onCompositionStart"
+      @compositionend="onCompositionEnd"
       @input="autoResize"
     ></textarea>
     <button
@@ -25,6 +27,11 @@
 
 <script setup>
 import { ref, computed, nextTick } from 'vue'
+
+// C30.5.4: track IME composition state to prevent Enter from sending during input
+const isComposing = ref(false)
+function onCompositionStart() { isComposing.value = true }
+function onCompositionEnd()   { isComposing.value = false }
 import { useI18n } from '../../utils/i18n.js'
 
 const props = defineProps({
@@ -45,7 +52,10 @@ const inputVal = computed({
 
 const canSend = computed(() => inputVal.value.trim().length > 0 && !props.isSending)
 
-function onEnter() {
+function onEnter(event) {
+  // C30.5.4: block send during IME composition (Chinese / Japanese / Korean input)
+  if (isComposing.value || event?.isComposing) return
+  event?.preventDefault()
   if (canSend.value) onSend()
 }
 

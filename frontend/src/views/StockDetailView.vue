@@ -46,16 +46,26 @@
         />
       </section>
 
-      <!-- ── 3. 技术面解读 ─────────────────────────────────────────────────── -->
-      <section id="section-insight" class="card">
+      <!-- ── Tab navigation ─────────────────────────────────────────────────── -->
+      <div class="detail-tabs">
+        <button
+          v-for="tab in detailTabs"
+          :key="tab.key"
+          :class="['detail-tab-btn', activeDetailTab === tab.key && 'active']"
+          @click="onTabClick(tab.key)"
+        >{{ tab.label }}</button>
+      </div>
+
+      <!-- Tab: 技术面解读 -->
+      <section v-show="activeDetailTab === 'insight'" id="section-insight" class="card">
         <TechnicalInsightCard
           :insight="technicalInsight"
           :loading="technicalInsightLoading"
         />
       </section>
 
-      <!-- ── 4. 相关新闻区 ──────────────────────────────────────────────────── -->
-      <section id="section-news" class="card">
+      <!-- Tab: 相关新闻 -->
+      <section v-show="activeDetailTab === 'news'" id="section-news" class="card">
         <NewsTimelinePanel
           :news-items="newsItems"
           :loading="newsLoading"
@@ -65,64 +75,8 @@
         />
       </section>
 
-      <!-- ── 5. 本 APP 研究结论区 ──────────────────────────────────────────── -->
-      <section id="section-research" class="card">
-        <StockDetailResearchPanel
-          :market="market"
-          :symbol="symbol"
-          :stock-name="stockName"
-          :latest-report="latestReport"
-          :latest-full-report="latestFullReport"
-          :full-report-loading="fullReportLoading"
-          :summary-excerpt="reportExcerpt"
-          :loading="reportsLoading"
-        />
-      </section>
-
-      <!-- ── 6. 历史报告栏 ──────────────────────────────────────────────────── -->
-      <section id="section-history" class="card">
-        <div class="card-title">历史报告</div>
-
-        <div v-if="reportsLoading" class="state-row">
-          <span class="spinner"></span>
-          <span class="state-text">加载历史报告…</span>
-        </div>
-        <EmptyState
-          v-else-if="reports.length === 0"
-          icon="📋"
-          title="暂无该股票的分析报告"
-          message="暂无该股票的分析报告，可前往综合分析页生成。"
-          action-text="前往综合分析页"
-          :compact="true"
-          @action="goAnalyze"
-        />
-        <div v-else class="report-list">
-          <div
-            v-for="rep in reports"
-            :key="rep.id"
-            class="report-row"
-            @click="goReport(rep.id)"
-          >
-            <div class="report-row-left">
-              <span :class="['report-type-badge', rep.analysis_scope !== 'comprehensive' && rep.analysis_scope ? 'badge-partial' : '']">
-                {{ scopeLabel(rep.analysis_scope) }}
-              </span>
-              <span v-if="rep.auto_saved" class="auto-saved-mini">自动保存</span>
-              <span class="report-name">{{ rep.stock_name || rep.symbol }}</span>
-              <span class="report-date">{{ formatTime(rep.created_at) }}</span>
-            </div>
-            <span class="report-arrow">›</span>
-          </div>
-        </div>
-        <div v-if="!reportsLoading && reports.length >= 5" class="report-more">
-          <button class="btn btn-secondary btn-sm" @click="goHistory">
-            查看全部历史报告
-          </button>
-        </div>
-      </section>
-
-      <!-- ── 7. 同行业热门股票栏 ────────────────────────────────────────────── -->
-      <section id="section-peers" class="card">
+      <!-- Tab: 同行业对比 -->
+      <section v-show="activeDetailTab === 'peers'" id="section-peers" class="card">
         <div class="card-title">同行业热门股票</div>
 
         <div v-if="hotLoading" class="state-row">
@@ -180,6 +134,79 @@
           </div>
         </div>
       </section>
+
+      <!-- Tab: 公司 -->
+      <section v-show="activeDetailTab === 'company'" class="card company-tab-card">
+        <CompanyFundamentalsPanel
+          v-if="companyTabVisited && market && symbol"
+          :market="market"
+          :symbol="symbol"
+          :stock-name="stockName"
+        />
+        <div v-else class="cfp-placeholder">
+          <span class="muted-text">点击"公司"Tab 加载财务数据</span>
+        </div>
+      </section>
+
+      <!-- Tab: 历史报告 -->
+      <section v-show="activeDetailTab === 'history'" class="card">
+        <!-- ── 本 APP 研究结论区 ── -->
+        <StockDetailResearchPanel
+          :market="market"
+          :symbol="symbol"
+          :stock-name="stockName"
+          :latest-report="latestReport"
+          :latest-full-report="latestFullReport"
+          :full-report-loading="fullReportLoading"
+          :summary-excerpt="reportExcerpt"
+          :loading="reportsLoading"
+        />
+
+        <!-- ── 历史报告栏 ── -->
+        <div id="section-history" style="margin-top: 16px;">
+          <div class="card-title">历史报告</div>
+
+          <div v-if="reportsLoading" class="state-row">
+            <span class="spinner"></span>
+            <span class="state-text">加载历史报告…</span>
+          </div>
+          <EmptyState
+            v-else-if="reports.length === 0"
+            icon="📋"
+            title="暂无该股票的分析报告"
+            message="暂无该股票的分析报告，可前往综合分析页生成。"
+            action-text="前往综合分析页"
+            :compact="true"
+            @action="goAnalyze"
+          />
+          <div v-else class="report-list">
+            <div
+              v-for="rep in reports"
+              :key="rep.id"
+              class="report-row"
+              @click="goReport(rep.id)"
+            >
+              <div class="report-row-left">
+                <span :class="['report-type-badge', rep.analysis_scope !== 'comprehensive' && rep.analysis_scope ? 'badge-partial' : '']">
+                  {{ scopeLabel(rep.analysis_scope) }}
+                </span>
+                <span v-if="rep.auto_saved" class="auto-saved-mini">自动保存</span>
+                <span class="report-name">{{ rep.stock_name || rep.symbol }}</span>
+                <span class="report-date">{{ formatTime(rep.created_at) }}</span>
+              </div>
+              <span class="report-arrow">›</span>
+            </div>
+          </div>
+          <div v-if="!reportsLoading && reports.length >= 5" class="report-more">
+            <button class="btn btn-secondary btn-sm" @click="goHistory">
+              查看全部历史报告
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Keep id="section-research" accessible for scrollToSection -->
+      <div id="section-research" style="display:none;"></div>
     </div>
   </div>
 </template>
@@ -206,6 +233,7 @@ import NewsTimelinePanel        from '../components/NewsTimelinePanel.vue'
 import DataQualitySummary       from '../components/DataQualitySummary.vue'
 import EmptyState               from '../components/EmptyState.vue'
 import StockDetailResearchPanel from '../components/StockDetailResearchPanel.vue'
+import CompanyFundamentalsPanel from '../components/CompanyFundamentalsPanel.vue'
 import { buildTechnicalInsightSummary } from '../utils/technicalInsights.js'
 
 const route  = useRoute()
@@ -252,6 +280,23 @@ const technicalInsightLoading = ref(false)
 // ── Watchlist ─────────────────────────────────────────────────────────────────
 const watchlistItemId = ref(null)   // null = not in list, string = item id
 const watchlistLoading = ref(false)
+
+// ── Detail tab navigation ─────────────────────────────────────────────────────
+const activeDetailTab = ref('insight')
+const companyTabVisited = ref(false)
+
+const detailTabs = [
+  { key: 'insight', label: '技术面解读' },
+  { key: 'news',    label: '相关新闻' },
+  { key: 'peers',   label: '同行业对比' },
+  { key: 'company', label: '公司' },
+  { key: 'history', label: '历史报告' },
+]
+
+function onTabClick(key) {
+  activeDetailTab.value = key
+  if (key === 'company') companyTabVisited.value = true
+}
 
 // ── Compare ───────────────────────────────────────────────────────────────────
 // '' | 'in_list' | 'added' | 'full'
@@ -614,7 +659,10 @@ function onInsightData(payload) {
 // Re-run when route params change (navigating between stock detail pages)
 watch(
   () => [route.params.market, route.params.symbol],
-  () => loadAll(),
+  () => {
+    companyTabVisited.value = false
+    loadAll()
+  },
   { immediate: true },
 )
 
@@ -1002,6 +1050,43 @@ function scopeLabel(scope) {
   padding: 0 4px;
   margin-left: 4px;
   vertical-align: middle;
+}
+
+/* ── Detail Tabs ── */
+.detail-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.detail-tabs::-webkit-scrollbar { display: none; }
+
+.detail-tab-btn {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.detail-tab-btn:hover { color: var(--text); }
+.detail-tab-btn.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  font-weight: 600;
+}
+
+.company-tab-card {
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 
 /* ── Mobile ── */

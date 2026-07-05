@@ -1,0 +1,39 @@
+{
+  "market": "CN",
+  "symbol": "600519",
+  "ts_code": "600519.SH",
+  "module_key": "income_statement",
+  "module_name": "利润表趋势",
+  "group": "财务分析",
+  "group_seq": 2,
+  "data": {
+    "series": [
+      {"end_date": "20231231", "revenue": 150560000000.0, "operate_profit": 87200000000.0, "total_profit": 87800000000.0, "n_income": 74734000000.0, "n_income_attr_p": 74734000000.0, "basic_eps": 59.49, "diluted_eps": 59.49},
+      {"end_date": "20221231", "revenue": 127600000000.0, "operate_profit": 73800000000.0, "total_profit": 74200000000.0, "n_income": 62716000000.0, "n_income_attr_p": 62716000000.0, "basic_eps": 49.97, "diluted_eps": 49.97},
+      {"end_date": "20211231", "revenue": 109200000000.0, "operate_profit": 63100000000.0, "total_profit": 63600000000.0, "n_income": 52460000000.0, "n_income_attr_p": 52460000000.0, "basic_eps": 41.81, "diluted_eps": 41.81},
+      {"end_date": "20201231", "revenue": 97600000000.0, "operate_profit": 56300000000.0, "total_profit": 56800000000.0, "n_income": 46700000000.0, "n_income_attr_p": 46700000000.0, "basic_eps": 37.20, "diluted_eps": 37.20},
+      {"end_date": "20191231", "revenue": 89500000000.0, "operate_profit": 51600000000.0, "total_profit": 52100000000.0, "n_income": 41220000000.0, "n_income_attr_p": 41220000000.0, "basic_eps": 32.84, "diluted_eps": 32.84},
+      {"end_date": "20181231", "revenue": 77750000000.0, "operate_profit": 43800000000.0, "total_profit": 44200000000.0, "n_income": 35200000000.0, "n_income_attr_p": 35200000000.0, "basic_eps": 28.05, "diluted_eps": 28.05},
+      {"end_date": "20171231", "revenue": 61450000000.0, "operate_profit": 33600000000.0, "total_profit": 34100000000.0, "n_income": 27080000000.0, "n_income_attr_p": 27080000000.0, "basic_eps": 21.56, "diluted_eps": 21.56},
+      {"end_date": "20161231", "revenue": 40980000000.0, "operate_profit": 22100000000.0, "total_profit": 22500000000.0, "n_income": 16730000000.0, "n_income_attr_p": 16730000000.0, "basic_eps": 13.33, "diluted_eps": 13.33}
+    ],
+    "source": "tushare"
+  },
+  "errors": [],
+  "partial": false,
+  "stale": false,
+  "generated_at": "2026-07-05T10:23:45+08:00",
+  "source": {
+    "primary": "tushare",
+    "fallback": null,
+    "akshare_enabled": false,
+    "actual": "tushare"
+  },
+  "meta": {
+    "render_type": "table",
+    "chart_type": "bar",
+    "unit_hints": {},
+    "field_labels": {},
+    "empty_state": "暂无数据"
+  }
+}

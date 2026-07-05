@@ -203,6 +203,19 @@ export function normalizeChatEvent(rawEventType, rawPayload) {
     }
 
     // ── Streaming content ──────────────────────────────────────────────────────
+    // C31.6: New phase-based thinking events (distinct from legacy "thinking")
+    case 'thinking_event':
+      return {
+        type:       'ui_thinking_event',
+        phase:      p.phase      ?? '',
+        title:      p.title      ?? '',
+        content:    p.content    ?? '',
+        status:     p.status     ?? 'completed',
+        agent:      p.agent      ?? '',
+        importance: p.importance ?? 'medium',
+        timestamp:  p.timestamp  ?? null,
+      }
+
     case 'thinking':
       // C28.5: structured thinking (with source) → ui_thinking_item; raw → ui_thinking_delta
       if (p.source) {

@@ -28,8 +28,9 @@ class DeepSeekClient(BaseLLMClient):
                 "DEEPSEEK_API_KEY is not set. "
                 "Add it to your .env file before using DeepSeekClient."
             )
-        self._default_model = settings.deepseek_default_model
-        self._pro_model = settings.deepseek_pro_model
+        self._default_model  = settings.deepseek_default_model
+        self._pro_model      = settings.deepseek_pro_model
+        self._reasoner_model = settings.deepseek_reasoner_model  # C32
         self._client = OpenAI(
             api_key=settings.deepseek_api_key,
             base_url=settings.deepseek_base_url,
@@ -98,11 +99,35 @@ class DeepSeekClient(BaseLLMClient):
         """
         return self._stream_generator(messages, temperature=temperature, model=model)
 
+    # ── C32: Reasoning model (deepseek-reasoner) ─────────────────────────────
+
+    async def async_stream_reasoner(
+        self,
+        messages: list[dict],
+    ) -> AsyncGenerator[dict, None]:
+        """
+        C32: Stream from the deepseek-reasoner (R1) model.
+
+        The reasoner model:
+          - Produces `reasoning_content` tokens before the final answer.
+          - Does NOT support `temperature`, `top_p`, or similar sampling params.
+
+        Yields the same shape as async_stream_chat:
+            {"type": "thinking", "content": str}  — reasoning_content tokens
+            {"type": "answer",   "content": str}  — final answer tokens
+            {"type": "done"}                        — stream finished sentinel
+        """
+        return self._stream_generator(
+            messages,
+            temperature=None,         # reasoner ignores temperature
+            model=self._reasoner_model,
+        )
+
     async def _stream_generator(
         self,
         messages: list[dict],
         *,
-        temperature: float = 0.3,
+        temperature: float | None = 0.3,
         model: str | None = None,
     ) -> AsyncGenerator[dict, None]:
         target_model = model or self._default_model
@@ -111,12 +136,15 @@ class DeepSeekClient(BaseLLMClient):
 
         def _run_sync_stream() -> None:
             try:
-                stream = self._client.chat.completions.create(
-                    model=target_model,
-                    messages=messages,
-                    temperature=temperature,
-                    stream=True,
-                )
+                # C32: reasoner model doesn't support temperature; omit when None
+                create_kwargs: dict = {
+                    "model":    target_model,
+                    "messages": messages,
+                    "stream":   True,
+                }
+                if temperature is not None:
+                    create_kwargs["temperature"] = temperature
+                stream = self._client.chat.completions.create(**create_kwargs)
                 for chunk in stream:
                     if not chunk.choices:
                         continue

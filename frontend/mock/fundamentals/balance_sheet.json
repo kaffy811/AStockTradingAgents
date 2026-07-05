@@ -1,0 +1,39 @@
+{
+  "market": "CN",
+  "symbol": "600519",
+  "ts_code": "600519.SH",
+  "module_key": "balance_sheet",
+  "module_name": "资产负债表关键指标",
+  "group": "资产负债",
+  "group_seq": 3,
+  "data": {
+    "series": [
+      {"end_date": "20231231", "total_assets": 289600000000.0, "total_liab": 78500000000.0, "total_hldr_eqy_inc_min_int": 211100000000.0, "money_cap": 181200000000.0, "accounts_receiv": 980000000.0, "inventories": 37400000000.0, "total_cur_assets": 254300000000.0, "total_nca": 35300000000.0, "total_cur_liab": 46900000000.0, "total_ncl": 31600000000.0},
+      {"end_date": "20221231", "total_assets": 254200000000.0, "total_liab": 68100000000.0, "total_hldr_eqy_inc_min_int": 186100000000.0, "money_cap": 156100000000.0, "accounts_receiv": 870000000.0, "inventories": 31600000000.0, "total_cur_assets": 221800000000.0, "total_nca": 32400000000.0, "total_cur_liab": 42800000000.0, "total_ncl": 25300000000.0},
+      {"end_date": "20211231", "total_assets": 215900000000.0, "total_liab": 56800000000.0, "total_hldr_eqy_inc_min_int": 159100000000.0, "money_cap": 126500000000.0, "accounts_receiv": 760000000.0, "inventories": 25400000000.0, "total_cur_assets": 186500000000.0, "total_nca": 29400000000.0, "total_cur_liab": 37500000000.0, "total_ncl": 19300000000.0},
+      {"end_date": "20201231", "total_assets": 186500000000.0, "total_liab": 48300000000.0, "total_hldr_eqy_inc_min_int": 138200000000.0, "money_cap": 104800000000.0, "accounts_receiv": 650000000.0, "inventories": 22100000000.0, "total_cur_assets": 159100000000.0, "total_nca": 27400000000.0, "total_cur_liab": 33500000000.0, "total_ncl": 14800000000.0},
+      {"end_date": "20191231", "total_assets": 163300000000.0, "total_liab": 41700000000.0, "total_hldr_eqy_inc_min_int": 121600000000.0, "money_cap": 87800000000.0, "accounts_receiv": 540000000.0, "inventories": 19200000000.0, "total_cur_assets": 137600000000.0, "total_nca": 25700000000.0, "total_cur_liab": 30500000000.0, "total_ncl": 11200000000.0},
+      {"end_date": "20181231", "total_assets": 140800000000.0, "total_liab": 35300000000.0, "total_hldr_eqy_inc_min_int": 105500000000.0, "money_cap": 71200000000.0, "accounts_receiv": 430000000.0, "inventories": 16800000000.0, "total_cur_assets": 116100000000.0, "total_nca": 24700000000.0, "total_cur_liab": 27100000000.0, "total_ncl": 8200000000.0},
+      {"end_date": "20171231", "total_assets": 118600000000.0, "total_liab": 29300000000.0, "total_hldr_eqy_inc_min_int": 89300000000.0, "money_cap": 56500000000.0, "accounts_receiv": 320000000.0, "inventories": 14200000000.0, "total_cur_assets": 95500000000.0, "total_nca": 23100000000.0, "total_cur_liab": 23400000000.0, "total_ncl": 5900000000.0},
+      {"end_date": "20161231", "total_assets": 97500000000.0, "total_liab": 23600000000.0, "total_hldr_eqy_inc_min_int": 73900000000.0, "money_cap": 42100000000.0, "accounts_receiv": 210000000.0, "inventories": 12500000000.0, "total_cur_assets": 75300000000.0, "total_nca": 22200000000.0, "total_cur_liab": 19400000000.0, "total_ncl": 4200000000.0}
+    ],
+    "source": "tushare"
+  },
+  "errors": [],
+  "partial": false,
+  "stale": false,
+  "generated_at": "2026-07-05T10:23:45+08:00",
+  "source": {
+    "primary": "tushare",
+    "fallback": null,
+    "akshare_enabled": false,
+    "actual": "tushare"
+  },
+  "meta": {
+    "render_type": "table",
+    "chart_type": "bar",
+    "unit_hints": {},
+    "field_labels": {},
+    "empty_state": "暂无数据"
+  }
+}

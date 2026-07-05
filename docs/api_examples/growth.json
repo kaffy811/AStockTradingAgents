@@ -1,0 +1,54 @@
+{
+  "market": "CN",
+  "symbol": "600519",
+  "ts_code": "600519.SH",
+  "module_key": "growth",
+  "module_name": "成长性指标",
+  "group": "财务分析",
+  "group_seq": 2,
+  "data": {
+    "series": [
+      {"end_date": "20231231", "revenue": 150560000000.0, "revenue_yoy_pct": 18.0, "net_profit_parent": 74734000000.0, "net_profit_yoy_pct": 19.2, "deduct_net_profit_yoy_pct": 18.8},
+      {"end_date": "20221231", "revenue": 127600000000.0, "revenue_yoy_pct": 16.9, "net_profit_parent": 62716000000.0, "net_profit_yoy_pct": 19.6, "deduct_net_profit_yoy_pct": 19.1},
+      {"end_date": "20211231", "revenue": 109200000000.0, "revenue_yoy_pct": 11.9, "net_profit_parent": 52460000000.0, "net_profit_yoy_pct": 12.3, "deduct_net_profit_yoy_pct": 12.0},
+      {"end_date": "20201231", "revenue": 97600000000.0, "revenue_yoy_pct": 9.1, "net_profit_parent": 46700000000.0, "net_profit_yoy_pct": 13.3, "deduct_net_profit_yoy_pct": 13.1},
+      {"end_date": "20191231", "revenue": 89500000000.0, "revenue_yoy_pct": 15.1, "net_profit_parent": 41220000000.0, "net_profit_yoy_pct": 17.1, "deduct_net_profit_yoy_pct": 17.0},
+      {"end_date": "20181231", "revenue": 77750000000.0, "revenue_yoy_pct": 26.5, "net_profit_parent": 35200000000.0, "net_profit_yoy_pct": 30.0, "deduct_net_profit_yoy_pct": 29.5},
+      {"end_date": "20171231", "revenue": 61450000000.0, "revenue_yoy_pct": 50.0, "net_profit_parent": 27080000000.0, "net_profit_yoy_pct": 61.9, "deduct_net_profit_yoy_pct": 61.4},
+      {"end_date": "20161231", "revenue": 40980000000.0, "revenue_yoy_pct": 18.9, "net_profit_parent": 16730000000.0, "net_profit_yoy_pct": 7.8, "deduct_net_profit_yoy_pct": 7.5}
+    ],
+    "annual": true,
+    "comment": "营收与净利润保持双位数增长，成长性持续稳健",
+    "source": "tushare"
+  },
+  "errors": [],
+  "partial": false,
+  "stale": false,
+  "generated_at": "2026-07-05T10:23:45+08:00",
+  "source": {
+    "primary": "tushare",
+    "fallback": null,
+    "akshare_enabled": false,
+    "actual": "tushare"
+  },
+  "meta": {
+    "render_type": "chart_table",
+    "chart_type": "bar",
+    "unit_hints": {
+      "revenue": "元",
+      "net_profit_parent": "元",
+      "revenue_yoy_pct": "%",
+      "net_profit_yoy_pct": "%",
+      "deduct_net_profit_yoy_pct": "%"
+    },
+    "field_labels": {
+      "end_date": "报告期",
+      "revenue": "营收",
+      "revenue_yoy_pct": "营收同比",
+      "net_profit_parent": "归母净利润",
+      "net_profit_yoy_pct": "净利润同比",
+      "deduct_net_profit_yoy_pct": "扣非净利润同比"
+    },
+    "empty_state": "暂无数据"
+  }
+}

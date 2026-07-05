@@ -1,0 +1,61 @@
+{
+  "market": "CN",
+  "symbol": "600519",
+  "ts_code": "600519.SH",
+  "module_key": "main_business",
+  "module_name": "主营业务构成",
+  "group": "财务分析",
+  "group_seq": 2,
+  "data": {
+    "symbol": "600519",
+    "ts_code": "600519.SH",
+    "periods": [
+      {
+        "end_date": "20231231",
+        "total_sales": 150560000000.0,
+        "items": [
+          {"bz_item": "茅台酒", "bz_sales": 128900000000.0, "bz_profit": 98200000000.0, "bz_cost": 30700000000.0, "sales_ratio_pct": 85.6},
+          {"bz_item": "系列酒", "bz_sales": 21660000000.0, "bz_profit": 14100000000.0, "bz_cost": 7560000000.0, "sales_ratio_pct": 14.4}
+        ]
+      },
+      {
+        "end_date": "20221231",
+        "total_sales": 127600000000.0,
+        "items": [
+          {"bz_item": "茅台酒", "bz_sales": 109500000000.0, "bz_profit": 83200000000.0, "bz_cost": 26300000000.0, "sales_ratio_pct": 85.8},
+          {"bz_item": "系列酒", "bz_sales": 18100000000.0, "bz_profit": 11800000000.0, "bz_cost": 6300000000.0, "sales_ratio_pct": 14.2}
+        ]
+      }
+    ],
+    "source": "tushare"
+  },
+  "errors": [],
+  "partial": false,
+  "stale": false,
+  "generated_at": "2026-07-05T10:23:45+08:00",
+  "source": {
+    "primary": "tushare",
+    "fallback": null,
+    "akshare_enabled": false,
+    "actual": "tushare"
+  },
+  "meta": {
+    "render_type": "table",
+    "chart_type": "pie",
+    "unit_hints": {
+      "bz_sales": "元",
+      "bz_profit": "元",
+      "bz_cost": "元",
+      "sales_ratio_pct": "%"
+    },
+    "field_labels": {
+      "bz_item": "业务线",
+      "bz_sales": "销售额",
+      "bz_profit": "利润",
+      "bz_cost": "成本",
+      "sales_ratio_pct": "收入占比",
+      "end_date": "报告期"
+    },
+    "empty_state": "暂无数据"
+  }
+}

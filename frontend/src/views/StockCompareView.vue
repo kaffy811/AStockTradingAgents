@@ -5,6 +5,14 @@
     <!-- ── Page title ── -->
     <div class="scv-title-bar">
       <div>
+        <!-- C30.3.4: back-to-chat button when navigated from chat copilot -->
+        <button
+          v-if="fromChat"
+          class="btn btn-sm btn-ghost scv-back-btn"
+          @click="goBackToChat"
+        >
+          ← {{ t('cmp_back_to_chat') }}
+        </button>
         <h1 class="scv-title">{{ t('cmp_title') }}</h1>
         <p class="scv-subtitle">{{ t('cmp_subtitle') }}</p>
       </div>
@@ -77,6 +85,13 @@ import StockCompareTable    from '../components/StockCompareTable.vue'
 const router = useRouter()
 const route  = useRoute()
 const { t }  = useI18n()
+
+// C30.3.4: detect navigation origin for back button
+const fromChat = computed(() => route.query.from === 'chat')
+
+function goBackToChat() {
+  router.push('/chat')
+}
 
 // ── State ──────────────────────────────────────────────────────────────────
 // selectedStocks: [{ market, symbol, name }]
@@ -185,11 +200,12 @@ function goHistory(p) {
 
 // ── Parse URL / storage tokens ─────────────────────────────────────────────
 function _parseTokens(stocksParam) {
+  // C30.5.2: dedup by market:symbol key so the same stock added twice counts as one
+  const seen = new Set()
   return String(stocksParam)
     .split(',')
     .map(t => t.trim())
     .filter(Boolean)
-    .slice(0, 4)
     .map(t => {
       const colonIdx = t.indexOf(':')
       if (colonIdx < 1) return null
@@ -200,6 +216,13 @@ function _parseTokens(stocksParam) {
       return { market, symbol, name: '' }
     })
     .filter(Boolean)
+    .filter(s => {
+      const key = `${s.market}:${s.symbol}`
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
+    .slice(0, 4)
 }
 
 async function _loadParsed(parsed) {
@@ -268,6 +291,17 @@ onUnmounted(() => {
   margin-bottom: 16px;
   gap: 12px;
 }
+
+.scv-back-btn {
+  font-size: 12px;
+  color: var(--muted);
+  padding: 2px 0;
+  margin-bottom: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.scv-back-btn:hover { color: var(--text); }
 
 .scv-title {
   font-size: 22px;

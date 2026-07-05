@@ -304,6 +304,29 @@ export default {
   chat_step_tool:         '도구 실행',
   chat_step_conclude:     '답변 생성',
 
+  // ── C32.3 Conversation Markers ────────────────────────────────────────────
+  chat_markers_jump:      '이 질문으로 이동',
+
+  // ── C32.4/C32.5 Session Search ────────────────────────────────────────────
+  chat_search_placeholder: '대화 검색…',
+  chat_search_clear:       '검색 지우기',
+  chat_search_no_results:  '관련 대화를 찾을 수 없습니다.',
+  chat_search_loading:     '검색 중…',
+  chat_filter_title:       '시간 필터',
+  chat_filter_today:       '오늘',
+  chat_filter_yesterday:   '어제',
+  chat_filter_7days:       '최근 7일',
+  chat_filter_30days:      '최근 30일',
+  chat_filter_month:       '이번 달',
+  chat_filter_clear:       '필터 지우기',
+
+  // ── Sidebar resize + calendar date picker ─────────────────────────────────
+  chat_calendar_btn:       '날짜로 필터',
+  chat_date_select_hint:   '시작 날짜를 클릭하세요',
+  chat_date_start_label:   '시작：',
+  chat_date_end_label:     '종료：',
+  chat_apply_filter:       '필터 적용',
+
   // ── M36 report output language ────────────────────────────────────────────
   settings_rpt_lang:      '보고서 출력 언어',
   settings_rpt_lang_hint: 'AI 생성 보고서 본문 언어 (UI 언어와 독립)',

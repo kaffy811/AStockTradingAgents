@@ -243,3 +243,124 @@ def _template_steps_for_intent(intent: str) -> list[dict]:
         ("回答生成",     "我会基于已验证信息生成最终回答。"),
     ]))
     return [{"title": t, "content": c, "status": "done"} for t, c in raw]
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# C31.4 — DeepSeek reasoning_content → public ThinkingEvent dicts (9-phase)
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Maps 5 legacy extraction hints to C31 phases
+_C31_PHASE_HINTS = [
+    ("problem_analysis",   "问题分析",   re.compile(r"问题|理解|判断|请求类型|intent|用户意图|用户想",  re.IGNORECASE)),
+    ("deep_reasoning",     "深度思考",   re.compile(r"思考|分析|比较|评估|权衡|推理|考虑|综合|区分",   re.IGNORECASE)),
+    ("risk_review",        "风险审查",   re.compile(r"风险|审查|合规|建议|不确定|边界|注意|警告|过度", re.IGNORECASE)),
+    ("synthesis",          "回答生成",   re.compile(r"回答|生成|总结|输出|最终|结论|基于",             re.IGNORECASE)),
+    ("agent_observation",  "数据观测",   re.compile(r"检索|查询|数据|获取|工具|搜索|找到|API|结果",    re.IGNORECASE)),
+]
+
+_PHASE_EXCERPT_MAX = 100   # max chars to take from a single sentence
+
+
+def convert_reasoning_to_public_thinking_events(
+    reasoning_content: str,
+    intent: str = "general",
+    plan=None,           # CentralPlan | None — used for fallback content
+    *,
+    max_chars: int = 2000,
+) -> list[dict]:
+    """
+    C31.4: Convert DeepSeek reasoning_content to a list of ThinkingEvent dicts
+    using the 9-phase C31 structure.
+
+    Raw chain-of-thought is NEVER emitted intact:
+      1. Sanitize (remove system prompts, tool args, stack traces, API keys).
+      2. Extract representative sentences per phase via hint patterns.
+      3. If a phase has no matching sentence, fall back to CentralPlan content.
+      4. If no reasoning_content at all, use the CentralPlan entirely.
+
+    Args:
+        reasoning_content: Raw text from DeepSeek's reasoning_content field.
+        intent:            Detected intent (from IntentDecisionAgent).
+        plan:              CentralPlan from CentralPlanningAgent (optional fallback).
+        max_chars:         Cap on reasoning_content before processing.
+
+    Returns:
+        List of thinking_event payload dicts (as produced by make_thinking_event).
+        Ready to emit as "thinking_event" SSE events.
+    """
+    from app.agents.thinking_events import make_thinking_event, PHASE_LABELS  # local import
+
+    # ── Sanitize first ────────────────────────────────────────────────────────
+    sanitized = sanitize_thinking_content(reasoning_content or "", max_chars=max_chars)
+
+    # ── No usable reasoning → use CentralPlan events as fallback ─────────────
+    if not sanitized.strip():
+        if plan is not None:
+            return [
+                plan.get_phase_event(ph)
+                for ph in [
+                    "problem_analysis", "planning", "task_decomposition",
+                    "agent_dispatch", "deep_reasoning", "risk_review", "synthesis",
+                ]
+                if plan.get_phase_event(ph).get("content")
+            ]
+        # No plan either — return minimal template
+        return [
+            make_thinking_event(ph, PHASE_LABELS.get(ph, ph), content)
+            for ph, content in [
+                ("problem_analysis", "正在分析用户问题，判断所需信息类型。"),
+                ("deep_reasoning",   "正在综合已获取信息，形成研究结论。"),
+                ("risk_review",      "正在检查是否存在买卖建议或无来源推断。"),
+                ("synthesis",        "正在基于已验证信息生成最终回答。"),
+            ]
+        ]
+
+    # ── Extract sentences from sanitized reasoning ────────────────────────────
+    sentences = re.split(r"[。！？\n]+", sanitized)
+    sentences = [s.strip() for s in sentences if len(s.strip()) > 10]
+
+    events: list[dict] = []
+    matched_phases: set[str] = set()
+
+    for phase, label, hint_re in _C31_PHASE_HINTS:
+        # Find a sentence matching the hint
+        excerpt = next(
+            (s[:_PHASE_EXCERPT_MAX] for s in sentences if hint_re.search(s)),
+            None,
+        )
+        if excerpt is None and plan is not None:
+            # Fallback to plan content for this phase
+            plan_ev = plan.get_phase_event(phase)
+            if plan_ev.get("content"):
+                excerpt = plan_ev["content"][:_PHASE_EXCERPT_MAX]
+        if excerpt:
+            events.append(make_thinking_event(phase, label, excerpt, status="completed"))
+            matched_phases.add(phase)
+
+    # ── Ensure key phases always present ─────────────────────────────────────
+    for ph in ("problem_analysis", "risk_review", "synthesis"):
+        if ph not in matched_phases:
+            fallback_content = ""
+            if plan is not None:
+                plan_ev = plan.get_phase_event(ph)
+                fallback_content = plan_ev.get("content", "")
+            if not fallback_content:
+                fallback_content = {
+                    "problem_analysis": "正在理解用户问题，判断所需信息类型。",
+                    "risk_review":      "检查是否存在买卖建议或无来源财务数字。",
+                    "synthesis":        "基于已验证信息生成最终回答。",
+                }.get(ph, "")
+            if fallback_content:
+                events.append(make_thinking_event(
+                    ph, PHASE_LABELS.get(ph, ph), fallback_content, status="completed"
+                ))
+
+    # Sort to maintain canonical phase order
+    _PHASE_ORDER = {
+        "problem_analysis": 0, "intent_decision": 1, "planning": 2,
+        "task_decomposition": 3, "agent_dispatch": 4, "agent_observation": 5,
+        "deep_reasoning": 6, "risk_review": 7, "synthesis": 8,
+    }
+    events.sort(key=lambda e: _PHASE_ORDER.get(e.get("phase", ""), 99))
+
+    return events

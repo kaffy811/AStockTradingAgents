@@ -36,6 +36,35 @@ export function listChatSessions(limit = 20, offset = 0) {
 }
 
 /**
+ * C32.4: Search chat sessions by keyword and/or time range.
+ * @param {string|null}   q           — keyword (searches title + message content)
+ * @param {object}        opts
+ * @param {string[]|null} opts.date_ranges — preset: "today"|"yesterday"|"7days"|"30days"|"month"
+ * @param {string|null}   opts.start_date  — ISO date string
+ * @param {string|null}   opts.end_date    — ISO date string
+ * @param {number}        opts.limit
+ * @param {number}        opts.offset
+ * @returns {Promise<{items, total}>}
+ */
+export function searchChatSessions(q = null, opts = {}) {
+  const params = new URLSearchParams()
+  if (q)                       params.set('q', q)
+  if (opts.start_date)         params.set('start_date', opts.start_date)
+  if (opts.end_date)           params.set('end_date', opts.end_date)
+  // date_from/date_to from calendar picker → backend start_date/end_date params
+  if (opts.date_from)          params.set('start_date', opts.date_from)
+  if (opts.date_to)            params.set('end_date', opts.date_to)
+  if (opts.limit != null)      params.set('limit', String(opts.limit))
+  if (opts.offset != null)     params.set('offset', String(opts.offset))
+  // date_ranges is a multi-value param
+  for (const dr of (opts.date_ranges || [])) {
+    params.append('date_ranges', dr)
+  }
+  const qs = params.toString()
+  return baseFetch(`/chat/sessions/search${qs ? '?' + qs : ''}`)
+}
+
+/**
  * Get session detail with all messages.
  * @param {string} sessionId
  * @returns {Promise<{session_id, title, status, messages}>}

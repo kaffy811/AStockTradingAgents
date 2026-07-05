@@ -1159,8 +1159,13 @@ class FinancialAgent:
         answer_chunks: list[str] = []
         try:
             from app.llm.factory import get_llm_client
+            from app.core.config import settings as _cfg
             llm = get_llm_client()
-            gen = await llm.async_stream_chat(messages, temperature=0.4)
+            # C32: use deepseek-reasoner when enabled (produces reasoning_content 思维链)
+            if _cfg.enable_deepseek_reasoner and hasattr(llm, "async_stream_reasoner"):
+                gen = await llm.async_stream_reasoner(messages)
+            else:
+                gen = await llm.async_stream_chat(messages, temperature=0.4)
 
             async def _consume_stream() -> None:
                 async for chunk in gen:

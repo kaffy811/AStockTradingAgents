@@ -1,0 +1,52 @@
+{
+  "market": "CN",
+  "symbol": "600519",
+  "ts_code": "600519.SH",
+  "module_key": "profitability",
+  "module_name": "盈利质量",
+  "group": "财务分析",
+  "group_seq": 2,
+  "data": {
+    "series": [
+      {"end_date": "20231231", "gross_margin": 91.8, "net_margin": 49.6, "roe": 35.2, "roa": 25.7, "expense_ratio": 5.2},
+      {"end_date": "20221231", "gross_margin": 91.5, "net_margin": 49.2, "roe": 33.1, "roa": 24.7, "expense_ratio": 5.5},
+      {"end_date": "20211231", "gross_margin": 91.2, "net_margin": 48.0, "roe": 30.8, "roa": 23.5, "expense_ratio": 5.8},
+      {"end_date": "20201231", "gross_margin": 90.9, "net_margin": 47.8, "roe": 28.5, "roa": 21.8, "expense_ratio": 6.1},
+      {"end_date": "20191231", "gross_margin": 90.7, "net_margin": 46.0, "roe": 26.9, "roa": 20.7, "expense_ratio": 6.5},
+      {"end_date": "20181231", "gross_margin": 90.2, "net_margin": 45.3, "roe": 25.2, "roa": 19.4, "expense_ratio": 6.9},
+      {"end_date": "20171231", "gross_margin": 89.8, "net_margin": 44.1, "roe": 24.1, "roa": 18.3, "expense_ratio": 7.2},
+      {"end_date": "20161231", "gross_margin": 89.1, "net_margin": 40.8, "roe": 22.5, "roa": 17.2, "expense_ratio": 7.8}
+    ],
+    "source": "tushare"
+  },
+  "errors": [],
+  "partial": false,
+  "stale": false,
+  "generated_at": "2026-07-05T10:23:45+08:00",
+  "source": {
+    "primary": "tushare",
+    "fallback": null,
+    "akshare_enabled": false,
+    "actual": "tushare"
+  },
+  "meta": {
+    "render_type": "chart_table",
+    "chart_type": "line",
+    "unit_hints": {
+      "gross_margin": "%",
+      "net_margin": "%",
+      "roe": "%",
+      "roa": "%",
+      "expense_ratio": "%"
+    },
+    "field_labels": {
+      "end_date": "报告期",
+      "gross_margin": "毛利率",
+      "net_margin": "净利率",
+      "roe": "ROE",
+      "roa": "ROA",
+      "expense_ratio": "期间费用率"
+    },
+    "empty_state": "暂无数据"
+  }
+}

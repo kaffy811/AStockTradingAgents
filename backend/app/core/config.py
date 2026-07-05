@@ -35,8 +35,13 @@ class Settings(BaseSettings):
     deepseek_base_url: str = "https://api.deepseek.com"
     deepseek_default_model: str = "deepseek-v4-flash"
     deepseek_pro_model: str = "deepseek-v4-pro"
+    deepseek_reasoner_model: str = "deepseek-reasoner"  # C32: R1-series reasoning model
     deepseek_model: str = "deepseek-v4-flash"
     openai_api_key: str | None = None
+    # C32: When True, FinancialAgent uses deepseek-reasoner for streaming responses.
+    # The model produces reasoning_content (思维链) which the frontend displays in
+    # the collapsible raw-chain drawer.  Set ENABLE_DEEPSEEK_REASONER=false in .env to disable.
+    enable_deepseek_reasoner: bool = True
 
     # Embedding (Phase 2C / 2D.5)
     # Supported values: mock (default, CI-safe) | openai | deepseek
@@ -81,6 +86,25 @@ class Settings(BaseSettings):
     # 设置 DEFAULT_ANALYSIS_ENGINE=langgraph 可将 staging 灰度至 LangGraph。
     # 非法值自动 fallback 至 custom_coordinator，不影响服务启动。
     default_analysis_engine: str = "custom_coordinator"
+
+    # ETL（Phase 2B）
+    # True（默认）：ETL 功能可用，industry_rank 从 PostgreSQL industry_rank_snapshot 读取。
+    # False：ETL 关闭，industry_rank 立即返回 partial=True（不影响主服务）。
+    etl_enabled: bool = True
+
+    # Stock Fundamental Service（Phase 1）
+    # Tushare Pro token — 申请地址 tushare.pro，免费注册后获取
+    # 生产环境通过 Docker secrets 注入，禁止硬编码
+    tushare_token: str | None = None
+    # AkShare 备用数据源开关（默认关闭）
+    # 设置 ENABLE_AKSHARE=true 后 Tushare 失败时自动降级到 AkShare
+    enable_akshare: bool = False
+    # Tushare 令牌桶速率限制（积分/分钟）；基础账户 500，付费账户可调高
+    tushare_rate_limit_per_min: int = 500
+    # Tushare API 调用超时（秒）
+    tushare_timeout_seconds: float = 15.0
+    # Fundamental Service 缓存版本号（修改数据结构时递增，自动清空旧缓存）
+    fs_cache_version: str = "v1"
 
     # Multi-Agent Orchestrator (Phase 2E-1)
     # 默认关闭。设置 ENABLE_MULTI_AGENT_ORCHESTRATOR=true 后对复杂金融研究问题

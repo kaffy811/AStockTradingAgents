@@ -70,9 +70,18 @@ class GeneralFinancialAnswerSkill(BaseSkill):
             intent = _detect_intent(message)
             has_stock = bool(intent.get("symbol"))
 
+            # C32.1.1: inject memory context into query so FinancialAgent
+            # understands multi-turn coreferences without rewriting the agent.
+            effective_query = message
+            mem_ctx = context.memory_context
+            if mem_ctx is not None and not mem_ctx.is_empty():
+                mem_block = mem_ctx.to_prompt_block()
+                if mem_block:
+                    effective_query = f"【会话上下文】\n{mem_block}\n\n当前问题：{message}"
+
             agent = FinancialAgent()
             response = await agent.run(
-                query=message,
+                query=effective_query,
                 db=context.db,
                 tool_registry=context.tool_registry,
                 output_language=context.output_language,
@@ -162,6 +171,7 @@ class GeneralFinancialAnswerSkill(BaseSkill):
                 rag_documents=rag_docs_for_llm,
                 output_language=context.output_language,
                 timeout_seconds=28.0,
+                memory_context=context.memory_context,  # C32.1.1
             )
             if data_limited:
                 answer = answer.rstrip() + "\n\n> **数据说明：** 本次回答基于现有参考资料，部分实时工具数据不可用，结论仅供参考。"
