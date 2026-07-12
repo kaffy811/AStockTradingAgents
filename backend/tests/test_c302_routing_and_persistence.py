@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import re
 import uuid
+from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -23,6 +24,19 @@ def _make_uid(suffix: int = 42) -> uuid.UUID:
 
 def _make_db():
     return AsyncMock()
+
+
+def _frontend_card_path() -> Path:
+    card_path = (
+        Path(__file__).resolve().parents[2]
+        / "frontend"
+        / "src"
+        / "components"
+        / "chat"
+        / "ChatResultCard.vue"
+    )
+    assert card_path.exists(), f"missing frontend component file: {card_path}"
+    return card_path
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -228,10 +242,8 @@ class TestP3CompletedConstraint:
     def test_t15_frontend_card_shows_hint_for_no_report_id(self):
         """T15: ChatResultCard shows hint text (not 'view report') when completed + no report_id."""
         import re
-        card_path = (
-            "/Users/kaffy/Documents/TradingAgents/frontend/src/components/chat/ChatResultCard.vue"
-        )
-        with open(card_path) as f:
+        card_path = _frontend_card_path()
+        with open(card_path, encoding="utf-8") as f:
             src = f.read()
         # Must have hint for completed-without-report-id case
         assert "hasDirectReportLink" in src, "ChatResultCard must check hasDirectReportLink"
@@ -241,10 +253,8 @@ class TestP3CompletedConstraint:
 
     def test_t16_run_id_not_in_failed_card_hint(self):
         """T16: The failed card hint must NOT mention 'Run ID' or raw run_id."""
-        card_path = (
-            "/Users/kaffy/Documents/TradingAgents/frontend/src/components/chat/ChatResultCard.vue"
-        )
-        with open(card_path) as f:
+        card_path = _frontend_card_path()
+        with open(card_path, encoding="utf-8") as f:
             src = f.read()
         # The error hint text must not expose run_id
         hint_match = re.search(r'rc-run-hint--error.*?</p>', src, re.DOTALL)
@@ -282,10 +292,8 @@ class TestRunIdElimination:
 
     def test_t19_analysis_run_card_template_has_no_run_id_display(self):
         """T19: ChatResultCard analysis_run template must not render run_id to users."""
-        card_path = (
-            "/Users/kaffy/Documents/TradingAgents/frontend/src/components/chat/ChatResultCard.vue"
-        )
-        with open(card_path) as f:
+        card_path = _frontend_card_path()
+        with open(card_path, encoding="utf-8") as f:
             src = f.read()
         # The template section for analysis_run must not display card.data.run_id as text
         # (it can store it as data but not render it in visible text)

@@ -164,14 +164,15 @@ async def test_baostock_aggregate_returns_six_keys():
     client = BaoStockClient()
 
     # Mock the internal _sync_fetch_all to return empty raw data
-    with patch("asyncio.to_thread", new=AsyncMock(return_value={
-        "profit": [], "growth": [], "balance": [],
-        "operation": [], "cash_flow": [], "dupont": [],
-    })):
-        with patch("app.datasource.baostock_client._get_bs_lock") as mock_lock:
-            mock_lock.return_value.__aenter__ = AsyncMock(return_value=None)
-            mock_lock.return_value.__aexit__ = AsyncMock(return_value=None)
-            result = await client.get_all_financial_indicators("600519.SH")
+    with patch.dict(sys.modules, {"baostock": MagicMock()}):
+        with patch("asyncio.to_thread", new=AsyncMock(return_value={
+            "profit": [], "growth": [], "balance": [],
+            "operation": [], "cash_flow": [], "dupont": [],
+        })):
+            with patch("app.datasource.baostock_client._get_bs_lock") as mock_lock:
+                mock_lock.return_value.__aenter__ = AsyncMock(return_value=None)
+                mock_lock.return_value.__aexit__ = AsyncMock(return_value=None)
+                result = await client.get_all_financial_indicators("600519.SH")
 
     assert isinstance(result, dict)
     expected_keys = {"profit", "growth", "balance", "operation", "cash_flow", "dupont"}
@@ -197,11 +198,12 @@ async def test_baostock_aggregate_same_shape_as_individual():
     }
 
     client = BaoStockClient()
-    with patch("asyncio.to_thread", new=AsyncMock(return_value=mock_raw)):
-        with patch("app.datasource.baostock_client._get_bs_lock") as mock_lock:
-            mock_lock.return_value.__aenter__ = AsyncMock(return_value=None)
-            mock_lock.return_value.__aexit__ = AsyncMock(return_value=None)
-            result = await client.get_all_financial_indicators("600519.SH")
+    with patch.dict(sys.modules, {"baostock": MagicMock()}):
+        with patch("asyncio.to_thread", new=AsyncMock(return_value=mock_raw)):
+            with patch("app.datasource.baostock_client._get_bs_lock") as mock_lock:
+                mock_lock.return_value.__aenter__ = AsyncMock(return_value=None)
+                mock_lock.return_value.__aexit__ = AsyncMock(return_value=None)
+                result = await client.get_all_financial_indicators("600519.SH")
 
     profit_rows = result["profit"]
     assert len(profit_rows) == 1

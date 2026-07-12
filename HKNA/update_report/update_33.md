@@ -1,4 +1,11 @@
 ---
+本次补充说明
+
+1. 这次修复的是 same-region Linux runner 暴露出的跨平台测试可移植性问题，不是 Fusion / RAG / Supabase 业务故障。
+2. 已移除测试对本机 `/tmp` sidecar 和 `/Users/kaffy` 绝对路径的依赖，改为仓库内确定性 fixture 与仓库根定位。
+3. BaoStock 相关测试已显式控制模块可见性，避免依赖 runner 是否预装可选依赖。
+
+---
 目前完成的工作汇总：
 
 已完成
