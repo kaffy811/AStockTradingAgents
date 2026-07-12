@@ -462,6 +462,11 @@ class CompanyV2FinancialFusionJobService:
             row.progress = 1.0
             row.completed_at = _now().replace(tzinfo=None)
             row.retryable = 0
+            row.claimed_by = None
+            row.claimed_at = None
+            row.heartbeat_at = None
+            row.lease_expires_at = None
+            row.next_retry_at = None
             await db.commit()
             await db.refresh(row)
         return self._row_to_status(row)

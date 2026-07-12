@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy import inspect
 
 
 revision = "j8k9l0m1n2o3"
@@ -17,6 +18,10 @@ depends_on = None
 
 
 def upgrade() -> None:
+    bind = op.get_bind()
+    inspector = inspect(bind)
+    if inspector.has_table("company_v2_financial_fusion_jobs"):
+        return
     op.create_table(
         "company_v2_financial_fusion_jobs",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
@@ -58,6 +63,10 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    bind = op.get_bind()
+    inspector = inspect(bind)
+    if not inspector.has_table("company_v2_financial_fusion_jobs"):
+        return
     op.drop_index("ix_company_v2_financial_fusion_jobs_fingerprint", table_name="company_v2_financial_fusion_jobs")
     op.drop_index("ix_company_v2_financial_fusion_jobs_status", table_name="company_v2_financial_fusion_jobs")
     op.drop_index("ix_company_v2_financial_fusion_jobs_report_id", table_name="company_v2_financial_fusion_jobs")

@@ -9,3 +9,4 @@ from app.models.data_coverage import (                               # noqa: F40
 )
 from app.models.company_v2_report_rag import ReportRagDocument, ReportRagChunk  # noqa: F401
 from app.models.company_v2_financial_fusion_job import CompanyV2FinancialFusionJob  # noqa: F401
+from app.models.company_v2_financial_fusion_worker_observation import CompanyV2FinancialFusionWorkerObservation  # noqa: F401

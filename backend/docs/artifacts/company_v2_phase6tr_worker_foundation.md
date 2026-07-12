@@ -1,0 +1,40 @@
+# Phase 6T-R Worker Foundation
+
+```json
+{
+  "phase": "phase6tr_worker_foundation",
+  "status": "passed",
+  "migration_applied": true,
+  "worker_foundation_ready": true,
+  "shadow_mode_verified": true,
+  "real_execution_count": 0,
+  "stage3_status": "not_authorized",
+  "auto_run": false,
+  "rollout_percent": 0,
+  "claim_strategy": "postgresql_atomic_claim_with_skip_locked",
+  "lease_policy": {
+    "lease_seconds_default": 60,
+    "heartbeat_seconds_default": 15
+  },
+  "durable_tables": [
+    "company_v2_financial_fusion_jobs",
+    "company_v2_financial_fusion_worker_observations"
+  ],
+  "safety_guarantees": [
+    "shadow_only",
+    "no_provider_calls",
+    "no_rag_queries",
+    "no_extractor_calls",
+    "no_real_fusion_execution"
+  ],
+  "test_results": {
+    "targeted_unit": "8 passed",
+    "targeted_live": "4 passed",
+    "hermetic_backend": "3073 passed, 13 deselected",
+    "live_backend": "13 passed",
+    "canonical_backend": "3086 passed"
+  },
+  "blocking_issues": [],
+  "errors": []
+}
+```

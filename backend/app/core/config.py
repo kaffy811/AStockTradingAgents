@@ -190,6 +190,11 @@ class Settings(BaseSettings):
     company_v2_financial_fusion_field_definition_registry_version: str = "v1"
     company_v2_financial_fusion_tolerance_version: str = "v1"
     company_v2_financial_fusion_singleflight_ttl_seconds: int = 60
+    company_v2_financial_fusion_stage3_authorized: bool = False
+    company_v2_financial_fusion_worker_mode: str = "shadow"
+    company_v2_financial_fusion_worker_enabled: bool = False
+    company_v2_financial_fusion_worker_lease_seconds: int = 60
+    company_v2_financial_fusion_worker_heartbeat_seconds: int = 15
 
     # Auth
     secret_key: str = Field(..., min_length=16)
