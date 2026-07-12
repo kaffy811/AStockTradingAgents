@@ -44,6 +44,7 @@ class FinancialFusionEligibility:
     cached: bool = False
     last_run_at: str | None = None
     force_enabled: bool = False
+    manual_admission: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -60,6 +61,7 @@ class FinancialFusionEligibility:
             "cached": self.cached,
             "last_run_at": self.last_run_at,
             "force_enabled": self.force_enabled,
+            "manual_admission": self.manual_admission,
         }
 
 
@@ -75,6 +77,7 @@ class CompanyV2FinancialFusionRolloutService:
         cached: bool = False,
         last_run_at: str | None = None,
         force_enabled: bool = False,
+        manual_admission: bool = False,
         supported_fields: list[str] | None = None,
     ) -> dict[str, Any]:
         enabled = bool(getattr(settings, "company_v2_financial_fusion_enabled", False))
@@ -84,6 +87,91 @@ class CompanyV2FinancialFusionRolloutService:
         bucket = _stable_bucket(symbol, report_id)
         supported_fields = list(supported_fields or [])
 
+        if manual_admission:
+            if not report_ready:
+                return FinancialFusionEligibility(
+                    enabled=True,
+                    eligible=False,
+                    reason="REPORT_NOT_READY",
+                    rollout_bucket=bucket,
+                    rollout_percent=rollout_percent,
+                    auto_run=auto_run,
+                    report_ready=report_ready,
+                    rag_ready=rag_ready,
+                    structured_ready=structured_ready,
+                    supported_fields=supported_fields,
+                    cached=cached,
+                    last_run_at=last_run_at,
+                    force_enabled=force_enabled,
+                    manual_admission=manual_admission,
+                ).to_dict()
+            if not rag_ready:
+                return FinancialFusionEligibility(
+                    enabled=True,
+                    eligible=False,
+                    reason="RAG_NOT_INDEXED",
+                    rollout_bucket=bucket,
+                    rollout_percent=rollout_percent,
+                    auto_run=auto_run,
+                    report_ready=report_ready,
+                    rag_ready=rag_ready,
+                    structured_ready=structured_ready,
+                    supported_fields=supported_fields,
+                    cached=cached,
+                    last_run_at=last_run_at,
+                    force_enabled=force_enabled,
+                    manual_admission=manual_admission,
+                ).to_dict()
+            if not structured_ready:
+                return FinancialFusionEligibility(
+                    enabled=True,
+                    eligible=False,
+                    reason="STRUCTURED_DATA_UNAVAILABLE",
+                    rollout_bucket=bucket,
+                    rollout_percent=rollout_percent,
+                    auto_run=auto_run,
+                    report_ready=report_ready,
+                    rag_ready=rag_ready,
+                    structured_ready=structured_ready,
+                    supported_fields=supported_fields,
+                    cached=cached,
+                    last_run_at=last_run_at,
+                    force_enabled=force_enabled,
+                    manual_admission=manual_admission,
+                ).to_dict()
+            if symbol in allowlist:
+                return FinancialFusionEligibility(
+                    enabled=enabled,
+                    eligible=True,
+                    reason="ALLOWLIST",
+                    rollout_bucket=bucket,
+                    rollout_percent=rollout_percent,
+                    auto_run=auto_run,
+                    report_ready=report_ready,
+                    rag_ready=rag_ready,
+                    structured_ready=structured_ready,
+                    supported_fields=supported_fields,
+                    cached=cached,
+                    last_run_at=last_run_at,
+                    force_enabled=False,
+                    manual_admission=True,
+                ).to_dict()
+            return FinancialFusionEligibility(
+                enabled=enabled,
+                eligible=False,
+                reason="NOT_IN_ALLOWLIST",
+                rollout_bucket=bucket,
+                rollout_percent=rollout_percent,
+                auto_run=auto_run,
+                report_ready=report_ready,
+                rag_ready=rag_ready,
+                structured_ready=structured_ready,
+                supported_fields=supported_fields,
+                cached=cached,
+                last_run_at=last_run_at,
+                force_enabled=False,
+                manual_admission=True,
+            ).to_dict()
         if not enabled and not force_enabled:
             return FinancialFusionEligibility(
                 enabled=False,
@@ -99,6 +187,7 @@ class CompanyV2FinancialFusionRolloutService:
                 cached=cached,
                 last_run_at=last_run_at,
                 force_enabled=force_enabled,
+                manual_admission=manual_admission,
             ).to_dict()
 
         if not report_ready:
@@ -116,6 +205,7 @@ class CompanyV2FinancialFusionRolloutService:
                 cached=cached,
                 last_run_at=last_run_at,
                 force_enabled=force_enabled,
+                manual_admission=manual_admission,
             ).to_dict()
 
         if not rag_ready:
@@ -133,6 +223,7 @@ class CompanyV2FinancialFusionRolloutService:
                 cached=cached,
                 last_run_at=last_run_at,
                 force_enabled=force_enabled,
+                manual_admission=manual_admission,
             ).to_dict()
 
         if not structured_ready:
@@ -150,6 +241,7 @@ class CompanyV2FinancialFusionRolloutService:
                 cached=cached,
                 last_run_at=last_run_at,
                 force_enabled=force_enabled,
+                manual_admission=manual_admission,
             ).to_dict()
 
         if force_enabled:
@@ -167,6 +259,7 @@ class CompanyV2FinancialFusionRolloutService:
                 cached=cached,
                 last_run_at=last_run_at,
                 force_enabled=True,
+                manual_admission=manual_admission,
             ).to_dict()
 
         if symbol in allowlist:
@@ -184,6 +277,7 @@ class CompanyV2FinancialFusionRolloutService:
                 cached=cached,
                 last_run_at=last_run_at,
                 force_enabled=False,
+                manual_admission=manual_admission,
             ).to_dict()
 
         if bucket < rollout_percent:
@@ -201,6 +295,7 @@ class CompanyV2FinancialFusionRolloutService:
                 cached=cached,
                 last_run_at=last_run_at,
                 force_enabled=False,
+                manual_admission=manual_admission,
             ).to_dict()
 
         return FinancialFusionEligibility(
@@ -217,6 +312,7 @@ class CompanyV2FinancialFusionRolloutService:
             cached=cached,
             last_run_at=last_run_at,
             force_enabled=force_enabled,
+            manual_admission=manual_admission,
         ).to_dict()
 
 

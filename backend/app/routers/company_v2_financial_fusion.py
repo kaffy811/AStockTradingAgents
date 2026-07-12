@@ -62,6 +62,8 @@ def _report_source_url(doc: ReportDocument) -> str:
 def _should_dispatch_fusion_job(payload: dict[str, Any]) -> bool:
     if payload.get("duplicate") or payload.get("status") != "queued":
         return False
+    if not bool(getattr(settings, "company_v2_financial_fusion_enabled", False)):
+        return False
     auto_run = bool(getattr(settings, "company_v2_financial_fusion_auto_run", False))
     rollout_percent = int(getattr(settings, "company_v2_financial_fusion_rollout_percent", 0) or 0)
     if not auto_run or rollout_percent <= 0:

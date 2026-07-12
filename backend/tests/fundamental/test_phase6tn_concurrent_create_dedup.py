@@ -131,6 +131,7 @@ def test_duplicate_create_does_not_dispatch_background_job(tmp_path, monkeypatch
 
     monkeypatch.setattr(company_v2_financial_fusion_job_service, "create_job", fake_create_job)
     monkeypatch.setattr(company_v2_financial_fusion_job_service, "run_job", fake_run_job)
+    monkeypatch.setattr(settings, "company_v2_financial_fusion_enabled", True, raising=False)
     monkeypatch.setattr(settings, "company_v2_financial_fusion_auto_run", True, raising=False)
     monkeypatch.setattr(settings, "company_v2_financial_fusion_rollout_percent", 100, raising=False)
 

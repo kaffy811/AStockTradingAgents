@@ -19,6 +19,7 @@ def test_job_create_fast_response_without_background_task_when_auto_run_disabled
 
     monkeypatch.setattr(company_v2_financial_fusion_job_service, "create_job", fake_create_job)
     monkeypatch.setattr(company_v2_financial_fusion_job_service, "run_job", fake_run_job)
+    monkeypatch.setattr(settings, "company_v2_financial_fusion_enabled", True, raising=False)
     monkeypatch.setattr(settings, "company_v2_financial_fusion_auto_run", False, raising=False)
     monkeypatch.setattr(settings, "company_v2_financial_fusion_rollout_percent", 0, raising=False)
     bg = FakeBackgroundTasks()
@@ -51,6 +52,7 @@ def test_job_create_dispatches_once_only_when_auto_run_authorized(tmp_path, monk
 
     monkeypatch.setattr(company_v2_financial_fusion_job_service, "create_job", fake_create_job)
     monkeypatch.setattr(company_v2_financial_fusion_job_service, "run_job", fake_run_job)
+    monkeypatch.setattr(settings, "company_v2_financial_fusion_enabled", True, raising=False)
     monkeypatch.setattr(settings, "company_v2_financial_fusion_auto_run", True, raising=False)
     monkeypatch.setattr(settings, "company_v2_financial_fusion_rollout_percent", 100, raising=False)
     bg = FakeBackgroundTasks()
@@ -86,6 +88,7 @@ def test_job_create_does_not_dispatch_when_rollout_percent_is_zero(tmp_path, mon
 
     monkeypatch.setattr(company_v2_financial_fusion_job_service, "create_job", fake_create_job)
     monkeypatch.setattr(company_v2_financial_fusion_job_service, "run_job", fake_run_job)
+    monkeypatch.setattr(settings, "company_v2_financial_fusion_enabled", True, raising=False)
     monkeypatch.setattr(settings, "company_v2_financial_fusion_auto_run", True, raising=False)
     monkeypatch.setattr(settings, "company_v2_financial_fusion_rollout_percent", 0, raising=False)
     bg = FakeBackgroundTasks()

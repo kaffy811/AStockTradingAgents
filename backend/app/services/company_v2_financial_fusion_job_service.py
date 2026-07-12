@@ -156,11 +156,13 @@ class CompanyV2FinancialFusionJobService:
         refresh: bool,
         requester_scope: str = "manual",
         force_enabled: bool = False,
+        manual_admission: bool | None = None,
         trace: dict[str, float] | None = None,
     ) -> dict[str, Any]:
         trace = trace if trace is not None else {}
         await self.ensure_schema()
         selected_fields = list(fields or DEFAULT_FUSION_FIELDS)
+        manual_admission = requester_scope == "manual" if manual_admission is None else bool(manual_admission)
         started = perf_counter()
         rollout = company_v2_financial_fusion_rollout_service.evaluate(
             symbol=symbol,
@@ -169,6 +171,7 @@ class CompanyV2FinancialFusionJobService:
             rag_ready=True,
             structured_ready=True,
             force_enabled=force_enabled,
+            manual_admission=manual_admission,
             supported_fields=selected_fields,
         )
         trace["allowlist_check_ms"] = round((perf_counter() - started) * 1000, 2)
