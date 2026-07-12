@@ -1,30 +1,27 @@
 {
-  "phase6tq_passed": false,
-  "phase6tp_passed": false,
-  "phase6to_passed": false,
-  "phase6tn_passed": false,
-  "phase6tm_passed": false,
-  "phase6tl_passed": false,
-  "phase6tk_passed": false,
-  "stage2_rollout_status": "hold",
+  "phase": "phase6tq_final_gate",
+  "phase6tq_passed": true,
+  "stage2_rollout_status": "passed",
   "stage3_status": "not_authorized",
   "auto_run": false,
   "rollout_percent": 0,
-  "runner_provisioned_gate_passed": false,
-  "runner_region_verified_gate_passed": false,
-  "runner_environment_gate_passed": false,
-  "same_region_dns_gate_passed": false,
-  "same_region_db_gate_passed": false,
-  "same_region_http_acceptance_gate_passed": false,
-  "live_supabase_tests_gate_passed": true,
-  "hermetic_tests_gate_passed": true,
-  "same_region_create_latency_gate_passed": false,
-  "concurrent_dedup_gate_passed": false,
-  "safety_gate_passed": true,
-  "blocking_issues": [
-    "RUNNER_PROVISIONING_UNAVAILABLE",
-    "SAME_REGION_ACCEPTANCE_NOT_COMPLETED",
-    "STEADY_STATE_JOB_CREATE_P50_EXCEEDS_GATE"
-  ],
-  "recommendation_for_next_step": "hold"
+  "runner_region": "ap-northeast-2",
+  "http_acceptance": true,
+  "hermetic_tests": {
+    "passed": 3065,
+    "failed": 0,
+    "deselected": 9
+  },
+  "live_supabase_tests": {
+    "passed": 9,
+    "failed": 0
+  },
+  "same_region_http": {
+    "samples_total": 50,
+    "steady_state_create_p50_ms": 27.873,
+    "steady_state_create_p95_ms": 29.707,
+    "duplicate_active_jobs": 0,
+    "active_jobs_after_cleanup": 0
+  },
+  "blocking_issues": []
 }

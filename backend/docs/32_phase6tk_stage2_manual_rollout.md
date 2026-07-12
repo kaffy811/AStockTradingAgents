@@ -30,3 +30,57 @@ Manual job API:
 
 The job status response is intentionally lightweight and must not include local file
 paths, database connection strings, credentials, or stack traces.
+
+## Phase 6T-Q Same-Region Acceptance
+
+Use the same-region runner only. Cross-region measurements are diagnostic and do
+not replace acceptance.
+
+Prerequisites:
+
+- `SECRET_KEY` set
+- `DATABASE_URL` set
+- `COMPANY_V2_FINANCIAL_FUSION_SYMBOL_ALLOWLIST=601686,600519,300750,000725,000001`
+- `COMPANY_V2_FINANCIAL_FUSION_AUTO_RUN=false`
+- `COMPANY_V2_FINANCIAL_FUSION_ROLLOUT_PERCENT=0`
+
+Start the API on localhost:
+
+```bash
+cd backend
+source .venv/bin/activate
+source ~/.tradingagents_env
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+```
+
+Run acceptance:
+
+```bash
+cd backend
+source .venv/bin/activate
+source ~/.tradingagents_env
+.venv/bin/python scripts/company_v2_financial_fusion_phase6tq_acceptance.py \
+  --base-url http://127.0.0.1:8000 \
+  --warmup 10 \
+  --samples 50 \
+  --symbols 601686,600519,300750,000725,000001 \
+  --out-json docs/artifacts/company_v2_phase6tq_same_region_acceptance.json \
+  --out-md docs/artifacts/company_v2_phase6tq_same_region_acceptance.md
+```
+
+Gate conditions:
+
+- `p50 <= 300 ms`
+- `p95 <= 1000 ms`
+- live Supabase tests pass
+- active jobs are cleaned up to `0`
+
+Cleanup rules:
+
+- Only cancel jobs created by the acceptance script by default.
+- Do not cancel unknown production jobs unless `--cleanup-known-job-ids` is
+  explicitly provided.
+- Check active queued/running jobs before release.
+
+Do not enable automatic execution.
+Do not authorize Stage 3.

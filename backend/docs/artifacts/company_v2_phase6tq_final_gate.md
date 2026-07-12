@@ -1,11 +1,18 @@
 # Phase 6T-Q Final Gate
 
-## Result
+- Phase 6T-Q acceptance: passed
+- Stage 2 acceptance: passed
+- Stage 3: not authorized
+- auto_run: false
+- rollout_percent: 0
+- runner region: ap-northeast-2
+- hermetic tests: 3065 passed, 9 deselected
+- live Supabase tests: 9 passed
+- same-region HTTP samples: 50
+- steady-state create p50: 27.873 ms
+- steady-state create p95: 29.707 ms
+- duplicate active jobs: 0
+- active jobs after cleanup: 0
 
-- `phase6tq_passed`: `false`
-- `stage2_rollout_status`: `hold`
-- `blocking_issues`: `RUNNER_PROVISIONING_UNAVAILABLE`, `SAME_REGION_ACCEPTANCE_NOT_COMPLETED`, `STEADY_STATE_JOB_CREATE_P50_EXCEEDS_GATE`
-
-## Conclusion
-
-No same-region runner was provisioned in this session, so deployment-equivalent acceptance could not be completed truthfully.
+This confirms allowlist manual admission only.
+It does not enable automatic rollout or Stage 3 execution.

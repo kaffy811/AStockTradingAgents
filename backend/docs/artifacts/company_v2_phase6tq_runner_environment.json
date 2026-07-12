@@ -1,17 +1,12 @@
 {
   "phase": "phase6tq_runner_environment",
-  "status": "not_provisioned",
-  "provider": null,
-  "region": null,
-  "runtime_version": null,
-  "driver_version": null,
-  "pool_config": null,
-  "service_bind": null,
-  "health_endpoint": null,
-  "startup_duration_ms": null,
-  "db_pool_initialization_ms": null,
-  "worker_mode": null,
-  "notes": [
-    "No same-region runner could be launched from this environment."
-  ]
+  "status": "passed",
+  "cloud_provider": "Alibaba Cloud",
+  "region": "ap-northeast-2",
+  "os": "Ubuntu 24.04.2 LTS",
+  "architecture": "x86_64",
+  "python": "3.12",
+  "database_region": "ap-northeast-2",
+  "http_target": "localhost",
+  "public_api_exposure": false
 }

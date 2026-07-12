@@ -1,13 +1,23 @@
 {
   "phase": "phase6tq_same_region_acceptance",
-  "status": "not_executed",
-  "runner_provisioned": false,
-  "http_acceptance": false,
-  "samples_total": 0,
-  "steady_state_create_p50_ms": null,
-  "steady_state_create_p95_ms": null,
-  "duplicate_active_jobs": null,
-  "errors": [
-    "runner_not_provisioned"
-  ]
+  "status": "passed",
+  "runner_provisioned": true,
+  "runner_region": "ap-northeast-2",
+  "http_acceptance": true,
+  "warmup_total": 10,
+  "samples_total": 50,
+  "steady_state_create_p50_ms": 27.873,
+  "steady_state_create_p95_ms": 29.707,
+  "steady_state_create_min_ms": 27.122,
+  "steady_state_create_max_ms": 236.267,
+  "auto_run": false,
+  "rollout_percent": 0,
+  "manual_jobs_remained_queued": true,
+  "jobs_cancelled": 50,
+  "duplicate_active_jobs": 0,
+  "preexisting_active_jobs_found": 5,
+  "preexisting_active_jobs_cancelled": 5,
+  "active_jobs_after_cleanup": 0,
+  "cleanup_completed": true,
+  "errors": []
 }
