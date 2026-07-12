@@ -11,6 +11,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import load_only
 
+from app.core.config import settings
 from app.core.database import get_db
 from app.models.report_document import ReportDocument
 from app.services.company_v2_financial_fusion_report_readiness import (
@@ -56,6 +57,16 @@ def _symbol_from_ts_code(ts_code: str | None) -> str:
 
 def _report_source_url(doc: ReportDocument) -> str:
     return doc.pdf_url or doc.source_url or ""
+
+
+def _should_dispatch_fusion_job(payload: dict[str, Any]) -> bool:
+    if payload.get("duplicate") or payload.get("status") != "queued":
+        return False
+    auto_run = bool(getattr(settings, "company_v2_financial_fusion_auto_run", False))
+    rollout_percent = int(getattr(settings, "company_v2_financial_fusion_rollout_percent", 0) or 0)
+    if not auto_run or rollout_percent <= 0:
+        return False
+    return True
 
 
 async def _load_report(*, report_id: int, market: str, symbol: str, db: AsyncSession) -> ReportDocument:
@@ -139,7 +150,7 @@ async def create_company_v2_financial_fusion_job(
     )
     if not payload.get("ok"):
         return _json(payload, 200)
-    if not payload.get("duplicate") and payload.get("status") == "queued":
+    if _should_dispatch_fusion_job(payload):
         background_tasks.add_task(company_v2_financial_fusion_job_service.run_job, payload["job_id"])
     return _json(
         {

@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 import asyncio
+import json
 from datetime import datetime
 from types import SimpleNamespace
 
+from app.core.config import settings
+from app.routers.company_v2_financial_fusion import FinancialFusionJobRequest, create_company_v2_financial_fusion_job
 from app.services.company_v2_financial_fusion_job_service import company_v2_financial_fusion_job_service
 from app.services.company_v2_financial_fusion_rollout_service import company_v2_financial_fusion_rollout_service
 
-from .phase6tk_helpers import make_doc
+from .phase6tk_helpers import FakeBackgroundTasks, FakeDb, make_doc
 
 
 class _Result:
@@ -107,3 +110,39 @@ def test_duplicate_create_returns_existing_job_without_reinsert(tmp_path, monkey
     assert db.execute_count == 2
     assert db.commit_count == 1
     assert db.refresh_count == 0
+
+
+def test_duplicate_create_does_not_dispatch_background_job(tmp_path, monkeypatch):
+    doc = make_doc(tmp_path, symbol="300750", report_id=4)
+
+    async def fake_create_job(**_kwargs):
+        return {
+            "ok": True,
+            "job_id": "existing-job",
+            "status": "queued",
+            "cache_hit": False,
+            "duplicate": True,
+            "poll_after_ms": 1000,
+            "estimated_wait_seconds": 30,
+        }
+
+    async def fake_run_job(_job_id):
+        return None
+
+    monkeypatch.setattr(company_v2_financial_fusion_job_service, "create_job", fake_create_job)
+    monkeypatch.setattr(company_v2_financial_fusion_job_service, "run_job", fake_run_job)
+    monkeypatch.setattr(settings, "company_v2_financial_fusion_auto_run", True, raising=False)
+    monkeypatch.setattr(settings, "company_v2_financial_fusion_rollout_percent", 100, raising=False)
+
+    response = asyncio.run(
+        create_company_v2_financial_fusion_job(
+            background_tasks=FakeBackgroundTasks(),
+            body=FinancialFusionJobRequest(report_id=4, fields=["revenue"], refresh=False),
+            market="CN",
+            symbol="300750",
+            db=FakeDb(doc),
+        )
+    )
+
+    assert response.status_code == 202
+    assert json.loads(response.body)["job_id"] == "existing-job"
