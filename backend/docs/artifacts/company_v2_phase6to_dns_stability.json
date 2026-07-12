@@ -1,0 +1,15 @@
+{
+  "phase": "phase6to_dns_stability",
+  "hostname": "aws-1-ap-northeast-2.pooler.supabase.com",
+  "attempts": 30,
+  "dns_success_rate": 0.0,
+  "dns_p50_ms": 0.04,
+  "dns_p95_ms": 0.06,
+  "dns_error_count": 30,
+  "unique_resolved_addresses": [],
+  "ipv4_available": false,
+  "ipv6_available": false,
+  "resolver": "socket.getaddrinfo",
+  "ttl_observed": null,
+  "error_type": "gaierror"
+}

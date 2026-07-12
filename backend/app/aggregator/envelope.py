@@ -21,7 +21,7 @@ app/aggregator/envelope.py — 统一响应信封（DataEnvelope）
 from __future__ import annotations
 
 from datetime import datetime, timezone, timedelta
-from typing import Any, TypedDict
+from typing import Any, NotRequired, TypedDict
 
 
 # ── 类型定义 ─────────────────────────────────────────────────────────────────
@@ -37,6 +37,9 @@ class DataEnvelope(TypedDict):
         stale         — True 表示数据来自过期缓存（源暂不可用）
         partial_errors — ok=True 但某些子字段解析失败的描述列表
         cached_at     — ISO 8601 带时区时间戳；None 表示直接从源获取（未缓存）
+        error_code    — Phase 6N-8A：稳定错误码（DATA_SOURCE_EMPTY /
+                        DATA_SOURCE_UNAVAILABLE 等）。仅 provider 类错误使用，
+                        绝不承载 AUTH_REQUIRED（auth 走 HTTP 401/403）。
     """
     ok: bool
     data: Any | None
@@ -44,6 +47,7 @@ class DataEnvelope(TypedDict):
     stale: bool
     partial_errors: list[str]
     cached_at: str | None
+    error_code: NotRequired[str | None]
 
 
 # ── 辅助函数 ─────────────────────────────────────────────────────────────────
@@ -90,19 +94,22 @@ def err_envelope(
     *,
     stale: bool = False,
     cached_at: str | None = None,
+    error_code: str | None = None,
 ) -> DataEnvelope:
     """
     构建失败信封。
 
     Args:
-        reason:    失败原因描述（面向开发者，不直接暴露给用户）
-        stale:     是否为过期缓存（失败但仍有旧数据 — 一般不用此组合）
-        cached_at: 旧数据的缓存时间
+        reason:     失败原因描述（面向开发者，不直接暴露给用户）
+        stale:      是否为过期缓存（失败但仍有旧数据 — 一般不用此组合）
+        cached_at:  旧数据的缓存时间
+        error_code: Phase 6N-8A 稳定错误码（如 DATA_SOURCE_EMPTY /
+                    DATA_SOURCE_UNAVAILABLE），供前端分类展示
 
     Returns:
         DataEnvelope with ok=False, data=None
     """
-    return DataEnvelope(
+    env = DataEnvelope(
         ok=False,
         data=None,
         reason=reason,
@@ -110,6 +117,9 @@ def err_envelope(
         partial_errors=[],
         cached_at=cached_at,
     )
+    if error_code is not None:
+        env["error_code"] = error_code
+    return env
 
 
 _DEFAULT_META: dict = {
@@ -205,6 +215,15 @@ def build_api_response(
         group_seq = 0
         meta = dict(_DEFAULT_META)
 
+    # When ok=False, data is None — populate with a safe stub so frontend never crashes
+    if not envelope["ok"]:
+        reason_text = envelope.get("reason") or (errors[0] if errors else "数据源不可用")
+        data = {"rows": [], "reasons": [reason_text]}
+    elif envelope["partial_errors"] and isinstance(data, dict) and "reasons" not in data:
+        # ok=True but partial_errors present — surface reasons into data so frontend
+        # can show DataSourceBanner / FundamentalEmptyReason with a useful message.
+        data = {**data, "reasons": list(envelope["partial_errors"])}
+
     return {
         "market":      market.upper(),
         "symbol":      symbol,
@@ -215,7 +234,8 @@ def build_api_response(
         "group_seq":   group_seq,
         "data":        data,
         "errors":      errors,
-        "partial":     bool(envelope["partial_errors"]),
+        # partial=True when ok=False (data unavailable) OR when partial_errors exist
+        "partial":     (not envelope["ok"]) or bool(envelope["partial_errors"]),
         "stale":       envelope["stale"],
         "generated_at": _now_cst(),
         "source": {

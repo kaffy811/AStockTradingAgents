@@ -1,0 +1,45 @@
+{
+  "blocker_code": "SUPABASE_POOLER_DNS_RESOLUTION_FAILED",
+  "blocker_status": "resolved",
+  "resolved_at": "2026-07-11T20:00:00+08:00",
+  "affected_stage": "stage2_prepare",
+  "report_view_gate_passed": true,
+  "business_logic_regression": false,
+  "stage2_execution_complete": false,
+  "phase6tj_passed": false,
+  "next_action": "resume_stage2_download_with_manual_gates",
+  "tests_passed": true,
+  "build_passed": true,
+  "diagnostics": {
+    "dns_resolution": "passed",
+    "tcp_connectivity": "passed",
+    "db_authentication": "passed",
+    "ssl_handshake": "passed",
+    "database_query": "passed",
+    "root_cause": "LOCAL_DNS_CONFIGURATION",
+    "root_cause_note": "Earlier DNS resolution failure for aws-1-ap-northeast-2.pooler.supabase.com was transient (local resolver / network). At diagnostic time (2026-07-11) system nslookup/dig/dscacheutil, Python getaddrinfo, TCP 5432/6543, and SQLAlchemy asyncpg SELECT 1 all succeeded. No config change was required.",
+    "recommended_action": "No DATABASE_URL change needed. Resume Stage 2 from download step using --resume; run one step at a time with manual review between steps."
+  },
+  "endpoint_verification": {
+    "database_url_masked": "postgresql+asyncpg://postgres.qvpdtnazhxbfifrjdfdf:***@aws-1-ap-northeast-2.pooler.supabase.com:6543/postgres",
+    "endpoint_type": "transaction_pooler",
+    "region": "ap-northeast-2",
+    "port": 6543,
+    "username_contains_project_ref": true,
+    "url_format": "sqlalchemy_asyncpg",
+    "dns_cname": "pool-tcp-apne21-d945ac5-227b13d6652af255.elb.ap-northeast-2.amazonaws.com",
+    "resolved_ips": ["3.39.47.126", "43.202.154.182"]
+  },
+  "stage2_resume_capability": {
+    "script": "backend/scripts/company_v2_financial_fusion_stage2_prepare.py",
+    "supports_checkpoint": true,
+    "supports_resume": true,
+    "supports_single_step": true,
+    "supports_single_symbol": true,
+    "skips_completed_symbols": true,
+    "retries_failed_or_timeout_symbols": true,
+    "checkpoint_path": "backend/docs/artifacts/company_v2_financial_fusion_stage2_prepare_phase6tj.checkpoint.json",
+    "checkpoint_exists": false,
+    "resume_point": "download (no prior checkpoint; Stage 2 was never actually started)"
+  }
+}

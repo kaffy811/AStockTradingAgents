@@ -1,0 +1,13 @@
+{
+  "phase": "phase6tq_same_region_acceptance",
+  "status": "not_executed",
+  "runner_provisioned": false,
+  "http_acceptance": false,
+  "samples_total": 0,
+  "steady_state_create_p50_ms": null,
+  "steady_state_create_p95_ms": null,
+  "duplicate_active_jobs": null,
+  "errors": [
+    "runner_not_provisioned"
+  ]
+}

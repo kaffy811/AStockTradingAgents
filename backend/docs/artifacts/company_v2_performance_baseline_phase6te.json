@@ -1,0 +1,453 @@
+{
+  "generated_at": "2026-07-11",
+  "phase6te1_deep_timeout_baseline": [
+    {
+      "symbol": "600519",
+      "final_status": "failed",
+      "timeout": true,
+      "elapsed_ms": 0,
+      "provider_calls": null,
+      "provider_call_accounting": null,
+      "performance_progress": null,
+      "cache_hit": false,
+      "warnings": [],
+      "blocking_issues": [
+        "per_symbol_timeout_exceeded:180s"
+      ]
+    },
+    {
+      "symbol": "300750",
+      "final_status": "failed",
+      "timeout": true,
+      "elapsed_ms": 0,
+      "provider_calls": null,
+      "provider_call_accounting": null,
+      "performance_progress": null,
+      "cache_hit": false,
+      "warnings": [],
+      "blocking_issues": [
+        "per_symbol_timeout_exceeded:180s"
+      ]
+    },
+    {
+      "symbol": "000001",
+      "final_status": "failed",
+      "timeout": true,
+      "elapsed_ms": 0,
+      "provider_calls": null,
+      "provider_call_accounting": null,
+      "performance_progress": null,
+      "cache_hit": false,
+      "warnings": [],
+      "blocking_issues": [
+        "per_symbol_timeout_exceeded:180s"
+      ]
+    }
+  ],
+  "phase6te2_deep_repaired": [
+    {
+      "symbol": "600519",
+      "final_status": "passed",
+      "timeout": false,
+      "elapsed_ms": 13124,
+      "provider_calls": 120,
+      "provider_call_accounting": {
+        "planned_calls": 120,
+        "actual_calls": 120,
+        "calls_by_endpoint": {
+          "profit": 20,
+          "growth": 20,
+          "balance": 20,
+          "operation": 20,
+          "cash_flow": 20,
+          "dupont": 20
+        },
+        "duplicate_calls_avoided": 600
+      },
+      "performance_progress": {
+        "provider_calls_completed": 120,
+        "provider_calls_planned": 120,
+        "years_completed": [
+          2021,
+          2022,
+          2023,
+          2024,
+          2025
+        ],
+        "current_year": 2025,
+        "current_quarter": 4,
+        "modules_completed": [
+          "profitability",
+          "growth",
+          "solvency",
+          "operation_capability",
+          "cashflow_quality",
+          "dupont"
+        ],
+        "cache_hits": 0,
+        "last_successful_operation": "cninfo_discovery"
+      },
+      "cache_hit": false,
+      "warnings": [],
+      "blocking_issues": []
+    },
+    {
+      "symbol": "300750",
+      "final_status": "passed",
+      "timeout": false,
+      "elapsed_ms": 42175,
+      "provider_calls": 120,
+      "provider_call_accounting": {
+        "planned_calls": 120,
+        "actual_calls": 120,
+        "calls_by_endpoint": {
+          "profit": 20,
+          "growth": 20,
+          "balance": 20,
+          "operation": 20,
+          "cash_flow": 20,
+          "dupont": 20
+        },
+        "duplicate_calls_avoided": 600
+      },
+      "performance_progress": {
+        "provider_calls_completed": 120,
+        "provider_calls_planned": 120,
+        "years_completed": [
+          2021,
+          2022,
+          2023,
+          2024,
+          2025
+        ],
+        "current_year": 2025,
+        "current_quarter": 4,
+        "modules_completed": [
+          "profitability",
+          "growth",
+          "solvency",
+          "operation_capability",
+          "cashflow_quality",
+          "dupont"
+        ],
+        "cache_hits": 0,
+        "last_successful_operation": "cninfo_discovery"
+      },
+      "cache_hit": false,
+      "warnings": [],
+      "blocking_issues": []
+    },
+    {
+      "symbol": "000001",
+      "final_status": "passed",
+      "timeout": false,
+      "elapsed_ms": 22654,
+      "provider_calls": 120,
+      "provider_call_accounting": {
+        "planned_calls": 120,
+        "actual_calls": 120,
+        "calls_by_endpoint": {
+          "profit": 20,
+          "growth": 20,
+          "balance": 20,
+          "operation": 20,
+          "cash_flow": 20,
+          "dupont": 20
+        },
+        "duplicate_calls_avoided": 600
+      },
+      "performance_progress": {
+        "provider_calls_completed": 120,
+        "provider_calls_planned": 120,
+        "years_completed": [
+          2021,
+          2022,
+          2023,
+          2024,
+          2025
+        ],
+        "current_year": 2025,
+        "current_quarter": 4,
+        "modules_completed": [
+          "profitability",
+          "growth",
+          "solvency",
+          "operation_capability",
+          "cashflow_quality",
+          "dupont"
+        ],
+        "cache_hits": 0,
+        "last_successful_operation": "cninfo_discovery"
+      },
+      "cache_hit": false,
+      "warnings": [],
+      "blocking_issues": []
+    }
+  ],
+  "phase6te2_smokes": {
+    "300750": {
+      "symbol": "300750",
+      "final_status": "passed",
+      "timeout": false,
+      "elapsed_ms": 33850,
+      "provider_calls": 120,
+      "provider_call_accounting": {
+        "planned_calls": 120,
+        "actual_calls": 120,
+        "calls_by_endpoint": {
+          "profit": 20,
+          "growth": 20,
+          "balance": 20,
+          "operation": 20,
+          "cash_flow": 20,
+          "dupont": 20
+        },
+        "duplicate_calls_avoided": 600
+      },
+      "performance_progress": {
+        "provider_calls_completed": 120,
+        "provider_calls_planned": 120,
+        "years_completed": [],
+        "current_year": 2021,
+        "current_quarter": 1,
+        "modules_completed": [
+          "profitability",
+          "growth",
+          "solvency",
+          "operation_capability",
+          "cashflow_quality",
+          "dupont"
+        ],
+        "cache_hits": 0,
+        "last_successful_operation": "financial_stage_artifact_write"
+      },
+      "cache_hit": false,
+      "warnings": [],
+      "blocking_issues": []
+    },
+    "600519": {
+      "symbol": "600519",
+      "final_status": "passed",
+      "timeout": false,
+      "elapsed_ms": 20318,
+      "provider_calls": 120,
+      "provider_call_accounting": {
+        "planned_calls": 120,
+        "actual_calls": 120,
+        "calls_by_endpoint": {
+          "profit": 20,
+          "growth": 20,
+          "balance": 20,
+          "operation": 20,
+          "cash_flow": 20,
+          "dupont": 20
+        },
+        "duplicate_calls_avoided": 600
+      },
+      "performance_progress": {
+        "provider_calls_completed": 120,
+        "provider_calls_planned": 120,
+        "years_completed": [],
+        "current_year": 2021,
+        "current_quarter": 1,
+        "modules_completed": [
+          "profitability",
+          "growth",
+          "solvency",
+          "operation_capability",
+          "cashflow_quality",
+          "dupont"
+        ],
+        "cache_hits": 0,
+        "last_successful_operation": "financial_stage_artifact_write"
+      },
+      "cache_hit": false,
+      "warnings": [],
+      "blocking_issues": []
+    },
+    "000001": {
+      "symbol": "000001",
+      "final_status": "warning",
+      "timeout": false,
+      "elapsed_ms": 33291,
+      "provider_calls": 120,
+      "provider_call_accounting": {
+        "planned_calls": 120,
+        "actual_calls": 120,
+        "calls_by_endpoint": {
+          "profit": 20,
+          "growth": 20,
+          "balance": 20,
+          "operation": 20,
+          "cash_flow": 20,
+          "dupont": 20
+        },
+        "duplicate_calls_avoided": 600
+      },
+      "performance_progress": {
+        "provider_calls_completed": 120,
+        "provider_calls_planned": 120,
+        "years_completed": [],
+        "current_year": 2021,
+        "current_quarter": 1,
+        "modules_completed": [
+          "profitability",
+          "growth",
+          "solvency",
+          "operation_capability",
+          "cashflow_quality",
+          "dupont"
+        ],
+        "cache_hits": 0,
+        "last_successful_operation": "financial_stage_artifact_write"
+      },
+      "cache_hit": false,
+      "warnings": [
+        "history_audit_warning:profitability",
+        "history_audit_warning:growth",
+        "history_audit_warning:solvency",
+        "history_audit_warning:operation_capability",
+        "history_audit_warning:cashflow_quality",
+        "history_audit_warning:dupont"
+      ],
+      "blocking_issues": []
+    }
+  },
+  "fast_symbols": [
+    {
+      "symbol": "600519",
+      "final_status": "passed",
+      "timeout": false,
+      "elapsed_ms": 145877,
+      "provider_calls": 120,
+      "provider_call_accounting": null,
+      "performance_progress": null,
+      "cache_hit": false,
+      "warnings": [],
+      "blocking_issues": []
+    },
+    {
+      "symbol": "000725",
+      "final_status": "passed",
+      "timeout": false,
+      "elapsed_ms": 110498,
+      "provider_calls": 120,
+      "provider_call_accounting": null,
+      "performance_progress": null,
+      "cache_hit": false,
+      "warnings": [],
+      "blocking_issues": []
+    },
+    {
+      "symbol": "601686",
+      "final_status": "warning",
+      "timeout": false,
+      "elapsed_ms": 76412,
+      "provider_calls": 42,
+      "provider_call_accounting": null,
+      "performance_progress": null,
+      "cache_hit": false,
+      "warnings": [
+        "history_audit_warning:dupont"
+      ],
+      "blocking_issues": []
+    },
+    {
+      "symbol": "300750",
+      "final_status": "passed",
+      "timeout": false,
+      "elapsed_ms": 87126,
+      "provider_calls": 54,
+      "provider_call_accounting": null,
+      "performance_progress": null,
+      "cache_hit": false,
+      "warnings": [],
+      "blocking_issues": []
+    },
+    {
+      "symbol": "688981",
+      "final_status": "passed",
+      "timeout": false,
+      "elapsed_ms": 58015,
+      "provider_calls": 42,
+      "provider_call_accounting": null,
+      "performance_progress": null,
+      "cache_hit": false,
+      "warnings": [],
+      "blocking_issues": []
+    },
+    {
+      "symbol": "601318",
+      "final_status": "passed",
+      "timeout": false,
+      "elapsed_ms": 136910,
+      "provider_calls": 120,
+      "provider_call_accounting": null,
+      "performance_progress": null,
+      "cache_hit": false,
+      "warnings": [],
+      "blocking_issues": []
+    },
+    {
+      "symbol": "000001",
+      "final_status": "warning",
+      "timeout": false,
+      "elapsed_ms": 120181,
+      "provider_calls": 120,
+      "provider_call_accounting": null,
+      "performance_progress": null,
+      "cache_hit": false,
+      "warnings": [
+        "history_audit_warning:profitability",
+        "history_audit_warning:growth",
+        "history_audit_warning:solvency",
+        "history_audit_warning:operation_capability",
+        "history_audit_warning:cashflow_quality",
+        "history_audit_warning:dupont"
+      ],
+      "blocking_issues": []
+    },
+    {
+      "symbol": "601728",
+      "final_status": "passed",
+      "timeout": false,
+      "elapsed_ms": 53059,
+      "provider_calls": 36,
+      "provider_call_accounting": null,
+      "performance_progress": null,
+      "cache_hit": false,
+      "warnings": [],
+      "blocking_issues": []
+    }
+  ],
+  "000725_retry": {
+    "symbol": "000725",
+    "final_status": "passed",
+    "timeout": false,
+    "elapsed_ms": 110498,
+    "provider_calls": 120,
+    "provider_call_accounting": null,
+    "performance_progress": null,
+    "cache_hit": false,
+    "warnings": [],
+    "blocking_issues": []
+  },
+  "601686_chart_reaudit": {
+    "symbol": "601686",
+    "final_status": "warning",
+    "timeout": false,
+    "elapsed_ms": 76412,
+    "provider_calls": 42,
+    "provider_call_accounting": null,
+    "performance_progress": null,
+    "cache_hit": false,
+    "warnings": [
+      "history_audit_warning:dupont"
+    ],
+    "blocking_issues": []
+  },
+  "targeted_tests": {
+    "backend": "33 passed in 0.20s",
+    "command": "backend/.venv/bin/python -m pytest backend/tests/fundamental/test_phase6te2_quarterly_deep_performance.py backend/tests/fundamental/test_phase6te1_history_fetch_performance.py backend/tests/fundamental/test_phase6te_chart_contract_validation.py -q"
+  }
+}

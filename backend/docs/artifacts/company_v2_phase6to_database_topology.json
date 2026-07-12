@@ -1,0 +1,29 @@
+{
+  "phase": "phase6to_database_topology",
+  "database_url_host": "aws-1-ap-northeast-2.pooler.supabase.com",
+  "database_region": "ap-northeast-2",
+  "supabase_pooler_region": "ap-northeast-2",
+  "transaction_pooler_endpoint": "postgresql+asyncpg://<masked>@aws-1-ap-northeast-2.pooler.supabase.com:6543/postgres",
+  "session_pooler_endpoint": null,
+  "direct_database_endpoint": null,
+  "application_region": "United States (estimated developer workstation)",
+  "developer_machine_region": "United States (estimated)",
+  "dns_resolver": "system socket.getaddrinfo",
+  "driver": "postgresql+asyncpg",
+  "engine_mode": "async",
+  "poolclass": "AsyncAdaptedQueuePool",
+  "pool_size": 5,
+  "max_overflow": 10,
+  "pool_timeout": null,
+  "pool_recycle": 1800,
+  "pool_pre_ping": false,
+  "statement_cache_size": 0,
+  "prepared_statement_mode": "disabled_for_pgbouncer_compatibility",
+  "hostname_region_match": true,
+  "cross_continent_rtt_likely": true,
+  "notes": [
+    "The hostname resolves to ap-northeast-2, which matches the Supabase pooler region.",
+    "Local execution is estimated to be in the United States, so the measured path is likely cross-continent.",
+    "The current shell could not resolve the pooler host consistently, so live same-region acceptance was not completed here."
+  ]
+}

@@ -26,9 +26,11 @@ export async function baseFetch(path, options = {}) {
   })
 
   if (res.status === 401) {
-    authStore.logout()
+    // Phase 6N-8A: session expired — mark it so LoginCard can explain why.
+    authStore.logout({ expired: true })
     const err = new Error('登录已过期，请重新登录')
     err.status = 401
+    err.errorCode = 'AUTH_REQUIRED'
     throw err
   }
 
@@ -39,8 +41,13 @@ export async function baseFetch(path, options = {}) {
   const data = await res.json()
 
   if (!res.ok) {
-    const err = new Error(data.detail || `HTTP ${res.status}`)
+    const err = new Error(
+      (typeof data.detail === 'string' && data.detail) || data.message || `HTTP ${res.status}`
+    )
     err.status = res.status
+    // Phase 6N-8A: propagate stable backend error_code (AUTH_REQUIRED /
+    // DATA_SOURCE_EMPTY / DATA_SOURCE_UNAVAILABLE / ...) for classification.
+    err.errorCode = data.error_code || null
     throw err
   }
 

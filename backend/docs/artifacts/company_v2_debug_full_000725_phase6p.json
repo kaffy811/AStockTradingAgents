@@ -1,0 +1,4837 @@
+{
+  "schema_version": "2.0",
+  "schema_features": [
+    "formatter_registry",
+    "field_trace",
+    "coverage",
+    "provider_summary",
+    "computed_field_registry",
+    "report_status_machine"
+  ],
+  "request_id": "0781d3b5-d52e-4972-86df-7bdd16f6c2a4",
+  "market": "CN",
+  "symbol": "000725",
+  "ts_code": "000725.SZ",
+  "data_mode": "standard",
+  "partial": true,
+  "summary": {
+    "providers_attempted": 24,
+    "providers_success": 20,
+    "providers_data_success": 0,
+    "providers_timeout": 0,
+    "providers_failed": 0,
+    "modules_renderable": 1,
+    "modules_unavailable": 10,
+    "cache_hit_count": 2,
+    "cache_stale_count": 0,
+    "cache_unavailable_count": 0,
+    "report_pdf_not_found_count": 2,
+    "report_not_ingested_count": 0,
+    "mapping_error_count": 8,
+    "render_rule_error_count": 0,
+    "fallback_to_legacy_count": 0,
+    "provider_calls_count": {
+      "baostock_aggregate": 1
+    },
+    "baostock_aggregate_calls": 1
+  },
+  "agent_summary": {
+    "overall_coverage_pct": 9.09,
+    "mapping_quality_pct": 27.27,
+    "provider_health_pct": 0.0,
+    "computed_fields_count": 0,
+    "missing_critical_fields": [
+      "market_cap",
+      "float_market_cap"
+    ],
+    "diagnosis_tags": [
+      "MAPPING_ERROR",
+      "MISSING_COMPUTABLE_FIELDS",
+      "REPORT_PDF_NOT_FOUND",
+      "OK"
+    ],
+    "recommended_next_actions": [
+      "Enable share capital provider or reuse BaoStock total_share for market_cap.",
+      "Limit automated analysis to data-availability caveats until coverage improves."
+    ]
+  },
+  "modules": {
+    "quote_overview": {
+      "schema_version": "2.0",
+      "schema_features": [
+        "formatter_registry",
+        "field_trace",
+        "coverage",
+        "provider_summary",
+        "computed_field_registry",
+        "report_status_machine"
+      ],
+      "request_id": "8b6518c2-6514-47e3-8ead-e770a574bf86",
+      "market": "CN",
+      "symbol": "000725",
+      "ts_code": "000725.SZ",
+      "module_key": "quote_overview",
+      "data_mode": "standard",
+      "stage": "final",
+      "ok": false,
+      "partial": true,
+      "stale": false,
+      "source_chain": [
+        {
+          "provider": "akshare",
+          "endpoint": "stock_zh_a_spot_em",
+          "attempted": true,
+          "success": true,
+          "status": "success",
+          "started_at": "2026-07-09T11:20:47.111392+00:00",
+          "ended_at": "2026-07-09T11:20:52.342229+00:00",
+          "elapsed_ms": 5230,
+          "latency_ms": 5230,
+          "rows_count": 2,
+          "columns": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "non_null_fields": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "missing_fields": [],
+          "error_code": null,
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": "tuple",
+          "raw_shape": [
+            2,
+            8
+          ],
+          "detached_timeout": false,
+          "aggregate_source_id": null,
+          "data_success": false
+        },
+        {
+          "provider": "baostock",
+          "endpoint": "query_history_k_data_plus",
+          "attempted": true,
+          "success": false,
+          "status": "empty",
+          "started_at": "2026-07-09T11:20:52.342372+00:00",
+          "ended_at": "2026-07-09T11:20:52.344663+00:00",
+          "elapsed_ms": 2,
+          "latency_ms": 2,
+          "rows_count": 0,
+          "columns": [],
+          "non_null_fields": [],
+          "missing_fields": [],
+          "error_code": "PROVIDER_EMPTY",
+          "error_message": "provider returned no rows",
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": "NoneType",
+          "raw_shape": [
+            0,
+            0
+          ],
+          "detached_timeout": false,
+          "aggregate_source_id": null,
+          "data_success": false
+        }
+      ],
+      "raw": {
+        "baostock": [
+          {
+            "endpoint": "query_history_k_data_plus",
+            "raw_type": "NoneType",
+            "raw_shape": [
+              0,
+              0
+            ],
+            "columns": [],
+            "rows_count": 0,
+            "status": "empty",
+            "started_at": "2026-07-09T11:20:52.342372+00:00",
+            "ended_at": "2026-07-09T11:20:52.344663+00:00",
+            "elapsed_ms": 2,
+            "detached_timeout": false,
+            "raw_sample": [],
+            "error_code": "PROVIDER_EMPTY",
+            "error_message": "provider returned no rows",
+            "raw_full": []
+          }
+        ],
+        "akshare": [
+          {
+            "endpoint": "stock_zh_a_spot_em",
+            "raw_type": "tuple",
+            "raw_shape": [
+              2,
+              8
+            ],
+            "columns": [
+              "elapsed_ms",
+              "errors",
+              "interface",
+              "provider",
+              "reason_code",
+              "source",
+              "source_fields",
+              "status"
+            ],
+            "rows_count": 2,
+            "status": "success",
+            "started_at": "2026-07-09T11:20:47.111392+00:00",
+            "ended_at": "2026-07-09T11:20:52.342229+00:00",
+            "elapsed_ms": 5230,
+            "detached_timeout": false,
+            "raw_sample": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "stock_zh_a_spot_em",
+                "source": "akshare_spot_em",
+                "status": "failed",
+                "elapsed_ms": 5230,
+                "reason_code": "NETWORK_UNAVAILABLE",
+                "source_fields": {},
+                "errors": [
+                  {
+                    "error": "HTTPSConnectionPool(host='82.push2.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/clist/get?pn=1&pz=100&po=1&np=1&ut=bd1d9ddb04089700cf9c27f6f7426281&fltt=2&invt=2&fid=f12&fs=m%3A0+"
+                  }
+                ]
+              }
+            ],
+            "error_code": null,
+            "error_message": null,
+            "raw_full": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "stock_zh_a_spot_em",
+                "source": "akshare_spot_em",
+                "status": "failed",
+                "elapsed_ms": 5230,
+                "reason_code": "NETWORK_UNAVAILABLE",
+                "source_fields": {},
+                "errors": [
+                  {
+                    "error": "HTTPSConnectionPool(host='82.push2.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/clist/get?pn=1&pz=100&po=1&np=1&ut=bd1d9ddb04089700cf9c27f6f7426281&fltt=2&invt=2&fid=f12&fs=m%3A0+"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "tencent": [],
+        "sina": [],
+        "eastmoney": [],
+        "pdf_metrics": []
+      },
+      "normalized": {
+        "rows": [],
+        "metrics": {},
+        "fields": {}
+      },
+      "completion": {
+        "filled_fields": {},
+        "still_missing_fields": {
+          "latest_price": "FIELD_MISSING",
+          "recent_close": "FIELD_MISSING",
+          "open": "FIELD_MISSING",
+          "high": "FIELD_MISSING",
+          "low": "FIELD_MISSING",
+          "volume": "FIELD_MISSING",
+          "amount": "FIELD_MISSING",
+          "pct_chg": "FIELD_MISSING",
+          "turnover": "FIELD_MISSING",
+          "pe_ttm": "FIELD_MISSING",
+          "pb": "FIELD_MISSING",
+          "ps_ttm": "FIELD_MISSING",
+          "pcf_ncf_ttm": "FIELD_MISSING",
+          "market_cap": "SHARE_CAPITAL_MISSING",
+          "float_market_cap": "SHARE_CAPITAL_MISSING"
+        },
+        "computed_fields": {},
+        "fallback_chain": {}
+      },
+      "render": {
+        "renderable": false,
+        "chart_renderable": false,
+        "table_renderable": false,
+        "has_displayable_data": false,
+        "visible_fields": [],
+        "hidden_fields": [
+          "latest_price",
+          "recent_close",
+          "open",
+          "high",
+          "low",
+          "volume",
+          "amount",
+          "pct_chg",
+          "turnover",
+          "pe_ttm",
+          "pb",
+          "ps_ttm",
+          "pcf_ncf_ttm",
+          "market_cap",
+          "float_market_cap"
+        ],
+        "reason": "ALL_NULL_ROWS"
+      },
+      "field_trace": {},
+      "coverage": {
+        "required_fields": 15,
+        "filled_fields": 0,
+        "computed_fields": 0,
+        "missing_fields": 15,
+        "coverage_pct": 0.0,
+        "required_field_list": [
+          "latest_price",
+          "recent_close",
+          "open",
+          "high",
+          "low",
+          "volume",
+          "amount",
+          "pct_chg",
+          "turnover",
+          "pe_ttm",
+          "pb",
+          "ps_ttm",
+          "pcf_ncf_ttm",
+          "market_cap",
+          "float_market_cap"
+        ],
+        "filled_field_list": [],
+        "computed_field_list": [],
+        "missing_field_map": {
+          "latest_price": "FIELD_MISSING",
+          "recent_close": "FIELD_MISSING",
+          "open": "FIELD_MISSING",
+          "high": "FIELD_MISSING",
+          "low": "FIELD_MISSING",
+          "volume": "FIELD_MISSING",
+          "amount": "FIELD_MISSING",
+          "pct_chg": "FIELD_MISSING",
+          "turnover": "FIELD_MISSING",
+          "pe_ttm": "FIELD_MISSING",
+          "pb": "FIELD_MISSING",
+          "ps_ttm": "FIELD_MISSING",
+          "pcf_ncf_ttm": "FIELD_MISSING",
+          "market_cap": "SHARE_CAPITAL_MISSING",
+          "float_market_cap": "SHARE_CAPITAL_MISSING"
+        }
+      },
+      "provider_summary": {
+        "akshare": {
+          "attempted": true,
+          "success": true,
+          "data_success": false,
+          "rows": 2,
+          "fields_available": 8,
+          "fields_mapped": 0,
+          "fields_used": 0,
+          "missing": 15,
+          "timeout": false,
+          "network_error": false,
+          "cache_hit": false,
+          "reason_code": null
+        },
+        "baostock": {
+          "attempted": true,
+          "success": false,
+          "data_success": false,
+          "rows": 0,
+          "fields_available": 0,
+          "fields_mapped": 0,
+          "fields_used": 0,
+          "missing": 15,
+          "timeout": false,
+          "network_error": false,
+          "cache_hit": false,
+          "reason_code": "PROVIDER_EMPTY"
+        }
+      },
+      "errors": [
+        {
+          "layer": "render",
+          "error_code": "ALL_NULL_ROWS",
+          "message": "No displayable core fields after completion",
+          "provider": null,
+          "endpoint": null,
+          "field": null
+        }
+      ],
+      "warnings": [],
+      "diagnosis": {
+        "module_key": "quote_overview",
+        "primary_issue": "MAPPING_ERROR",
+        "tags": [
+          "MAPPING_ERROR",
+          "MISSING_COMPUTABLE_FIELDS"
+        ],
+        "severity": "warning",
+        "coverage_pct": 0.0,
+        "raw_rows_count": 2,
+        "normalized_rows_count": 0,
+        "valid_fields_count": 0,
+        "evidence": [
+          "raw rows_count=2, normalized rows_count=0"
+        ],
+        "recommended_fix": [
+          "add field mapping",
+          "Enable share capital provider or reuse BaoStock total_share for market_cap."
+        ]
+      },
+      "agent_summary": {
+        "overall_coverage_pct": 0.0,
+        "mapping_quality_pct": 0.0,
+        "provider_health_pct": 0.0,
+        "computed_fields_count": 0,
+        "missing_critical_fields": [
+          "market_cap",
+          "float_market_cap"
+        ],
+        "diagnosis_tags": [
+          "MAPPING_ERROR",
+          "MISSING_COMPUTABLE_FIELDS"
+        ],
+        "recommended_next_actions": [
+          "Enable share capital provider or reuse BaoStock total_share for market_cap.",
+          "Limit automated analysis to data-availability caveats until coverage improves."
+        ]
+      },
+      "debug": {
+        "enabled": true,
+        "raw_truncated": false,
+        "max_raw_chars": 20000
+      }
+    },
+    "valuation": {
+      "schema_version": "2.0",
+      "schema_features": [
+        "formatter_registry",
+        "field_trace",
+        "coverage",
+        "provider_summary",
+        "computed_field_registry",
+        "report_status_machine"
+      ],
+      "request_id": "e72fdca4-2c38-44a6-810a-bf92f2f49cd6",
+      "market": "CN",
+      "symbol": "000725",
+      "ts_code": "000725.SZ",
+      "module_key": "valuation",
+      "data_mode": "standard",
+      "stage": "final",
+      "ok": false,
+      "partial": true,
+      "stale": false,
+      "source_chain": [
+        {
+          "provider": "akshare",
+          "endpoint": "stock_zh_a_spot_em",
+          "attempted": true,
+          "success": true,
+          "status": "success",
+          "started_at": "2026-07-09T11:20:47.111392+00:00",
+          "ended_at": "2026-07-09T11:20:52.342229+00:00",
+          "elapsed_ms": 5230,
+          "latency_ms": 5230,
+          "rows_count": 2,
+          "columns": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "non_null_fields": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "missing_fields": [],
+          "error_code": null,
+          "error_message": null,
+          "cache_hit": true,
+          "cache_stale": false,
+          "cache_status": "ok",
+          "raw_type": "tuple",
+          "raw_shape": [
+            2,
+            8
+          ],
+          "detached_timeout": false,
+          "aggregate_source_id": null,
+          "data_success": false
+        },
+        {
+          "provider": "baostock",
+          "endpoint": "query_history_k_data_plus",
+          "attempted": true,
+          "success": false,
+          "status": "empty",
+          "started_at": "2026-07-09T11:20:52.342372+00:00",
+          "ended_at": "2026-07-09T11:20:52.344663+00:00",
+          "elapsed_ms": 2,
+          "latency_ms": 2,
+          "rows_count": 0,
+          "columns": [],
+          "non_null_fields": [],
+          "missing_fields": [],
+          "error_code": "PROVIDER_EMPTY",
+          "error_message": "provider returned no rows",
+          "cache_hit": true,
+          "cache_stale": false,
+          "cache_status": "ok",
+          "raw_type": "NoneType",
+          "raw_shape": [
+            0,
+            0
+          ],
+          "detached_timeout": false,
+          "aggregate_source_id": null,
+          "data_success": false
+        }
+      ],
+      "raw": {
+        "baostock": [
+          {
+            "endpoint": "query_history_k_data_plus",
+            "raw_type": "NoneType",
+            "raw_shape": [
+              0,
+              0
+            ],
+            "columns": [],
+            "rows_count": 0,
+            "status": "empty",
+            "started_at": "2026-07-09T11:20:52.342372+00:00",
+            "ended_at": "2026-07-09T11:20:52.344663+00:00",
+            "elapsed_ms": 2,
+            "detached_timeout": false,
+            "raw_sample": [],
+            "error_code": "PROVIDER_EMPTY",
+            "error_message": "provider returned no rows",
+            "raw_full": []
+          }
+        ],
+        "akshare": [
+          {
+            "endpoint": "stock_zh_a_spot_em",
+            "raw_type": "tuple",
+            "raw_shape": [
+              2,
+              8
+            ],
+            "columns": [
+              "elapsed_ms",
+              "errors",
+              "interface",
+              "provider",
+              "reason_code",
+              "source",
+              "source_fields",
+              "status"
+            ],
+            "rows_count": 2,
+            "status": "success",
+            "started_at": "2026-07-09T11:20:47.111392+00:00",
+            "ended_at": "2026-07-09T11:20:52.342229+00:00",
+            "elapsed_ms": 5230,
+            "detached_timeout": false,
+            "raw_sample": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "stock_zh_a_spot_em",
+                "source": "akshare_spot_em",
+                "status": "failed",
+                "elapsed_ms": 5230,
+                "reason_code": "NETWORK_UNAVAILABLE",
+                "source_fields": {},
+                "errors": [
+                  {
+                    "error": "HTTPSConnectionPool(host='82.push2.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/clist/get?pn=1&pz=100&po=1&np=1&ut=bd1d9ddb04089700cf9c27f6f7426281&fltt=2&invt=2&fid=f12&fs=m%3A0+"
+                  }
+                ]
+              }
+            ],
+            "error_code": null,
+            "error_message": null,
+            "raw_full": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "stock_zh_a_spot_em",
+                "source": "akshare_spot_em",
+                "status": "failed",
+                "elapsed_ms": 5230,
+                "reason_code": "NETWORK_UNAVAILABLE",
+                "source_fields": {},
+                "errors": [
+                  {
+                    "error": "HTTPSConnectionPool(host='82.push2.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/clist/get?pn=1&pz=100&po=1&np=1&ut=bd1d9ddb04089700cf9c27f6f7426281&fltt=2&invt=2&fid=f12&fs=m%3A0+"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "tencent": [],
+        "sina": [],
+        "eastmoney": [],
+        "pdf_metrics": []
+      },
+      "normalized": {
+        "rows": [],
+        "metrics": {},
+        "fields": {}
+      },
+      "completion": {
+        "filled_fields": {},
+        "still_missing_fields": {
+          "pe_ttm": "FIELD_MISSING",
+          "pb": "FIELD_MISSING",
+          "ps_ttm": "FIELD_MISSING",
+          "pcf_ncf_ttm": "FIELD_MISSING",
+          "market_cap": "SHARE_CAPITAL_MISSING",
+          "float_market_cap": "SHARE_CAPITAL_MISSING"
+        },
+        "computed_fields": {},
+        "fallback_chain": {}
+      },
+      "render": {
+        "renderable": false,
+        "chart_renderable": false,
+        "table_renderable": false,
+        "has_displayable_data": false,
+        "visible_fields": [],
+        "hidden_fields": [
+          "pe_ttm",
+          "pb",
+          "ps_ttm",
+          "pcf_ncf_ttm",
+          "market_cap",
+          "float_market_cap"
+        ],
+        "reason": "ALL_NULL_ROWS"
+      },
+      "field_trace": {},
+      "coverage": {
+        "required_fields": 6,
+        "filled_fields": 0,
+        "computed_fields": 0,
+        "missing_fields": 6,
+        "coverage_pct": 0.0,
+        "required_field_list": [
+          "pe_ttm",
+          "pb",
+          "ps_ttm",
+          "pcf_ncf_ttm",
+          "market_cap",
+          "float_market_cap"
+        ],
+        "filled_field_list": [],
+        "computed_field_list": [],
+        "missing_field_map": {
+          "pe_ttm": "FIELD_MISSING",
+          "pb": "FIELD_MISSING",
+          "ps_ttm": "FIELD_MISSING",
+          "pcf_ncf_ttm": "FIELD_MISSING",
+          "market_cap": "SHARE_CAPITAL_MISSING",
+          "float_market_cap": "SHARE_CAPITAL_MISSING"
+        }
+      },
+      "provider_summary": {
+        "akshare": {
+          "attempted": true,
+          "success": true,
+          "data_success": false,
+          "rows": 2,
+          "fields_available": 8,
+          "fields_mapped": 0,
+          "fields_used": 0,
+          "missing": 6,
+          "timeout": false,
+          "network_error": false,
+          "cache_hit": true,
+          "reason_code": null
+        },
+        "baostock": {
+          "attempted": true,
+          "success": false,
+          "data_success": false,
+          "rows": 0,
+          "fields_available": 0,
+          "fields_mapped": 0,
+          "fields_used": 0,
+          "missing": 6,
+          "timeout": false,
+          "network_error": false,
+          "cache_hit": true,
+          "reason_code": "PROVIDER_EMPTY"
+        }
+      },
+      "errors": [
+        {
+          "layer": "render",
+          "error_code": "ALL_NULL_ROWS",
+          "message": "No displayable core fields after completion",
+          "provider": null,
+          "endpoint": null,
+          "field": null
+        }
+      ],
+      "warnings": [],
+      "diagnosis": {
+        "module_key": "valuation",
+        "primary_issue": "MAPPING_ERROR",
+        "tags": [
+          "MAPPING_ERROR",
+          "MISSING_COMPUTABLE_FIELDS"
+        ],
+        "severity": "warning",
+        "coverage_pct": 0.0,
+        "raw_rows_count": 2,
+        "normalized_rows_count": 0,
+        "valid_fields_count": 0,
+        "evidence": [
+          "raw rows_count=2, normalized rows_count=0"
+        ],
+        "recommended_fix": [
+          "add field mapping",
+          "Enable share capital provider or reuse BaoStock total_share for market_cap."
+        ]
+      },
+      "agent_summary": {
+        "overall_coverage_pct": 0.0,
+        "mapping_quality_pct": 0.0,
+        "provider_health_pct": 0.0,
+        "computed_fields_count": 0,
+        "missing_critical_fields": [
+          "market_cap",
+          "float_market_cap"
+        ],
+        "diagnosis_tags": [
+          "MAPPING_ERROR",
+          "MISSING_COMPUTABLE_FIELDS"
+        ],
+        "recommended_next_actions": [
+          "Enable share capital provider or reuse BaoStock total_share for market_cap.",
+          "Limit automated analysis to data-availability caveats until coverage improves."
+        ]
+      },
+      "debug": {
+        "enabled": true,
+        "raw_truncated": false,
+        "max_raw_chars": 20000
+      }
+    },
+    "profitability": {
+      "schema_version": "2.0",
+      "schema_features": [
+        "formatter_registry",
+        "field_trace",
+        "coverage",
+        "provider_summary",
+        "computed_field_registry",
+        "report_status_machine"
+      ],
+      "request_id": "ea8ad9e1-68f1-4424-9826-8594f5ffd42c",
+      "market": "CN",
+      "symbol": "000725",
+      "ts_code": "000725.SZ",
+      "module_key": "profitability",
+      "data_mode": "standard",
+      "stage": "final",
+      "ok": false,
+      "partial": true,
+      "stale": false,
+      "source_chain": [
+        {
+          "provider": "baostock",
+          "endpoint": "get_all_financial_indicators",
+          "attempted": true,
+          "success": true,
+          "status": "success",
+          "started_at": "2026-07-09T11:20:47.110115+00:00",
+          "ended_at": "2026-07-09T11:20:47.111249+00:00",
+          "elapsed_ms": 1,
+          "latency_ms": 1,
+          "rows_count": 1,
+          "columns": [
+            "balance",
+            "cash_flow",
+            "dupont",
+            "growth",
+            "operation",
+            "profit"
+          ],
+          "non_null_fields": [
+            "balance",
+            "cash_flow",
+            "dupont",
+            "growth",
+            "operation",
+            "profit"
+          ],
+          "missing_fields": [],
+          "error_code": null,
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": "ok",
+          "raw_type": "dict",
+          "raw_shape": [
+            1,
+            6
+          ],
+          "detached_timeout": false,
+          "aggregate_source_id": "baostock:get_all_financial_indicators:000725.SZ",
+          "data_success": false
+        },
+        {
+          "provider": "akshare",
+          "endpoint": "statements",
+          "attempted": true,
+          "success": true,
+          "status": "success",
+          "started_at": "2026-07-09T11:20:52.345793+00:00",
+          "ended_at": "2026-07-09T11:20:52.351720+00:00",
+          "elapsed_ms": 5,
+          "latency_ms": 5,
+          "rows_count": 2,
+          "columns": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "latest_period",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "non_null_fields": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "missing_fields": [],
+          "error_code": null,
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": "tuple",
+          "raw_shape": [
+            2,
+            9
+          ],
+          "detached_timeout": false,
+          "aggregate_source_id": null,
+          "data_success": false
+        },
+        {
+          "provider": "akshare",
+          "endpoint": "financial_indicator",
+          "attempted": true,
+          "success": true,
+          "status": "success",
+          "started_at": "2026-07-09T11:20:52.351794+00:00",
+          "ended_at": "2026-07-09T11:20:52.385849+00:00",
+          "elapsed_ms": 34,
+          "latency_ms": 34,
+          "rows_count": 2,
+          "columns": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "non_null_fields": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "missing_fields": [],
+          "error_code": null,
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": "tuple",
+          "raw_shape": [
+            2,
+            8
+          ],
+          "detached_timeout": false,
+          "aggregate_source_id": null,
+          "data_success": false
+        }
+      ],
+      "raw": {
+        "baostock": [
+          {
+            "endpoint": "get_all_financial_indicators",
+            "raw_type": "dict",
+            "raw_shape": [
+              1,
+              6
+            ],
+            "columns": [
+              "balance",
+              "cash_flow",
+              "dupont",
+              "growth",
+              "operation",
+              "profit"
+            ],
+            "rows_count": 1,
+            "status": "success",
+            "started_at": "2026-07-09T11:20:47.110115+00:00",
+            "ended_at": "2026-07-09T11:20:47.111249+00:00",
+            "elapsed_ms": 1,
+            "detached_timeout": false,
+            "raw_sample": [
+              {
+                "profit": [],
+                "growth": [],
+                "balance": [],
+                "operation": [],
+                "cash_flow": [],
+                "dupont": []
+              }
+            ],
+            "error_code": null,
+            "error_message": null,
+            "raw_full": [
+              {
+                "profit": [],
+                "growth": [],
+                "balance": [],
+                "operation": [],
+                "cash_flow": [],
+                "dupont": []
+              }
+            ]
+          }
+        ],
+        "akshare": [
+          {
+            "endpoint": "statements",
+            "raw_type": "tuple",
+            "raw_shape": [
+              2,
+              9
+            ],
+            "columns": [
+              "elapsed_ms",
+              "errors",
+              "interface",
+              "latest_period",
+              "provider",
+              "reason_code",
+              "source",
+              "source_fields",
+              "status"
+            ],
+            "rows_count": 2,
+            "status": "success",
+            "started_at": "2026-07-09T11:20:52.345793+00:00",
+            "ended_at": "2026-07-09T11:20:52.351720+00:00",
+            "elapsed_ms": 5,
+            "detached_timeout": false,
+            "raw_sample": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "em+sina_statements",
+                "source": "akshare_sina_report",
+                "status": "failed",
+                "elapsed_ms": 5,
+                "latest_period": "",
+                "reason_code": "PROVIDER_EMPTY",
+                "source_fields": {},
+                "errors": [
+                  {
+                    "sheet": "profit",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "profit",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  },
+                  {
+                    "sheet": "balance",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "balance",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  },
+                  {
+                    "sheet": "cashflow",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "cashflow",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  }
+                ]
+              }
+            ],
+            "error_code": null,
+            "error_message": null,
+            "raw_full": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "em+sina_statements",
+                "source": "akshare_sina_report",
+                "status": "failed",
+                "elapsed_ms": 5,
+                "latest_period": "",
+                "reason_code": "PROVIDER_EMPTY",
+                "source_fields": {},
+                "errors": [
+                  {
+                    "sheet": "profit",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "profit",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  },
+                  {
+                    "sheet": "balance",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "balance",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  },
+                  {
+                    "sheet": "cashflow",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "cashflow",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "endpoint": "financial_indicator",
+            "raw_type": "tuple",
+            "raw_shape": [
+              2,
+              8
+            ],
+            "columns": [
+              "elapsed_ms",
+              "errors",
+              "interface",
+              "provider",
+              "reason_code",
+              "source",
+              "source_fields",
+              "status"
+            ],
+            "rows_count": 2,
+            "status": "success",
+            "started_at": "2026-07-09T11:20:52.351794+00:00",
+            "ended_at": "2026-07-09T11:20:52.385849+00:00",
+            "elapsed_ms": 34,
+            "detached_timeout": false,
+            "raw_sample": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "stock_financial_analysis_indicator",
+                "source": "akshare_sina_indicator",
+                "status": "failed",
+                "reason_code": "NETWORK_UNAVAILABLE",
+                "elapsed_ms": 33,
+                "source_fields": {},
+                "errors": [
+                  {
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='datacenter.eastmoney.com', port=443): Max retries exceeded with url: /securities/api/data/get?"
+                  },
+                  {
+                    "error": "HTTPSConnectionPool(host='money.finance.sina.com.cn', port=443): Max retries exceeded with url: /corp/go.php/vFD_FinancialGuideLine/stockid/000725/ctr"
+                  }
+                ]
+              }
+            ],
+            "error_code": null,
+            "error_message": null,
+            "raw_full": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "stock_financial_analysis_indicator",
+                "source": "akshare_sina_indicator",
+                "status": "failed",
+                "reason_code": "NETWORK_UNAVAILABLE",
+                "elapsed_ms": 33,
+                "source_fields": {},
+                "errors": [
+                  {
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='datacenter.eastmoney.com', port=443): Max retries exceeded with url: /securities/api/data/get?"
+                  },
+                  {
+                    "error": "HTTPSConnectionPool(host='money.finance.sina.com.cn', port=443): Max retries exceeded with url: /corp/go.php/vFD_FinancialGuideLine/stockid/000725/ctr"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "tencent": [],
+        "sina": [],
+        "eastmoney": [],
+        "pdf_metrics": []
+      },
+      "normalized": {
+        "rows": [],
+        "metrics": {},
+        "fields": {}
+      },
+      "completion": {
+        "filled_fields": {},
+        "still_missing_fields": {
+          "roe": "FIELD_MISSING",
+          "gross_margin": "FIELD_MISSING",
+          "net_margin": "FIELD_MISSING",
+          "roa": "FIELD_MISSING",
+          "roic": "FIELD_MISSING"
+        },
+        "computed_fields": {},
+        "fallback_chain": {}
+      },
+      "render": {
+        "renderable": false,
+        "chart_renderable": false,
+        "table_renderable": false,
+        "has_displayable_data": false,
+        "visible_fields": [],
+        "hidden_fields": [
+          "roe",
+          "gross_margin",
+          "net_margin",
+          "roa",
+          "roic"
+        ],
+        "reason": "ALL_NULL_ROWS"
+      },
+      "field_trace": {},
+      "coverage": {
+        "required_fields": 5,
+        "filled_fields": 0,
+        "computed_fields": 0,
+        "missing_fields": 5,
+        "coverage_pct": 0.0,
+        "required_field_list": [
+          "roe",
+          "gross_margin",
+          "net_margin",
+          "roa",
+          "roic"
+        ],
+        "filled_field_list": [],
+        "computed_field_list": [],
+        "missing_field_map": {
+          "roe": "FIELD_MISSING",
+          "gross_margin": "FIELD_MISSING",
+          "net_margin": "FIELD_MISSING",
+          "roa": "FIELD_MISSING",
+          "roic": "FIELD_MISSING"
+        }
+      },
+      "provider_summary": {
+        "baostock": {
+          "attempted": true,
+          "success": true,
+          "data_success": false,
+          "rows": 1,
+          "fields_available": 6,
+          "fields_mapped": 0,
+          "fields_used": 0,
+          "missing": 5,
+          "timeout": false,
+          "network_error": false,
+          "cache_hit": false,
+          "reason_code": null
+        },
+        "akshare": {
+          "attempted": true,
+          "success": true,
+          "data_success": false,
+          "rows": 2,
+          "fields_available": 8,
+          "fields_mapped": 0,
+          "fields_used": 0,
+          "missing": 5,
+          "timeout": false,
+          "network_error": false,
+          "cache_hit": false,
+          "reason_code": null
+        }
+      },
+      "errors": [
+        {
+          "layer": "render",
+          "error_code": "ALL_NULL_ROWS",
+          "message": "No displayable core fields after completion",
+          "provider": null,
+          "endpoint": null,
+          "field": null
+        }
+      ],
+      "warnings": [],
+      "diagnosis": {
+        "module_key": "profitability",
+        "primary_issue": "MAPPING_ERROR",
+        "tags": [
+          "MAPPING_ERROR"
+        ],
+        "severity": "warning",
+        "coverage_pct": 0.0,
+        "raw_rows_count": 5,
+        "normalized_rows_count": 0,
+        "valid_fields_count": 0,
+        "evidence": [
+          "raw rows_count=5, normalized rows_count=0"
+        ],
+        "recommended_fix": [
+          "add field mapping"
+        ]
+      },
+      "agent_summary": {
+        "overall_coverage_pct": 0.0,
+        "mapping_quality_pct": 0.0,
+        "provider_health_pct": 0.0,
+        "computed_fields_count": 0,
+        "missing_critical_fields": [],
+        "diagnosis_tags": [
+          "MAPPING_ERROR"
+        ],
+        "recommended_next_actions": [
+          "Limit automated analysis to data-availability caveats until coverage improves."
+        ]
+      },
+      "debug": {
+        "enabled": true,
+        "raw_truncated": false,
+        "max_raw_chars": 20000
+      }
+    },
+    "growth": {
+      "schema_version": "2.0",
+      "schema_features": [
+        "formatter_registry",
+        "field_trace",
+        "coverage",
+        "provider_summary",
+        "computed_field_registry",
+        "report_status_machine"
+      ],
+      "request_id": "630eb0a3-f7e9-49a3-bc82-15566804f6d0",
+      "market": "CN",
+      "symbol": "000725",
+      "ts_code": "000725.SZ",
+      "module_key": "growth",
+      "data_mode": "standard",
+      "stage": "final",
+      "ok": false,
+      "partial": true,
+      "stale": false,
+      "source_chain": [
+        {
+          "provider": "baostock",
+          "endpoint": "get_all_financial_indicators",
+          "attempted": true,
+          "success": true,
+          "status": "success",
+          "started_at": "2026-07-09T11:20:47.110115+00:00",
+          "ended_at": "2026-07-09T11:20:47.111249+00:00",
+          "elapsed_ms": 1,
+          "latency_ms": 1,
+          "rows_count": 1,
+          "columns": [
+            "balance",
+            "cash_flow",
+            "dupont",
+            "growth",
+            "operation",
+            "profit"
+          ],
+          "non_null_fields": [
+            "balance",
+            "cash_flow",
+            "dupont",
+            "growth",
+            "operation",
+            "profit"
+          ],
+          "missing_fields": [],
+          "error_code": null,
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": "ok",
+          "raw_type": "dict",
+          "raw_shape": [
+            1,
+            6
+          ],
+          "detached_timeout": false,
+          "aggregate_source_id": "baostock:get_all_financial_indicators:000725.SZ",
+          "data_success": false
+        },
+        {
+          "provider": "akshare",
+          "endpoint": "statements",
+          "attempted": true,
+          "success": true,
+          "status": "success",
+          "started_at": "2026-07-09T11:20:52.386155+00:00",
+          "ended_at": "2026-07-09T11:20:52.388152+00:00",
+          "elapsed_ms": 2,
+          "latency_ms": 2,
+          "rows_count": 2,
+          "columns": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "latest_period",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "non_null_fields": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "missing_fields": [],
+          "error_code": null,
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": "tuple",
+          "raw_shape": [
+            2,
+            9
+          ],
+          "detached_timeout": false,
+          "aggregate_source_id": null,
+          "data_success": false
+        },
+        {
+          "provider": "akshare",
+          "endpoint": "financial_indicator",
+          "attempted": true,
+          "success": true,
+          "status": "success",
+          "started_at": "2026-07-09T11:20:52.388176+00:00",
+          "ended_at": "2026-07-09T11:20:52.389135+00:00",
+          "elapsed_ms": 0,
+          "latency_ms": 0,
+          "rows_count": 2,
+          "columns": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "non_null_fields": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "missing_fields": [],
+          "error_code": null,
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": "tuple",
+          "raw_shape": [
+            2,
+            8
+          ],
+          "detached_timeout": false,
+          "aggregate_source_id": null,
+          "data_success": false
+        }
+      ],
+      "raw": {
+        "baostock": [
+          {
+            "endpoint": "get_all_financial_indicators",
+            "raw_type": "dict",
+            "raw_shape": [
+              1,
+              6
+            ],
+            "columns": [
+              "balance",
+              "cash_flow",
+              "dupont",
+              "growth",
+              "operation",
+              "profit"
+            ],
+            "rows_count": 1,
+            "status": "success",
+            "started_at": "2026-07-09T11:20:47.110115+00:00",
+            "ended_at": "2026-07-09T11:20:47.111249+00:00",
+            "elapsed_ms": 1,
+            "detached_timeout": false,
+            "raw_sample": [
+              {
+                "profit": [],
+                "growth": [],
+                "balance": [],
+                "operation": [],
+                "cash_flow": [],
+                "dupont": []
+              }
+            ],
+            "error_code": null,
+            "error_message": null,
+            "raw_full": [
+              {
+                "profit": [],
+                "growth": [],
+                "balance": [],
+                "operation": [],
+                "cash_flow": [],
+                "dupont": []
+              }
+            ]
+          }
+        ],
+        "akshare": [
+          {
+            "endpoint": "statements",
+            "raw_type": "tuple",
+            "raw_shape": [
+              2,
+              9
+            ],
+            "columns": [
+              "elapsed_ms",
+              "errors",
+              "interface",
+              "latest_period",
+              "provider",
+              "reason_code",
+              "source",
+              "source_fields",
+              "status"
+            ],
+            "rows_count": 2,
+            "status": "success",
+            "started_at": "2026-07-09T11:20:52.386155+00:00",
+            "ended_at": "2026-07-09T11:20:52.388152+00:00",
+            "elapsed_ms": 2,
+            "detached_timeout": false,
+            "raw_sample": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "em+sina_statements",
+                "source": "akshare_sina_report",
+                "status": "failed",
+                "elapsed_ms": 1,
+                "latest_period": "",
+                "reason_code": "PROVIDER_EMPTY",
+                "source_fields": {},
+                "errors": [
+                  {
+                    "sheet": "profit",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "profit",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  },
+                  {
+                    "sheet": "balance",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "balance",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  },
+                  {
+                    "sheet": "cashflow",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "cashflow",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  }
+                ]
+              }
+            ],
+            "error_code": null,
+            "error_message": null,
+            "raw_full": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "em+sina_statements",
+                "source": "akshare_sina_report",
+                "status": "failed",
+                "elapsed_ms": 1,
+                "latest_period": "",
+                "reason_code": "PROVIDER_EMPTY",
+                "source_fields": {},
+                "errors": [
+                  {
+                    "sheet": "profit",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "profit",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  },
+                  {
+                    "sheet": "balance",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "balance",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  },
+                  {
+                    "sheet": "cashflow",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "cashflow",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "endpoint": "financial_indicator",
+            "raw_type": "tuple",
+            "raw_shape": [
+              2,
+              8
+            ],
+            "columns": [
+              "elapsed_ms",
+              "errors",
+              "interface",
+              "provider",
+              "reason_code",
+              "source",
+              "source_fields",
+              "status"
+            ],
+            "rows_count": 2,
+            "status": "success",
+            "started_at": "2026-07-09T11:20:52.388176+00:00",
+            "ended_at": "2026-07-09T11:20:52.389135+00:00",
+            "elapsed_ms": 0,
+            "detached_timeout": false,
+            "raw_sample": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "stock_financial_analysis_indicator",
+                "source": "akshare_sina_indicator",
+                "status": "failed",
+                "reason_code": "NETWORK_UNAVAILABLE",
+                "elapsed_ms": 0,
+                "source_fields": {},
+                "errors": [
+                  {
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='datacenter.eastmoney.com', port=443): Max retries exceeded with url: /securities/api/data/get?"
+                  },
+                  {
+                    "error": "HTTPSConnectionPool(host='money.finance.sina.com.cn', port=443): Max retries exceeded with url: /corp/go.php/vFD_FinancialGuideLine/stockid/000725/ctr"
+                  }
+                ]
+              }
+            ],
+            "error_code": null,
+            "error_message": null,
+            "raw_full": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "stock_financial_analysis_indicator",
+                "source": "akshare_sina_indicator",
+                "status": "failed",
+                "reason_code": "NETWORK_UNAVAILABLE",
+                "elapsed_ms": 0,
+                "source_fields": {},
+                "errors": [
+                  {
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='datacenter.eastmoney.com', port=443): Max retries exceeded with url: /securities/api/data/get?"
+                  },
+                  {
+                    "error": "HTTPSConnectionPool(host='money.finance.sina.com.cn', port=443): Max retries exceeded with url: /corp/go.php/vFD_FinancialGuideLine/stockid/000725/ctr"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "tencent": [],
+        "sina": [],
+        "eastmoney": [],
+        "pdf_metrics": []
+      },
+      "normalized": {
+        "rows": [],
+        "metrics": {},
+        "fields": {}
+      },
+      "completion": {
+        "filled_fields": {},
+        "still_missing_fields": {
+          "revenue": "FIELD_MISSING",
+          "revenue_yoy": "FIELD_MISSING",
+          "net_profit_parent": "FIELD_MISSING",
+          "net_profit_yoy": "FIELD_MISSING",
+          "eps_basic": "FIELD_MISSING"
+        },
+        "computed_fields": {},
+        "fallback_chain": {}
+      },
+      "render": {
+        "renderable": false,
+        "chart_renderable": false,
+        "table_renderable": false,
+        "has_displayable_data": false,
+        "visible_fields": [],
+        "hidden_fields": [
+          "revenue",
+          "revenue_yoy",
+          "net_profit_parent",
+          "net_profit_yoy",
+          "eps_basic"
+        ],
+        "reason": "ALL_NULL_ROWS"
+      },
+      "field_trace": {},
+      "coverage": {
+        "required_fields": 5,
+        "filled_fields": 0,
+        "computed_fields": 0,
+        "missing_fields": 5,
+        "coverage_pct": 0.0,
+        "required_field_list": [
+          "revenue",
+          "revenue_yoy",
+          "net_profit_parent",
+          "net_profit_yoy",
+          "eps_basic"
+        ],
+        "filled_field_list": [],
+        "computed_field_list": [],
+        "missing_field_map": {
+          "revenue": "FIELD_MISSING",
+          "revenue_yoy": "FIELD_MISSING",
+          "net_profit_parent": "FIELD_MISSING",
+          "net_profit_yoy": "FIELD_MISSING",
+          "eps_basic": "FIELD_MISSING"
+        }
+      },
+      "provider_summary": {
+        "baostock": {
+          "attempted": true,
+          "success": true,
+          "data_success": false,
+          "rows": 1,
+          "fields_available": 6,
+          "fields_mapped": 0,
+          "fields_used": 0,
+          "missing": 5,
+          "timeout": false,
+          "network_error": false,
+          "cache_hit": false,
+          "reason_code": null
+        },
+        "akshare": {
+          "attempted": true,
+          "success": true,
+          "data_success": false,
+          "rows": 2,
+          "fields_available": 8,
+          "fields_mapped": 0,
+          "fields_used": 0,
+          "missing": 5,
+          "timeout": false,
+          "network_error": false,
+          "cache_hit": false,
+          "reason_code": null
+        }
+      },
+      "errors": [
+        {
+          "layer": "render",
+          "error_code": "ALL_NULL_ROWS",
+          "message": "No displayable core fields after completion",
+          "provider": null,
+          "endpoint": null,
+          "field": null
+        }
+      ],
+      "warnings": [],
+      "diagnosis": {
+        "module_key": "growth",
+        "primary_issue": "MAPPING_ERROR",
+        "tags": [
+          "MAPPING_ERROR"
+        ],
+        "severity": "warning",
+        "coverage_pct": 0.0,
+        "raw_rows_count": 5,
+        "normalized_rows_count": 0,
+        "valid_fields_count": 0,
+        "evidence": [
+          "raw rows_count=5, normalized rows_count=0"
+        ],
+        "recommended_fix": [
+          "add field mapping"
+        ]
+      },
+      "agent_summary": {
+        "overall_coverage_pct": 0.0,
+        "mapping_quality_pct": 0.0,
+        "provider_health_pct": 0.0,
+        "computed_fields_count": 0,
+        "missing_critical_fields": [],
+        "diagnosis_tags": [
+          "MAPPING_ERROR"
+        ],
+        "recommended_next_actions": [
+          "Limit automated analysis to data-availability caveats until coverage improves."
+        ]
+      },
+      "debug": {
+        "enabled": true,
+        "raw_truncated": false,
+        "max_raw_chars": 20000
+      }
+    },
+    "cashflow_quality": {
+      "schema_version": "2.0",
+      "schema_features": [
+        "formatter_registry",
+        "field_trace",
+        "coverage",
+        "provider_summary",
+        "computed_field_registry",
+        "report_status_machine"
+      ],
+      "request_id": "1d7c7a1b-1282-4833-b056-f3acc57490ac",
+      "market": "CN",
+      "symbol": "000725",
+      "ts_code": "000725.SZ",
+      "module_key": "cashflow_quality",
+      "data_mode": "standard",
+      "stage": "final",
+      "ok": false,
+      "partial": true,
+      "stale": false,
+      "source_chain": [
+        {
+          "provider": "baostock",
+          "endpoint": "get_all_financial_indicators",
+          "attempted": true,
+          "success": true,
+          "status": "success",
+          "started_at": "2026-07-09T11:20:47.110115+00:00",
+          "ended_at": "2026-07-09T11:20:47.111249+00:00",
+          "elapsed_ms": 1,
+          "latency_ms": 1,
+          "rows_count": 1,
+          "columns": [
+            "balance",
+            "cash_flow",
+            "dupont",
+            "growth",
+            "operation",
+            "profit"
+          ],
+          "non_null_fields": [
+            "balance",
+            "cash_flow",
+            "dupont",
+            "growth",
+            "operation",
+            "profit"
+          ],
+          "missing_fields": [],
+          "error_code": null,
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": "ok",
+          "raw_type": "dict",
+          "raw_shape": [
+            1,
+            6
+          ],
+          "detached_timeout": false,
+          "aggregate_source_id": "baostock:get_all_financial_indicators:000725.SZ",
+          "data_success": false
+        },
+        {
+          "provider": "akshare",
+          "endpoint": "statements",
+          "attempted": true,
+          "success": true,
+          "status": "success",
+          "started_at": "2026-07-09T11:20:52.389344+00:00",
+          "ended_at": "2026-07-09T11:20:52.391177+00:00",
+          "elapsed_ms": 1,
+          "latency_ms": 1,
+          "rows_count": 2,
+          "columns": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "latest_period",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "non_null_fields": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "missing_fields": [],
+          "error_code": null,
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": "tuple",
+          "raw_shape": [
+            2,
+            9
+          ],
+          "detached_timeout": false,
+          "aggregate_source_id": null,
+          "data_success": false
+        },
+        {
+          "provider": "akshare",
+          "endpoint": "financial_indicator",
+          "attempted": true,
+          "success": true,
+          "status": "success",
+          "started_at": "2026-07-09T11:20:52.391204+00:00",
+          "ended_at": "2026-07-09T11:20:52.392178+00:00",
+          "elapsed_ms": 0,
+          "latency_ms": 0,
+          "rows_count": 2,
+          "columns": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "non_null_fields": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "missing_fields": [],
+          "error_code": null,
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": "tuple",
+          "raw_shape": [
+            2,
+            8
+          ],
+          "detached_timeout": false,
+          "aggregate_source_id": null,
+          "data_success": false
+        }
+      ],
+      "raw": {
+        "baostock": [
+          {
+            "endpoint": "get_all_financial_indicators",
+            "raw_type": "dict",
+            "raw_shape": [
+              1,
+              6
+            ],
+            "columns": [
+              "balance",
+              "cash_flow",
+              "dupont",
+              "growth",
+              "operation",
+              "profit"
+            ],
+            "rows_count": 1,
+            "status": "success",
+            "started_at": "2026-07-09T11:20:47.110115+00:00",
+            "ended_at": "2026-07-09T11:20:47.111249+00:00",
+            "elapsed_ms": 1,
+            "detached_timeout": false,
+            "raw_sample": [
+              {
+                "profit": [],
+                "growth": [],
+                "balance": [],
+                "operation": [],
+                "cash_flow": [],
+                "dupont": []
+              }
+            ],
+            "error_code": null,
+            "error_message": null,
+            "raw_full": [
+              {
+                "profit": [],
+                "growth": [],
+                "balance": [],
+                "operation": [],
+                "cash_flow": [],
+                "dupont": []
+              }
+            ]
+          }
+        ],
+        "akshare": [
+          {
+            "endpoint": "statements",
+            "raw_type": "tuple",
+            "raw_shape": [
+              2,
+              9
+            ],
+            "columns": [
+              "elapsed_ms",
+              "errors",
+              "interface",
+              "latest_period",
+              "provider",
+              "reason_code",
+              "source",
+              "source_fields",
+              "status"
+            ],
+            "rows_count": 2,
+            "status": "success",
+            "started_at": "2026-07-09T11:20:52.389344+00:00",
+            "ended_at": "2026-07-09T11:20:52.391177+00:00",
+            "elapsed_ms": 1,
+            "detached_timeout": false,
+            "raw_sample": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "em+sina_statements",
+                "source": "akshare_sina_report",
+                "status": "failed",
+                "elapsed_ms": 1,
+                "latest_period": "",
+                "reason_code": "PROVIDER_EMPTY",
+                "source_fields": {},
+                "errors": [
+                  {
+                    "sheet": "profit",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "profit",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  },
+                  {
+                    "sheet": "balance",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "balance",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  },
+                  {
+                    "sheet": "cashflow",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "cashflow",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  }
+                ]
+              }
+            ],
+            "error_code": null,
+            "error_message": null,
+            "raw_full": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "em+sina_statements",
+                "source": "akshare_sina_report",
+                "status": "failed",
+                "elapsed_ms": 1,
+                "latest_period": "",
+                "reason_code": "PROVIDER_EMPTY",
+                "source_fields": {},
+                "errors": [
+                  {
+                    "sheet": "profit",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "profit",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  },
+                  {
+                    "sheet": "balance",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "balance",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  },
+                  {
+                    "sheet": "cashflow",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "cashflow",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "endpoint": "financial_indicator",
+            "raw_type": "tuple",
+            "raw_shape": [
+              2,
+              8
+            ],
+            "columns": [
+              "elapsed_ms",
+              "errors",
+              "interface",
+              "provider",
+              "reason_code",
+              "source",
+              "source_fields",
+              "status"
+            ],
+            "rows_count": 2,
+            "status": "success",
+            "started_at": "2026-07-09T11:20:52.391204+00:00",
+            "ended_at": "2026-07-09T11:20:52.392178+00:00",
+            "elapsed_ms": 0,
+            "detached_timeout": false,
+            "raw_sample": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "stock_financial_analysis_indicator",
+                "source": "akshare_sina_indicator",
+                "status": "failed",
+                "reason_code": "NETWORK_UNAVAILABLE",
+                "elapsed_ms": 0,
+                "source_fields": {},
+                "errors": [
+                  {
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='datacenter.eastmoney.com', port=443): Max retries exceeded with url: /securities/api/data/get?"
+                  },
+                  {
+                    "error": "HTTPSConnectionPool(host='money.finance.sina.com.cn', port=443): Max retries exceeded with url: /corp/go.php/vFD_FinancialGuideLine/stockid/000725/ctr"
+                  }
+                ]
+              }
+            ],
+            "error_code": null,
+            "error_message": null,
+            "raw_full": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "stock_financial_analysis_indicator",
+                "source": "akshare_sina_indicator",
+                "status": "failed",
+                "reason_code": "NETWORK_UNAVAILABLE",
+                "elapsed_ms": 0,
+                "source_fields": {},
+                "errors": [
+                  {
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='datacenter.eastmoney.com', port=443): Max retries exceeded with url: /securities/api/data/get?"
+                  },
+                  {
+                    "error": "HTTPSConnectionPool(host='money.finance.sina.com.cn', port=443): Max retries exceeded with url: /corp/go.php/vFD_FinancialGuideLine/stockid/000725/ctr"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "tencent": [],
+        "sina": [],
+        "eastmoney": [],
+        "pdf_metrics": []
+      },
+      "normalized": {
+        "rows": [],
+        "metrics": {},
+        "fields": {}
+      },
+      "completion": {
+        "filled_fields": {},
+        "still_missing_fields": {
+          "operating_cashflow": "FIELD_MISSING",
+          "ocf_to_np": "FIELD_MISSING",
+          "ocf_to_revenue": "FIELD_MISSING",
+          "cashflow_revenue_ratio": "FIELD_MISSING"
+        },
+        "computed_fields": {},
+        "fallback_chain": {}
+      },
+      "render": {
+        "renderable": false,
+        "chart_renderable": false,
+        "table_renderable": false,
+        "has_displayable_data": false,
+        "visible_fields": [],
+        "hidden_fields": [
+          "operating_cashflow",
+          "ocf_to_np",
+          "ocf_to_revenue",
+          "cashflow_revenue_ratio"
+        ],
+        "reason": "ALL_NULL_ROWS"
+      },
+      "field_trace": {},
+      "coverage": {
+        "required_fields": 4,
+        "filled_fields": 0,
+        "computed_fields": 0,
+        "missing_fields": 4,
+        "coverage_pct": 0.0,
+        "required_field_list": [
+          "operating_cashflow",
+          "ocf_to_np",
+          "ocf_to_revenue",
+          "cashflow_revenue_ratio"
+        ],
+        "filled_field_list": [],
+        "computed_field_list": [],
+        "missing_field_map": {
+          "operating_cashflow": "FIELD_MISSING",
+          "ocf_to_np": "FIELD_MISSING",
+          "ocf_to_revenue": "FIELD_MISSING",
+          "cashflow_revenue_ratio": "FIELD_MISSING"
+        }
+      },
+      "provider_summary": {
+        "baostock": {
+          "attempted": true,
+          "success": true,
+          "data_success": false,
+          "rows": 1,
+          "fields_available": 6,
+          "fields_mapped": 0,
+          "fields_used": 0,
+          "missing": 4,
+          "timeout": false,
+          "network_error": false,
+          "cache_hit": false,
+          "reason_code": null
+        },
+        "akshare": {
+          "attempted": true,
+          "success": true,
+          "data_success": false,
+          "rows": 2,
+          "fields_available": 8,
+          "fields_mapped": 0,
+          "fields_used": 0,
+          "missing": 4,
+          "timeout": false,
+          "network_error": false,
+          "cache_hit": false,
+          "reason_code": null
+        }
+      },
+      "errors": [
+        {
+          "layer": "render",
+          "error_code": "ALL_NULL_ROWS",
+          "message": "No displayable core fields after completion",
+          "provider": null,
+          "endpoint": null,
+          "field": null
+        }
+      ],
+      "warnings": [],
+      "diagnosis": {
+        "module_key": "cashflow_quality",
+        "primary_issue": "MAPPING_ERROR",
+        "tags": [
+          "MAPPING_ERROR"
+        ],
+        "severity": "warning",
+        "coverage_pct": 0.0,
+        "raw_rows_count": 5,
+        "normalized_rows_count": 0,
+        "valid_fields_count": 0,
+        "evidence": [
+          "raw rows_count=5, normalized rows_count=0"
+        ],
+        "recommended_fix": [
+          "add field mapping"
+        ]
+      },
+      "agent_summary": {
+        "overall_coverage_pct": 0.0,
+        "mapping_quality_pct": 0.0,
+        "provider_health_pct": 0.0,
+        "computed_fields_count": 0,
+        "missing_critical_fields": [],
+        "diagnosis_tags": [
+          "MAPPING_ERROR"
+        ],
+        "recommended_next_actions": [
+          "Limit automated analysis to data-availability caveats until coverage improves."
+        ]
+      },
+      "debug": {
+        "enabled": true,
+        "raw_truncated": false,
+        "max_raw_chars": 20000
+      }
+    },
+    "solvency": {
+      "schema_version": "2.0",
+      "schema_features": [
+        "formatter_registry",
+        "field_trace",
+        "coverage",
+        "provider_summary",
+        "computed_field_registry",
+        "report_status_machine"
+      ],
+      "request_id": "efb3fe27-e69b-4c1b-9a2a-b5bbb8f760e1",
+      "market": "CN",
+      "symbol": "000725",
+      "ts_code": "000725.SZ",
+      "module_key": "solvency",
+      "data_mode": "standard",
+      "stage": "final",
+      "ok": false,
+      "partial": true,
+      "stale": false,
+      "source_chain": [
+        {
+          "provider": "baostock",
+          "endpoint": "get_all_financial_indicators",
+          "attempted": true,
+          "success": true,
+          "status": "success",
+          "started_at": "2026-07-09T11:20:47.110115+00:00",
+          "ended_at": "2026-07-09T11:20:47.111249+00:00",
+          "elapsed_ms": 1,
+          "latency_ms": 1,
+          "rows_count": 1,
+          "columns": [
+            "balance",
+            "cash_flow",
+            "dupont",
+            "growth",
+            "operation",
+            "profit"
+          ],
+          "non_null_fields": [
+            "balance",
+            "cash_flow",
+            "dupont",
+            "growth",
+            "operation",
+            "profit"
+          ],
+          "missing_fields": [],
+          "error_code": null,
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": "ok",
+          "raw_type": "dict",
+          "raw_shape": [
+            1,
+            6
+          ],
+          "detached_timeout": false,
+          "aggregate_source_id": "baostock:get_all_financial_indicators:000725.SZ",
+          "data_success": false
+        },
+        {
+          "provider": "akshare",
+          "endpoint": "statements",
+          "attempted": true,
+          "success": true,
+          "status": "success",
+          "started_at": "2026-07-09T11:20:52.392361+00:00",
+          "ended_at": "2026-07-09T11:20:52.394231+00:00",
+          "elapsed_ms": 1,
+          "latency_ms": 1,
+          "rows_count": 2,
+          "columns": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "latest_period",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "non_null_fields": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "missing_fields": [],
+          "error_code": null,
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": "tuple",
+          "raw_shape": [
+            2,
+            9
+          ],
+          "detached_timeout": false,
+          "aggregate_source_id": null,
+          "data_success": false
+        },
+        {
+          "provider": "akshare",
+          "endpoint": "financial_indicator",
+          "attempted": true,
+          "success": true,
+          "status": "success",
+          "started_at": "2026-07-09T11:20:52.394246+00:00",
+          "ended_at": "2026-07-09T11:20:52.395066+00:00",
+          "elapsed_ms": 0,
+          "latency_ms": 0,
+          "rows_count": 2,
+          "columns": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "non_null_fields": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "missing_fields": [],
+          "error_code": null,
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": "tuple",
+          "raw_shape": [
+            2,
+            8
+          ],
+          "detached_timeout": false,
+          "aggregate_source_id": null,
+          "data_success": false
+        }
+      ],
+      "raw": {
+        "baostock": [
+          {
+            "endpoint": "get_all_financial_indicators",
+            "raw_type": "dict",
+            "raw_shape": [
+              1,
+              6
+            ],
+            "columns": [
+              "balance",
+              "cash_flow",
+              "dupont",
+              "growth",
+              "operation",
+              "profit"
+            ],
+            "rows_count": 1,
+            "status": "success",
+            "started_at": "2026-07-09T11:20:47.110115+00:00",
+            "ended_at": "2026-07-09T11:20:47.111249+00:00",
+            "elapsed_ms": 1,
+            "detached_timeout": false,
+            "raw_sample": [
+              {
+                "profit": [],
+                "growth": [],
+                "balance": [],
+                "operation": [],
+                "cash_flow": [],
+                "dupont": []
+              }
+            ],
+            "error_code": null,
+            "error_message": null,
+            "raw_full": [
+              {
+                "profit": [],
+                "growth": [],
+                "balance": [],
+                "operation": [],
+                "cash_flow": [],
+                "dupont": []
+              }
+            ]
+          }
+        ],
+        "akshare": [
+          {
+            "endpoint": "statements",
+            "raw_type": "tuple",
+            "raw_shape": [
+              2,
+              9
+            ],
+            "columns": [
+              "elapsed_ms",
+              "errors",
+              "interface",
+              "latest_period",
+              "provider",
+              "reason_code",
+              "source",
+              "source_fields",
+              "status"
+            ],
+            "rows_count": 2,
+            "status": "success",
+            "started_at": "2026-07-09T11:20:52.392361+00:00",
+            "ended_at": "2026-07-09T11:20:52.394231+00:00",
+            "elapsed_ms": 1,
+            "detached_timeout": false,
+            "raw_sample": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "em+sina_statements",
+                "source": "akshare_sina_report",
+                "status": "failed",
+                "elapsed_ms": 1,
+                "latest_period": "",
+                "reason_code": "PROVIDER_EMPTY",
+                "source_fields": {},
+                "errors": [
+                  {
+                    "sheet": "profit",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "profit",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  },
+                  {
+                    "sheet": "balance",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "balance",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  },
+                  {
+                    "sheet": "cashflow",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "cashflow",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  }
+                ]
+              }
+            ],
+            "error_code": null,
+            "error_message": null,
+            "raw_full": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "em+sina_statements",
+                "source": "akshare_sina_report",
+                "status": "failed",
+                "elapsed_ms": 1,
+                "latest_period": "",
+                "reason_code": "PROVIDER_EMPTY",
+                "source_fields": {},
+                "errors": [
+                  {
+                    "sheet": "profit",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "profit",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  },
+                  {
+                    "sheet": "balance",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "balance",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  },
+                  {
+                    "sheet": "cashflow",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "cashflow",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "endpoint": "financial_indicator",
+            "raw_type": "tuple",
+            "raw_shape": [
+              2,
+              8
+            ],
+            "columns": [
+              "elapsed_ms",
+              "errors",
+              "interface",
+              "provider",
+              "reason_code",
+              "source",
+              "source_fields",
+              "status"
+            ],
+            "rows_count": 2,
+            "status": "success",
+            "started_at": "2026-07-09T11:20:52.394246+00:00",
+            "ended_at": "2026-07-09T11:20:52.395066+00:00",
+            "elapsed_ms": 0,
+            "detached_timeout": false,
+            "raw_sample": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "stock_financial_analysis_indicator",
+                "source": "akshare_sina_indicator",
+                "status": "failed",
+                "reason_code": "NETWORK_UNAVAILABLE",
+                "elapsed_ms": 0,
+                "source_fields": {},
+                "errors": [
+                  {
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='datacenter.eastmoney.com', port=443): Max retries exceeded with url: /securities/api/data/get?"
+                  },
+                  {
+                    "error": "HTTPSConnectionPool(host='money.finance.sina.com.cn', port=443): Max retries exceeded with url: /corp/go.php/vFD_FinancialGuideLine/stockid/000725/ctr"
+                  }
+                ]
+              }
+            ],
+            "error_code": null,
+            "error_message": null,
+            "raw_full": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "stock_financial_analysis_indicator",
+                "source": "akshare_sina_indicator",
+                "status": "failed",
+                "reason_code": "NETWORK_UNAVAILABLE",
+                "elapsed_ms": 0,
+                "source_fields": {},
+                "errors": [
+                  {
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='datacenter.eastmoney.com', port=443): Max retries exceeded with url: /securities/api/data/get?"
+                  },
+                  {
+                    "error": "HTTPSConnectionPool(host='money.finance.sina.com.cn', port=443): Max retries exceeded with url: /corp/go.php/vFD_FinancialGuideLine/stockid/000725/ctr"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "tencent": [],
+        "sina": [],
+        "eastmoney": [],
+        "pdf_metrics": []
+      },
+      "normalized": {
+        "rows": [],
+        "metrics": {},
+        "fields": {}
+      },
+      "completion": {
+        "filled_fields": {},
+        "still_missing_fields": {
+          "current_ratio": "FIELD_MISSING",
+          "quick_ratio": "FIELD_MISSING",
+          "cash_ratio": "FIELD_MISSING",
+          "debt_ratio": "FIELD_MISSING",
+          "equity_multiplier": "FIELD_MISSING"
+        },
+        "computed_fields": {},
+        "fallback_chain": {}
+      },
+      "render": {
+        "renderable": false,
+        "chart_renderable": false,
+        "table_renderable": false,
+        "has_displayable_data": false,
+        "visible_fields": [],
+        "hidden_fields": [
+          "current_ratio",
+          "quick_ratio",
+          "cash_ratio",
+          "debt_ratio",
+          "equity_multiplier"
+        ],
+        "reason": "ALL_NULL_ROWS"
+      },
+      "field_trace": {},
+      "coverage": {
+        "required_fields": 5,
+        "filled_fields": 0,
+        "computed_fields": 0,
+        "missing_fields": 5,
+        "coverage_pct": 0.0,
+        "required_field_list": [
+          "current_ratio",
+          "quick_ratio",
+          "cash_ratio",
+          "debt_ratio",
+          "equity_multiplier"
+        ],
+        "filled_field_list": [],
+        "computed_field_list": [],
+        "missing_field_map": {
+          "current_ratio": "FIELD_MISSING",
+          "quick_ratio": "FIELD_MISSING",
+          "cash_ratio": "FIELD_MISSING",
+          "debt_ratio": "FIELD_MISSING",
+          "equity_multiplier": "FIELD_MISSING"
+        }
+      },
+      "provider_summary": {
+        "baostock": {
+          "attempted": true,
+          "success": true,
+          "data_success": false,
+          "rows": 1,
+          "fields_available": 6,
+          "fields_mapped": 0,
+          "fields_used": 0,
+          "missing": 5,
+          "timeout": false,
+          "network_error": false,
+          "cache_hit": false,
+          "reason_code": null
+        },
+        "akshare": {
+          "attempted": true,
+          "success": true,
+          "data_success": false,
+          "rows": 2,
+          "fields_available": 8,
+          "fields_mapped": 0,
+          "fields_used": 0,
+          "missing": 5,
+          "timeout": false,
+          "network_error": false,
+          "cache_hit": false,
+          "reason_code": null
+        }
+      },
+      "errors": [
+        {
+          "layer": "render",
+          "error_code": "ALL_NULL_ROWS",
+          "message": "No displayable core fields after completion",
+          "provider": null,
+          "endpoint": null,
+          "field": null
+        }
+      ],
+      "warnings": [],
+      "diagnosis": {
+        "module_key": "solvency",
+        "primary_issue": "MAPPING_ERROR",
+        "tags": [
+          "MAPPING_ERROR"
+        ],
+        "severity": "warning",
+        "coverage_pct": 0.0,
+        "raw_rows_count": 5,
+        "normalized_rows_count": 0,
+        "valid_fields_count": 0,
+        "evidence": [
+          "raw rows_count=5, normalized rows_count=0"
+        ],
+        "recommended_fix": [
+          "add field mapping"
+        ]
+      },
+      "agent_summary": {
+        "overall_coverage_pct": 0.0,
+        "mapping_quality_pct": 0.0,
+        "provider_health_pct": 0.0,
+        "computed_fields_count": 0,
+        "missing_critical_fields": [],
+        "diagnosis_tags": [
+          "MAPPING_ERROR"
+        ],
+        "recommended_next_actions": [
+          "Limit automated analysis to data-availability caveats until coverage improves."
+        ]
+      },
+      "debug": {
+        "enabled": true,
+        "raw_truncated": false,
+        "max_raw_chars": 20000
+      }
+    },
+    "operation_capability": {
+      "schema_version": "2.0",
+      "schema_features": [
+        "formatter_registry",
+        "field_trace",
+        "coverage",
+        "provider_summary",
+        "computed_field_registry",
+        "report_status_machine"
+      ],
+      "request_id": "0af7fa72-0875-4aa1-9d6c-405319696e5b",
+      "market": "CN",
+      "symbol": "000725",
+      "ts_code": "000725.SZ",
+      "module_key": "operation_capability",
+      "data_mode": "standard",
+      "stage": "final",
+      "ok": false,
+      "partial": true,
+      "stale": false,
+      "source_chain": [
+        {
+          "provider": "baostock",
+          "endpoint": "get_all_financial_indicators",
+          "attempted": true,
+          "success": true,
+          "status": "success",
+          "started_at": "2026-07-09T11:20:47.110115+00:00",
+          "ended_at": "2026-07-09T11:20:47.111249+00:00",
+          "elapsed_ms": 1,
+          "latency_ms": 1,
+          "rows_count": 1,
+          "columns": [
+            "balance",
+            "cash_flow",
+            "dupont",
+            "growth",
+            "operation",
+            "profit"
+          ],
+          "non_null_fields": [
+            "balance",
+            "cash_flow",
+            "dupont",
+            "growth",
+            "operation",
+            "profit"
+          ],
+          "missing_fields": [],
+          "error_code": null,
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": "ok",
+          "raw_type": "dict",
+          "raw_shape": [
+            1,
+            6
+          ],
+          "detached_timeout": false,
+          "aggregate_source_id": "baostock:get_all_financial_indicators:000725.SZ",
+          "data_success": false
+        },
+        {
+          "provider": "akshare",
+          "endpoint": "statements",
+          "attempted": true,
+          "success": true,
+          "status": "success",
+          "started_at": "2026-07-09T11:20:52.395240+00:00",
+          "ended_at": "2026-07-09T11:20:52.396964+00:00",
+          "elapsed_ms": 1,
+          "latency_ms": 1,
+          "rows_count": 2,
+          "columns": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "latest_period",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "non_null_fields": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "missing_fields": [],
+          "error_code": null,
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": "tuple",
+          "raw_shape": [
+            2,
+            9
+          ],
+          "detached_timeout": false,
+          "aggregate_source_id": null,
+          "data_success": false
+        },
+        {
+          "provider": "akshare",
+          "endpoint": "financial_indicator",
+          "attempted": true,
+          "success": true,
+          "status": "success",
+          "started_at": "2026-07-09T11:20:52.396983+00:00",
+          "ended_at": "2026-07-09T11:20:52.397662+00:00",
+          "elapsed_ms": 0,
+          "latency_ms": 0,
+          "rows_count": 2,
+          "columns": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "non_null_fields": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "missing_fields": [],
+          "error_code": null,
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": "tuple",
+          "raw_shape": [
+            2,
+            8
+          ],
+          "detached_timeout": false,
+          "aggregate_source_id": null,
+          "data_success": false
+        }
+      ],
+      "raw": {
+        "baostock": [
+          {
+            "endpoint": "get_all_financial_indicators",
+            "raw_type": "dict",
+            "raw_shape": [
+              1,
+              6
+            ],
+            "columns": [
+              "balance",
+              "cash_flow",
+              "dupont",
+              "growth",
+              "operation",
+              "profit"
+            ],
+            "rows_count": 1,
+            "status": "success",
+            "started_at": "2026-07-09T11:20:47.110115+00:00",
+            "ended_at": "2026-07-09T11:20:47.111249+00:00",
+            "elapsed_ms": 1,
+            "detached_timeout": false,
+            "raw_sample": [
+              {
+                "profit": [],
+                "growth": [],
+                "balance": [],
+                "operation": [],
+                "cash_flow": [],
+                "dupont": []
+              }
+            ],
+            "error_code": null,
+            "error_message": null,
+            "raw_full": [
+              {
+                "profit": [],
+                "growth": [],
+                "balance": [],
+                "operation": [],
+                "cash_flow": [],
+                "dupont": []
+              }
+            ]
+          }
+        ],
+        "akshare": [
+          {
+            "endpoint": "statements",
+            "raw_type": "tuple",
+            "raw_shape": [
+              2,
+              9
+            ],
+            "columns": [
+              "elapsed_ms",
+              "errors",
+              "interface",
+              "latest_period",
+              "provider",
+              "reason_code",
+              "source",
+              "source_fields",
+              "status"
+            ],
+            "rows_count": 2,
+            "status": "success",
+            "started_at": "2026-07-09T11:20:52.395240+00:00",
+            "ended_at": "2026-07-09T11:20:52.396964+00:00",
+            "elapsed_ms": 1,
+            "detached_timeout": false,
+            "raw_sample": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "em+sina_statements",
+                "source": "akshare_sina_report",
+                "status": "failed",
+                "elapsed_ms": 1,
+                "latest_period": "",
+                "reason_code": "PROVIDER_EMPTY",
+                "source_fields": {},
+                "errors": [
+                  {
+                    "sheet": "profit",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "profit",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  },
+                  {
+                    "sheet": "balance",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "balance",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  },
+                  {
+                    "sheet": "cashflow",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "cashflow",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  }
+                ]
+              }
+            ],
+            "error_code": null,
+            "error_message": null,
+            "raw_full": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "em+sina_statements",
+                "source": "akshare_sina_report",
+                "status": "failed",
+                "elapsed_ms": 1,
+                "latest_period": "",
+                "reason_code": "PROVIDER_EMPTY",
+                "source_fields": {},
+                "errors": [
+                  {
+                    "sheet": "profit",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "profit",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  },
+                  {
+                    "sheet": "balance",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "balance",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  },
+                  {
+                    "sheet": "cashflow",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "cashflow",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "endpoint": "financial_indicator",
+            "raw_type": "tuple",
+            "raw_shape": [
+              2,
+              8
+            ],
+            "columns": [
+              "elapsed_ms",
+              "errors",
+              "interface",
+              "provider",
+              "reason_code",
+              "source",
+              "source_fields",
+              "status"
+            ],
+            "rows_count": 2,
+            "status": "success",
+            "started_at": "2026-07-09T11:20:52.396983+00:00",
+            "ended_at": "2026-07-09T11:20:52.397662+00:00",
+            "elapsed_ms": 0,
+            "detached_timeout": false,
+            "raw_sample": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "stock_financial_analysis_indicator",
+                "source": "akshare_sina_indicator",
+                "status": "failed",
+                "reason_code": "NETWORK_UNAVAILABLE",
+                "elapsed_ms": 0,
+                "source_fields": {},
+                "errors": [
+                  {
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='datacenter.eastmoney.com', port=443): Max retries exceeded with url: /securities/api/data/get?"
+                  },
+                  {
+                    "error": "HTTPSConnectionPool(host='money.finance.sina.com.cn', port=443): Max retries exceeded with url: /corp/go.php/vFD_FinancialGuideLine/stockid/000725/ctr"
+                  }
+                ]
+              }
+            ],
+            "error_code": null,
+            "error_message": null,
+            "raw_full": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "stock_financial_analysis_indicator",
+                "source": "akshare_sina_indicator",
+                "status": "failed",
+                "reason_code": "NETWORK_UNAVAILABLE",
+                "elapsed_ms": 0,
+                "source_fields": {},
+                "errors": [
+                  {
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='datacenter.eastmoney.com', port=443): Max retries exceeded with url: /securities/api/data/get?"
+                  },
+                  {
+                    "error": "HTTPSConnectionPool(host='money.finance.sina.com.cn', port=443): Max retries exceeded with url: /corp/go.php/vFD_FinancialGuideLine/stockid/000725/ctr"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "tencent": [],
+        "sina": [],
+        "eastmoney": [],
+        "pdf_metrics": []
+      },
+      "normalized": {
+        "rows": [],
+        "metrics": {},
+        "fields": {}
+      },
+      "completion": {
+        "filled_fields": {},
+        "still_missing_fields": {
+          "asset_turnover": "FIELD_MISSING",
+          "inventory_turnover": "FIELD_MISSING",
+          "receivable_turnover": "FIELD_MISSING",
+          "total_asset_turnover": "FIELD_MISSING"
+        },
+        "computed_fields": {},
+        "fallback_chain": {}
+      },
+      "render": {
+        "renderable": false,
+        "chart_renderable": false,
+        "table_renderable": false,
+        "has_displayable_data": false,
+        "visible_fields": [],
+        "hidden_fields": [
+          "asset_turnover",
+          "inventory_turnover",
+          "receivable_turnover",
+          "total_asset_turnover"
+        ],
+        "reason": "ALL_NULL_ROWS"
+      },
+      "field_trace": {},
+      "coverage": {
+        "required_fields": 4,
+        "filled_fields": 0,
+        "computed_fields": 0,
+        "missing_fields": 4,
+        "coverage_pct": 0.0,
+        "required_field_list": [
+          "asset_turnover",
+          "inventory_turnover",
+          "receivable_turnover",
+          "total_asset_turnover"
+        ],
+        "filled_field_list": [],
+        "computed_field_list": [],
+        "missing_field_map": {
+          "asset_turnover": "FIELD_MISSING",
+          "inventory_turnover": "FIELD_MISSING",
+          "receivable_turnover": "FIELD_MISSING",
+          "total_asset_turnover": "FIELD_MISSING"
+        }
+      },
+      "provider_summary": {
+        "baostock": {
+          "attempted": true,
+          "success": true,
+          "data_success": false,
+          "rows": 1,
+          "fields_available": 6,
+          "fields_mapped": 0,
+          "fields_used": 0,
+          "missing": 4,
+          "timeout": false,
+          "network_error": false,
+          "cache_hit": false,
+          "reason_code": null
+        },
+        "akshare": {
+          "attempted": true,
+          "success": true,
+          "data_success": false,
+          "rows": 2,
+          "fields_available": 8,
+          "fields_mapped": 0,
+          "fields_used": 0,
+          "missing": 4,
+          "timeout": false,
+          "network_error": false,
+          "cache_hit": false,
+          "reason_code": null
+        }
+      },
+      "errors": [
+        {
+          "layer": "render",
+          "error_code": "ALL_NULL_ROWS",
+          "message": "No displayable core fields after completion",
+          "provider": null,
+          "endpoint": null,
+          "field": null
+        }
+      ],
+      "warnings": [],
+      "diagnosis": {
+        "module_key": "operation_capability",
+        "primary_issue": "MAPPING_ERROR",
+        "tags": [
+          "MAPPING_ERROR"
+        ],
+        "severity": "warning",
+        "coverage_pct": 0.0,
+        "raw_rows_count": 5,
+        "normalized_rows_count": 0,
+        "valid_fields_count": 0,
+        "evidence": [
+          "raw rows_count=5, normalized rows_count=0"
+        ],
+        "recommended_fix": [
+          "add field mapping"
+        ]
+      },
+      "agent_summary": {
+        "overall_coverage_pct": 0.0,
+        "mapping_quality_pct": 0.0,
+        "provider_health_pct": 0.0,
+        "computed_fields_count": 0,
+        "missing_critical_fields": [],
+        "diagnosis_tags": [
+          "MAPPING_ERROR"
+        ],
+        "recommended_next_actions": [
+          "Limit automated analysis to data-availability caveats until coverage improves."
+        ]
+      },
+      "debug": {
+        "enabled": true,
+        "raw_truncated": false,
+        "max_raw_chars": 20000
+      }
+    },
+    "dupont": {
+      "schema_version": "2.0",
+      "schema_features": [
+        "formatter_registry",
+        "field_trace",
+        "coverage",
+        "provider_summary",
+        "computed_field_registry",
+        "report_status_machine"
+      ],
+      "request_id": "d291b6df-3ac9-4bd0-b033-b14e02c4d79d",
+      "market": "CN",
+      "symbol": "000725",
+      "ts_code": "000725.SZ",
+      "module_key": "dupont",
+      "data_mode": "standard",
+      "stage": "final",
+      "ok": false,
+      "partial": true,
+      "stale": false,
+      "source_chain": [
+        {
+          "provider": "baostock",
+          "endpoint": "get_all_financial_indicators",
+          "attempted": true,
+          "success": true,
+          "status": "success",
+          "started_at": "2026-07-09T11:20:47.110115+00:00",
+          "ended_at": "2026-07-09T11:20:47.111249+00:00",
+          "elapsed_ms": 1,
+          "latency_ms": 1,
+          "rows_count": 1,
+          "columns": [
+            "balance",
+            "cash_flow",
+            "dupont",
+            "growth",
+            "operation",
+            "profit"
+          ],
+          "non_null_fields": [
+            "balance",
+            "cash_flow",
+            "dupont",
+            "growth",
+            "operation",
+            "profit"
+          ],
+          "missing_fields": [],
+          "error_code": null,
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": "ok",
+          "raw_type": "dict",
+          "raw_shape": [
+            1,
+            6
+          ],
+          "detached_timeout": false,
+          "aggregate_source_id": "baostock:get_all_financial_indicators:000725.SZ",
+          "data_success": false
+        },
+        {
+          "provider": "akshare",
+          "endpoint": "statements",
+          "attempted": true,
+          "success": true,
+          "status": "success",
+          "started_at": "2026-07-09T11:20:52.397877+00:00",
+          "ended_at": "2026-07-09T11:20:52.399522+00:00",
+          "elapsed_ms": 1,
+          "latency_ms": 1,
+          "rows_count": 2,
+          "columns": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "latest_period",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "non_null_fields": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "missing_fields": [],
+          "error_code": null,
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": "tuple",
+          "raw_shape": [
+            2,
+            9
+          ],
+          "detached_timeout": false,
+          "aggregate_source_id": null,
+          "data_success": false
+        },
+        {
+          "provider": "akshare",
+          "endpoint": "financial_indicator",
+          "attempted": true,
+          "success": true,
+          "status": "success",
+          "started_at": "2026-07-09T11:20:52.399538+00:00",
+          "ended_at": "2026-07-09T11:20:52.400381+00:00",
+          "elapsed_ms": 0,
+          "latency_ms": 0,
+          "rows_count": 2,
+          "columns": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "non_null_fields": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "missing_fields": [],
+          "error_code": null,
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": "tuple",
+          "raw_shape": [
+            2,
+            8
+          ],
+          "detached_timeout": false,
+          "aggregate_source_id": null,
+          "data_success": false
+        }
+      ],
+      "raw": {
+        "baostock": [
+          {
+            "endpoint": "get_all_financial_indicators",
+            "raw_type": "dict",
+            "raw_shape": [
+              1,
+              6
+            ],
+            "columns": [
+              "balance",
+              "cash_flow",
+              "dupont",
+              "growth",
+              "operation",
+              "profit"
+            ],
+            "rows_count": 1,
+            "status": "success",
+            "started_at": "2026-07-09T11:20:47.110115+00:00",
+            "ended_at": "2026-07-09T11:20:47.111249+00:00",
+            "elapsed_ms": 1,
+            "detached_timeout": false,
+            "raw_sample": [
+              {
+                "profit": [],
+                "growth": [],
+                "balance": [],
+                "operation": [],
+                "cash_flow": [],
+                "dupont": []
+              }
+            ],
+            "error_code": null,
+            "error_message": null,
+            "raw_full": [
+              {
+                "profit": [],
+                "growth": [],
+                "balance": [],
+                "operation": [],
+                "cash_flow": [],
+                "dupont": []
+              }
+            ]
+          }
+        ],
+        "akshare": [
+          {
+            "endpoint": "statements",
+            "raw_type": "tuple",
+            "raw_shape": [
+              2,
+              9
+            ],
+            "columns": [
+              "elapsed_ms",
+              "errors",
+              "interface",
+              "latest_period",
+              "provider",
+              "reason_code",
+              "source",
+              "source_fields",
+              "status"
+            ],
+            "rows_count": 2,
+            "status": "success",
+            "started_at": "2026-07-09T11:20:52.397877+00:00",
+            "ended_at": "2026-07-09T11:20:52.399522+00:00",
+            "elapsed_ms": 1,
+            "detached_timeout": false,
+            "raw_sample": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "em+sina_statements",
+                "source": "akshare_sina_report",
+                "status": "failed",
+                "elapsed_ms": 1,
+                "latest_period": "",
+                "reason_code": "PROVIDER_EMPTY",
+                "source_fields": {},
+                "errors": [
+                  {
+                    "sheet": "profit",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "profit",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  },
+                  {
+                    "sheet": "balance",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "balance",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  },
+                  {
+                    "sheet": "cashflow",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "cashflow",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  }
+                ]
+              }
+            ],
+            "error_code": null,
+            "error_message": null,
+            "raw_full": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "em+sina_statements",
+                "source": "akshare_sina_report",
+                "status": "failed",
+                "elapsed_ms": 1,
+                "latest_period": "",
+                "reason_code": "PROVIDER_EMPTY",
+                "source_fields": {},
+                "errors": [
+                  {
+                    "sheet": "profit",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "profit",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  },
+                  {
+                    "sheet": "balance",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "balance",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  },
+                  {
+                    "sheet": "cashflow",
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='emweb.securities.eastmoney.com', port=443): Max retries exceeded with url: /PC_HSF10/NewFinanceAnalysis/Index?type=web&code="
+                  },
+                  {
+                    "sheet": "cashflow",
+                    "source": "sina",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='quotes.sina.cn', port=443): Max retries exceeded with url: /cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022?pa"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "endpoint": "financial_indicator",
+            "raw_type": "tuple",
+            "raw_shape": [
+              2,
+              8
+            ],
+            "columns": [
+              "elapsed_ms",
+              "errors",
+              "interface",
+              "provider",
+              "reason_code",
+              "source",
+              "source_fields",
+              "status"
+            ],
+            "rows_count": 2,
+            "status": "success",
+            "started_at": "2026-07-09T11:20:52.399538+00:00",
+            "ended_at": "2026-07-09T11:20:52.400381+00:00",
+            "elapsed_ms": 0,
+            "detached_timeout": false,
+            "raw_sample": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "stock_financial_analysis_indicator",
+                "source": "akshare_sina_indicator",
+                "status": "failed",
+                "reason_code": "NETWORK_UNAVAILABLE",
+                "elapsed_ms": 0,
+                "source_fields": {},
+                "errors": [
+                  {
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='datacenter.eastmoney.com', port=443): Max retries exceeded with url: /securities/api/data/get?"
+                  },
+                  {
+                    "error": "HTTPSConnectionPool(host='money.finance.sina.com.cn', port=443): Max retries exceeded with url: /corp/go.php/vFD_FinancialGuideLine/stockid/000725/ctr"
+                  }
+                ]
+              }
+            ],
+            "error_code": null,
+            "error_message": null,
+            "raw_full": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "stock_financial_analysis_indicator",
+                "source": "akshare_sina_indicator",
+                "status": "failed",
+                "reason_code": "NETWORK_UNAVAILABLE",
+                "elapsed_ms": 0,
+                "source_fields": {},
+                "errors": [
+                  {
+                    "source": "em",
+                    "reason_code": "NETWORK_UNAVAILABLE",
+                    "error": "HTTPSConnectionPool(host='datacenter.eastmoney.com', port=443): Max retries exceeded with url: /securities/api/data/get?"
+                  },
+                  {
+                    "error": "HTTPSConnectionPool(host='money.finance.sina.com.cn', port=443): Max retries exceeded with url: /corp/go.php/vFD_FinancialGuideLine/stockid/000725/ctr"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "tencent": [],
+        "sina": [],
+        "eastmoney": [],
+        "pdf_metrics": []
+      },
+      "normalized": {
+        "rows": [],
+        "metrics": {},
+        "fields": {}
+      },
+      "completion": {
+        "filled_fields": {},
+        "still_missing_fields": {
+          "roe": "FIELD_MISSING",
+          "net_margin": "FIELD_MISSING",
+          "asset_turnover": "FIELD_MISSING",
+          "equity_multiplier": "FIELD_MISSING"
+        },
+        "computed_fields": {},
+        "fallback_chain": {}
+      },
+      "render": {
+        "renderable": false,
+        "chart_renderable": false,
+        "table_renderable": false,
+        "has_displayable_data": false,
+        "visible_fields": [],
+        "hidden_fields": [
+          "roe",
+          "net_margin",
+          "asset_turnover",
+          "equity_multiplier"
+        ],
+        "reason": "ALL_NULL_ROWS"
+      },
+      "field_trace": {},
+      "coverage": {
+        "required_fields": 4,
+        "filled_fields": 0,
+        "computed_fields": 0,
+        "missing_fields": 4,
+        "coverage_pct": 0.0,
+        "required_field_list": [
+          "roe",
+          "net_margin",
+          "asset_turnover",
+          "equity_multiplier"
+        ],
+        "filled_field_list": [],
+        "computed_field_list": [],
+        "missing_field_map": {
+          "roe": "FIELD_MISSING",
+          "net_margin": "FIELD_MISSING",
+          "asset_turnover": "FIELD_MISSING",
+          "equity_multiplier": "FIELD_MISSING"
+        }
+      },
+      "provider_summary": {
+        "baostock": {
+          "attempted": true,
+          "success": true,
+          "data_success": false,
+          "rows": 1,
+          "fields_available": 6,
+          "fields_mapped": 0,
+          "fields_used": 0,
+          "missing": 4,
+          "timeout": false,
+          "network_error": false,
+          "cache_hit": false,
+          "reason_code": null
+        },
+        "akshare": {
+          "attempted": true,
+          "success": true,
+          "data_success": false,
+          "rows": 2,
+          "fields_available": 8,
+          "fields_mapped": 0,
+          "fields_used": 0,
+          "missing": 4,
+          "timeout": false,
+          "network_error": false,
+          "cache_hit": false,
+          "reason_code": null
+        }
+      },
+      "errors": [
+        {
+          "layer": "render",
+          "error_code": "ALL_NULL_ROWS",
+          "message": "No displayable core fields after completion",
+          "provider": null,
+          "endpoint": null,
+          "field": null
+        }
+      ],
+      "warnings": [],
+      "diagnosis": {
+        "module_key": "dupont",
+        "primary_issue": "MAPPING_ERROR",
+        "tags": [
+          "MAPPING_ERROR"
+        ],
+        "severity": "warning",
+        "coverage_pct": 0.0,
+        "raw_rows_count": 5,
+        "normalized_rows_count": 0,
+        "valid_fields_count": 0,
+        "evidence": [
+          "raw rows_count=5, normalized rows_count=0"
+        ],
+        "recommended_fix": [
+          "add field mapping"
+        ]
+      },
+      "agent_summary": {
+        "overall_coverage_pct": 0.0,
+        "mapping_quality_pct": 0.0,
+        "provider_health_pct": 0.0,
+        "computed_fields_count": 0,
+        "missing_critical_fields": [],
+        "diagnosis_tags": [
+          "MAPPING_ERROR"
+        ],
+        "recommended_next_actions": [
+          "Limit automated analysis to data-availability caveats until coverage improves."
+        ]
+      },
+      "debug": {
+        "enabled": true,
+        "raw_truncated": false,
+        "max_raw_chars": 20000
+      }
+    },
+    "report_documents": {
+      "schema_version": "2.0",
+      "schema_features": [
+        "formatter_registry",
+        "field_trace",
+        "coverage",
+        "provider_summary",
+        "computed_field_registry",
+        "report_status_machine"
+      ],
+      "request_id": "79b7487a-95a9-4809-9052-2dcec9cbe12f",
+      "market": "CN",
+      "symbol": "000725",
+      "ts_code": "000725.SZ",
+      "module_key": "report_documents",
+      "data_mode": "standard",
+      "stage": "final",
+      "ok": false,
+      "partial": true,
+      "stale": false,
+      "source_chain": [
+        {
+          "provider": "pdf_metrics",
+          "endpoint": "discovery",
+          "attempted": true,
+          "success": false,
+          "status": null,
+          "started_at": null,
+          "ended_at": null,
+          "elapsed_ms": null,
+          "latency_ms": 0,
+          "rows_count": 0,
+          "columns": [],
+          "non_null_fields": [],
+          "missing_fields": [],
+          "error_code": null,
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": null,
+          "raw_shape": null,
+          "detached_timeout": false,
+          "aggregate_source_id": null,
+          "data_success": null
+        }
+      ],
+      "raw": {
+        "baostock": [],
+        "akshare": [],
+        "tencent": [],
+        "sina": [],
+        "eastmoney": [],
+        "pdf_metrics": {
+          "discovery_attempts": [
+            {
+              "provider": "cninfo",
+              "year": 2025,
+              "report_type": "annual",
+              "query": {
+                "symbol": "000725",
+                "year": 2025,
+                "report_type": "annual"
+              },
+              "status": "empty",
+              "candidate_count": 0,
+              "top_candidates": [],
+              "error_code": "PDF_NOT_FOUND"
+            },
+            {
+              "provider": "sse",
+              "year": 2025,
+              "report_type": "annual",
+              "query": {
+                "symbol": "000725",
+                "year": 2025,
+                "report_type": "annual"
+              },
+              "status": "empty",
+              "candidate_count": 0,
+              "top_candidates": [],
+              "error_code": "PDF_NOT_FOUND"
+            },
+            {
+              "provider": "szse",
+              "year": 2025,
+              "report_type": "annual",
+              "query": {
+                "symbol": "000725",
+                "year": 2025,
+                "report_type": "annual"
+              },
+              "status": "empty",
+              "candidate_count": 0,
+              "top_candidates": [],
+              "error_code": "PDF_NOT_FOUND"
+            }
+          ]
+        }
+      },
+      "normalized": {
+        "rows": [
+          {
+            "documents_count": 0,
+            "chunks_count": 0,
+            "embedding_count": 0,
+            "report_status": "EMPTY",
+            "display_fields": {
+              "chunks_count": {
+                "raw_value": 0,
+                "normalized_value": 0,
+                "display_value": "0",
+                "display_type": "integer",
+                "unit": null,
+                "precision": 2
+              },
+              "embedding_count": {
+                "raw_value": 0,
+                "normalized_value": 0,
+                "display_value": "0",
+                "display_type": "integer",
+                "unit": null,
+                "precision": 2
+              },
+              "report_status": {
+                "raw_value": "EMPTY",
+                "normalized_value": "EMPTY",
+                "display_value": "EMPTY",
+                "display_type": "string",
+                "unit": null,
+                "precision": 2
+              },
+              "documents_count": {
+                "raw_value": 0,
+                "normalized_value": 0,
+                "display_value": "0",
+                "display_type": "integer",
+                "unit": null,
+                "precision": 2
+              }
+            }
+          }
+        ],
+        "metrics": {
+          "documents_count": 0,
+          "chunks_count": 0,
+          "embedding_count": 0,
+          "report_status": "EMPTY",
+          "display_fields": {
+            "chunks_count": {
+              "raw_value": 0,
+              "normalized_value": 0,
+              "display_value": "0",
+              "display_type": "integer",
+              "unit": null,
+              "precision": 2
+            },
+            "embedding_count": {
+              "raw_value": 0,
+              "normalized_value": 0,
+              "display_value": "0",
+              "display_type": "integer",
+              "unit": null,
+              "precision": 2
+            },
+            "report_status": {
+              "raw_value": "EMPTY",
+              "normalized_value": "EMPTY",
+              "display_value": "EMPTY",
+              "display_type": "string",
+              "unit": null,
+              "precision": 2
+            },
+            "documents_count": {
+              "raw_value": 0,
+              "normalized_value": 0,
+              "display_value": "0",
+              "display_type": "integer",
+              "unit": null,
+              "precision": 2
+            }
+          }
+        },
+        "fields": {}
+      },
+      "completion": {
+        "filled_fields": {},
+        "still_missing_fields": {
+          "documents_count": "FIELD_MISSING"
+        },
+        "computed_fields": {},
+        "fallback_chain": {}
+      },
+      "render": {
+        "renderable": true,
+        "chart_renderable": false,
+        "table_renderable": false,
+        "has_displayable_data": false,
+        "visible_fields": [],
+        "hidden_fields": [
+          "documents_count"
+        ],
+        "reason": "REPORT_PDF_NOT_FOUND"
+      },
+      "field_trace": {},
+      "coverage": {
+        "required_fields": 1,
+        "filled_fields": 0,
+        "computed_fields": 0,
+        "missing_fields": 1,
+        "coverage_pct": 0.0,
+        "required_field_list": [
+          "documents_count"
+        ],
+        "filled_field_list": [],
+        "computed_field_list": [],
+        "missing_field_map": {
+          "documents_count": "FIELD_MISSING"
+        }
+      },
+      "provider_summary": {
+        "pdf_metrics": {
+          "attempted": true,
+          "success": false,
+          "data_success": false,
+          "rows": 0,
+          "fields_available": 0,
+          "fields_mapped": 0,
+          "fields_used": 0,
+          "missing": 1,
+          "timeout": false,
+          "network_error": false,
+          "cache_hit": false,
+          "reason_code": null
+        }
+      },
+      "errors": [
+        {
+          "layer": "provider",
+          "error_code": "REPORT_PDF_NOT_FOUND",
+          "message": "No confirmed report PDF documents indexed",
+          "provider": null,
+          "endpoint": null,
+          "field": null
+        }
+      ],
+      "warnings": [],
+      "diagnosis": {
+        "module_key": "report_documents",
+        "primary_issue": "REPORT_PDF_NOT_FOUND",
+        "tags": [
+          "REPORT_PDF_NOT_FOUND"
+        ],
+        "severity": "info",
+        "coverage_pct": 0.0,
+        "raw_rows_count": 0,
+        "normalized_rows_count": 1,
+        "valid_fields_count": 1,
+        "evidence": [
+          "documents_count=0, no confirmed report PDF documents indexed"
+        ],
+        "recommended_fix": [
+          "run PDF discovery",
+          "manually enter PDF URL",
+          "upload report PDF"
+        ]
+      },
+      "agent_summary": {
+        "overall_coverage_pct": 0.0,
+        "mapping_quality_pct": 100.0,
+        "provider_health_pct": 0.0,
+        "computed_fields_count": 0,
+        "missing_critical_fields": [],
+        "diagnosis_tags": [
+          "REPORT_PDF_NOT_FOUND"
+        ],
+        "recommended_next_actions": [
+          "Limit automated analysis to data-availability caveats until coverage improves."
+        ]
+      },
+      "debug": {
+        "enabled": true,
+        "raw_truncated": false,
+        "max_raw_chars": 20000
+      }
+    },
+    "report_rag": {
+      "schema_version": "2.0",
+      "schema_features": [
+        "formatter_registry",
+        "field_trace",
+        "coverage",
+        "provider_summary",
+        "computed_field_registry",
+        "report_status_machine"
+      ],
+      "request_id": "790f5310-3693-45ae-a1b9-46addd9279ae",
+      "market": "CN",
+      "symbol": "000725",
+      "ts_code": "000725.SZ",
+      "module_key": "report_rag",
+      "data_mode": "standard",
+      "stage": "final",
+      "ok": false,
+      "partial": true,
+      "stale": false,
+      "source_chain": [
+        {
+          "provider": "pdf_metrics",
+          "endpoint": "discovery",
+          "attempted": true,
+          "success": false,
+          "status": null,
+          "started_at": null,
+          "ended_at": null,
+          "elapsed_ms": null,
+          "latency_ms": 0,
+          "rows_count": 0,
+          "columns": [],
+          "non_null_fields": [],
+          "missing_fields": [],
+          "error_code": null,
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": null,
+          "raw_shape": null,
+          "detached_timeout": false,
+          "aggregate_source_id": null,
+          "data_success": null
+        }
+      ],
+      "raw": {
+        "baostock": [],
+        "akshare": [],
+        "tencent": [],
+        "sina": [],
+        "eastmoney": [],
+        "pdf_metrics": {
+          "discovery_attempts": [
+            {
+              "provider": "cninfo",
+              "year": 2025,
+              "report_type": "annual",
+              "query": {
+                "symbol": "000725",
+                "year": 2025,
+                "report_type": "annual"
+              },
+              "status": "empty",
+              "candidate_count": 0,
+              "top_candidates": [],
+              "error_code": "PDF_NOT_FOUND"
+            },
+            {
+              "provider": "sse",
+              "year": 2025,
+              "report_type": "annual",
+              "query": {
+                "symbol": "000725",
+                "year": 2025,
+                "report_type": "annual"
+              },
+              "status": "empty",
+              "candidate_count": 0,
+              "top_candidates": [],
+              "error_code": "PDF_NOT_FOUND"
+            },
+            {
+              "provider": "szse",
+              "year": 2025,
+              "report_type": "annual",
+              "query": {
+                "symbol": "000725",
+                "year": 2025,
+                "report_type": "annual"
+              },
+              "status": "empty",
+              "candidate_count": 0,
+              "top_candidates": [],
+              "error_code": "PDF_NOT_FOUND"
+            }
+          ]
+        }
+      },
+      "normalized": {
+        "rows": [
+          {
+            "documents_count": 0,
+            "chunks_count": 0,
+            "embedding_count": 0,
+            "rag_status": "REPORT_PDF_NOT_FOUND",
+            "display_fields": {
+              "rag_status": {
+                "raw_value": "REPORT_PDF_NOT_FOUND",
+                "normalized_value": "REPORT_PDF_NOT_FOUND",
+                "display_value": "REPORT_PDF_NOT_FOUND",
+                "display_type": "string",
+                "unit": null,
+                "precision": 2
+              },
+              "chunks_count": {
+                "raw_value": 0,
+                "normalized_value": 0,
+                "display_value": "0",
+                "display_type": "integer",
+                "unit": null,
+                "precision": 2
+              },
+              "embedding_count": {
+                "raw_value": 0,
+                "normalized_value": 0,
+                "display_value": "0",
+                "display_type": "integer",
+                "unit": null,
+                "precision": 2
+              },
+              "documents_count": {
+                "raw_value": 0,
+                "normalized_value": 0,
+                "display_value": "0",
+                "display_type": "integer",
+                "unit": null,
+                "precision": 2
+              }
+            }
+          }
+        ],
+        "metrics": {
+          "documents_count": 0,
+          "chunks_count": 0,
+          "embedding_count": 0,
+          "rag_status": "REPORT_PDF_NOT_FOUND",
+          "display_fields": {
+            "rag_status": {
+              "raw_value": "REPORT_PDF_NOT_FOUND",
+              "normalized_value": "REPORT_PDF_NOT_FOUND",
+              "display_value": "REPORT_PDF_NOT_FOUND",
+              "display_type": "string",
+              "unit": null,
+              "precision": 2
+            },
+            "chunks_count": {
+              "raw_value": 0,
+              "normalized_value": 0,
+              "display_value": "0",
+              "display_type": "integer",
+              "unit": null,
+              "precision": 2
+            },
+            "embedding_count": {
+              "raw_value": 0,
+              "normalized_value": 0,
+              "display_value": "0",
+              "display_type": "integer",
+              "unit": null,
+              "precision": 2
+            },
+            "documents_count": {
+              "raw_value": 0,
+              "normalized_value": 0,
+              "display_value": "0",
+              "display_type": "integer",
+              "unit": null,
+              "precision": 2
+            }
+          }
+        },
+        "fields": {}
+      },
+      "completion": {
+        "filled_fields": {},
+        "still_missing_fields": {
+          "chunks_count": "FIELD_MISSING",
+          "embedding_count": "FIELD_MISSING"
+        },
+        "computed_fields": {},
+        "fallback_chain": {}
+      },
+      "render": {
+        "renderable": true,
+        "chart_renderable": false,
+        "table_renderable": false,
+        "has_displayable_data": false,
+        "visible_fields": [],
+        "hidden_fields": [
+          "chunks_count",
+          "embedding_count"
+        ],
+        "reason": "REPORT_PDF_NOT_FOUND"
+      },
+      "field_trace": {},
+      "coverage": {
+        "required_fields": 2,
+        "filled_fields": 0,
+        "computed_fields": 0,
+        "missing_fields": 2,
+        "coverage_pct": 0.0,
+        "required_field_list": [
+          "chunks_count",
+          "embedding_count"
+        ],
+        "filled_field_list": [],
+        "computed_field_list": [],
+        "missing_field_map": {
+          "chunks_count": "FIELD_MISSING",
+          "embedding_count": "FIELD_MISSING"
+        }
+      },
+      "provider_summary": {
+        "pdf_metrics": {
+          "attempted": true,
+          "success": false,
+          "data_success": false,
+          "rows": 0,
+          "fields_available": 0,
+          "fields_mapped": 0,
+          "fields_used": 0,
+          "missing": 2,
+          "timeout": false,
+          "network_error": false,
+          "cache_hit": false,
+          "reason_code": null
+        }
+      },
+      "errors": [
+        {
+          "layer": "provider",
+          "error_code": "REPORT_PDF_NOT_FOUND",
+          "message": "No confirmed report PDF documents indexed",
+          "provider": null,
+          "endpoint": null,
+          "field": null
+        }
+      ],
+      "warnings": [],
+      "diagnosis": {
+        "module_key": "report_rag",
+        "primary_issue": "REPORT_PDF_NOT_FOUND",
+        "tags": [
+          "REPORT_PDF_NOT_FOUND"
+        ],
+        "severity": "info",
+        "coverage_pct": 0.0,
+        "raw_rows_count": 0,
+        "normalized_rows_count": 1,
+        "valid_fields_count": 2,
+        "evidence": [
+          "documents_count=0, RAG cannot run without report PDF"
+        ],
+        "recommended_fix": [
+          "run PDF discovery",
+          "manually enter PDF URL",
+          "upload report PDF"
+        ]
+      },
+      "agent_summary": {
+        "overall_coverage_pct": 0.0,
+        "mapping_quality_pct": 100.0,
+        "provider_health_pct": 0.0,
+        "computed_fields_count": 0,
+        "missing_critical_fields": [],
+        "diagnosis_tags": [
+          "REPORT_PDF_NOT_FOUND"
+        ],
+        "recommended_next_actions": [
+          "Limit automated analysis to data-availability caveats until coverage improves."
+        ]
+      },
+      "debug": {
+        "enabled": true,
+        "raw_truncated": false,
+        "max_raw_chars": 20000
+      }
+    },
+    "ai_analysis_status": {
+      "schema_version": "2.0",
+      "schema_features": [
+        "formatter_registry",
+        "field_trace",
+        "coverage",
+        "provider_summary",
+        "computed_field_registry",
+        "report_status_machine"
+      ],
+      "request_id": "92d6a49e-bd92-4d00-a2a4-3832d541cca8",
+      "market": "CN",
+      "symbol": "000725",
+      "ts_code": "000725.SZ",
+      "module_key": "ai_analysis_status",
+      "data_mode": "standard",
+      "stage": "final",
+      "ok": true,
+      "partial": false,
+      "stale": false,
+      "source_chain": [],
+      "raw": {
+        "baostock": [],
+        "akshare": [],
+        "tencent": [],
+        "sina": [],
+        "eastmoney": [],
+        "pdf_metrics": []
+      },
+      "normalized": {
+        "rows": [
+          {
+            "summary": "结构化财务数据摘要可用；年报 RAG 尚未接入。",
+            "structured_summary_available": true,
+            "rag_available": false,
+            "ai_enabled": true,
+            "ai_key_configured": true,
+            "display_fields": {
+              "structured_summary_available": {
+                "raw_value": true,
+                "normalized_value": true,
+                "display_value": "True",
+                "display_type": "string",
+                "unit": null,
+                "precision": 2
+              },
+              "ai_enabled": {
+                "raw_value": true,
+                "normalized_value": true,
+                "display_value": "True",
+                "display_type": "string",
+                "unit": null,
+                "precision": 2
+              },
+              "rag_available": {
+                "raw_value": false,
+                "normalized_value": false,
+                "display_value": "False",
+                "display_type": "string",
+                "unit": null,
+                "precision": 2
+              },
+              "summary": {
+                "raw_value": "结构化财务数据摘要可用；年报 RAG 尚未接入。",
+                "normalized_value": "结构化财务数据摘要可用；年报 RAG 尚未接入。",
+                "display_value": "结构化财务数据摘要可用；年报 RAG 尚未接入。",
+                "display_type": "string",
+                "unit": null,
+                "precision": 2
+              },
+              "ai_key_configured": {
+                "raw_value": true,
+                "normalized_value": true,
+                "display_value": "True",
+                "display_type": "string",
+                "unit": null,
+                "precision": 2
+              }
+            }
+          }
+        ],
+        "metrics": {
+          "summary": "结构化财务数据摘要可用；年报 RAG 尚未接入。",
+          "structured_summary_available": true,
+          "rag_available": false,
+          "ai_enabled": true,
+          "ai_key_configured": true,
+          "display_fields": {
+            "structured_summary_available": {
+              "raw_value": true,
+              "normalized_value": true,
+              "display_value": "True",
+              "display_type": "string",
+              "unit": null,
+              "precision": 2
+            },
+            "ai_enabled": {
+              "raw_value": true,
+              "normalized_value": true,
+              "display_value": "True",
+              "display_type": "string",
+              "unit": null,
+              "precision": 2
+            },
+            "rag_available": {
+              "raw_value": false,
+              "normalized_value": false,
+              "display_value": "False",
+              "display_type": "string",
+              "unit": null,
+              "precision": 2
+            },
+            "summary": {
+              "raw_value": "结构化财务数据摘要可用；年报 RAG 尚未接入。",
+              "normalized_value": "结构化财务数据摘要可用；年报 RAG 尚未接入。",
+              "display_value": "结构化财务数据摘要可用；年报 RAG 尚未接入。",
+              "display_type": "string",
+              "unit": null,
+              "precision": 2
+            },
+            "ai_key_configured": {
+              "raw_value": true,
+              "normalized_value": true,
+              "display_value": "True",
+              "display_type": "string",
+              "unit": null,
+              "precision": 2
+            }
+          }
+        },
+        "fields": {
+          "summary": {
+            "value": "结构化财务数据摘要可用；年报 RAG 尚未接入。",
+            "raw_value": "结构化财务数据摘要可用；年报 RAG 尚未接入。",
+            "normalized_value": "结构化财务数据摘要可用；年报 RAG 尚未接入。",
+            "display_value": "结构化财务数据摘要可用；年报 RAG 尚未接入。",
+            "display_type": "string",
+            "unit": null,
+            "precision": 2,
+            "source": "provider",
+            "provider": "provider",
+            "provider_method": null,
+            "raw_field": null,
+            "computed": false,
+            "computed_formula": null,
+            "fallback_from": null,
+            "confidence": 0.95,
+            "updated_at": "2026-07-09T11:21:10.713905+00:00"
+          }
+        }
+      },
+      "completion": {
+        "filled_fields": {
+          "summary": {
+            "value": "结构化财务数据摘要可用；年报 RAG 尚未接入。",
+            "raw_value": "结构化财务数据摘要可用；年报 RAG 尚未接入。",
+            "normalized_value": "结构化财务数据摘要可用；年报 RAG 尚未接入。",
+            "display_value": "结构化财务数据摘要可用；年报 RAG 尚未接入。",
+            "display_type": "string",
+            "unit": null,
+            "precision": 2,
+            "source": "provider",
+            "provider": "provider",
+            "provider_method": null,
+            "raw_field": null,
+            "computed": false,
+            "computed_formula": null,
+            "fallback_from": null,
+            "confidence": 0.95,
+            "updated_at": "2026-07-09T11:21:10.713905+00:00"
+          }
+        },
+        "still_missing_fields": {},
+        "computed_fields": {},
+        "fallback_chain": {
+          "summary": "provider"
+        }
+      },
+      "render": {
+        "renderable": true,
+        "chart_renderable": false,
+        "table_renderable": true,
+        "has_displayable_data": true,
+        "visible_fields": [
+          "summary"
+        ],
+        "hidden_fields": [],
+        "reason": null
+      },
+      "field_trace": {
+        "summary": {
+          "provider": "provider",
+          "provider_method": null,
+          "raw_field": null,
+          "normalized_field": "summary",
+          "formatter": "string",
+          "computed": false,
+          "computed_formula": null,
+          "source_fields": [],
+          "fallback_from": null,
+          "source_chain_index": 0,
+          "confidence": 0.95
+        }
+      },
+      "coverage": {
+        "required_fields": 1,
+        "filled_fields": 1,
+        "computed_fields": 0,
+        "missing_fields": 0,
+        "coverage_pct": 100.0,
+        "required_field_list": [
+          "summary"
+        ],
+        "filled_field_list": [
+          "summary"
+        ],
+        "computed_field_list": [],
+        "missing_field_map": {}
+      },
+      "provider_summary": {},
+      "errors": [],
+      "warnings": [],
+      "diagnosis": {
+        "module_key": "ai_analysis_status",
+        "primary_issue": "OK",
+        "tags": [
+          "OK"
+        ],
+        "severity": "info",
+        "coverage_pct": 100.0,
+        "raw_rows_count": 0,
+        "normalized_rows_count": 1,
+        "valid_fields_count": 1,
+        "evidence": [],
+        "recommended_fix": []
+      },
+      "agent_summary": {
+        "overall_coverage_pct": 100.0,
+        "mapping_quality_pct": 100.0,
+        "provider_health_pct": 0.0,
+        "computed_fields_count": 0,
+        "missing_critical_fields": [],
+        "diagnosis_tags": [
+          "OK"
+        ],
+        "recommended_next_actions": []
+      },
+      "debug": {
+        "enabled": true,
+        "raw_truncated": false,
+        "max_raw_chars": 20000
+      }
+    }
+  }
+}

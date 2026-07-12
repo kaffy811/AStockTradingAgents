@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     app_name: str = "TradingAgents Backend"
     app_env: str = "development"
     app_title: str = "TradingAgents API"
-    app_version: str = "0.1.0"
+    app_version: str = "1.1.0-free-rc1"
     debug: bool = True
     cors_origins: list[str] = [
         "http://localhost:3000",
@@ -67,6 +67,12 @@ class Settings(BaseSettings):
     # Database
     database_url: str = Field(..., description="postgresql+asyncpg://...")
     redis_url: str | None = "redis://localhost:6379"
+
+    # Company V2 RAG repository backend（Phase 6T-J1）
+    # 合法值：database（默认，PostgreSQL 永久持久化）/ memory（仅隔离测试用，非永久）
+    # database 初始化失败时抛结构化错误，禁止静默 fallback 到 memory。
+    company_v2_rag_repository_backend: str = "database"
+    company_v2_rag_chunk_batch_size: int = 200
     # Set to False in production to skip Base.metadata.create_all at startup.
     # Production deployments should run: uv run alembic upgrade head
     enable_create_all: bool = True
@@ -99,6 +105,32 @@ class Settings(BaseSettings):
     # AkShare 备用数据源开关（默认关闭）
     # 设置 ENABLE_AKSHARE=true 后 Tushare 失败时自动降级到 AkShare
     enable_akshare: bool = False
+    # Phase 6A: Zero-cost data mode
+    # DATA_MODE=free: skip Tushare Pro-only APIs, use BaoStock+AkShare
+    data_mode: str = "standard"  # "standard" | "free"
+    enable_tushare: bool = True   # Set False in free mode to disable Tushare Pro APIs
+    enable_baostock: bool = False  # BaoStock primary for free mode
+    enable_report_pdf: bool = False  # Report PDF attachment feature
+    enable_report_rag: bool = False  # Phase 6F: PDF→pgvector RAG
+    enable_company_v2_debug_api: bool = True
+    debug_company_v2: bool = False
+    company_v2_raw_preview_chars: int = 2000
+    company_v2_provider_timeout_seconds: float = 8.0
+    company_v2_provider_timeout_baostock_seconds: float = 20.0
+    company_v2_provider_timeout_akshare_seconds: float = 12.0
+    company_v2_provider_timeout_http_seconds: float = 8.0
+    company_v2_debug_full_timeout_seconds: float = 45.0
+    company_v2_debug_module_timeout_seconds: float = 20.0
+    company_v2_debug_script_symbol_timeout_seconds: float = 90.0
+    # Phase 6G: Report RAG embedding provider (separate from financial_rag embedding_provider)
+    # mock (default, CI-safe, 0-cost) | local (sentence-transformers) | disabled
+    report_embedding_provider: str = "mock"
+    # Model name or local path for sentence-transformers (used when report_embedding_provider=local)
+    # Recommended: BAAI/bge-small-zh-v1.5 (384d), intfloat/multilingual-e5-small (384d)
+    report_embedding_model: str | None = None
+    # Target embedding dimension — must match report_chunks.embedding vector(N)
+    # Default 1536 matches current schema. Change requires new migration.
+    report_embedding_dim: int = 384
     # Tushare 令牌桶速率限制（积分/分钟）；基础账户 500，付费账户可调高
     tushare_rate_limit_per_min: int = 500
     # Tushare API 调用超时（秒）
@@ -113,6 +145,52 @@ class Settings(BaseSettings):
     # Orchestrator 内部异常时自动 fallback 至原 FinancialAgent。
     enable_multi_agent_orchestrator: bool = False
 
+    # AI Fundamental Analysis Agent (Phase 3)
+    # ai_provider: which LLM provider to use for fundamental analysis
+    #   "deepseek" (default) — uses DEEPSEEK_API_KEY
+    #   "openai"             — uses OPENAI_API_KEY (future)
+    # ai_enabled: master switch; set to false to always return partial=true
+    ai_provider: str = "deepseek"
+    ai_enabled: bool = True
+
+    @property
+    def ai_api_key(self) -> str | None:
+        """Unified API key lookup based on ai_provider."""
+        if self.ai_provider == "deepseek":
+            return self.deepseek_api_key
+        if self.ai_provider == "openai":
+            return self.openai_api_key
+        return None
+
+    # Phase 6K: Report Chat Cache
+    report_chat_cache_ttl_seconds: int = 1800        # 30 min default
+    enable_report_chat_cache: bool = True
+    report_chat_cache_version: str = "v1"
+
+    # Phase 6K: Report Chat Rate Limit
+    report_chat_rate_limit_per_minute: int = 10
+    report_chat_rate_limit_per_hour: int = 100
+    enable_report_chat_rate_limit: bool = True
+
+    # Phase 6K: Report Chat Session Memory
+    report_chat_memory_ttl_seconds: int = 3600       # 1 hour
+    report_chat_memory_max_turns: int = 5
+    enable_report_chat_memory: bool = True
+
+    # Phase 6T-H: Financial Evidence Fusion Rollout
+    company_v2_financial_fusion_enabled: bool = False
+    company_v2_financial_fusion_rollout_percent: int = 0
+    company_v2_financial_fusion_symbol_allowlist: str = ""
+    company_v2_financial_fusion_auto_run: bool = False
+    company_v2_financial_fusion_max_fields_per_request: int = 10
+    company_v2_financial_fusion_timeout_seconds: int = 60
+    company_v2_financial_fusion_cache_ttl_seconds: int = 86400
+    company_v2_financial_fusion_cache_version: str = "v1"
+    company_v2_financial_fusion_structured_data_version: str = "v1"
+    company_v2_financial_fusion_field_definition_registry_version: str = "v1"
+    company_v2_financial_fusion_tolerance_version: str = "v1"
+    company_v2_financial_fusion_singleflight_ttl_seconds: int = 60
+
     # Auth
     secret_key: str = Field(..., min_length=16)
     access_token_expire_minutes: int = 60
@@ -120,3 +198,8 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+
+def get_settings() -> Settings:
+    """Return the singleton settings instance."""
+    return settings

@@ -1,0 +1,7 @@
+ts_code,trade_date,overall_completeness,overall_without_rag,quote_completeness,valuation_completeness,valuation_p0_completeness,valuation_p1_completeness,financial_statement_completeness,financial_indicator_completeness,financial_completeness,rag_completeness,rag_status,missing_field_count
+600519.SH,2026-07-08,0.8837,0.9744,1.0,0.9,1.0,0.8571,1.0,1.0,1.0,0.0,empty,1
+000725.SZ,2026-07-08,0.8837,0.9744,1.0,0.9,1.0,0.8571,1.0,1.0,1.0,0.0,empty,1
+601686.SH,2026-07-08,0.8837,0.9744,1.0,0.9,1.0,0.8571,1.0,1.0,1.0,0.0,empty,1
+300750.SZ,2026-07-08,0.8837,0.9744,1.0,0.9,1.0,0.8571,1.0,1.0,1.0,0.0,empty,1
+601318.SH,2026-07-08,0.6744,0.7436,1.0,0.9,1.0,0.8571,0.7333,0.5455,0.6864,0.0,empty,10
+600186.SH,2026-07-08,0.8837,0.9744,1.0,0.9,1.0,0.8571,1.0,1.0,1.0,0.0,empty,1

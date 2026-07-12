@@ -1,0 +1,21 @@
+{
+  "phase": "phase6to_endpoint_comparison",
+  "current_transaction_pooler": {
+    "endpoint": "aws-1-ap-northeast-2.pooler.supabase.com:6543",
+    "status": "dns_failure_in_current_shell",
+    "select_1_p50_ms": null,
+    "insert_commit_p50_ms": null
+  },
+  "session_pooler": {
+    "endpoint": null,
+    "status": "not_configured"
+  },
+  "direct_database_connection": {
+    "endpoint": null,
+    "status": "not_configured_in_repo_env"
+  },
+  "formal_same_region_equivalent": {
+    "status": "not_completed",
+    "reason": "no reachable same-region runner in this shell and pooler DNS resolution failed"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "generated_at": "2026-07-11",
+  "phase": "6T-E cold cross-stock acceptance (interrupted)",
+  "blocker": "HISTORY_PROVIDER_N_PLUS_ONE_REQUESTS",
+  "phase6te_passed": false,
+  "performance_gate_passed": false,
+  "action": "optimize_history_fetch_before_rerun",
+  "interrupted_run": {
+    "symbols_planned": ["600519", "000725", "601686", "300750", "688981", "601318", "000001", "601728"],
+    "symbols_completed": ["600519"],
+    "symbols_not_run": ["000725", "601686", "300750", "688981", "601318", "000001", "601728"],
+    "note": "未完成股票不伪造结果；601686 另有独立冒烟运行结果（见下）"
+  },
+  "baseline_600519": {
+    "symbol": "600519",
+    "completed": true,
+    "elapsed_ms": 1611120,
+    "elapsed_minutes": 26.9,
+    "modules_ok": 2,
+    "estimated_provider_calls": "600+ (list_year 2001 → ~104 quarters × 6 tables，逐季串行查询)",
+    "baostock_errors_observed": "多次「接收数据异常，请稍后再试」+ Bad file descriptor（长会话逐季查询期间）",
+    "cninfo_status": "success"
+  },
+  "baseline_601686_smoke": {
+    "symbol": "601686",
+    "completed": true,
+    "cold_total_latency_ms": 411595,
+    "warm_build_full_latency_ms": 478746,
+    "note": "冒烟运行时 history dashboard 尚无缓存；缓存已在 6T-E 中补齐，但根因（逐季 N+1 请求）未解决"
+  },
+  "root_cause": {
+    "location": "backend/app/datasource/baostock_client.py get_all_financial_indicators → _sync_fetch_all",
+    "pattern": "single session（login 1 次）内，6 张表 × n_quarters 逐季串行 query_*_data 调用",
+    "n_quarters_source": "history_financial_provider.fetch_all_modules_history: n_quarters=(end_year-start_year+1)*4+4",
+    "example": "600519 (2001上市): n_quarters≈104 → ~624 次 BaoStock 查询"
+  },
+  "thresholds_after_fix": {
+    "annual_full_history_external_calls": "<=10 (target)",
+    "quarterly_recent_5y_calls": "<=25 (target)",
+    "baostock_login_per_request": "<=1",
+    "aggregate_calls_per_request": "<=1"
+  }
+}

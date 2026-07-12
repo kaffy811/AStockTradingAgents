@@ -1,0 +1,17 @@
+{
+  "phase": "phase6tq_db_preflight",
+  "runner_provisioned": false,
+  "dns_success_rate": null,
+  "tcp_success_rate": null,
+  "tls_auth_success_rate": null,
+  "select1_p50_ms": null,
+  "select1_p95_ms": null,
+  "pk_select_p50_ms": null,
+  "pk_select_p95_ms": null,
+  "insert_commit_p50_ms": null,
+  "insert_commit_p95_ms": null,
+  "error_count": null,
+  "pool_reuse_rate": null,
+  "status": "not_executed",
+  "blocker": "runner_not_provisioned"
+}

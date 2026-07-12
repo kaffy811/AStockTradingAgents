@@ -1,0 +1,75 @@
+{
+  "phase": "phase6tp_dns_matrix",
+  "environments": [
+    {
+      "name": "macos_shell",
+      "attempts": 30,
+      "success_rate": 0.0,
+      "a_record": [],
+      "aaaa_record": [],
+      "resolver_latency_ms_p50": 0.04,
+      "resolver_latency_ms_p95": 0.06,
+      "error_type": "gaierror",
+      "resolver_server": "local_shell_context",
+      "vpn_or_proxy_state": "unknown",
+      "ipv4_path": false,
+      "ipv6_path": false
+    },
+    {
+      "name": "python_runtime",
+      "attempts": 5,
+      "success_rate": 0.0,
+      "a_record": [],
+      "aaaa_record": [],
+      "resolver_latency_ms_p50": 0.05,
+      "resolver_latency_ms_p95": 0.06,
+      "error_type": "gaierror",
+      "resolver_server": "socket.getaddrinfo",
+      "vpn_or_proxy_state": "unknown",
+      "ipv4_path": false,
+      "ipv6_path": false
+    },
+    {
+      "name": "application_process",
+      "attempts": 0,
+      "success_rate": null,
+      "a_record": [],
+      "aaaa_record": [],
+      "resolver_latency_ms_p50": null,
+      "resolver_latency_ms_p95": null,
+      "error_type": "not_run_separately",
+      "resolver_server": null,
+      "vpn_or_proxy_state": null,
+      "ipv4_path": null,
+      "ipv6_path": null
+    },
+    {
+      "name": "docker_container",
+      "attempts": 0,
+      "success_rate": null,
+      "a_record": [],
+      "aaaa_record": [],
+      "resolver_latency_ms_p50": null,
+      "resolver_latency_ms_p95": null,
+      "error_type": "docker_unavailable",
+      "resolver_server": null,
+      "vpn_or_proxy_state": null,
+      "ipv4_path": null,
+      "ipv6_path": null
+    },
+    {
+      "name": "same_region_runner",
+      "attempts": 0,
+      "success_rate": null,
+      "a_record": [],
+      "aaaa_record": [],
+      "resolver_latency_ms_p50": null,
+      "resolver_latency_ms_p95": null,
+      "error_type": "not_available",
+      "resolver_server": null,
+      "vpn_or_proxy_state": null,
+      "ipv4_path": null,
+      "ipv6_path": null
+    }
+  ]
+}

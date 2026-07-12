@@ -20,7 +20,7 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.dependencies import get_current_user
+from app.dependencies import get_current_user, get_optional_user
 from app.models.industry import (
     IndustryConstituentsResponse,
     IndustryConstituentItem,
@@ -92,7 +92,7 @@ _HOT_NONE: dict = {
 @router.get("/", response_model=list[IndustryInfoResponse])
 async def list_industries(
     market: str = "CN",
-    user:   User         = Depends(get_current_user),
+    # Public endpoint — no auth required (industry list is market reference data)
     db:     AsyncSession = Depends(get_db),
 ) -> list[IndustryInfoResponse]:
     """

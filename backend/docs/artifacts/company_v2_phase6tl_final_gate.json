@@ -1,0 +1,33 @@
+{
+  "phase6tl_passed": false,
+  "phase6tk_passed": false,
+  "stage2_rollout_status": "hold",
+  "stage3_status": "not_authorized",
+  "auto_run": false,
+  "rollout_percent": 0,
+  "blocking_issues": [
+    {
+      "code": "JOB_CREATE_P95_EXCEEDS_GATE",
+      "detail": "Real acceptance measured job_create p95 at 6923.74ms, above the 1000ms gate."
+    },
+    {
+      "code": "JOB_CREATE_P50_EXCEEDS_GATE",
+      "detail": "Real acceptance measured job_create p50 at 1723.65ms, above the 300ms gate."
+    },
+    {
+      "code": "WARM_P50_EXCEEDS_GATE",
+      "detail": "Real acceptance measured warm_result p50 at 1443.31ms, above the 500ms gate."
+    },
+    {
+      "code": "WARM_SPEEDUP_BELOW_GATE",
+      "detail": "Real acceptance measured warm speedup at about 1.07x, below the 3x gate."
+    }
+  ],
+  "verified": {
+    "database_connectivity_gate_passed": true,
+    "backend_full_tests_passed": true,
+    "frontend_tests_passed": true,
+    "frontend_build_passed": true
+  },
+  "recommendation_for_next_step": "hold"
+}

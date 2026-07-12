@@ -1,0 +1,30 @@
+{
+  "phase6tq_passed": false,
+  "phase6tp_passed": false,
+  "phase6to_passed": false,
+  "phase6tn_passed": false,
+  "phase6tm_passed": false,
+  "phase6tl_passed": false,
+  "phase6tk_passed": false,
+  "stage2_rollout_status": "hold",
+  "stage3_status": "not_authorized",
+  "auto_run": false,
+  "rollout_percent": 0,
+  "runner_provisioned_gate_passed": false,
+  "runner_region_verified_gate_passed": false,
+  "runner_environment_gate_passed": false,
+  "same_region_dns_gate_passed": false,
+  "same_region_db_gate_passed": false,
+  "same_region_http_acceptance_gate_passed": false,
+  "live_supabase_tests_gate_passed": true,
+  "hermetic_tests_gate_passed": true,
+  "same_region_create_latency_gate_passed": false,
+  "concurrent_dedup_gate_passed": false,
+  "safety_gate_passed": true,
+  "blocking_issues": [
+    "RUNNER_PROVISIONING_UNAVAILABLE",
+    "SAME_REGION_ACCEPTANCE_NOT_COMPLETED",
+    "STEADY_STATE_JOB_CREATE_P50_EXCEEDS_GATE"
+  ],
+  "recommendation_for_next_step": "hold"
+}

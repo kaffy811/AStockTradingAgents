@@ -13,6 +13,37 @@
  * }
  */
 
+/**
+ * Phase 6N-8B: Check if any row contains at least one valid core field value.
+ *
+ * Rules:
+ *   - null / undefined / "" / "—" / NaN → empty
+ *   - 0 is VALID
+ *   - At least one row must have at least one valid core field to return true
+ *
+ * @param {Array<object>} rows
+ * @param {string[]} [coreFields] — if omitted, checks all non-meta fields
+ * @returns {boolean}
+ */
+export function hasDisplayableData(rows, coreFields) {
+  if (!Array.isArray(rows) || rows.length === 0) return false
+  const checkFields = Array.isArray(coreFields) && coreFields.length > 0
+    ? coreFields
+    : null
+  const EMPTY_VALUES = new Set([null, undefined, '', '—', NaN])
+  for (const row of rows) {
+    const keys = checkFields || Object.keys(row).filter(k => !k.startsWith('_') &&
+      k !== 'source' && k !== 'ts_code' && k !== 'symbol' && k !== 'end_date' &&
+      k !== 'trade_date' && k !== 'ann_date')
+    for (const k of keys) {
+      const v = row[k]
+      // 0 is valid; NaN check via Number comparison
+      if (!EMPTY_VALUES.has(v) && !(typeof v === 'number' && isNaN(v))) return true
+    }
+  }
+  return false
+}
+
 // null/NaN safe float
 function sf(v) {
   if (v === null || v === undefined || v === '' || !Number.isFinite(Number(v))) return null
@@ -115,7 +146,7 @@ function adaptValuation(data, meta) {
 }
 
 function adaptGrowth(data, meta) {
-  const rows = data?.series || []
+  const rows = data?.series || data?.rows || []
   const uh = meta?.unit_hints || {}
   const fl = meta?.field_labels || {}
   const reversed = [...rows].reverse()
@@ -130,21 +161,23 @@ function adaptGrowth(data, meta) {
 }
 
 function adaptProfitability(data, meta) {
-  const rows = data?.series || []
+  const rows = data?.series || data?.rows || []
   const fl = meta?.field_labels || {}
   const reversed = [...rows].reverse()
   const xAxis = reversed.map(r => (r.end_date || '').replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3'))
+  // BaoStock returns _pct suffix; Tushare returns same _pct suffix; support both
   const series = [
-    { name: fl.gross_margin || '毛利率(%)', type: 'line', data: reversed.map(r => sf(r.gross_margin)), connectNulls: false },
-    { name: fl.net_margin || '净利率(%)', type: 'line', data: reversed.map(r => sf(r.net_margin)), connectNulls: false },
-    { name: fl.roe || 'ROE(%)', type: 'line', data: reversed.map(r => sf(r.roe)), connectNulls: false },
-    { name: fl.roa || 'ROA(%)', type: 'line', data: reversed.map(r => sf(r.roa)), connectNulls: false },
+    { name: fl.gross_margin_pct || '毛利率(%)', type: 'line', data: reversed.map(r => sf(r.gross_margin_pct ?? r.gross_margin)), connectNulls: false },
+    { name: fl.net_margin_pct || '净利率(%)', type: 'line', data: reversed.map(r => sf(r.net_margin_pct ?? r.net_margin)), connectNulls: false },
+    { name: fl.roe_pct || 'ROE(%)', type: 'line', data: reversed.map(r => sf(r.roe_pct ?? r.roe)), connectNulls: false },
+    { name: fl.roa_pct || 'ROA(%)', type: 'line', data: reversed.map(r => sf(r.roa_pct ?? r.roa)), connectNulls: false },
   ]
-  return { metrics: [], xAxis, series, rows, columns: ['end_date','gross_margin','net_margin','roe','roa','expense_ratio'], insight: null }
+  return { metrics: [], xAxis, series, rows, columns: ['end_date','gross_margin_pct','net_margin_pct','roe_pct','roa_pct','roic_pct'], insight: null }
 }
 
 function adaptCashflowQuality(data, meta) {
-  const rows = data?.series || []
+  // Tushare and BaoStock both return `periods`; fall back to series/rows for safety
+  const rows = data?.periods || data?.series || data?.rows || []
   const fl = meta?.field_labels || {}
   const uh = meta?.unit_hints || {}
   const reversed = [...rows].reverse()
@@ -165,20 +198,21 @@ function adaptCashflowQuality(data, meta) {
 }
 
 function adaptDupont(data, meta) {
-  const rows = data?.series || []
+  const rows = data?.series || data?.rows || []
   const fl = meta?.field_labels || {}
   const reversed = [...rows].reverse()
   const xAxis = reversed.map(r => (r.end_date || '').replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3'))
+  // BaoStock returns roe_pct/net_margin_pct/assets_turn; Tushare same _pct suffix
   const series = [
-    { name: fl.roe || 'ROE(%)', type: 'line', data: reversed.map(r => sf(r.roe)), connectNulls: false },
-    { name: fl.net_margin || '净利率(%)', type: 'bar', data: reversed.map(r => sf(r.net_margin)), connectNulls: false },
-    { name: fl.asset_turnover || '资产周转率', type: 'bar', data: reversed.map(r => sf(r.asset_turnover)), connectNulls: false },
+    { name: fl.roe_pct || 'ROE(%)', type: 'line', data: reversed.map(r => sf(r.roe_pct ?? r.roe)), connectNulls: false },
+    { name: fl.net_margin_pct || '净利率(%)', type: 'bar', data: reversed.map(r => sf(r.net_margin_pct ?? r.net_margin)), connectNulls: false },
+    { name: fl.assets_turn || '资产周转率', type: 'bar', data: reversed.map(r => sf(r.assets_turn ?? r.asset_turnover)), connectNulls: false },
   ]
   return {
     metrics: [],
     xAxis, series,
     rows,
-    columns: ['end_date','roe','net_margin','asset_turnover','equity_multiplier'],
+    columns: ['end_date','roe_pct','net_margin_pct','assets_turn','equity_multiplier','factor_product_pct'],
     insight: '注意：三因子乘积与披露ROE可能因平均净资产口径不同存在小幅差异，仅供趋势参考。'
   }
 }
@@ -282,6 +316,30 @@ function adaptIndustryRank(data, meta) {
 
 // ── Registry ─────────────────────────────────────────────────────────────────
 
+function adaptAiAnalysis(data, meta) {
+  // data = { ai_analysis: { dimensions: [...], ... } }
+  const ai = data?.ai_analysis || {}
+  const dims = ai.dimensions || []
+  // Build radar chart data
+  const radarIndicators = dims.map(d => ({ name: d.name, max: 100 }))
+  const series = dims.length ? [{
+    name: '基本面评分',
+    type: 'radar',
+    data: [{ value: dims.map(d => d.score ?? 0), name: '评分' }],
+    connectNulls: false,
+  }] : []
+  // No table rows for ai_analysis
+  return {
+    metrics: ai.overall_score != null ? [{ label: '综合评分', value: String(ai.overall_score), raw: ai.overall_score, field: 'overall_score' }] : [],
+    xAxis: [],
+    series,
+    rows: [],
+    columns: [],
+    insight: ai.summary || null,
+    radarIndicators,
+  }
+}
+
 const ADAPTERS = {
   valuation:           adaptValuation,
   growth:              adaptGrowth,
@@ -293,6 +351,7 @@ const ADAPTERS = {
   dividend_history:    adaptDividendHistory,
   major_holders:       adaptMajorHolders,
   industry_rank:       adaptIndustryRank,
+  ai_analysis:         adaptAiAnalysis,
 }
 
 /**

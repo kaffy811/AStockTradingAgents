@@ -1,0 +1,55 @@
+{
+  "report_id": 3,
+  "symbol": "300750",
+  "human_review_queue": [
+    {
+      "field": "net_profit_parent",
+      "status": "definition_mismatch",
+      "reason": "field definition text indicates a different financial concept",
+      "confidence": 0.3,
+      "official_value": 72201282000,
+      "structured_value": 76786309000,
+      "provider_definition": null,
+      "matched_label": null,
+      "field_definition_match": {
+        "status": "definition_mismatch",
+        "match_type": "incompatible",
+        "field": "net_profit_parent",
+        "canonical_name": "归属于上市公司股东的净利润",
+        "matched_label": "net_profit",
+        "provider_definition": "unknown",
+        "incompatible_labels": [
+          "net_profit"
+        ],
+        "reason": "field definition text indicates a different financial concept"
+      },
+      "evidence_page": 117,
+      "evidence_excerpt": "1.归属于母公司股东的净利润 72,201,282"
+    },
+    {
+      "field": "roe_weighted",
+      "status": "definition_mismatch",
+      "reason": "field definition text indicates a different financial concept",
+      "confidence": 0.5,
+      "official_value": 24.91,
+      "structured_value": 0.247249,
+      "provider_definition": null,
+      "matched_label": null,
+      "field_definition_match": {
+        "status": "definition_mismatch",
+        "match_type": "incompatible",
+        "field": "roe_weighted",
+        "canonical_name": "加权平均净资产收益率",
+        "matched_label": "ROE",
+        "provider_definition": "unknown",
+        "incompatible_labels": [
+          "ROE",
+          "roe"
+        ],
+        "reason": "field definition text indicates a different financial concept"
+      },
+      "evidence_page": 232,
+      "evidence_excerpt": "加权平均净资产收益率（%） 归属于公司普通股股东的净利润 24.91"
+    }
+  ]
+}

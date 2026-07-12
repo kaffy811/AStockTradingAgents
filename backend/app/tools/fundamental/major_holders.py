@@ -82,9 +82,12 @@ class MajorHoldersTool(BaseFundamentalTool):
         result: dict[str, Any] = {
             "symbol": symbol,
             "ts_code": ts_code,
+            "rows": top10_list,
             "top10_float_holders": top10_list,
             "latest_period": fmt_date(latest_period) if latest_period else None,
+            "holder_number_trend": holder_num_series,
             "holder_num_series": holder_num_series,
+            "reasons": [],
             "comment": comment or "持股数据已获取。",
             "source": "tushare",
         }

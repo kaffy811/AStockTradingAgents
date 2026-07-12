@@ -1195,7 +1195,7 @@ class FinancialAgent:
                 _tm = (
                     "### 研究摘要\n\n当前 AI 响应超时，无法生成完整分析。\n\n"
                     "### 风险提示\n\n- 实时数据分析暂不可用，请稍后重试\n\n"
-                    "_仅供研究参考，不构成任何投资建议。_"
+                    "_仅供研究参考，不构成投资建议。_"
                 )
                 answer_chunks.append(_tm)
                 await _emit("answer_delta", {"delta": _tm})
@@ -1216,7 +1216,7 @@ class FinancialAgent:
                 _fb = (
                     "### 研究摘要\n\n当前数据服务暂时不可用，请稍后重试。\n\n"
                     "### 风险提示\n\n- 服务临时不可用，结论不可信赖\n\n"
-                    "_仅供研究参考，不构成任何投资建议。_"
+                    "_仅供研究参考，不构成投资建议。_"
                 )
                 answer_chunks = [_fb]
 

@@ -2,6 +2,10 @@
   <div class="app-shell">
     <div class="login-card card">
       <div class="card-title">🤖 TradingAgents — 登录</div>
+      <!-- Phase 6N-8A: 401 触发的登出显示明确的过期提示，而不是无说明的登录框 -->
+      <div v-if="authStore.sessionExpired" class="session-expired-note">
+        ⚠️ 登录已过期，请重新登录后查看行情、新闻和财报数据。
+      </div>
       <div class="login-form">
         <div class="form-group">
           <label>用户名</label>
@@ -65,6 +69,16 @@ async function handleLogin() {
   font-size: 17px;
   text-align: center;
   margin-bottom: 22px;
+}
+
+.session-expired-note {
+  margin-bottom: 14px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--status-warn-bg, #fffbeb);
+  color: var(--status-warn, #92400e);
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .login-form {

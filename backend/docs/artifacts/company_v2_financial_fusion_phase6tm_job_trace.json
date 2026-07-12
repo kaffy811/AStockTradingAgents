@@ -1,0 +1,38 @@
+{
+  "phase": "phase6tm_job_trace",
+  "real_execution": true,
+  "connection_cold_create": {
+    "elapsed_ms": 2740.98,
+    "sql_query_count": 15,
+    "report_id": 1,
+    "report_year": 2024
+  },
+  "steady_state_create": {
+    "p50_ms": 400.88,
+    "p95_ms": 405.57,
+    "sample_count": 4,
+    "sql_query_count": [1, 1, 1, 1]
+  },
+  "steady_state_results": [
+    {
+      "symbol": "600519",
+      "elapsed_ms": 354.08,
+      "sql_query_count": 1
+    },
+    {
+      "symbol": "300750",
+      "elapsed_ms": 400.29,
+      "sql_query_count": 1
+    },
+    {
+      "symbol": "000725",
+      "elapsed_ms": 403.81,
+      "sql_query_count": 1
+    },
+    {
+      "symbol": "000001",
+      "elapsed_ms": 401.46,
+      "sql_query_count": 1
+    }
+  ]
+}

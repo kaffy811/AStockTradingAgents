@@ -1,0 +1,24 @@
+{
+  "generated_at": "2026-07-11",
+  "history_gate_passed": true,
+  "chart_gate_passed": true,
+  "cninfo_gate_passed": true,
+  "performance_gate_passed": true,
+  "phase6te_passed": true,
+  "blocking_issues": [],
+  "warnings": [
+    "fast:601686:history_audit_warning:dupont",
+    "fast:000001:history_audit_warning:profitability,history_audit_warning:growth,history_audit_warning:solvency,history_audit_warning:operation_capability,history_audit_warning:cashflow_quality,history_audit_warning:dupont",
+    "cninfo:cache_hit_not_observed_by_script"
+  ],
+  "recommendation_for_phase6td": "proceed",
+  "deep_chart_gate_status": "passed",
+  "deep_chart_gate_reason": "",
+  "chart_contract_regression": false,
+  "inputs": {
+    "fast_artifact": "company_v2_cross_stock_fast_acceptance_phase6te1.json",
+    "deep_e1_baseline": "company_v2_cross_stock_deep_acceptance_phase6te1.json",
+    "deep_e2_artifact": "company_v2_cross_stock_deep_acceptance_phase6te2.json",
+    "cninfo_artifact": "company_v2_cninfo_stability_phase6te.json"
+  }
+}

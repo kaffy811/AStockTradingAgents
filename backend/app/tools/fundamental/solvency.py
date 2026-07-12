@@ -114,11 +114,77 @@ class SolvencyTool(BaseFundamentalTool):
                 "ocf_to_debt_reason": "Phase 2A 暂不拉取 cashflow 表，返回 null",
             })
 
+        latest = series[0] if series else {}
         result: dict[str, Any] = {
             "symbol": symbol, "ts_code": ts_code,
-            "annual": self.annual, "series": series,
+            "annual": self.annual,
+            "rows": series,
+            "series": series,
+            "summary": {
+                "debt_to_assets_pct": latest.get("debt_to_assets_pct"),
+                "current_ratio": latest.get("current_ratio"),
+                "quick_ratio": latest.get("quick_ratio"),
+                "cash_ratio": latest.get("cash_ratio"),
+                "equity_multiplier": latest.get("equity_multiplier"),
+                "end_date": latest.get("end_date"),
+            },
+            "reasons": [],
             "comment": _comment(series), "source": "tushare",
         }
         if partial_errors:
             result["_partial_errors"] = partial_errors
         return result
+
+    async def fetch_baostock(self, market: str, symbol: str) -> dict[str, Any]:
+        """
+        BaoStock 备用：偿债能力（currentRatio / quickRatio / cashRatio / liabilityToAsset）。
+        """
+        from app.datasource.baostock_client import baostock_client
+        from app.datasource.tushare_client import _to_ts_code as _ts
+        ts_code = _ts(market, symbol)
+        rows = await baostock_client.get_balance_data(ts_code, n=self.limit)
+        if not rows:
+            raise RuntimeError("BaoStock get_balance_data 无数据")
+
+        series = []
+        for r in rows:
+            stat_date = r.get("stat_date") or ""
+            if len(stat_date) == 8 and "-" not in stat_date:
+                stat_date = f"{stat_date[:4]}-{stat_date[4:6]}-{stat_date[6:]}"
+            # liabilityToAsset → debt_to_assets_pct (BaoStock 返回小数如 0.519，乘 100 转 %)
+            liability_ratio = r.get("liability_to_asset")
+            debt_to_assets_pct = round(float(liability_ratio) * 100, 2) if liability_ratio is not None else None
+            series.append({
+                "end_date":          stat_date,
+                "debt_to_assets_pct": debt_to_assets_pct,
+                "current_ratio":     r.get("current_ratio"),
+                "quick_ratio":       r.get("quick_ratio"),
+                "cash_ratio":        r.get("cash_ratio"),
+                "equity_multiplier": None,   # BaoStock 不直接提供
+                "interest_coverage": None,
+                "interest_coverage_reason": "BaoStock 不提供利息费用数据",
+                "ocf_to_debt":       None,
+                "ocf_to_debt_reason": "BaoStock 不提供经营现金流数据",
+            })
+        series.sort(key=lambda x: x.get("end_date") or "", reverse=True)
+        series = series[:self.limit]
+
+        latest = series[0] if series else {}
+        return {
+            "symbol": symbol, "ts_code": ts_code,
+            "annual": self.annual,
+            "rows": series,
+            "series": series,
+            "summary": {
+                "debt_to_assets_pct": latest.get("debt_to_assets_pct"),
+                "current_ratio": latest.get("current_ratio"),
+                "quick_ratio": latest.get("quick_ratio"),
+                "cash_ratio": latest.get("cash_ratio"),
+                "equity_multiplier": None,
+                "end_date": latest.get("end_date"),
+            },
+            "reasons": [],
+            "comment": _comment(series),
+            "source": "baostock",
+            "_partial_errors": ["BaoStock 备用：权益乘数/利息保障/OCF 相关字段不可用"],
+        }

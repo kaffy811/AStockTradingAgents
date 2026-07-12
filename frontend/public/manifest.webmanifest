@@ -1,11 +1,15 @@
 {
-  "name": "TradingAgents",
+  "name": "TradingAgents — AI 金融研究",
   "short_name": "TradingAgents",
-  "description": "AI 多 Agent 股票研究系统",
+  "description": "AI 驱动的多 Agent 股票研究平台",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#0f172a",
+  "theme_color": "#1a2540",
+  "background_color": "#ffffff",
   "lang": "zh-CN",
-  "icons": []
+  "icons": [
+    { "src": "/favicon.ico", "sizes": "any", "type": "image/x-icon" },
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
 }

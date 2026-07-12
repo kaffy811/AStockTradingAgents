@@ -1,0 +1,827 @@
+{
+  "records": [
+    {
+      "input": "backend/docs/artifacts/company_v2_debug_full_600519_phase6p_recapture.json",
+      "symbol": "600519",
+      "request_id": "f92d81db-eefc-4557-8637-a8e78f3c7ce5",
+      "schema_version": "2.0",
+      "validation_status": "warning",
+      "data_quality_score": 89,
+      "checks_total": 27,
+      "checks_passed": 16,
+      "checks_warning": 3,
+      "checks_failed": 0,
+      "checks_skipped": 8,
+      "critical_failures": 0,
+      "strong_failed_count": 0,
+      "weak_warning_count": 2,
+      "semantic_warning_count": 2,
+      "skipped_due_to_context_count": 1,
+      "formula_context_missing_count": 2,
+      "top_validation_checks": [
+        {
+          "check_id": "dupont_roe_formula",
+          "module_key": "dupont",
+          "check_strength": "weak",
+          "severity": "warning",
+          "status": "warning",
+          "field": "roe",
+          "expected": 0.2053499582642378,
+          "actual": 0.105687,
+          "relative_diff_pct": 48.5332,
+          "tolerance_pct": 5.0,
+          "tags": [
+            "DUPONT_PROVIDER_DEFINED",
+            "ACCOUNTING_DEFINITION_DIFFERENCE",
+            "DUPONT_FORMULA_WEAK_CHECK"
+          ],
+          "evidence": [
+            {
+              "roe": 0.105687,
+              "net_margin": 0.967631,
+              "asset_turnover": 0.175399,
+              "equity_multiplier": 1.209923,
+              "computed_roe": 0.2053499582642378,
+              "formula_context": [
+                {
+                  "period": "2026-03-31",
+                  "report_period_type": "quarterly",
+                  "value_basis": "unknown",
+                  "unit": "%",
+                  "percent_scale": "decimal_to_percent",
+                  "provider_definition": "dupont_provider_defined",
+                  "source_module": "dupont",
+                  "source_provider": "baostock",
+                  "raw_field": "dupont_roe",
+                  "normalized_field": "roe",
+                  "publish_date": "2026-04-25"
+                },
+                {
+                  "period": "2026-03-31",
+                  "report_period_type": "quarterly",
+                  "value_basis": "unknown",
+                  "unit": "%",
+                  "percent_scale": "decimal_to_percent",
+                  "provider_definition": "dupont_provider_defined",
+                  "source_module": "dupont",
+                  "source_provider": "baostock",
+                  "raw_field": "dupont_npi",
+                  "normalized_field": "net_margin",
+                  "publish_date": "2026-04-25"
+                },
+                {
+                  "period": "2026-03-31",
+                  "report_period_type": "quarterly",
+                  "value_basis": "unknown",
+                  "unit": "ratio",
+                  "percent_scale": "unknown",
+                  "provider_definition": "dupont_provider_defined",
+                  "source_module": "dupont",
+                  "source_provider": "baostock",
+                  "raw_field": "dupont_at",
+                  "normalized_field": "asset_turnover",
+                  "publish_date": "2026-04-25"
+                },
+                {
+                  "period": "2026-03-31",
+                  "report_period_type": "quarterly",
+                  "value_basis": "unknown",
+                  "unit": "ratio",
+                  "percent_scale": "unknown",
+                  "provider_definition": "dupont_provider_defined",
+                  "source_module": "dupont",
+                  "source_provider": "baostock",
+                  "raw_field": "dupont_am",
+                  "normalized_field": "equity_multiplier",
+                  "publish_date": "2026-04-25"
+                }
+              ]
+            }
+          ],
+          "recommended_fix": [
+            "compare provider definitions for Dupont components"
+          ]
+        },
+        {
+          "check_id": "net_margin_formula",
+          "module_key": "profitability",
+          "check_strength": "weak",
+          "severity": "warning",
+          "status": "warning",
+          "field": "net_margin",
+          "expected": 0.16363352995439587,
+          "actual": 0.522245,
+          "relative_diff_pct": 68.6673,
+          "tolerance_pct": 3.0,
+          "tags": [
+            "FORMULA_CONTEXT_MISSING"
+          ],
+          "evidence": [
+            {
+              "net_profit": 28153831489.89,
+              "revenue": 172054171890.91,
+              "formula_context": [
+                {
+                  "period": "2026-03-31",
+                  "report_period_type": "quarterly",
+                  "value_basis": "unknown",
+                  "unit": "%",
+                  "percent_scale": "decimal_to_percent",
+                  "provider_definition": "unknown",
+                  "source_module": "profitability",
+                  "source_provider": "baostock",
+                  "raw_field": "net_margin",
+                  "normalized_field": "net_margin",
+                  "publish_date": "2026-04-25"
+                },
+                {
+                  "period": "2026-03-31",
+                  "report_period_type": "quarterly",
+                  "value_basis": "unknown",
+                  "unit": "unknown",
+                  "percent_scale": "unknown",
+                  "provider_definition": "unknown",
+                  "source_module": "profitability",
+                  "source_provider": "baostock_aggregate",
+                  "raw_field": null,
+                  "normalized_field": "net_profit",
+                  "publish_date": "2026-04-25"
+                },
+                {
+                  "period": "2026-03-31",
+                  "report_period_type": "quarterly",
+                  "value_basis": "unknown",
+                  "unit": "unknown",
+                  "percent_scale": "unknown",
+                  "provider_definition": "unknown",
+                  "source_module": "profitability",
+                  "source_provider": "baostock_aggregate",
+                  "raw_field": null,
+                  "normalized_field": "revenue",
+                  "publish_date": "2026-04-25"
+                }
+              ]
+            }
+          ],
+          "recommended_fix": [
+            "align period and value_basis before validating net_margin",
+            "inspect BaoStock field definition",
+            "avoid cross-module strong formula check"
+          ]
+        },
+        {
+          "check_id": "receivable_turnover_sanity",
+          "module_key": "operation_capability",
+          "check_strength": "strong",
+          "severity": "info",
+          "status": "warning",
+          "field": "receivable_turnover",
+          "expected": null,
+          "actual": 3084.614768,
+          "relative_diff_pct": null,
+          "tolerance_pct": null,
+          "tags": [],
+          "evidence": [
+            "POSSIBLE_ACCOUNTING_STRUCTURE"
+          ],
+          "recommended_fix": []
+        },
+        {
+          "check_id": "market_cap_formula",
+          "module_key": "quote_overview",
+          "check_strength": "strong",
+          "severity": "info",
+          "status": "pass",
+          "field": "market_cap",
+          "expected": 1480421325470.85,
+          "actual": 1480421325470.85,
+          "relative_diff_pct": 0.0,
+          "tolerance_pct": 1.0,
+          "tags": [],
+          "evidence": [
+            {
+              "price_field": "recent_close",
+              "price": 1182.19,
+              "total_share": 1252270215.0
+            }
+          ],
+          "recommended_fix": []
+        },
+        {
+          "check_id": "float_market_cap_formula",
+          "module_key": "quote_overview",
+          "check_strength": "strong",
+          "severity": "info",
+          "status": "pass",
+          "field": "float_market_cap",
+          "expected": 1480421325470.85,
+          "actual": 1480421325470.85,
+          "relative_diff_pct": 0.0,
+          "tolerance_pct": 1.0,
+          "tags": [],
+          "evidence": [
+            {
+              "price_field": "recent_close",
+              "price": 1182.19,
+              "float_share": 1252270215.0
+            }
+          ],
+          "recommended_fix": []
+        },
+        {
+          "check_id": "float_market_cap_lte_market_cap",
+          "module_key": "quote_overview",
+          "check_strength": "strong",
+          "severity": "info",
+          "status": "pass",
+          "field": "float_market_cap",
+          "expected": "<= 1480421325470.85",
+          "actual": 1480421325470.85,
+          "relative_diff_pct": 0.0,
+          "tolerance_pct": 0.0,
+          "tags": [],
+          "evidence": [],
+          "recommended_fix": []
+        },
+        {
+          "check_id": "pe_ttm_sanity",
+          "module_key": "valuation",
+          "check_strength": "strong",
+          "severity": "info",
+          "status": "pass",
+          "field": "pe_ttm",
+          "expected": null,
+          "actual": 17.866555,
+          "relative_diff_pct": null,
+          "tolerance_pct": null,
+          "tags": [],
+          "evidence": [],
+          "recommended_fix": []
+        },
+        {
+          "check_id": "pb_sanity",
+          "module_key": "valuation",
+          "check_strength": "strong",
+          "severity": "info",
+          "status": "pass",
+          "field": "pb",
+          "expected": null,
+          "actual": 5.455395,
+          "relative_diff_pct": null,
+          "tolerance_pct": null,
+          "tags": [],
+          "evidence": [],
+          "recommended_fix": []
+        }
+      ]
+    },
+    {
+      "input": "backend/docs/artifacts/company_v2_debug_full_000725_phase6p_recapture.json",
+      "symbol": "000725",
+      "request_id": "d6b78595-5eed-4233-8015-e54b819cacef",
+      "schema_version": "2.0",
+      "validation_status": "warning",
+      "data_quality_score": 94,
+      "checks_total": 27,
+      "checks_passed": 17,
+      "checks_warning": 2,
+      "checks_failed": 0,
+      "checks_skipped": 8,
+      "critical_failures": 0,
+      "strong_failed_count": 0,
+      "weak_warning_count": 2,
+      "semantic_warning_count": 2,
+      "skipped_due_to_context_count": 1,
+      "formula_context_missing_count": 2,
+      "top_validation_checks": [
+        {
+          "check_id": "dupont_roe_formula",
+          "module_key": "dupont",
+          "check_strength": "weak",
+          "severity": "warning",
+          "status": "warning",
+          "field": "roe",
+          "expected": 0.3765730625947025,
+          "actual": 0.012619,
+          "relative_diff_pct": 96.649,
+          "tolerance_pct": 5.0,
+          "tags": [
+            "DUPONT_PROVIDER_DEFINED",
+            "ACCOUNTING_DEFINITION_DIFFERENCE",
+            "DUPONT_FORMULA_WEAK_CHECK"
+          ],
+          "evidence": [
+            {
+              "roe": 0.012619,
+              "net_margin": 0.998907,
+              "asset_turnover": 0.116697,
+              "equity_multiplier": 3.230461,
+              "computed_roe": 0.3765730625947025,
+              "formula_context": [
+                {
+                  "period": "2026-03-31",
+                  "report_period_type": "quarterly",
+                  "value_basis": "unknown",
+                  "unit": "%",
+                  "percent_scale": "decimal_to_percent",
+                  "provider_definition": "dupont_provider_defined",
+                  "source_module": "dupont",
+                  "source_provider": "baostock",
+                  "raw_field": "dupont_roe",
+                  "normalized_field": "roe",
+                  "publish_date": "2026-04-30"
+                },
+                {
+                  "period": "2026-03-31",
+                  "report_period_type": "quarterly",
+                  "value_basis": "unknown",
+                  "unit": "%",
+                  "percent_scale": "decimal_to_percent",
+                  "provider_definition": "dupont_provider_defined",
+                  "source_module": "dupont",
+                  "source_provider": "baostock",
+                  "raw_field": "dupont_npi",
+                  "normalized_field": "net_margin",
+                  "publish_date": "2026-04-30"
+                },
+                {
+                  "period": "2026-03-31",
+                  "report_period_type": "quarterly",
+                  "value_basis": "unknown",
+                  "unit": "ratio",
+                  "percent_scale": "unknown",
+                  "provider_definition": "dupont_provider_defined",
+                  "source_module": "dupont",
+                  "source_provider": "baostock",
+                  "raw_field": "dupont_at",
+                  "normalized_field": "asset_turnover",
+                  "publish_date": "2026-04-30"
+                },
+                {
+                  "period": "2026-03-31",
+                  "report_period_type": "quarterly",
+                  "value_basis": "unknown",
+                  "unit": "ratio",
+                  "percent_scale": "unknown",
+                  "provider_definition": "dupont_provider_defined",
+                  "source_module": "dupont",
+                  "source_provider": "baostock",
+                  "raw_field": "dupont_am",
+                  "normalized_field": "equity_multiplier",
+                  "publish_date": "2026-04-30"
+                }
+              ]
+            }
+          ],
+          "recommended_fix": [
+            "compare provider definitions for Dupont components"
+          ]
+        },
+        {
+          "check_id": "net_margin_formula",
+          "module_key": "profitability",
+          "check_strength": "weak",
+          "severity": "warning",
+          "status": "warning",
+          "field": "net_margin",
+          "expected": 0.008353709639075058,
+          "actual": 0.033511,
+          "relative_diff_pct": 75.0717,
+          "tolerance_pct": 3.0,
+          "tags": [
+            "FORMULA_CONTEXT_MISSING"
+          ],
+          "evidence": [
+            {
+              "net_profit": 1709087317.0,
+              "revenue": 204590222888.0,
+              "formula_context": [
+                {
+                  "period": "2026-03-31",
+                  "report_period_type": "quarterly",
+                  "value_basis": "unknown",
+                  "unit": "%",
+                  "percent_scale": "decimal_to_percent",
+                  "provider_definition": "unknown",
+                  "source_module": "profitability",
+                  "source_provider": "baostock",
+                  "raw_field": "net_margin",
+                  "normalized_field": "net_margin",
+                  "publish_date": "2026-04-30"
+                },
+                {
+                  "period": "2026-03-31",
+                  "report_period_type": "quarterly",
+                  "value_basis": "unknown",
+                  "unit": "unknown",
+                  "percent_scale": "unknown",
+                  "provider_definition": "unknown",
+                  "source_module": "profitability",
+                  "source_provider": "baostock_aggregate",
+                  "raw_field": null,
+                  "normalized_field": "net_profit",
+                  "publish_date": "2026-04-30"
+                },
+                {
+                  "period": "2026-03-31",
+                  "report_period_type": "quarterly",
+                  "value_basis": "unknown",
+                  "unit": "unknown",
+                  "percent_scale": "unknown",
+                  "provider_definition": "unknown",
+                  "source_module": "profitability",
+                  "source_provider": "baostock_aggregate",
+                  "raw_field": null,
+                  "normalized_field": "revenue",
+                  "publish_date": "2026-04-30"
+                }
+              ]
+            }
+          ],
+          "recommended_fix": [
+            "align period and value_basis before validating net_margin",
+            "inspect BaoStock field definition",
+            "avoid cross-module strong formula check"
+          ]
+        },
+        {
+          "check_id": "market_cap_formula",
+          "module_key": "quote_overview",
+          "check_strength": "strong",
+          "severity": "info",
+          "status": "pass",
+          "field": "market_cap",
+          "expected": 301911273721.60004,
+          "actual": 301911273721.60004,
+          "relative_diff_pct": 0.0,
+          "tolerance_pct": 1.0,
+          "tags": [],
+          "evidence": [
+            {
+              "price_field": "recent_close",
+              "price": 8.15,
+              "total_share": 37044328064.0
+            }
+          ],
+          "recommended_fix": []
+        },
+        {
+          "check_id": "float_market_cap_formula",
+          "module_key": "quote_overview",
+          "check_strength": "strong",
+          "severity": "info",
+          "status": "pass",
+          "field": "float_market_cap",
+          "expected": 296184559089.8,
+          "actual": 296184559089.8,
+          "relative_diff_pct": 0.0,
+          "tolerance_pct": 1.0,
+          "tags": [],
+          "evidence": [
+            {
+              "price_field": "recent_close",
+              "price": 8.15,
+              "float_share": 36341663692.0
+            }
+          ],
+          "recommended_fix": []
+        },
+        {
+          "check_id": "float_market_cap_lte_market_cap",
+          "module_key": "quote_overview",
+          "check_strength": "strong",
+          "severity": "info",
+          "status": "pass",
+          "field": "float_market_cap",
+          "expected": "<= 301911273721.60004",
+          "actual": 296184559089.8,
+          "relative_diff_pct": 0.0,
+          "tolerance_pct": 0.0,
+          "tags": [],
+          "evidence": [],
+          "recommended_fix": []
+        },
+        {
+          "check_id": "pe_ttm_sanity",
+          "module_key": "valuation",
+          "check_strength": "strong",
+          "severity": "info",
+          "status": "pass",
+          "field": "pe_ttm",
+          "expected": null,
+          "actual": 50.739792,
+          "relative_diff_pct": null,
+          "tolerance_pct": null,
+          "tags": [],
+          "evidence": [],
+          "recommended_fix": []
+        },
+        {
+          "check_id": "pb_sanity",
+          "module_key": "valuation",
+          "check_strength": "strong",
+          "severity": "info",
+          "status": "pass",
+          "field": "pb",
+          "expected": null,
+          "actual": 2.218355,
+          "relative_diff_pct": null,
+          "tolerance_pct": null,
+          "tags": [],
+          "evidence": [],
+          "recommended_fix": []
+        },
+        {
+          "check_id": "ps_ttm_sanity",
+          "module_key": "valuation",
+          "check_strength": "strong",
+          "severity": "info",
+          "status": "pass",
+          "field": "ps_ttm",
+          "expected": null,
+          "actual": 1.472791,
+          "relative_diff_pct": null,
+          "tolerance_pct": null,
+          "tags": [],
+          "evidence": [],
+          "recommended_fix": []
+        }
+      ]
+    },
+    {
+      "input": "backend/docs/artifacts/company_v2_debug_full_601686_phase6p_recapture.json",
+      "symbol": "601686",
+      "request_id": "76597827-bcab-4f14-95a4-a584343c7373",
+      "schema_version": "2.0",
+      "validation_status": "warning",
+      "data_quality_score": 84,
+      "checks_total": 27,
+      "checks_passed": 15,
+      "checks_warning": 4,
+      "checks_failed": 0,
+      "checks_skipped": 8,
+      "critical_failures": 0,
+      "strong_failed_count": 0,
+      "weak_warning_count": 2,
+      "semantic_warning_count": 2,
+      "skipped_due_to_context_count": 1,
+      "formula_context_missing_count": 2,
+      "top_validation_checks": [
+        {
+          "check_id": "dupont_roe_formula",
+          "module_key": "dupont",
+          "check_strength": "weak",
+          "severity": "warning",
+          "status": "warning",
+          "field": "roe",
+          "expected": 1.4010487298199854,
+          "actual": 0.018961,
+          "relative_diff_pct": 98.6467,
+          "tolerance_pct": 5.0,
+          "tags": [
+            "DUPONT_PROVIDER_DEFINED",
+            "ACCOUNTING_DEFINITION_DIFFERENCE",
+            "DUPONT_FORMULA_WEAK_CHECK"
+          ],
+          "evidence": [
+            {
+              "roe": 0.018961,
+              "net_margin": 0.896523,
+              "asset_turnover": 0.448859,
+              "equity_multiplier": 3.481624,
+              "computed_roe": 1.4010487298199854,
+              "formula_context": [
+                {
+                  "period": "2026-03-31",
+                  "report_period_type": "quarterly",
+                  "value_basis": "unknown",
+                  "unit": "%",
+                  "percent_scale": "decimal_to_percent",
+                  "provider_definition": "dupont_provider_defined",
+                  "source_module": "dupont",
+                  "source_provider": "baostock",
+                  "raw_field": "dupont_roe",
+                  "normalized_field": "roe",
+                  "publish_date": "2026-04-29"
+                },
+                {
+                  "period": "2026-03-31",
+                  "report_period_type": "quarterly",
+                  "value_basis": "unknown",
+                  "unit": "%",
+                  "percent_scale": "decimal_to_percent",
+                  "provider_definition": "dupont_provider_defined",
+                  "source_module": "dupont",
+                  "source_provider": "baostock",
+                  "raw_field": "dupont_npi",
+                  "normalized_field": "net_margin",
+                  "publish_date": "2026-04-29"
+                },
+                {
+                  "period": "2026-03-31",
+                  "report_period_type": "quarterly",
+                  "value_basis": "unknown",
+                  "unit": "ratio",
+                  "percent_scale": "unknown",
+                  "provider_definition": "dupont_provider_defined",
+                  "source_module": "dupont",
+                  "source_provider": "baostock",
+                  "raw_field": "dupont_at",
+                  "normalized_field": "asset_turnover",
+                  "publish_date": "2026-04-29"
+                },
+                {
+                  "period": "2026-03-31",
+                  "report_period_type": "quarterly",
+                  "value_basis": "unknown",
+                  "unit": "ratio",
+                  "percent_scale": "unknown",
+                  "provider_definition": "dupont_provider_defined",
+                  "source_module": "dupont",
+                  "source_provider": "baostock",
+                  "raw_field": "dupont_am",
+                  "normalized_field": "equity_multiplier",
+                  "publish_date": "2026-04-29"
+                }
+              ]
+            }
+          ],
+          "recommended_fix": [
+            "compare provider definitions for Dupont components"
+          ]
+        },
+        {
+          "check_id": "net_margin_formula",
+          "module_key": "profitability",
+          "check_strength": "weak",
+          "severity": "warning",
+          "status": "warning",
+          "field": "net_margin",
+          "expected": 0.0028430893614642266,
+          "actual": 0.013534,
+          "relative_diff_pct": 78.993,
+          "tolerance_pct": 3.0,
+          "tags": [
+            "FORMULA_CONTEXT_MISSING"
+          ],
+          "evidence": [
+            {
+              "net_profit": 144062444.38,
+              "revenue": 50671092626.44,
+              "formula_context": [
+                {
+                  "period": "2026-03-31",
+                  "report_period_type": "quarterly",
+                  "value_basis": "unknown",
+                  "unit": "%",
+                  "percent_scale": "decimal_to_percent",
+                  "provider_definition": "unknown",
+                  "source_module": "profitability",
+                  "source_provider": "baostock",
+                  "raw_field": "net_margin",
+                  "normalized_field": "net_margin",
+                  "publish_date": "2026-04-29"
+                },
+                {
+                  "period": "2026-03-31",
+                  "report_period_type": "quarterly",
+                  "value_basis": "unknown",
+                  "unit": "unknown",
+                  "percent_scale": "unknown",
+                  "provider_definition": "unknown",
+                  "source_module": "profitability",
+                  "source_provider": "baostock_aggregate",
+                  "raw_field": null,
+                  "normalized_field": "net_profit",
+                  "publish_date": "2026-04-29"
+                },
+                {
+                  "period": "2026-03-31",
+                  "report_period_type": "quarterly",
+                  "value_basis": "unknown",
+                  "unit": "unknown",
+                  "percent_scale": "unknown",
+                  "provider_definition": "unknown",
+                  "source_module": "profitability",
+                  "source_provider": "baostock_aggregate",
+                  "raw_field": null,
+                  "normalized_field": "revenue",
+                  "publish_date": "2026-04-29"
+                }
+              ]
+            }
+          ],
+          "recommended_fix": [
+            "align period and value_basis before validating net_margin",
+            "inspect BaoStock field definition",
+            "avoid cross-module strong formula check"
+          ]
+        },
+        {
+          "check_id": "pcf_ncf_ttm_sanity",
+          "module_key": "valuation",
+          "check_strength": "strong",
+          "severity": "info",
+          "status": "warning",
+          "field": "pcf_ncf_ttm",
+          "expected": null,
+          "actual": -23.28705,
+          "relative_diff_pct": null,
+          "tolerance_pct": null,
+          "tags": [],
+          "evidence": [
+            "CASHFLOW_VALUATION_NEGATIVE"
+          ],
+          "recommended_fix": []
+        },
+        {
+          "check_id": "ocf_to_np_sanity",
+          "module_key": "cashflow_quality",
+          "check_strength": "strong",
+          "severity": "warning",
+          "status": "warning",
+          "field": "ocf_to_np",
+          "expected": null,
+          "actual": -0.095326,
+          "relative_diff_pct": null,
+          "tolerance_pct": null,
+          "tags": [],
+          "evidence": [],
+          "recommended_fix": []
+        },
+        {
+          "check_id": "market_cap_formula",
+          "module_key": "quote_overview",
+          "check_strength": "strong",
+          "severity": "info",
+          "status": "pass",
+          "field": "market_cap",
+          "expected": 7298873318.4,
+          "actual": 7298873318.4,
+          "relative_diff_pct": 0.0,
+          "tolerance_pct": 1.0,
+          "tags": [],
+          "evidence": [
+            {
+              "price_field": "recent_close",
+              "price": 4.96,
+              "total_share": 1471547040.0
+            }
+          ],
+          "recommended_fix": []
+        },
+        {
+          "check_id": "float_market_cap_formula",
+          "module_key": "quote_overview",
+          "check_strength": "strong",
+          "severity": "info",
+          "status": "pass",
+          "field": "float_market_cap",
+          "expected": 7298873318.4,
+          "actual": 7298873318.4,
+          "relative_diff_pct": 0.0,
+          "tolerance_pct": 1.0,
+          "tags": [],
+          "evidence": [
+            {
+              "price_field": "recent_close",
+              "price": 4.96,
+              "float_share": 1471547040.0
+            }
+          ],
+          "recommended_fix": []
+        },
+        {
+          "check_id": "float_market_cap_lte_market_cap",
+          "module_key": "quote_overview",
+          "check_strength": "strong",
+          "severity": "info",
+          "status": "pass",
+          "field": "float_market_cap",
+          "expected": "<= 7298873318.4",
+          "actual": 7298873318.4,
+          "relative_diff_pct": 0.0,
+          "tolerance_pct": 0.0,
+          "tags": [],
+          "evidence": [],
+          "recommended_fix": []
+        },
+        {
+          "check_id": "pe_ttm_sanity",
+          "module_key": "valuation",
+          "check_strength": "strong",
+          "severity": "info",
+          "status": "pass",
+          "field": "pe_ttm",
+          "expected": null,
+          "actual": 10.849659,
+          "relative_diff_pct": null,
+          "tolerance_pct": null,
+          "tags": [],
+          "evidence": [],
+          "recommended_fix": []
+        }
+      ]
+    }
+  ]
+}

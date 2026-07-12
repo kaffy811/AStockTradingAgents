@@ -1,0 +1,13 @@
+{
+  "phase": "phase6to_same_region_acceptance",
+  "status": "blocked",
+  "blocker": "pooler DNS resolution failure in current shell",
+  "planned_checks": [
+    "30 SELECT 1",
+    "30 primary-key SELECT",
+    "30 INSERT+COMMIT",
+    "50 steady-state create samples",
+    "10 concurrent duplicate-create checks"
+  ],
+  "completed": false
+}

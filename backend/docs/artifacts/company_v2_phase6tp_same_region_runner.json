@@ -1,0 +1,11 @@
+{
+  "phase": "phase6tp_same_region_runner",
+  "status": "not_provisioned_in_current_session",
+  "provider": null,
+  "region": null,
+  "network_path": null,
+  "runtime_version": null,
+  "driver_version": null,
+  "pool_config": null,
+  "reason": "no same-region runner was available in this session; live Supabase became reachable only with network-permissioned checks"
+}

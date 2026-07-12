@@ -3,6 +3,8 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.core.config import settings
 from app.core.database import close_redis, connect_redis, init_db
@@ -10,7 +12,14 @@ from app.datasource.tushare_client import init_tushare_client
 from app.routers import router
 from app.routers.fundamentals import router as fundamentals_router
 from app.routers.fundamentals_compat import compat_router
+from app.routers.company_v2_debug import router as company_v2_debug_router
+from app.routers.company_v2_financial_fusion import router as company_v2_financial_fusion_router
+from app.routers.company_v2_report_rag import router as company_v2_report_rag_router
+from app.routers.report_discovery import router as report_discovery_router
+from app.routers.report_rag import router as report_rag_router
+from app.routers.report_chat import report_chat_router
 from app.services.cache_service import set_event_loop
+from app.core.structured_debug_logger import CompanyV2RequestIdMiddleware
 
 
 @asynccontextmanager
@@ -39,8 +48,41 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(CompanyV2RequestIdMiddleware)
+
+
+# ── Phase 6N-8A: auth errors carry a stable error_code ────────────────────────
+# 401/403 must NEVER be mistaken for a data-source failure by the frontend.
+# Response keeps `detail` (backward compat) and adds `error_code` + `message`.
+@app.exception_handler(StarletteHTTPException)
+async def _http_exception_handler(request, exc: StarletteHTTPException):
+    from app.core.error_codes import AUTH_REQUIRED, FORBIDDEN
+
+    payload = {"detail": exc.detail}
+    if exc.status_code == 401:
+        payload["error_code"] = AUTH_REQUIRED
+        payload["message"] = "Authentication required"
+    elif exc.status_code == 403:
+        # Missing Authorization header surfaces as 403 via HTTPBearer —
+        # semantically it is still "please log in".
+        if isinstance(exc.detail, str) and "Not authenticated" in exc.detail:
+            payload["error_code"] = AUTH_REQUIRED
+            payload["message"] = "Authentication required"
+        else:
+            payload["error_code"] = FORBIDDEN
+            payload["message"] = "Forbidden"
+    elif isinstance(exc.detail, dict):
+        # Router already provided a structured payload — pass through unchanged
+        payload = exc.detail
+    return JSONResponse(payload, status_code=exc.status_code, headers=exc.headers)
 
 app.include_router(router, prefix="/api/v1")
 # Stock Fundamental Service（Phase 1.5）— 路由前缀已在各 router 内部定义
 app.include_router(fundamentals_router)    # /api/v1/stocks/{market}/{symbol}/fundamentals/...
 app.include_router(compat_router)          # /api/v1/modules, /api/v1/stock/{code}/...
+app.include_router(report_discovery_router)  # /api/v1/stocks/{market}/{code}/reports/discover
+app.include_router(report_rag_router)        # /api/v1/stocks/{market}/{code}/reports/{id}/chunk|embed|rag
+app.include_router(report_chat_router)       # /api/v1/stock/{code}/report-chat
+app.include_router(company_v2_debug_router)  # /api/v2/company/{market}/{symbol}/debug/...
+app.include_router(company_v2_financial_fusion_router)  # /api/v2/company/{market}/{symbol}/financial-fusion/...
+app.include_router(company_v2_report_rag_router)  # /api/v2/company/{market}/{symbol}/reports/{id}/rag/...

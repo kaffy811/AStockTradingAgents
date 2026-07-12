@@ -16,11 +16,14 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from fastapi import APIRouter, HTTPException, Path
+from fastapi import APIRouter, Depends, HTTPException, Path
 from fastapi.responses import JSONResponse
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 
-from app.aggregator.envelope import build_api_response
+from app.aggregator.envelope import build_api_response, ok_envelope, err_envelope
 from app.aggregator.fundamentals_aggregator import get_aggregator
+from app.core.database import get_db
 from app.datasource.tushare_client import _to_ts_code
 from app.tools.fundamental import MODULE_NAME_MAP
 
@@ -123,8 +126,10 @@ async def get_fundamentals_module(
         envelope, market=market, symbol=symbol, ts_code=ts_code,
         module_key=module_key, module_name=_module_name(module_key),
     )
-    status = 200 if envelope["ok"] else 503
-    return _disclaimer_response(response, status_code=status)
+    # Always HTTP 200 — errors surface via partial=True + errors[] in the envelope.
+    # Returning 503 on every missing token floods the browser console and breaks
+    # the frontend graceful-degradation path (DataSourceBanner).
+    return _disclaimer_response(response, status_code=200)
 
 
 # ── 端点 3：模块声明列表 ──────────────────────────────────────────────────────
@@ -149,3 +154,73 @@ async def list_fundamentals_modules(
     aggregator = get_aggregator()
     modules = aggregator.list_modules()
     return _disclaimer_response(modules)
+
+
+# ── 端点 4：年报文件索引（Phase 6A）─────────────────────────────────────────
+
+@router.get(
+    "/{market}/{symbol}/fundamentals/modules/report_documents",
+    summary="上市公司年报/半年报文件索引（Phase 6A）",
+)
+async def get_report_documents(
+    market: str = Path(..., description="市场代码：CN / HK / US"),
+    symbol: str = Path(..., description="股票代码"),
+    db: AsyncSession = Depends(get_db),
+) -> JSONResponse:
+    """
+    查询 report_documents 表中该股票的历史年报/半年报索引。
+
+    - 需要 ENABLE_REPORT_PDF=true 且已运行 PDF 采集任务后才有数据。
+    - 未开启时返回 partial=True + 提示信息，不报错。
+    """
+    from app.core.config import settings
+
+    market = _validate_market(market)
+    ts_code = _to_ts_code(market, symbol)
+
+    if not settings.enable_report_pdf:
+        envelope = err_envelope(
+            "ENABLE_REPORT_PDF 未开启，年报文件功能未激活。"
+            "请设置环境变量 ENABLE_REPORT_PDF=true 并运行 PDF 采集任务。"
+        )
+        response = build_api_response(
+            envelope, market=market, symbol=symbol, ts_code=ts_code,
+            module_key="report_documents", module_name="年报文件",
+        )
+        return _disclaimer_response(response)
+
+    try:
+        from app.models.report_document import ReportDocument
+        stmt = (
+            select(ReportDocument)
+            .where(ReportDocument.ts_code == ts_code)
+            .order_by(ReportDocument.period_end.desc())
+        )
+        result = await db.execute(stmt)
+        docs = result.scalars().all()
+        rows = [
+            {
+                "id":               d.id,
+                "ts_code":          d.ts_code,
+                "report_type":      d.report_type,
+                "period_end":       d.period_end,
+                "title":            d.title,
+                "source_url":       d.source_url,
+                "file_sha256":      d.file_sha256,
+                "text_excerpt":     d.text_excerpt,
+                "disclosure_date":  d.disclosure_date,
+                "parsed":           d.parsed,
+                "created_at":       d.created_at.isoformat() if d.created_at else None,
+            }
+            for d in docs
+        ]
+        envelope = ok_envelope({"ts_code": ts_code, "rows": rows, "source": "db"})
+    except Exception as e:
+        log.warning("report_documents 查询失败 [%s]: %s", ts_code, e)
+        envelope = err_envelope(f"年报文件查询失败: {e}")
+
+    response = build_api_response(
+        envelope, market=market, symbol=symbol, ts_code=ts_code,
+        module_key="report_documents", module_name="年报文件",
+    )
+    return _disclaimer_response(response)

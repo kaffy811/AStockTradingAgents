@@ -129,9 +129,20 @@ class CapitalOccupationTool(BaseFundamentalTool):
             }
             series.append(period)
 
+        latest = series[0] if series else {}
         result: dict[str, Any] = {
             "symbol": symbol, "ts_code": ts_code,
-            "annual": self.annual, "series": series,
+            "annual": self.annual,
+            "rows": series,
+            "series": series,
+            "summary": {
+                "occupation_power": latest.get("occupation_power"),
+                "receivable_to_revenue_pct": latest.get("receivable_to_revenue_pct"),
+                "payable_to_revenue_pct": latest.get("payable_to_revenue_pct"),
+                "advance_to_revenue_pct": latest.get("advance_to_revenue_pct"),
+                "end_date": latest.get("end_date"),
+            },
+            "reasons": [],
             "comment": _comment(series), "source": "tushare",
         }
         if all_missing:

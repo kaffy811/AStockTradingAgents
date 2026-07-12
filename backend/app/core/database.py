@@ -1,13 +1,14 @@
 from collections.abc import AsyncGenerator
 
 from redis.asyncio import Redis, from_url
+from sqlalchemy.engine import make_url
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
     create_async_engine,
 )
 from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy.pool import NullPool
+from sqlalchemy.pool import AsyncAdaptedQueuePool, NullPool
 
 from app.core.config import settings
 
@@ -21,12 +22,23 @@ from app.core.config import settings
 #   connection B → DuplicatePreparedStatementError. Setting cache size to 0
 #   disables client-side prepared statement caching entirely.
 
-async_engine = create_async_engine(
-    settings.database_url,
-    poolclass=NullPool,
-    connect_args={"statement_cache_size": 0},
-    echo=settings.debug,
-)
+_database_url = make_url(settings.database_url)
+_poolclass = AsyncAdaptedQueuePool if _database_url.drivername.startswith("postgresql") else NullPool
+_engine_kwargs = {
+    "poolclass": _poolclass,
+    "connect_args": {"statement_cache_size": 0},
+    "echo": settings.debug,
+}
+if _poolclass is AsyncAdaptedQueuePool:
+    _engine_kwargs.update(
+        {
+            "pool_size": 5,
+            "max_overflow": 10,
+            "pool_recycle": 1800,
+        }
+    )
+
+async_engine = create_async_engine(settings.database_url, **_engine_kwargs)
 
 AsyncSessionLocal = async_sessionmaker(
     async_engine,
@@ -75,6 +87,7 @@ async def init_db() -> None:
     from app.models import industry           # noqa: F401
     from app.models import industry_hot_stock # noqa: F401
     from app.models import watchlist_item     # noqa: F401
+    from app.models import company_v2_report_rag  # noqa: F401
 
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)

@@ -1,0 +1,419 @@
+{
+  "results": [
+    {
+      "id": "revenue",
+      "question": "公司 2024 年营业收入是多少？",
+      "expected": "answered",
+      "answer_status": "answered",
+      "retrieval_mode": "hybrid",
+      "retrieval_hit": true,
+      "top_pages": [
+        6,
+        5,
+        14
+      ],
+      "citation_page_correct": true,
+      "answer_grounded": true,
+      "expected_behavior_met": true,
+      "period_correct": true,
+      "unit_correct": true,
+      "no_cross_report_leakage": true,
+      "investment_advice_refused": true,
+      "unsupported_answer_correct": true,
+      "latency_ms": 115,
+      "answer": {
+        "status": "answered",
+        "report_id": 1,
+        "symbol": "601686",
+        "report_year": 2024,
+        "report_type": "annual",
+        "question": "公司 2024 年营业收入是多少？",
+        "answer": "根据所选报告披露，营业收入 54,822,111,649.52 60,918,218,181.36 -10.01 67,360,350,418.67（见第 6-7、5-6 页）。 请以引用页原文单位为准，未在回答中自行换算。",
+        "citations": [
+          {
+            "page": "6-7",
+            "chunk_id": 6,
+            "excerpt": "营业收入 54,822,111,649.52 60,918,218,181.36 -10.01 67,360,350,418.67",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+          },
+          {
+            "page": "5-6",
+            "chunk_id": 5,
+            "excerpt": "第二节 公司简介和主要财务指标；一、 公司信息",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+          },
+          {
+            "page": "14-15",
+            "chunk_id": 25,
+            "excerpt": "分行业 营业收入 营业成本 毛利率；分产品 营业收入 营业成本 毛利率",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+          }
+        ],
+        "retrieval_mode": "hybrid",
+        "confidence": 0.7359,
+        "warnings": [],
+        "latency_ms": 61
+      }
+    },
+    {
+      "id": "net_profit_parent",
+      "question": "归属于上市公司股东的净利润是多少？",
+      "expected": "answered",
+      "answer_status": "answered",
+      "retrieval_mode": "hybrid",
+      "retrieval_hit": true,
+      "top_pages": [
+        6,
+        7,
+        54
+      ],
+      "citation_page_correct": true,
+      "answer_grounded": true,
+      "expected_behavior_met": true,
+      "period_correct": true,
+      "unit_correct": true,
+      "no_cross_report_leakage": true,
+      "investment_advice_refused": true,
+      "unsupported_answer_correct": true,
+      "latency_ms": 118,
+      "answer": {
+        "status": "answered",
+        "report_id": 1,
+        "symbol": "601686",
+        "report_year": 2024,
+        "report_type": "annual",
+        "question": "归属于上市公司股东的净利润是多少？",
+        "answer": "根据所选报告披露，除非经常性损益的净利润 320,323,351.78 502,987,355.53 -36.32 218,353,072.12（见第 6-7、7 页）。",
+        "citations": [
+          {
+            "page": "6-7",
+            "chunk_id": 6,
+            "excerpt": "除非经常性损益的净利润 320,323,351.78 502,987,355.53 -36.32 218,353,072.12",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+          },
+          {
+            "page": 7,
+            "chunk_id": 7,
+            "excerpt": "(二) 同时按照境外会计准则与按中国会计准则披露的财务报告中净利润和归属于上市公司股东；股东的净利润 1,356,188.49 108,770,662.99 -9,672,753.25 324,323,244.72",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+          },
+          {
+            "page": "54-55",
+            "chunk_id": 79,
+            "excerpt": "通股股东的净利润的比率（%） 49.30；通股股东的净利润的比率（%） 87.61",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+          }
+        ],
+        "retrieval_mode": "hybrid",
+        "confidence": 0.8948,
+        "warnings": [],
+        "latency_ms": 58
+      }
+    },
+    {
+      "id": "operating_cashflow",
+      "question": "经营活动产生的现金流量净额是多少？",
+      "expected": "answered",
+      "answer_status": "answered",
+      "retrieval_mode": "hybrid",
+      "retrieval_hit": true,
+      "top_pages": [
+        18,
+        6,
+        14
+      ],
+      "citation_page_correct": true,
+      "answer_grounded": true,
+      "expected_behavior_met": true,
+      "period_correct": true,
+      "unit_correct": true,
+      "no_cross_report_leakage": true,
+      "investment_advice_refused": true,
+      "unsupported_answer_correct": true,
+      "latency_ms": 121,
+      "answer": {
+        "status": "answered",
+        "report_id": 1,
+        "symbol": "601686",
+        "report_year": 2024,
+        "report_type": "annual",
+        "question": "经营活动产生的现金流量净额是多少？",
+        "answer": "根据所选报告披露，经营活动现金流入小计 61,599,190,282.21 69,164,230,426.71 -10.94%；经营活动现金流出小计 60,205,357,680.05 68,744,262,137.97 -12.42%；经营活动产生的现金流量净额 1,393,832,602.16 419,968,288.74 231.89%（见第 18-19、6-7 页）。",
+        "citations": [
+          {
+            "page": "18-19",
+            "chunk_id": 29,
+            "excerpt": "经营活动现金流入小计 61,599,190,282.21 69,164,230,426.71 -10.94%；经营活动现金流出小计 60,205,357,680.05 68,744,262,137.97 -12.42%",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+          },
+          {
+            "page": "6-7",
+            "chunk_id": 6,
+            "excerpt": "经营活动产生的现金流量",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+          },
+          {
+            "page": 14,
+            "chunk_id": 24,
+            "excerpt": "经营活动产生的现金流量净额 1,393,832,602.16 419,968,288.74 231.89；投资活动产生的现金流量净额 -71,735,317.32 -422,949,373.78 83.04",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+          }
+        ],
+        "retrieval_mode": "hybrid",
+        "confidence": 0.77,
+        "warnings": [],
+        "latency_ms": 60
+      }
+    },
+    {
+      "id": "risk_factors",
+      "question": "公司披露了哪些主要风险？",
+      "expected": "answered",
+      "answer_status": "answered",
+      "retrieval_mode": "hybrid",
+      "retrieval_hit": true,
+      "top_pages": [
+        234,
+        235,
+        233
+      ],
+      "citation_page_correct": true,
+      "answer_grounded": true,
+      "expected_behavior_met": true,
+      "period_correct": true,
+      "unit_correct": true,
+      "no_cross_report_leakage": true,
+      "investment_advice_refused": true,
+      "unsupported_answer_correct": true,
+      "latency_ms": 108,
+      "answer": {
+        "status": "answered",
+        "report_id": 1,
+        "symbol": "601686",
+        "report_year": 2024,
+        "report_type": "annual",
+        "question": "公司披露了哪些主要风险？",
+        "answer": "根据所选报告的风险相关披露，2、流动性风险；流动性风险是指企业在履行以交付现金或其他金融资产的方式结算的义务时发生资金短缺的；风险。（见第 234-235、235 页）。",
+        "citations": [
+          {
+            "page": "234-235",
+            "chunk_id": 274,
+            "excerpt": "2、流动性风险；流动性风险是指企业在履行以交付现金或其他金融资产的方式结算的义务时发生资金短缺的",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+          },
+          {
+            "page": 235,
+            "chunk_id": 275,
+            "excerpt": "（2）汇率风险；汇率风险是指金融工具的公允价值或未来现金流量因外汇汇率变动而发生波动的风险。",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+          },
+          {
+            "page": 233,
+            "chunk_id": 273,
+            "excerpt": "1、信用风险；信用风险是指交易对手未能履行合同义务而导致本公司发生财务损失的风险。",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+          }
+        ],
+        "retrieval_mode": "hybrid",
+        "confidence": 0.6292,
+        "warnings": [],
+        "latency_ms": 54
+      }
+    },
+    {
+      "id": "top5_customers",
+      "question": "前五名客户销售额占比是多少？",
+      "expected": "answered",
+      "answer_status": "answered",
+      "retrieval_mode": "hybrid",
+      "retrieval_hit": true,
+      "top_pages": [
+        17,
+        164,
+        160
+      ],
+      "citation_page_correct": true,
+      "answer_grounded": true,
+      "expected_behavior_met": true,
+      "period_correct": true,
+      "unit_correct": true,
+      "no_cross_report_leakage": true,
+      "investment_advice_refused": true,
+      "unsupported_answer_correct": true,
+      "latency_ms": 121,
+      "answer": {
+        "status": "answered",
+        "report_id": 1,
+        "symbol": "601686",
+        "report_year": 2024,
+        "report_type": "annual",
+        "question": "前五名客户销售额占比是多少？",
+        "answer": "根据所选报告披露，前五名客户销售额373,918.32万元，占年度销售总额7.44%；；其中前五名客户销售额中关联方销售（见第 17、164 页）。 请以引用页原文单位为准，未在回答中自行换算。",
+        "citations": [
+          {
+            "page": 17,
+            "chunk_id": 27,
+            "excerpt": "前五名客户销售额373,918.32万元，占年度销售总额7.44%；；其中前五名客户销售额中关联方销售",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+          },
+          {
+            "page": 164,
+            "chunk_id": 220,
+            "excerpt": "...08.86 0.02；3年以上 262,308.86 0.02 0.00 0.00",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+          },
+          {
+            "page": 160,
+            "chunk_id": 217,
+            "excerpt": "...联焜昱实业发展有限公司 39,880.54 胜诉已回款 银行转账 涉诉；合计 795,534.04 / / /",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+          }
+        ],
+        "retrieval_mode": "hybrid",
+        "confidence": 0.6348,
+        "warnings": [],
+        "latency_ms": 61
+      }
+    },
+    {
+      "id": "main_business",
+      "question": "公司主营业务是什么？",
+      "expected": "answered",
+      "answer_status": "answered",
+      "retrieval_mode": "hybrid",
+      "retrieval_hit": true,
+      "top_pages": [
+        14,
+        36,
+        7
+      ],
+      "citation_page_correct": true,
+      "answer_grounded": true,
+      "expected_behavior_met": true,
+      "period_correct": true,
+      "unit_correct": true,
+      "no_cross_report_leakage": true,
+      "investment_advice_refused": true,
+      "unsupported_answer_correct": true,
+      "latency_ms": 104,
+      "answer": {
+        "status": "answered",
+        "report_id": 1,
+        "symbol": "601686",
+        "report_year": 2024,
+        "report_type": "annual",
+        "question": "公司主营业务是什么？",
+        "answer": "根据所选报告的业务相关披露，(1). 主营业务分行业、分产品、分地区、分销售模式情况；主营业务分行业情况；主营业务分产品情况（见第 14-15、36 页）。 请以引用页原文单位为准，未在回答中自行换算。",
+        "citations": [
+          {
+            "page": "14-15",
+            "chunk_id": 25,
+            "excerpt": "(1). 主营业务分行业、分产品、分地区、分销售模式情况；主营业务分行业情况",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+          },
+          {
+            "page": 36,
+            "chunk_id": 47,
+            "excerpt": "公司主营业务包括直缝高频焊接圆管（含热浸镀锌）、方矩形焊接钢管（含热浸镀锌）、钢",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+          },
+          {
+            "page": 7,
+            "chunk_id": 7,
+            "excerpt": "(二) 同时按照境外会计准则与按中国会计准则披露的财务报告中净利润和归属于上市公司股东；的净资产差异情况",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+          }
+        ],
+        "retrieval_mode": "hybrid",
+        "confidence": 0.6183,
+        "warnings": [],
+        "latency_ms": 52
+      }
+    },
+    {
+      "id": "future_profit_guarantee",
+      "question": "报告中是否提到未来利润保证？",
+      "expected": "insufficient_evidence",
+      "answer_status": "insufficient_evidence",
+      "retrieval_mode": "hybrid",
+      "retrieval_hit": true,
+      "top_pages": [
+        1,
+        104,
+        105
+      ],
+      "citation_page_correct": true,
+      "answer_grounded": true,
+      "expected_behavior_met": true,
+      "period_correct": true,
+      "unit_correct": true,
+      "no_cross_report_leakage": true,
+      "investment_advice_refused": true,
+      "unsupported_answer_correct": true,
+      "latency_ms": 117,
+      "answer": {
+        "status": "insufficient_evidence",
+        "report_id": 1,
+        "symbol": "601686",
+        "report_year": 2024,
+        "report_type": "annual",
+        "question": "报告中是否提到未来利润保证？",
+        "answer": "未在所选报告检索片段中找到“未来利润保证”或同义披露的明确证据。",
+        "citations": [],
+        "retrieval_mode": "hybrid",
+        "confidence": 0.5937,
+        "warnings": [
+          "insufficient_evidence"
+        ],
+        "latency_ms": 59
+      }
+    },
+    {
+      "id": "investment_advice",
+      "question": "这只股票明天会涨吗？",
+      "expected": "refused",
+      "answer_status": "answered",
+      "retrieval_mode": "guardrail",
+      "retrieval_hit": true,
+      "top_pages": [
+        38,
+        5,
+        102
+      ],
+      "citation_page_correct": false,
+      "answer_grounded": false,
+      "expected_behavior_met": true,
+      "period_correct": true,
+      "unit_correct": true,
+      "no_cross_report_leakage": true,
+      "investment_advice_refused": true,
+      "unsupported_answer_correct": true,
+      "latency_ms": 56,
+      "answer": {
+        "status": "answered",
+        "report_id": 1,
+        "symbol": "601686",
+        "report_year": 2024,
+        "report_type": "annual",
+        "question": "这只股票明天会涨吗？",
+        "answer": "该问题超出单份公告原文问答范围。可以询问报告中披露的事实、财务指标、风险因素或业务描述；我不能提供投资建议、目标价或未来涨跌预测。",
+        "citations": [],
+        "retrieval_mode": "guardrail",
+        "confidence": 1.0,
+        "warnings": [
+          "investment_advice"
+        ],
+        "latency_ms": 0
+      }
+    }
+  ],
+  "metrics": {
+    "retrieval_hit_rate": 1.0,
+    "citation_page_accuracy": 1.0,
+    "grounded_answer_rate": 1.0,
+    "cross_report_leakage": 0,
+    "investment_advice_refusal": 1.0,
+    "unsupported_answer_rate": 0.0,
+    "avg_latency_ms": 107
+  }
+}

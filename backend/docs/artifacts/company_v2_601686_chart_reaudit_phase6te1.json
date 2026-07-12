@@ -1,0 +1,128 @@
+{
+  "generated_at": "2026-07-11",
+  "mode": "fast",
+  "period": "annual",
+  "quarterly_years": null,
+  "gates": {
+    "mode": "fast",
+    "symbols_total": 1,
+    "symbols_passed": 0,
+    "symbols_warning": 1,
+    "symbols_failed": 0,
+    "symbols_timeout": 0,
+    "history_gate_passed": true,
+    "chart_gate_passed": true,
+    "cninfo_gate_passed": null,
+    "performance_gate_passed": true,
+    "phase_gate_passed": true
+  },
+  "symbols": [
+    {
+      "symbol": "601686",
+      "company_profile_ok": true,
+      "stock_basic_ok": true,
+      "list_date": "2020-12-04",
+      "history_modules_ok": 6,
+      "annual_rows_by_module": {
+        "profitability": 5,
+        "growth": 5,
+        "solvency": 5,
+        "operation_capability": 4,
+        "cashflow_quality": 4,
+        "dupont": 3
+      },
+      "quarterly_rows_by_module": {},
+      "history_completeness": {
+        "profitability": {
+          "status": "pass",
+          "rows_count": 5,
+          "completeness_pct": 83,
+          "missing_periods_count": 1,
+          "duplicate_period_count": 0,
+          "future_periods": [],
+          "pre_listing_periods": [],
+          "latest_matches_history": true,
+          "period_order_valid": true
+        },
+        "growth": {
+          "status": "pass",
+          "rows_count": 5,
+          "completeness_pct": 83,
+          "missing_periods_count": 1,
+          "duplicate_period_count": 0,
+          "future_periods": [],
+          "pre_listing_periods": [],
+          "latest_matches_history": true,
+          "period_order_valid": true
+        },
+        "solvency": {
+          "status": "pass",
+          "rows_count": 5,
+          "completeness_pct": 83,
+          "missing_periods_count": 1,
+          "duplicate_period_count": 0,
+          "future_periods": [],
+          "pre_listing_periods": [],
+          "latest_matches_history": true,
+          "period_order_valid": true
+        },
+        "operation_capability": {
+          "status": "pass",
+          "rows_count": 4,
+          "completeness_pct": 67,
+          "missing_periods_count": 2,
+          "duplicate_period_count": 0,
+          "future_periods": [],
+          "pre_listing_periods": [],
+          "latest_matches_history": true,
+          "period_order_valid": true
+        },
+        "cashflow_quality": {
+          "status": "pass",
+          "rows_count": 4,
+          "completeness_pct": 67,
+          "missing_periods_count": 2,
+          "duplicate_period_count": 0,
+          "future_periods": [],
+          "pre_listing_periods": [],
+          "latest_matches_history": true,
+          "period_order_valid": true
+        },
+        "dupont": {
+          "status": "warning",
+          "rows_count": 3,
+          "completeness_pct": 50,
+          "missing_periods_count": 3,
+          "duplicate_period_count": 0,
+          "future_periods": [],
+          "pre_listing_periods": [],
+          "latest_matches_history": true,
+          "period_order_valid": true
+        }
+      },
+      "history_truncated": true,
+      "history_range_label": "最近 5 期",
+      "chart_contract_valid": true,
+      "invalid_chart_contracts": [],
+      "cninfo_reports_count": null,
+      "cninfo_status": "skipped",
+      "provider_calls": 42,
+      "login_batches": 3,
+      "years_from_cache": 0,
+      "years_fetched": 7,
+      "cache_hit": false,
+      "elapsed_ms": 76412,
+      "warm_latency_ms": null,
+      "response_size_bytes": 20242,
+      "page_profile_size_bytes": null,
+      "debug_profile_size_bytes": null,
+      "baostock_aggregate_calls": 1,
+      "timeout": false,
+      "blocking_issues": [],
+      "warnings": [
+        "history_audit_warning:dupont"
+      ],
+      "final_status": "warning"
+    }
+  ]
+}

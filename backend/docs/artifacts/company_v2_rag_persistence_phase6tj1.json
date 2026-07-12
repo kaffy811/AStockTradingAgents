@@ -1,0 +1,260 @@
+{
+  "phase": "6T-J1 Persistent RAG Repository Wiring",
+  "executed_at": "2026-07-12",
+  "schema_audit": {
+    "finding": "Live DDL predated the ORM model: documents table lacked active_index/supersedes_rag_document_id/stale_reason/indexed_at/deleted_at/index_generation and had a UNIQUE index on report_id (tables were created by Base.metadata.create_all, no governing migration).",
+    "migration_required": true,
+    "migration": "alembic i7j8k9l0m1n2 — add 6 model columns, drop unique report_id index, add unique (report_id, index_generation)",
+    "driver_constraint": "asyncpg only (no sync PG driver) → DB repository owns a private daemon-loop AsyncEngine (NullPool + statement_cache_size=0 for Supabase pgbouncer)"
+  },
+  "repository": {
+    "backend_config": "COMPANY_V2_RAG_REPOSITORY_BACKEND (production default: database; tests inject memory via conftest)",
+    "no_memory_fallback": true,
+    "old_in_memory_index_result": "phase 6T-J index run (2026-07-11): 4/4 indexed in-process only, NOT persisted — superseded, kept for history in company_v2_financial_fusion_stage2_index_phase6tj.json",
+    "new_database_persisted_result": "this artifact"
+  },
+  "reindex": {
+    "checkpoint_revalidation": "checkpoint ok=true + DB active doc missing -> PERSISTENCE_MISSING_REINDEX_REQUIRED (implemented in stage2 prepare script)",
+    "notes": [
+      "first DB run hit pgbouncer DuplicatePreparedStatementError -> fixed with statement_cache_size=0 + NullPool (mirrors app.core.database)",
+      "per-row ORM inserts were ~0.7s RTT each over Supabase -> replaced with Core executemany batch insert",
+      "3 symbols initially exceeded 180s per-symbol timeout; their transactions completed atomically after timeout; final --resume run converged checkpoint via idempotent reuse (4/4 ok, 0 timeout)"
+    ]
+  },
+  "db_verification": {
+    "active_documents": 4,
+    "duplicate_active_documents": 0,
+    "chunks_total": 1217,
+    "orphan_chunks": 0,
+    "invalid_page_chunks": 0,
+    "cross_report_mismatch": 0,
+    "empty_chunks": 0,
+    "duplicate_chunks_per_doc": 0,
+    "chunks_missing_embedding": 0,
+    "version_metadata": {
+      "parse_version": "company-v2-pages-v1",
+      "embedding_model": "company-v2-hash-keyword",
+      "embedding_version": "company-v2-hash-keyword-v1"
+    }
+  },
+  "independent_process_smoke": {
+    "ok": true,
+    "repository_backend": "database",
+    "persistent": true,
+    "results": [
+      {
+        "report_id": 2,
+        "repository_backend": "database",
+        "persistent": true,
+        "rag_document_id": 1,
+        "symbol": "600519",
+        "generation": 1,
+        "persisted_chunk_count": 211,
+        "expected_chunk_count": 211,
+        "chunk_count_match": true,
+        "retrieved_after_restart": true,
+        "symbol_isolation": true,
+        "retrievals": [
+          {
+            "query": "营业收入",
+            "evidence_found": true,
+            "retrieved": 6,
+            "top_page": 6,
+            "citation_valid": true,
+            "report_isolation": true,
+            "cross_report_leakage_detected": false
+          },
+          {
+            "query": "净利润",
+            "evidence_found": true,
+            "retrieved": 6,
+            "top_page": 143,
+            "citation_valid": true,
+            "report_isolation": true,
+            "cross_report_leakage_detected": false
+          },
+          {
+            "query": "经营活动产生的现金流量净额",
+            "evidence_found": true,
+            "retrieved": 6,
+            "top_page": 6,
+            "citation_valid": true,
+            "report_isolation": true,
+            "cross_report_leakage_detected": false
+          },
+          {
+            "query": "资产总计",
+            "evidence_found": true,
+            "retrieved": 6,
+            "top_page": 57,
+            "citation_valid": true,
+            "report_isolation": true,
+            "cross_report_leakage_detected": false
+          }
+        ]
+      },
+      {
+        "report_id": 3,
+        "repository_backend": "database",
+        "persistent": true,
+        "rag_document_id": 2,
+        "symbol": "300750",
+        "generation": 1,
+        "persisted_chunk_count": 299,
+        "expected_chunk_count": 299,
+        "chunk_count_match": true,
+        "retrieved_after_restart": true,
+        "symbol_isolation": true,
+        "retrievals": [
+          {
+            "query": "营业收入",
+            "evidence_found": true,
+            "retrieved": 6,
+            "top_page": 11,
+            "citation_valid": true,
+            "report_isolation": true,
+            "cross_report_leakage_detected": false
+          },
+          {
+            "query": "净利润",
+            "evidence_found": true,
+            "retrieved": 6,
+            "top_page": 232,
+            "citation_valid": true,
+            "report_isolation": true,
+            "cross_report_leakage_detected": false
+          },
+          {
+            "query": "经营活动产生的现金流量净额",
+            "evidence_found": true,
+            "retrieved": 6,
+            "top_page": 11,
+            "citation_valid": true,
+            "report_isolation": true,
+            "cross_report_leakage_detected": false
+          },
+          {
+            "query": "资产总计",
+            "evidence_found": true,
+            "retrieved": 6,
+            "top_page": 113,
+            "citation_valid": true,
+            "report_isolation": true,
+            "cross_report_leakage_detected": false
+          }
+        ]
+      },
+      {
+        "report_id": 4,
+        "repository_backend": "database",
+        "persistent": true,
+        "rag_document_id": 3,
+        "symbol": "000725",
+        "generation": 1,
+        "persisted_chunk_count": 311,
+        "expected_chunk_count": 311,
+        "chunk_count_match": true,
+        "retrieved_after_restart": true,
+        "symbol_isolation": true,
+        "retrievals": [
+          {
+            "query": "营业收入",
+            "evidence_found": true,
+            "retrieved": 6,
+            "top_page": 13,
+            "citation_valid": true,
+            "report_isolation": true,
+            "cross_report_leakage_detected": false
+          },
+          {
+            "query": "净利润",
+            "evidence_found": true,
+            "retrieved": 6,
+            "top_page": 12,
+            "citation_valid": true,
+            "report_isolation": true,
+            "cross_report_leakage_detected": false
+          },
+          {
+            "query": "经营活动产生的现金流量净额",
+            "evidence_found": true,
+            "retrieved": 6,
+            "top_page": 25,
+            "citation_valid": true,
+            "report_isolation": true,
+            "cross_report_leakage_detected": false
+          },
+          {
+            "query": "资产总计",
+            "evidence_found": true,
+            "retrieved": 6,
+            "top_page": 97,
+            "citation_valid": true,
+            "report_isolation": true,
+            "cross_report_leakage_detected": false
+          }
+        ]
+      },
+      {
+        "report_id": 5,
+        "repository_backend": "database",
+        "persistent": true,
+        "rag_document_id": 4,
+        "symbol": "000001",
+        "generation": 1,
+        "persisted_chunk_count": 396,
+        "expected_chunk_count": 396,
+        "chunk_count_match": true,
+        "retrieved_after_restart": true,
+        "symbol_isolation": true,
+        "retrievals": [
+          {
+            "query": "营业收入",
+            "evidence_found": true,
+            "retrieved": 6,
+            "top_page": 17,
+            "citation_valid": true,
+            "report_isolation": true,
+            "cross_report_leakage_detected": false
+          },
+          {
+            "query": "净利润",
+            "evidence_found": true,
+            "retrieved": 6,
+            "top_page": 18,
+            "citation_valid": true,
+            "report_isolation": true,
+            "cross_report_leakage_detected": false
+          },
+          {
+            "query": "经营活动产生的现金流量净额",
+            "evidence_found": true,
+            "retrieved": 6,
+            "top_page": 19,
+            "citation_valid": true,
+            "report_isolation": true,
+            "cross_report_leakage_detected": false
+          },
+          {
+            "query": "吸收存款",
+            "evidence_found": true,
+            "retrieved": 6,
+            "top_page": 29,
+            "citation_valid": true,
+            "report_isolation": true,
+            "cross_report_leakage_detected": false
+          }
+        ]
+      }
+    ],
+    "total_persisted_chunks": 1217
+  },
+  "qa_fusion_wiring": "index service / index manager / retriever / comparison retriever+answer / fusion (via index service) all share the single factory repository (verified object identity); status() exposes repository_backend+persistent",
+  "tests": {
+    "targeted": "22/22 phase6tj1 tests PASS (incl. real DB rollback/batch/restart/independent-process)",
+    "canonical_full": "cd backend && .venv/bin/python -m pytest -q -> 2996 passed, 0 failed, 391s",
+    "failed_test_names": [],
+    "tests_gate_passed": true,
+    "acceptance_data_pollution_check": "post-suite: docs=4 chunks=1217 leftover_test_rows=0"
+  }
+}

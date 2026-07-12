@@ -1,0 +1,541 @@
+[
+  {
+    "symbol": "600519",
+    "module_key": "profitability",
+    "provider": "baostock",
+    "raw_rows_count": 6,
+    "raw_columns": [
+      "eps_ttm",
+      "gross_margin",
+      "liqa_share",
+      "mb_revenue",
+      "net_margin",
+      "net_profit",
+      "pub_date",
+      "roe_avg",
+      "stat_date",
+      "total_share",
+      "ts_code"
+    ],
+    "normalized_rows_count": 0,
+    "missing_mapping_fields": [
+      "roe",
+      "net_margin",
+      "gross_margin",
+      "net_profit",
+      "eps_ttm",
+      "revenue",
+      "total_share",
+      "float_share"
+    ],
+    "suggested_mapping": {
+      "roe": "roe_avg/roeAvg",
+      "net_margin": "net_margin/npMargin",
+      "gross_margin": "gross_margin/gpMargin",
+      "net_profit": "net_profit/netProfit",
+      "eps_ttm": "eps_ttm/epsTTM",
+      "revenue": "mb_revenue/MBRevenue",
+      "total_share": "total_share/totalShare",
+      "float_share": "liqa_share/liqaShare"
+    },
+    "diagnosis": "MAPPING_ERROR"
+  },
+  {
+    "symbol": "600519",
+    "module_key": "growth",
+    "provider": "baostock",
+    "raw_rows_count": 6,
+    "raw_columns": [
+      "yoy_equity",
+      "yoy_asset",
+      "yoy_ni",
+      "yoy_eps",
+      "yoy_pni"
+    ],
+    "normalized_rows_count": 0,
+    "missing_mapping_fields": [
+      "equity_yoy",
+      "asset_yoy",
+      "net_profit_yoy",
+      "eps_yoy",
+      "parent_net_profit_yoy"
+    ],
+    "suggested_mapping": {
+      "equity_yoy": "yoy_equity/YOYEquity",
+      "asset_yoy": "yoy_asset/YOYAsset",
+      "net_profit_yoy": "yoy_ni/YOYNI",
+      "eps_yoy": "yoy_eps/YOYEPSBasic",
+      "parent_net_profit_yoy": "yoy_pni/YOYPNI"
+    },
+    "diagnosis": "PROVIDER_TIMEOUT"
+  },
+  {
+    "symbol": "600519",
+    "module_key": "cashflow_quality",
+    "provider": "baostock",
+    "raw_rows_count": 6,
+    "raw_columns": [
+      "ca_to_asset",
+      "nca_to_asset",
+      "tangible_to_asset",
+      "cfo_to_or",
+      "cfo_to_np",
+      "cfo_to_gr"
+    ],
+    "normalized_rows_count": 0,
+    "missing_mapping_fields": [
+      "ocf_to_revenue",
+      "ocf_to_np",
+      "ocf_to_growth"
+    ],
+    "suggested_mapping": {
+      "ocf_to_revenue": "cfo_to_or/CFOToOR",
+      "ocf_to_np": "cfo_to_np/CFOToNP",
+      "ocf_to_growth": "cfo_to_gr/CFOToGr"
+    },
+    "diagnosis": "PROVIDER_TIMEOUT"
+  },
+  {
+    "symbol": "600519",
+    "module_key": "solvency",
+    "provider": "baostock",
+    "raw_rows_count": 6,
+    "raw_columns": [
+      "current_ratio",
+      "quick_ratio",
+      "cash_ratio",
+      "yoy_liability",
+      "liability_to_asset",
+      "asset_to_equity"
+    ],
+    "normalized_rows_count": 0,
+    "missing_mapping_fields": [
+      "current_ratio",
+      "quick_ratio",
+      "cash_ratio",
+      "debt_ratio",
+      "equity_multiplier"
+    ],
+    "suggested_mapping": {
+      "current_ratio": "current_ratio/currentRatio",
+      "quick_ratio": "quick_ratio/quickRatio",
+      "cash_ratio": "cash_ratio/cashRatio",
+      "debt_ratio": "liability_to_asset/liabilityToAsset",
+      "equity_multiplier": "asset_to_equity/assetToEquity"
+    },
+    "diagnosis": "PROVIDER_TIMEOUT"
+  },
+  {
+    "symbol": "600519",
+    "module_key": "operation_capability",
+    "provider": "baostock",
+    "raw_rows_count": 6,
+    "raw_columns": [
+      "nr_turn_ratio",
+      "nr_turn_days",
+      "inv_turn_ratio",
+      "inv_turn_days",
+      "ca_turn_ratio",
+      "asset_turn_ratio"
+    ],
+    "normalized_rows_count": 0,
+    "missing_mapping_fields": [
+      "receivable_turnover",
+      "inventory_turnover",
+      "asset_turnover",
+      "total_asset_turnover"
+    ],
+    "suggested_mapping": {
+      "receivable_turnover": "nr_turn_ratio/NRTurnRatio",
+      "inventory_turnover": "inv_turn_ratio/INVTurnRatio",
+      "asset_turnover": "asset_turn_ratio/AssetTurnRatio",
+      "total_asset_turnover": "asset_turn_ratio/AssetTurnRatio"
+    },
+    "diagnosis": "PROVIDER_TIMEOUT"
+  },
+  {
+    "symbol": "600519",
+    "module_key": "dupont",
+    "provider": "baostock",
+    "raw_rows_count": 6,
+    "raw_columns": [
+      "dupont_roe",
+      "dupont_npi",
+      "dupont_nitogr",
+      "dupont_tax",
+      "dupont_int",
+      "dupont_at",
+      "dupont_am"
+    ],
+    "normalized_rows_count": 0,
+    "missing_mapping_fields": [
+      "roe",
+      "equity_multiplier",
+      "asset_turnover",
+      "net_margin"
+    ],
+    "suggested_mapping": {
+      "roe": "dupont_roe/dupontROE",
+      "equity_multiplier": "dupont_am/dupontAssetStoEquity",
+      "asset_turnover": "dupont_at/dupontAssetTurn",
+      "net_margin": "dupont_npi/dupontPnitoni"
+    },
+    "diagnosis": "PROVIDER_TIMEOUT"
+  },
+  {
+    "symbol": "000725",
+    "module_key": "profitability",
+    "provider": "baostock",
+    "raw_rows_count": 6,
+    "raw_columns": [
+      "roe_avg",
+      "net_margin",
+      "gross_margin",
+      "net_profit",
+      "eps_ttm",
+      "total_share",
+      "liqa_share"
+    ],
+    "normalized_rows_count": 0,
+    "missing_mapping_fields": [
+      "roe",
+      "net_margin",
+      "gross_margin",
+      "net_profit",
+      "eps_ttm",
+      "revenue",
+      "total_share",
+      "float_share"
+    ],
+    "suggested_mapping": {
+      "roe": "roe_avg/roeAvg",
+      "net_margin": "net_margin/npMargin",
+      "gross_margin": "gross_margin/gpMargin",
+      "net_profit": "net_profit/netProfit",
+      "eps_ttm": "eps_ttm/epsTTM",
+      "revenue": "mb_revenue/MBRevenue",
+      "total_share": "total_share/totalShare",
+      "float_share": "liqa_share/liqaShare"
+    },
+    "diagnosis": "PROVIDER_TIMEOUT"
+  },
+  {
+    "symbol": "000725",
+    "module_key": "growth",
+    "provider": "baostock",
+    "raw_rows_count": 1,
+    "raw_columns": [
+      "balance",
+      "cash_flow",
+      "dupont",
+      "growth",
+      "operation",
+      "profit"
+    ],
+    "normalized_rows_count": 1,
+    "missing_mapping_fields": [],
+    "suggested_mapping": {
+      "equity_yoy": "yoy_equity/YOYEquity",
+      "asset_yoy": "yoy_asset/YOYAsset",
+      "net_profit_yoy": "yoy_ni/YOYNI",
+      "eps_yoy": "yoy_eps/YOYEPSBasic",
+      "parent_net_profit_yoy": "yoy_pni/YOYPNI"
+    },
+    "diagnosis": "OK"
+  },
+  {
+    "symbol": "000725",
+    "module_key": "cashflow_quality",
+    "provider": "baostock",
+    "raw_rows_count": 6,
+    "raw_columns": [
+      "ca_to_asset",
+      "nca_to_asset",
+      "tangible_to_asset",
+      "cfo_to_or",
+      "cfo_to_np",
+      "cfo_to_gr",
+      "ebit_to_interest"
+    ],
+    "normalized_rows_count": 0,
+    "missing_mapping_fields": [
+      "ocf_to_revenue",
+      "ocf_to_np",
+      "ocf_to_growth"
+    ],
+    "suggested_mapping": {
+      "ocf_to_revenue": "cfo_to_or/CFOToOR",
+      "ocf_to_np": "cfo_to_np/CFOToNP",
+      "ocf_to_growth": "cfo_to_gr/CFOToGr"
+    },
+    "diagnosis": "PROVIDER_TIMEOUT"
+  },
+  {
+    "symbol": "000725",
+    "module_key": "solvency",
+    "provider": "baostock",
+    "raw_rows_count": 6,
+    "raw_columns": [
+      "current_ratio",
+      "quick_ratio",
+      "cash_ratio",
+      "yoy_liability",
+      "liability_to_asset",
+      "asset_to_equity"
+    ],
+    "normalized_rows_count": 0,
+    "missing_mapping_fields": [
+      "current_ratio",
+      "quick_ratio",
+      "cash_ratio",
+      "debt_ratio",
+      "equity_multiplier"
+    ],
+    "suggested_mapping": {
+      "current_ratio": "current_ratio/currentRatio",
+      "quick_ratio": "quick_ratio/quickRatio",
+      "cash_ratio": "cash_ratio/cashRatio",
+      "debt_ratio": "liability_to_asset/liabilityToAsset",
+      "equity_multiplier": "asset_to_equity/assetToEquity"
+    },
+    "diagnosis": "PROVIDER_TIMEOUT"
+  },
+  {
+    "symbol": "000725",
+    "module_key": "operation_capability",
+    "provider": "baostock",
+    "raw_rows_count": 6,
+    "raw_columns": [
+      "nr_turn_ratio",
+      "nr_turn_days",
+      "inv_turn_ratio",
+      "inv_turn_days",
+      "ca_turn_ratio",
+      "asset_turn_ratio"
+    ],
+    "normalized_rows_count": 0,
+    "missing_mapping_fields": [
+      "receivable_turnover",
+      "inventory_turnover",
+      "asset_turnover",
+      "total_asset_turnover"
+    ],
+    "suggested_mapping": {
+      "receivable_turnover": "nr_turn_ratio/NRTurnRatio",
+      "inventory_turnover": "inv_turn_ratio/INVTurnRatio",
+      "asset_turnover": "asset_turn_ratio/AssetTurnRatio",
+      "total_asset_turnover": "asset_turn_ratio/AssetTurnRatio"
+    },
+    "diagnosis": "PROVIDER_TIMEOUT"
+  },
+  {
+    "symbol": "000725",
+    "module_key": "dupont",
+    "provider": "baostock",
+    "raw_rows_count": 6,
+    "raw_columns": [
+      "dupont_roe",
+      "dupont_npi",
+      "dupont_nitogr",
+      "dupont_tax",
+      "dupont_int",
+      "dupont_at",
+      "dupont_am"
+    ],
+    "normalized_rows_count": 0,
+    "missing_mapping_fields": [
+      "roe",
+      "equity_multiplier",
+      "asset_turnover",
+      "net_margin"
+    ],
+    "suggested_mapping": {
+      "roe": "dupont_roe/dupontROE",
+      "equity_multiplier": "dupont_am/dupontAssetStoEquity",
+      "asset_turnover": "dupont_at/dupontAssetTurn",
+      "net_margin": "dupont_npi/dupontPnitoni"
+    },
+    "diagnosis": "PROVIDER_TIMEOUT"
+  },
+  {
+    "symbol": "601686",
+    "module_key": "profitability",
+    "provider": "baostock",
+    "raw_rows_count": 6,
+    "raw_columns": [
+      "eps_ttm",
+      "gross_margin",
+      "liqa_share",
+      "mb_revenue",
+      "net_margin",
+      "net_profit",
+      "pub_date",
+      "roe_avg",
+      "stat_date",
+      "total_share",
+      "ts_code"
+    ],
+    "normalized_rows_count": 0,
+    "missing_mapping_fields": [
+      "roe",
+      "net_margin",
+      "gross_margin",
+      "net_profit",
+      "eps_ttm",
+      "revenue",
+      "total_share",
+      "float_share"
+    ],
+    "suggested_mapping": {
+      "roe": "roe_avg/roeAvg",
+      "net_margin": "net_margin/npMargin",
+      "gross_margin": "gross_margin/gpMargin",
+      "net_profit": "net_profit/netProfit",
+      "eps_ttm": "eps_ttm/epsTTM",
+      "revenue": "mb_revenue/MBRevenue",
+      "total_share": "total_share/totalShare",
+      "float_share": "liqa_share/liqaShare"
+    },
+    "diagnosis": "MAPPING_ERROR"
+  },
+  {
+    "symbol": "601686",
+    "module_key": "growth",
+    "provider": "baostock",
+    "raw_rows_count": 6,
+    "raw_columns": [
+      "pub_date",
+      "stat_date",
+      "ts_code",
+      "yoy_asset",
+      "yoy_eps",
+      "yoy_equity",
+      "yoy_ni",
+      "yoy_pni"
+    ],
+    "normalized_rows_count": 1,
+    "missing_mapping_fields": [],
+    "suggested_mapping": {
+      "equity_yoy": "yoy_equity/YOYEquity",
+      "asset_yoy": "yoy_asset/YOYAsset",
+      "net_profit_yoy": "yoy_ni/YOYNI",
+      "eps_yoy": "yoy_eps/YOYEPSBasic",
+      "parent_net_profit_yoy": "yoy_pni/YOYPNI"
+    },
+    "diagnosis": "OK"
+  },
+  {
+    "symbol": "601686",
+    "module_key": "cashflow_quality",
+    "provider": "baostock",
+    "raw_rows_count": 6,
+    "raw_columns": [
+      "ca_to_asset",
+      "nca_to_asset",
+      "tangible_to_asset",
+      "cfo_to_or",
+      "cfo_to_np",
+      "cfo_to_gr",
+      "ebit_to_interest"
+    ],
+    "normalized_rows_count": 0,
+    "missing_mapping_fields": [
+      "ocf_to_revenue",
+      "ocf_to_np",
+      "ocf_to_growth"
+    ],
+    "suggested_mapping": {
+      "ocf_to_revenue": "cfo_to_or/CFOToOR",
+      "ocf_to_np": "cfo_to_np/CFOToNP",
+      "ocf_to_growth": "cfo_to_gr/CFOToGr"
+    },
+    "diagnosis": "PROVIDER_TIMEOUT"
+  },
+  {
+    "symbol": "601686",
+    "module_key": "solvency",
+    "provider": "baostock",
+    "raw_rows_count": 6,
+    "raw_columns": [
+      "current_ratio",
+      "quick_ratio",
+      "cash_ratio",
+      "yoy_liability",
+      "liability_to_asset",
+      "asset_to_equity"
+    ],
+    "normalized_rows_count": 0,
+    "missing_mapping_fields": [
+      "current_ratio",
+      "quick_ratio",
+      "cash_ratio",
+      "debt_ratio",
+      "equity_multiplier"
+    ],
+    "suggested_mapping": {
+      "current_ratio": "current_ratio/currentRatio",
+      "quick_ratio": "quick_ratio/quickRatio",
+      "cash_ratio": "cash_ratio/cashRatio",
+      "debt_ratio": "liability_to_asset/liabilityToAsset",
+      "equity_multiplier": "asset_to_equity/assetToEquity"
+    },
+    "diagnosis": "PROVIDER_TIMEOUT"
+  },
+  {
+    "symbol": "601686",
+    "module_key": "operation_capability",
+    "provider": "baostock",
+    "raw_rows_count": 6,
+    "raw_columns": [
+      "nr_turn_ratio",
+      "nr_turn_days",
+      "inv_turn_ratio",
+      "inv_turn_days",
+      "ca_turn_ratio",
+      "asset_turn_ratio"
+    ],
+    "normalized_rows_count": 0,
+    "missing_mapping_fields": [
+      "receivable_turnover",
+      "inventory_turnover",
+      "asset_turnover",
+      "total_asset_turnover"
+    ],
+    "suggested_mapping": {
+      "receivable_turnover": "nr_turn_ratio/NRTurnRatio",
+      "inventory_turnover": "inv_turn_ratio/INVTurnRatio",
+      "asset_turnover": "asset_turn_ratio/AssetTurnRatio",
+      "total_asset_turnover": "asset_turn_ratio/AssetTurnRatio"
+    },
+    "diagnosis": "PROVIDER_TIMEOUT"
+  },
+  {
+    "symbol": "601686",
+    "module_key": "dupont",
+    "provider": "baostock",
+    "raw_rows_count": 6,
+    "raw_columns": [
+      "dupont_roe",
+      "dupont_npi",
+      "dupont_nitogr",
+      "dupont_tax",
+      "dupont_int",
+      "dupont_at",
+      "dupont_am"
+    ],
+    "normalized_rows_count": 0,
+    "missing_mapping_fields": [
+      "roe",
+      "equity_multiplier",
+      "asset_turnover",
+      "net_margin"
+    ],
+    "suggested_mapping": {
+      "roe": "dupont_roe/dupontROE",
+      "equity_multiplier": "dupont_am/dupontAssetStoEquity",
+      "asset_turnover": "dupont_at/dupontAssetTurn",
+      "net_margin": "dupont_npi/dupontPnitoni"
+    },
+    "diagnosis": "PROVIDER_TIMEOUT"
+  }
+]

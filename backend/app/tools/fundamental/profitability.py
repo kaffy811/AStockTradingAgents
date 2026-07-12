@@ -105,3 +105,57 @@ class ProfitabilityTool(BaseFundamentalTool):
         if partial_errors:
             result["_partial_errors"] = partial_errors
         return result
+
+    async def fetch_baostock(self, market: str, symbol: str) -> dict[str, Any]:
+        """
+        BaoStock 备用：盈利能力（gpMargin / npMargin / roeAvg）。
+        BaoStock 字段名 → 内部 schema 映射。
+        """
+        from app.datasource.baostock_client import baostock_client
+        from app.datasource.tushare_client import _to_ts_code as _ts
+        ts_code = _ts(market, symbol)
+        rows = await baostock_client.get_profit_data(ts_code, n=self.limit)
+        if not rows:
+            raise RuntimeError("BaoStock get_profit_data 无数据")
+
+        def _pct(v):
+            """BaoStock 返回小数 (0.52)，转为百分比 (52.22)。"""
+            if v is None:
+                return None
+            try:
+                return round(float(v) * 100, 4)
+            except (TypeError, ValueError):
+                return None
+
+        series = []
+        for r in rows:
+            stat_date = r.get("stat_date") or ""
+            # BaoStock statDate 格式: "2024-12-31" 或 "20241231"
+            if len(stat_date) == 8 and "-" not in stat_date:
+                stat_date = f"{stat_date[:4]}-{stat_date[4:6]}-{stat_date[6:]}"
+            # BaoStock 无 roa/roic/费用率，返回 null
+            # BaoStock 返回小数 (0.92)，乘 100 转为与 Tushare 一致的百分比 (92.xx)
+            series.append({
+                "end_date":               stat_date,
+                "gross_margin_pct":       _pct(r.get("gross_margin")),   # gpMargin → %
+                "net_margin_pct":         _pct(r.get("net_margin")),      # npMargin → %
+                "roe_pct":                _pct(r.get("roe_avg")),         # roeAvg → %
+                "roa_pct":                None,
+                "roic_pct":               None,
+                "expense_ratio_pct":      None,
+                "sales_expense_ratio_pct":  None,
+                "admin_expense_ratio_pct":  None,
+                "finance_expense_ratio_pct": None,
+            })
+        # 最新期降序
+        series.sort(key=lambda x: x.get("end_date") or "", reverse=True)
+        series = series[:self.limit]
+
+        return {
+            "symbol": symbol, "ts_code": ts_code,
+            "annual": self.annual,
+            "series": series,
+            "comment": _comment(series),
+            "source": "baostock",
+            "_partial_errors": ["BaoStock 备用：roa/roic/费用率不可用，相关字段为 null"],
+        }

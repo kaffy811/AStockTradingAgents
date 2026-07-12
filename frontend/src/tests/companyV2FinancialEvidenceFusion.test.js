@@ -1,0 +1,47 @@
+import { describe, expect, it } from 'vitest'
+
+describe('CompanyV2FinancialEvidenceFusionPanel', () => {
+  it('exposes explicit fusion controls and no automatic run', async () => {
+    const raw = await import('../components/company-v2/reports/CompanyV2FinancialEvidenceFusionPanel.vue?raw')
+    expect(raw.default).toContain('financial-evidence-fusion-panel')
+    expect(raw.default).toContain('核验官方报告')
+    expect(raw.default).toContain('重新核验')
+    expect(raw.default).toContain('查看状态')
+    expect(raw.default).toContain('createCompanyV2FinancialFusionJob')
+    expect(raw.default).toContain('getCompanyV2FinancialFusionJob')
+    expect(raw.default).toContain('getCompanyV2FinancialFusionJobResult')
+    expect(raw.default).toContain('cancelCompanyV2FinancialFusionJob')
+    expect(raw.default).toContain('getCompanyV2FinancialFusion')
+    expect(raw.default).toContain('getCompanyV2FinancialFusionEligibility')
+    expect(raw.default).toContain('getCompanyV2FinancialFusionHealth')
+    expect(raw.default).toContain('getCompanyV2FinancialFusionPrepareStatus')
+    expect(raw.default).toContain('selectedReportId')
+    expect(raw.default).not.toContain('onMounted(runFusion)')
+  })
+
+  it('renders status labels, citations, and source trace without local_path', async () => {
+    const raw = await import('../components/company-v2/reports/CompanyV2FinancialEvidenceFusionPanel.vue?raw')
+    expect(raw.default).toContain('definition_mismatch')
+    expect(raw.default).toContain('period_basis_mismatch')
+    expect(raw.default).toContain('structured_field_missing')
+    expect(raw.default).toContain('insufficient_evidence')
+    expect(raw.default).toContain('Source Trace')
+    expect(raw.default).toContain('official_excerpt')
+    expect(raw.default).toContain('CompanyV2FinancialFusionHealthBadge')
+    expect(raw.default).toContain('CompanyV2FinancialFusionReviewBadge')
+    expect(raw.default).toContain('官方报告查看')
+    expect(raw.default).toContain('正在核验官方报告，通常需要约 30–60 秒。')
+    expect(raw.default).toContain('rel="noopener noreferrer"')
+    expect(raw.default).not.toContain('local_path')
+  })
+
+  it('adds report document toolbar toggle and panel import', async () => {
+    const docs = await import('../components/company-v2/CompanyV2ReportDocuments.vue?raw')
+    const api = await import('../api/companyV2.js?raw')
+    expect(docs.default).toContain('report-fusion-toggle')
+    expect(docs.default).toContain('CompanyV2FinancialEvidenceFusionPanel')
+    expect(api.default).toContain('/financial-fusion/jobs')
+    expect(api.default).toContain('/financial-fusion/run')
+    expect(api.default).toContain('/reports/${reportId}/financial-fusion')
+  })
+})

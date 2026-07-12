@@ -159,6 +159,7 @@ class FundamentalAnalystAgent:
         market:          str,
         symbol:          str,
         output_language: str = "zh-CN",
+        source_reports:  list[dict] | None = None,
     ) -> str:
         """
         生成 Markdown 基本面分析报告。
@@ -192,7 +193,7 @@ class FundamentalAnalystAgent:
             )
 
         # ── Step 2: 组装用户 Prompt ───────────────────────────────────────────
-        user_content = self._build_user_prompt(market, symbol, snapshot, output_language)
+        user_content = self._build_user_prompt(market, symbol, snapshot, output_language, source_reports or [])
 
         # ── Step 3: 调用 LLM ──────────────────────────────────────────────────
         log.info("FundamentalAnalystAgent: calling LLM [%s/%s]", market, symbol)
@@ -210,6 +211,7 @@ class FundamentalAnalystAgent:
         symbol: str,
         snapshot: dict,
         output_language: str = "zh-CN",
+        source_reports: list[dict] | None = None,
     ) -> str:
         """
         将 fundamentals 快照拆分为：
@@ -325,7 +327,7 @@ class FundamentalAnalystAgent:
 
         lang_instruction = build_output_language_instruction(output_language)
 
-        return f"""\
+        prompt = f"""\
 请对以下股票进行基本面快照分析，仅基于所提供数据，严格遵守系统提示中的所有禁止事项。
 {period_warning}{insufficient_warning}
 
@@ -353,3 +355,18 @@ class FundamentalAnalystAgent:
 
 请严格按照系统提示规定的 Markdown 报告结构输出，章节标题不得更改，不得新增或删除章节。\
 {lang_instruction}"""
+
+        # ── source_reports 注入 ───────────────────────────────────────────────────
+        if source_reports:
+            prompt += "\n\n---\n【关联年报摘录（AI 引用参考）】\n"
+            prompt += "以下为已下载并解析的公司年报/半年报文本摘录，供基本面分析参考。\n"
+            prompt += '引用时请标注\u201c（来源：报告类型 报告期）\u201d，不得引用不在此列表中的内容。\n'
+            prompt += '禁止编造报告引用，禁止写\u201c第X页\u201d，禁止写\u201c全部财报完整覆盖\u201d。\n\n'
+            for r in source_reports[:4]:  # max 4 reports
+                title = r.get("title") or ""
+                rtype = r.get("report_type") or ""
+                period = r.get("period_end") or ""
+                excerpt = (r.get("text_excerpt") or "")[:3000]
+                prompt += f"--- {title} ({rtype} {period}) ---\n{excerpt}\n\n"
+
+        return prompt

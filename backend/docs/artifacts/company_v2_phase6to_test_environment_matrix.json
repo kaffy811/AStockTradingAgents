@@ -1,0 +1,18 @@
+{
+  "phase": "phase6to_test_environment_matrix",
+  "hermetic_suite": {
+    "marker": "not live_supabase",
+    "target": "backend hermetic tests without external Supabase DNS dependency",
+    "status": "passed"
+  },
+  "live_integration_suite": {
+    "marker": "live_supabase",
+    "target": "DB-backed tests against live Supabase",
+    "status": "blocked_in_current_shell",
+    "reason": "pooler DNS resolution failure"
+  },
+  "acceptance": {
+    "target": "live DB acceptance",
+    "status": "blocked_in_current_shell"
+  }
+}

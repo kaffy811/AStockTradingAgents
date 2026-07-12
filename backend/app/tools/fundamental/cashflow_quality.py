@@ -270,6 +270,51 @@ class CashflowQualityTool(BaseFundamentalTool):
             result["_partial_errors"] = partial_errors
         return result
 
+    async def fetch_baostock(self, market: str, symbol: str) -> dict[str, Any]:
+        """
+        BaoStock 备用：现金流质量。
+        实测字段: CFOToOR=收现比, CFOToNP=净现比(CFO/净利润), CFOToGr=CFO/营收
+        BaoStock 不提供 OCF 绝对值，只有比率，故 ocf/net_profit_parent/revenue 均为 null。
+        """
+        from app.datasource.baostock_client import baostock_client
+        from app.datasource.tushare_client import _to_ts_code as _ts
+        ts_code = _ts(market, symbol)
+        rows = await baostock_client.get_cash_flow_data(ts_code, n=8)
+        if not rows:
+            raise RuntimeError("BaoStock get_cash_flow_data 无数据")
+
+        periods = []
+        for r in rows:
+            stat_date = r.get("stat_date") or ""
+            if len(stat_date) == 8 and "-" not in stat_date:
+                stat_date = f"{stat_date[:4]}-{stat_date[4:6]}-{stat_date[6:]}"
+            cfo_to_or = r.get("cfo_to_or")   # 经营现金流/营业总收入（收现比）
+            cfo_to_np = r.get("cfo_to_np")   # 经营现金流/净利润（净现比，实测字段名）
+            periods.append({
+                "end_date":               stat_date,
+                "ocf":                    None,   # BaoStock 仅提供比率
+                "net_profit_parent":      None,
+                "revenue":                None,
+                "ocf_to_np":              cfo_to_np,   # CFOToNP = 净现比
+                "cash_sales_ratio":       cfo_to_or,
+                "core_profit_cash_ratio": None,
+                "fcf":                    None,
+                "cashflow_profile":       "数据不足",
+                "profile_signs":          ["?", "?", "?"],
+                "comment":                "BaoStock 备用：仅有现金流比率（CFOToOR/CFOToNP），无绝对值。",
+            })
+        periods.sort(key=lambda x: x.get("end_date") or "", reverse=True)
+
+        return {
+            "symbol":  symbol,
+            "ts_code": ts_code,
+            "periods": periods,
+            "source":  "baostock",
+            "_partial_errors": [
+                "BaoStock 备用：经营现金流净额/净利润/营收绝对值不可用，仅有比率字段"
+            ],
+        }
+
     async def fetch_akshare(self, market: str, symbol: str) -> dict[str, Any]:
         """AkShare 备用：仅能提供经营现金流净额（单期）。"""
         from app.datasource.akshare_client import akshare_fs_client

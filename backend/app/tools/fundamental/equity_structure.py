@@ -41,10 +41,20 @@ class EquityStructureTool(BaseFundamentalTool):
         float_ratio_pct = round(float_share / total_share * 100, 2) if (float_share and total_share) else None
         free_ratio_pct = round(free_share / total_share * 100, 2) if (free_share and total_share) else None
 
+        trade_date_fmt = fmt_date(str(row_get(row, "trade_date") or ""))
+        snapshot_row = {
+            "trade_date": trade_date_fmt,
+            "total_share_wan": total_share,
+            "float_share_wan": float_share,
+            "free_share_wan": free_share,
+            "float_ratio_pct": float_ratio_pct,
+            "free_ratio_pct": free_ratio_pct,
+        }
         return {
             "symbol": symbol,
             "ts_code": ts_code,
-            "trade_date": fmt_date(str(row_get(row, "trade_date") or "")),
+            "rows": [snapshot_row],
+            "trade_date": trade_date_fmt,
             "total_share_wan": total_share,    # 总股本（万股）
             "float_share_wan": float_share,    # 流通股本（万股）
             "free_share_wan": free_share,      # 自由流通股本（万股）
@@ -52,5 +62,14 @@ class EquityStructureTool(BaseFundamentalTool):
             "circ_mv_wan": circ_mv,            # 流通市值（万元）
             "float_ratio_pct": float_ratio_pct,
             "free_ratio_pct": free_ratio_pct,
+            "summary": {
+                "trade_date": trade_date_fmt,
+                "total_share_wan": total_share,
+                "float_share_wan": float_share,
+                "free_share_wan": free_share,
+                "float_ratio_pct": float_ratio_pct,
+                "free_ratio_pct": free_ratio_pct,
+            },
+            "reasons": [],
             "source": "tushare",
         }
