@@ -1,0 +1,14 @@
+{
+  "phase": "phase6ts_db_reconnect",
+  "status": "passed",
+  "db_disconnect_count": 1,
+  "db_reconnect_count": 1,
+  "db_reconnect_events": [
+    {
+      "at_seconds": 4.18,
+      "disposed": true
+    }
+  ],
+  "real_execution_count": 0,
+  "blocking_issues": []
+}

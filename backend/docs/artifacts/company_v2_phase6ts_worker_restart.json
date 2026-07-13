@@ -1,0 +1,13 @@
+{
+  "phase": "phase6ts_worker_restart",
+  "status": "passed",
+  "worker_restart_count": 4,
+  "worker_restart_events": [
+    {
+      "at_seconds": 2.01,
+      "worker_id": "phase6ts-worker-1"
+    }
+  ],
+  "real_execution_count": 0,
+  "blocking_issues": []
+}
