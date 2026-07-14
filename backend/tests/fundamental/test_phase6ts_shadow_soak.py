@@ -5,6 +5,7 @@ import json
 import os
 import signal
 import time
+from datetime import datetime, timedelta
 from types import SimpleNamespace
 
 import pytest
@@ -86,7 +87,18 @@ def test_run_soak_hermetic_controls_restart_and_reconnect(monkeypatch):
         assert requester_run_id is not None
         assert allowed_job_ids == {"job-601686", "job-600519"}
         claimed_job_id = f"{worker_id}-job-{invocations[worker_id]}"
-        metrics.record_claim(claimed_job_id, 1.5, active_claims)
+        now = soak._now()
+        metrics.record_claim(
+            {
+                "job_id": claimed_job_id,
+                "claimed_by": worker_id,
+                "claimed_at": now,
+                "lease_expires_at": now + timedelta(seconds=lease_seconds),
+            },
+            1.5,
+            active_claims,
+            requester_run_id=requester_run_id,
+        )
         metrics.jobs_observed += 1
         metrics.shadow_observation_count += 1
         metrics.observation_rows_written += 1
@@ -96,7 +108,7 @@ def test_run_soak_hermetic_controls_restart_and_reconnect(monkeypatch):
         metrics.extractor_call_count += 0
         metrics.fusion_result_write_count += 0
         await asyncio.sleep(0.4)
-        metrics.record_release(claimed_job_id, active_claims)
+        metrics.record_release(claimed_job_id, active_claims, worker_id=worker_id)
         while not stop_event.is_set():
             await asyncio.sleep(0.05)
 
@@ -142,6 +154,8 @@ def test_run_soak_hermetic_controls_restart_and_reconnect(monkeypatch):
     assert payload["metrics"]["worker_restart_count"] >= 1
     assert payload["metrics"]["db_reconnect_count"] == 1
     assert payload["metrics"]["duplicate_claim_count"] == 0
+    assert "reclaim_after_restart_count" in payload["metrics"]
+    assert "duplicate_claim_events" in payload["metrics"]
     assert payload["metrics"]["active_leases_end"] == 0
     assert payload["metrics"]["stale_leases_end"] == 0
     assert payload["metrics"]["provider_call_count"] == 0
@@ -282,7 +296,7 @@ def test_worker_loop_continues_polling_without_eligible_jobs(monkeypatch):
             worker_id="worker-a",
             metrics=metrics,
             stop_event=stop_event,
-            active_claims=set(),
+            active_claims={},
             poll_interval_seconds=0.05,
             lease_seconds=1,
             heartbeat_seconds=1,
@@ -539,7 +553,7 @@ def test_worker_loop_receives_soak_scope_filters(monkeypatch):
             worker_id="worker-a",
             metrics=metrics,
             stop_event=stop_event,
-            active_claims=set(),
+            active_claims={},
             poll_interval_seconds=0.1,
             lease_seconds=1,
             heartbeat_seconds=1,
@@ -553,6 +567,91 @@ def test_worker_loop_receives_soak_scope_filters(monkeypatch):
     assert calls and calls[0]["requester_scope"] == soak.JOB_SCOPE
     assert calls[0]["requester_run_id"] == "run-123"
     assert calls[0]["allowed_job_ids"] == ["job-1", "job-2"]
+
+
+def test_claim_sequential_reclaim_after_expired_lease_is_not_duplicate():
+    metrics = soak.SoakMetrics(duration_seconds=8, worker_count=2)
+    active_claims: dict[str, list[dict]] = {}
+    first_at = datetime(2026, 7, 15, 1, 0, 0)
+    second_at = first_at + timedelta(seconds=4)
+
+    metrics.record_claim(
+        {
+            "job_id": "job-1",
+            "claimed_by": "worker-a",
+            "claimed_at": first_at,
+            "lease_expires_at": first_at + timedelta(seconds=3),
+        },
+        1.0,
+        active_claims,
+        requester_run_id="run-1",
+    )
+    metrics.record_claim(
+        {
+            "job_id": "job-1",
+            "claimed_by": "worker-b",
+            "claimed_at": second_at,
+            "lease_expires_at": second_at + timedelta(seconds=3),
+        },
+        1.0,
+        active_claims,
+        requester_run_id="run-1",
+    )
+
+    assert metrics.duplicate_claim_count == 0
+    assert metrics.simultaneous_claim_conflicts == 0
+    assert metrics.reclaim_after_restart_count == 1
+    assert metrics.claim_reclaim_events[0]["duplicate_job_id"] == "job-1"
+    assert metrics.claim_reclaim_events[0]["first_worker_id"] == "worker-a"
+    assert metrics.claim_reclaim_events[0]["second_worker_id"] == "worker-b"
+    assert metrics.claim_reclaim_events[0]["overlap"] is False
+    assert metrics.claim_reclaim_events[0]["reclaim_reason"] == "lease_expired_before_reclaim"
+    assert metrics.claim_reclaim_events[0]["requester_run_id"] == "run-1"
+
+
+def test_claim_overlapping_lease_counts_duplicate_with_diagnostics():
+    metrics = soak.SoakMetrics(duration_seconds=8, worker_count=2)
+    active_claims: dict[str, list[dict]] = {}
+    first_at = datetime(2026, 7, 15, 1, 0, 0)
+    second_at = first_at + timedelta(seconds=2)
+
+    metrics.record_claim(
+        {
+            "job_id": "job-1",
+            "claimed_by": "worker-a",
+            "claimed_at": first_at,
+            "lease_expires_at": first_at + timedelta(seconds=3),
+        },
+        1.0,
+        active_claims,
+        requester_run_id="run-1",
+    )
+    metrics.record_claim(
+        {
+            "job_id": "job-1",
+            "claimed_by": "worker-b",
+            "claimed_at": second_at,
+            "lease_expires_at": second_at + timedelta(seconds=3),
+        },
+        1.0,
+        active_claims,
+        requester_run_id="run-1",
+    )
+
+    assert metrics.duplicate_claim_count == 1
+    assert metrics.simultaneous_claim_conflicts == 1
+    assert metrics.reclaim_after_restart_count == 0
+    event = metrics.duplicate_claim_events[0]
+    assert event["duplicate_job_id"] == "job-1"
+    assert event["first_worker_id"] == "worker-a"
+    assert event["second_worker_id"] == "worker-b"
+    assert event["first_claim_timestamp"] == first_at.isoformat()
+    assert event["second_claim_timestamp"] == second_at.isoformat()
+    assert event["first_lease_expires_at"] == (first_at + timedelta(seconds=3)).isoformat()
+    assert event["second_lease_expires_at"] == (second_at + timedelta(seconds=3)).isoformat()
+    assert event["overlap"] is True
+    assert event["reclaim_reason"] == "lease_overlap"
+    assert event["requester_run_id"] == "run-1"
 
 
 def test_soak_claim_scope_validation_rejects_wrong_scope():

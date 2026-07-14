@@ -170,7 +170,14 @@ async def test_live_shadow_soak_short_run_with_restart_and_reconnect(monkeypatch
         assert payload["rag_query_count"] == 0
         assert payload["extractor_call_count"] == 0
         assert payload["fusion_result_write_count"] == 0
-        assert payload["metrics"]["duplicate_claim_count"] == 0
+        metrics = payload["metrics"]
+        assert "duplicate_claim_events" in metrics
+        assert "claim_reclaim_events" in metrics
+        assert "reclaim_after_restart_count" in metrics
+        assert metrics["duplicate_claim_count"] == 0, {
+            "field": "metrics.duplicate_claim_count",
+            "metrics": metrics,
+        }
         assert payload["metrics"]["active_leases_end"] == 0
         assert payload["metrics"]["stale_leases_end"] == 0
         assert payload["metrics"]["worker_restart_count"] >= 1

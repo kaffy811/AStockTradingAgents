@@ -54,7 +54,17 @@ def _now() -> datetime:
 
 def _sanitize(value: Any) -> Any:
     if isinstance(value, dict):
-        blocked = {"database_url", "password", "token", "traceback", "stack", "local_path", "path", "sidecar_path"}
+        blocked = {
+            "database_url",
+            "password",
+            "token",
+            "traceback",
+            "traceback_sanitized",
+            "stack",
+            "local_path",
+            "path",
+            "sidecar_path",
+        }
         return {k: _sanitize(v) for k, v in value.items() if k not in blocked}
     if isinstance(value, list):
         return [_sanitize(item) for item in value]
@@ -65,6 +75,19 @@ def _sanitize(value: Any) -> Any:
 
 def _iso(value: datetime | None) -> str | None:
     return value.isoformat() if value else None
+
+
+def _coerce_datetime(value: Any) -> datetime | None:
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        return value.replace(tzinfo=None)
+    if isinstance(value, str):
+        try:
+            return datetime.fromisoformat(value.replace("Z", "+00:00")).replace(tzinfo=None)
+        except ValueError:
+            return None
+    return None
 
 
 def _git_commit() -> str | None:
@@ -156,6 +179,7 @@ class SoakMetrics:
     heartbeat_failures: int = 0
     duplicate_claim_count: int = 0
     simultaneous_claim_conflicts: int = 0
+    reclaim_after_restart_count: int = 0
     observation_rows_written: int = 0
     active_leases_peak: int = 0
     active_leases_end: int | None = None
@@ -180,23 +204,146 @@ class SoakMetrics:
     claimed_job_ids: list[str] = field(default_factory=list)
     worker_restart_events: list[dict[str, Any]] = field(default_factory=list)
     db_reconnect_events: list[dict[str, Any]] = field(default_factory=list)
+    claim_reclaim_events: list[dict[str, Any]] = field(default_factory=list)
+    duplicate_claim_events: list[dict[str, Any]] = field(default_factory=list)
+    _claim_event_ids_seen: set[str] = field(default_factory=set, repr=False)
     errors: list[dict[str, Any]] = field(default_factory=list)
 
     def record_loop(self, ms: float) -> None:
         self.loop_events.append(ms)
 
-    def record_claim(self, job_id: str, ms: float, active_claims: set[str]) -> None:
+    def _active_lease_count(self, active_claims: dict[str, list[dict[str, Any]]]) -> int:
+        return sum(len(events) for events in active_claims.values())
+
+    def _claim_event_id(self, claim: dict[str, Any], requester_run_id: str | None) -> str:
+        return "|".join(
+            [
+                str(requester_run_id or ""),
+                str(claim.get("job_id") or ""),
+                str(claim.get("claimed_by") or claim.get("worker_id") or ""),
+                str(_iso(_coerce_datetime(claim.get("claimed_at"))) or ""),
+                str(_iso(_coerce_datetime(claim.get("lease_expires_at"))) or ""),
+            ]
+        )
+
+    def _claim_diagnostic(
+        self,
+        first: dict[str, Any],
+        second: dict[str, Any],
+        *,
+        overlap: bool,
+        reclaim_reason: str,
+        requester_run_id: str | None,
+    ) -> dict[str, Any]:
+        return {
+            "duplicate_job_id": second.get("job_id"),
+            "first_worker_id": first.get("worker_id"),
+            "second_worker_id": second.get("worker_id"),
+            "first_claim_timestamp": _iso(first.get("claimed_at")),
+            "second_claim_timestamp": _iso(second.get("claimed_at")),
+            "first_lease_expires_at": _iso(first.get("lease_expires_at")),
+            "second_lease_expires_at": _iso(second.get("lease_expires_at")),
+            "overlap": overlap,
+            "reclaim_reason": reclaim_reason,
+            "requester_run_id": requester_run_id,
+        }
+
+    def record_claim(
+        self,
+        claim: dict[str, Any] | str,
+        ms: float,
+        active_claims: dict[str, list[dict[str, Any]]],
+        *,
+        requester_run_id: str | None = None,
+    ) -> str:
+        if isinstance(claim, str):
+            now = _now()
+            claim = {
+                "job_id": claim,
+                "claimed_by": "unknown",
+                "claimed_at": now,
+                "lease_expires_at": now,
+            }
+        job_id = str(claim.get("job_id") or "")
+        worker_id = str(claim.get("claimed_by") or claim.get("worker_id") or "")
+        claimed_at = _coerce_datetime(claim.get("claimed_at")) or _now()
+        lease_expires_at = _coerce_datetime(claim.get("lease_expires_at")) or claimed_at
+        event = {
+            "job_id": job_id,
+            "worker_id": worker_id,
+            "claimed_at": claimed_at,
+            "lease_expires_at": lease_expires_at,
+        }
+        event_id = self._claim_event_id(claim, requester_run_id)
+        event["event_id"] = event_id
+        if event_id in self._claim_event_ids_seen:
+            return event_id
+        self._claim_event_ids_seen.add(event_id)
         self.claim_events.append(ms)
         self.unique_jobs_claimed.add(job_id)
         self.claimed_job_ids.append(job_id)
-        if job_id in active_claims:
+
+        previous_events = list(active_claims.get(job_id, []))
+        overlapping = [
+            previous
+            for previous in previous_events
+            if previous.get("lease_expires_at") and claimed_at < previous["lease_expires_at"]
+        ]
+        if overlapping:
+            first = sorted(overlapping, key=lambda item: item["claimed_at"])[0]
             self.duplicate_claim_count += 1
             self.simultaneous_claim_conflicts += 1
-        active_claims.add(job_id)
-        self.active_leases_peak = max(self.active_leases_peak, len(active_claims))
+            self.duplicate_claim_events.append(
+                self._claim_diagnostic(
+                    first,
+                    event,
+                    overlap=True,
+                    reclaim_reason="lease_overlap",
+                    requester_run_id=requester_run_id,
+                )
+            )
+        elif previous_events:
+            first = sorted(previous_events, key=lambda item: item["claimed_at"])[-1]
+            self.reclaim_after_restart_count += 1
+            self.claim_reclaim_events.append(
+                self._claim_diagnostic(
+                    first,
+                    event,
+                    overlap=False,
+                    reclaim_reason="lease_expired_before_reclaim",
+                    requester_run_id=requester_run_id,
+                )
+            )
 
-    def record_release(self, job_id: str, active_claims: set[str]) -> None:
-        active_claims.discard(job_id)
+        active_claims[job_id] = [
+            previous for previous in previous_events
+            if previous.get("lease_expires_at") and claimed_at < previous["lease_expires_at"]
+        ]
+        active_claims[job_id].append(event)
+        self.active_leases_peak = max(self.active_leases_peak, self._active_lease_count(active_claims))
+        return event_id
+
+    def record_release(
+        self,
+        job_id: str,
+        active_claims: dict[str, list[dict[str, Any]]],
+        *,
+        worker_id: str | None = None,
+        claim_event_id: str | None = None,
+    ) -> None:
+        events = list(active_claims.get(job_id, []))
+        if not events:
+            return
+        if claim_event_id:
+            events = [event for event in events if event.get("event_id") != claim_event_id]
+        elif worker_id:
+            events = [event for event in events if event.get("worker_id") != worker_id]
+        else:
+            events = []
+        if events:
+            active_claims[job_id] = events
+        else:
+            active_claims.pop(job_id, None)
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -209,6 +356,9 @@ class SoakMetrics:
             "unique_jobs_claimed": len(self.unique_jobs_claimed),
             "duplicate_claim_count": self.duplicate_claim_count,
             "simultaneous_claim_conflicts": self.simultaneous_claim_conflicts,
+            "reclaim_after_restart_count": self.reclaim_after_restart_count,
+            "duplicate_claim_events": self.duplicate_claim_events,
+            "claim_reclaim_events": self.claim_reclaim_events,
             "observation_rows_written": self.observation_rows_written,
             "active_leases_peak": self.active_leases_peak,
             "active_leases_end": self.active_leases_end,
@@ -392,7 +542,7 @@ async def _worker_loop(
     worker_id: str,
     metrics: SoakMetrics,
     stop_event: asyncio.Event,
-    active_claims: set[str],
+    active_claims: dict[str, list[dict[str, Any]]],
     poll_interval_seconds: float,
     lease_seconds: int,
     heartbeat_seconds: int,
@@ -424,7 +574,12 @@ async def _worker_loop(
                 if not claim:
                     break
                 claimed_any = True
-                metrics.record_claim(claim["job_id"], claim_ms, active_claims)
+                claim_event_id = metrics.record_claim(
+                    claim,
+                    claim_ms,
+                    active_claims,
+                    requester_run_id=requester_run_id,
+                )
                 try:
                     hold_task = asyncio.create_task(
                         _hold_and_heartbeat(
@@ -490,7 +645,12 @@ async def _worker_loop(
                     metrics.errors.append({"worker_id": worker_id, "job_id": claim["job_id"], "message": str(exc)[:200]})
                     metrics.unrecovered_worker_failures += 1
                 finally:
-                    metrics.record_release(claim["job_id"], active_claims)
+                    metrics.record_release(
+                        claim["job_id"],
+                        active_claims,
+                        worker_id=worker_id,
+                        claim_event_id=claim_event_id,
+                    )
         except asyncio.CancelledError:
             metrics.worker_restart_count += 1
             break
@@ -507,7 +667,7 @@ def _start_worker_task(
     run_id: str,
     metrics: SoakMetrics,
     stop_event: asyncio.Event,
-    active_claims: set[str],
+    active_claims: dict[str, list[dict[str, Any]]],
     allowed_job_ids: set[str],
 ) -> asyncio.Task:
     return asyncio.create_task(
@@ -615,7 +775,7 @@ async def run_soak(
     blocking_issues: list[str] = []
     exit_reason = "duration_elapsed"
     stop_event = asyncio.Event()
-    active_claims: set[str] = set()
+    active_claims: dict[str, list[dict[str, Any]]] = {}
     workers: list[asyncio.Task] = []
     restart_done = False
     reconnect_done = False
@@ -867,6 +1027,9 @@ def _build_gate_payload(payload: dict[str, Any]) -> dict[str, Any]:
         "observation_rows_written": metrics.get("observation_rows_written", 0),
         "duplicate_claim_count": metrics.get("duplicate_claim_count", 0),
         "simultaneous_claim_conflicts": metrics.get("simultaneous_claim_conflicts", 0),
+        "reclaim_after_restart_count": metrics.get("reclaim_after_restart_count", 0),
+        "duplicate_claim_events": metrics.get("duplicate_claim_events", []),
+        "claim_reclaim_events": metrics.get("claim_reclaim_events", []),
         "unknown_jobs_modified": metrics.get("unknown_jobs_modified", 0),
         "active_leases_peak": metrics.get("active_leases_peak", 0),
         "active_leases_end": payload.get("active_leases_end", metrics.get("active_leases_end")),
@@ -964,6 +1127,9 @@ def _secondary_artifacts(payload: dict[str, Any], base_artifact_dir: str) -> Non
         "jobs_created": payload.get("jobs_created", _metric(payload, "jobs_created")),
         "jobs_cancelled": payload.get("jobs_cancelled", _metric(payload, "jobs_cancelled")),
         "duplicate_claim_count": _metric(payload, "duplicate_claim_count"),
+        "reclaim_after_restart_count": _metric(payload, "reclaim_after_restart_count"),
+        "duplicate_claim_events": _metric(payload, "duplicate_claim_events", []),
+        "claim_reclaim_events": _metric(payload, "claim_reclaim_events", []),
         "unknown_jobs_modified": _metric(payload, "unknown_jobs_modified"),
         "active_leases_end": payload.get("active_leases_end", _metric(payload, "active_leases_end")),
         "stale_leases_end": payload.get("stale_leases_end", _metric(payload, "stale_leases_end")),
@@ -991,6 +1157,9 @@ def _secondary_artifacts(payload: dict[str, Any], base_artifact_dir: str) -> Non
         "jobs_created": payload.get("jobs_created", _metric(payload, "jobs_created")),
         "jobs_cancelled": payload.get("jobs_cancelled", _metric(payload, "jobs_cancelled")),
         "duplicate_claim_count": _metric(payload, "duplicate_claim_count"),
+        "reclaim_after_restart_count": _metric(payload, "reclaim_after_restart_count"),
+        "duplicate_claim_events": _metric(payload, "duplicate_claim_events", []),
+        "claim_reclaim_events": _metric(payload, "claim_reclaim_events", []),
         "unknown_jobs_modified": _metric(payload, "unknown_jobs_modified"),
         "active_leases_end": payload.get("active_leases_end", _metric(payload, "active_leases_end")),
         "stale_leases_end": payload.get("stale_leases_end", _metric(payload, "stale_leases_end")),
