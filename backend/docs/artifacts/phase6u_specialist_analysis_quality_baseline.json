@@ -1,0 +1,60 @@
+{
+  "phase": "phase6u_p3_specialist_analysis_quality_baseline",
+  "status": "current_version_recorded",
+  "note": "Pre-change live endpoint outputs were not captured before code modification in this session. This artifact records the current hermetic quality baseline and does not claim to be a real before/after live comparison.",
+  "routes": [
+    {
+      "route": "/analysis/fundamental",
+      "input": {"market": "CN", "symbol": "600519"},
+      "input_data_summary": "FundamentalDataService snapshot; report period from data_quality.latest_report_date; valuation/profitability/growth/financial_health may be partially missing.",
+      "output_full_text": "Not executed against live route in this artifact.",
+      "numeric_count": null,
+      "unsupported_numeric_count": null,
+      "missing_fields_explained": "covered_by_tests",
+      "period_or_time_range_explained": "covered_by_tests",
+      "direct_investment_advice": false,
+      "elapsed_ms": null
+    },
+    {
+      "route": "/analysis/technical",
+      "input": {"market": "CN", "symbol": "600519"},
+      "input_data_summary": "StockDataService daily K-line plus optional quote; TechnicalIndicatorService indicators; K-line period and last date are passed to prompt.",
+      "output_full_text": "Not executed against live route in this artifact.",
+      "numeric_count": null,
+      "unsupported_numeric_count": null,
+      "missing_fields_explained": "covered_by_tests",
+      "period_or_time_range_explained": "covered_by_tests",
+      "direct_investment_advice": false,
+      "elapsed_ms": null
+    },
+    {
+      "route": "/analysis/news",
+      "input": {"market": "CN", "symbol": "600519"},
+      "input_data_summary": "NewsDataService stock news snapshot; hours_back and limit determine time window; duplicate titles are removed before prompt.",
+      "output_full_text": "Not executed against live route in this artifact.",
+      "numeric_count": null,
+      "unsupported_numeric_count": null,
+      "missing_fields_explained": "covered_by_tests",
+      "period_or_time_range_explained": "covered_by_tests",
+      "direct_investment_advice": false,
+      "elapsed_ms": null
+    },
+    {
+      "route": "/analysis/peer-comparison",
+      "input": {"market": "CN", "symbol": "600519", "peer": "300750"},
+      "input_data_summary": "PeerComparisonService target and peer fundamentals; latest_report_dates determine comparability; available/missing fields determine allowed comparisons.",
+      "output_full_text": "Not executed against live route in this artifact.",
+      "numeric_count": null,
+      "unsupported_numeric_count": null,
+      "missing_fields_explained": "covered_by_tests",
+      "period_or_time_range_explained": "covered_by_tests",
+      "direct_investment_advice": false,
+      "elapsed_ms": null
+    }
+  ],
+  "verification": {
+    "targeted": "31 passed, 1281 deselected, 1 warning",
+    "hermetic": "3120 passed, 15 deselected, 208 warnings",
+    "live_routes_executed": false
+  }
+}

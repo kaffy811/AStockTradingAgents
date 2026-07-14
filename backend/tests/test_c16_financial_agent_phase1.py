@@ -461,7 +461,7 @@ class TestDoubleAnswerDelta:
 
     @pytest.mark.asyncio
     async def test_answer_chunks_not_duplicated_in_response(self):
-        """The combined answer_delta text must exactly equal answer_text (no duplication)."""
+        """answer_text is the final_answer view and must not duplicate complete answers."""
         events, response = await _run_agent(
             "苹果公司适合长期持有吗？",
             mock_quote=_QUOTE_RESULT,
@@ -470,14 +470,10 @@ class TestDoubleAnswerDelta:
         deltas = _events_of(events, "answer_delta")
         combined_deltas = "".join(e["payload"]["delta"] for e in deltas)
 
-        # The response.answer_text is the filtered version of combined_deltas
-        # They should match length-wise (or answer_text may have small additions like disclaimer)
         assert len(combined_deltas) > 0, "Must have answer_delta content"
-        assert combined_deltas in response.answer_text or response.answer_text in combined_deltas or \
-               abs(len(combined_deltas) - len(response.answer_text)) <= 60, (
-            f"answer_delta combined ({len(combined_deltas)} chars) and "
-            f"answer_text ({len(response.answer_text)} chars) should be similar length"
-        )
+        assert response.final_answer.summary in response.answer_text
+        assert response.answer_text.count("## 结论摘要") <= 1
+        assert response.answer_text.count("## 来源") <= 1
 
     def test_realtime_flag_prevents_phase8_replay(self):
         """Contract test: _realtime_answer_delta_emitted=True must skip Phase 8 replay."""
@@ -679,7 +675,8 @@ class TestSafetyFilters:
         ])
         _, response = await _run_agent("AAPL 可以买入吗", llm=llm)
         assert "买入" not in response.answer_text, "Banned phrase '买入' must be filtered"
-        assert "关注" in response.answer_text, "Replacement '关注' must appear"
+        assert "不构成投资建议" in response.answer_text
+        assert response.final_answer.data_quality.level in {"low", "insufficient"}
 
     @pytest.mark.asyncio
     async def test_disclaimer_always_present(self):

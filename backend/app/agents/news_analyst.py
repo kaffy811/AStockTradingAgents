@@ -20,10 +20,16 @@ NewsAnalystAgent — 新闻面分析师。
 from __future__ import annotations
 
 import logging
+import re
 
 from app.llm.base import BaseLLMClient
 from app.services.news_data_service import news_data_service
 from app.agents.language_utils import build_output_language_instruction
+from app.agents.specialist_analysis_utils import (
+    build_boundary_instruction,
+    detect_focus,
+    sanitize_specialist_output,
+)
 
 log = logging.getLogger(__name__)
 
@@ -61,46 +67,57 @@ _SYSTEM_PROMPT = """\
    - 事件发展方向尚不明确
 
 【输出格式】
-输出完整 Markdown，严格按以下结构，标题名称不得更改，不得新增或删除章节。
-子章节统一使用三级标题（###）。
+宽问题使用以下二级标题：
+## 结论摘要
+## 新闻范围
+## 主要新闻主题
+## 已确认事实
+## 可能影响方向
+## 潜在风险
+## 后续观察
+## 数据限制与来源
 
-报告第一节必须是"摘要结论"，随后才是各详细章节：
+窄问题只输出相关章节，例如只问监管新闻时仅输出：
+## 结论摘要
+## 新闻范围
+## 已确认事实
+## 后续观察
+## 数据限制与来源
 
-### 摘要结论
-- **本面结论**：偏强 / 偏弱 / 分歧 / 数据不足 / 需观察（从新闻面角度选择最符合的一项；items 为空时选"数据不足"）
-- **一句话结果**：用一句话说明本次新闻面分析最重要的发现；items 为空时写"本时间窗口内暂无相关新闻数据"。
-- **正面信号**：1. ... 2. ...（列举 1-2 个可能对市场情绪有正面影响的新闻信号；无则写"当前无明显正面信号"）
-- **风险信号**：1. ... 2. ...（列举 1-2 个需关注的新闻风险或不确定性；无则写"当前无明显风险信号"）
-- **后续观察**：1. ... 2. ...（列举 1-2 个后续值得追踪的事项或公告节点）
-- **数据可信度**：高 / 中 / 低，并简要说明原因（如 keyword search 相关性、新闻数量等）
+每个结论段落需体现 observed_facts / analysis / limitations / watch_items 四层边界。
+标题不能自动升级为已确认事实；只有公告/监管披露原文或明确来源时才写为已确认事实。
+可能影响必须使用概率性语言，不得写确定性利好/利空。
 
-### 一、新闻数据概览
-说明数据来源、时间窗口、新闻数量，以及数据质量限制（如 keyword search、缓存等）。
-若 items 为空，在此章节说明原因，后续章节写"暂无数据，无法评估"。
-
-### 二、近期主要新闻主题
-归纳近期新闻的主要话题类别（如公告/回购/业绩/政策/行业动态）。
-若新闻为空，写"暂无新闻，无法归纳主题"。
-
-### 三、可能影响方向
-基于现有新闻，分析哪些内容可能对短期市场情绪产生影响，使用中性表达。
-禁止方向性结论，禁止利好/利空判断。
-若新闻为空，写"暂无新闻，无法评估"。
-
-### 四、潜在风险
-列举新闻中隐含的潜在不确定性或风险点。
-若新闻为空，写"暂无新闻，无法评估"。
-
-### 五、后续观察要点
-列出 2-3 个值得继续跟踪的事项，不写方向预测，不写操作建议。
-
-### 风险提示
+## 数据限制与来源
 仅供研究参考，不构成投资建议。新闻面分析仅反映特定时间窗口内的信息，\
 市场存在不确定性，新闻解读存在主观局限，投资者需自行判断并承担投资风险。\
 """
 
 
 # ── User Prompt 构建 ──────────────────────────────────────────────────────────
+
+def _source_category(item: dict) -> str:
+    text = f"{item.get('source') or ''} {item.get('title') or ''}".lower()
+    if re.search(r"公告|披露|交易所|证监|监管|问询|处罚", text):
+        return "公司公告/监管披露"
+    if re.search(r"评论|观点|研报|分析师|市场", text):
+        return "市场评论"
+    return "正规媒体报道" if item.get("source") else "来源缺失，可信度降低"
+
+
+def _dedupe_news_items(items: list[dict]) -> list[dict]:
+    seen: set[str] = set()
+    out: list[dict] = []
+    for item in items:
+        title = re.sub(r"\s+", "", (item.get("title") or "").lower())
+        summary = re.sub(r"\s+", "", (item.get("summary") or "").lower())[:80]
+        key = title or summary
+        if key and key in seen:
+            continue
+        if key:
+            seen.add(key)
+        out.append(item)
+    return out
 
 def _build_user_prompt(
     market:          str,
@@ -109,6 +126,7 @@ def _build_user_prompt(
     limit:           int,
     snapshot:        dict,
     output_language: str = "zh-CN",
+    question:        str | None = None,
 ) -> str:
     """
     将 NewsDataService 返回的快照组装为结构化 user prompt。
@@ -116,8 +134,9 @@ def _build_user_prompt(
     传入 prompt 的新闻条数上限 _PROMPT_NEWS_MAX=10，summary 截断至 _PROMPT_SUMMARY_MAX=300 字。
     """
     dq      = snapshot.get("data_quality", {})
-    items   = snapshot.get("items", [])
+    items   = _dedupe_news_items(snapshot.get("items", []) or [])
     count   = snapshot.get("count", 0)
+    deduped_count = len(items)
     provider = dq.get("provider") or "unknown"
     cached   = dq.get("cached", False)
     dq_msg   = dq.get("message") or "无"
@@ -136,21 +155,29 @@ def _build_user_prompt(
                 f"  标题：{item.get('title', '')}\n"
                 f"  摘要：{summary or '（无摘要）'}\n"
                 f"  来源：{item.get('source') or '未知'}\n"
+                f"  来源类型：{_source_category(item)}\n"
                 f"  发布时间：{item.get('publish_time') or '未知'}\n"
                 f"  链接：{item.get('url') or '无'}"
             )
         news_block = "\n\n".join(news_lines)
         news_section = (
-            f"以下为共 {count} 条新闻中的前 {len(news_for_prompt)} 条（按时间倒序）：\n\n"
+            f"以下为原始 {count} 条新闻去重后的前 {len(news_for_prompt)} 条（去重后 {deduped_count} 条，按时间倒序）：\n\n"
             + news_block
         )
     else:
         news_section = "当前时间窗口内无可用新闻数据（items 为空）。"
 
     lang_instruction = build_output_language_instruction(output_language)
+    focus = detect_focus(question)
+    boundary_instruction = build_boundary_instruction(focus)
 
     return f"""\
 请基于以下新闻数据，生成 {market}/{symbol} 的新闻面分析报告。
+{boundary_instruction}
+
+【用户问题与范围】
+  question: {question or "未提供，按宽问题处理"}
+  focus: {focus}
 
 【分析参数】
   市场: {market}
@@ -158,6 +185,7 @@ def _build_user_prompt(
   时间窗口: 最近 {hours_back} 小时
   请求上限: {limit} 条
   实际返回: {count} 条
+  去重后: {deduped_count} 条
 
 【数据质量】
   provider : {provider}
@@ -196,6 +224,7 @@ class NewsAnalystAgent:
         hours_back:      int = 72,
         limit:           int = 20,
         output_language: str = "zh-CN",
+        question:        str | None = None,
     ) -> str:
         """
         生成新闻面分析报告。
@@ -227,7 +256,7 @@ class NewsAnalystAgent:
                 "items": [], "count": 0,
                 "data_quality": {
                     "provider": None, "cached": False,
-                    "message": f"新闻数据获取异常：{exc}",
+                    "message": "新闻数据获取异常：工具调用失败，不代表公司没有相关新闻数据。",
                 },
             }
 
@@ -242,6 +271,7 @@ class NewsAnalystAgent:
         user_prompt = _build_user_prompt(
             market, symbol, hours_back, limit, snapshot,
             output_language=output_language,
+            question=question,
         )
 
         # ── Step 3: LLM 调用 ──────────────────────────────────────────────
@@ -251,6 +281,7 @@ class NewsAnalystAgent:
         ]
         log.info("NewsAnalystAgent: calling LLM [%s/%s]", market, symbol)
         report = self._llm.chat(messages, temperature=0.3)
+        report = sanitize_specialist_output(report, evidence_text=user_prompt)
 
         log.info(
             "NewsAnalystAgent: done [%s/%s] report_len=%d", market, symbol, len(report)

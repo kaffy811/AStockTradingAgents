@@ -75,6 +75,11 @@ _FINANCIAL_SYSTEM_PROMPT = """你是一个金融研究型 AI Agent，负责根�
 12. 【买入决策合规】对"继续买入""该不该买""要不要加仓"类问题，
     必须以"我无法替您做买入/卖出决定"开头，然后列出用户可以自行评估的客观条件，
     不能给出"可以买""建议持有""可以继续"等任何倾向性操作建议。
+13. 【证据边界】所有数字、日期、涨跌幅、财务指标和新闻事实必须来自本轮工具结果、
+    已审核 RAG 证据或会话明确继承的实体上下文。禁止使用模型记忆补实时价格、财务数字或新闻事实。
+14. 【数据缺失】工具为空、RAG 为空或 provider 异常时，只能保留可验证事实并降低结论强度；
+    不得把工具失败写成公司没有相关数据，不得伪装成完整工具分析。
+15. 【输出边界】禁止输出内部 chain of thought、工具参数、本地路径、provider secret、未提供 URL 或页码。
 
 严禁出现：买入、卖出、做多、做空、抄底、目标价、稳赚、必涨、追涨"""
 
@@ -289,6 +294,14 @@ def _filter_banned(text: str) -> str:
     return text
 
 
+def _public_error_message(exc: Exception | str) -> str:
+    text = str(exc)[:160]
+    text = re.sub(r"(/[A-Za-z0-9_.@-]+)+", "[path]", text)
+    text = re.sub(r"(?i)(api[_-]?key|secret|token|password)\s*[=:]\s*\S+", r"\1=[redacted]", text)
+    text = re.sub(r"(?i)api[_-]?key|secret|token|password", "credential", text)
+    return text or "unknown_error"
+
+
 # C28.1: Strip model self-talk preamble that appears before the first section header
 _PREAMBLE_RE = re.compile(r"^.+?(?=^#{2,3}\s)", re.DOTALL | re.MULTILINE)
 _SELFREF_PREAMBLE = re.compile(
@@ -402,7 +415,7 @@ async def _run_tool_with_timeout(
         }
     except Exception as exc:
         log.warning("Tool %s failed: %s", tool_name, exc)
-        return {"ok": False, "error": str(exc)}
+        return {"ok": False, "error": _public_error_message(exc)}
 
 
 async def _fetch_us_quote(symbol: str) -> dict:
@@ -1128,14 +1141,14 @@ class FinancialAgent:
                     )
                 tool_context_parts.append("\n".join(rag_parts))
             else:
-                tool_context_parts.append("【知识库检索】当前知识库未检索到相关资料，以下分析基于模型通用知识，不保证与最新财报或公告一致。")
+                tool_context_parts.append("【知识库检索】当前知识库未检索到相关资料。不得使用模型通用知识补充个股事实、财务数字或公告内容。")
 
         # ── LLM synthesis phase ───────────────────────────────────────────────
 
         tool_context = (
             "\n".join(tool_context_parts)
             if tool_context_parts
-            else "（本次未调用专项工具，以通用知识作答）"
+            else "（本次未获得可靠工具数据或审核资料。不得使用模型记忆补充具体股票事实、实时价格、新闻或财务数字。）"
         )
 
         lang_hint = {
@@ -1247,8 +1260,13 @@ class FinancialAgent:
         data_quality.source_count  = _computed_dq.source_count
         data_quality.tool_count    = _computed_dq.tool_count
 
-        # Parse structured sections from markdown answer
+        # Parse structured sections from markdown answer. From this point on,
+        # FinalAnswer is the single structured fact source; answer_text is only
+        # its markdown view.
         final_answer = _parse_final_answer(answer_text, tool_calls, rag_results, data_quality)
+        final_answer = _harden_final_answer(final_answer, tool_calls, rag_results, data_quality)
+        answer_text = _render_final_answer(final_answer, query)
+        answer_text = sanitize_financial_answer(_filter_banned(answer_text))
 
         response = AgentResponse(
             request_id=request_id,
@@ -1386,3 +1404,223 @@ def _parse_final_answer(
         data_quality=data_quality or DataQuality(),
         disclaimer=_DISCLAIMER,
     )
+
+
+def _has_success_evidence(tool_calls: list[ToolCallRecord], rag_results: list[dict] | None = None) -> bool:
+    return any(tc.status == "success" and (tc.result_summary or tc.raw_result) for tc in tool_calls) or bool(rag_results)
+
+
+def _text_key(text: str) -> str:
+    return re.sub(r"\s+", "", (text or "").lower())
+
+
+def _dedupe_text_items(items: list[str]) -> list[str]:
+    seen: set[str] = set()
+    out: list[str] = []
+    for item in items:
+        clean = (item or "").strip()
+        if not clean:
+            continue
+        key = _text_key(clean)
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(clean)
+    return out
+
+
+def _dedupe_sources(sources: list[SourceRef]) -> list[SourceRef]:
+    seen: set[tuple] = set()
+    out: list[SourceRef] = []
+    for src in sources:
+        key = (
+            src.title.strip(),
+            src.source_type.strip(),
+            src.source.strip(),
+            src.published_at.strip(),
+            src.url.strip(),
+            src.page,
+        )
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(src)
+    return out
+
+
+def _numeric_tokens(text: str) -> list[str]:
+    return re.findall(r"(?<![A-Za-z])\d+(?:\.\d+)?%?", text or "")
+
+
+def _evidence_blob(final_answer: FinalAnswer) -> str:
+    parts: list[str] = []
+    for dp in final_answer.data_points or []:
+        parts.extend([dp.label, dp.value])
+    for src in final_answer.sources or []:
+        parts.extend([src.title, src.snippet or "", " ".join(src.supports or [])])
+    return "\n".join(parts)
+
+
+def _token_in_evidence(token: str, evidence: str) -> bool:
+    if token in evidence:
+        return True
+    try:
+        value = float(token.rstrip("%"))
+    except ValueError:
+        return False
+    for candidate in _numeric_tokens(evidence):
+        try:
+            if abs(float(candidate.rstrip("%")) - value) < 0.0001:
+                return True
+        except ValueError:
+            continue
+    return False
+
+
+def _remove_unsupported_numbers(final_answer: FinalAnswer) -> FinalAnswer:
+    evidence = _evidence_blob(final_answer)
+    unsupported: set[str] = set()
+    for attr in ("summary", "analysis", "business_analysis", "market_analysis", "linkage_analysis"):
+        text = getattr(final_answer, attr, "") or ""
+        for token in _numeric_tokens(text):
+            if token and not _token_in_evidence(token, evidence):
+                unsupported.add(token)
+    if not unsupported:
+        return final_answer
+    for attr in ("summary", "analysis", "business_analysis", "market_analysis", "linkage_analysis"):
+        text = getattr(final_answer, attr, "") or ""
+        for token in unsupported:
+            text = text.replace(token, "未提供数字")
+        setattr(final_answer, attr, text)
+    limitation = "部分数字未能追溯到 data_points 或 sources，已降级处理。"
+    if limitation not in final_answer.risk_points:
+        final_answer.risk_points.insert(0, limitation)
+    if final_answer.data_quality:
+        final_answer.data_quality.warning_flags = _dedupe_text_items(
+            list(final_answer.data_quality.warning_flags or []) + ["unsupported_numeric_claim"]
+        )
+    return final_answer
+
+
+def _source_type_for_tool(tool_name: str) -> str:
+    if "quote" in tool_name or "kline" in tool_name:
+        return "market_quote"
+    if "news" in tool_name:
+        return "news"
+    if "rag" in tool_name:
+        return "rag"
+    return "tool_result"
+
+
+def _tool_sources(tool_calls: list[ToolCallRecord]) -> list[SourceRef]:
+    sources: list[SourceRef] = []
+    for tc in tool_calls:
+        if tc.status != "success" or not tc.result_summary:
+            continue
+        sources.append(SourceRef(
+            title=tc.display_name or tc.tool_name,
+            source_type=_source_type_for_tool(tc.tool_name),
+            source=tc.tool_name,
+            verified=True,
+            confidence="medium",
+            snippet=tc.result_summary[:200],
+            supports=[tc.result_summary[:80]],
+        ))
+    return sources
+
+
+def _insufficient_final_answer(data_quality: DataQuality, tool_calls: list[ToolCallRecord]) -> FinalAnswer:
+    failed = [tc.tool_name for tc in tool_calls if tc.status == "failed"]
+    data_quality.level = "insufficient"
+    data_quality.reason = data_quality.reason or "核心工具数据和审核资料缺失"
+    data_quality.failed_tools = _dedupe_text_items(data_quality.failed_tools + failed)
+    data_quality.missing_data = _dedupe_text_items(data_quality.missing_data + ["可靠行情/新闻/RAG evidence"])
+    return FinalAnswer(
+        summary="当前缺少可靠工具结果或已审核资料，无法完成具体股票分析；工具异常不代表公司没有相关数据。",
+        data_points=[],
+        analysis="本次不能使用模型记忆补充实时价格、财务数字、新闻事实或公告内容。可以回答数据范围、缺失项和下一步应补充的信息。",
+        risk_points=[
+            "核心数据缺失，结论强度已降级。",
+            "工具调用失败不应解读为公司不存在相关信息。",
+        ],
+        sources=[],
+        data_quality=data_quality,
+        disclaimer=_DISCLAIMER,
+    )
+
+
+def _harden_final_answer(
+    final_answer: FinalAnswer,
+    tool_calls: list[ToolCallRecord],
+    rag_results: list[dict] | None,
+    data_quality: DataQuality,
+) -> FinalAnswer:
+    if not _has_success_evidence(tool_calls, rag_results):
+        return _insufficient_final_answer(data_quality, tool_calls)
+
+    final_answer.data_quality = data_quality
+    # Keep FinalAnswer.sources backward-compatible: it represents document/RAG
+    # citations only. Tool evidence remains traceable through data_points.
+    final_answer.sources = _dedupe_sources(list(final_answer.sources or []))[:10]
+    final_answer.risk_points = [
+        item for item in _dedupe_text_items(final_answer.risk_points)
+        if "仅供研究参考" not in item and "不构成" not in item
+    ][:5]
+
+    summary_key = _text_key(final_answer.summary)
+    if summary_key and _text_key(final_answer.analysis).startswith(summary_key[:80]):
+        final_answer.analysis = final_answer.analysis[len(final_answer.summary):].strip(" \n-:：")
+    for attr in ("business_analysis", "market_analysis", "linkage_analysis"):
+        value = getattr(final_answer, attr, "")
+        if value and _text_key(value) in {_text_key(final_answer.analysis), summary_key}:
+            setattr(final_answer, attr, "")
+
+    final_answer.disclaimer = _DISCLAIMER
+    return _remove_unsupported_numbers(final_answer)
+
+
+def _render_final_answer(final_answer: FinalAnswer, query: str = "") -> str:
+    narrow = bool(re.search(r"成交量|价格|股价|新闻|风险|现金流|毛利率|净利润|走势|K线", query or "")) and len(query or "") <= 40
+    lines: list[str] = []
+    if narrow:
+        lines.extend(["## 结论", final_answer.summary.strip()])
+        if final_answer.data_points:
+            lines.extend(["", "## 关键数据"])
+            lines.extend(f"- {dp.label}: {dp.value}" for dp in final_answer.data_points[:6])
+        if final_answer.analysis:
+            lines.extend(["", "## 解释", final_answer.analysis.strip()])
+        lines.extend(["", "## 风险/限制"])
+    else:
+        lines.extend(["## 结论摘要", final_answer.summary.strip()])
+        if final_answer.data_points:
+            lines.extend(["", "## 关键数据"])
+            lines.extend(f"- {dp.label}: {dp.value}" for dp in final_answer.data_points[:8])
+        if final_answer.business_analysis:
+            lines.extend(["", "## 基本面与业务", final_answer.business_analysis.strip()])
+        if final_answer.market_analysis:
+            lines.extend(["", "## 市场表现", final_answer.market_analysis.strip()])
+        if final_answer.linkage_analysis:
+            lines.extend(["", "## 事件与联动", final_answer.linkage_analysis.strip()])
+        if final_answer.analysis and not (final_answer.business_analysis or final_answer.market_analysis or final_answer.linkage_analysis):
+            lines.extend(["", "## 基本面与业务", final_answer.analysis.strip()])
+        lines.extend(["", "## 风险与数据限制"])
+
+    risks = final_answer.risk_points or []
+    if risks:
+        lines.extend(f"- {risk}" for risk in risks[:5])
+    if final_answer.data_quality and final_answer.data_quality.level in {"low", "insufficient"}:
+        lines.append(f"- 数据质量：{final_answer.data_quality.level}；{final_answer.data_quality.reason or '存在数据缺口'}")
+
+    lines.extend(["", "## 来源"])
+    if final_answer.sources:
+        for src in final_answer.sources[:8]:
+            label = src.title or src.source or src.source_type
+            meta = "，".join(x for x in [src.source_type, src.published_at] if x)
+            lines.append(f"- {label}" + (f"（{meta}）" if meta else ""))
+    elif final_answer.data_points:
+        lines.append("- 本次工具结果（见关键数据）。")
+    else:
+        lines.append("- 证据不足：本次没有可靠来源。")
+
+    lines.extend(["", f"_{final_answer.disclaimer}_"])
+    return "\n".join(line for line in lines if line is not None).strip()

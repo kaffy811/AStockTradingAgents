@@ -15,6 +15,8 @@ _CREDENTIAL_WORD_RE = re.compile(r"(?i)api[_-]?key|secret|token|password")
 _BANNED_REPLACEMENTS: tuple[tuple[str, str], ...] = (
     ("强烈买入", "不提供买卖指令"),
     ("强烈卖出", "不提供买卖指令"),
+    ("最值得买", "不提供买卖指令"),
+    ("更值得买入", "不提供买卖指令"),
     ("买入", "关注"),
     ("卖出", "观察"),
     ("满仓", "控制风险"),
@@ -111,13 +113,14 @@ def detect_focus(question: str | None, default: str = "wide") -> str:
     q = (question or "").strip()
     if not q:
         return default
+    if re.search(r"ROE|净资产收益率", q, re.IGNORECASE) and re.search(r"同行|对比|比较|比", q):
+        return "roe_peer"
     patterns = {
         "cashflow": r"现金流|经营现金",
         "valuation": r"估值|PE|PB|市盈率|市净率",
         "profitability": r"ROE|毛利率|净利率|盈利|利润",
         "volume": r"成交量|量能|放量|缩量",
         "regulatory_news": r"监管|处罚|问询|立案|公告",
-        "roe_peer": r"ROE|净资产收益率",
     }
     for focus, pattern in patterns.items():
         if re.search(pattern, q, re.IGNORECASE):
