@@ -39,6 +39,12 @@ ACTIVE_JOB_INDEX_SQL = text(
     WHERE status IN ('queued', 'running')
     """
 )
+WORKER_OBSERVATION_JOB_ID_INDEX_SQL = text(
+    """
+    CREATE INDEX IF NOT EXISTS ix_company_v2_financial_fusion_worker_observations_job_id
+    ON company_v2_financial_fusion_worker_observations (job_id)
+    """
+)
 STAGE_PROGRESS = {
     "queued": 0.0,
     "eligibility": 0.05,
@@ -115,6 +121,8 @@ class CompanyV2FinancialFusionJobService:
             await conn.run_sync(Base.metadata.create_all)
             if async_engine.url.get_backend_name() == "postgresql":
                 await conn.execute(ACTIVE_JOB_INDEX_SQL)
+                await conn.execute(text("DROP INDEX IF EXISTS ix_company_v2_financial_fusion_worker_observations_job_id"))
+                await conn.execute(WORKER_OBSERVATION_JOB_ID_INDEX_SQL)
         self._schema_ready = True
 
     @staticmethod

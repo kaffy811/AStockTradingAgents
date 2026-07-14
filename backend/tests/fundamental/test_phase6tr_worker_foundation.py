@@ -128,11 +128,41 @@ def test_claim_next_job_assigns_shadow_lease(monkeypatch):
     )
     assert payload["job_id"] == "job-1"
     assert payload["claimed_by"] == "worker-a"
-    assert payload["attempt_count"] == 1
+    assert payload["attempt_count"] == 0
+    assert row.attempt_count == 0
     assert payload["execution_mode"] == SHADOW_EXECUTION_MODE
     assert row.claimed_by == "worker-a"
     assert row.worker_version == WORKER_VERSION
     assert db.flushed == 1
+
+
+def test_claim_next_job_increments_attempt_only_for_real_execution(monkeypatch):
+    row = _make_job_row()
+    db = _FakeSession([_FakeSelectResult(row)])
+    monkeypatch.setattr(settings, "company_v2_financial_fusion_worker_lease_seconds", 60, raising=False)
+    payload = asyncio.run(
+        company_v2_financial_fusion_worker_service.claim_next_job(db=db, worker_id="worker-a", execution_mode="canary")
+    )
+    assert payload["attempt_count"] == 1
+    assert row.attempt_count == 1
+    assert payload["execution_mode"] == "canary"
+
+
+def test_shadow_claim_ignores_real_max_attempts_budget(monkeypatch):
+    row = _make_job_row(attempt_count=3, max_attempts=3)
+    db = _FakeSession([_FakeSelectResult(row)])
+    monkeypatch.setattr(settings, "company_v2_financial_fusion_worker_lease_seconds", 60, raising=False)
+    payload = asyncio.run(
+        company_v2_financial_fusion_worker_service.claim_next_job(
+            db=db,
+            worker_id="worker-a",
+            execution_mode=SHADOW_EXECUTION_MODE,
+            max_attempts=3,
+        )
+    )
+    assert payload["job_id"] == "job-1"
+    assert payload["attempt_count"] == 3
+    assert row.attempt_count == 3
 
 
 def test_heartbeat_requires_owner_and_active_lease():
@@ -215,7 +245,18 @@ def test_evaluate_shadow_job_never_requests_real_execution(monkeypatch):
 
 
 def test_run_shadow_cycle_reports_zero_real_execution(monkeypatch):
-    async def fake_claim(*, db, worker_id, lease_seconds=None, heartbeat_seconds=None, execution_mode=SHADOW_EXECUTION_MODE, max_attempts=None):
+    async def fake_claim(
+        *,
+        db,
+        worker_id,
+        lease_seconds=None,
+        heartbeat_seconds=None,
+        execution_mode=SHADOW_EXECUTION_MODE,
+        max_attempts=None,
+        requester_scope=None,
+        requester_run_id=None,
+        allowed_job_ids=None,
+    ):
         if not hasattr(fake_claim, "called"):
             fake_claim.called = True
             return {"job_id": "job-1", "symbol": "600519", "report_id": 2}
@@ -224,7 +265,7 @@ def test_run_shadow_cycle_reports_zero_real_execution(monkeypatch):
     async def fake_load_job(_db, _job_id):
         return _make_job_row()
 
-    async def fake_eval(*, db, job, worker_id):
+    async def fake_eval(*, db, job, worker_id, expected_requester_scope=None, expected_requester_run_id=None, allowed_job_ids=None):
         return {"would_execute": False, "job_id": job.job_id}
 
     monkeypatch.setattr(company_v2_financial_fusion_worker_service, "claim_next_job", fake_claim)

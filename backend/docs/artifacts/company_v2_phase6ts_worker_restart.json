@@ -1,13 +1,15 @@
 {
   "phase": "phase6ts_worker_restart",
   "status": "passed",
-  "worker_restart_count": 4,
-  "worker_restart_events": [
-    {
-      "at_seconds": 2.01,
-      "worker_id": "phase6ts-worker-1"
-    }
-  ],
+  "run_id": "0654cd6c5f834f78a90eccd44f22d471",
+  "started_at": "2026-07-14T04:58:50.281556",
+  "finished_at": "2026-07-14T05:02:34.717830",
+  "requested_duration_seconds": 180.0,
+  "actual_duration_seconds": 195.005,
+  "process_pid": 10241,
+  "git_commit": "de6d93b12bbb6e6e4bd1c3d21f5f047a9bcd0bec",
+  "worker_restart_count": 2,
+  "worker_restart_events": [],
   "real_execution_count": 0,
   "blocking_issues": []
 }

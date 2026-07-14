@@ -91,6 +91,18 @@ async def _count_active_leases() -> int:
         return len(list(result.scalars().all()))
 
 
+async def _count_active_leases_for(job_ids: list[str]) -> int:
+    async with LiveSessionLocal() as db:
+        result = await db.execute(
+            select(CompanyV2FinancialFusionJob).where(
+                CompanyV2FinancialFusionJob.job_id.in_(job_ids),
+                CompanyV2FinancialFusionJob.claimed_by.is_not(None),
+                CompanyV2FinancialFusionJob.status == "queued",
+            )
+        )
+        return len(list(result.scalars().all()))
+
+
 async def test_live_claim_is_atomic_and_skip_locked():
     report = await _latest_report("600519")
     job_id = f"phase6tr-{uuid4().hex}"
@@ -98,7 +110,13 @@ async def test_live_claim_is_atomic_and_skip_locked():
     try:
         async def _one(worker_id: str):
             async with LiveSessionLocal() as db:
-                return await company_v2_financial_fusion_worker_service.claim_next_job(db=db, worker_id=worker_id, lease_seconds=30)
+                return await company_v2_financial_fusion_worker_service.claim_next_job(
+                    db=db,
+                    worker_id=worker_id,
+                    lease_seconds=30,
+                    requester_scope="phase6tr_live",
+                    allowed_job_ids=[job_id],
+                )
 
         results = await asyncio.gather(_one("worker-a"), _one("worker-b"))
         claimed = [item for item in results if item is not None]
@@ -117,11 +135,26 @@ async def test_live_lease_expiry_allows_reclaim_and_blocks_old_heartbeat():
     await _insert_job(report, job_id=job_id)
     try:
         async with LiveSessionLocal() as db:
-            claim = await company_v2_financial_fusion_worker_service.claim_next_job(db=db, worker_id="worker-a", lease_seconds=30)
+            claim = await company_v2_financial_fusion_worker_service.claim_next_job(
+                db=db,
+                worker_id="worker-a",
+                lease_seconds=30,
+                requester_scope="phase6tr_live",
+                allowed_job_ids=[job_id],
+            )
         assert claim and claim["job_id"] == job_id
 
         async with LiveSessionLocal() as db:
-            assert await company_v2_financial_fusion_worker_service.claim_next_job(db=db, worker_id="worker-b", lease_seconds=30) is None
+            assert (
+                await company_v2_financial_fusion_worker_service.claim_next_job(
+                    db=db,
+                    worker_id="worker-b",
+                    lease_seconds=30,
+                    requester_scope="phase6tr_live",
+                    allowed_job_ids=[job_id],
+                )
+                is None
+            )
 
         async with LiveSessionLocal() as db:
             await db.execute(
@@ -138,10 +171,16 @@ async def test_live_lease_expiry_allows_reclaim_and_blocks_old_heartbeat():
             assert await company_v2_financial_fusion_worker_service.heartbeat(db=db, job_id=job_id, worker_id="worker-a", lease_seconds=30) is None
 
         async with LiveSessionLocal() as db:
-            reclaimed = await company_v2_financial_fusion_worker_service.claim_next_job(db=db, worker_id="worker-b", lease_seconds=30)
+            reclaimed = await company_v2_financial_fusion_worker_service.claim_next_job(
+                db=db,
+                worker_id="worker-b",
+                lease_seconds=30,
+                requester_scope="phase6tr_live",
+                allowed_job_ids=[job_id],
+            )
         assert reclaimed and reclaimed["claimed_by"] == "worker-b"
         job = await _get_job(job_id)
-        assert job is not None and job.attempt_count >= 2
+        assert job is not None and job.attempt_count == 0
     finally:
         await _cleanup([job_id])
 
@@ -152,7 +191,13 @@ async def test_live_shadow_cycle_writes_observation_and_releases_active_lease():
     await _insert_job(report, job_id=job_id)
     try:
         async with LiveSessionLocal() as db:
-            payload = await company_v2_financial_fusion_worker_service.run_shadow_cycle(db=db, worker_id="worker-shadow", max_jobs=1)
+            payload = await company_v2_financial_fusion_worker_service.run_shadow_cycle(
+                db=db,
+                worker_id="worker-shadow",
+                max_jobs=1,
+                requester_scope="phase6tr_live",
+                allowed_job_ids={job_id},
+            )
         assert payload["real_execution_count"] == 0
         assert payload["shadow_mode_verified"] is True
         async with LiveSessionLocal() as db:
@@ -165,11 +210,12 @@ async def test_live_shadow_cycle_writes_observation_and_releases_active_lease():
             assert observation.rag_query_calls == 0
             assert observation.extractor_calls == 0
             assert observation.fusion_calls == 0
-        assert await _count_active_leases() == 0
+        assert await _count_active_leases_for([job_id]) == 0
         job = await _get_job(job_id)
         assert job is not None
         assert job.claimed_by is None
         assert job.execution_mode == "shadow"
+        assert job.attempt_count == 0
     finally:
         await _cleanup([job_id])
 
@@ -182,6 +228,14 @@ async def test_live_cancelled_and_completed_jobs_are_never_claimed():
     await _insert_job(report, job_id=completed_id, status="completed")
     try:
         async with LiveSessionLocal() as db:
-            assert await company_v2_financial_fusion_worker_service.claim_next_job(db=db, worker_id="worker-a") is None
+            assert (
+                await company_v2_financial_fusion_worker_service.claim_next_job(
+                    db=db,
+                    worker_id="worker-a",
+                    requester_scope="phase6tr_live",
+                    allowed_job_ids=[cancelled_id, completed_id],
+                )
+                is None
+            )
     finally:
         await _cleanup([cancelled_id, completed_id])

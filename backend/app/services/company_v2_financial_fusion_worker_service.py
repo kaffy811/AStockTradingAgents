@@ -6,7 +6,8 @@ from datetime import datetime, timedelta, timezone
 import hashlib
 from typing import Any
 
-from sqlalchemy import and_, or_, select, update
+from sqlalchemy import and_, cast, func, or_, select, update
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
@@ -37,6 +38,19 @@ def _stable_bucket(symbol: str, report_id: int) -> int:
     return int(digest[:8], 16) % 100
 
 
+def _requester_run_id(metadata_json: str | None) -> str | None:
+    if not metadata_json:
+        return None
+    try:
+        metadata = json.loads(metadata_json)
+    except Exception:
+        return None
+    if isinstance(metadata, dict):
+        run_id = metadata.get("run_id")
+        return str(run_id) if run_id else None
+    return None
+
+
 class CompanyV2FinancialFusionWorkerService:
     async def claim_next_job(
         self,
@@ -47,10 +61,17 @@ class CompanyV2FinancialFusionWorkerService:
         heartbeat_seconds: int | None = None,
         execution_mode: str = SHADOW_EXECUTION_MODE,
         max_attempts: int | None = None,
+        requester_scope: str | None = None,
+        requester_run_id: str | None = None,
+        allowed_job_ids: list[str] | set[str] | tuple[str, ...] | None = None,
     ) -> dict[str, Any] | None:
         lease_seconds = int(lease_seconds or getattr(settings, "company_v2_financial_fusion_worker_lease_seconds", 60))
         heartbeat_seconds = int(heartbeat_seconds or getattr(settings, "company_v2_financial_fusion_worker_heartbeat_seconds", 15))
         max_attempts = int(max_attempts or 3)
+        is_shadow = str(execution_mode or SHADOW_EXECUTION_MODE) == SHADOW_EXECUTION_MODE
+        allowed_ids = [str(job_id) for job_id in (allowed_job_ids or []) if str(job_id).strip()]
+        if allowed_job_ids is not None and not allowed_ids:
+            return None
         now = _now()
         lease_expires_at = now + timedelta(seconds=lease_seconds)
 
@@ -61,23 +82,56 @@ class CompanyV2FinancialFusionWorkerService:
                     CompanyV2FinancialFusionJob.status == "queued",
                     or_(CompanyV2FinancialFusionJob.next_retry_at.is_(None), CompanyV2FinancialFusionJob.next_retry_at <= now),
                     or_(CompanyV2FinancialFusionJob.lease_expires_at.is_(None), CompanyV2FinancialFusionJob.lease_expires_at <= now),
-                    or_(CompanyV2FinancialFusionJob.attempt_count.is_(None), CompanyV2FinancialFusionJob.attempt_count < max_attempts),
                 )
                 .order_by(
                     CompanyV2FinancialFusionJob.created_at.asc(),
                     CompanyV2FinancialFusionJob.id.asc(),
                 )
             )
+            if not is_shadow:
+                stmt = stmt.where(
+                    or_(
+                        CompanyV2FinancialFusionJob.attempt_count.is_(None),
+                        CompanyV2FinancialFusionJob.attempt_count < max_attempts,
+                    )
+                )
+            if requester_scope:
+                stmt = stmt.where(CompanyV2FinancialFusionJob.requester_scope == requester_scope)
+            if allowed_ids:
+                stmt = stmt.where(CompanyV2FinancialFusionJob.job_id.in_(allowed_ids))
+            if requester_run_id and getattr(getattr(db, "bind", None), "dialect", None) and db.bind.dialect.name == "postgresql":
+                stmt = stmt.where(
+                    func.coalesce(
+                        func.jsonb_extract_path_text(
+                            cast(CompanyV2FinancialFusionJob.requester_metadata_json, JSONB),
+                            "run_id",
+                        ),
+                        "",
+                    ) == requester_run_id
+                )
             if getattr(getattr(db, "bind", None), "dialect", None) and db.bind.dialect.name == "postgresql":
                 stmt = stmt.with_for_update(skip_locked=True)
             row = (await db.execute(stmt.limit(1))).scalars().first()
             if not row:
                 return None
+            if requester_scope and row.requester_scope != requester_scope:
+                raise RuntimeError(
+                    f"scope isolation violation: expected requester_scope={requester_scope!r}, got {row.requester_scope!r}"
+                )
+            if allowed_ids and row.job_id not in set(allowed_ids):
+                raise RuntimeError(
+                    f"scope isolation violation: job_id {row.job_id!r} not in allowed_job_ids"
+                )
+            if requester_run_id and _requester_run_id(row.requester_metadata_json) != requester_run_id:
+                raise RuntimeError(
+                    f"scope isolation violation: run_id mismatch for job_id={row.job_id!r}"
+                )
             row.claimed_by = worker_id
             row.claimed_at = now
             row.heartbeat_at = now
             row.lease_expires_at = lease_expires_at
-            row.attempt_count = int(row.attempt_count or 0) + 1
+            if not is_shadow:
+                row.attempt_count = int(row.attempt_count or 0) + 1
             row.execution_mode = execution_mode
             row.worker_version = WORKER_VERSION
             row.rollout_bucket_at_claim = _stable_bucket(row.symbol, row.report_id)
@@ -199,7 +253,20 @@ class CompanyV2FinancialFusionWorkerService:
         db: AsyncSession,
         job: CompanyV2FinancialFusionJob,
         worker_id: str,
+        expected_requester_scope: str | None = None,
+        expected_requester_run_id: str | None = None,
+        allowed_job_ids: set[str] | None = None,
     ) -> dict[str, Any]:
+        if allowed_job_ids is not None and job.job_id not in allowed_job_ids:
+            raise RuntimeError(f"scope isolation violation: job_id {job.job_id!r} not allowed")
+        if expected_requester_scope and job.requester_scope != expected_requester_scope:
+            raise RuntimeError(
+                f"scope isolation violation: expected requester_scope={expected_requester_scope!r}, got {job.requester_scope!r}"
+            )
+        if expected_requester_run_id and _requester_run_id(job.requester_metadata_json) != expected_requester_run_id:
+            raise RuntimeError(
+                f"scope isolation violation: run_id mismatch for job_id={job.job_id!r}"
+            )
         result = await db.execute(select(ReportDocument).where(ReportDocument.id == job.report_id))
         report = result.scalars().first()
         if db.in_transaction():
@@ -300,19 +367,52 @@ class CompanyV2FinancialFusionWorkerService:
         lease_seconds: int | None = None,
         heartbeat_seconds: int | None = None,
         max_jobs: int | None = None,
+        requester_scope: str | None = None,
+        requester_run_id: str | None = None,
+        allowed_job_ids: list[str] | set[str] | tuple[str, ...] | None = None,
     ) -> dict[str, Any]:
         max_jobs = int(max_jobs or 1)
+        allowed_ids_set = {str(job_id) for job_id in (allowed_job_ids or []) if str(job_id).strip()}
+        if allowed_job_ids is not None and not allowed_ids_set:
+            return {
+                "worker_id": worker_id,
+                "execution_mode": SHADOW_EXECUTION_MODE,
+                "claimed_jobs": [],
+                "observations": [],
+                "real_execution_count": 0,
+                "shadow_mode_verified": True,
+                "stage3_authorized": bool(getattr(settings, "company_v2_financial_fusion_stage3_authorized", False)),
+                "auto_run": bool(getattr(settings, "company_v2_financial_fusion_auto_run", False)),
+                "rollout_percent": int(getattr(settings, "company_v2_financial_fusion_rollout_percent", 0) or 0),
+            }
         claimed: list[dict[str, Any]] = []
         observations: list[dict[str, Any]] = []
         for _ in range(max_jobs):
-            job = await self.claim_next_job(db=db, worker_id=worker_id, lease_seconds=lease_seconds, heartbeat_seconds=heartbeat_seconds)
+            job = await self.claim_next_job(
+                db=db,
+                worker_id=worker_id,
+                lease_seconds=lease_seconds,
+                heartbeat_seconds=heartbeat_seconds,
+                requester_scope=requester_scope,
+                requester_run_id=requester_run_id,
+                allowed_job_ids=allowed_ids_set or None,
+            )
             if not job:
                 break
             claimed.append(job)
             loaded_job = await self._load_job(db, job["job_id"])
             if db.in_transaction():
                 await db.commit()
-            record = await self.evaluate_shadow_job(db=db, job=loaded_job, worker_id=worker_id)
+            if loaded_job is None:
+                raise RuntimeError(f"scope isolation violation: missing job_id={job['job_id']!r}")
+            record = await self.evaluate_shadow_job(
+                db=db,
+                job=loaded_job,
+                worker_id=worker_id,
+                expected_requester_scope=requester_scope,
+                expected_requester_run_id=requester_run_id,
+                allowed_job_ids=allowed_ids_set or None,
+            )
             observations.append(record)
         return {
             "worker_id": worker_id,

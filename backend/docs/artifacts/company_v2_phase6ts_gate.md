@@ -2,28 +2,25 @@
 
 ```json
 {
-  "phase6ts_passed": true,
+  "phase6ts_passed": false,
+  "shadow_soak_completed": false,
   "stage3_status": "not_authorized",
-  "shadow_soak_completed": true,
-  "duration_seconds": 8,
+  "stage3_authorized": false,
+  "auto_run": false,
+  "rollout_percent": 0,
+  "requested_duration_seconds": 7200,
+  "observed_exit_after_seconds_approx": 84,
   "worker_count": 2,
-  "duplicate_claim_count": 0,
-  "active_leases_end": 0,
-  "stale_leases_end": 0,
+  "poll_interval_seconds": 5,
+  "lease_seconds": 60,
+  "heartbeat_seconds": 15,
   "real_execution_count": 0,
   "provider_call_count": 0,
   "rag_query_count": 0,
   "extractor_call_count": 0,
   "fusion_result_write_count": 0,
-  "auto_run": false,
-  "rollout_percent": 0,
-  "blocking_issues": [],
-  "worker_restart_count": 4,
-  "db_disconnect_count": 1,
-  "db_reconnect_count": 1,
-  "jobs_created": 2,
-  "jobs_cancelled": 2,
-  "preexisting_active_jobs_found": 0,
-  "preexisting_active_jobs_cancelled": 0
+  "blocking_issues": [
+    "SHADOW_SOAK_EXITED_BEFORE_REQUESTED_DURATION"
+  ]
 }
 ```
