@@ -12,7 +12,7 @@ import pytest
 def test_validate_pdf_url_whitelist():
     """只允许白名单域名的 PDF URL。"""
     from app.datasource.cninfo_provider import validate_pdf_url
-    ok, _ = validate_pdf_url("http://static.cninfo.com.cn/finalpage/2026-04-30/1225273091.PDF")
+    ok, _ = validate_pdf_url("https://static.cninfo.com.cn/finalpage/2026-04-30/1225273091.PDF")
     assert ok
 
 def test_validate_pdf_url_reject_non_whitelist():
@@ -25,7 +25,7 @@ def test_validate_pdf_url_reject_non_whitelist():
 def test_validate_pdf_url_reject_non_pdf():
     """非 .PDF 后缀被拒绝。"""
     from app.datasource.cninfo_provider import validate_pdf_url
-    ok, reason = validate_pdf_url("http://static.cninfo.com.cn/finalpage/2026-04-30/1225273091.html")
+    ok, reason = validate_pdf_url("https://static.cninfo.com.cn/finalpage/2026-04-30/1225273091.html")
     assert not ok
     assert ".pdf" in reason.lower() or "pdf" in reason.lower()
 

@@ -166,7 +166,7 @@ def test_extract_report_metadata_is_summary():
 def test_validate_pdf_url_whitelist_static():
     """static.cninfo.com.cn 域名允许。"""
     from app.datasource.cninfo_provider import validate_pdf_url
-    ok, _ = validate_pdf_url("http://static.cninfo.com.cn/finalpage/2026-04-30/1225273091.PDF")
+    ok, _ = validate_pdf_url("https://static.cninfo.com.cn/finalpage/2026-04-30/1225273091.PDF")
     assert ok is True
 
 
@@ -181,7 +181,7 @@ def test_validate_pdf_url_reject_non_whitelist():
 def test_validate_pdf_url_reject_non_pdf():
     """非 .PDF 后缀被拒绝。"""
     from app.datasource.cninfo_provider import validate_pdf_url
-    ok, reason = validate_pdf_url("http://static.cninfo.com.cn/finalpage/2026-04-30/doc.html")
+    ok, reason = validate_pdf_url("https://static.cninfo.com.cn/finalpage/2026-04-30/doc.html")
     assert ok is False
     assert "pdf" in reason.lower()
 

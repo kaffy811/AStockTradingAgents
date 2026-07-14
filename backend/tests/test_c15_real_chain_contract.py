@@ -69,8 +69,6 @@ def _make_ctx() -> SkillContext:
 
 
 @pytest.mark.parametrize("query", [
-    "贵州茅台最新财报表现如何？",
-    "最新财报",
     "600519 业绩怎么样",
     "贵州茅台业绩情况",
     "这只股票怎么样",
@@ -86,6 +84,19 @@ def test_gfa_can_handle_financial_queries(query):
     assert skill.can_handle(query, ctx) is True, (
         f"can_handle() returned False for financial query: {query!r}"
     )
+
+
+@pytest.mark.parametrize("query", [
+    "贵州茅台最新财报表现如何？",
+    "最新财报",
+])
+def test_financial_report_queries_defer_from_gfa_to_report_skill(query):
+    """Formal report questions must use the report explanation chain, not GFA."""
+    from app.agents.chat_skills.report_explanation_skill import ReportExplanationSkill
+
+    ctx = _make_ctx()
+    assert GeneralFinancialAnswerSkill().can_handle(query, ctx) is False
+    assert ReportExplanationSkill().can_handle(query, ctx) is True
 
 
 @pytest.mark.parametrize("greeting", [

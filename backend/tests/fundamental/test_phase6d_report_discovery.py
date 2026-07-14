@@ -97,17 +97,11 @@ async def test_cninfo_tool_returns_candidates_with_schema():
         "totals": 1,
     }
 
-    with patch("app.tools.reports.cninfo_report_search_tool.httpx.AsyncClient") as mock_client_cls, \
-         patch("app.tools.reports.cninfo_report_search_tool.asyncio.sleep", new_callable=AsyncMock):
-        mock_resp = MagicMock()
-        mock_resp.raise_for_status = MagicMock()
-        mock_resp.json = MagicMock(return_value=mock_response)
-        mock_client = AsyncMock()
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=None)
-        mock_client.post = AsyncMock(return_value=mock_resp)
-        mock_client_cls.return_value = mock_client
+    async def fake_search(*args, **kwargs):
+        return {"announcements": mock_response["announcements"], "diagnostics": {"status": "success"}}
 
+    with patch("app.tools.reports.cninfo_report_search_tool.search_announcements_with_diagnostics", fake_search), \
+         patch("app.tools.reports.cninfo_report_search_tool.asyncio.sleep", new_callable=AsyncMock):
         candidates = await tool.search("600519", "贵州茅台", "annual", 2024)
 
     assert len(candidates) > 0
