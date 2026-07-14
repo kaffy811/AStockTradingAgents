@@ -27,10 +27,10 @@ def _make_context():
 
 class TestGeneralFinancialAnswerSkill:
 
-    def test_can_handle_non_empty(self):
+    def test_can_handle_financial_non_empty(self):
         from app.agents.chat_skills.general_financial_answer_skill import GeneralFinancialAnswerSkill
         skill = GeneralFinancialAnswerSkill()
-        assert skill.can_handle("任何问题", _make_context()) is True
+        assert skill.can_handle("贵州茅台最近表现如何", _make_context()) is True
 
     def test_can_handle_empty_returns_false(self):
         from app.agents.chat_skills.general_financial_answer_skill import GeneralFinancialAnswerSkill

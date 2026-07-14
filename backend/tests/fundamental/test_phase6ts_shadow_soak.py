@@ -367,6 +367,7 @@ def test_sigterm_path_marks_failed_and_runs_cleanup(monkeypatch):
 def test_running_artifact_overwrites_old_run_id_before_final(monkeypatch, tmp_path):
     json_path = tmp_path / "shadow.json"
     md_path = tmp_path / "shadow.md"
+    secondary_dir = tmp_path / "artifacts"
     json_path.write_text(json.dumps({"status": "passed", "run_id": "old-run"}, ensure_ascii=False), encoding="utf-8")
     observed_running = {}
 
@@ -398,6 +399,8 @@ def test_running_artifact_overwrites_old_run_id_before_final(monkeypatch, tmp_pa
             "1",
             "--symbols",
             "601686",
+            "--base-artifact-dir",
+            str(secondary_dir),
             "--out-json",
             str(json_path),
             "--out-md",
@@ -411,6 +414,106 @@ def test_running_artifact_overwrites_old_run_id_before_final(monkeypatch, tmp_pa
     assert final_payload["status"] == "passed"
     assert final_payload["run_id"] == observed_running["run_id"]
     assert final_payload["actual_duration_seconds"] == 1.0
+
+
+def _sample_passed_payload() -> dict:
+    metrics = soak.SoakMetrics(duration_seconds=7200, worker_count=2)
+    metrics.jobs_created = 5
+    metrics.jobs_cancelled = 5
+    metrics.jobs_observed = 30
+    metrics.observation_rows_written = 30
+    metrics.active_leases_peak = 2
+    metrics.active_leases_end = 0
+    metrics.stale_leases_end = 0
+    metrics.worker_restart_count = 1
+    metrics.db_disconnect_count = 1
+    metrics.db_reconnect_count = 1
+    metrics.preexisting_active_jobs_found = 0
+    return soak._build_payload(
+        status="passed",
+        run_id="run-current",
+        symbols=["601686", "600519", "300750", "000725", "000001"],
+        created_jobs=[],
+        metrics=metrics,
+        blocking_issues=[],
+        started_at=soak._now(),
+        finished_at=soak._now(),
+        requested_duration_seconds=7200,
+        actual_duration_seconds=7200.1,
+        exit_reason="duration_elapsed",
+        process_pid=123,
+        git_commit="abc123",
+    )
+
+
+def test_phase6ts_current_run_overwrites_old_gate_artifact(tmp_path):
+    gate_path = tmp_path / "company_v2_phase6ts_gate.json"
+    gate_path.write_text(
+        json.dumps(
+            {
+                "run_id": "old-run",
+                "duration_seconds": 8,
+                "worker_restart_count": 4,
+                "jobs_created": 2,
+                "jobs_cancelled": 2,
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+
+    payload = _sample_passed_payload()
+    soak._secondary_artifacts(payload, str(tmp_path))
+    gate = json.loads(gate_path.read_text(encoding="utf-8"))
+
+    assert gate["run_id"] == payload["run_id"]
+    assert gate["duration_seconds"] == payload["metrics"]["duration_seconds"]
+    assert gate["jobs_created"] == payload["jobs_created"]
+    assert gate["jobs_cancelled"] == payload["jobs_cancelled"]
+    assert gate["worker_restart_count"] == payload["metrics"]["worker_restart_count"]
+    assert gate["db_disconnect_count"] == payload["metrics"]["db_disconnect_count"]
+    assert gate["db_reconnect_count"] == payload["metrics"]["db_reconnect_count"]
+    assert gate["duration_seconds"] != 8
+    assert gate["jobs_created"] != 2
+    assert gate["jobs_cancelled"] != 2
+    assert gate["worker_restart_count"] != 4
+
+
+def test_phase6ts_gate_artifacts_share_current_run_metrics(tmp_path):
+    payload = _sample_passed_payload()
+    soak._secondary_artifacts(payload, str(tmp_path))
+
+    gate = json.loads((tmp_path / "company_v2_phase6ts_gate.json").read_text(encoding="utf-8"))
+    restart = json.loads((tmp_path / "company_v2_phase6ts_worker_restart.json").read_text(encoding="utf-8"))
+    reconnect = json.loads((tmp_path / "company_v2_phase6ts_db_reconnect.json").read_text(encoding="utf-8"))
+
+    assert gate["run_id"] == restart["run_id"] == reconnect["run_id"] == payload["run_id"]
+    assert gate["duration_seconds"] == payload["metrics"]["duration_seconds"]
+    assert gate["jobs_created"] == payload["jobs_created"]
+    assert gate["jobs_cancelled"] == payload["jobs_cancelled"]
+    assert gate["worker_restart_count"] == restart["worker_restart_count"] == 1
+    assert gate["db_disconnect_count"] == reconnect["db_disconnect_count"] == 1
+    assert gate["db_reconnect_count"] == reconnect["db_reconnect_count"] == 1
+
+
+def test_phase6ts_passed_gate_inconsistency_fails():
+    payload = _sample_passed_payload()
+    gate = soak._build_gate_payload(payload)
+    gate["run_id"] = "old-run"
+
+    with pytest.raises(RuntimeError, match="gate artifact inconsistent"):
+        soak._assert_gate_consistency(gate, payload)
+
+
+def test_phase6ts_gate_contains_no_secret_or_absolute_path():
+    payload = _sample_passed_payload()
+    payload["created_jobs"] = [{"database_url": "postgresql://secret", "path": "/Users/kaffy/secret"}]
+    gate = soak._build_gate_payload(payload)
+    serialized = json.dumps(soak._sanitize(gate), ensure_ascii=False)
+
+    assert "secret" not in serialized.lower()
+    assert "/Users/" not in serialized
+    assert "database_url" not in serialized
 
 
 def test_worker_loop_receives_soak_scope_filters(monkeypatch):

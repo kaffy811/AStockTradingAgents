@@ -27,19 +27,23 @@
 - 更新 `backend/tests/fundamental/test_phase6ts_shadow_soak.py`，覆盖 3 秒 duration、无 eligible job 继续轮询、worker 异常失败 artifact、SIGTERM cleanup、running artifact 覆盖旧 run_id。
 - 更新 `backend/tests/fundamental/test_phase6ts_shadow_soak_live.py`，覆盖 live run_id claim 隔离和 live shadow soak 完整结束。
 
-6. Gate 状态回收
-- 更新 `backend/docs/artifacts/company_v2_phase6ts_gate.json` 和 `.md`，保持 `phase6ts_passed=false`、`shadow_soak_completed=false`、`stage3_status=not_authorized`。
-- blocking issue 固定为 `SHADOW_SOAK_EXITED_BEFORE_REQUESTED_DURATION`，不授权 Stage 3，不进入 Canary，不执行真实 Fusion。
+6. Phase 6T-S 正式两小时 Shadow Soak Gate 收口
+- 正式两小时 Shadow Soak 已完成，`run_id=9548e1efb8ec4f8cb6e40d5bf62b1c1a`。
+- `duration_seconds=7200`，`worker_count=2`，`worker_restart_count=1`，`db_disconnect_count=1`，`db_reconnect_count=1`。
+- `duplicate_claim_count=0`，`simultaneous_claim_conflicts=0`，`unknown_jobs_modified=0`。
+- `active_leases_end=0`，`stale_leases_end=0`，jobs cleanup 为 `jobs_created=5`、`jobs_cancelled=5`。
+- `real_execution_count=0`，`provider_call_count=0`，`rag_query_count=0`，`extractor_call_count=0`，`fusion_result_write_count=0`。
+- Stage 3 仍为 `not_authorized`，`stage3_authorized=false`，`auto_run=false`，`rollout_percent=0`，尚未进入 Canary。
 
 7. 验证结果
 - 定向回归通过：`21 passed, 2 warnings`。
 - live foundation + shadow soak 回归通过：`6 passed, 5 warnings`。
 - full backend tests 通过：`3101 passed, 261 warnings`。
-- 180 秒 live smoke 通过：`status=passed`，`run_id=0654cd6c5f834f78a90eccd44f22d471`，`actual_duration_seconds=195.005`，`jobs_created=5`，`jobs_cancelled=5`，`active_leases_end=0`，`stale_leases_end=0`，`real_execution_count=0`。
+- 正式两小时 Soak Gate artifact 已更新为 `status=passed`，`shadow_soak_completed=true`，`phase6ts_passed=true`。
 
 ---
 下一步：你需要操作
 
-第一步：复核 `backend/docs/artifacts/company_v2_phase6ts_gate.json`，确认 7200 秒 Gate 仍为失败态且 Stage 3 未授权。
-第二步：复核 `backend/docs/artifacts/company_v2_phase6ts_shadow_soak.json`，确认最终 smoke artifact 属于 run_id `0654cd6c5f834f78a90eccd44f22d471`。
-第三步：提交时使用 commit message：`fix(company-v2): keep Phase 6T-S shadow soak alive for requested duration`。
+第一步：复核 `backend/docs/artifacts/company_v2_phase6ts_gate.json`，确认 Gate 属于 run_id `9548e1efb8ec4f8cb6e40d5bf62b1c1a` 且 `duration_seconds=7200`。
+第二步：复核 `backend/docs/artifacts/company_v2_phase6ts_shadow_soak.json`、`company_v2_phase6ts_worker_restart.json`、`company_v2_phase6ts_db_reconnect.json` 使用同一 run_id 和同一批正式指标。
+第三步：提交时使用 commit message：`test(company-v2): finalize Phase 6T-S two-hour shadow soak gate`。

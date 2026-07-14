@@ -37,6 +37,24 @@ def run(coro):
     return asyncio.run(coro)
 
 
+def _make_selection():
+    from app.agent.report_context import ReportSelection
+
+    return ReportSelection(
+        report_id=1,
+        symbol="600519",
+        market="CN",
+        ts_code="600519.SH",
+        stock_name="贵州茅台",
+        report_year=2023,
+        report_type="annual",
+        period_end="2023-12-31",
+        title="贵州茅台2023年年度报告",
+        disclosure_date="2024-03-30",
+        selection_reason="latest_formal_report",
+    )
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # T01 — make_cache_key is deterministic
 # ─────────────────────────────────────────────────────────────────────────────
@@ -469,12 +487,10 @@ def test_agent_error_path_includes_phase6k_fields():
 
     agent = ReportChatCopilotAgent()
 
-    with (
-        patch("app.agent.report_chat_cache.read_cache", new_callable=AsyncMock, return_value=None),
-        patch("app.agent.report_chat_session_memory.load_memory", new_callable=AsyncMock, return_value=[]),
-        patch("app.services.report_rag_service.ReportRagService") as MockRag,
-        patch("app.llm.deepseek_client.DeepSeekClient") as MockLLM,
-    ):
+    with patch("app.agent.report_chat_cache.read_cache", new_callable=AsyncMock, return_value=None), \
+        patch("app.agent.report_chat_session_memory.load_memory", new_callable=AsyncMock, return_value=[]), \
+        patch("app.services.report_rag_service.ReportRagService") as MockRag, \
+        patch("app.llm.deepseek_client.DeepSeekClient") as MockLLM:
         mock_rag = AsyncMock()
         mock_rag.query = AsyncMock(return_value={"chunks": [], "partial": False, "errors": []})
         MockRag.return_value = mock_rag
@@ -482,13 +498,14 @@ def test_agent_error_path_includes_phase6k_fields():
         # LLM raises an error
         MockLLM.return_value.chat = MagicMock(side_effect=RuntimeError("LLM down"))
 
-        result = run(agent.chat(
-            market="CN",
-            symbol="600519",
-            question="主营业务是什么？",
-            db=None,
-            session_id="test-session",
-        ))
+        with patch("app.agent.report_chat_copilot_agent.resolve_report_selection", AsyncMock(return_value=_make_selection())):
+            result = run(agent.chat(
+                market="CN",
+                symbol="600519",
+                question="主营业务是什么？",
+                db=None,
+                session_id="test-session",
+            ))
 
     assert "cache_meta" in result
     assert "memory_meta" in result

@@ -82,6 +82,11 @@ class ReportChatRequest(BaseModel):
         default=None,
         description="Filter by report year(s), e.g. [2022, 2023]",
     )
+    report_id: Optional[int] = Field(
+        default=None,
+        ge=1,
+        description="Explicit ReportDocument id. If invalid, the agent must not fall back to another report.",
+    )
     top_k: int = Field(
         default=6,
         ge=1,
@@ -321,6 +326,7 @@ async def report_chat(
             db=db,
             report_types=body.report_types,
             years=body.years,
+            report_id=body.report_id,
             top_k=body.top_k,
             force_refresh=body.force_refresh,
             session_id=body.session_id,

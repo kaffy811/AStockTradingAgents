@@ -45,6 +45,7 @@ class ReportRagService:
         db: AsyncSession,
         report_types: Optional[list[str]] = None,
         years: Optional[list[int]] = None,
+        report_id: Optional[int] = None,
         top_k: int = _DEFAULT_TOP_K,
     ) -> dict:
         """
@@ -74,6 +75,7 @@ class ReportRagService:
                 db=db,
                 report_types=report_types,
                 years=years,
+                report_id=report_id,
                 top_k=top_k,
             )
             if results:
@@ -93,6 +95,7 @@ class ReportRagService:
                     db=db,
                     report_types=report_types,
                     years=years,
+                    report_id=report_id,
                     top_k=top_k,
                 )
                 search_mode = "keyword"
@@ -132,6 +135,7 @@ class ReportRagService:
         db: AsyncSession,
         report_types: Optional[list[str]],
         years: Optional[list[int]],
+        report_id: Optional[int],
         top_k: int,
     ) -> list[ReportChunk]:
         """Use pgvector cosine similarity search."""
@@ -147,6 +151,10 @@ class ReportRagService:
         if years:
             conditions.append("rc.report_year = ANY(:years)")
             params["years"] = years
+
+        if report_id is not None:
+            conditions.append("rc.report_id = :report_id")
+            params["report_id"] = int(report_id)
 
         where_clause = " AND ".join(conditions)
 
@@ -180,6 +188,7 @@ class ReportRagService:
         db: AsyncSession,
         report_types: Optional[list[str]],
         years: Optional[list[int]],
+        report_id: Optional[int],
         top_k: int,
     ) -> list[ReportChunk]:
         """Keyword ILIKE fallback search."""
@@ -196,6 +205,8 @@ class ReportRagService:
             stmt = stmt.where(ReportChunk.report_type.in_(report_types))
         if years:
             stmt = stmt.where(ReportChunk.report_year.in_(years))
+        if report_id is not None:
+            stmt = stmt.where(ReportChunk.report_id == int(report_id))
 
         # Use first keyword for basic ILIKE
         stmt = stmt.where(ReportChunk.content.ilike(f"%{words[0]}%"))

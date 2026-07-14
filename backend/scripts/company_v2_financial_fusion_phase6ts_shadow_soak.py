@@ -841,6 +841,76 @@ def _write_artifacts(payload: dict[str, Any], *, out_json: str, out_md: str) -> 
     _atomic_write_text(Path(out_md), _artifact_lines(payload))
 
 
+def _metric(payload: dict[str, Any], key: str, default: Any = 0) -> Any:
+    metrics = payload.get("metrics") or {}
+    return metrics.get(key, payload.get(key, default))
+
+
+def _build_gate_payload(payload: dict[str, Any]) -> dict[str, Any]:
+    metrics = payload.get("metrics") or {}
+    gate_payload = {
+        "phase6ts_passed": bool(payload.get("phase6ts_passed")),
+        "stage3_status": payload.get("stage3_status", "not_authorized"),
+        "stage3_authorized": bool(payload.get("stage3_authorized", False)),
+        "shadow_soak_completed": bool(payload.get("shadow_soak_completed")),
+        "run_id": payload.get("run_id"),
+        "status": payload.get("status"),
+        "worker_mode": payload.get("worker_mode", "shadow"),
+        "duration_seconds": metrics.get("duration_seconds", payload.get("duration_seconds")),
+        "requested_duration_seconds": payload.get("requested_duration_seconds"),
+        "actual_duration_seconds": payload.get("actual_duration_seconds"),
+        "worker_count": metrics.get("worker_count", payload.get("worker_count")),
+        "symbols": payload.get("symbols", []),
+        "jobs_created": payload.get("jobs_created", metrics.get("jobs_created", 0)),
+        "jobs_cancelled": payload.get("jobs_cancelled", metrics.get("jobs_cancelled", 0)),
+        "jobs_observed": metrics.get("jobs_observed", 0),
+        "observation_rows_written": metrics.get("observation_rows_written", 0),
+        "duplicate_claim_count": metrics.get("duplicate_claim_count", 0),
+        "simultaneous_claim_conflicts": metrics.get("simultaneous_claim_conflicts", 0),
+        "unknown_jobs_modified": metrics.get("unknown_jobs_modified", 0),
+        "active_leases_peak": metrics.get("active_leases_peak", 0),
+        "active_leases_end": payload.get("active_leases_end", metrics.get("active_leases_end")),
+        "stale_leases_end": payload.get("stale_leases_end", metrics.get("stale_leases_end")),
+        "heartbeat_failures": metrics.get("heartbeat_failures", 0),
+        "lease_renewal_failures": metrics.get("lease_renewal_failures", 0),
+        "worker_restart_count": metrics.get("worker_restart_count", 0),
+        "db_disconnect_count": metrics.get("db_disconnect_count", 0),
+        "db_reconnect_count": metrics.get("db_reconnect_count", 0),
+        "preexisting_active_jobs_found": metrics.get("preexisting_active_jobs_found", 0),
+        "real_execution_count": payload.get("real_execution_count", metrics.get("real_execution_count", 0)),
+        "provider_call_count": payload.get("provider_call_count", metrics.get("provider_call_count", 0)),
+        "rag_query_count": payload.get("rag_query_count", metrics.get("rag_query_count", 0)),
+        "extractor_call_count": payload.get("extractor_call_count", metrics.get("extractor_call_count", 0)),
+        "fusion_result_write_count": payload.get("fusion_result_write_count", metrics.get("fusion_result_write_count", 0)),
+        "auto_run": bool(payload.get("auto_run", False)),
+        "rollout_percent": int(payload.get("rollout_percent", 0) or 0),
+        "blocking_issues": payload.get("blocking_issues", []),
+        "errors": payload.get("errors", []),
+    }
+    _assert_gate_consistency(gate_payload, payload)
+    return gate_payload
+
+
+def _assert_gate_consistency(gate_payload: dict[str, Any], payload: dict[str, Any]) -> None:
+    if gate_payload.get("status") != "passed":
+        return
+    comparisons = {
+        "run_id": payload.get("run_id"),
+        "duration_seconds": _metric(payload, "duration_seconds"),
+        "jobs_created": payload.get("jobs_created", _metric(payload, "jobs_created")),
+        "jobs_cancelled": payload.get("jobs_cancelled", _metric(payload, "jobs_cancelled")),
+        "worker_restart_count": _metric(payload, "worker_restart_count"),
+        "db_disconnect_count": _metric(payload, "db_disconnect_count"),
+        "db_reconnect_count": _metric(payload, "db_reconnect_count"),
+    }
+    mismatches = [
+        key for key, expected in comparisons.items()
+        if gate_payload.get(key) != expected
+    ]
+    if mismatches:
+        raise RuntimeError(f"phase6ts gate artifact inconsistent for passed run: {', '.join(mismatches)}")
+
+
 def _running_payload(
     *,
     run_id: str,
@@ -878,19 +948,32 @@ def _running_payload(
 
 def _secondary_artifacts(payload: dict[str, Any], base_artifact_dir: str) -> None:
     base = Path(base_artifact_dir)
+    gate_payload = _build_gate_payload(payload)
     restart_payload = {
         "phase": "phase6ts_worker_restart",
         "status": payload["status"],
         "run_id": payload.get("run_id"),
         "started_at": payload.get("started_at"),
         "finished_at": payload.get("finished_at"),
+        "duration_seconds": _metric(payload, "duration_seconds"),
         "requested_duration_seconds": payload.get("requested_duration_seconds"),
         "actual_duration_seconds": payload.get("actual_duration_seconds"),
         "process_pid": payload.get("process_pid"),
         "git_commit": payload.get("git_commit"),
+        "worker_count": _metric(payload, "worker_count"),
+        "jobs_created": payload.get("jobs_created", _metric(payload, "jobs_created")),
+        "jobs_cancelled": payload.get("jobs_cancelled", _metric(payload, "jobs_cancelled")),
+        "duplicate_claim_count": _metric(payload, "duplicate_claim_count"),
+        "unknown_jobs_modified": _metric(payload, "unknown_jobs_modified"),
+        "active_leases_end": payload.get("active_leases_end", _metric(payload, "active_leases_end")),
+        "stale_leases_end": payload.get("stale_leases_end", _metric(payload, "stale_leases_end")),
         "worker_restart_count": payload["metrics"]["worker_restart_count"],
         "worker_restart_events": payload["metrics"]["worker_restart_events"],
         "real_execution_count": payload["real_execution_count"],
+        "provider_call_count": payload["provider_call_count"],
+        "rag_query_count": payload["rag_query_count"],
+        "extractor_call_count": payload["extractor_call_count"],
+        "fusion_result_write_count": payload["fusion_result_write_count"],
         "blocking_issues": payload["blocking_issues"],
     }
     reconnect_payload = {
@@ -899,17 +982,31 @@ def _secondary_artifacts(payload: dict[str, Any], base_artifact_dir: str) -> Non
         "run_id": payload.get("run_id"),
         "started_at": payload.get("started_at"),
         "finished_at": payload.get("finished_at"),
+        "duration_seconds": _metric(payload, "duration_seconds"),
         "requested_duration_seconds": payload.get("requested_duration_seconds"),
         "actual_duration_seconds": payload.get("actual_duration_seconds"),
         "process_pid": payload.get("process_pid"),
         "git_commit": payload.get("git_commit"),
+        "worker_count": _metric(payload, "worker_count"),
+        "jobs_created": payload.get("jobs_created", _metric(payload, "jobs_created")),
+        "jobs_cancelled": payload.get("jobs_cancelled", _metric(payload, "jobs_cancelled")),
+        "duplicate_claim_count": _metric(payload, "duplicate_claim_count"),
+        "unknown_jobs_modified": _metric(payload, "unknown_jobs_modified"),
+        "active_leases_end": payload.get("active_leases_end", _metric(payload, "active_leases_end")),
+        "stale_leases_end": payload.get("stale_leases_end", _metric(payload, "stale_leases_end")),
         "db_disconnect_count": payload["metrics"]["db_disconnect_count"],
         "db_reconnect_count": payload["metrics"]["db_reconnect_count"],
         "db_reconnect_events": payload["metrics"]["db_reconnect_events"],
         "real_execution_count": payload["real_execution_count"],
+        "provider_call_count": payload["provider_call_count"],
+        "rag_query_count": payload["rag_query_count"],
+        "extractor_call_count": payload["extractor_call_count"],
+        "fusion_result_write_count": payload["fusion_result_write_count"],
         "blocking_issues": payload["blocking_issues"],
     }
     for name, value in {
+        "company_v2_phase6ts_gate.json": gate_payload,
+        "company_v2_phase6ts_gate.md": gate_payload,
         "company_v2_phase6ts_worker_restart.json": restart_payload,
         "company_v2_phase6ts_worker_restart.md": restart_payload,
         "company_v2_phase6ts_db_reconnect.json": reconnect_payload,

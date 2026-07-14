@@ -28,6 +28,15 @@ from app.services.fundamental_data_service import (
     fundamental_data_service as _default_service,
 )
 from app.agents.language_utils import build_output_language_instruction
+from app.agents.specialist_analysis_utils import (
+    build_boundary_instruction,
+    detect_focus,
+    format_money_cny,
+    format_number,
+    format_percent,
+    is_missing,
+    sanitize_specialist_output,
+)
 
 log = logging.getLogger(__name__)
 
@@ -72,47 +81,27 @@ _SYSTEM_PROMPT = """\
   例如 26910000000 = 269.1 亿元。
 
 【输出格式】
-输出完整 Markdown，严格按以下结构，标题名称不得更改，不得新增或删除章节。
-子章节统一使用三级标题（###）。
+宽问题使用以下二级标题：
+## 结论摘要
+## 数据范围与报告期
+## 盈利能力
+## 成长表现
+## 现金流与财务安全
+## 估值与缺失字段
+## 观察要点
+## 风险与数据限制
 
-报告第一节必须是"摘要结论"，随后才是各详细章节：
+窄问题只输出相关章节，例如只问现金流时仅输出：
+## 结论摘要
+## 数据范围与报告期
+## 现金流与财务安全
+## 观察要点
+## 风险与数据限制
 
-### 摘要结论
-- **本面结论**：偏强 / 偏弱 / 分歧 / 数据不足 / 需观察（从基本面角度选择最符合的一项）
-- **一句话结果**：用一句话说明本次基本面分析最重要的发现。
-- **正面信号**：1. ... 2. ...（列举 1-2 个积极的基本面信号；无则写"当前无明显正面信号"）
-- **风险信号**：1. ... 2. ...（列举 1-2 个需关注的基本面风险；无则写"当前无明显风险信号"）
-- **后续观察**：1. ... 2. ...（列举 1-2 个后续值得追踪的财务指标或事件）
-- **数据可信度**：高 / 中 / 低，并简要说明原因（如报告期类型、字段缺失情况等）
+每个结论段落需体现 observed_facts / analysis / limitations / watch_items 四层边界。
+所有财务指标必须标明报告期；没有原因证据时写"当前数据无法确认具体原因"。
 
-### 一、数据概览
-- 股票代码、市场、公司名称
-- 分析报告期（必须写出 latest_report_date 及报告类型：季报/中报/年报）
-- 可用字段数量与缺失字段说明
-
-### 二、盈利能力
-- ROE（净资产收益率）—— 如缺失写"数据缺失，暂不评价"
-- 毛利率（销售毛利率）—— 如缺失写"数据缺失，暂不评价"
-- 净利率（销售净利率）—— 如缺失写"数据缺失，暂不评价"
-
-### 三、成长能力
-- 营收同比增长率 —— 如缺失写"数据缺失，暂不评价"
-- 净利润同比增长率 —— 如缺失写"数据缺失，暂不评价"
-
-### 四、财务安全与现金流
-- 资产负债率 —— 如缺失写"数据缺失，暂不评价"
-- 经营性现金流（换算为亿元展示）—— 如缺失写"数据缺失，暂不评价"
-
-### 五、估值与数据缺口
-- 说明 PE/PB/PS 等估值字段是否存在
-- 如缺失，必须写"估值数据缺失，暂不评价估值水平"
-- 汇总所有缺失字段
-
-### 六、观察要点
-- 列举 2-3 个值得关注的基本面信号（只描述客观现象，不预测方向，不给操作建议）
-- 若数据严重不足，说明当前分析的主要限制
-
-### 风险提示
+## 风险与数据限制
 仅供研究参考，不构成投资建议。基本面快照分析存在局限性，\
 单期数据不代表长期趋势，市场存在不确定性，\
 投资者需自行判断并承担投资风险。\
@@ -160,6 +149,7 @@ class FundamentalAnalystAgent:
         symbol:          str,
         output_language: str = "zh-CN",
         source_reports:  list[dict] | None = None,
+        question:        str | None = None,
     ) -> str:
         """
         生成 Markdown 基本面分析报告。
@@ -193,7 +183,14 @@ class FundamentalAnalystAgent:
             )
 
         # ── Step 2: 组装用户 Prompt ───────────────────────────────────────────
-        user_content = self._build_user_prompt(market, symbol, snapshot, output_language, source_reports or [])
+        user_content = self._build_user_prompt(
+            market,
+            symbol,
+            snapshot,
+            output_language,
+            source_reports or [],
+            question=question,
+        )
 
         # ── Step 3: 调用 LLM ──────────────────────────────────────────────────
         log.info("FundamentalAnalystAgent: calling LLM [%s/%s]", market, symbol)
@@ -201,7 +198,8 @@ class FundamentalAnalystAgent:
             {"role": "system", "content": _SYSTEM_PROMPT},
             {"role": "user",   "content": user_content},
         ]
-        return self._llm.chat(messages, temperature=0.3)
+        report = self._llm.chat(messages, temperature=0.3)
+        return sanitize_specialist_output(report, evidence_text=user_content)
 
     # ── 内部：构造用户 Prompt ─────────────────────────────────────────────────
 
@@ -212,6 +210,7 @@ class FundamentalAnalystAgent:
         snapshot: dict,
         output_language: str = "zh-CN",
         source_reports: list[dict] | None = None,
+        question: str | None = None,
     ) -> str:
         """
         将 fundamentals 快照拆分为：
@@ -264,18 +263,18 @@ class FundamentalAnalystAgent:
 
         for label, path, unit in _KEY_FIELDS:
             v = _get_val(path)
-            if v is None:
+            if is_missing(v):
                 missing.append(f"  {label}（{path}）: [缺失]")
             else:
                 # operating_cashflow: 换算为亿元
                 if path == "financial_health.operating_cashflow":
-                    display = f"{v / 1e8:.2f} 亿元（原始值 {v:.0f} 元）"
+                    display = f"{format_money_cny(v)}（原始值 {format_number(v, precision=0)} 元）"
                 elif unit == "%":
-                    display = f"{v}%"
+                    display = format_percent(v)
                 elif unit == "元":
-                    display = f"{v:,.0f} 元"
+                    display = f"{format_number(v, precision=0)} 元"
                 else:
-                    display = str(v)
+                    display = format_number(v) if isinstance(v, (int, float)) else str(v)
                     if unit:
                         display += f" {unit}"
                 available.append(f"  {label}（{path}）: {display}")
@@ -294,7 +293,7 @@ class FundamentalAnalystAgent:
             growth.get("revenue_growth_yoy"), growth.get("net_profit_growth_yoy"),
             fh.get("debt_ratio"), fh.get("operating_cashflow"),
         ]
-        n_available_financial = sum(1 for v in financial_fields if v is not None)
+        n_available_financial = sum(1 for v in financial_fields if not is_missing(v))
         is_data_insufficient  = n_available_financial == 0
 
         # ── 数据来源说明 ──────────────────────────────────────────────────────
@@ -326,10 +325,17 @@ class FundamentalAnalystAgent:
         missing_block   = "\n".join(missing)   if missing   else "  （无缺失字段）"
 
         lang_instruction = build_output_language_instruction(output_language)
+        focus = detect_focus(question)
+        boundary_instruction = build_boundary_instruction(focus)
 
         prompt = f"""\
 请对以下股票进行基本面快照分析，仅基于所提供数据，严格遵守系统提示中的所有禁止事项。
 {period_warning}{insufficient_warning}
+{boundary_instruction}
+
+【用户问题与范围】
+  question: {question or "未提供，按宽问题处理"}
+  focus: {focus}
 
 【基本信息】
   市场: {market_cn}（{market}）

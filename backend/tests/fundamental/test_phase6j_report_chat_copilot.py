@@ -59,6 +59,24 @@ def _make_rag_result(chunks: list[dict] | None = None, fallback: bool = False) -
     }
 
 
+def _make_selection(report_id: int = 1):
+    from app.agent.report_context import ReportSelection
+
+    return ReportSelection(
+        report_id=report_id,
+        symbol="600519",
+        market="CN",
+        ts_code="600519.SH",
+        stock_name="贵州茅台",
+        report_year=2023,
+        report_type="annual",
+        period_end="2023-12-31",
+        title="贵州茅台2023年年度报告",
+        disclosure_date="2024-03-30",
+        selection_reason="latest_formal_report",
+    )
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Test 1: valid financial question → allowed
 # ─────────────────────────────────────────────────────────────────────────────
@@ -163,13 +181,14 @@ async def test_no_cross_stock_retrieval():
         mock_instance.query = fake_rag_query
         MockRag.return_value = mock_instance
 
-        # Patch LLM to avoid real call
-        with patch("app.core.config.settings") as mock_settings:
-            mock_settings.ai_enabled = False
-            mock_settings.ai_api_key = None
-            await agent.chat(
-                market="CN", symbol="600519", question="主营业务是什么？", db=MagicMock()
-            )
+        with patch("app.agent.report_chat_copilot_agent.resolve_report_selection", AsyncMock(return_value=_make_selection())):
+            # Patch LLM to avoid real call
+            with patch("app.core.config.settings") as mock_settings:
+                mock_settings.ai_enabled = False
+                mock_settings.ai_api_key = None
+                await agent.chat(
+                    market="CN", symbol="600519", question="主营业务是什么？", db=MagicMock()
+                )
 
     assert len(captured_ts_code) == 1
     assert captured_ts_code[0] == "600519.SH"  # not any other stock
@@ -193,12 +212,13 @@ async def test_no_chunks_returns_partial():
         mock_instance.query = fake_rag_no_chunks
         MockRag.return_value = mock_instance
 
-        with patch("app.core.config.settings") as mock_settings:
-            mock_settings.ai_enabled = False
-            mock_settings.ai_api_key = None
-            result = await agent.chat(
-                market="CN", symbol="600519", question="主营业务？", db=MagicMock()
-            )
+        with patch("app.agent.report_chat_copilot_agent.resolve_report_selection", AsyncMock(return_value=_make_selection())):
+            with patch("app.core.config.settings") as mock_settings:
+                mock_settings.ai_enabled = False
+                mock_settings.ai_api_key = None
+                result = await agent.chat(
+                    market="CN", symbol="600519", question="主营业务？", db=MagicMock()
+                )
 
     # When LLM is disabled and no chunks, agent returns graceful fallback
     assert isinstance(result, dict)
@@ -368,12 +388,13 @@ async def test_long_question_truncated():
         mock_instance.query = fake_rag
         MockRag.return_value = mock_instance
 
-        with patch("app.core.config.settings") as mock_settings:
-            mock_settings.ai_enabled = False
-            mock_settings.ai_api_key = None
-            result = await agent.chat(
-                market="CN", symbol="600519", question=long_q, db=MagicMock()
-            )
+        with patch("app.agent.report_chat_copilot_agent.resolve_report_selection", AsyncMock(return_value=_make_selection())):
+            with patch("app.core.config.settings") as mock_settings:
+                mock_settings.ai_enabled = False
+                mock_settings.ai_api_key = None
+                result = await agent.chat(
+                    market="CN", symbol="600519", question=long_q, db=MagicMock()
+                )
 
     # Should always return a dict, never raise
     assert isinstance(result, dict)
@@ -411,15 +432,16 @@ async def test_agent_never_raises():
     async def boom(ts_code, query_text, db, **kwargs):
         raise RuntimeError("Simulated RAG service crash")
 
-    with patch("app.services.report_rag_service.ReportRagService") as MockRag:
-        mock_instance = MagicMock()
-        mock_instance.query = boom
-        MockRag.return_value = mock_instance
+    with patch("app.agent.report_chat_copilot_agent.resolve_report_selection", AsyncMock(return_value=_make_selection())):
+        with patch("app.services.report_rag_service.ReportRagService") as MockRag:
+            mock_instance = MagicMock()
+            mock_instance.query = boom
+            MockRag.return_value = mock_instance
 
-        # Should not raise; must return a dict
-        result = await agent.chat(
-            market="CN", symbol="600519", question="主营业务？", db=MagicMock()
-        )
+            # Should not raise; must return a dict
+            result = await agent.chat(
+                market="CN", symbol="600519", question="主营业务？", db=MagicMock()
+            )
 
     assert isinstance(result, dict)
     assert result.get("partial") is True

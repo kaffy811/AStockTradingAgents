@@ -25,6 +25,13 @@ from app.llm.base import BaseLLMClient
 from app.services.stock_data_service import stock_data_service
 from app.services.technical_indicator_service import technical_indicator_service
 from app.agents.language_utils import build_output_language_instruction
+from app.agents.specialist_analysis_utils import (
+    build_boundary_instruction,
+    detect_focus,
+    format_number,
+    is_missing,
+    sanitize_specialist_output,
+)
 
 log = logging.getLogger(__name__)
 
@@ -62,43 +69,29 @@ _SYSTEM_PROMPT = """\
 - quote volume 单位：股。
 
 【输出格式】
-输出完整 Markdown，严格按以下结构，标题名称不得更改，不得新增或删除章节。
-子章节统一使用三级标题（###）。
+宽问题使用以下二级标题：
+## 结论摘要
+## 行情与时间范围
+## 趋势与均线
+## 量价变化
+## 波动与关键位置
+## 短期风险
+## 观察要点
+## 数据限制
 
-报告第一节必须是"摘要结论"，随后才是各详细章节：
+窄问题只输出相关章节，例如只问成交量时仅输出：
+## 结论摘要
+## 行情与时间范围
+## 量价变化
+## 观察要点
+## 数据限制
 
-### 摘要结论
-- **本面结论**：偏强 / 偏弱 / 分歧 / 数据不足 / 需观察（从技术面角度选择最符合的一项）
-- **一句话结果**：用一句话说明本次技术面分析最重要的发现。
-- **正面信号**：1. ... 2. ...（列举 1-2 个积极的技术信号；无则写"当前无明显正面信号"）
-- **风险信号**：1. ... 2. ...（列举 1-2 个需关注的技术风险；无则写"当前无明显风险信号"）
-- **后续观察**：1. ... 2. ...（列举 1-2 个后续值得追踪的指标或价位）
-- **数据可信度**：高 / 中 / 低，并简要说明原因（如 K 线数据来源、数据根数是否充足等）
+每个结论段落需体现 observed_facts / analysis / limitations / watch_items 四层边界。
+必须明确 K 线周期和截至日期。不得把 K 线最后一根描述成实时行情，除非输入明确提供实时报价。
+支撑位和压力位只能来自输入的区间高低点，不得生成其他精确价位。
+指标冲突时明确写"信号不一致"。数据不足时不得判断长期趋势。
 
-### 一、行情概览
-- 股票代码、市场
-- 参考价格及来源（实时报价 或 K线最新收盘价（实时报价不可用））
-- 统计区间（起止日期、K线根数）
-
-### 二、均线与趋势
-- MA5、MA10、MA20、MA60 当前值（数据不足时注明"数据不足，暂不评估"）
-- 短期趋势（MA5 vs MA10）、中期趋势（MA10 vs MA20）
-- 价格相对 MA20 和 MA60 的偏离百分比
-
-### 三、量价变化
-- 近期成交量变化（5 日均量 vs 20 日均量）
-- 今日量能状态
-- 量价配合情况（须基于数据判断，不得凭空描述）
-
-### 四、短期风险
-- 近 20 日高点（压力位参考）与低点（支撑位参考）
-- 近 60 日高低点（若数据充足）
-- 近 1 日、5 日、20 日涨跌幅
-
-### 五、观察要点
-- 列举 2-3 个值得关注的技术信号（只描述客观现象，不预测方向，不给出操作建议）
-
-### 风险提示
+## 数据限制
 仅供研究参考，不构成投资建议。技术面分析存在局限性，市场存在不确定性，\
 投资者需自行判断并承担投资风险。\
 """
@@ -122,6 +115,7 @@ class TechnicalAnalystAgent:
         market:          str,
         symbol:          str,
         output_language: str = "zh-CN",
+        question:        str | None = None,
     ) -> str:
         """
         生成 Markdown 技术面分析报告。
@@ -164,6 +158,7 @@ class TechnicalAnalystAgent:
         user_content = self._build_user_prompt(
             market, symbol, bars, quote, indicators,
             output_language=output_language,
+            question=question,
         )
 
         # ── Step 5: 调用 LLM ─────────────────────────────────────────────────
@@ -172,7 +167,8 @@ class TechnicalAnalystAgent:
             {"role": "system", "content": _SYSTEM_PROMPT},
             {"role": "user",   "content": user_content},
         ]
-        return self._llm.chat(messages, temperature=0.3)
+        report = self._llm.chat(messages, temperature=0.3)
+        return sanitize_specialist_output(report, evidence_text=user_content)
 
     # ── 内部：构造用户 Prompt ─────────────────────────────────────────────────
 
@@ -184,11 +180,12 @@ class TechnicalAnalystAgent:
         quote: dict | None,
         indicators: dict,
         output_language: str = "zh-CN",
+        question: str | None = None,
     ) -> str:
         """将数据整理为结构化文本，供 LLM 阅读。output_language 控制报告语言。"""
 
         # ── 参考价格 ─────────────────────────────────────────────────────────
-        if quote and quote.get("price") is not None:
+        if quote and not is_missing(quote.get("price")):
             ref_price        = quote["price"]
             ref_price_source = "实时报价"
         else:
@@ -206,15 +203,15 @@ class TechnicalAnalystAgent:
             q_lines = []
             for label, key in [("名称", "name"), ("今开", "open"), ("今高", "high"),
                                 ("今低", "low"), ("昨收", "prev_close")]:
-                if quote.get(key) is not None:
+                if not is_missing(quote.get(key)):
                     q_lines.append(f"  {label}: {quote[key]}")
-            if quote.get("change") is not None:
+            if not is_missing(quote.get("change")):
                 q_lines.append(f"  涨跌: {quote['change']}")
-            if quote.get("change_pct") is not None:
+            if not is_missing(quote.get("change_pct")):
                 q_lines.append(f"  涨跌幅: {quote['change_pct']}%")
-            if quote.get("volume") is not None:
+            if not is_missing(quote.get("volume")):
                 q_lines.append(f"  成交量: {quote['volume']:,} 股")
-            if quote.get("amount") is not None:
+            if not is_missing(quote.get("amount")):
                 q_lines.append(
                     f"  成交额（真实）: {quote['amount']/1e8:.2f} 亿{currency}"
                 )
@@ -228,12 +225,13 @@ class TechnicalAnalystAgent:
 
         # ── 技术指标区块 ──────────────────────────────────────────────────────
         def fmt(v: object, suffix: str = "") -> str:
-            return f"{v}{suffix}" if v is not None else "数据不足"
+            return format_number(v, suffix=suffix) if not is_missing(v) else "数据不足"
 
         indicators_block = f"""\
 【技术指标】
-  K线根数: {indicators['bar_count']} 根（{first_date} → {last_date}）
-  最新收盘: {fmt(indicators['latest_close'])}
+  K线周期: 日 K
+  K线根数: {indicators['bar_count']} 根（{first_date} → {last_date}，截至日期 {last_date}）
+  最新收盘: {fmt(indicators['latest_close'])}（历史 K 线收盘价，不等同于实时价）
 
   均线（收盘价均值）:
     MA5  = {fmt(indicators['ma5'])}
@@ -272,9 +270,9 @@ class TechnicalAnalystAgent:
         for b in recent:
             est = b.get("amount_estimated")
             # 标注 [估算] 避免 LLM 误认为真实数据
-            est_str = f"{est/1e8:.2f}亿[估算]" if est is not None else "N/A"
+            est_str = f"{est/1e8:.2f}亿[估算]" if not is_missing(est) else "N/A"
             amt = b.get("amount")
-            amt_str = f"{amt/1e8:.2f}亿[真实]" if amt is not None else "—"
+            amt_str = f"{amt/1e8:.2f}亿[真实]" if not is_missing(amt) else "—"
             kline_rows.append(
                 f"  {b.get('date')} | "
                 f"开:{b.get('open')} 高:{b.get('high')} "
@@ -285,9 +283,16 @@ class TechnicalAnalystAgent:
         kline_block = "\n".join(kline_rows)
 
         lang_instruction = build_output_language_instruction(output_language)
+        focus = detect_focus(question)
+        boundary_instruction = build_boundary_instruction(focus)
 
         return f"""\
 请对以下股票进行技术面分析，仅基于所提供的数据，严格遵守系统提示中的所有禁止事项。
+{boundary_instruction}
+
+【用户问题与范围】
+  question: {question or "未提供，按宽问题处理"}
+  focus: {focus}
 
 【基本信息】
   市场: {market_cn}（{market}）

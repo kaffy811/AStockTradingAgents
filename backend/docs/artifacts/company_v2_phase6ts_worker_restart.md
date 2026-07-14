@@ -1,19 +1,14 @@
-# Phase 6T-S Secondary Artifact
+# Phase 6T-S Worker Restart Artifact
 
-```json
-{
-  "phase": "phase6ts_worker_restart",
-  "status": "passed",
-  "run_id": "0654cd6c5f834f78a90eccd44f22d471",
-  "started_at": "2026-07-14T04:58:50.281556",
-  "finished_at": "2026-07-14T05:02:34.717830",
-  "requested_duration_seconds": 180.0,
-  "actual_duration_seconds": 195.005,
-  "process_pid": 10241,
-  "git_commit": "de6d93b12bbb6e6e4bd1c3d21f5f047a9bcd0bec",
-  "worker_restart_count": 2,
-  "worker_restart_events": [],
-  "real_execution_count": 0,
-  "blocking_issues": []
-}
-```
+- `run_id`: `9548e1efb8ec4f8cb6e40d5bf62b1c1a`
+- Status: `passed`
+- Duration: `7200` seconds
+- Worker count: `2`
+- Worker restart count: `1`
+- Worker restart event: `1800.63` seconds
+- Jobs created/cancelled: `5 / 5`
+- Duplicate claims/conflicts: `0 / 0`
+- Active/stale leases at end: `0 / 0`
+- Unknown jobs modified: `0`
+- Real Fusion/provider/RAG/extractor calls: `0 / 0 / 0 / 0`
+- Stage 3 remains not authorized; Canary not started.

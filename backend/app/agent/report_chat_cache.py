@@ -35,11 +35,12 @@ def _question_hash(normalized_question: str) -> str:
     return hashlib.sha256(normalized_question.encode("utf-8")).hexdigest()[:16]
 
 
-def _filters_hash(report_types: list[str] | None, years: list[int] | None) -> str:
+def _filters_hash(report_types: list[str] | None, years: list[int] | None, report_id: int | None = None) -> str:
     """Stable hash of query filters."""
     payload = {
         "rt": sorted(report_types or []),
         "yr": sorted(years or []),
+        "rid": int(report_id) if report_id is not None else None,
     }
     s = json.dumps(payload, sort_keys=True)
     return hashlib.md5(s.encode()).hexdigest()[:8]
@@ -50,12 +51,13 @@ def make_cache_key(
     normalized_question: str,
     report_types: list[str] | None = None,
     years: list[int] | None = None,
+    report_id: int | None = None,
 ) -> str:
     """Build deterministic cache key for a report-chat query."""
     from app.core.config import settings
     version = settings.report_chat_cache_version or _CACHE_VERSION
     qh = _question_hash(normalized_question)
-    fh = _filters_hash(report_types, years)
+    fh = _filters_hash(report_types, years, report_id)
     return f"rc:{version}:{ts_code}:{qh}:{fh}"
 
 
@@ -84,6 +86,7 @@ async def read_cache(
     normalized_question: str,
     report_types: list[str] | None = None,
     years: list[int] | None = None,
+    report_id: int | None = None,
 ) -> dict | None:
     """
     Return cached chat result or None.
@@ -98,7 +101,7 @@ async def read_cache(
     if redis is None:
         return None
 
-    key = make_cache_key(ts_code, normalized_question, report_types, years)
+    key = make_cache_key(ts_code, normalized_question, report_types, years, report_id)
     try:
         raw = await redis.get(key)
         if raw is None:
@@ -119,6 +122,7 @@ async def write_cache(
     result: dict,
     report_types: list[str] | None = None,
     years: list[int] | None = None,
+    report_id: int | None = None,
     is_rejection: bool = False,
 ) -> bool:
     """
@@ -142,7 +146,7 @@ async def write_cache(
     if redis is None:
         return False
 
-    key = make_cache_key(ts_code, normalized_question, report_types, years)
+    key = make_cache_key(ts_code, normalized_question, report_types, years, report_id)
     ttl = _REJECTION_TTL if is_rejection else settings.report_chat_cache_ttl_seconds
 
     payload = dict(result)

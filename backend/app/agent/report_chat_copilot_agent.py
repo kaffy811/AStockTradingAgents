@@ -28,6 +28,8 @@ import unicodedata
 from pathlib import Path
 from typing import Any
 
+from app.agent.report_context import is_narrow_question, report_scope_line, resolve_report_selection
+
 log = logging.getLogger(__name__)
 
 _PROMPTS_DIR = Path(__file__).parent / "prompts"
@@ -226,6 +228,69 @@ def _build_chunks_context(chunks: list[dict]) -> str:
     return json.dumps(compact, ensure_ascii=False, indent=None)
 
 
+def _build_report_metadata_context(report_context: dict[str, Any]) -> str:
+    return json.dumps(
+        {
+            "symbol": report_context.get("symbol"),
+            "market": report_context.get("market"),
+            "stock_name": report_context.get("stock_name"),
+            "report_id": report_context.get("report_id"),
+            "report_year": report_context.get("report_year"),
+            "report_type": report_context.get("report_type"),
+            "period_end": report_context.get("period_end"),
+            "title": report_context.get("title"),
+            "disclosure_date": report_context.get("disclosure_date"),
+            "selection_reason": report_context.get("selection_reason"),
+            "switched_from_report_id": report_context.get("switched_from_report_id"),
+        },
+        ensure_ascii=False,
+    )
+
+
+def _format_data_limited_answer(question: str, report_context: dict[str, Any], chunks: list[dict], limitations: list[str]) -> str:
+    narrow = is_narrow_question(question)
+    scope = report_scope_line_from_dict(report_context)
+    if narrow:
+        return (
+            "## 结论\n"
+            "当前已接入资料不足以形成强结论。\n\n"
+            "## 关键数据\n"
+            "未获得可验证的结构化财务字段或足够的已审核财报片段。\n\n"
+            "## 解释\n"
+            "不能使用模型记忆补充财务数字，也不能猜测缺失字段。\n\n"
+            "## 数据限制\n"
+            + "\n".join(f"- {item}" for item in limitations)
+            + "\n\n## 来源\n"
+            + (f"- {len(chunks)} 条已检索财报片段" if chunks else "- 未检索到可引用片段")
+        )
+    return (
+        "## 结论摘要\n"
+        "当前已接入资料不足以完整回答该问题，以下仅说明报告范围和数据限制。\n\n"
+        "## 报告与数据范围\n"
+        f"- {scope}\n\n"
+        "## 关键财务表现\n"
+        "- 缺少可验证的结构化财务字段或足够的财报片段，不能编造数字。\n\n"
+        "## 现金流与财务质量\n"
+        "- 证据不足，暂不形成判断。\n\n"
+        "## 主要变化与原因\n"
+        "- 报告未提供足够证据时，不推断原因。\n\n"
+        "## 风险与数据限制\n"
+        + "\n".join(f"- {item}" for item in limitations)
+        + "\n\n## 证据来源\n"
+        + (f"- {len(chunks)} 条已检索财报片段" if chunks else "- 未检索到可引用片段")
+    )
+
+
+def report_scope_line_from_dict(report_context: dict[str, Any]) -> str:
+    return (
+        f"{report_context.get('market')}/{report_context.get('symbol')}，"
+        f"report_id={report_context.get('report_id')}，"
+        f"{report_context.get('report_year') or '未知年份'}，"
+        f"{report_context.get('report_type') or '未知类型'}，"
+        f"报告期 {report_context.get('period_end') or '未知'}"
+    )
+
+
 def _compute_rag_status(rag_result: dict) -> str:
     """
     Map RAG result metadata to a readable status string.
@@ -283,8 +348,10 @@ class ReportChatCopilotAgent:
         symbol: str,
         question: str,
         db: Any,
+        stock_name: str | None = None,
         report_types: list[str] | None = None,
         years: list[int] | None = None,
+        report_id: int | None = None,
         top_k: int = 6,
         # Phase 6K new params
         force_refresh: bool = False,
@@ -300,8 +367,10 @@ class ReportChatCopilotAgent:
                 symbol=symbol,
                 question=question,
                 db=db,
+                stock_name=stock_name,
                 report_types=report_types,
                 years=years,
+                report_id=report_id,
                 top_k=top_k,
                 force_refresh=force_refresh,
                 session_id=session_id,
@@ -317,8 +386,10 @@ class ReportChatCopilotAgent:
         symbol: str,
         question: str,
         db: Any,
+        stock_name: str | None,
         report_types: list[str] | None,
         years: list[int] | None,
+        report_id: int | None,
         top_k: int,
         force_refresh: bool,
         session_id: str | None,
@@ -412,31 +483,9 @@ class ReportChatCopilotAgent:
             ts_code = _to_ts_code(market, symbol)
         except Exception as e:
             log.warning("Could not resolve ts_code for %s/%s: %s", market, symbol, e)
-            ts_code = f"{symbol}.SH"  # fallback best-effort
+            ts_code = f"{symbol}.SH" if (market or "").upper() == "CN" else str(symbol).upper()
 
-        # ── 3. Cache read ─────────────────────────────────────────────────────
-        if not force_refresh:
-            cached = await read_cache(
-                ts_code=ts_code,
-                normalized_question=normalized_question,
-                report_types=report_types,
-                years=years,
-            )
-            if cached is not None:
-                log.debug("Cache HIT for %s question=%r", ts_code, normalized_question[:40])
-                # Inject fresh safety/memory meta into cached response
-                cached["safety_meta"] = safety_meta
-                # Reload turns count for display even on cache hit
-                if use_memory and session_id:
-                    turns = await load_memory(session_id, ts_code)
-                    cached["memory_meta"] = memory_meta_dict(session_id, len(turns), False)
-                else:
-                    cached.setdefault("memory_meta", memory_meta_dict(session_id, 0, False))
-                return cached
-
-        cache_meta = _empty_cache_meta()
-
-        # ── 4. Load session memory ────────────────────────────────────────────
+        # ── 3. Load session memory before report selection/cache ─────────────
         memory_turns: list[dict] = []
         memory_context_used = False
 
@@ -446,6 +495,85 @@ class ReportChatCopilotAgent:
             except Exception as e:
                 log.debug("Session memory load failed: %s", e)
                 memory_turns = []
+
+        # ── 4. Resolve report selection ──────────────────────────────────────
+        try:
+            selection = await resolve_report_selection(
+                db=db,
+                market=market,
+                symbol=symbol,
+                stock_name=stock_name,
+                question=normalized_question,
+                report_id=report_id,
+                report_types=report_types,
+                years=years,
+                memory_turns=memory_turns,
+            )
+        except Exception as e:
+            log.warning("Report selection failed for %s/%s: %s", market, symbol, e)
+            selection = None
+
+        if selection is None:
+            return {
+                "answer": "无法确定本次要使用的财报，请提供明确的股票代码和 report_id 或报告年份。",
+                "source_chunks": [],
+                "review_audit": {},
+                "rag_status": "unavailable",
+                "confidence": "low",
+                "evidence_used": [],
+                "data_limitations": ["报告选择失败，未进入财报解释"],
+                "disclaimer": "本内容基于已接入的公开财报片段，仅供参考，不构成投资建议。",
+                "errors": ["report_selection_failed"],
+                "partial": True,
+                "cache_meta": _empty_cache_meta(),
+                "memory_meta": memory_meta_dict(session_id, len(memory_turns), False),
+                "safety_meta": safety_meta,
+            }
+
+        if not selection.ok:
+            return {
+                "answer": selection.error or "无法确定本次要使用的财报。",
+                "source_chunks": [],
+                "review_audit": {},
+                "rag_status": "unavailable",
+                "confidence": "low",
+                "evidence_used": [],
+                "data_limitations": [selection.error or "报告选择失败"],
+                "disclaimer": "本内容基于已接入的公开财报片段，仅供参考，不构成投资建议。",
+                "errors": [selection.selection_reason],
+                "partial": True,
+                "cache_meta": _empty_cache_meta(),
+                "memory_meta": {
+                    **memory_meta_dict(session_id, len(memory_turns), False),
+                    "report_context": selection.metadata(),
+                },
+                "safety_meta": safety_meta,
+            }
+
+        selected_report_id = selection.report_id
+        selected_report_types = [selection.report_type] if selection.report_type else report_types
+        selected_years = [selection.report_year] if selection.report_year else years
+        report_context = selection.metadata()
+
+        # ── 5. Cache read ─────────────────────────────────────────────────────
+        if not force_refresh:
+            cached = await read_cache(
+                ts_code=ts_code,
+                normalized_question=normalized_question,
+                report_types=selected_report_types,
+                years=selected_years,
+                report_id=selected_report_id,
+            )
+            if cached is not None:
+                log.debug("Cache HIT for %s question=%r", ts_code, normalized_question[:40])
+                cached["safety_meta"] = safety_meta
+                cached["memory_meta"] = {
+                    **memory_meta_dict(session_id, len(memory_turns), False),
+                    "report_context": report_context,
+                }
+                return cached
+
+        cache_meta = _empty_cache_meta()
 
         # ── 5. Expand query for RAG (conversation-aware) ──────────────────────
         expanded_query = _expand_query(normalized_question, memory_turns)
@@ -461,8 +589,9 @@ class ReportChatCopilotAgent:
                 ts_code=ts_code,
                 query_text=expanded_query,
                 db=db,
-                report_types=report_types,
-                years=years,
+                report_types=selected_report_types,
+                years=selected_years,
+                report_id=selected_report_id,
                 top_k=top_k,
             )
             chunks = rag_result.get("chunks", []) or []
@@ -480,6 +609,7 @@ class ReportChatCopilotAgent:
         # ── 8. Build LLM prompt (with session memory context) ─────────────────
         system_prompt = _load_system_prompt()
         chunks_json = _build_chunks_context(chunks)
+        report_metadata_json = _build_report_metadata_context(report_context)
 
         # Inject conversation history if available
         memory_context_block = build_memory_context_prompt(memory_turns)
@@ -492,10 +622,13 @@ class ReportChatCopilotAgent:
         user_prompt = (
             f"股票代码（ts_code）：{ts_code}\n\n"
             f"用户问题：{normalized_question}\n"
+            f"\n本次选定报告（report_metadata）：\n{report_metadata_json}\n"
+            "\n结构化财务字段（structured_financial_data）：\n[]\n"
+            "\nreview_audit：将在模型输出后由系统审核；模型不得假设审核通过。\n"
             f"{memory_section}"
             f"\n已接入财报片段（source_chunks，共 {len(chunks)} 条）：\n"
             f"{chunks_json}\n\n"
-            "请严格基于以上财报片段回答问题，输出合法 JSON（不带代码块标记）。"
+            "请严格基于 report_metadata、structured_financial_data、source_chunks 和会话上下文回答问题，输出合法 JSON（不带代码块标记）。"
         )
 
         messages = [
@@ -540,21 +673,26 @@ class ReportChatCopilotAgent:
 
         # If LLM completely failed, build a graceful fallback
         if llm_error or not raw_llm_result:
+            limitations = ["AI 服务暂时不可用"]
+            if not chunks:
+                limitations.insert(0, "当前未检索到相关财报片段")
             return {
                 "answer": (
-                    "AI 分析服务暂时不可用。" +
-                    ("当前已接入资料不足以判断此问题。" if not chunks else
-                     f"已检索到 {len(chunks)} 条相关财报片段，但 AI 分析暂时无法处理。")
+                    "AI 分析服务暂时不可用。"
+                    + _format_data_limited_answer(normalized_question, report_context, chunks, limitations)
                 ),
                 "source_chunks": [],
                 "review_audit": {},
                 "rag_status": rag_status,
                 "confidence": "low",
-                "data_limitations": ["AI 服务暂时不可用"],
+                "data_limitations": limitations,
                 "errors": errors,
                 "partial": True,
                 "cache_meta":  cache_meta,
-                "memory_meta": memory_meta_dict(session_id, len(memory_turns), memory_context_used),
+                "memory_meta": {
+                    **memory_meta_dict(session_id, len(memory_turns), memory_context_used),
+                    "report_context": report_context,
+                },
                 "safety_meta": safety_meta,
             }
 
@@ -606,19 +744,28 @@ class ReportChatCopilotAgent:
         review_status = review_result.get("status", "approved")
         if review_status == "rejected":
             answer = (
-                "您的问题涉及本系统不支持的内容（如投资建议或违禁词汇）。"
-                "本系统仅提供基于公开财报的客观信息查询。"
+                "## 结论摘要\n"
+                "证据审核未通过，不能生成强结论。\n\n"
+                "## 报告与数据范围\n"
+                f"- {report_scope_line(selection)}\n\n"
+                "## 风险与数据限制\n"
+                "- 已保留可验证事实，但删除或降级了不符合证据规则的内容。\n\n"
+                "## 证据来源\n"
+                "- 仅限已审核通过的财报片段。"
             )
-            source_chunks_out = []
-            confidence = "high"
+            confidence = "low"
+            data_limitations = list(data_limitations or [])
+            if "证据审核未通过，强结论已降级" not in data_limitations:
+                data_limitations.insert(0, "证据审核未通过，强结论已降级")
 
         if not chunks and "当前已接入资料不足" not in answer:
             if "当前未检索到相关财报片段" not in (data_limitations or []):
                 data_limitations = list(data_limitations or [])
-                data_limitations.insert(0, "当前未检索到相关财报片段，答案基于通用财务知识")
+                data_limitations.insert(0, "当前未检索到相关财报片段，不能编造财务数字")
+                answer = _format_data_limited_answer(normalized_question, report_context, chunks, data_limitations)
 
         is_rejection = review_status == "rejected" or classification == "rejected"
-        partial = bool(errors) or rag_result.get("partial", False)
+        partial = bool(errors) or rag_result.get("partial", False) or review_status not in {"approved", "revised", "skipped"}
 
         result = {
             "answer":           answer,
@@ -632,7 +779,10 @@ class ReportChatCopilotAgent:
             "errors":           errors,
             "partial":          partial,
             "cache_meta":       cache_meta,
-            "memory_meta":      memory_meta_dict(session_id, len(memory_turns), memory_context_used),
+            "memory_meta": {
+                **memory_meta_dict(session_id, len(memory_turns), memory_context_used),
+                "report_context": report_context,
+            },
             "safety_meta":      safety_meta,
         }
 
@@ -642,8 +792,9 @@ class ReportChatCopilotAgent:
                 ts_code=ts_code,
                 normalized_question=normalized_question,
                 result=result,
-                report_types=report_types,
-                years=years,
+                report_types=selected_report_types,
+                years=selected_years,
+                report_id=selected_report_id,
                 is_rejection=is_rejection,
             )
             # Refresh cache_meta in the returned result (key was computed inside write_cache)
@@ -653,7 +804,7 @@ class ReportChatCopilotAgent:
             _ttl = 60 if is_rejection else _settings.report_chat_cache_ttl_seconds
             result["cache_meta"] = {
                 "hit":         False,
-                "key":         make_cache_key(ts_code, normalized_question, report_types, years),
+                "key":         make_cache_key(ts_code, normalized_question, selected_report_types, selected_years, selected_report_id),
                 "ttl_seconds": _ttl,
                 "created_at":  int(_time.time()),
             }
@@ -664,6 +815,7 @@ class ReportChatCopilotAgent:
                 ts_code=ts_code,
                 question=normalized_question,
                 answer=answer,
+                metadata={"report_context": report_context},
             )
 
         return result

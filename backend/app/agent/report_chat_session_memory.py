@@ -40,7 +40,7 @@ async def _get_redis() -> Any | None:
         return None
 
 
-def _make_turn(question: str, answer: str) -> str:
+def _make_turn(question: str, answer: str, metadata: dict | None = None) -> str:
     """Serialize a (question, answer) turn to a JSON string."""
     snippet = answer[:_ANSWER_SNIPPET_LEN] if answer else ""
     turn = {
@@ -48,6 +48,8 @@ def _make_turn(question: str, answer: str) -> str:
         "a":  snippet,
         "ts": int(time.time()),
     }
+    if metadata:
+        turn["report_context"] = metadata.get("report_context") or metadata
     return json.dumps(turn, ensure_ascii=False)
 
 
@@ -93,6 +95,7 @@ async def append_turn(
     ts_code: str,
     question: str,
     answer: str,
+    metadata: dict | None = None,
 ) -> bool:
     """
     Append a new turn to the conversation history for (session_id, ts_code).
@@ -114,7 +117,7 @@ async def append_turn(
     ttl = settings.report_chat_memory_ttl_seconds
 
     try:
-        turn_json = _make_turn(question, answer)
+        turn_json = _make_turn(question, answer, metadata)
         pipe = redis.pipeline()
         pipe.rpush(key, turn_json)
         # Keep only the last max_turns turns (trim from left if list is longer)
@@ -151,6 +154,14 @@ def build_memory_context_prompt(turns: list[dict]) -> str:
             lines.append(f"用户: {q}")
         if a:
             lines.append(f"助手: {a}")
+        report_context = t.get("report_context")
+        if isinstance(report_context, dict) and report_context.get("report_id"):
+            lines.append(
+                "报告上下文: "
+                f"report_id={report_context.get('report_id')}, "
+                f"period={report_context.get('period_end')}, "
+                f"type={report_context.get('report_type')}"
+            )
     return "\n".join(lines)
 
 

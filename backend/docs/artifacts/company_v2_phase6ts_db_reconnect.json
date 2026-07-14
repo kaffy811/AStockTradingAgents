@@ -1,16 +1,32 @@
 {
   "phase": "phase6ts_db_reconnect",
   "status": "passed",
-  "run_id": "0654cd6c5f834f78a90eccd44f22d471",
-  "started_at": "2026-07-14T04:58:50.281556",
-  "finished_at": "2026-07-14T05:02:34.717830",
-  "requested_duration_seconds": 180.0,
-  "actual_duration_seconds": 195.005,
-  "process_pid": 10241,
-  "git_commit": "de6d93b12bbb6e6e4bd1c3d21f5f047a9bcd0bec",
-  "db_disconnect_count": 0,
-  "db_reconnect_count": 0,
-  "db_reconnect_events": [],
+  "run_id": "9548e1efb8ec4f8cb6e40d5bf62b1c1a",
+  "duration_seconds": 7200,
+  "requested_duration_seconds": 7200,
+  "actual_duration_seconds": 7200,
+  "worker_count": 2,
+  "jobs_created": 5,
+  "jobs_cancelled": 5,
+  "duplicate_claim_count": 0,
+  "simultaneous_claim_conflicts": 0,
+  "unknown_jobs_modified": 0,
+  "active_leases_peak": 2,
+  "active_leases_end": 0,
+  "stale_leases_end": 0,
+  "db_disconnect_count": 1,
+  "db_reconnect_count": 1,
+  "db_reconnect_events": [
+    {
+      "at_seconds": 3601.36,
+      "disposed": true
+    }
+  ],
   "real_execution_count": 0,
-  "blocking_issues": []
+  "provider_call_count": 0,
+  "rag_query_count": 0,
+  "extractor_call_count": 0,
+  "fusion_result_write_count": 0,
+  "blocking_issues": [],
+  "errors": []
 }
