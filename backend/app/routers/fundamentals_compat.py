@@ -445,15 +445,33 @@ async def get_module_diagnostics(
     _use_bs_inference = (_data_mode == "free" and market == "CN" and _enable_baostock)
 
     def _inferred_baostock(module_key: str) -> dict:
-        """Config-based inference: BaoStock available → module has data."""
+        """Config-based diagnostic placeholder; never reports data success."""
+        try:
+            from app.datasource.baostock_client import baostock_import_status
+            available, import_error = baostock_import_status()
+        except Exception as exc:
+            available, import_error = False, f"{type(exc).__name__}: {exc}"
+        if not available:
+            return {
+                "module_key":       module_key,
+                "status":           "failed",
+                "rows_count":       0,
+                "non_null_fields":  [],
+                "latency_ms":       0,
+                "provider_success": None,
+                "inferred":         False,
+                "reason_code":      "PROVIDER_UNAVAILABLE",
+                "error":            import_error or "baostock import unavailable",
+            }
         return {
             "module_key":       module_key,
-            "status":           "ok",
-            "rows_count":       1,  # inferred; actual count loaded on demand
+            "status":           "empty",
+            "rows_count":       0,
             "non_null_fields":  [],
             "latency_ms":       0,
-            "provider_success": "baostock",
+            "provider_success": None,
             "inferred":         True,
+            "reason_code":      "PROBE_SKIPPED_BAOSTOCK_SERIALIZED",
         }
 
     # 并发探针非 BaoStock 模块；BaoStock 模块在 free+CN 下直接推断
@@ -472,6 +490,7 @@ async def get_module_diagnostics(
     # 单独探针 report_documents + RAG 状态（DB 查询）
     rd_count    = 0
     rc_count    = 0   # report_chunks
+    cv2_chunk_count = 0
     emb_count   = 0   # chunks with non-null embedding
     rd_status   = "failed"
     rag_status  = "unknown"
@@ -489,6 +508,19 @@ async def get_module_diagnostics(
             {"ts_code": ts_code},
         )).scalar() or 0
 
+        cv2_chunk_count = (await db.execute(
+            text("""
+                SELECT COUNT(*)
+                FROM company_v2_report_rag_chunks c
+                JOIN company_v2_report_rag_documents d ON d.id = c.rag_document_id
+                WHERE d.symbol = :symbol
+                  AND d.active_index = 1
+                  AND d.deleted_at IS NULL
+                  AND d.status IN ('indexed', 'partial')
+            """),
+            {"symbol": symbol},
+        )).scalar() or 0
+
         emb_count = (await db.execute(
             text("SELECT COUNT(*) FROM report_chunks WHERE ts_code = :ts_code AND embedding IS NOT NULL"),
             {"ts_code": ts_code},
@@ -496,7 +528,9 @@ async def get_module_diagnostics(
 
         rd_status  = "ok" if rd_count > 0 else "empty"
         # RAG ready = has chunks with embeddings
-        if rc_count > 0 and emb_count > 0:
+        if cv2_chunk_count > 0:
+            rag_status = "ready"
+        elif rc_count > 0 and emb_count > 0:
             rag_status = "ready"
         elif rd_count > 0:
             rag_status = "not_indexed"   # docs exist but no chunks/embeddings yet
@@ -519,6 +553,7 @@ async def get_module_diagnostics(
             "documents_count": rd_count,
             "chunks_count":    rc_count,
             "embedding_count": emb_count,
+            "company_v2_chunks_count": cv2_chunk_count,
         },
     })
 

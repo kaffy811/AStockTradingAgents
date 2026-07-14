@@ -11,6 +11,7 @@ app/services/report_rag_service.py — 财报 RAG 检索服务（Phase 6F / 6G�
 """
 from __future__ import annotations
 
+import asyncio
 import logging
 from typing import Optional
 
@@ -101,6 +102,29 @@ class ReportRagService:
                 search_mode = "keyword"
             except Exception as e:
                 errors.append(f"keyword search failed: {str(e)[:100]}")
+
+        if not results and report_id is not None:
+            company_v2_result = await self._company_v2_search(
+                ts_code=ts_code,
+                query_text=query_text,
+                report_id=report_id,
+                years=years,
+                top_k=top_k,
+            )
+            company_v2_chunks = company_v2_result.get("chunks", [])
+            if company_v2_chunks:
+                return {
+                    "chunks": company_v2_chunks,
+                    "partial": len(errors) > 0,
+                    "errors": errors,
+                    "search_mode": company_v2_result.get("search_mode", "company_v2_hybrid"),
+                    "total": len(company_v2_chunks),
+                    "fallback_used": True,
+                    "provider": "company_v2_report_rag",
+                    "selected_report_id": report_id,
+                }
+            if company_v2_result.get("error_code"):
+                errors.append(f"company_v2_rag unavailable: {company_v2_result['error_code']}")
 
         chunks_out = []
         for r in results:
@@ -231,6 +255,58 @@ class ReportRagService:
             "section_title": chunk.section_title,
             "content":       content,
             "has_embedding": chunk.embedding is not None,
+        }
+
+    async def _company_v2_search(
+        self,
+        *,
+        ts_code: str,
+        query_text: str,
+        report_id: int,
+        years: Optional[list[int]],
+        top_k: int,
+    ) -> dict:
+        """Bridge legacy report chat retrieval to Company V2 report RAG by report_id."""
+        symbol = (ts_code or "").split(".")[0]
+        report_year = int(years[0]) if years else None
+        try:
+            from app.services.company_v2_report_rag_retriever import company_v2_report_rag_retriever
+
+            result = await asyncio.to_thread(
+                company_v2_report_rag_retriever.retrieve,
+                report_id=int(report_id),
+                question=query_text,
+                top_k=top_k,
+                symbol=symbol or None,
+                report_year=report_year,
+            )
+        except Exception as exc:
+            log.warning("Company V2 report RAG bridge failed for report_id=%s: %s", report_id, exc)
+            return {"chunks": [], "error_code": "COMPANY_V2_RAG_FAILED"}
+
+        chunks = []
+        for item in result.get("chunks") or []:
+            chunks.append({
+                "chunk_id": item.get("chunk_id"),
+                "report_id": item.get("report_id") or report_id,
+                "ts_code": ts_code,
+                "report_type": item.get("report_type"),
+                "report_year": item.get("report_year"),
+                "period": str(item.get("report_year") or ""),
+                "chunk_index": item.get("chunk_id"),
+                "section_title": item.get("section_title"),
+                "content": item.get("text_excerpt") or "",
+                "score": item.get("score"),
+                "score_detail": item.get("score_detail"),
+                "page_start": item.get("page_start"),
+                "page_end": item.get("page_end"),
+                "source_url": item.get("source_url"),
+                "has_embedding": bool((item.get("score_detail") or {}).get("embedding_score")),
+            })
+        return {
+            "chunks": chunks,
+            "search_mode": result.get("retrieval_mode") or "company_v2_hybrid",
+            "error_code": result.get("error_code"),
         }
 
 

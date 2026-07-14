@@ -239,6 +239,9 @@ async def build_company_history_dashboard(
             },
             "data_success": mdata.get("data_success", False),
             "provider": mdata.get("provider", "baostock"),
+            "provider_status": mdata.get("provider_status"),
+            "reason_code": mdata.get("reason_code"),
+            "errors": mdata.get("errors", []),
         }
     validation_latency_ms = int((time.perf_counter() - t0) * 1000)
 
@@ -309,6 +312,9 @@ async def build_company_history_dashboard(
         "years_completed": provider_stats.get("years_completed", []),
         "valid_quarters_total": provider_stats.get("valid_quarters_total", len(valid_quarters or [])),
         "provider_history_clamped_to_2007": provider_stats.get("provider_history_clamped_to_2007", False),
+        "status": provider_stats.get("status"),
+        "reason_code": provider_stats.get("reason_code"),
+        "errors": provider_stats.get("errors", []),
         "cache_hit": False,
     }
     if data_success_count > 0:

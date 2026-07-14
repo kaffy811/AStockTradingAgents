@@ -33,7 +33,11 @@ _SIMPLE_GREETING = re.compile(
 # Skill-level data limitation notice (prepended when tools had no data)
 _DATA_LIMIT_NOTICE = "\n\n> **数据说明：** 本次回答基于现有参考资料，部分实时工具数据不可用，结论仅供参考。"
 
-_REPORT_INTENT = re.compile(r"report_id|解释.{0,6}报告|报告.{0,6}(解释|结论|风险|内容)|最近.{0,4}报告|这份报告|报告里", re.IGNORECASE)
+_REPORT_INTENT = re.compile(
+    r"report_id|解释.{0,6}报告|报告.{0,6}(解释|结论|风险|内容)|最近.{0,4}报告|这份报告|报告里"
+    r"|财报|年报|半年报|季报|一季报|三季报|年度报告|半年度报告|季度报告",
+    re.IGNORECASE,
+)
 _NEWS_INTENT = re.compile(r"新闻|消息|公告|利好|利空|催化|哪一条影响最大", re.IGNORECASE)
 _ANOMALY_INTENT = re.compile(r"异动|为什么.*(涨|跌)|大涨|大跌|涨停|跌停|放量|缩量", re.IGNORECASE)
 _RISK_INTENT = re.compile(r"风险|暴雷|黑天鹅|最大.*不确定|不确定性", re.IGNORECASE)

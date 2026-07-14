@@ -10,6 +10,7 @@ BaoStock 是免费 A 股数据源，无需付费订阅。
 from __future__ import annotations
 
 import asyncio
+import importlib.util
 import io
 import logging
 import sys
@@ -23,6 +24,17 @@ log = logging.getLogger(__name__)
 # Serialize all sync calls with a module-level asyncio lock so concurrent async
 # callers don't interleave login/logout → "Bad file descriptor".
 _bs_lock: asyncio.Lock | None = None
+
+
+def baostock_import_status() -> tuple[bool, str | None]:
+    """Return whether the runtime can import BaoStock without importing it."""
+    try:
+        spec = importlib.util.find_spec("baostock")
+    except (ImportError, ValueError) as exc:
+        return False, f"{type(exc).__name__}: {exc}"
+    if spec is None:
+        return False, "No module named 'baostock'"
+    return True, None
 
 
 def _get_bs_lock() -> asyncio.Lock:
@@ -807,6 +819,9 @@ class BaoStockClient:
         quarter_sig = ",".join(f"{y}Q{q}" for y, q in year_quarters_all) or "none"
 
         stats: dict[str, Any] = {
+            "status": "pending",
+            "reason_code": None,
+            "errors": [],
             "mode": mode,
             "requested_start_year": requested_start,
             "effective_start_year": start_year,
@@ -830,7 +845,17 @@ class BaoStockClient:
             "last_successful_operation": "",
         }
         empty = {k: [] for k in _BULK_TABLE_KEYS}
+        available, import_error = baostock_import_status()
+        if not available:
+            stats.update({
+                "status": "unavailable",
+                "reason_code": "PROVIDER_UNAVAILABLE",
+                "errors": [import_error or "baostock import unavailable"],
+            })
+            log.warning("BaoStock unavailable for history bulk [%s]: %s", ts_code, import_error)
+            return {**map_aggregate_raw(ts_code, empty), "_bulk_stats": stats}
         if not years:
+            stats.update({"status": "empty", "reason_code": "NO_REQUESTED_YEARS"})
             return {**map_aggregate_raw(ts_code, empty), "_bulk_stats": stats}
 
         from app.services.company_v2_snapshot_cache_service import (
@@ -918,6 +943,34 @@ class BaoStockClient:
                     for year, tables in by_year.items():
                         fetched_by_year[year] = tables
 
+                missing_years = [year for year in uncached_years if year not in fetched_by_year]
+                if missing_years:
+                    missing_quarters = [
+                        (y, q) for y, q in year_quarters_all if y in set(missing_years)
+                    ]
+                    try:
+                        async with _get_bs_lock():
+                            serial_result = await asyncio.to_thread(
+                                _bulk_fetch_years_worker,
+                                bs_code,
+                                missing_quarters,
+                            )
+                        stats["login_batches"] = max(1, stats["login_batches"]) + 1
+                        by_year, calls, calls_by_endpoint = serial_result
+                        stats["provider_calls"] += calls
+                        stats["actual_calls"] += calls
+                        for endpoint, count in calls_by_endpoint.items():
+                            stats["calls_by_endpoint"][endpoint] = stats["calls_by_endpoint"].get(endpoint, 0) + count
+                        for year, tables in by_year.items():
+                            fetched_by_year[year] = tables
+                    except ImportError as exc:
+                        stats["errors"].append(f"PROVIDER_UNAVAILABLE: {exc}")
+                        stats["reason_code"] = "PROVIDER_UNAVAILABLE"
+                        log.warning("bulk fetch serial fallback unavailable [%s]: %s", ts_code, exc)
+                    except Exception as exc:
+                        stats["errors"].append(f"serial fallback failed: {str(exc)[:160]}")
+                        log.warning("bulk fetch serial fallback failed [%s]: %s", ts_code, exc)
+
                 for year in uncached_years:
                     tables = fetched_by_year.get(year)
                     if tables is None:
@@ -950,6 +1003,14 @@ class BaoStockClient:
 
             stats["cache_hit"] = stats["years_from_cache"] == len(years) and len(years) > 0
             stats["years_completed"] = sorted(set(stats["years_completed"]))
+            if stats["years_completed"]:
+                stats["status"] = "success" if len(stats["years_completed"]) == len(years) else "partial"
+                if stats["status"] == "partial" and not stats.get("reason_code"):
+                    stats["reason_code"] = "PARTIAL_PROVIDER_DATA"
+            else:
+                stats["status"] = "empty"
+                if not stats.get("reason_code"):
+                    stats["reason_code"] = "PROVIDER_EMPTY"
             mapped = map_aggregate_raw(ts_code, merged_raw)
             if mode == "quarterly" and (stats["years_from_cache"] or stats["years_fetched"]):
                 try:

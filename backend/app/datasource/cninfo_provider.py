@@ -38,6 +38,7 @@ _ALLOWED_PDF_HOSTS = frozenset([
 
 # ── CNINFO API ──────────────────────────────────────────────────────────────
 _QUERY_URL = "http://www.cninfo.com.cn/new/hisAnnouncement/query"
+_QUERY_ENDPOINT_SCHEME_REASON = "CNINFO hisAnnouncement endpoint rejects HTTPS in some environments; PDF URLs remain HTTPS-only"
 _FULLTEXT_URL = "http://www.cninfo.com.cn/new/fulltextSearch/full"
 _PDF_BASE = "https://static.cninfo.com.cn/"
 _TIMEOUT_SECONDS = 10.0
@@ -131,6 +132,59 @@ _REPORT_TYPE_CONFIG: dict[str, dict] = {
     },
 }
 
+_LEGACY_REPORT_TYPE_MAP = {
+    "annual": "annual",
+    "annual_report": "annual",
+    "semi": "semi_annual",
+    "semi_annual": "semi_annual",
+    "semi_annual_report": "semi_annual",
+    "quarterly_report": "q3",
+    "q1": "q1",
+    "q1_report": "q1",
+    "q3": "q3",
+    "q3_report": "q3",
+}
+
+
+def normalize_report_type(report_type: str) -> str:
+    """Normalize legacy/public report type names to canonical CNINFO types."""
+    return _LEGACY_REPORT_TYPE_MAP.get((report_type or "").strip(), (report_type or "").strip())
+
+
+def categories_for_report_type(report_type: str) -> list[str]:
+    canonical = normalize_report_type(report_type)
+    cfg = _REPORT_TYPE_CONFIG.get(canonical)
+    if cfg:
+        return list(cfg["categories"])
+    compat = _CATEGORY_COMPAT.get(canonical)
+    return [compat] if compat else []
+
+
+def period_from_type_year(report_type: str, report_year: int) -> str:
+    canonical = normalize_report_type(report_type)
+    suffix = {
+        "annual": "1231",
+        "semi_annual": "0630",
+        "q1": "0331",
+        "q3": "0930",
+    }.get(canonical, "1231")
+    return f"{int(report_year)}{suffix}"
+
+
+def cninfo_request_contract(symbol: str, report_type: str, *, category: str | None = None) -> dict[str, str]:
+    """Expose canonical CNINFO request contract for adapters/tests."""
+    categories = categories_for_report_type(report_type)
+    return {
+        "query_url": _QUERY_URL,
+        "query_endpoint_scheme": urlparse(_QUERY_URL).scheme,
+        "query_endpoint_scheme_reason": _QUERY_ENDPOINT_SCHEME_REASON,
+        "referer": _HEADERS["Referer"],
+        "column": _exchange_column(symbol),
+        "category": category or (categories[0] if categories else ""),
+        "timeout_seconds": str(_TIMEOUT_SECONDS),
+        "max_retries": str(_MAX_RETRIES),
+    }
+
 
 def _exchange_column(stock_code: str) -> str:
     if stock_code.startswith(("6", "5")):
@@ -196,8 +250,8 @@ def validate_pdf_url(url: str) -> tuple[bool, str]:
     if not url:
         return False, "empty URL"
     parsed = urlparse(url)
-    # Scheme check
-    if parsed.scheme not in ("http", "https"):
+    # Scheme check: canonical report PDFs must be HTTPS.
+    if parsed.scheme != "https":
         return False, f"scheme {parsed.scheme!r} not allowed"
     # Host whitelist
     host = (parsed.hostname or "").lower()
@@ -211,6 +265,88 @@ def validate_pdf_url(url: str) -> tuple[bool, str]:
     if re.match(r"^(127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)", host or ""):
         return False, "internal address blocked"
     return True, "ok"
+
+
+async def search_announcements_with_diagnostics(
+    symbol: str,
+    *,
+    org_id: str | None = None,
+    start_date: str = "",
+    end_date: str = "",
+    category: str = "category_ndbg_szsh",
+    page: int = 1,
+    page_size: int = 20,
+) -> dict[str, Any]:
+    """Canonical CNINFO query with structured provider diagnostics."""
+    column = _exchange_column(symbol)
+    form_data: dict[str, str] = {
+        "stock":     symbol,
+        "tabName":   "fulltext",
+        "pageNum":   str(page),
+        "pageSize":  str(page_size),
+        "column":    column,
+        "category":  category,
+        "isHLtitle": "true",
+    }
+    if org_id and org_id != "ORG_ID_NOT_FOUND":
+        form_data["orgId"] = org_id
+    if start_date and end_date:
+        form_data["seDate"] = f"{start_date}~{end_date}"
+
+    diagnostics = {
+        "status": "pending",
+        "reason_code": None,
+        "endpoint": _QUERY_URL,
+        "query_endpoint_scheme": urlparse(_QUERY_URL).scheme,
+        "query_endpoint_scheme_reason": _QUERY_ENDPOINT_SCHEME_REASON,
+        "column": column,
+        "category": category,
+        "raw_rows_count": 0,
+        "errors": [],
+    }
+    await asyncio.sleep(_RATE_LIMIT_SECONDS)
+    for attempt in range(_MAX_RETRIES + 1):
+        try:
+            async with httpx.AsyncClient(
+                headers=_HEADERS,
+                timeout=_TIMEOUT_SECONDS,
+                follow_redirects=True,
+            ) as client:
+                resp = await client.post(_QUERY_URL, data=form_data)
+                if resp.status_code == 404:
+                    diagnostics.update({"status": "empty", "reason_code": "PROVIDER_EMPTY"})
+                    return {"announcements": [], "diagnostics": diagnostics}
+                resp.raise_for_status()
+                data = resp.json()
+                announcements = data.get("announcements") or []
+                diagnostics["raw_rows_count"] = len(announcements)
+                diagnostics["status"] = "success" if announcements else "empty"
+                diagnostics["reason_code"] = None if announcements else "PROVIDER_EMPTY"
+                return {"announcements": announcements, "diagnostics": diagnostics}
+        except httpx.TimeoutException as exc:
+            diagnostics["errors"].append(f"timeout:{str(exc)[:120]}")
+            if attempt < _MAX_RETRIES:
+                await asyncio.sleep(2 ** attempt)
+                continue
+            diagnostics.update({"status": "timeout", "reason_code": "PROVIDER_TIMEOUT"})
+            return {"announcements": [], "diagnostics": diagnostics}
+        except httpx.ConnectError as exc:
+            diagnostics["errors"].append(f"connect_error:{str(exc)[:120]}")
+            if attempt < _MAX_RETRIES:
+                await asyncio.sleep(2 ** attempt)
+                continue
+            diagnostics.update({"status": "connect_error", "reason_code": "PROVIDER_CONNECT_ERROR"})
+            return {"announcements": [], "diagnostics": diagnostics}
+        except httpx.HTTPStatusError as exc:
+            diagnostics["errors"].append(f"http_error:{exc.response.status_code}")
+            diagnostics.update({"status": "http_error", "reason_code": "PROVIDER_HTTP_ERROR"})
+            return {"announcements": [], "diagnostics": diagnostics}
+        except Exception as exc:
+            diagnostics["errors"].append(f"unexpected:{type(exc).__name__}")
+            diagnostics.update({"status": "failed", "reason_code": "PROVIDER_FAILED"})
+            return {"announcements": [], "diagnostics": diagnostics}
+    diagnostics.update({"status": "failed", "reason_code": "PROVIDER_FAILED"})
+    return {"announcements": [], "diagnostics": diagnostics}
 
 
 def resolve_pdf_url(announcement: dict[str, Any]) -> str | None:
@@ -344,49 +480,25 @@ async def search_announcements(
     Returns:
         原始公告 dict 列表（可能为空）
     """
-    column = _exchange_column(symbol)
-    form_data: dict[str, str] = {
-        "stock":     symbol,
-        "tabName":   "fulltext",
-        "pageNum":   str(page),
-        "pageSize":  str(page_size),
-        "column":    column,
-        "category":  category,
-        "isHLtitle": "true",
-    }
-    if org_id and org_id != "ORG_ID_NOT_FOUND":
-        form_data["orgId"] = org_id
-    if start_date and end_date:
-        form_data["seDate"] = f"{start_date}~{end_date}"
-
-    await asyncio.sleep(_RATE_LIMIT_SECONDS)
-    for attempt in range(_MAX_RETRIES + 1):
-        try:
-            async with httpx.AsyncClient(
-                headers=_HEADERS,
-                timeout=_TIMEOUT_SECONDS,
-                follow_redirects=True,
-            ) as client:
-                resp = await client.post(_QUERY_URL, data=form_data)
-                if resp.status_code == 404:
-                    log.debug("CNINFO 404 for %s", symbol)
-                    return []
-                resp.raise_for_status()
-                data = resp.json()
-                return data.get("announcements") or []
-        except httpx.HTTPStatusError as e:
-            log.warning("CNINFO HTTP %d for %s", e.response.status_code, symbol)
-            return []
-        except (httpx.TimeoutException, httpx.ConnectError) as e:
-            if attempt < _MAX_RETRIES:
-                await asyncio.sleep(2 ** attempt)
-                continue
-            log.warning("CNINFO timeout/connect for %s: %s", symbol, e)
-            return []
-        except Exception as e:
-            log.warning("CNINFO unexpected error for %s: %s", symbol, e)
-            return []
-    return []
+    result = await search_announcements_with_diagnostics(
+        symbol,
+        org_id=org_id,
+        start_date=start_date,
+        end_date=end_date,
+        category=category,
+        page=page,
+        page_size=page_size,
+    )
+    diagnostics = result.get("diagnostics") or {}
+    status = diagnostics.get("status")
+    if status not in {"success", "empty"}:
+        log.warning(
+            "CNINFO %s for %s: %s",
+            status,
+            symbol,
+            diagnostics.get("errors") or diagnostics.get("reason_code"),
+        )
+    return result.get("announcements") or []
 
 
 async def fulltext_search_announcements(

@@ -365,6 +365,9 @@ async def fetch_module_history(
     raw_rows: list[dict] = []
     aux_profit_rows: list[dict] = []
     data_success = False
+    provider_status = "unknown"
+    provider_reason_code: str | None = None
+    provider_errors: list[str] = []
     try:
         from app.datasource.baostock_client import baostock_client
         all_data = await baostock_client.get_financial_history_bulk(
@@ -373,6 +376,11 @@ async def fetch_module_history(
             end_year=end_year,
             mode="annual" if period == "annual" else "quarterly",
         )
+        stats = all_data.get("_bulk_stats") if isinstance(all_data, dict) else {}
+        if isinstance(stats, dict):
+            provider_status = str(stats.get("status") or "unknown")
+            provider_reason_code = stats.get("reason_code")
+            provider_errors = [str(item) for item in (stats.get("errors") or []) if item]
         table_rows = all_data.get(table_key, [])
         raw_rows = table_rows
         if module_key == "growth":
@@ -380,6 +388,9 @@ async def fetch_module_history(
         data_success = bool(raw_rows)
     except Exception as e:
         log.warning("history_financial_provider [%s/%s] BaoStock failed: %s", ts_code, module_key, e)
+        provider_status = "failed"
+        provider_reason_code = "PROVIDER_FAILED"
+        provider_errors = [str(e)[:160]]
 
     return _build_module_history_from_rows(
         module_key,
@@ -390,6 +401,9 @@ async def fetch_module_history(
         period=period,
         data_success=data_success,
         aux_profit_rows=aux_profit_rows,
+        provider_status=provider_status,
+        provider_reason_code=provider_reason_code,
+        provider_errors=provider_errors,
     )
 
 
@@ -403,6 +417,9 @@ def _build_module_history_from_rows(
     period: str,
     data_success: bool,
     aux_profit_rows: list[dict] | None = None,
+    provider_status: str = "unknown",
+    provider_reason_code: str | None = None,
+    provider_errors: list[str] | None = None,
 ) -> dict[str, Any]:
     """Normalize one BaoStock table into the CompanyV2 history contract."""
     from app.services.company_v2_period_classifier import enrich_row, is_valid_period
@@ -473,6 +490,12 @@ def _build_module_history_from_rows(
     history_coverage = _compute_history_coverage(
         filtered, period_type=period_type, start_year=start_year, end_year=end_year
     )
+    insufficient_history = period == "annual" and len(filtered) < 3
+    history_coverage["insufficient_history"] = insufficient_history
+    if insufficient_history:
+        history_coverage["insufficient_history_reason"] = (
+            "annual history has fewer than 3 provider-backed periods"
+        )
 
     # 同时确定 point_in_time（只有1行）
     if len(filtered) == 1:
@@ -492,8 +515,13 @@ def _build_module_history_from_rows(
         "source_fields": {
             "baostock_table": table_key,
             "ts_code": ts_code,
+            "provider_status": provider_status,
+            "reason_code": provider_reason_code,
         },
         "data_success": data_success and bool(filtered),
+        "provider_status": provider_status,
+        "reason_code": provider_reason_code if not (data_success and bool(filtered)) else None,
+        "errors": provider_errors or [],
         "history_coverage": history_coverage,
         "chart_contract": _CHART_CONTRACTS.get(module_key, {}),
     }
@@ -580,9 +608,23 @@ async def fetch_all_modules_history(
             stats_out.update(aggregate["_bulk_stats"])
     except Exception as exc:
         log.warning("fetch_all_modules_history [%s] BaoStock aggregate failed: %s", ts_code, exc)
-        return {mk: _empty_module_result(mk, start_year, end_year) for mk in modules}
+        return {
+            mk: _empty_module_result(
+                mk,
+                start_year,
+                end_year,
+                provider_status="failed",
+                reason_code="PROVIDER_FAILED",
+                errors=[str(exc)[:160]],
+            )
+            for mk in modules
+        }
 
     profit_rows = aggregate.get("profit") or []
+    stats = aggregate.get("_bulk_stats") if isinstance(aggregate, dict) else {}
+    provider_status = str(stats.get("status") or "unknown") if isinstance(stats, dict) else "unknown"
+    provider_reason_code = stats.get("reason_code") if isinstance(stats, dict) else None
+    provider_errors = [str(item) for item in (stats.get("errors") or []) if item] if isinstance(stats, dict) else []
     output: dict[str, dict[str, Any]] = {}
     for module_key in modules:
         table_key = _MODULE_BAOSTOCK_TABLE[module_key]
@@ -596,6 +638,9 @@ async def fetch_all_modules_history(
             period=period,
             data_success=bool(rows),
             aux_profit_rows=profit_rows if module_key == "growth" and isinstance(profit_rows, list) else None,
+            provider_status=provider_status,
+            provider_reason_code=provider_reason_code,
+            provider_errors=provider_errors,
         )
         if period == "quarterly" and output[module_key].get("history"):
             try:
@@ -621,7 +666,15 @@ async def fetch_all_modules_history(
     return output
 
 
-def _empty_module_result(module_key: str, start_year: int, end_year: int) -> dict[str, Any]:
+def _empty_module_result(
+    module_key: str,
+    start_year: int,
+    end_year: int,
+    *,
+    provider_status: str = "empty",
+    reason_code: str | None = None,
+    errors: list[str] | None = None,
+) -> dict[str, Any]:
     return {
         "provider": "baostock",
         "module_key": module_key,
@@ -629,8 +682,14 @@ def _empty_module_result(module_key: str, start_year: int, end_year: int) -> dic
         "rows": [],
         "latest": {},
         "history": [],
-        "source_fields": {},
+        "source_fields": {
+            "provider_status": provider_status,
+            "reason_code": reason_code,
+        },
         "data_success": False,
+        "provider_status": provider_status,
+        "reason_code": reason_code,
+        "errors": errors or [],
         "history_coverage": {
             "start_period": "",
             "end_period": "",
@@ -638,6 +697,8 @@ def _empty_module_result(module_key: str, start_year: int, end_year: int) -> dic
             "expected_periods_count": 0,
             "missing_periods": [],
             "history_truncated": True,
+            "insufficient_history": True,
+            "insufficient_history_reason": "no provider-backed history rows",
         },
         "chart_contract": _CHART_CONTRACTS.get(module_key, {}),
     }

@@ -51,11 +51,12 @@ class ReportDocumentService:
         Returns:
             {"status": "inserted"|"exists"|"skipped", "report_id": int|None, "reason": str}
         """
-        stock_code = candidate.get("stock_code") or ""
+        stock_code = candidate.get("stock_code") or candidate.get("symbol") or ""
         report_type = candidate.get("report_type") or ""
-        period = candidate.get("period") or ""
-        source = candidate.get("source") or ""
+        period = candidate.get("period") or candidate.get("period_end") or ""
+        source = candidate.get("source") or ("cninfo" if (candidate.get("pdf_url") or candidate.get("source_url")) else "")
         pdf_url = candidate.get("pdf_url") or ""
+        source_url = candidate.get("source_url") or pdf_url
         confidence = candidate.get("confidence") or 0.0
         ts_code = _ts_code_from_stock_code(stock_code)
 
@@ -81,6 +82,8 @@ class ReportDocumentService:
         period_end = period
         if len(period) == 8:
             period_end = f"{period[:4]}-{period[4:6]}-{period[6:]}"
+        if not period_end and candidate.get("report_year") and report_type == "annual":
+            period_end = f"{int(candidate['report_year'])}-12-31"
 
         # Check duplicate: by ts_code + report_type + period_end + source
         stmt2 = select(ReportDocument).where(
@@ -92,10 +95,19 @@ class ReportDocumentService:
         result2 = await db.execute(stmt2)
         existing2 = result2.scalars().first()
         if existing2:
+            changed = False
+            if source_url and not existing2.source_url:
+                existing2.source_url = source_url
+                changed = True
+            if pdf_url and not existing2.pdf_url:
+                existing2.pdf_url = pdf_url
+                changed = True
+            if changed:
+                await db.commit()
             return {"status": "exists", "report_id": existing2.id, "reason": "ts_code+type+period+source already in db"}
 
         # Format disclosure_date
-        ann_date = candidate.get("ann_date") or ""
+        ann_date = candidate.get("ann_date") or candidate.get("announcement_date") or candidate.get("disclosure_date") or ""
         disclosure_date = ann_date
         if len(ann_date) == 8:
             disclosure_date = f"{ann_date[:4]}-{ann_date[4:6]}-{ann_date[6:]}"
@@ -106,7 +118,7 @@ class ReportDocumentService:
             report_type=report_type,
             period_end=period_end,
             title=candidate.get("title") or "",
-            source_url=candidate.get("source_url") or "",
+            source_url=source_url or "",
             pdf_url=pdf_url,
             report_year=candidate.get("report_year"),
             source=source,

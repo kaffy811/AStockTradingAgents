@@ -681,7 +681,7 @@ class ReportChatCopilotAgent:
                     "AI 分析服务暂时不可用。"
                     + _format_data_limited_answer(normalized_question, report_context, chunks, limitations)
                 ),
-                "source_chunks": [],
+                "source_chunks": chunks,
                 "review_audit": {},
                 "rag_status": rag_status,
                 "confidence": "low",

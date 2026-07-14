@@ -394,6 +394,7 @@ async def _persist_report_documents(db: AsyncSession, symbol: str, reports: list
         if not pdf_url:
             persisted.append(safe_report)
             continue
+        source_url = safe_report.get("source_url") or pdf_url
         result = await db.execute(
             select(ReportDocument).where(
                 ReportDocument.ts_code == ts_code,
@@ -407,7 +408,7 @@ async def _persist_report_documents(db: AsyncSession, symbol: str, reports: list
                 report_type=safe_report.get("report_type") or "annual",
                 period_end=_period_end(safe_report),
                 title=safe_report.get("title") or "",
-                source_url=pdf_url,
+                source_url=source_url,
                 pdf_url=pdf_url,
                 report_year=safe_report.get("report_year"),
                 source=safe_report.get("source") or "cninfo",
@@ -426,6 +427,10 @@ async def _persist_report_documents(db: AsyncSession, symbol: str, reports: list
             doc.disclosure_date = safe_report.get("announcement_date") or safe_report.get("disclosure_date") or doc.disclosure_date
             doc.source = safe_report.get("source") or doc.source
             doc.confidence = safe_report.get("confidence") or doc.confidence
+            if source_url and not doc.source_url:
+                doc.source_url = source_url
+            if pdf_url and not doc.pdf_url:
+                doc.pdf_url = pdf_url
         safe_report["id"] = doc.id
         safe_report["report_id"] = doc.id
         safe_report["download_status"] = doc.download_status
