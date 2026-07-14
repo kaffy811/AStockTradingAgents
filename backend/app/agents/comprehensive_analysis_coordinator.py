@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import re
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 from datetime import datetime, timezone
 
@@ -98,10 +99,10 @@ _SCOPE_SUMMARY_DIMS: dict[str, str] = {
     "technical_fundamental": "技术面与基本面双维度",
 }
 
-# 传给综合 LLM 的子报告最大字符数（technical / fundamental / peer_comparison）
-_SECTION_MAX_CHARS = 4000
-# 新闻子报告最大字符数（稍短，避免综合 prompt 过长）
-_NEWS_SECTION_MAX_CHARS = 3000
+# 传给综合 LLM 的每个结构化子摘要最大字符数。sections 仍保留完整子报告。
+_SECTION_MAX_CHARS = 2200
+_NEWS_SECTION_MAX_CHARS = 1800
+_SYNTHESIS_PROMPT_MAX_CHARS = 9500
 
 # 每个 Agent 超时（秒）
 _AGENT_TIMEOUT = 300
@@ -110,16 +111,19 @@ _AGENT_TIMEOUT = 300
 # ── System Prompt ─────────────────────────────────────────────────────────────
 
 _SYSTEM_PROMPT = """\
-你是一位综合股票分析协调员，负责将技术面、基本面、同行对比、新闻面四份子报告整合为简洁的综合分析摘要。
+你是一位综合股票分析协调员，负责将技术面、基本面、同行对比、新闻面四份子报告的结构化证据摘要整合为简洁的综合分析报告。
 
-【报告标题与身份声明规则（必须严格遵守）】
+【封闭证据集规则（必须严格遵守）】
 - 用户消息的【分析目标】中包含"股票："字段，该字段是本次分析对象的完整标识（如"平安银行（CN/000001）"或"腾讯控股（HK/00700）"）。
-- 报告 Markdown 第一行标题必须使用该完整标识，格式为：
-    # 综合分析报告：{股票字段完整内容}
-  例如：# 综合分析报告：平安银行（CN/000001）
-- 综合结论卡片中【一句话结论】必须以"本报告分析对象为 {股票字段完整内容}。"开头，随后一句话概括综合判断。
-- 如果股票字段内容仅为"市场/代码"格式（即无中文名称），则保持该格式，不得凭空添加名称。
-- 正文每个章节第一次提及本股票时，必须使用完整标识（含中文名，如已提供），后续可简称。
+- 只能总结四个子报告证据摘要中已经出现的事实。
+- 不得新增任何数字，不得重新计算财务指标、技术指标或估值。
+- 不得为新闻补充未出现的原因，不得生成新公司、同行、事件或指标。
+- 不得把"可能/需观察/数据不足"改写成确定结论。
+- 不得把不同时间范围的数据放在同一句直接比较。
+- 不得把同行样本结果写成目标公司自身数据。
+- 不得删除重要数据限制，不得虚构来源、URL、页码。
+- 不得输出 chain of thought、内部推理、工具参数或执行轨迹。
+- 股票名称、代码、market 必须与输入一致。
 
 【严格禁止事项】
 以下内容一律禁止，违反即为无效输出：
@@ -175,48 +179,48 @@ _SYSTEM_PROMPT = """\
     "强劲" → "在当前可用数据中表现较好"
     "显著利好 / 显著利空" → "可能对市场情绪有一定影响（方向仍需观察）"
 
+【冲突与降级规则】
+- 基本面与新闻冲突时，写为不同维度信号，不互相覆盖。
+- 技术面与基本面冲突时，明确"中长期与短期信号不一致"。
+- 同行与基本面冲突时，若自身增长但低于同行，不得写成"表现优秀"。
+- 数据日期不同，明确各自时间范围，不做同周期直接比较。
+- 某个子报告缺失时，对应章节写"本次无可用数据"，不得补写。
+- 子报告冲突时明确列出冲突，不强行统一。
+
 【输出格式】
 输出完整 Markdown，严格按以下结构，标题名称不得更改，不得新增或删除章节：
 
 # 综合分析报告：{【分析目标】中"股票："字段的完整内容}
 
-## 一、综合结论卡片
-- **综合判断**：偏强 / 偏弱 / 分歧 / 数据不足 / 需观察（基于四面信号综合选择最符合的一项）
-- **一句话结论**：本报告分析对象为 {股票字段完整内容}。（随后用一句话概括综合判断，不得超过 30 字）
-- **核心矛盾**：若各维度信号存在分歧，列举主要矛盾点（1-2 条）；若方向基本一致，写"各维度信号方向基本一致"。
-- **正面因素**：1. ... 2. ...（各维度中的正面观察，限 2-3 条，只引用子报告已有内容）
-- **主要风险**：1. ... 2. ...（各维度中的风险信号，限 2-3 条，只引用子报告已有内容）
-- **后续观察重点**：1. ... 2. ...（2-3 个中性后续观察点，不写方向预测，不写操作建议）
-- **数据完整度**：说明本次分析覆盖哪些维度、哪些字段缺失，以及对结论可信度的影响。
+## 综合结论
+第一段直接回答，必须以"本报告分析对象为 {股票字段完整内容}。"开头。
 
-## 二、四面结论汇总
+## 核心事实卡片
+最多 5 条，只列子报告已经出现的关键事实；不要重复完整子报告。
 
-### 1. 技术面结论
-提炼技术面子报告的 1-3 个关键技术信号，不得引入基本面或新闻面数据。
+## 基本面与财务
+只整合基本面子报告；无数据时写"本次无可用数据"。
 
-### 2. 基本面结论
-提炼基本面子报告的主要发现，缺失字段不得评价。
-必须声明字段边界："在当前可用字段范围内""由于估值/行业字段缺失，基本面判断有限"等。
+## 市场与技术
+只整合技术面子报告；无数据时写"本次无可用数据"。
 
-### 3. 同行对比结论
-提炼同行对比子报告的主要发现，说明目标公司相对可比样本的相对位置。
-无同行时说明"暂无可用同行数据"；样本来源须明确（PEER_MAP 手动配置 或 动态热门股）。
+## 新闻与事件
+只整合新闻面子报告；无数据时写"本次无可用数据"。
 
-### 4. 新闻面结论
-提炼新闻面子报告的关键结论。
-- 暂无新闻数据时，写"本时间窗口内暂无新闻数据"。
-- HK 关键词搜索结果须说明相关性需谨慎判断。
-- 不得编造新闻，只能整合 section 中已有结论。
+## 同行位置
+只整合同行对比子报告；无数据时写"本次无可用数据"。
 
-## 三、主要数据局限
-列出本次分析缺失或受限的关键字段及原因（含新闻时间窗口限制和数据源覆盖）。
+## 关键联动
+只写不同维度之间已由子报告支持的联动或冲突；不强行统一。
 
-## 四、后续观察清单
-2～3 个中性观察点，不写方向预测，不写操作建议。
+## 主要风险
+列风险，不列数据缺失。
 
-## 风险提示
-仅供研究参考，不构成投资建议。技术面、基本面、同行对比与新闻面分析均存在局限性，\
-市场存在不确定性，投资者需自行判断并承担投资风险。\
+## 数据限制
+列数据缺失、字段覆盖、时间范围、截断、来源限制。必须保留子报告限制。
+
+## 后续观察
+中性观察点，不写方向预测，不写买卖建议。
 """
 
 
@@ -278,7 +282,21 @@ class ComprehensiveAnalysisCoordinator:
         sections, statuses = self._run_agents_parallel(market, symbol)
 
         # ── Step 2: 构建综合 Prompt ──────────────────────────────────────
-        synthesis_user = self._build_synthesis_prompt(market, symbol, sections)
+        stock_identity = f"{market}/{symbol}"
+        metadata = _build_metadata(market, sections, statuses)
+        if _all_sections_unavailable(sections):
+            report = _insufficient_data_report(stock_identity, sections)
+            metadata["partial"] = True
+            log.info("ComprehensiveCoordinator: all sections unavailable [%s/%s]", market, symbol)
+            return {
+                "market":   market,
+                "symbol":   symbol,
+                "report":   report,
+                "sections": sections,
+                "metadata": metadata,
+            }
+
+        synthesis_user = self._build_synthesis_prompt(market, symbol, sections, stock_identity)
 
         # ── Step 3: 综合 LLM 调用 ────────────────────────────────────────
         log.info("ComprehensiveCoordinator: calling synthesis LLM [%s/%s]", market, symbol)
@@ -292,8 +310,12 @@ class ComprehensiveAnalysisCoordinator:
             log.error("ComprehensiveCoordinator: synthesis LLM failed [%s/%s]: %s",
                       market, symbol, exc)
             report = _fallback_report(market, symbol, sections, exc)
+        report, validation = _finalize_synthesis_report(
+            report, sections, market, symbol, stock_identity
+        )
 
-        metadata = _build_metadata(market, sections, statuses)
+        metadata["partial"] = _is_partial_analysis(sections, statuses)
+        metadata["synthesis_validation"] = validation
         log.info("ComprehensiveCoordinator: done [%s/%s]", market, symbol)
         return {
             "market":   market,
@@ -366,6 +388,20 @@ class ComprehensiveAnalysisCoordinator:
             db, market, symbol, output_language="zh-CN",
         )
 
+        metadata = _build_metadata(market, sections, statuses)
+        if _all_sections_unavailable(sections):
+            report = _insufficient_data_report(stock_identity, sections)
+            metadata["partial"] = True
+            log.info("ComprehensiveCoordinator.analyze_async: all sections unavailable [%s/%s]", market, symbol)
+            return {
+                "market":     market,
+                "symbol":     symbol,
+                "stock_name": stock_name or "",
+                "report":     report,
+                "sections":   sections,
+                "metadata":   metadata,
+            }
+
         synthesis_user = self._build_synthesis_prompt(market, symbol, sections, stock_identity)
         messages = [
             {"role": "system", "content": _SYSTEM_PROMPT},
@@ -382,8 +418,12 @@ class ComprehensiveAnalysisCoordinator:
                 market, symbol, exc,
             )
             report = _fallback_report(market, symbol, sections, exc, stock_identity)
+        report, validation = _finalize_synthesis_report(
+            report, sections, market, symbol, stock_identity, stock_name=stock_name
+        )
 
-        metadata = _build_metadata(market, sections, statuses)
+        metadata["partial"] = _is_partial_analysis(sections, statuses)
+        metadata["synthesis_validation"] = validation
         log.info("ComprehensiveCoordinator.analyze_async: done [%s/%s]", market, symbol)
         return {
             "market":     market,
@@ -538,31 +578,40 @@ class ComprehensiveAnalysisCoordinator:
 
         else:
             # comprehensive — full synthesis LLM (same as analyze_async)
-            synthesis_user = self._build_synthesis_prompt(
-                market, symbol, sections, stock_identity, output_language=output_language,
-            )
-            messages = [
-                {"role": "system", "content": _SYSTEM_PROMPT},
-                {"role": "user",   "content": synthesis_user},
-            ]
-            log.info(
-                "ComprehensiveCoordinator.analyze_scoped: calling synthesis LLM [%s/%s]",
-                market, symbol,
-            )
-            try:
-                report = await asyncio.to_thread(self._llm.chat, messages, temperature=0.3)
-            except Exception as exc:
-                log.error(
-                    "ComprehensiveCoordinator.analyze_scoped: synthesis LLM failed [%s/%s]: %s",
-                    market, symbol, exc,
+            if _all_sections_unavailable(sections):
+                report = _insufficient_data_report(stock_identity, sections)
+            else:
+                synthesis_user = self._build_synthesis_prompt(
+                    market, symbol, sections, stock_identity, output_language=output_language,
                 )
-                report = _fallback_report(market, symbol, sections, exc, stock_identity,
-                                          output_language=output_language)
+                messages = [
+                    {"role": "system", "content": _SYSTEM_PROMPT},
+                    {"role": "user",   "content": synthesis_user},
+                ]
+                log.info(
+                    "ComprehensiveCoordinator.analyze_scoped: calling synthesis LLM [%s/%s]",
+                    market, symbol,
+                )
+                try:
+                    report = await asyncio.to_thread(self._llm.chat, messages, temperature=0.3)
+                except Exception as exc:
+                    log.error(
+                        "ComprehensiveCoordinator.analyze_scoped: synthesis LLM failed [%s/%s]: %s",
+                        market, symbol, exc,
+                    )
+                    report = _fallback_report(market, symbol, sections, exc, stock_identity,
+                                              output_language=output_language)
+            report, validation = _finalize_synthesis_report(
+                report, sections, market, symbol, stock_identity, stock_name=stock_name
+            )
 
         metadata = _build_metadata(market, sections, statuses)
         metadata["analysis_scope"]   = analysis_scope
         metadata["workflow_engine"]  = "custom_coordinator"
         metadata["output_language"]  = output_language
+        metadata["partial"]          = _is_partial_analysis(sections, statuses)
+        if analysis_scope == "comprehensive":
+            metadata["synthesis_validation"] = validation
 
         log.info(
             "ComprehensiveCoordinator.analyze_scoped: done [%s/%s] scope=%s",
@@ -784,10 +833,8 @@ class ComprehensiveAnalysisCoordinator:
         output_language: str = "zh-CN",
     ) -> str:
         """
-        将四个子报告截断后拼入 Prompt。
-        technical / fundamental / peer_comparison 截断至 4000 字符；
-        news 截断至 3000 字符。
-        截断时追加截断提示，sections 中原始内容不变。
+        将四个子报告先压缩为结构化证据摘要，再拼入 Prompt。
+        sections 中原始内容不变；综合 LLM 只接收关键事实、数字、风险、限制与时间范围。
 
         stock_identity: 完整股票标识，如"平安银行（CN/000001）"；
                         None 时 fallback 为 "{market}/{symbol}"。
@@ -795,28 +842,26 @@ class ComprehensiveAnalysisCoordinator:
         """
         if stock_identity is None:
             stock_identity = f"{market}/{symbol}"
-        def _truncate(text: str, label: str, max_chars: int) -> str:
-            if len(text) <= max_chars:
-                return text
-            return (
-                text[:max_chars]
-                + f"\n\n...[{label} 报告已截断，以上为前 {max_chars} 字符]"
-            )
 
-        tech_text  = _truncate(sections.get("technical", ""),       "技术面",   _SECTION_MAX_CHARS)
-        fund_text  = _truncate(sections.get("fundamental", ""),     "基本面",   _SECTION_MAX_CHARS)
-        peer_text  = _truncate(sections.get("peer_comparison", ""), "同行对比", _SECTION_MAX_CHARS)
-        news_text  = _truncate(sections.get("news", ""),            "新闻面",   _NEWS_SECTION_MAX_CHARS)
+        summaries = {
+            "technical": _build_section_summary(
+                "technical", sections.get("technical", ""), _SECTION_MAX_CHARS
+            ),
+            "fundamental": _build_section_summary(
+                "fundamental", sections.get("fundamental", ""), _SECTION_MAX_CHARS
+            ),
+            "peer_comparison": _build_section_summary(
+                "peer_comparison", sections.get("peer_comparison", ""), _SECTION_MAX_CHARS
+            ),
+            "news": _build_section_summary(
+                "news", sections.get("news", ""), _NEWS_SECTION_MAX_CHARS
+            ),
+        }
 
-        truncated_any = any([
-            len(sections.get("technical",       "")) > _SECTION_MAX_CHARS,
-            len(sections.get("fundamental",     "")) > _SECTION_MAX_CHARS,
-            len(sections.get("peer_comparison", "")) > _SECTION_MAX_CHARS,
-            len(sections.get("news",            "")) > _NEWS_SECTION_MAX_CHARS,
-        ])
+        truncated_any = any(summary["truncated"] for summary in summaries.values())
         truncation_note = (
-            "\n⚠️ 注意：以下子报告经过长度截断，请只基于可见内容整合，"
-            "不得补充截断部分未出现的数据。\n"
+            "\n注意：以下子报告已先压缩为结构化摘要。截断时已优先保留限制、来源、时间范围和关键数字；"
+            "不得补充摘要中未出现的数据。\n"
             if truncated_any else ""
         )
 
@@ -838,7 +883,7 @@ class ComprehensiveAnalysisCoordinator:
             f"其余解释、章节标题、摘要、风险提示均应使用 {lang_label}。\n"
         ) if output_language != "zh-CN" else ""
 
-        return f"""\
+        prompt = f"""\
 请基于以下四份子报告，生成综合分析摘要报告。
 {truncation_note}{hk_note}
 【分析目标】
@@ -852,30 +897,596 @@ class ComprehensiveAnalysisCoordinator:
 综合结论卡片中【一句话结论】必须以：
 本报告分析对象为 {stock_identity}。开头
 
----
-【子报告 1 — 技术面分析】
-{tech_text}
+【事实边界】
+- 以下四份"证据摘要"是封闭证据集。只能使用其中出现的事实、数字、公司、同行、事件、来源和限制。
+- 不得新增任何数字；不得重新计算指标；不得把不同时间范围的数据放在同一句直接比较。
+- 子报告缺失或状态为 unavailable/partial 时，对应章节必须写"本次无可用数据"或明确 partial。
+- 输出不得包含 chain of thought、工具参数、traceback、secret、绝对路径、买卖指令或确定涨跌预测。
 
 ---
-【子报告 2 — 基本面分析】
-{fund_text}
+【子报告 1 — 技术面分析证据摘要】
+{summaries["technical"]["text"]}
 
 ---
-【子报告 3 — 同行对比分析】
-{peer_text}
+【子报告 2 — 基本面分析证据摘要】
+{summaries["fundamental"]["text"]}
 
 ---
-【子报告 4 — 新闻面分析】
-{news_text}
+【子报告 3 — 同行对比分析证据摘要】
+{summaries["peer_comparison"]["text"]}
+
+---
+【子报告 4 — 新闻面分析证据摘要】
+{summaries["news"]["text"]}
 
 ---
 请严格按照系统提示规定的 Markdown 报告结构输出，标题名称不得更改，不得新增或删除章节。\
 综合报告只整合以上可见内容，不得推断或补充未出现的数据。\
 新闻面要点只能引用子报告 4 中已有的结论，不得编造新闻。\
 {language_instruction}"""
+        return _truncate_prompt(prompt, _SYNTHESIS_PROMPT_MAX_CHARS)
 
 
 # ── 工具函数 ─────────────────────────────────────────────────────────────────
+
+_SECTION_LABELS: dict[str, str] = {
+    "technical": "技术面",
+    "fundamental": "基本面",
+    "peer_comparison": "同行对比",
+    "news": "新闻面",
+}
+
+_KEY_FACT_PATTERNS = (
+    "observed_facts", "analysis", "limitations", "watch_items",
+    "观察", "事实", "结论", "摘要", "核心", "风险", "限制", "局限", "缺失",
+    "不可用", "数据不足", "时间", "报告期", "来源", "source", "period",
+    "date", "新闻", "事件", "同行", "样本", "PEER_MAP", "关键词搜索",
+)
+
+_DROP_LINE_PATTERNS = (
+    "仅供研究参考", "不构成投资建议", "投资者需自行判断", "风险提示：",
+    "免责声明", "```", "---",
+)
+
+_LIMITATION_PATTERNS = (
+    "限制", "局限", "缺失", "不可用", "数据不足", "暂不评价", "未返回",
+    "未能覆盖", "样本", "时间窗口", "报告期", "相关性", "截断", "partial",
+    "超时", "暂时不可用", "coverage", "missing", "unavailable", "limited",
+)
+
+_RISK_PATTERNS = ("风险", "压力", "不确定", "波动", "下滑", "负面", "偏弱")
+_NUMERIC_CONTEXT_PATTERNS = (
+    "元", "亿元", "%", "pct", "倍", "日", "年", "月", "报告期", "收盘", "成交",
+    "收入", "利润", "现金流", "ROE", "PE", "PB", "MA", "均线", "涨跌", "样本",
+    "小时", "交易日", "同比", "环比", "margin", "revenue", "profit",
+)
+_SOURCE_PATTERN = re.compile(r"https?://[^\s)）]+")
+_NUMBER_PATTERN = re.compile(r"(?<![A-Za-z_])[-+]?\d+(?:[.,]\d+)*(?:\.\d+)?%?")
+_ABS_PATH_PATTERN = re.compile(r"(/Users/|/private/|/var/|/tmp/)[^\s)）]+")
+_SECRET_PATTERN = re.compile(
+    r"(?i)(api[_-]?key|secret|token|password)\s*[:=]\s*['\"]?[^'\"\s)）]+"
+)
+_TRACEBACK_PATTERN = re.compile(r"Traceback \(most recent call last\):[\s\S]*")
+
+_FORBIDDEN_REPLACEMENTS: tuple[tuple[str, str], ...] = (
+    ("强烈买入", "不提供买卖建议"),
+    ("强烈卖出", "不提供买卖建议"),
+    ("买入建议", "研究观察"),
+    ("卖出建议", "研究观察"),
+    ("持有建议", "研究观察"),
+    ("满仓", "仓位建议已省略"),
+    ("梭哈", "仓位建议已省略"),
+    ("保证收益", "收益不确定"),
+    ("必涨", "走势不确定"),
+    ("必跌", "走势不确定"),
+    ("稳赚", "收益不确定"),
+    ("抄底", "操作表述已省略"),
+    ("逃顶", "操作表述已省略"),
+    ("清仓", "操作表述已省略"),
+    ("加仓", "操作表述已省略"),
+    ("减仓推荐", "操作表述已省略"),
+    ("确定涨幅", "确定性预测已省略"),
+    ("明天一定上涨", "短期走势不确定"),
+    ("明天一定下跌", "短期走势不确定"),
+    ("chain of thought", "内部推理已省略"),
+    ("内部思考过程", "内部推理已省略"),
+    ("工具参数", "工具细节已省略"),
+)
+
+
+def _is_unavailable_text(text: str | None) -> bool:
+    stripped = (text or "").strip()
+    if not stripped:
+        return True
+    if stripped.startswith("[") and any(kw in stripped for kw in ("暂时不可用", "超时", "数据缺失")):
+        return True
+    unavailable_markers = (
+        "暂无可用数据", "本次无可用数据", "所有工具数据为空",
+        "items 为空", "暂无相关新闻数据", "暂无新闻数据",
+    )
+    return any(marker in stripped for marker in unavailable_markers) and len(stripped) < 260
+
+
+def _all_sections_unavailable(sections: dict[str, str]) -> bool:
+    expected = ("technical", "fundamental", "peer_comparison", "news")
+    return all(_is_unavailable_text(sections.get(key, "")) for key in expected)
+
+
+def _is_partial_analysis(sections: dict[str, str], statuses: dict[str, dict]) -> bool:
+    if any(s.get("status") in {"failed", "timeout"} for s in statuses.values()):
+        return True
+    expected = ("technical", "fundamental", "peer_comparison", "news")
+    return any(_is_unavailable_text(sections.get(key, "")) for key in expected)
+
+
+def _clean_report_lines(text: str) -> list[str]:
+    seen: set[str] = set()
+    lines: list[str] = []
+    for raw in (text or "").splitlines():
+        line = raw.strip()
+        if not line:
+            continue
+        if any(drop in line for drop in _DROP_LINE_PATTERNS):
+            continue
+        compact = re.sub(r"\s+", " ", line)
+        if compact in seen:
+            continue
+        seen.add(compact)
+        lines.append(line)
+    return lines
+
+
+def _line_has_key_evidence(line: str) -> bool:
+    if _NUMBER_PATTERN.search(line) and any(
+        pattern.lower() in line.lower() for pattern in _NUMERIC_CONTEXT_PATTERNS
+    ):
+        return True
+    return any(pattern.lower() in line.lower() for pattern in _KEY_FACT_PATTERNS)
+
+
+def _prioritized_lines(lines: list[str]) -> list[str]:
+    limitation_lines = [
+        line for line in lines
+        if any(pattern.lower() in line.lower() for pattern in _LIMITATION_PATTERNS)
+    ]
+    numeric_or_source_lines = [
+        line for line in lines
+        if (_NUMBER_PATTERN.search(line) or _SOURCE_PATTERN.search(line))
+        and (
+            _SOURCE_PATTERN.search(line)
+            or any(pattern.lower() in line.lower() for pattern in _NUMERIC_CONTEXT_PATTERNS)
+        )
+        and line not in limitation_lines
+    ]
+    key_lines = [
+        line for line in lines
+        if _line_has_key_evidence(line)
+        and line not in limitation_lines
+        and line not in numeric_or_source_lines
+    ]
+    fallback_lines = [
+        line for line in lines
+        if line not in limitation_lines
+        and line not in numeric_or_source_lines
+        and line not in key_lines
+    ]
+    return limitation_lines + numeric_or_source_lines + key_lines + fallback_lines[:8]
+
+
+def _fit_lines_without_splitting_units(lines: list[str], max_chars: int) -> tuple[str, bool]:
+    output: list[str] = []
+    total = 0
+    truncated = False
+    for line in lines:
+        addition = len(line) + 1
+        if total + addition > max_chars:
+            truncated = True
+            continue
+        output.append(line)
+        total += addition
+    return "\n".join(output), truncated
+
+
+def _build_section_summary(section_key: str, text: str, max_chars: int) -> dict[str, object]:
+    label = _SECTION_LABELS.get(section_key, section_key)
+    if _is_unavailable_text(text):
+        return {
+            "text": f"- 状态：unavailable\n- 说明：{(text or '本次无可用数据').strip()}",
+            "truncated": False,
+        }
+
+    lines = _clean_report_lines(text)
+    selected = _prioritized_lines(lines)
+    fitted, truncated = _fit_lines_without_splitting_units(selected, max_chars)
+    if not fitted:
+        fitted = "本次无可用数据"
+    if truncated:
+        fitted += f"\n- 截断提示：{label}子报告较长，摘要已优先保留限制、来源、时间范围和关键数字。"
+    return {"text": fitted, "truncated": truncated or len("\n".join(lines)) > max_chars}
+
+
+def _truncate_prompt(prompt: str, max_chars: int) -> str:
+    if len(prompt) <= max_chars:
+        return prompt
+    marker = "\n【全局截断提示】综合 prompt 已达到长度上限；各维度限制、来源、时间范围和关键数字已优先保留。\n"
+    return prompt[: max_chars - len(marker)] + marker
+
+
+_SYNTHESIS_HEADINGS: tuple[str, ...] = (
+    "## 综合结论",
+    "## 核心事实卡片",
+    "## 基本面与财务",
+    "## 市场与技术",
+    "## 新闻与事件",
+    "## 同行位置",
+    "## 关键联动",
+    "## 主要风险",
+    "## 数据限制",
+    "## 后续观察",
+)
+
+
+def _extract_numbers(text: str) -> set[str]:
+    return {match.group(0) for match in _NUMBER_PATTERN.finditer(text or "")}
+
+
+def _normalize_number_token(token: str) -> str:
+    return token.replace(",", "")
+
+
+def _allowed_numbers(sections: dict[str, str], symbol: str) -> set[str]:
+    allowed: set[str] = {symbol, symbol.lstrip("0"), "0"}
+    for text in sections.values():
+        for number in _extract_numbers(text):
+            allowed.add(number)
+            allowed.add(_normalize_number_token(number))
+    return {number for number in allowed if number}
+
+
+def _section_lines(section_key: str, sections: dict[str, str], *, include_limits: bool = False) -> list[str]:
+    text = sections.get(section_key, "")
+    if _is_unavailable_text(text):
+        return ["本次无可用数据"]
+    lines = _prioritized_lines(_clean_report_lines(text))
+    if include_limits:
+        limited = [
+            line for line in lines
+            if any(pattern.lower() in line.lower() for pattern in _LIMITATION_PATTERNS)
+        ]
+        return limited[:6] or ["未发现额外数据限制"]
+    selected: list[str] = []
+    for line in lines:
+        if any(pattern.lower() in line.lower() for pattern in _LIMITATION_PATTERNS):
+            continue
+        selected.append(line)
+        if len(selected) >= 3:
+            break
+    return selected or ["本次无可用数据"]
+
+
+def _risk_lines(sections: dict[str, str]) -> list[str]:
+    risks: list[str] = []
+    for text in sections.values():
+        for line in _clean_report_lines(text):
+            if any(pattern in line for pattern in _RISK_PATTERNS):
+                risks.append(line)
+            if len(risks) >= 5:
+                return risks
+    return risks or ["各维度风险需结合后续数据继续观察"]
+
+
+def _limitation_lines(sections: dict[str, str]) -> list[str]:
+    limits: list[str] = []
+    for text in sections.values():
+        for line in _clean_report_lines(text):
+            if any(pattern.lower() in line.lower() for pattern in _LIMITATION_PATTERNS):
+                limits.append(line)
+    return _dedupe_lines(limits)[:10] or ["本次分析受限于子报告可用字段和时间范围"]
+
+
+def _fact_card_lines(sections: dict[str, str]) -> list[str]:
+    facts: list[str] = []
+    for key in ("fundamental", "technical", "news", "peer_comparison"):
+        if _is_unavailable_text(sections.get(key, "")):
+            continue
+        for line in _section_lines(key, sections):
+            if line == "本次无可用数据":
+                continue
+            facts.append(line)
+            if len(facts) >= 5:
+                return facts
+    return facts or ["本次可用子报告不足，核心事实卡片暂无法展开"]
+
+
+def _extract_dates(text: str) -> set[str]:
+    return set(re.findall(r"\d{4}(?:[-年]\d{1,2}(?:[-月]\d{1,2}日?)?)?", text or ""))
+
+
+def _detect_conflicts(sections: dict[str, str]) -> list[str]:
+    conflicts: list[str] = []
+    fundamental = sections.get("fundamental", "")
+    technical = sections.get("technical", "")
+    news = sections.get("news", "")
+    peer = sections.get("peer_comparison", "")
+
+    if any(kw in fundamental for kw in ("稳定", "改善", "增长", "较好")) and any(
+        kw in news for kw in ("负面", "处罚", "监管", "下滑", "风险")
+    ):
+        conflicts.append("基本面与新闻信号分属不同维度，财务数据稳定不覆盖新闻负面事件。")
+    if any(kw in fundamental for kw in ("改善", "增长", "修复")) and any(
+        kw in technical for kw in ("偏弱", "下行", "承压", "走弱")
+    ):
+        conflicts.append("中长期与短期信号不一致：基本面改善与技术趋势偏弱并存。")
+    if any(kw in fundamental for kw in ("增长", "提升", "改善")) and any(
+        kw in peer for kw in ("低于同行", "低于样本", "落后", "不及同行")
+    ):
+        conflicts.append("自身增长但低于同行样本，不应直接写为表现优秀。")
+
+    date_groups = [
+        _extract_dates(text) for text in (fundamental, technical, news, peer)
+        if text and not _is_unavailable_text(text)
+    ]
+    unique_dates = set().union(*date_groups) if date_groups else set()
+    if len(unique_dates) > 1:
+        sample = "、".join(sorted(unique_dates)[:4])
+        conflicts.append(f"各子报告时间范围不完全一致（{sample}），不做同周期直接比较。")
+    return conflicts or ["未发现需要强行统一的跨维度冲突；后续仍需按维度分别观察。"]
+
+
+def _dedupe_lines(lines: list[str]) -> list[str]:
+    seen: set[str] = set()
+    deduped: list[str] = []
+    for line in lines:
+        compact = re.sub(r"\s+", " ", line).strip()
+        if not compact or compact in seen:
+            continue
+        seen.add(compact)
+        deduped.append(line.strip())
+    return deduped
+
+
+def _bulletize(lines: list[str], limit: int | None = None) -> str:
+    selected = _dedupe_lines(lines)
+    if limit is not None:
+        selected = selected[:limit]
+    return "\n".join(f"- {line}" for line in selected) if selected else "- 本次无可用数据"
+
+
+def _coerce_synthesis_shape(
+    report: str,
+    sections: dict[str, str],
+    stock_identity: str,
+) -> tuple[str, bool]:
+    required_title = f"# 综合分析报告：{stock_identity}"
+    has_required_shape = report.strip().startswith(required_title) and all(
+        heading in report for heading in _SYNTHESIS_HEADINGS
+    )
+    if has_required_shape:
+        return report, False
+
+    conclusion_line = (
+        f"本报告分析对象为 {stock_identity}。本次综合分析仅基于四个子报告中的可见事实整理，"
+        "若某维度缺失则不补写。"
+    )
+    shaped = f"""\
+{required_title}
+
+## 综合结论
+{conclusion_line}
+
+## 核心事实卡片
+{_bulletize(_fact_card_lines(sections), 5)}
+
+## 基本面与财务
+{_bulletize(_section_lines("fundamental", sections), 3)}
+
+## 市场与技术
+{_bulletize(_section_lines("technical", sections), 3)}
+
+## 新闻与事件
+{_bulletize(_section_lines("news", sections), 3)}
+
+## 同行位置
+{_bulletize(_section_lines("peer_comparison", sections), 3)}
+
+## 关键联动
+{_bulletize(_detect_conflicts(sections), 4)}
+
+## 主要风险
+{_bulletize(_risk_lines(sections), 5)}
+
+## 数据限制
+{_bulletize(_limitation_lines(sections), 10)}
+
+## 后续观察
+- 继续观察后续报告期、行情数据、新闻事件和同行样本变化。
+- 若任一维度后续补齐数据，应以补齐后的子报告为准重新综合。
+"""
+    return shaped, True
+
+
+def _remove_duplicate_paragraphs(report: str) -> tuple[str, int]:
+    blocks = re.split(r"\n{2,}", report.strip())
+    seen: set[str] = set()
+    output: list[str] = []
+    duplicates = 0
+    for block in blocks:
+        compact = re.sub(r"\s+", " ", block).strip()
+        if compact in seen and not compact.startswith("#"):
+            duplicates += 1
+            continue
+        seen.add(compact)
+        output.append(block)
+    return "\n\n".join(output) + "\n", duplicates
+
+
+def _sanitize_forbidden_content(report: str) -> tuple[str, int]:
+    count = 0
+    sanitized = report
+    for forbidden, replacement in _FORBIDDEN_REPLACEMENTS:
+        if forbidden in sanitized:
+            count += sanitized.count(forbidden)
+            sanitized = sanitized.replace(forbidden, replacement)
+    before = sanitized
+    sanitized = _TRACEBACK_PATTERN.sub("执行异常细节已省略。", sanitized)
+    sanitized = _SECRET_PATTERN.sub("secret 已省略", sanitized)
+    sanitized = _ABS_PATH_PATTERN.sub("本地路径已省略", sanitized)
+    if sanitized != before:
+        count += 1
+    return sanitized, count
+
+
+def _remove_out_of_scope_sources(report: str, sections: dict[str, str]) -> tuple[str, int]:
+    allowed_sources: set[str] = set()
+    for text in sections.values():
+        allowed_sources.update(match.group(0) for match in _SOURCE_PATTERN.finditer(text or ""))
+    removed = 0
+
+    def replace(match: re.Match[str]) -> str:
+        nonlocal removed
+        url = match.group(0)
+        if url in allowed_sources:
+            return url
+        removed += 1
+        return "来源未提供"
+
+    return _SOURCE_PATTERN.sub(replace, report), removed
+
+
+def _remove_unsupported_numbers(
+    report: str,
+    sections: dict[str, str],
+    symbol: str,
+) -> tuple[str, int]:
+    allowed = _allowed_numbers(sections, symbol)
+    removed = 0
+
+    def replace(match: re.Match[str]) -> str:
+        nonlocal removed
+        token = match.group(0)
+        normalized = _normalize_number_token(token)
+        if token in allowed or normalized in allowed:
+            return token
+        removed += 1
+        return "未提供数字"
+
+    return _NUMBER_PATTERN.sub(replace, report), removed
+
+
+def _ensure_identity(
+    report: str,
+    market: str,
+    symbol: str,
+    stock_identity: str,
+    stock_name: str | None = None,
+) -> tuple[str, int]:
+    required_title = f"# 综合分析报告：{stock_identity}"
+    changed = 0
+    lines = report.splitlines()
+    if not lines or not lines[0].startswith("# 综合分析报告："):
+        lines.insert(0, required_title)
+        changed += 1
+    elif lines[0] != required_title:
+        lines[0] = required_title
+        changed += 1
+
+    output = "\n".join(lines)
+    if f"{market}/{symbol}" not in output:
+        output = output.replace(
+            "## 综合结论",
+            f"## 综合结论\n本报告分析对象为 {stock_identity}。",
+            1,
+        )
+        changed += 1
+    if stock_name and stock_name not in output:
+        output = output.replace(
+            "## 综合结论",
+            f"## 综合结论\n本报告分析对象为 {stock_identity}。",
+            1,
+        )
+        changed += 1
+    return output, changed
+
+
+def _ensure_limitations(report: str, sections: dict[str, str]) -> tuple[str, int]:
+    missing: list[str] = []
+    for line in _limitation_lines(sections):
+        if line != "本次分析受限于子报告可用字段和时间范围" and line not in report:
+            missing.append(line)
+    if not missing:
+        return report, 0
+    insertion = "\n".join(f"- {line}" for line in missing[:6])
+    if "## 数据限制" not in report:
+        return report + f"\n\n## 数据限制\n{insertion}\n", len(missing)
+    return report.replace("## 数据限制", f"## 数据限制\n{insertion}", 1), len(missing)
+
+
+def _finalize_synthesis_report(
+    report: str,
+    sections: dict[str, str],
+    market: str,
+    symbol: str,
+    stock_identity: str,
+    stock_name: str | None = None,
+) -> tuple[str, dict[str, int | bool]]:
+    shaped, shape_changed = _coerce_synthesis_shape(report or "", sections, stock_identity)
+    shaped, identity_changes = _ensure_identity(shaped, market, symbol, stock_identity, stock_name)
+    shaped, source_removals = _remove_out_of_scope_sources(shaped, sections)
+    shaped, unsupported_numbers = _remove_unsupported_numbers(shaped, sections, symbol)
+    shaped, safety_replacements = _sanitize_forbidden_content(shaped)
+    shaped, missing_limits = _ensure_limitations(shaped, sections)
+    shaped, duplicate_count = _remove_duplicate_paragraphs(shaped)
+
+    validation = {
+        "shape_coerced": shape_changed,
+        "identity_corrections": identity_changes,
+        "unsupported_number_count": unsupported_numbers,
+        "out_of_scope_source_count": source_removals,
+        "safety_violation_count": safety_replacements,
+        "missing_limitation_count": missing_limits,
+        "duplicate_section_count": duplicate_count,
+    }
+    return shaped, validation
+
+
+def _insufficient_data_report(stock_identity: str, sections: dict[str, str]) -> str:
+    statuses = [
+        f"{_SECTION_LABELS.get(name, name)}：{(text or '本次无可用数据').strip()}"
+        for name, text in sections.items()
+    ]
+    return f"""\
+# 综合分析报告：{stock_identity}
+
+## 综合结论
+本报告分析对象为 {stock_identity}。本次四个子报告均无可用数据，无法生成综合分析正文。
+
+## 核心事实卡片
+- 本次无可用数据
+
+## 基本面与财务
+本次无可用数据
+
+## 市场与技术
+本次无可用数据
+
+## 新闻与事件
+本次无可用数据
+
+## 同行位置
+本次无可用数据
+
+## 关键联动
+本次无可用数据
+
+## 主要风险
+- 数据不足导致无法识别具体风险。
+
+## 数据限制
+{_bulletize(statuses, 10)}
+
+## 后续观察
+- 待基础行情、财务、新闻或同行数据恢复后重新生成综合分析。
+"""
 
 def _trunc(text: str, label: str, max_chars: int) -> str:
     """截断子报告，追加截断提示（供非静态方法使用）。"""

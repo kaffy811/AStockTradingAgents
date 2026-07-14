@@ -1,0 +1,56 @@
+{
+  "phase": "phase6u_p4_production_regression",
+  "generated_at": "2026-07-14",
+  "fixture": "backend/tests/fixtures/phase6u_production_regression_cases.json",
+  "fixture_total": 30,
+  "case_groups": {
+    "fundamental": 8,
+    "multi_turn": 6,
+    "comprehensive": 4,
+    "technical": 4,
+    "news": 4,
+    "missing_data_and_safety": 4
+  },
+  "coverage": {
+    "fixture_loadable": true,
+    "main_route_contracts": true,
+    "financial_report_not_gfa_contract": true,
+    "technical_route_contract": true,
+    "news_route_contract": true,
+    "comparison_not_gfa_contract": true,
+    "multi_turn_symbol_inheritance": true,
+    "new_entity_overrides_old_entity": true,
+    "report_id_inheritance_contract": true,
+    "narrow_question_shape": true,
+    "comprehensive_no_unsupported_numbers": true,
+    "comprehensive_no_full_subreport_repetition": true,
+    "comprehensive_preserves_limitations": true,
+    "conflicts_explicit": true,
+    "missing_subreport_partial": true,
+    "all_missing_no_empty_synthesis": true,
+    "no_buy_sell_instruction": true,
+    "no_deterministic_prediction": true,
+    "no_chain_of_thought": true,
+    "no_tool_args_traceback_secret_abs_path": true,
+    "schema_unchanged": true,
+    "frontend_fields_unchanged": true,
+    "no_new_skip": true
+  },
+  "metrics": {
+    "route_accuracy": 1.0,
+    "entity_inheritance_accuracy": 1.0,
+    "unsupported_number_count": 0,
+    "duplicate_section_count": 0,
+    "missing_limitation_count": 0,
+    "safety_violation_count": 0,
+    "schema_regression_count": 0
+  },
+  "targeted_tests": {
+    "command": "cd backend && .venv/bin/python -m pytest -q tests/fundamental -k \"comprehensive or production_regression or phase6u\"",
+    "result": "49 passed, 1282 deselected, 1 warning"
+  },
+  "hermetic_tests": {
+    "command": "cd backend && .venv/bin/python -m pytest -q -m \"not live_supabase\"",
+    "result": "3139 passed, 15 deselected, 206 warnings"
+  }
+}
