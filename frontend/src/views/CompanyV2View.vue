@@ -51,14 +51,17 @@
       </div>
     </header>
 
-    <div v-if="loading && !hasDisplayData" class="cv2-loading">加载中...</div>
-    <div v-else-if="error && !hasDisplayData" class="cv2-error">
+    <div v-if="error && !hasDisplayData" class="cv2-error">
       <span>{{ error }}</span>
       <button class="cv2-retry" @click="load(true)">重试</button>
     </div>
     <template v-else>
       <p v-if="loading" class="cv2-refreshing">正在刷新数据...</p>
       <p v-if="refreshWarning" class="cv2-refresh-warning">{{ refreshWarning }}</p>
+      <p v-if="pageTimedOut" class="cv2-refresh-warning">
+        加载超时，可重试。
+        <button class="cv2-inline-retry" @click="load(true)">重试</button>
+      </p>
       <CompanyV2CompanyProfileCard
         :stock-basic="stockBasic"
         :symbol="symbol"
@@ -67,6 +70,12 @@
         data-testid="company-profile-card"
       />
 
+      <section v-if="loading && !Object.keys(stockBasic || {}).length" class="cv2-skeleton-section" data-testid="profile-skeleton">
+        <div class="cv2-skeleton-line wide"></div>
+        <div class="cv2-skeleton-line"></div>
+        <div class="cv2-skeleton-line short"></div>
+      </section>
+
       <!-- 2. Overview Cards (来自 quote_overview) -->
       <CompanyV2StockBasicCard
         v-if="quoteRow && Object.keys(quoteRow).length"
@@ -74,6 +83,11 @@
         :stock-basic="stockBasic"
         data-testid="stock-basic-card"
       />
+      <section v-else-if="loading" class="cv2-skeleton-section" data-testid="quote-skeleton">
+        <div class="cv2-skeleton-grid">
+          <span v-for="n in 4" :key="n" class="cv2-skeleton-tile"></span>
+        </div>
+      </section>
 
       <!-- Debug Panel（默认折叠） -->
       <details v-if="debugMode" class="cv2-debug-details" data-testid="debug-panel">
@@ -93,6 +107,13 @@
         :symbol="symbol"
         :debug-mode="debugMode"
       />
+      <section v-if="loading && !visibleModules.length" class="cv2-section cv2-module-skeletons" data-testid="financial-module-skeletons">
+        <div v-for="name in ['盈利能力', '成长能力', '现金流质量', '报告文件']" :key="name" class="cv2-skeleton-module">
+          <div class="cv2-skeleton-title">{{ name }}</div>
+          <div class="cv2-skeleton-line wide"></div>
+          <div class="cv2-skeleton-line"></div>
+        </div>
+      </section>
 
       <!-- 不可展示模块列表 -->
       <section v-if="debugMode && unavailableModules.length" class="cv2-section">
@@ -132,6 +153,7 @@ defineProps({
 const loading = ref(false)
 const error = ref('')
 const refreshWarning = ref('')
+const pageTimedOut = ref(false)
 const debugData = ref({})
 const historyData = ref({})   // 全历史数据
 const stockBasic = ref({})    // 公司/股票基本信息
@@ -282,9 +304,11 @@ const priceIsRealtime = computed(() => !!quoteRow.value.price_is_realtime)
 // Phase 6T-E: 请求取消 + 序号守卫，防止股票快速切换时旧请求覆盖新页面
 let _loadSeq = 0
 let _abortController = null
+let _timeoutTimer = null
 
 async function load(force = false) {
   if (_abortController) _abortController.abort()
+  if (_timeoutTimer) clearTimeout(_timeoutTimer)
   _abortController = typeof AbortController !== 'undefined' ? new AbortController() : null
   const signal = _abortController?.signal
   const seq = ++_loadSeq
@@ -294,6 +318,10 @@ async function load(force = false) {
   loading.value = true
   error.value = ''
   refreshWarning.value = ''
+  pageTimedOut.value = false
+  _timeoutTimer = setTimeout(() => {
+    if (seq === _loadSeq && loading.value) pageTimedOut.value = true
+  }, 15000)
   try {
     if (!restored) {
       debugData.value = {}
@@ -306,8 +334,19 @@ async function load(force = false) {
     // 并行加载：快照数据 + 历史数据（默认 annual，上市以来）+ 公司基本信息
     // profile=page：轻量生产展示；仅当用户打开 include raw 时请求完整 debug profile
     // 不默认 period=all / 上市以来全部季度
-    const [debugResult, historyResult, basicResult] = await Promise.allSettled([
-      getCompanyV2FullDebug(market.value, symbol.value, {
+    const basicPromise = getCompanyV2Profile(market.value, symbol.value, { signal }).then(data => {
+      if (seq === _loadSeq && requestGeneration.startsWith(`${market.value}:${symbol.value}:annual:`)) {
+        stockBasic.value = { ...(stockBasic.value || {}), ...(data || {}) }
+      }
+      return data
+    }).catch(() => ({}))
+    const historyPromise = getCompanyV2History(market.value, symbol.value, { period: 'annual', force_refresh: force, signal }).then(data => {
+      if (seq === _loadSeq && requestGeneration.startsWith(`${market.value}:${symbol.value}:annual:`)) {
+        historyData.value = data || {}
+      }
+      return data
+    }).catch(() => ({}))
+    const debugPromise = getCompanyV2FullDebug(market.value, symbol.value, {
         include_raw: includeRaw.value,
         force_refresh: force,
         max_raw_chars: 20000,
@@ -315,9 +354,11 @@ async function load(force = false) {
         period: 'annual',
         profile: includeRaw.value ? 'debug' : 'page',
         signal,
-      }),
-      getCompanyV2History(market.value, symbol.value, { period: 'annual', force_refresh: force, signal }).catch(() => ({})),
-      getCompanyV2Profile(market.value, symbol.value, { signal }).catch(() => ({})),
+      })
+    const [debugResult, historyResult, basicResult] = await Promise.allSettled([
+      debugPromise,
+      historyPromise,
+      basicPromise,
     ])
     if (seq !== _loadSeq || !requestGeneration.startsWith(`${market.value}:${symbol.value}:annual:`)) return
     if (debugResult.status === 'fulfilled') {
@@ -352,6 +393,7 @@ async function load(force = false) {
     }
     emit('load-error', e)
   } finally {
+    if (_timeoutTimer) clearTimeout(_timeoutTimer)
     if (seq === _loadSeq) loading.value = false
   }
 }
@@ -369,7 +411,10 @@ watch([market, symbol], () => {
   resetViewState({ keepCached: true })
   load(false)
 })
-onUnmounted(() => { if (_abortController) _abortController.abort() })
+onUnmounted(() => {
+  if (_abortController) _abortController.abort()
+  if (_timeoutTimer) clearTimeout(_timeoutTimer)
+})
 </script>
 
 <style scoped>
@@ -424,11 +469,33 @@ onUnmounted(() => { if (_abortController) _abortController.abort() })
 .cv2-loading, .cv2-error { padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px; background: #fff; }
 .cv2-error { display: flex; align-items: center; gap: 12px; }
 .cv2-retry { border: 1px solid #d1d5db; background: #fff; border-radius: 6px; padding: 5px 10px; cursor: pointer; }
+.cv2-inline-retry { margin-left: 8px; border: 1px solid #d1d5db; background: #fff; border-radius: 5px; padding: 3px 8px; cursor: pointer; }
 .cv2-refreshing, .cv2-refresh-warning {
   margin: 0 0 12px; padding: 8px 10px; border-radius: 6px; font-size: 12px;
 }
 .cv2-refreshing { background: #eff6ff; color: #1d4ed8; }
 .cv2-refresh-warning { background: #fef3c7; color: #92400e; }
+.cv2-skeleton-section {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+.cv2-skeleton-line {
+  height: 10px;
+  width: 56%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #f3f4f6, #e5e7eb, #f3f4f6);
+  margin: 8px 0;
+}
+.cv2-skeleton-line.wide { width: 82%; }
+.cv2-skeleton-line.short { width: 34%; }
+.cv2-skeleton-grid { display: grid; grid-template-columns: repeat(4, minmax(120px, 1fr)); gap: 12px; }
+.cv2-skeleton-tile { height: 48px; border-radius: 6px; background: #f3f4f6; display: block; }
+.cv2-module-skeletons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.cv2-skeleton-module { border: 1px solid #f3f4f6; border-radius: 8px; padding: 12px; }
+.cv2-skeleton-title { font-size: 13px; font-weight: 600; color: #6b7280; margin-bottom: 6px; }
 .cv2-debug-details { margin-top: 4px; margin-bottom: 16px; }
 .cv2-debug-summary {
   cursor: pointer; font-size: 13px; color: #6b7280; padding: 6px 10px;

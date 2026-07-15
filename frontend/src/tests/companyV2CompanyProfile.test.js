@@ -60,20 +60,20 @@ describe('CompanyV2StockBasicCard', () => {
     expect(raw.default).toContain('recent_close')
   })
 
-  it('renders PE/PB/PS/PCF', async () => {
+  it('keeps valuation ratios out of top quote summary', async () => {
     const raw = await import('../components/company-v2/CompanyV2StockBasicCard.vue?raw')
-    expect(raw.default).toContain('pe_ttm')
-    expect(raw.default).toContain('pb')
-    expect(raw.default).toContain('ps_ttm')
-    expect(raw.default).toContain('pcf_ncf_ttm')
+    expect(raw.default).not.toContain('pe_ttm')
+    expect(raw.default).not.toContain('ps_ttm')
+    expect(raw.default).not.toContain('pcf_ncf_ttm')
+    expect(raw.default).toContain('turnover')
+    expect(raw.default).not.toContain("key: 'amount'")
   })
 
-  it('renders total market cap and float market cap', async () => {
+  it('renders total market cap without duplicating float market cap', async () => {
     const raw = await import('../components/company-v2/CompanyV2StockBasicCard.vue?raw')
     expect(raw.default).toContain('market_cap')
-    expect(raw.default).toContain('float_market_cap')
     expect(raw.default).toContain('总市值')
-    expect(raw.default).toContain('流通市值')
+    expect(raw.default).not.toContain('流通市值')
   })
 
   it('has non-realtime price handling', async () => {

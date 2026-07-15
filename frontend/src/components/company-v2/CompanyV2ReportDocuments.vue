@@ -4,10 +4,13 @@
     <div class="cv2-rd-header">
       <div class="cv2-rd-status-row">
         <span :class="['cv2-rd-badge', statusBadgeClass]">{{ statusBadgeText }}</span>
-        <span v-if="reportSummary.report_count > 0" class="cv2-rd-count">
-          {{ reportSummary.report_count }} 份文件
+        <span v-if="reportSummary.report_count > 0" class="cv2-rd-summary">
+          {{ summaryText }}
         </span>
         <span v-if="reportSummary.rag_status === 'indexed'" class="cv2-rd-rag-badge">已可分析</span>
+        <span v-if="debugMode && reportSummary.report_count > 0" class="cv2-rd-count">
+          chunks {{ reportSummary.chunk_count }}
+        </span>
       </div>
       <p class="cv2-rd-hint">{{ statusHint }}</p>
     </div>
@@ -159,14 +162,18 @@ const reportSummary = computed(() => {
   const list = reports.value || []
   const annual = list.filter(item => (item.report_type || 'annual') === 'annual').length
   const chunkCount = list.reduce((sum, item) => sum + (Number(item.chunk_count) || 0), 0)
-  const ragReady = list.some(item => ['rag_ready', 'indexed', 'partial'].includes(item.rag_status) || item.rag_index_status === 'indexed')
+  const readyCount = list.filter(item => ['rag_ready', 'indexed', 'partial'].includes(item.rag_status) || ['indexed', 'partial'].includes(item.rag_index_status)).length
   return {
     report_count: list.length,
     annual_count: annual,
     chunk_count: chunkCount,
-    rag_status: ragReady ? 'indexed' : (list.length ? 'pending' : 'empty'),
+    ready_count: readyCount,
+    rag_status: readyCount > 0 ? 'indexed' : (list.length ? 'pending' : 'empty'),
   }
 })
+const summaryText = computed(() => (
+  `已发现 ${reportSummary.value.report_count} 份官方报告，其中 ${reportSummary.value.ready_count} 份可分析`
+))
 
 const statusBadgeClass = computed(() => {
   if (reportSummary.value.rag_status === 'indexed') return 'green'
@@ -185,7 +192,7 @@ const statusHint = computed(() => {
   if (['loading_persisted', 'discovering'].includes(reportState.value)) return '正在获取官方报告...'
   if (reportState.value === 'error') return '报告获取失败，请稍后重试。'
   if (reportSummary.value.report_count === 0) return '暂无已发现的官方财务报告。'
-  if (reportSummary.value.chunk_count === 0) return '已发现报告文件，尚未建立 RAG 索引。'
+  if (reportSummary.value.ready_count === 0) return '已发现官方报告，正在等待解析或索引。'
   return '报告已解析，可用于报告问答。'
 })
 const showNormalManualEntry = computed(() => !debugMode.value && ['empty', 'error'].includes(reportState.value))
@@ -349,7 +356,7 @@ watch(() => [props.market, props.symbol], () => {
 .cv2-rd-badge.green { background: #d1fae5; color: #065f46; }
 .cv2-rd-badge.yellow { background: #fef3c7; color: #92400e; }
 .cv2-rd-badge.grey { background: #f3f4f6; color: #6b7280; }
-.cv2-rd-count { font-size: 12px; color: #6b7280; }
+.cv2-rd-count, .cv2-rd-summary { font-size: 12px; color: #6b7280; }
 .cv2-rd-rag-badge { font-size: 11px; background: #ede9fe; color: #5b21b6; padding: 2px 6px; border-radius: 4px; }
 .cv2-rd-hint { font-size: 12px; color: #6b7280; margin: 0; }
 .cv2-rd-timeline { display: flex; flex-direction: column; gap: 4px; }

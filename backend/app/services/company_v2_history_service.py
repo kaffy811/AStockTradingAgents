@@ -33,8 +33,10 @@ from app.services.company_v2_stock_basic_service import (
 
 log = logging.getLogger(__name__)
 
-_CACHE_TTL_ANNUAL = 7 * 24 * 3600    # 7 天
-_CACHE_TTL_QUARTERLY = 3 * 24 * 3600  # 3 天
+_CACHE_TTL_ANNUAL = 12 * 3600
+_CACHE_STALE_TTL_ANNUAL = 12 * 3600
+_CACHE_TTL_QUARTERLY = 3600
+_CACHE_STALE_TTL_QUARTERLY = 5 * 3600
 
 
 def _ts_code(symbol: str) -> str:
@@ -142,21 +144,52 @@ async def build_company_history_dashboard(
         company_v2_snapshot_cache_service,
     )
     quarter_sig = ",".join(f"{y}Q{q}" for y, q in (valid_quarters or [])) or "annual"
-    cache_key = company_v2_snapshot_cache_service.make_key(
-        "history", ts, "v6te2", period, str(start_year), str(end_year), quarter_sig
+    cache_key = company_v2_snapshot_cache_service.make_company_key(
+        "company_history",
+        market,
+        symbol,
+        period,
+        str(start_year),
+        str(end_year),
+        quarter_sig,
+        version="v4",
     )
-    cached, hit, _stale, _status = await company_v2_snapshot_cache_service.get(
+    cached, swr_status, _status = await company_v2_snapshot_cache_service.get_swr(
         cache_key, force_refresh=force_refresh
     )
-    if hit and isinstance(cached, dict) and cached.get("modules"):
+    if swr_status in {"fresh", "stale"} and isinstance(cached, dict) and cached.get("modules"):
         cached_perf = dict(cached.get("performance_summary") or {})
         cached_perf["cache_hit"] = True
+        cached_perf["cache_status"] = swr_status
         cached_perf["provider_calls"] = 0
         cached_perf["actual_calls"] = 0
         cached_perf["login_batches"] = 0
         cached_perf["total_latency_ms"] = int((time.perf_counter() - t_total) * 1000)
         cached["performance_summary"] = cached_perf
+        if swr_status == "stale":
+            token = await company_v2_snapshot_cache_service.acquire_refresh_lock(cache_key, ttl=15)
+            if token:
+                asyncio.create_task(_refresh_history_cache(
+                    cache_key,
+                    token,
+                    market,
+                    symbol,
+                    period,
+                    start_year,
+                    end_year,
+                    include_stock_basic,
+                ))
         return cached
+    refresh_token: str | None = None
+    if swr_status in {"miss", "expired"}:
+        refresh_token = await company_v2_snapshot_cache_service.acquire_refresh_lock(cache_key, ttl=15)
+        if not refresh_token and isinstance(cached, dict) and cached.get("modules"):
+            cached_perf = dict(cached.get("performance_summary") or {})
+            cached_perf["cache_hit"] = True
+            cached_perf["cache_status"] = "stale"
+            cached_perf["total_latency_ms"] = int((time.perf_counter() - t_total) * 1000)
+            cached["performance_summary"] = cached_perf
+            return cached
 
     # Step 2: 获取全历史财务数据（所有模块，批量接口 + 分年缓存）
     t0 = time.perf_counter()
@@ -318,12 +351,42 @@ async def build_company_history_dashboard(
         "cache_hit": False,
     }
     if data_success_count > 0:
-        ttl = _CACHE_TTL_ANNUAL if period == "annual" else _CACHE_TTL_QUARTERLY
+        fresh_ttl = _CACHE_TTL_ANNUAL if period == "annual" else _CACHE_TTL_QUARTERLY
+        stale_ttl = _CACHE_STALE_TTL_ANNUAL if period == "annual" else _CACHE_STALE_TTL_QUARTERLY
         try:
-            await company_v2_snapshot_cache_service.set(cache_key, payload, ttl=ttl)
+            await company_v2_snapshot_cache_service.set_swr(cache_key, payload, fresh_ttl=fresh_ttl, stale_ttl=stale_ttl)
         except Exception as exc:
             log.debug("history dashboard cache set failed: %s", exc)
+    if refresh_token:
+        await company_v2_snapshot_cache_service.release_refresh_lock(cache_key, refresh_token)
     return payload
+
+
+async def _refresh_history_cache(
+    cache_key: str,
+    token: str,
+    market: str,
+    symbol: str,
+    period: str,
+    start_year: int | None,
+    end_year: int | None,
+    include_stock_basic: bool,
+) -> None:
+    from app.services.company_v2_snapshot_cache_service import company_v2_snapshot_cache_service
+    try:
+        await build_company_history_dashboard(
+            market,
+            symbol,
+            period=period,
+            start_year=start_year,
+            end_year=end_year,
+            force_refresh=True,
+            include_stock_basic=include_stock_basic,
+        )
+    except Exception as exc:
+        log.debug("background history cache refresh failed [%s]: %s", cache_key, exc)
+    finally:
+        await company_v2_snapshot_cache_service.release_refresh_lock(cache_key, token)
 
 
 def _build_history_range(

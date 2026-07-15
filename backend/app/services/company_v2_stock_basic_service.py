@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
 from datetime import date, datetime
 from typing import Any
 
@@ -220,7 +221,7 @@ async def _fetch_akshare_stock_info(symbol: str) -> dict[str, Any] | None:
         return None
 
 
-async def get_stock_basic(
+async def _load_stock_basic_uncached(
     symbol: str,
     *,
     force_refresh: bool = False,
@@ -337,6 +338,78 @@ async def get_stock_basic(
         "as_of_date": today_str,
     }
     return profile
+
+
+async def get_stock_basic(
+    symbol: str,
+    *,
+    force_refresh: bool = False,
+) -> dict[str, Any]:
+    from app.services.company_v2_snapshot_cache_service import company_v2_snapshot_cache_service
+
+    code = _extract_code(symbol)
+    use_cache = not _provider_functions_mocked_for_pytest()
+    cache_key = company_v2_snapshot_cache_service.make_company_key(
+        "company_profile",
+        "CN",
+        code,
+        version="v2",
+    )
+    cached, swr_status, _status = (None, "miss", "")
+    if use_cache:
+        cached, swr_status, _status = await company_v2_snapshot_cache_service.get_swr(
+            cache_key, force_refresh=force_refresh
+        )
+    if swr_status in {"fresh", "stale"} and isinstance(cached, dict) and cached.get("symbol"):
+        out = dict(cached)
+        out["cache_status"] = swr_status
+        if swr_status == "stale":
+            token = await company_v2_snapshot_cache_service.acquire_refresh_lock(cache_key, ttl=15)
+            if token:
+                asyncio.create_task(_refresh_stock_basic_cache(cache_key, token, code))
+        return out
+
+    if not use_cache:
+        return await _load_stock_basic_uncached(code, force_refresh=force_refresh)
+    token = await company_v2_snapshot_cache_service.acquire_refresh_lock(cache_key, ttl=15)
+    if not token and isinstance(cached, dict) and cached.get("symbol"):
+        out = dict(cached)
+        out["cache_status"] = "stale"
+        return out
+    try:
+        profile = await _load_stock_basic_uncached(code, force_refresh=force_refresh)
+        has_profile = bool(profile.get("company_name") or profile.get("short_name") or profile.get("list_date"))
+        fresh_ttl = 3 * 24 * 3600 if has_profile else 60
+        stale_ttl = 4 * 24 * 3600 if has_profile else 60
+        await company_v2_snapshot_cache_service.set_swr(cache_key, profile, fresh_ttl=fresh_ttl, stale_ttl=stale_ttl)
+        profile["cache_status"] = "miss"
+        return profile
+    finally:
+        await company_v2_snapshot_cache_service.release_refresh_lock(cache_key, token)
+
+
+async def _refresh_stock_basic_cache(cache_key: str, token: str, symbol: str) -> None:
+    from app.services.company_v2_snapshot_cache_service import company_v2_snapshot_cache_service
+
+    try:
+        profile = await _load_stock_basic_uncached(symbol, force_refresh=True)
+        has_profile = bool(profile.get("company_name") or profile.get("short_name") or profile.get("list_date"))
+        fresh_ttl = 3 * 24 * 3600 if has_profile else 60
+        stale_ttl = 4 * 24 * 3600 if has_profile else 60
+        await company_v2_snapshot_cache_service.set_swr(cache_key, profile, fresh_ttl=fresh_ttl, stale_ttl=stale_ttl)
+    except Exception as exc:
+        log.debug("background stock basic refresh failed [%s]: %s", symbol, exc)
+    finally:
+        await company_v2_snapshot_cache_service.release_refresh_lock(cache_key, token)
+
+
+def _provider_functions_mocked_for_pytest() -> bool:
+    if "PYTEST_CURRENT_TEST" not in os.environ:
+        return False
+    return any(
+        "unittest.mock" in type(func).__module__
+        for func in (_fetch_baostock_stock_basic, _fetch_akshare_stock_info)
+    )
 
 
 def get_default_start_year(

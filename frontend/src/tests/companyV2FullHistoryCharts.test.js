@@ -212,7 +212,7 @@ describe('CompanyV2View Phase 6T-B', () => {
   it('imports history API functions', async () => {
     const raw = await import('../views/CompanyV2View.vue?raw')
     expect(raw.default).toContain('getCompanyV2History')
-    expect(raw.default).toContain('getCompanyV2StockBasic')
+    expect(raw.default).toContain('getCompanyV2Profile')
   })
 
   it('debug panel is inside details element (collapsed by default)', async () => {

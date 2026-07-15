@@ -49,9 +49,9 @@ def test_baostock_cashflow_raw_maps_to_cashflow_normalized():
         "CFOToNP": 0.2,
         "CFOToGr": 0.3,
     }]})
-    assert rows[0]["ocf_to_revenue"] == 0.1
+    assert rows[0]["ocf_to_revenue"] == 0.3
     assert rows[0]["ocf_to_np"] == 0.2
-    assert rows[0]["cashflow_revenue_ratio"] == 0.3
+    assert rows[0]["cashflow_revenue_ratio"] == 0.1
 
 
 def test_baostock_solvency_raw_maps_to_solvency_normalized():
@@ -90,11 +90,14 @@ def test_baostock_dupont_raw_maps_to_dupont_normalized():
         "dupontAssetStoEquity": 2,
         "dupontAssetTurn": 3,
         "dupontPnitoni": 0.4,
+        "dupontNitogr": 0.5,
     }]})
     assert rows[0]["roe"] == 0.1
     assert rows[0]["equity_multiplier"] == 2
     assert rows[0]["asset_turnover"] == 3
-    assert rows[0]["net_margin"] == 0.4
+    assert rows[0]["dupont_net_profit_factor"] == 0.4
+    assert rows[0]["dupont_income_margin"] == 0.5
+    assert rows[0]["net_margin"] == 0.2
 
 
 def test_mapping_error_when_raw_rows_but_no_normalized_rows():

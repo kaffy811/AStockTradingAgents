@@ -141,7 +141,7 @@ const debugMode = computed(() => props.debugMode)
 const fields = computed(() => props.envelope.normalized?.fields || {})
 const firstRow = computed(() => props.envelope.normalized?.rows?.[0] || {})
 const BUSINESS_FIELDS = {
-  quote_overview: ['latest_price', 'pct_chg', 'amount', 'turnover', 'market_cap'],
+  quote_overview: ['latest_price', 'pct_chg', 'turnover', 'market_cap'],
   valuation: ['pe_ttm', 'pb', 'ps_ttm', 'pcf_ncf_ttm'],
   profitability: ['roe', 'gross_margin', 'net_margin', 'net_profit'],
   growth: ['main_business_revenue', 'net_profit', 'net_profit_yoy', 'parent_net_profit_yoy', 'equity_yoy', 'asset_yoy', 'eps_yoy'],
@@ -154,6 +154,7 @@ const BUSINESS_FIELDS = {
 const latestRow = computed(() => props.historyData?.latest || firstRow.value || {})
 const latestPeriodLabel = computed(() => latestRow.value.period || latestRow.value.period_end || fields.value[Object.keys(fields.value)[0]]?.period_end || '')
 const metricItems = computed(() => {
+  if (props.moduleKey === 'report_documents' && !debugMode.value) return []
   const preferred = BUSINESS_FIELDS[props.moduleKey] || props.envelope.render?.visible_fields || Object.keys(fields.value)
   const row = latestRow.value
   return preferred

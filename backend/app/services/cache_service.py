@@ -206,6 +206,49 @@ class RedisCacheService:
             log.warning("cache delete error [%s]: %s", key, exc)
             return False
 
+    async def delete_pattern(self, pattern: str) -> int:
+        """删除匹配 pattern 的 Redis keys，pattern 会自动加统一前缀。"""
+        redis = get_redis()
+        if redis is None:
+            return 0
+        try:
+            keys = await redis.keys(_full_key(pattern))
+            if not keys:
+                return 0
+            return int(await redis.delete(*keys))
+        except Exception as exc:
+            log.warning("cache delete_pattern error [%s]: %s", pattern, exc)
+            return 0
+
+    async def set_lock(self, key: str, token: str, ttl: int) -> bool:
+        """轻量分布式锁：SET key token NX EX ttl。Redis 不可用返回 False。"""
+        redis = get_redis()
+        if redis is None:
+            return False
+        try:
+            return bool(await redis.set(_full_key(key), token, nx=True, ex=ttl))
+        except Exception as exc:
+            log.warning("cache set_lock error [%s]: %s", key, exc)
+            return False
+
+    async def release_lock(self, key: str, token: str) -> bool:
+        """仅当 token 匹配时释放锁，避免误删其他请求持有的锁。"""
+        redis = get_redis()
+        if redis is None:
+            return False
+        fk = _full_key(key)
+        try:
+            current = await redis.get(fk)
+            if isinstance(current, bytes):
+                current = current.decode("utf-8", errors="ignore")
+            if current != token:
+                return False
+            await redis.delete(fk)
+            return True
+        except Exception as exc:
+            log.warning("cache release_lock error [%s]: %s", key, exc)
+            return False
+
     async def exists(self, key: str) -> bool:
         """检查 key 是否存在。Redis 不可用返回 False。"""
         redis = get_redis()

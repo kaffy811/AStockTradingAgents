@@ -7,8 +7,8 @@ describe('CompanyV2 official verification UI', () => {
   it('report timeline shows PDF status', async () => {
     const raw = await import('../components/company-v2/CompanyV2ReportTimeline.vue?raw')
     expect(raw.default).toContain('cv2-rt-pdf-status')
-    expect(raw.default).toContain('PDF discovered')
-    expect(raw.default).toContain('PDF parsed')
+    expect(raw.default).toContain("discovered: '已发现'")
+    expect(raw.default).toContain("parsed: '可分析'")
   })
 
   it('report timeline renders verification badge', async () => {

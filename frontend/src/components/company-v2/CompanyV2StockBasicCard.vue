@@ -54,7 +54,7 @@ const items = computed(() => {
   if (price != null) {
     result.push({
       key: 'price',
-      label: q.price_label || '最近收盘价',
+      label: '最新价',
       display: Number(price).toFixed(2),
       unit: '元',
       colorClass: '',
@@ -73,15 +73,6 @@ const items = computed(() => {
     })
   }
 
-  if (q.amount != null) {
-    result.push({
-      key: 'amount',
-      label: '成交额',
-      display: _fmt(q.amount, 'currency_b'),
-      unit: '',
-      colorClass: '',
-    })
-  }
   if (q.turnover != null) {
     result.push({
       key: 'turnover',

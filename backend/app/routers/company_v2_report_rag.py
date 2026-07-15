@@ -30,6 +30,7 @@ from app.services.company_v2_report_rag_index_service import (
     ReportDescriptor,
     company_v2_report_rag_index_service,
 )
+from app.services.company_v2_snapshot_cache_service import company_v2_snapshot_cache_service
 
 
 router = APIRouter(
@@ -60,6 +61,14 @@ class FinancialFusionRunRequest(BaseModel):
 
 def _json(payload: dict[str, Any], status_code: int = 200) -> JSONResponse:
     return JSONResponse(payload, status_code=status_code)
+
+
+async def _invalidate_company_report_caches(market: str, symbol: str) -> None:
+    market = market.upper()
+    await company_v2_snapshot_cache_service.invalidate_patterns([
+        f"company_v2:{market}:{symbol}:*",
+        f"company_reports:{market}:{symbol}:*",
+    ])
 
 
 def _symbol_from_ts_code(ts_code: str | None) -> str:
@@ -151,6 +160,7 @@ async def index_company_v2_report_rag(
     if not sidecar:
         return _json({"ok": False, "status": "failed", "error_code": "PDF_NOT_PARSED", "message": "page sidecar unavailable"}, 412)
     job = company_v2_report_rag_index_manager.enqueue_create_index(_descriptor_from_doc(doc, market, symbol), sidecar)
+    await _invalidate_company_report_caches(market, symbol)
     return _json({"ok": True, "report_id": report_id, "job_id": job["job_id"], "status": job["status"], "duplicate": job.get("duplicate", False)})
 
 
@@ -168,6 +178,7 @@ async def refresh_company_v2_report_rag(
     if not sidecar:
         return _json({"ok": False, "status": "failed", "error_code": "PDF_NOT_PARSED", "message": "page sidecar unavailable"}, 412)
     job = company_v2_report_rag_index_manager.enqueue_refresh_index(_descriptor_from_doc(doc, market, symbol), sidecar)
+    await _invalidate_company_report_caches(market, symbol)
     return _json({"ok": True, "report_id": report_id, "job_id": job["job_id"], "status": job["status"], "duplicate": job.get("duplicate", False)})
 
 
@@ -180,6 +191,7 @@ async def delete_company_v2_report_rag_index(
 ) -> JSONResponse:
     await _load_report(report_id=report_id, market=market, symbol=symbol, db=db)
     result = company_v2_report_rag_index_manager.delete_index(report_id)
+    await _invalidate_company_report_caches(market, symbol)
     return _json(result, 200 if result.get("ok") else 404)
 
 

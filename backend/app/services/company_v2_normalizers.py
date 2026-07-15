@@ -78,10 +78,11 @@ def normalize_baostock_table(module_key: str, rows: list[dict[str, Any]]) -> lis
             _set(out, source_map, "non_current_assets_to_assets", raw, "NCAToAsset", "nca_to_asset")
             _set(out, source_map, "tangible_assets_to_assets", raw, "tangibleAssetToAsset", "tangible_to_asset")
             _set(out, source_map, "ebitda_to_liability", raw, "ebITDAToLiability", "ebit_to_interest")
-            _set(out, source_map, "ocf_to_revenue", raw, "CFOToOR", "cfo_to_or")
+            # CFOToOR 与 CFOToGr 在 BaoStock 年报样本中为同一收入现金流比率。
+            # 普通展示只使用 ocf_to_revenue；cashflow_revenue_ratio 保留为兼容 alias。
+            _set(out, source_map, "ocf_to_revenue", raw, "CFOToGr", "cfo_to_gr", "CFOToOR", "cfo_to_or")
             _set(out, source_map, "ocf_to_np", raw, "CFOToNP", "cfo_to_np")
-            _set(out, source_map, "ocf_to_growth", raw, "CFOToGr", "cfo_to_gr")
-            _set(out, source_map, "cashflow_revenue_ratio", raw, "CFOToGr", "cfo_to_gr")
+            _set(out, source_map, "cashflow_revenue_ratio", raw, "CFOToOR", "cfo_to_or", "CFOToGr", "cfo_to_gr")
         elif module_key == "solvency":
             _set(out, source_map, "current_ratio", raw, "currentRatio", "current_ratio")
             _set(out, source_map, "quick_ratio", raw, "quickRatio", "quick_ratio")
@@ -101,11 +102,20 @@ def normalize_baostock_table(module_key: str, rows: list[dict[str, Any]]) -> lis
             _set(out, source_map, "roe", raw, "dupontROE", "dupont_roe")
             _set(out, source_map, "equity_multiplier", raw, "dupontAssetStoEquity", "dupont_am")
             _set(out, source_map, "asset_turnover", raw, "dupontAssetTurn", "dupont_at")
-            _set(out, source_map, "net_margin", raw, "dupontPnitoni", "dupont_npi")
-            _set(out, source_map, "net_income_to_gross_revenue", raw, "dupontNitogr", "dupont_nitogr")
+            _set(out, source_map, "dupont_net_profit_factor", raw, "dupontPnitoni", "dupont_npi")
+            _set(out, source_map, "dupont_income_margin", raw, "dupontNitogr", "dupont_nitogr")
             _set(out, source_map, "tax_burden", raw, "dupontTaxBurden", "dupont_tax")
             _set(out, source_map, "interest_burden", raw, "dupontIntburden", "dupont_int")
             _set(out, source_map, "ebit_to_gross_revenue", raw, "dupontEbittogr", "dupont_ebittogr")
+            npi = out.get("dupont_net_profit_factor")
+            nitogr = out.get("dupont_income_margin")
+            try:
+                if npi is not None and nitogr is not None:
+                    out["net_margin"] = round(float(npi) * float(nitogr), 6)
+                    out["net_margin_source"] = "computed"
+                    source_map["net_margin"] = "dupontPnitoni*dupontNitogr"
+            except (TypeError, ValueError):
+                pass
         if source_map:
             normalized.append(_with_meta(out, source_map))
     return normalized

@@ -37,6 +37,7 @@ from app.services.company_v2_debug_diagnosis_service import diagnose_company_v2_
 from app.services.company_v2_computed_field_registry import compute_company_v2_fields
 from app.services.company_v2_data_validation_engine import validate_company_v2_envelope
 from app.services.company_v2_formatter_registry import format_field
+from app.services.company_v2_field_metadata import field_metadata_payload
 from app.services.company_v2_normalizers import normalize_baostock_aggregate
 from app.services.company_v2_snapshot_cache_service import company_v2_snapshot_cache_service
 
@@ -66,7 +67,7 @@ CORE_FIELDS: dict[str, list[str]] = {
     "profitability": ["roe", "gross_margin", "net_margin", "roa", "roic"],
     # Phase 6T-E: 对齐 BaoStock 真实口径（growth 表无营收同比/基本每股收益）
     "growth": ["net_profit_yoy", "parent_net_profit_yoy", "equity_yoy", "asset_yoy", "eps_yoy"],
-    "cashflow_quality": ["operating_cashflow", "ocf_to_np", "ocf_to_revenue", "cashflow_revenue_ratio"],
+    "cashflow_quality": ["ocf_to_np", "ocf_to_revenue"],
     "solvency": ["current_ratio", "quick_ratio", "cash_ratio", "debt_ratio", "equity_multiplier"],
     "operation_capability": ["asset_turnover", "inventory_turnover", "receivable_turnover", "total_asset_turnover"],
     "dupont": ["roe", "net_margin", "asset_turnover", "equity_multiplier"],
@@ -199,9 +200,12 @@ def _field_metadata(
     confidence: float | None = None,
     formula_context: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
+    context = formula_context or {}
     metadata = {
         "value": value,
         **format_field(field, value),
+        "field_key": field,
+        "field_metadata": field_metadata_payload(field),
         "source": source,
         "provider": provider or ("computed" if computed else ("baostock" if source == "baostock_aggregate" else source)),
         "provider_method": provider_method,
@@ -210,7 +214,8 @@ def _field_metadata(
         "computed_formula": computed_formula,
         "fallback_from": fallback_from,
         "confidence": confidence if confidence is not None else (0.75 if computed else 0.95),
-        "formula_context": formula_context or {},
+        "formula_context": context,
+        "period_end": context.get("period"),
         "updated_at": datetime.now(timezone.utc).isoformat(),
     }
     return metadata
@@ -884,8 +889,8 @@ class CompanyV2DebugService:
                         "net_profit_yoy": row.get("yoy_ni"),
                         "parent_net_profit_yoy": row.get("yoy_pni"),
                         "ocf_to_np": row.get("cfo_to_np"),
-                        "ocf_to_revenue": row.get("cfo_to_or") or row.get("cfo_to_gr"),
-                        "cashflow_revenue_ratio": row.get("cfo_to_gr"),
+                        "ocf_to_revenue": row.get("cfo_to_gr") or row.get("cfo_to_or"),
+                        "cashflow_revenue_ratio": row.get("cfo_to_or") or row.get("cfo_to_gr"),
                         "current_ratio": row.get("current_ratio"),
                         "quick_ratio": row.get("quick_ratio"),
                         "cash_ratio": row.get("cash_ratio"),
@@ -895,6 +900,13 @@ class CompanyV2DebugService:
                         "inventory_turnover": row.get("inv_turn_ratio"),
                         "receivable_turnover": row.get("nr_turn_ratio"),
                         "total_asset_turnover": row.get("asset_turn_ratio"),
+                        "dupont_net_profit_factor": row.get("dupont_npi"),
+                        "dupont_income_margin": row.get("dupont_nitogr"),
+                        "net_margin": (
+                            round(float(row.get("dupont_npi")) * float(row.get("dupont_nitogr")), 6)
+                            if row.get("dupont_npi") is not None and row.get("dupont_nitogr") is not None
+                            else row.get("net_margin")
+                        ),
                     })
         return out
 
@@ -1082,7 +1094,7 @@ class CompanyV2DebugService:
     ) -> dict[str, Any]:
         ts_code = _to_ts_code(market.upper(), symbol)
         full_cache_key = company_v2_snapshot_cache_service.make_key(
-            "full", ts_code, "v6tb_history" if history else "v6p_quality",
+            "full", ts_code, "v6u_d2_history" if history else "v6u_d2_quality",
             ",".join(providers or []), str(include_raw), str(max_raw_chars),
             str(max_validation_checks), str(history), period, str(start_year), str(end_year)
         )

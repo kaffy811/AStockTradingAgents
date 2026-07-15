@@ -30,6 +30,7 @@ from app.services.company_v2_financial_fusion_metrics import company_v2_financia
 from app.services.company_v2_financial_fusion_review_queue import company_v2_financial_fusion_review_queue
 from app.services.company_v2_debug_service import MODULE_KEYS, company_v2_debug_service
 from app.services.company_v2_report_pdf_service import validate_cninfo_pdf_url
+from app.services.company_v2_snapshot_cache_service import company_v2_snapshot_cache_service
 
 router = APIRouter(prefix="/api/v2/company", tags=["company-v2-debug"])
 
@@ -49,6 +50,74 @@ def _is_dev_or_admin(user: User | None) -> bool:
 
 def _json(data: Any, status_code: int = 200) -> JSONResponse:
     return JSONResponse(content=data, status_code=status_code)
+
+
+def _company_v2_cache_key(market: str, symbol: str, period: str, *parts: str) -> str:
+    return company_v2_snapshot_cache_service.make_company_key(
+        "company_v2",
+        market.upper(),
+        symbol,
+        period,
+        *parts,
+        version="v4",
+    )
+
+
+def _company_reports_cache_key(market: str, symbol: str, report_type: str) -> str:
+    return company_v2_snapshot_cache_service.make_company_key(
+        "company_reports",
+        market.upper(),
+        symbol,
+        report_type or "annual",
+        version="v2",
+    )
+
+
+async def _invalidate_company_v2_caches(market: str, symbol: str) -> dict[str, int]:
+    market = market.upper()
+    ts_code = _ts_code(symbol)
+    return await company_v2_snapshot_cache_service.invalidate_patterns([
+        f"company_v2:{market}:{symbol}:*",
+        f"company_reports:{market}:{symbol}:*",
+        f"company_history:{market}:{symbol}:*",
+        f"cv2:full:{ts_code}:*",
+        f"cv2:history:{ts_code}:*",
+        f"cv2:provider:{ts_code}:*",
+    ])
+
+
+async def _build_full_payload(
+    market: str,
+    symbol: str,
+    *,
+    include_raw: bool,
+    providers: list[str] | None,
+    force_refresh: bool,
+    max_raw_chars: int,
+    db: AsyncSession | None,
+    max_validation_checks: int | None,
+    history: bool,
+    period: str,
+    start_year: int | None,
+    end_year: int | None,
+    effective_profile: str,
+) -> dict[str, Any]:
+    from app.services.company_v2_response_profile import apply_response_profile
+
+    data = await company_v2_debug_service.build_full(
+        market, symbol,
+        include_raw=include_raw and effective_profile != "page",
+        providers=providers,
+        force_refresh=force_refresh,
+        max_raw_chars=max_raw_chars,
+        db=db,
+        max_validation_checks=max_validation_checks,
+        history=history,
+        period=period if period in ("annual", "quarterly", "all") else "annual",
+        start_year=start_year,
+        end_year=end_year,
+    )
+    return apply_response_profile(data, effective_profile)
 
 
 def _parse_providers(value: str | None) -> list[str] | None:
@@ -106,25 +175,100 @@ async def debug_full(
     if not settings.enable_company_v2_debug_api or not _is_dev_or_admin(user):
         return _json({"ok": False, "error_code": "AUTH_REQUIRED", "message": "CompanyV2 debug API is disabled"}, 403)
     try:
-        from app.services.company_v2_response_profile import apply_response_profile
         effective_profile = profile if profile in ("page", "debug") else "debug"
-        # page profile 不返回 raw
-        data = await company_v2_debug_service.build_full(
-            market, symbol,
-            include_raw=_allow_raw(include_raw, user) and effective_profile != "page",
-            providers=_parse_providers(providers),
+        # apply_response_profile is called by _build_full_payload after cache-safe construction.
+        parsed_providers = _parse_providers(providers)
+        allow_raw = _allow_raw(include_raw, user) and effective_profile != "page"
+        cacheable = effective_profile == "page" and not allow_raw and not parsed_providers
+        clean_period = period if period in ("annual", "quarterly", "all") else "annual"
+        cache_key = _company_v2_cache_key(
+            market,
+            symbol,
+            clean_period,
+            "history" if history else "snapshot",
+            str(start_year or ""),
+            str(end_year or ""),
+        )
+        if cacheable:
+            cached, swr_status, _cache_status = await company_v2_snapshot_cache_service.get_swr(cache_key, force_refresh=force_refresh)
+            if swr_status in {"fresh", "stale"} and isinstance(cached, dict):
+                payload = dict(cached)
+                payload["cache_status"] = swr_status
+                if swr_status == "stale":
+                    token = await company_v2_snapshot_cache_service.acquire_refresh_lock(cache_key, ttl=15)
+                    if token:
+                        asyncio.create_task(_refresh_full_payload_cache(
+                            cache_key,
+                            token,
+                            market,
+                            symbol,
+                            max_raw_chars=max_raw_chars,
+                            max_validation_checks=max_validation_checks,
+                            history=history,
+                            period=clean_period,
+                            start_year=start_year,
+                            end_year=end_year,
+                        ))
+                return _json(payload)
+
+        data = await _build_full_payload(
+            market,
+            symbol,
+            include_raw=allow_raw,
+            providers=parsed_providers,
             force_refresh=force_refresh,
             max_raw_chars=max_raw_chars,
             db=db,
             max_validation_checks=max_validation_checks,
             history=history,
-            period=period if period in ("annual", "quarterly", "all") else "annual",
+            period=clean_period,
             start_year=start_year,
             end_year=end_year,
+            effective_profile=effective_profile,
         )
-        return _json(apply_response_profile(data, effective_profile))
+        if cacheable and isinstance(data, dict) and not data.get("error_code"):
+            await company_v2_snapshot_cache_service.set_swr(cache_key, data, fresh_ttl=20 * 60, stale_ttl=20 * 60)
+            data["cache_status"] = "miss"
+        return _json(data)
     except Exception as exc:
         return _json({"ok": False, "error_code": "MAPPING_ERROR", "message": str(exc)[:500]}, 200)
+
+
+async def _refresh_full_payload_cache(
+    cache_key: str,
+    token: str,
+    market: str,
+    symbol: str,
+    *,
+    max_raw_chars: int,
+    max_validation_checks: int | None,
+    history: bool,
+    period: str,
+    start_year: int | None,
+    end_year: int | None,
+) -> None:
+    try:
+        async for db in get_db():
+            data = await _build_full_payload(
+                market,
+                symbol,
+                include_raw=False,
+                providers=None,
+                force_refresh=True,
+                max_raw_chars=max_raw_chars,
+                db=db,
+                max_validation_checks=max_validation_checks,
+                history=history,
+                period=period,
+                start_year=start_year,
+                end_year=end_year,
+                effective_profile="page",
+            )
+            if isinstance(data, dict) and not data.get("error_code"):
+                await company_v2_snapshot_cache_service.set_swr(cache_key, data, fresh_ttl=20 * 60, stale_ttl=20 * 60)
+            break
+    finally:
+        await company_v2_snapshot_cache_service.release_refresh_lock(cache_key, token)
 
 
 @router.get("/{market}/{symbol}/debug/module/{module_key}")
@@ -202,7 +346,8 @@ async def debug_refresh(
     keys = [f"{prefix}{module_key}" for module_key in MODULE_KEYS]
     for key in keys:
         await company_v2_debug_service._write_cache(key, {}, 1)
-    return _json({"ok": True, "market": market.upper(), "symbol": symbol, "refreshed_keys": keys})
+    invalidated = await _invalidate_company_v2_caches(market, symbol)
+    return _json({"ok": True, "market": market.upper(), "symbol": symbol, "refreshed_keys": keys, "invalidated": invalidated})
 
 
 # ── Financial Fusion Monitoring / Admin ─────────────────────────────────────
@@ -246,6 +391,53 @@ async def debug_financial_fusion_review_queue(user: User | None = Depends(get_op
 # ── Report Timeline Endpoints ────────────────────────────────────────────────
 
 
+async def _build_persisted_reports_payload(
+    db: AsyncSession,
+    market: str,
+    symbol: str,
+    *,
+    report_type: str,
+) -> dict[str, Any]:
+    if market.upper() != "CN":
+        return {"ok": True, "reports": [], "total": 0, "message": "Only CN market supported"}
+    persisted = await _list_persisted_report_documents(db, symbol, report_type=report_type)
+    if persisted:
+        state = "persisted_found"
+    else:
+        state = "empty"
+    view_model = _reports_view_model(persisted, state=state)
+    return {
+        "ok": True,
+        "symbol": symbol,
+        "market": market.upper(),
+        "reports": persisted,
+        "timeline": persisted,
+        "total": len(persisted),
+        "documents_count": len(persisted),
+        "annual_reports_count": sum(1 for item in persisted if item.get("report_type") == "annual"),
+        "quarterly_reports_count": sum(1 for item in persisted if item.get("report_type") != "annual"),
+        "from_cache": False,
+        **view_model,
+    }
+
+
+async def _refresh_reports_cache(
+    cache_key: str,
+    token: str,
+    market: str,
+    symbol: str,
+    report_type: str,
+) -> None:
+    try:
+        async for db in get_db():
+            payload = await _build_persisted_reports_payload(db, market, symbol, report_type=report_type)
+            ttl = 30 * 60 if payload.get("reports") else 60
+            await company_v2_snapshot_cache_service.set_swr(cache_key, payload, fresh_ttl=ttl, stale_ttl=30 * 60)
+            break
+    finally:
+        await company_v2_snapshot_cache_service.release_refresh_lock(cache_key, token)
+
+
 @router.get("/{market}/{symbol}/reports")
 async def get_reports(
     market: str = Path(...),
@@ -257,52 +449,23 @@ async def get_reports(
     db: AsyncSession = Depends(get_db),
 ) -> JSONResponse:
     """返回 CNINFO 年报/季报时间线。"""
-    if market.upper() != "CN":
-        return _json({"ok": True, "reports": [], "total": 0, "message": "Only CN market supported"})
-    persisted = await _list_persisted_report_documents(db, symbol, report_type=report_type)
-    if persisted:
-        view_model = _reports_view_model(persisted, state="persisted_found")
-        return _json({
-            "ok": True,
-            "symbol": symbol,
-            "market": market.upper(),
-            "reports": persisted,
-            "timeline": persisted,
-            "total": len(persisted),
-            "documents_count": len(persisted),
-            "annual_reports_count": sum(1 for item in persisted if item.get("report_type") == "annual"),
-            "quarterly_reports_count": sum(1 for item in persisted if item.get("report_type") != "annual"),
-            "from_cache": True,
-            **view_model,
-        })
-    from app.services.cninfo_report_discovery_agent import cninfo_report_discovery_agent
-    report_types = None if report_type in ("all", "", None) else [report_type]
-    result = await cninfo_report_discovery_agent.discover(
-        market, symbol,
-        start_year=start_year,
-        end_year=end_year,
-        report_types=report_types,
-        force_refresh=False,
-    )
-    reports = result.get("reports") or []
-    try:
-        reports = await _persist_report_documents(db, symbol, reports)
-    except Exception as exc:
-        result.setdefault("errors", []).append(f"report_persist_failed:{str(exc)[:100]}")
-    view_model = _reports_view_model(reports, state="discovered" if reports else "empty", errors=result.get("errors", []))
-    return _json({
-        "ok": True,
-        "symbol": symbol,
-        "market": market.upper(),
-        "reports": reports,
-        "timeline": reports,
-        "total": len(reports),
-        "documents_count": len(reports),
-        "annual_reports_count": result.get("annual_reports_count", 0),
-        "quarterly_reports_count": result.get("quarterly_reports_count", 0),
-        "from_cache": result.get("from_cache", False),
-        **view_model,
-    })
+    cache_key = _company_reports_cache_key(market, symbol, report_type)
+    cached, swr_status, _cache_status = await company_v2_snapshot_cache_service.get_swr(cache_key)
+    if swr_status in {"fresh", "stale"} and isinstance(cached, dict):
+        payload = dict(cached)
+        payload["cache_status"] = swr_status
+        payload["from_cache"] = True
+        if swr_status == "stale":
+            token = await company_v2_snapshot_cache_service.acquire_refresh_lock(cache_key, ttl=15)
+            if token:
+                asyncio.create_task(_refresh_reports_cache(cache_key, token, market, symbol, report_type))
+        return _json(payload)
+    payload = await _build_persisted_reports_payload(db, market, symbol, report_type=report_type)
+    ttl = 30 * 60 if payload.get("reports") else 60
+    if market.upper() == "CN":
+        await company_v2_snapshot_cache_service.set_swr(cache_key, payload, fresh_ttl=ttl, stale_ttl=30 * 60)
+    payload["cache_status"] = "miss"
+    return _json(payload)
 
 
 @router.get("/{market}/{symbol}/reports/discover")
@@ -334,6 +497,7 @@ async def discover_reports(
         reports = await _persist_report_documents(db, symbol, reports)
     except Exception as exc:
         result.setdefault("errors", []).append(f"report_persist_failed:{str(exc)[:100]}")
+    await _invalidate_company_v2_caches(market, symbol)
     view_model = _reports_view_model(reports, state="discovered" if reports else "empty", errors=result.get("errors", []))
     return _json({
         "ok": True,
@@ -385,15 +549,24 @@ def _report_view_state(symbol: str, report: dict[str, Any]) -> dict[str, Any]:
 def _reports_view_model(reports: list[dict[str, Any]], *, state: str, errors: list[str] | None = None) -> dict[str, Any]:
     annual_count = sum(1 for item in reports if (item.get("report_type") or "annual") == "annual")
     chunk_count = sum(int(item.get("chunk_count") or 0) for item in reports)
-    rag_ready = any(
-        item.get("rag_status") in {"rag_ready", "indexed", "partial"}
+    ready_count = sum(
+        1 for item in reports
+        if item.get("rag_status") in {"rag_ready", "indexed", "partial"}
         or item.get("rag_index_status") in {"indexed", "partial"}
-        for item in reports
+    )
+    rag_ready = ready_count > 0
+    rag_document_count = sum(
+        1 for item in reports
+        if int(item.get("chunk_count") or 0) > 0
+        or item.get("rag_status") in {"rag_ready", "indexed", "partial"}
+        or item.get("rag_index_status") in {"indexed", "partial"}
     )
     summary = {
         "report_count": len(reports),
         "annual_count": annual_count,
         "chunk_count": chunk_count,
+        "ready_count": ready_count,
+        "rag_document_count": rag_document_count,
         "rag_status": "indexed" if rag_ready else ("pending" if reports else "empty"),
     }
     return {
@@ -403,6 +576,8 @@ def _reports_view_model(reports: list[dict[str, Any]], *, state: str, errors: li
         "report_count": summary["report_count"],
         "annual_count": summary["annual_count"],
         "chunk_count": summary["chunk_count"],
+        "ready_count": summary["ready_count"],
+        "rag_document_count": summary["rag_document_count"],
         "rag_status": summary["rag_status"],
         "errors": errors or [],
     }
@@ -610,6 +785,7 @@ async def add_manual_report(
     except Exception as exc:
         await db.rollback()
         return _json({"ok": False, "error_code": "REPORT_MANUAL_SAVE_FAILED", "message": str(exc)[:300]}, 200)
+    await _invalidate_company_v2_caches(market, symbol)
     return _json({"ok": True, "record": record, "message": "官方 PDF 链接已保存"})
 
 
@@ -626,6 +802,7 @@ async def download_company_v2_report_pdf(
     try:
         from app.services.company_v2_report_pdf_service import company_v2_report_pdf_service
         result = await company_v2_report_pdf_service.download_report(report_id, db)
+        await _invalidate_company_v2_caches(market, symbol)
         return _json(_strip_sensitive_report_payload(result))
     except Exception as exc:
         return _json({"ok": False, "status": "download_failed", "error_code": "PDF_DOWNLOAD_FAILED", "message": str(exc)[:500]}, 200)
@@ -644,6 +821,7 @@ async def parse_company_v2_report_pdf(
     try:
         from app.services.company_v2_pdf_text_parser import company_v2_pdf_text_parser
         result = await company_v2_pdf_text_parser.parse_report(report_id, db)
+        await _invalidate_company_v2_caches(market, symbol)
         return _json(_strip_sensitive_report_payload(result))
     except Exception as exc:
         return _json({"ok": False, "status": "parse_failed", "error_code": "PDF_PARSE_FAILED", "message": str(exc)[:500]}, 200)

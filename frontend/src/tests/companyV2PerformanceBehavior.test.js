@@ -41,13 +41,10 @@ describe('Phase 6T-E request cancellation', () => {
 })
 
 describe('Phase 6T-E loading behavior', () => {
-  it('debug panel is collapsed by default (details element)', async () => {
+  it('debug panel is gated behind debug mode', async () => {
     const raw = await import('../views/CompanyV2View.vue?raw')
-    const detailsIdx = raw.default.indexOf('<details class="cv2-debug-details"')
-    expect(detailsIdx).toBeGreaterThan(-1)
-    // 无 open 属性（默认折叠）
-    const detailsTag = raw.default.slice(detailsIdx, raw.default.indexOf('>', detailsIdx))
-    expect(detailsTag).not.toContain(' open')
+    expect(raw.default).toContain('v-if="debugMode" class="cv2-debug-details"')
+    expect(raw.default).toContain('VITE_COMPANY_V2_DEBUG')
   })
 
   it('no automatic PDF download/parse on page load', async () => {

@@ -39,9 +39,9 @@ describe('CompanyV2ReportQaPanel', () => {
     expect(panel.default).not.toContain('text_pages')
   })
 
-  it('timeline has explicit Report QA toggle and is not default expanded', async () => {
+  it('timeline has explicit report analysis toggle and is not default expanded', async () => {
     const raw = await import('../components/company-v2/CompanyV2ReportTimeline.vue?raw')
-    expect(raw.default).toContain('Report QA')
+    expect(raw.default).toContain('分析此报告')
     expect(raw.default).toContain('report-qa-toggle-btn')
     expect(raw.default).toContain('qaOpenId === reportId(item)')
     expect(raw.default).not.toContain('qaOpenId = reportId')

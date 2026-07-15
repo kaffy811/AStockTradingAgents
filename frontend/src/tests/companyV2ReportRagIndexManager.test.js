@@ -27,7 +27,7 @@ describe('CompanyV2ReportRagIndexManager', () => {
   it('index manager is not mounted by default', async () => {
     const raw = await import('../components/company-v2/CompanyV2ReportDocuments.vue?raw')
     expect(raw.default).toContain('showIndexManager = ref(false)')
-    expect(raw.default).toContain('v-if="showIndexManager"')
+    expect(raw.default).toContain('v-if="debugMode && showIndexManager"')
     expect(raw.default).toContain('report-rag-manager-toggle')
   })
 

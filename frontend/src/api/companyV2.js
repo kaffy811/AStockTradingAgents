@@ -223,3 +223,7 @@ export function getCompanyV2ModuleHistory(market, symbol, moduleKey, options = {
 export function getCompanyV2StockBasic(market, symbol) {
   return v2Fetch(`/api/v2/company/${market}/${symbol}/stock_basic`)
 }
+
+export function getCompanyV2Profile(market, symbol, options = {}) {
+  return v2Fetch(`/api/v2/company/${market}/${symbol}/profile`, { signal: options.signal })
+}
