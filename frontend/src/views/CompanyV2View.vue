@@ -44,7 +44,7 @@
             @click="switchToQuarterly"
           >{{ quarterlyLoading ? '季度…' : '季度' }}</button>
         </div>
-        <label class="cv2-raw-switch">
+        <label v-if="debugMode" class="cv2-raw-switch">
           <input v-model="includeRaw" type="checkbox" @change="load(true)" />
           include raw
         </label>
@@ -58,6 +58,7 @@
         :stock-basic="stockBasic"
         :symbol="symbol"
         :market="market"
+        :debug-mode="debugMode"
         data-testid="company-profile-card"
       />
 
@@ -70,7 +71,7 @@
       />
 
       <!-- Debug Panel（默认折叠） -->
-      <details class="cv2-debug-details" data-testid="debug-panel">
+      <details v-if="debugMode" class="cv2-debug-details" data-testid="debug-panel">
         <summary class="cv2-debug-summary">Debug / 诊断面板</summary>
         <CompanyV2DebugPanel :data="debugData" @refresh="refresh" />
       </details>
@@ -85,10 +86,11 @@
         :history-data="displayHistoryModules[item.key]"
         :market="market"
         :symbol="symbol"
+        :debug-mode="debugMode"
       />
 
       <!-- 不可展示模块列表 -->
-      <section v-if="unavailableModules.length" class="cv2-section">
+      <section v-if="debugMode && unavailableModules.length" class="cv2-section">
         <h2>暂无可展示数据</h2>
         <CompanyV2FallbackTable
           :rows="unavailableModules"
@@ -135,6 +137,11 @@ const quarterlyLoading = ref(false)
 
 const market = computed(() => String(route.params.market || '').toUpperCase())
 const symbol = computed(() => String(route.params.symbol || ''))
+const debugMode = computed(() => {
+  const envDebug = String(import.meta.env.VITE_COMPANY_V2_DEBUG || '').toLowerCase() === 'true'
+  const queryDebug = route.query.debug === '1' && import.meta.env.DEV
+  return envDebug || queryDebug
+})
 
 // 历史模块数据（传给 CompanyV2Section）
 const historyModules = computed(() => historyData.value.modules || {})
@@ -184,8 +191,8 @@ const titles = {
 
 // 模块展示顺序
 const MODULE_ORDER = [
-  'quote_overview', 'valuation', 'profitability', 'growth',
-  'cashflow_quality', 'solvency', 'operation_capability', 'dupont',
+  'quote_overview', 'profitability', 'growth',
+  'operation_capability', 'solvency', 'cashflow_quality', 'dupont', 'valuation',
   'report_documents', 'ai_analysis_status',
 ]
 
@@ -202,7 +209,7 @@ const moduleEntries = computed(() => {
 
 const statusPanelModules = new Set(['report_documents', 'ai_analysis_status'])
 const visibleModules = computed(() => moduleEntries.value.filter(item => (
-  item.envelope?.render?.has_displayable_data || item.envelope?.ok || statusPanelModules.has(item.key)
+  item.key !== 'ai_analysis_status' && (item.envelope?.render?.has_displayable_data || item.envelope?.ok || statusPanelModules.has(item.key))
 )))
 const unavailableModules = computed(() => moduleEntries.value
   .filter(item => !item.envelope?.render?.has_displayable_data && !item.envelope?.ok && !statusPanelModules.has(item.key))

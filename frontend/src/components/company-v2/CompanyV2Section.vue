@@ -9,6 +9,11 @@
     </header>
 
     <div class="cv2-quality-row">
+      <span :class="['cv2-user-quality', userQuality.class]">{{ userQuality.text }}</span>
+      <span v-if="latestPeriodLabel" class="cv2-period-label">数据截至 {{ latestPeriodLabel }}</span>
+    </div>
+
+    <div v-if="debugMode" class="cv2-quality-row">
       <span class="cv2-coverage">coverage {{ coverage.coverage_pct ?? 0 }}%</span>
       <span
         v-if="validationSummary.checks_total !== undefined"
@@ -23,7 +28,7 @@
       >{{ tag }}</span>
     </div>
 
-    <div class="cv2-source-chain">
+    <div v-if="debugMode" class="cv2-source-chain">
       <span
         v-for="source in envelope.source_chain || []"
         :key="`${source.provider}-${source.endpoint}`"
@@ -38,7 +43,10 @@
       该行业下以下指标不适用（N/A）：{{ notApplicableFields.map(f => fieldLabel(f)).join('、') }}
     </p>
 
-    <CompanyV2MetricCards v-if="metricItems.length" :items="metricItems" />
+    <CompanyV2MetricCards v-if="metricItems.length" :items="metricItems" :debug-mode="debugMode" />
+
+    <p v-if="cashflowWarning" class="cv2-business-warning">{{ cashflowWarning }}</p>
+    <p v-if="dupontMismatch" class="cv2-business-warning">指标口径或期间不一致，暂不进行杜邦拆解。</p>
 
     <!-- 报告文件模块：时间线 -->
     <CompanyV2ReportDocuments
@@ -46,6 +54,7 @@
       :envelope="envelope"
       :market="props.market"
       :symbol="props.symbol"
+      :debug-mode="debugMode"
     />
 
     <!-- 财务图表（有多行时优先图表，否则表格） -->
@@ -67,22 +76,22 @@
     />
     <CompanyV2UnavailablePanel v-else-if="props.moduleKey !== 'report_documents'" :reason="envelope.render?.reason" />
 
-    <div class="cv2-field-row">
+    <div v-if="debugMode" class="cv2-field-row">
       <span>diagnosis: {{ primaryIssue }}</span>
       <span>raw_rows_count: {{ diagnosis.raw_rows_count ?? 0 }}</span>
       <span>normalized_rows_count: {{ diagnosis.normalized_rows_count ?? tableRows.length }}</span>
       <span>valid_fields_count: {{ diagnosis.valid_fields_count ?? metricItems.length }}</span>
       <span>coverage: {{ coverage.filled_fields ?? filledFields.length }}/{{ coverage.required_fields ?? '—' }}</span>
     </div>
-    <details v-if="missingFields.length" class="cv2-missing-fields">
+    <details v-if="debugMode && missingFields.length" class="cv2-missing-fields">
       <summary>missing fields {{ missingFields.length }}</summary>
       <span>{{ missingFields.join(', ') }}</span>
     </details>
-    <details v-if="Object.keys(fieldTrace).length" class="cv2-trace">
+    <details v-if="debugMode && Object.keys(fieldTrace).length" class="cv2-trace">
       <summary>field_trace {{ Object.keys(fieldTrace).length }}</summary>
       <pre>{{ JSON.stringify(fieldTrace, null, 2) }}</pre>
     </details>
-    <details v-if="validationChecks.length" class="cv2-validation-checks">
+    <details v-if="debugMode && validationChecks.length" class="cv2-validation-checks">
       <summary>validation_checks {{ validationChecks.length }}</summary>
       <p>数据质量校验，仅用于字段一致性和口径提示，不构成投资建议。</p>
       <p v-if="hasWeakFormulaWarning" class="cv2-formula-warning">
@@ -96,8 +105,8 @@
       </p>
       <pre>{{ JSON.stringify(validationChecks, null, 2) }}</pre>
     </details>
-    <p v-if="diagnosisMessage" class="cv2-diagnosis-message">{{ diagnosisMessage }}</p>
-    <CompanyV2RawJsonDrawer :data="envelope" label="复制模块 JSON" />
+    <p v-if="debugMode && diagnosisMessage" class="cv2-diagnosis-message">{{ diagnosisMessage }}</p>
+    <CompanyV2RawJsonDrawer v-if="debugMode" :data="envelope" label="复制模块 JSON" />
   </section>
 </template>
 
@@ -125,24 +134,52 @@ const props = defineProps({
   symbol: { type: String, default: '' },
   // Phase 6T-B: 全历史数据（来自 /history 接口）
   historyData: { type: Object, default: () => null },
+  debugMode: { type: Boolean, default: false },
 })
+const debugMode = computed(() => props.debugMode)
 
 const fields = computed(() => props.envelope.normalized?.fields || {})
 const firstRow = computed(() => props.envelope.normalized?.rows?.[0] || {})
-const metricItems = computed(() => Object.entries(fields.value).map(([field, item]) => ({
-  field,
-  label: fieldLabel(field),
-  value: item?.value,
-  displayValue: item?.display_value,
-  rawValue: item?.raw_value ?? item?.value,
-  source: item?.source || 'provider',
-  provider: item?.provider,
-  rawField: item?.raw_field,
-  computedFormula: item?.computed_formula,
-  computed: !!item?.computed,
-  accuracyVerdict: props.envelope.accuracy_audit?.field_verdicts?.[field],
-  verificationStatus: props.envelope.official_verification?.fields?.[field]?.status,
-})))
+const BUSINESS_FIELDS = {
+  quote_overview: ['latest_price', 'pct_chg', 'amount', 'turnover', 'market_cap'],
+  valuation: ['pe_ttm', 'pb', 'ps_ttm', 'pcf_ncf_ttm'],
+  profitability: ['roe', 'gross_margin', 'net_margin', 'net_profit'],
+  growth: ['main_business_revenue', 'net_profit', 'net_profit_yoy', 'parent_net_profit_yoy', 'equity_yoy', 'asset_yoy', 'eps_yoy'],
+  operation_capability: ['asset_turnover', 'inventory_turnover', 'receivable_turnover'],
+  solvency: ['current_ratio', 'quick_ratio', 'cash_ratio', 'debt_ratio', 'equity_multiplier'],
+  cashflow_quality: ['ocf_to_np', 'ocf_to_revenue'],
+  dupont: ['roe', 'net_margin', 'asset_turnover', 'equity_multiplier'],
+  report_documents: ['documents_count', 'chunks_count', 'embedding_count'],
+}
+const latestRow = computed(() => props.historyData?.latest || firstRow.value || {})
+const latestPeriodLabel = computed(() => latestRow.value.period || latestRow.value.period_end || fields.value[Object.keys(fields.value)[0]]?.period_end || '')
+const metricItems = computed(() => {
+  const preferred = BUSINESS_FIELDS[props.moduleKey] || props.envelope.render?.visible_fields || Object.keys(fields.value)
+  const row = latestRow.value
+  return preferred
+    .filter(field => !['cashflow_revenue_ratio', 'dupont_npi', 'dupont_nitogr', 'dupont_net_profit_factor', 'dupont_income_margin'].includes(field))
+    .map(field => {
+      const item = fields.value[field] || {}
+      const value = row[field] ?? item.value
+      if (value === null || value === undefined || value === '') return null
+      return {
+        field,
+        label: fieldLabel(field),
+        value,
+        displayValue: item.display_value && row[field] === undefined ? item.display_value : formatBusinessValue(field, value),
+        rawValue: item?.raw_value ?? value,
+        periodEnd: row.period || item.period_end,
+        source: item?.source || 'provider',
+        provider: item?.provider,
+        rawField: item?.raw_field,
+        computedFormula: item?.computed_formula,
+        computed: !!item?.computed,
+        accuracyVerdict: props.envelope.accuracy_audit?.field_verdicts?.[field],
+        verificationStatus: props.envelope.official_verification?.fields?.[field]?.status,
+      }
+    })
+    .filter(Boolean)
+})
 // Phase 6T-B: 优先使用 history 数据（全量历史序列）；historyData 不存在时回退到 snapshot rows
 const historyRows = computed(() => {
   if (props.historyData && Array.isArray(props.historyData.history) && props.historyData.history.length > 0) {
@@ -168,7 +205,8 @@ const chartType = computed(() => suggestChartType(periodType.value, props.module
 const CHART_MODULES = new Set(['growth', 'profitability', 'dupont', 'cashflow_quality', 'solvency', 'operation_capability', 'valuation', 'quote_overview'])
 const showChart = computed(() => (
   CHART_MODULES.has(props.moduleKey) &&
-  tableRows.value.length >= 1 &&
+  tableRows.value.length >= 2 &&
+  !dupontMismatch.value &&
   chartType.value !== 'none'
 ))
 const filledFields = computed(() => Object.keys(props.envelope.completion?.filled_fields || {}))
@@ -179,6 +217,22 @@ const coverage = computed(() => props.envelope.coverage || {})
 const fieldTrace = computed(() => props.envelope.field_trace || {})
 const validationSummary = computed(() => props.envelope.validation_summary || {})
 const validationChecks = computed(() => props.envelope.validation_checks || [])
+const dupontMismatch = computed(() => (
+  props.moduleKey === 'dupont' &&
+  (latestRow.value.dupont_formula_status === 'mismatch' || props.historyData?.chart_contract?.formula_status === 'mismatch')
+))
+const cashflowWarning = computed(() => {
+  if (props.moduleKey !== 'cashflow_quality') return ''
+  const warnings = latestRow.value.warnings || props.historyData?.warnings || []
+  const hit = warnings.find(w => w?.code === 'CFO_TO_NP_DENOMINATOR_SENSITIVE')
+  return hit?.message || ''
+})
+const userQuality = computed(() => {
+  if (dupontMismatch.value) return { text: '指标口径待确认', class: 'warn' }
+  if (props.historyData?.history_coverage?.periods_count <= 2) return { text: '历史覆盖有限', class: 'warn' }
+  if (props.envelope.render?.has_displayable_data || props.historyData?.data_success) return { text: '数据完整', class: 'ok' }
+  return { text: '部分数据缺失', class: 'warn' }
+})
 const hasWeakFormulaWarning = computed(() => validationChecks.value.some(check => check.check_strength === 'weak'))
 const hasDupontProviderWarning = computed(() => validationChecks.value.some(check => (check.tags || []).includes('DUPONT_PROVIDER_DEFINED')))
 const hasNetMarginContextWarning = computed(() => validationChecks.value.some(check => check.check_id === 'net_margin_formula' && check.status === 'warning'))
@@ -190,7 +244,7 @@ const validationStatusClass = computed(() => {
 })
 const primaryIssue = computed(() => diagnosis.value.primary_issue || (props.envelope.ok ? 'OK' : 'PROVIDER_EMPTY'))
 const statusText = computed(() => {
-  if (primaryIssue.value === 'REPORT_PDF_NOT_FOUND') return '暂未接入可确认报告文件，可尝试发现、手动录入 PDF URL 或上传 PDF。'
+  if (primaryIssue.value === 'REPORT_PDF_NOT_FOUND') return '暂未接入可确认报告文件。'
   if (primaryIssue.value === 'REPORT_NOT_INGESTED') return '尚未接入可检索的年报片段，暂无法进行基于年报的 RAG 分析。'
   if (props.envelope.render?.reason) return props.envelope.render.reason
   const pct = coverage.value.coverage_pct
@@ -242,6 +296,12 @@ function fieldLabel(field) {
     revenue_yoy: '营收同比',
     net_profit_parent: '归母净利润',
     net_profit_yoy: '归母净利润同比',
+    parent_net_profit_yoy: '归母净利润同比',
+    main_business_revenue: '主营业务收入',
+    net_profit: '净利润',
+    equity_yoy: '净资产同比',
+    asset_yoy: '总资产同比',
+    eps_yoy: '每股收益同比',
     eps_basic: '基本每股收益',
     operating_cashflow: '经营现金流',
     ocf_to_np: '经营现金流/净利润',
@@ -260,7 +320,22 @@ function fieldLabel(field) {
     chunks_count: '年报片段数',
     embedding_count: '向量片段数',
     summary: '摘要状态',
-  })[field] || field
+  })[field] || '指标'
+}
+
+function formatBusinessValue(field, value) {
+  if (value === null || value === undefined || value === '' || Number.isNaN(value)) return '—'
+  const n = Number(value)
+  if (!Number.isFinite(n)) return String(value)
+  if (['roe', 'gross_margin', 'net_margin', 'net_profit_yoy', 'parent_net_profit_yoy', 'equity_yoy', 'asset_yoy', 'eps_yoy', 'ocf_to_np', 'ocf_to_revenue', 'debt_ratio'].includes(field)) {
+    return `${(n * 100).toFixed(2)}%`
+  }
+  if (['pct_chg', 'turnover'].includes(field)) return `${n.toFixed(2)}%`
+  if (['market_cap', 'float_market_cap', 'amount', 'revenue', 'main_business_revenue', 'net_profit'].includes(field)) {
+    if (Math.abs(n) >= 100000000) return `${(n / 100000000).toFixed(2)}亿`
+    if (Math.abs(n) >= 10000) return `${(n / 10000).toFixed(2)}万`
+  }
+  return n.toFixed(2)
 }
 
 function sourceClass(source) {
@@ -313,6 +388,31 @@ function tagClass(tag) {
   padding: 4px 10px;
   font-size: 12px;
   background: #fef3c7;
+  color: #92400e;
+}
+.cv2-user-quality,
+.cv2-period-label {
+  font-size: 12px;
+  color: #4b5563;
+}
+.cv2-user-quality {
+  border-radius: 999px;
+  padding: 3px 8px;
+  background: #f3f4f6;
+}
+.cv2-user-quality.ok {
+  background: #dcfce7;
+  color: #166534;
+}
+.cv2-user-quality.warn {
+  background: #fef3c7;
+  color: #92400e;
+}
+.cv2-business-warning {
+  margin: 10px 0 0;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: #fffbeb;
   color: #92400e;
 }
 .cv2-status.ok {

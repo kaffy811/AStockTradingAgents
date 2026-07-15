@@ -3,6 +3,8 @@ from __future__ import annotations
 from decimal import Decimal, InvalidOperation
 from typing import Any
 
+from app.services.company_v2_field_metadata import get_field_metadata
+
 
 PRICE_FIELDS = {"latest_price", "recent_close", "open", "high", "low", "close"}
 PERCENT_FIELDS = {
@@ -20,6 +22,9 @@ PERCENT_FIELDS = {
     "debt_ratio",
     "current_assets_to_assets",
     "non_current_assets_to_assets",
+    "parent_net_profit_yoy",
+    "net_profit_parent_yoy",
+    "dupont_income_margin",
 }
 ALREADY_PERCENT_FIELDS = {"pct_chg", "turnover"}
 RATIO_FIELDS = {
@@ -35,6 +40,8 @@ RATIO_FIELDS = {
     "inventory_turnover",
     "receivable_turnover",
     "total_asset_turnover",
+    "dupont_net_profit_factor",
+    "dupont_asset_turn",
 }
 MONEY_FIELDS = {
     "market_cap",
@@ -72,6 +79,16 @@ def _to_decimal(value: Any) -> Decimal | None:
 def _field_display_type(field_name: str, display_type: str | None) -> str:
     if display_type:
         return display_type
+    meta = get_field_metadata(field_name)
+    if meta:
+        if meta.semantic_type in {"percentage_fraction", "percentage_points"}:
+            return "percent"
+        if meta.semantic_type == "currency":
+            return "money" if field_name not in PRICE_FIELDS else "price"
+        if meta.semantic_type in {"ratio", "multiple"}:
+            return meta.semantic_type
+        if meta.semantic_type == "count":
+            return "integer"
     if field_name in PRICE_FIELDS:
         return "price"
     if field_name in PERCENT_FIELDS:
@@ -104,14 +121,18 @@ def format_field(
     *,
     percent_scale: str | None = None,
 ) -> dict[str, Any]:
+    meta = get_field_metadata(field_name)
     resolved_type = _field_display_type(field_name, display_type)
-    resolved_precision = 2 if precision is None else precision
+    resolved_precision = precision if precision is not None else (meta.precision if meta else 2)
+    semantic_type = meta.semantic_type if meta else resolved_type
+    resolved_unit = unit if unit is not None else (meta.unit if meta else None)
     metadata = {
         "raw_value": raw_value,
         "normalized_value": raw_value,
         "display_value": "—",
         "display_type": resolved_type,
-        "unit": unit,
+        "semantic_type": semantic_type,
+        "unit": resolved_unit,
         "precision": resolved_precision,
     }
     if _is_empty(raw_value):
@@ -124,25 +145,31 @@ def format_field(
         return metadata
 
     if resolved_type == "price":
-        metadata["unit"] = unit or "CNY"
+        metadata["unit"] = resolved_unit or "CNY"
         metadata["display_value"] = f"{number:.{resolved_precision}f}"
     elif resolved_type == "percent":
-        scale = percent_scale or ("already_percent" if field_name in ALREADY_PERCENT_FIELDS else "decimal_to_percent")
+        if percent_scale:
+            scale = percent_scale
+        elif semantic_type == "percentage_points" or field_name in ALREADY_PERCENT_FIELDS:
+            scale = "already_percent"
+        else:
+            scale = "decimal_to_percent"
         display_number = number if scale == "already_percent" else number * Decimal("100")
-        metadata["unit"] = unit or "%"
+        metadata["normalized_value"] = float(display_number)
+        metadata["unit"] = resolved_unit or "%"
         metadata["display_value"] = f"{display_number:.{resolved_precision}f}%"
         metadata["percent_scale"] = scale
     elif resolved_type in ("ratio", "multiple", "float"):
         metadata["display_value"] = f"{number:.{resolved_precision}f}"
     elif resolved_type == "money":
-        metadata["unit"] = unit or "CNY"
+        metadata["unit"] = resolved_unit or "CNY"
         metadata["display_value"] = _compact_number(
             number,
             [(Decimal("1000000000000"), "万亿"), (Decimal("100000000"), "亿"), (Decimal("10000"), "万")],
             resolved_precision,
         )
     elif resolved_type == "shares":
-        metadata["unit"] = unit or "股"
+        metadata["unit"] = resolved_unit or "股"
         metadata["display_value"] = _compact_number(
             number,
             [(Decimal("100000000"), "亿股"), (Decimal("10000"), "万股")],
@@ -151,7 +178,7 @@ def format_field(
     elif resolved_type == "integer":
         metadata["display_value"] = f"{number:.0f}"
     elif resolved_type == "days":
-        metadata["unit"] = unit or "天"
+        metadata["unit"] = resolved_unit or "天"
         metadata["display_value"] = f"{number:.{resolved_precision}f}天"
     elif resolved_type == "boolean":
         metadata["display_value"] = "是" if bool(raw_value) else "否"

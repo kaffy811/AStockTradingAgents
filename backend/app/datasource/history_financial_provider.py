@@ -76,8 +76,7 @@ _CHART_CONTRACTS: dict[str, dict[str, Any]] = {
             # Phase 6T-E: BaoStock cash_flow 表只有比率字段（无经营现金净流量绝对值），
             # 契约不得引用不存在字段；比率可为负，保留 0 轴突出。
             {"field": "ocf_to_np", "display_name": "经营现金/净利润", "display_type": "ratio"},
-            {"field": "ocf_to_revenue", "display_name": "经营现金/营收", "display_type": "ratio"},
-            {"field": "cashflow_revenue_ratio", "display_name": "现金流收入比", "display_type": "ratio"},
+            {"field": "ocf_to_revenue", "display_name": "经营现金/收入", "display_type": "ratio"},
         ],
         "highlight_zero_axis": True,
         # Phase 6T-E1: ocf_to_np 与 ocf_to_revenue 真实量级差可 >100x（601686 实测 124x），
@@ -159,7 +158,8 @@ def _normalize_growth_row(r: dict) -> dict:
     return {
         "period": period,
         "net_profit_yoy": _safe_float(r.get("yoy_ni")),          # YOYNI = 净利润同比
-        "net_profit_parent_yoy": _safe_float(r.get("yoy_pni")),  # YOYPNI = 归母净利润同比
+        "parent_net_profit_yoy": _safe_float(r.get("yoy_pni")),  # YOYPNI = 归母净利润同比
+        "net_profit_parent_yoy": _safe_float(r.get("yoy_pni")),  # backward-compatible alias
         "eps_yoy": _safe_float(r.get("yoy_eps")),
         "equity_yoy": _safe_float(r.get("yoy_equity")),
         "asset_yoy": _safe_float(r.get("yoy_asset")),
@@ -199,21 +199,27 @@ def _normalize_cashflow_row(r: dict) -> dict:
     return {
         "period": period,
         "ocf_to_np": _safe_float(r.get("cfo_to_np")),
-        "ocf_to_revenue": _safe_float(r.get("cfo_to_gr")),
-        "cashflow_revenue_ratio": _safe_float(r.get("cfo_to_or")),
+        "ocf_to_revenue": _safe_float(r.get("cfo_to_gr")) if _safe_float(r.get("cfo_to_gr")) is not None else _safe_float(r.get("cfo_to_or")),
+        "cashflow_revenue_ratio": _safe_float(r.get("cfo_to_or")) if _safe_float(r.get("cfo_to_or")) is not None else _safe_float(r.get("cfo_to_gr")),
         "source": "baostock_cashflow",
     }
 
 
 def _normalize_dupont_row(r: dict) -> dict:
     period = r.get("stat_date") or ""
+    npi = _safe_float(r.get("dupont_npi"))
+    nitogr = _safe_float(r.get("dupont_nitogr"))
+    net_margin = round(npi * nitogr, 6) if npi is not None and nitogr is not None else None
     return {
         "period": period,
         "roe": _safe_float(r.get("dupont_roe")),
-        "net_margin": _safe_float(r.get("dupont_nitogr")),
+        "net_margin": net_margin,
         "asset_turnover": _safe_float(r.get("dupont_at")),
         "equity_multiplier": _safe_float(r.get("dupont_am")),
-        "dupont_npi": _safe_float(r.get("dupont_npi")),
+        "dupont_net_profit_factor": npi,
+        "dupont_income_margin": nitogr,
+        "dupont_npi": npi,
+        "dupont_nitogr": nitogr,
         "dupont_tax": _safe_float(r.get("dupont_tax")),
         "dupont_int": _safe_float(r.get("dupont_int")),
         "source": "baostock_dupont",
@@ -299,6 +305,48 @@ def _compute_history_coverage(
         "missing_periods": missing[:40],
         "history_truncated": len(period_set) < expected_count,
     }
+
+
+def _annotate_cashflow_quality(rows: list[dict[str, Any]]) -> None:
+    for row in rows:
+        warnings = row.setdefault("warnings", [])
+        aliases = row.setdefault("aliases", {})
+        if row.get("cashflow_revenue_ratio") is not None:
+            aliases["cashflow_revenue_ratio"] = "ocf_to_revenue"
+        cfo_to_np = _safe_float(row.get("ocf_to_np"))
+        if cfo_to_np is not None and abs(cfo_to_np) >= 5:
+            warnings.append({
+                "code": "CFO_TO_NP_DENOMINATOR_SENSITIVE",
+                "message": "由于净利润基数较小，该比例波动较大",
+                "field": "ocf_to_np",
+                "period_end": row.get("period"),
+                "value": cfo_to_np,
+            })
+
+
+def _annotate_dupont_formula(rows: list[dict[str, Any]]) -> None:
+    for row in rows:
+        roe = _safe_float(row.get("roe"))
+        net_margin = _safe_float(row.get("net_margin"))
+        asset_turnover = _safe_float(row.get("asset_turnover"))
+        equity_multiplier = _safe_float(row.get("equity_multiplier"))
+        if None in (roe, net_margin, asset_turnover, equity_multiplier):
+            row["dupont_formula_status"] = "insufficient_data"
+            continue
+        formula_roe = round(float(net_margin) * float(asset_turnover) * float(equity_multiplier), 6)
+        diff = abs(formula_roe - float(roe))
+        tolerance = max(0.002, abs(float(roe)) * 0.08)
+        row["formula_roe"] = formula_roe
+        row["dupont_formula_diff"] = round(diff, 6)
+        row["dupont_formula_status"] = "match" if diff <= tolerance else "mismatch"
+        if row["dupont_formula_status"] == "mismatch":
+            row.setdefault("warnings", []).append({
+                "code": "DUPONT_FORMULA_MISMATCH",
+                "message": "指标口径或期间不一致，暂不进行杜邦拆解",
+                "period_end": row.get("period"),
+                "provider_roe": roe,
+                "formula_roe": formula_roe,
+            })
 
 
 def _all_quarters_from_year(start_year: int) -> list[tuple[int, int]]:
@@ -482,6 +530,10 @@ def _build_module_history_from_rows(
             source_provider="baostock",
             requested_period=period,
         )
+    if module_key == "cashflow_quality":
+        _annotate_cashflow_quality(filtered)
+    if module_key == "dupont":
+        _annotate_dupont_formula(filtered)
 
     period_type = _detect_period_type(filtered)
     if period == "annual" and filtered:
@@ -505,6 +557,18 @@ def _build_module_history_from_rows(
 
     latest = filtered[-1] if filtered else {}
 
+    module_warnings = [
+        warning
+        for row in filtered
+        for warning in (row.get("warnings") or [])
+        if isinstance(warning, dict)
+    ]
+    chart_contract = dict(_CHART_CONTRACTS.get(module_key, {}))
+    if module_key == "dupont" and latest.get("dupont_formula_status") == "mismatch":
+        chart_contract["preferred_chart"] = "metric_cards"
+        chart_contract["formula_status"] = "mismatch"
+        chart_contract["formula_warning"] = "指标口径或期间不一致，暂不进行杜邦拆解"
+
     return {
         "provider": "baostock",
         "module_key": module_key,
@@ -522,8 +586,9 @@ def _build_module_history_from_rows(
         "provider_status": provider_status,
         "reason_code": provider_reason_code if not (data_success and bool(filtered)) else None,
         "errors": provider_errors or [],
+        "warnings": module_warnings,
         "history_coverage": history_coverage,
-        "chart_contract": _CHART_CONTRACTS.get(module_key, {}),
+        "chart_contract": chart_contract,
     }
 
 
@@ -564,7 +629,7 @@ async def fetch_all_modules_history(
             for module_key in modules:
                 key = cache.make_key(
                     "quarterly_normalized", ts_code, module_key,
-                    str(start_year), str(end_year), quarter_sig, "v2",
+                    str(start_year), str(end_year), quarter_sig, "v6u_d2",
                 )
                 cached, hit, _stale, _st = await cache.get(key)
                 if not hit or not isinstance(cached, dict) or not cached.get("history"):
@@ -649,13 +714,13 @@ async def fetch_all_modules_history(
                 )
                 key = cache.make_key(
                     "quarterly_normalized", ts_code, module_key,
-                    str(start_year), str(end_year), quarter_sig, "v2",
+                    str(start_year), str(end_year), quarter_sig, "v6u_d2",
                 )
                 await cache.set(
                     key,
                     {
                         **output[module_key],
-                        "schema_version": "phase6te2-quarterly-normalized-v2",
+                        "schema_version": "phase6u-d2-quarterly-normalized-v1",
                         "provider": "baostock",
                         "period": period,
                     },

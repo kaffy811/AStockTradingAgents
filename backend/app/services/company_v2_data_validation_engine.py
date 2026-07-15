@@ -18,6 +18,8 @@ SEMANTIC_WARNING_TAGS = {
     "DUPONT_PROVIDER_DEFINED",
     "DUPONT_CROSS_MODULE_MIXED_SOURCE",
     "DUPONT_FORMULA_WEAK_CHECK",
+    "DUPONT_FORMULA_MISMATCH",
+    "CFO_TO_NP_DENOMINATOR_SENSITIVE",
     "ACCOUNTING_DEFINITION_DIFFERENCE",
     "FORMULA_CONTEXT_MISSING",
 }
@@ -380,9 +382,8 @@ def _dupont_check(data: dict[str, Any]) -> Check:
     diff = _relative_diff_pct(expected, roe)
     status = _status_from_diff(diff, 5.0, 15.0)
     severity = _severity_from_status(status)
-    if strength == "weak" and status == "fail":
-        status = "warning"
-        severity = "warning"
+    if status == "fail":
+        tags = list(dict.fromkeys([*tags, "DUPONT_FORMULA_MISMATCH"]))
     return _check(
         "dupont_roe_formula", "dupont", status=status, severity=severity,
         field="roe", expected=expected, actual=roe, relative_diff_pct=diff, tolerance_pct=5.0,
@@ -396,7 +397,7 @@ def _dupont_check(data: dict[str, Any]) -> Check:
         }],
         check_strength=strength,
         tags=tags,
-        recommended_fix=[] if status == "pass" else ["compare provider definitions for Dupont components"],
+        recommended_fix=[] if status == "pass" else ["do not render Dupont decomposition chart until period and formula semantics are aligned"],
     )
 
 
@@ -491,8 +492,21 @@ def _cashflow_checks(data: dict[str, Any]) -> list[Check]:
     net_profit = _num(_field_value(profit, "net_profit"))
     if ocf_to_np is None:
         checks.append(_check("ocf_to_np_sanity", "cashflow_quality", status="skipped", severity="info", field="ocf_to_np"))
-    elif ocf_to_np > 10 or ocf_to_np < -10 or (net_profit is not None and net_profit > 0 and ocf_to_np < 0):
-        checks.append(_check("ocf_to_np_sanity", "cashflow_quality", status="warning", severity="warning", field="ocf_to_np", actual=ocf_to_np))
+    elif ocf_to_np > 5 or ocf_to_np < -5 or (net_profit is not None and net_profit > 0 and ocf_to_np < 0):
+        checks.append(_check(
+            "ocf_to_np_sanity",
+            "cashflow_quality",
+            status="warning",
+            severity="warning",
+            field="ocf_to_np",
+            actual=ocf_to_np,
+            evidence=[{
+                "warning": "由于净利润基数较小，该比例波动较大",
+                "denominator_available": net_profit is not None,
+                "net_profit": net_profit,
+            }],
+            tags=["CFO_TO_NP_DENOMINATOR_SENSITIVE"],
+        ))
     else:
         checks.append(_check("ocf_to_np_sanity", "cashflow_quality", status="pass", severity="info", field="ocf_to_np", actual=ocf_to_np))
     if ocf_to_revenue is None:

@@ -866,7 +866,7 @@ class BaoStockClient:
         lock = _bulk_singleflight_locks.setdefault(sf_key, asyncio.Lock())
         async with lock:
             if mode == "quarterly":
-                bundle_key = cache.make_key("quarterly_bundle", ts_code, str(start_year), str(end_year), quarter_sig, "v2")
+                bundle_key = cache.make_key("quarterly_bundle", ts_code, str(start_year), str(end_year), quarter_sig, "v6u_d2")
                 cached_bundle, bundle_hit, _stale, _st = await cache.get(bundle_key, force_refresh=force_refresh)
                 if bundle_hit and isinstance(cached_bundle, dict) and isinstance(cached_bundle.get("tables"), dict):
                     stats.update(cached_bundle.get("stats") or {})
@@ -884,7 +884,7 @@ class BaoStockClient:
             for year in years:
                 year_quarters = [q for y, q in year_quarters_all if y == year]
                 year_sig = ",".join(str(q) for q in year_quarters) or "none"
-                key = cache.make_key("bsyearraw", ts_code, str(year), mode, year_sig, "v2")
+                key = cache.make_key("bsyearraw", ts_code, str(year), mode, year_sig, "v6u_d2")
                 cached, hit, _stale, _st = await cache.get(key, force_refresh=force_refresh)
                 if hit and isinstance(cached, dict) and isinstance(cached.get("tables"), dict):
                     stats["years_from_cache"] += 1
@@ -984,12 +984,12 @@ class BaoStockClient:
                         year_quarters = [q for y, q in year_quarters_all if y == year]
                         year_sig = ",".join(str(q) for q in year_quarters) or "none"
                         await cache.set(
-                            cache.make_key("bsyearraw", ts_code, str(year), mode, year_sig, "v2"),
+                            cache.make_key("bsyearraw", ts_code, str(year), mode, year_sig, "v6u_d2"),
                             {
                                 "provider": "baostock",
                                 "fetched_at": datetime.now(timezone.utc).isoformat(),
                                 "period": mode,
-                                "schema_version": "phase6te2-year-raw-v2",
+                                "schema_version": "phase6u-d2-year-raw-v1",
                                 "tables": tables,
                                 "year": year,
                                 "quarters": year_quarters,
@@ -1020,7 +1020,7 @@ class BaoStockClient:
                             "provider": "baostock",
                             "fetched_at": datetime.now(timezone.utc).isoformat(),
                             "period": mode,
-                            "schema_version": "phase6te2-quarterly-bundle-v2",
+                            "schema_version": "phase6u-d2-quarterly-bundle-v1",
                             "tables": merged_raw,
                             "start_year": start_year,
                             "end_year": end_year,

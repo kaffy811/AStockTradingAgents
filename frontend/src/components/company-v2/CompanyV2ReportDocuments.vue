@@ -18,6 +18,7 @@
       :default-show="defaultShow"
       :market="market"
       :symbol="symbol"
+      :debug-mode="debugMode"
       @discover="triggerDiscover"
       @manual="showManual = !showManual"
       @download-parse="downloadAndParse"
@@ -26,7 +27,7 @@
     />
 
     <!-- 操作按钮 -->
-    <div class="cv2-rd-toolbar">
+    <div v-if="debugMode" class="cv2-rd-toolbar">
       <button
         class="cv2-rd-discover-btn"
         :disabled="discovering"
@@ -56,28 +57,28 @@
     </div>
 
     <CompanyV2ReportRagIndexManager
-      v-if="showIndexManager"
+      v-if="debugMode && showIndexManager"
       :market="market"
       :symbol="symbol"
       @build="actionMessage = '请在对应报告的 Report QA 面板中建立索引。'"
     />
 
     <CompanyV2ReportComparisonPanel
-      v-if="showComparison"
+      v-if="debugMode && showComparison"
       :market="market"
       :symbol="symbol"
       :reports="reports"
     />
 
     <CompanyV2FinancialEvidenceFusionPanel
-      v-if="showFusion"
+      v-if="debugMode && showFusion"
       :market="market"
       :symbol="symbol"
       :reports="reports"
     />
 
     <!-- 手动录入面板 -->
-    <div v-if="showManual" class="cv2-rd-manual">
+    <div v-if="debugMode && showManual" class="cv2-rd-manual">
       <h4>手动录入年报 PDF URL</h4>
       <p class="cv2-rd-hint">仅支持 static.cninfo.com.cn 域名的 PDF 链接。</p>
       <div class="cv2-rd-manual-row">
@@ -91,12 +92,13 @@
 
     <!-- 发现错误 -->
     <div v-if="discoverErrors.length" class="cv2-rd-errors">
-      <details>
+      <details v-if="debugMode">
         <summary>发现日志（{{ discoverErrors.length }} 条）</summary>
         <ul>
           <li v-for="e in discoverErrors" :key="e">{{ e }}</li>
         </ul>
       </details>
+      <p v-else>报告发现暂时失败，其他财务数据不受影响。</p>
     </div>
     <p v-if="actionMessage" class="cv2-rd-success">{{ actionMessage }}</p>
   </div>
@@ -122,7 +124,9 @@ const props = defineProps({
   envelope: { type: Object, default: null },
   market:   { type: String, required: true },
   symbol:   { type: String, required: true },
+  debugMode: { type: Boolean, default: false },
 })
+const debugMode = computed(() => props.debugMode)
 
 const defaultShow = 5
 const reports = ref([])
@@ -137,6 +141,7 @@ const manualYear = ref('')
 const manualError = ref('')
 const manualSuccess = ref('')
 const actionMessage = ref('')
+const autoDiscoverKey = ref('')
 
 // Status derived from envelope
 const docRow = computed(() => props.envelope?.normalized?.rows?.[0] || {})
@@ -166,10 +171,18 @@ async function loadReports() {
     const res = await getCompanyV2Reports(props.market, props.symbol)
     if (res.ok && res.reports) {
       reports.value = res.reports
+      if (!reports.value.length) scheduleAutoDiscover()
     }
   } catch (e) {
-    // silent – will show empty state
+    scheduleAutoDiscover()
   }
+}
+
+function scheduleAutoDiscover() {
+  const key = `${props.market}:${props.symbol}`
+  if (autoDiscoverKey.value === key || discovering.value) return
+  autoDiscoverKey.value = key
+  triggerDiscover(false)
 }
 
 async function triggerDiscover(forceRefresh = false) {

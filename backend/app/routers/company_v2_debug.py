@@ -259,6 +259,21 @@ async def get_reports(
     """返回 CNINFO 年报/季报时间线。"""
     if market.upper() != "CN":
         return _json({"ok": True, "reports": [], "total": 0, "message": "Only CN market supported"})
+    persisted = await _list_persisted_report_documents(db, symbol, report_type=report_type)
+    if persisted:
+        return _json({
+            "ok": True,
+            "symbol": symbol,
+            "market": market.upper(),
+            "reports": persisted,
+            "timeline": persisted,
+            "total": len(persisted),
+            "documents_count": len(persisted),
+            "annual_reports_count": sum(1 for item in persisted if item.get("report_type") == "annual"),
+            "quarterly_reports_count": sum(1 for item in persisted if item.get("report_type") != "annual"),
+            "from_cache": True,
+            "errors": [],
+        })
     from app.services.cninfo_report_discovery_agent import cninfo_report_discovery_agent
     report_types = None if report_type in ("all", "", None) else [report_type]
     result = await cninfo_report_discovery_agent.discover(
@@ -443,6 +458,44 @@ async def _persist_report_documents(db: AsyncSession, symbol: str, reports: list
         persisted.append({k: v for k, v in safe_report.items() if k not in {"local_path", "path"}})
     await db.commit()
     return persisted
+
+
+async def _list_persisted_report_documents(db: AsyncSession, symbol: str, *, report_type: str = "annual") -> list[dict[str, Any]]:
+    ts_code = _ts_code(symbol)
+    stmt = select(ReportDocument).where(ReportDocument.ts_code == ts_code)
+    if report_type not in ("all", "", None):
+        stmt = stmt.where(ReportDocument.report_type == report_type)
+    stmt = stmt.order_by(ReportDocument.period_end.desc().nullslast(), ReportDocument.report_year.desc().nullslast(), ReportDocument.id.desc())
+    result = await db.execute(stmt)
+    docs = result.scalars().all()
+    out: list[dict[str, Any]] = []
+    for doc in docs:
+        item = {
+            "id": doc.id,
+            "report_id": doc.id,
+            "symbol": symbol,
+            "ts_code": doc.ts_code,
+            "report_type": doc.report_type,
+            "period_end": doc.period_end,
+            "title": doc.title,
+            "source_url": doc.source_url,
+            "pdf_url": doc.pdf_url,
+            "report_year": doc.report_year,
+            "source": doc.source,
+            "disclosure_date": doc.disclosure_date,
+            "announcement_date": doc.disclosure_date,
+            "confidence": doc.confidence,
+            "download_status": doc.download_status,
+            "parse_status": doc.parse_status,
+            "pdf_status": doc.download_status,
+            "rag_index_status": doc.rag_status,
+            "rag_status": "rag_ready" if doc.rag_status in {"indexed", "partial"} else doc.rag_status,
+            "qa_ready": bool(doc.parsed and doc.parse_status in {"parsed", "partial"}),
+            "fusion_ready": bool(doc.rag_status in {"indexed", "partial"}),
+        }
+        item.update(_report_view_state(symbol, item))
+        out.append(item)
+    return out
 
 
 @router.post("/{market}/{symbol}/reports/manual")
