@@ -21,14 +21,21 @@ New fields in response (Phase 6K):
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import json
 import logging
 import re
+import time
 import unicodedata
 from pathlib import Path
 from typing import Any
 
-from app.agent.report_context import is_narrow_question, report_scope_line, resolve_report_selection
+from app.agent.report_context import (
+    is_narrow_question,
+    latest_memory_report_id,
+    report_scope_line,
+    resolve_report_selection,
+)
 
 log = logging.getLogger(__name__)
 
@@ -37,6 +44,16 @@ _PROMPTS_DIR = Path(__file__).parent / "prompts"
 # ── Constants ─────────────────────────────────────────────────────────────────
 
 _MAX_QUESTION_LEN = 500
+_REPORT_CHAT_OVERALL_TIMEOUT_SECONDS = 45.0
+_REPORT_SELECTION_TIMEOUT_SECONDS = 12.0
+_RAG_QUERY_TIMEOUT_SECONDS = 8.0
+_LLM_SYNTHESIS_TIMEOUT_SECONDS = 25.0
+_REVIEW_TIMEOUT_SECONDS = 5.0
+_EVIDENCE_CACHE_TTL_SECONDS = 20 * 60
+_SELECTION_CACHE_TTL_SECONDS = 45 * 60
+_MAX_EVIDENCE_CHARS = 6000
+_MAX_CHUNK_CHARS = 1200
+_REPORT_CHAT_FAST_PATH_VERSION = "d4_2_v1"
 
 _SAFE_REJECTION_ANSWER: dict[str, Any] = {
     "answer": (
@@ -212,6 +229,407 @@ def _strip_json_fence(text: str) -> str:
     return text.strip()
 
 
+def _extract_response_text(value: Any) -> str:
+    """Extract assistant text from common LLM/agent response shapes."""
+    if value is None:
+        return ""
+    if isinstance(value, str):
+        return value.strip()
+    if isinstance(value, dict):
+        for key in ("answer", "final_answer", "content", "response", "text", "message", "result"):
+            nested = value.get(key)
+            text = _extract_response_text(nested)
+            if text:
+                return text
+        choices = value.get("choices")
+        if isinstance(choices, list) and choices:
+            text = _extract_response_text(choices[0])
+            if text:
+                return text
+        return ""
+    if hasattr(value, "content"):
+        text = _extract_response_text(getattr(value, "content"))
+        if text:
+            return text
+    if hasattr(value, "text"):
+        text = _extract_response_text(getattr(value, "text"))
+        if text:
+            return text
+    if hasattr(value, "choices"):
+        text = _extract_response_text({"choices": getattr(value, "choices")})
+        if text:
+            return text
+    return ""
+
+
+def _normalize_llm_json_result(value: Any) -> dict:
+    """Return a dict with canonical answer when the LLM shape is non-standard."""
+    if isinstance(value, dict):
+        normalized = dict(value)
+        if not str(normalized.get("answer") or "").strip():
+            extracted = _extract_response_text(normalized)
+            if extracted:
+                normalized["answer"] = extracted
+        return normalized
+    extracted = _extract_response_text(value)
+    return {"answer": extracted} if extracted else {}
+
+
+def _ms_since(start: float) -> int:
+    return int((time.perf_counter() - start) * 1000)
+
+
+def _hash_payload(payload: Any) -> str:
+    raw = json.dumps(payload, ensure_ascii=False, sort_keys=True, default=str)
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]
+
+
+def _selection_cache_key(
+    *,
+    ts_code: str,
+    normalized_question: str,
+    report_id: int | None,
+    report_types: list[str] | None,
+    years: list[int] | None,
+    memory_report_id: int | None,
+) -> str:
+    return "report_chat:selection:{ver}:{ts}:{fingerprint}".format(
+        ver=_REPORT_CHAT_FAST_PATH_VERSION,
+        ts=ts_code,
+        fingerprint=_hash_payload({
+            "q": normalized_question,
+            "rid": report_id,
+            "rt": report_types or [],
+            "yr": years or [],
+            "mem": memory_report_id,
+        }),
+    )
+
+
+def _evidence_cache_key(
+    *,
+    ts_code: str,
+    report_id: int | None,
+    normalized_question: str,
+    top_k: int,
+) -> str:
+    return "report_chat:evidence:{ver}:{ts}:{rid}:{qh}:{top_k}".format(
+        ver=_REPORT_CHAT_FAST_PATH_VERSION,
+        ts=ts_code,
+        rid=report_id or "none",
+        qh=_hash_payload({"q": normalized_question}),
+        top_k=top_k,
+    )
+
+
+async def _cache_get_json(key: str) -> Any | None:
+    try:
+        from app.services.cache_service import cache_service
+        return await cache_service.get_json(key)
+    except Exception:
+        return None
+
+
+async def _cache_set_json(key: str, value: Any, ttl: int) -> bool:
+    try:
+        from app.services.cache_service import cache_service
+        return await cache_service.set_json(key, value, ttl)
+    except Exception:
+        return False
+
+
+def _selection_from_metadata(metadata: dict[str, Any] | None):
+    if not isinstance(metadata, dict) or not metadata.get("report_id"):
+        return None
+    from app.agent.report_context import ReportSelection
+    return ReportSelection(
+        report_id=int(metadata["report_id"]),
+        symbol=str(metadata.get("symbol") or ""),
+        market=str(metadata.get("market") or ""),
+        ts_code=str(metadata.get("ts_code") or ""),
+        stock_name=metadata.get("stock_name"),
+        report_year=metadata.get("report_year"),
+        report_type=metadata.get("report_type"),
+        period_end=metadata.get("period_end"),
+        title=metadata.get("title"),
+        disclosure_date=metadata.get("disclosure_date"),
+        selection_reason=str(metadata.get("selection_reason") or "cache_hit"),
+        pdf_url=metadata.get("pdf_url"),
+        source_url=metadata.get("source_url"),
+        parsed=metadata.get("parsed"),
+        rag_status=metadata.get("rag_status"),
+        chunk_count=metadata.get("chunk_count"),
+        switched_from_report_id=metadata.get("switched_from_report_id"),
+        error=metadata.get("error"),
+    )
+
+
+def _is_pdf_question(question: str) -> bool:
+    return bool(re.search(r"(pdf|PDF|链接|入口|在哪里|下载|官方)", question or ""))
+
+
+def _is_indexed_report(report_context: dict[str, Any]) -> bool:
+    rag_status = str(report_context.get("rag_status") or "").lower()
+    return bool(report_context.get("parsed")) and rag_status in {"indexed", "embedded", "ready", "chunked"}
+
+
+def _limit_evidence_chunks(chunks: list[dict], max_chars: int = _MAX_EVIDENCE_CHARS) -> list[dict]:
+    limited: list[dict] = []
+    used = 0
+    for chunk in chunks or []:
+        item = dict(chunk)
+        content = str(item.get("content") or "")[:_MAX_CHUNK_CHARS]
+        if not content.strip():
+            continue
+        if used + len(content) > max_chars:
+            remaining = max(0, max_chars - used)
+            if remaining < 160:
+                break
+            content = content[:remaining]
+        item["content"] = content
+        limited.append(item)
+        used += len(content)
+        if used >= max_chars:
+            break
+    return limited
+
+
+def _evidence_chars(chunks: list[dict]) -> int:
+    return sum(len(str(c.get("content") or "")) for c in chunks or [])
+
+
+def _format_pdf_answer(report_context: dict[str, Any]) -> str:
+    title = report_context.get("title") or "已选财务报告"
+    year = report_context.get("report_year") or "未知年度"
+    period = report_context.get("period_end") or "未知期间"
+    url = report_context.get("pdf_url") or report_context.get("source_url")
+    if url:
+        return (
+            f"## 官方 PDF\n"
+            f"- 报告：{title}\n"
+            f"- 年度/期间：{year} / {period}\n"
+            f"- 官方 PDF：{url}\n\n"
+            "该链接来自已持久化的官方报告 metadata，未重新触发下载、解析或索引。"
+        )
+    return (
+        f"## 官方 PDF\n"
+        f"- 报告：{title}\n"
+        f"- 年度/期间：{year} / {period}\n"
+        "- 当前已选报告没有可展示的官方 PDF 链接。"
+    )
+
+
+def _format_evidence_fallback_answer(
+    *,
+    question: str,
+    report_context: dict[str, Any],
+    chunks: list[dict],
+    reason: str,
+) -> str:
+    title = report_context.get("title") or "已选财务报告"
+    year = report_context.get("report_year") or "未知年度"
+    period = report_context.get("period_end") or "未知期间"
+    pdf_url = report_context.get("pdf_url") or report_context.get("source_url")
+    lines = [
+        "## 结论",
+        f"自动总结未完成：{reason}。以下仅列出已检索到的报告证据，不能编造报告片段之外的数字或判断。",
+        "",
+        "## 报告范围",
+        f"- 报告：{title}",
+        f"- 年度/期间：{year} / {period}",
+    ]
+    if pdf_url:
+        lines.append(f"- 官方 PDF：{pdf_url}")
+    lines.extend(["", "## 关键数据"])
+    if not chunks:
+        lines.append("- 当前未检索到可引用的报告片段，不能使用模型记忆补充财务数字。")
+    lines.extend(["", "## 已检索到的证据"])
+    if not chunks:
+        lines.append("- 当前未检索到可引用的报告片段。")
+    for idx, chunk in enumerate(chunks[:6], 1):
+        section = chunk.get("section_title") or f"片段 {chunk.get('chunk_id') or idx}"
+        content = re.sub(r"\s+", " ", str(chunk.get("content") or "")).strip()
+        if len(content) > 260:
+            content = content[:260] + "…"
+        page = ""
+        if chunk.get("page_start"):
+            page = f"（页码 {chunk.get('page_start')}）"
+        lines.append(f"{idx}. {section}{page}：{content}")
+    lines.extend([
+        "",
+        "## 数据来源说明",
+        f"- 问题：{question}",
+        f"- 证据片段数：{len(chunks)}",
+    ])
+    return "\n".join(lines)
+
+
+async def _emit_report_stage(event_callback: Any, *, phase: str, title: str, status: str = "running") -> None:
+    if not event_callback:
+        return
+    try:
+        await event_callback("thinking_event", {
+            "phase": phase,
+            "title": title,
+            "content": title,
+            "status": status,
+            "agent": "ReportChatCopilotAgent",
+            "importance": "medium",
+            "timestamp": None,
+        })
+    except Exception:
+        pass
+
+
+async def _query_company_v2_indexed_evidence(
+    *,
+    ts_code: str,
+    symbol: str,
+    report_context: dict[str, Any],
+    query_text: str,
+    top_k: int,
+) -> dict[str, Any]:
+    from app.services.company_v2_report_rag_retriever import company_v2_report_rag_retriever
+
+    report_id = int(report_context.get("report_id"))
+    report_year = report_context.get("report_year")
+    raw = await asyncio.to_thread(
+        company_v2_report_rag_retriever.retrieve,
+        report_id=report_id,
+        question=query_text,
+        top_k=top_k,
+        symbol=symbol or (ts_code or "").split(".")[0] or None,
+        report_year=int(report_year) if report_year else None,
+    )
+    chunks: list[dict[str, Any]] = []
+    for item in raw.get("chunks") or []:
+        chunks.append({
+            "chunk_id": item.get("chunk_id"),
+            "report_id": item.get("report_id") or report_id,
+            "ts_code": ts_code,
+            "report_type": item.get("report_type") or report_context.get("report_type"),
+            "report_year": item.get("report_year") or report_context.get("report_year"),
+            "period": str(item.get("report_year") or report_context.get("period_end") or ""),
+            "chunk_index": item.get("chunk_id"),
+            "section_title": item.get("section_title"),
+            "content": item.get("text_excerpt") or "",
+            "score": item.get("score"),
+            "score_detail": item.get("score_detail"),
+            "page_start": item.get("page_start"),
+            "page_end": item.get("page_end"),
+            "source_url": item.get("source_url") or report_context.get("source_url") or report_context.get("pdf_url"),
+            "has_embedding": bool((item.get("score_detail") or {}).get("embedding_score")),
+        })
+    return {
+        "chunks": chunks,
+        "partial": bool(raw.get("error_code")),
+        "errors": [raw["error_code"]] if raw.get("error_code") else [],
+        "search_mode": raw.get("retrieval_mode") or "company_v2_hybrid",
+        "total": len(chunks),
+        "fallback_used": False,
+        "provider": "company_v2_report_rag",
+        "selected_report_id": report_id,
+    }
+
+
+async def _query_indexed_report_db_evidence(
+    *,
+    db: Any,
+    ts_code: str,
+    report_context: dict[str, Any],
+    query_text: str,
+    top_k: int,
+) -> dict[str, Any]:
+    """Fast indexed-report path: bounded lexical DB fetch by report_id."""
+    from sqlalchemy import or_, select
+    from app.models.company_v2_report_rag import ReportRagChunk, ReportRagDocument
+
+    report_id = int(report_context.get("report_id"))
+    terms: list[str] = []
+    if any(term in query_text for term in ("收入", "营收", "利润", "净利润", "业绩", "财务指标")):
+        terms.extend(["营业收入", "净利润", "归属于上市公司股东", "主要会计数据", "主要财务指标"])
+    if "风险" in query_text:
+        terms = ["风险", "风险因素", "可能面对的风险"] + terms
+    if "现金流" in query_text or "经营现金流" in query_text:
+        terms = ["经营活动产生的现金流量净额", "现金流量", "经营活动"] + terms
+    # Deduplicate while preserving order.
+    terms = list(dict.fromkeys(terms))[:8]
+
+    doc_stmt = (
+        select(ReportRagDocument)
+        .where(
+            ReportRagDocument.report_id == report_id,
+            ReportRagDocument.active_index == 1,
+            ReportRagDocument.deleted_at.is_(None),
+        )
+        .order_by(ReportRagDocument.index_generation.desc())
+    )
+    doc = (await db.execute(doc_stmt)).scalars().first()
+    if doc is None:
+        return {
+            "chunks": [],
+            "partial": True,
+            "errors": ["COMPANY_V2_INDEX_NOT_FOUND"],
+            "search_mode": "indexed_db_lexical",
+            "total": 0,
+            "fallback_used": False,
+            "provider": "indexed_report_db",
+            "selected_report_id": report_id,
+        }
+
+    stmt = select(ReportRagChunk).where(
+        ReportRagChunk.rag_document_id == int(doc.id),
+        ReportRagChunk.report_id == report_id,
+    )
+    if terms:
+        stmt = stmt.where(or_(*[ReportRagChunk.text.ilike(f"%{term}%") for term in terms]))
+    stmt = stmt.order_by(ReportRagChunk.chunk_index).limit(max(1, min(int(top_k or 6), 8)))
+
+    result = await db.execute(stmt)
+    rows = result.scalars().all()
+    if not rows:
+        fallback_stmt = (
+            select(ReportRagChunk)
+            .where(
+                ReportRagChunk.rag_document_id == int(doc.id),
+                ReportRagChunk.report_id == report_id,
+            )
+            .order_by(ReportRagChunk.chunk_index)
+            .limit(max(1, min(int(top_k or 6), 8)))
+        )
+        rows = (await db.execute(fallback_stmt)).scalars().all()
+    chunks: list[dict[str, Any]] = []
+    for row in rows:
+        content = str(row.text or "")
+        chunks.append({
+            "chunk_id": row.id,
+            "report_id": row.report_id,
+            "ts_code": ts_code,
+            "report_type": doc.report_type,
+            "report_year": doc.report_year,
+            "period": report_context.get("period_end") or str(doc.report_year),
+            "chunk_index": row.chunk_index,
+            "section_title": row.section_title,
+            "content": content[:_MAX_CHUNK_CHARS],
+            "page_start": row.page_start,
+            "page_end": row.page_end,
+            "source_url": doc.source_url or report_context.get("source_url") or report_context.get("pdf_url"),
+            "has_embedding": bool(row.embedding),
+            "score": 0.55,
+            "score_detail": {"keyword_terms": terms},
+        })
+    return {
+        "chunks": chunks,
+        "partial": False,
+        "errors": [],
+        "search_mode": "indexed_db_lexical",
+        "total": len(chunks),
+        "fallback_used": False,
+        "provider": "indexed_report_db",
+        "selected_report_id": report_id,
+    }
+
+
 def _build_chunks_context(chunks: list[dict]) -> str:
     """Serialize RAG chunks as compact JSON for LLM prompt injection."""
     compact = []
@@ -357,25 +775,37 @@ class ReportChatCopilotAgent:
         force_refresh: bool = False,
         session_id: str | None = None,
         use_memory: bool = True,
+        event_callback: Any = None,
     ) -> dict:
         """
         Returns structured result dict. Never raises.
         """
         try:
-            return await self._do_chat(
-                market=market,
-                symbol=symbol,
-                question=question,
-                db=db,
-                stock_name=stock_name,
-                report_types=report_types,
-                years=years,
-                report_id=report_id,
-                top_k=top_k,
-                force_refresh=force_refresh,
-                session_id=session_id,
-                use_memory=use_memory,
+            return await asyncio.wait_for(
+                self._do_chat(
+                    market=market,
+                    symbol=symbol,
+                    question=question,
+                    db=db,
+                    stock_name=stock_name,
+                    report_types=report_types,
+                    years=years,
+                    report_id=report_id,
+                    top_k=top_k,
+                    force_refresh=force_refresh,
+                    session_id=session_id,
+                    use_memory=use_memory,
+                    event_callback=event_callback,
+                ),
+                timeout=_REPORT_CHAT_OVERALL_TIMEOUT_SECONDS,
             )
+        except asyncio.TimeoutError:
+            log.error("ReportChatCopilotAgent timed out for %s/%s", market, symbol)
+            result = _make_error_result(errors=["REPORT_AGENT_TIMEOUT"], partial=True)
+            result["status"] = "failed"
+            result["error_code"] = "REPORT_AGENT_TIMEOUT"
+            result["answer"] = "报告数据获取或总结生成超时，请稍后重试。"
+            return result
         except Exception as e:
             log.error("ReportChatCopilotAgent unexpected error: %s", e, exc_info=True)
             return _make_error_result(errors=[str(e)], partial=True)
@@ -394,6 +824,7 @@ class ReportChatCopilotAgent:
         force_refresh: bool,
         session_id: str | None,
         use_memory: bool,
+        event_callback: Any,
     ) -> dict:
         from app.agent.report_chat_cache import (
             read_cache, write_cache, _empty_cache_meta,
@@ -403,6 +834,35 @@ class ReportChatCopilotAgent:
         )
 
         errors: list[str] = []
+        total_start = time.perf_counter()
+        timings: dict[str, int] = {
+            "report_selection_ms": 0,
+            "report_document_load_ms": 0,
+            "rag_status_check_ms": 0,
+            "vector_query_ms": 0,
+            "lexical_query_ms": 0,
+            "rerank_ms": 0,
+            "chunk_fetch_ms": 0,
+            "evidence_assembly_ms": 0,
+            "llm_queue_ms": 0,
+            "llm_first_token_ms": 0,
+            "llm_total_ms": 0,
+            "review_ms": 0,
+            "persistence_ms": 0,
+            "total_ms": 0,
+        }
+        perf_meta: dict[str, Any] = {
+            "cache": {
+                "final_answer": "bypass" if force_refresh else "miss",
+                "selection": "miss",
+                "evidence": "miss",
+            },
+            "timeout_layer": None,
+            "retry_count": 0,
+            "llm_model": None,
+            "top_k_requested": top_k,
+            "fast_path_version": _REPORT_CHAT_FAST_PATH_VERSION,
+        }
 
         # ── 0. Sanitize inputs ────────────────────────────────────────────────
         question = (question or "").strip()
@@ -413,7 +873,8 @@ class ReportChatCopilotAgent:
         if not question:
             return _make_error_result(errors=["问题不能为空"], partial=False)
 
-        top_k = min(top_k, 10)
+        top_k = min(top_k, 8)
+        perf_meta["top_k_effective"] = top_k
 
         # ── 0a. Normalize question ────────────────────────────────────────────
         normalized_question, was_normalized = _normalize_question(question)
@@ -497,21 +958,45 @@ class ReportChatCopilotAgent:
                 memory_turns = []
 
         # ── 4. Resolve report selection ──────────────────────────────────────
+        await _emit_report_stage(event_callback, phase="report_selection", title="正在定位报告")
+        memory_report_id = latest_memory_report_id(memory_turns)
+        selection_key = _selection_cache_key(
+            ts_code=ts_code,
+            normalized_question=normalized_question,
+            report_id=report_id,
+            report_types=report_types,
+            years=years,
+            memory_report_id=memory_report_id,
+        )
+        selection = None
+        selection_start = time.perf_counter()
         try:
-            selection = await resolve_report_selection(
-                db=db,
-                market=market,
-                symbol=symbol,
-                stock_name=stock_name,
-                question=normalized_question,
-                report_id=report_id,
-                report_types=report_types,
-                years=years,
-                memory_turns=memory_turns,
-            )
+            cached_selection = await _cache_get_json(selection_key)
+            selection = _selection_from_metadata(cached_selection)
+            if selection is not None:
+                perf_meta["cache"]["selection"] = "hit"
+            else:
+                selection = await asyncio.wait_for(
+                    resolve_report_selection(
+                        db=db,
+                        market=market,
+                        symbol=symbol,
+                        stock_name=stock_name,
+                        question=normalized_question,
+                        report_id=report_id,
+                        report_types=report_types,
+                        years=years,
+                        memory_turns=memory_turns,
+                    ),
+                    timeout=_REPORT_SELECTION_TIMEOUT_SECONDS,
+                )
+                if selection and selection.ok:
+                    await _cache_set_json(selection_key, selection.metadata(), _SELECTION_CACHE_TTL_SECONDS)
         except Exception as e:
             log.warning("Report selection failed for %s/%s: %s", market, symbol, e)
+            perf_meta["timeout_layer"] = "report_selection" if isinstance(e, asyncio.TimeoutError) else perf_meta["timeout_layer"]
             selection = None
+        timings["report_selection_ms"] = _ms_since(selection_start)
 
         if selection is None:
             return {
@@ -554,6 +1039,39 @@ class ReportChatCopilotAgent:
         selected_report_types = [selection.report_type] if selection.report_type else report_types
         selected_years = [selection.report_year] if selection.report_year else years
         report_context = selection.metadata()
+        perf_meta["report_id"] = selected_report_id
+        perf_meta["report_year"] = selection.report_year
+        perf_meta["report_context"] = report_context
+
+        # ── 4b. PDF/link fast path ───────────────────────────────────────────
+        if _is_pdf_question(normalized_question):
+            answer = _format_pdf_answer(report_context)
+            timings["total_ms"] = _ms_since(total_start)
+            return {
+                "status": "completed",
+                "answer": answer,
+                "source_chunks": [],
+                "review_audit": {},
+                "rag_status": "not_required",
+                "confidence": "high" if (report_context.get("pdf_url") or report_context.get("source_url")) else "low",
+                "evidence_used": [],
+                "data_limitations": [] if (report_context.get("pdf_url") or report_context.get("source_url")) else ["已选报告缺少官方 PDF URL"],
+                "disclaimer": "本内容基于已接入的公开财报片段，仅供参考，不构成投资建议。",
+                "errors": [],
+                "partial": False,
+                "cache_meta": _empty_cache_meta(),
+                "memory_meta": {
+                    **memory_meta_dict(session_id, len(memory_turns), False),
+                    "report_context": report_context,
+                },
+                "safety_meta": safety_meta,
+                "performance_meta": {
+                    **perf_meta,
+                    "stage_timings_ms": timings,
+                    "source_chunks_count": 0,
+                    "evidence_chars": 0,
+                },
+            }
 
         # ── 5. Cache read ─────────────────────────────────────────────────────
         if not force_refresh:
@@ -566,10 +1084,16 @@ class ReportChatCopilotAgent:
             )
             if cached is not None:
                 log.debug("Cache HIT for %s question=%r", ts_code, normalized_question[:40])
+                perf_meta["cache"]["final_answer"] = "hit"
                 cached["safety_meta"] = safety_meta
                 cached["memory_meta"] = {
                     **memory_meta_dict(session_id, len(memory_turns), False),
                     "report_context": report_context,
+                }
+                cached["performance_meta"] = {
+                    **(cached.get("performance_meta") or {}),
+                    **perf_meta,
+                    "stage_timings_ms": {**timings, "total_ms": _ms_since(total_start)},
                 }
                 return cached
 
@@ -579,34 +1103,134 @@ class ReportChatCopilotAgent:
         expanded_query = _expand_query(normalized_question, memory_turns)
 
         # ── 6. RAG retrieval ──────────────────────────────────────────────────
+        await _emit_report_stage(event_callback, phase="report_evidence_retrieval", title="正在检索报告证据")
         chunks: list[dict] = []
         rag_result: dict = {"chunks": [], "partial": False, "errors": [], "provider": "unavailable"}
         rag_status = "unavailable"
+        evidence_key = _evidence_cache_key(
+            ts_code=ts_code,
+            report_id=selected_report_id,
+            normalized_question=expanded_query,
+            top_k=top_k,
+        )
 
+        evidence_start = time.perf_counter()
         try:
-            from app.services.report_rag_service import ReportRagService
-            rag_result = await ReportRagService().query(
-                ts_code=ts_code,
-                query_text=expanded_query,
-                db=db,
-                report_types=selected_report_types,
-                years=selected_years,
-                report_id=selected_report_id,
-                top_k=top_k,
-            )
+            cached_evidence = await _cache_get_json(evidence_key)
+            if isinstance(cached_evidence, dict) and cached_evidence.get("chunks"):
+                rag_result = cached_evidence.get("rag_result") or {}
+                chunks = cached_evidence.get("chunks") or []
+                rag_status = cached_evidence.get("rag_status") or _compute_rag_status(rag_result)
+                perf_meta["cache"]["evidence"] = "hit"
+            else:
+                rag_start = time.perf_counter()
+                if _is_indexed_report(report_context):
+                    rag_result = await asyncio.wait_for(
+                        _query_indexed_report_db_evidence(
+                            db=db,
+                            ts_code=ts_code,
+                            report_context=report_context,
+                            query_text=expanded_query,
+                            top_k=top_k,
+                        ),
+                        timeout=_RAG_QUERY_TIMEOUT_SECONDS,
+                    )
+                else:
+                    from app.services.report_rag_service import ReportRagService
+                    rag_result = await asyncio.wait_for(
+                        ReportRagService().query(
+                            ts_code=ts_code,
+                            query_text=expanded_query,
+                            db=db,
+                            report_types=selected_report_types,
+                            years=selected_years,
+                            report_id=selected_report_id,
+                            top_k=top_k,
+                        ),
+                        timeout=_RAG_QUERY_TIMEOUT_SECONDS,
+                    )
+                timings["vector_query_ms"] = _ms_since(rag_start)
+                chunks = rag_result.get("chunks", []) or []
+                rag_status = _compute_rag_status(rag_result)
+                await _cache_set_json(
+                    evidence_key,
+                    {
+                        "chunks": chunks,
+                        "rag_result": rag_result,
+                        "rag_status": rag_status,
+                        "report_context": report_context,
+                        "created_at": int(time.time()),
+                    },
+                    _EVIDENCE_CACHE_TTL_SECONDS,
+                )
+                perf_meta["cache"]["evidence"] = "written"
             chunks = rag_result.get("chunks", []) or []
+            if perf_meta["cache"]["evidence"] == "hit":
+                chunks = cached_evidence.get("chunks") or []
+            chunks = _limit_evidence_chunks(chunks)
             rag_status = _compute_rag_status(rag_result)
             if rag_result.get("errors"):
                 errors.extend(rag_result["errors"])
+        except asyncio.TimeoutError:
+            perf_meta["timeout_layer"] = "rag_query"
+            stale_evidence = await _cache_get_json(evidence_key)
+            if isinstance(stale_evidence, dict) and stale_evidence.get("chunks"):
+                chunks = _limit_evidence_chunks(stale_evidence.get("chunks") or [])
+                rag_result = stale_evidence.get("rag_result") or {"chunks": chunks, "partial": True, "errors": ["RAG timeout; stale evidence used"]}
+                rag_status = stale_evidence.get("rag_status") or _compute_rag_status(rag_result)
+                perf_meta["cache"]["evidence"] = "stale_hit"
+                errors.append("RAG检索超时，已使用缓存证据")
+            else:
+                errors.append("RAG检索超时")
+                rag_status = "unavailable"
         except Exception as e:
             log.warning("RAG service failed for %s: %s", ts_code, e)
             errors.append(f"RAG检索失败: {e}")
             rag_status = "unavailable"
+        timings["evidence_assembly_ms"] = _ms_since(evidence_start)
+        timings["chunk_fetch_ms"] = timings["evidence_assembly_ms"]
+        perf_meta["chunks_before_rerank"] = len(rag_result.get("chunks", []) or chunks)
+        perf_meta["chunks_after_rerank"] = len(chunks)
+        perf_meta["source_chunks_count"] = len(chunks)
+        perf_meta["evidence_chars"] = _evidence_chars(chunks)
+        perf_meta["indexed_fast_path"] = _is_indexed_report(report_context)
 
         # ── 7. Build allowed chunk IDs ────────────────────────────────────────
         allowed_chunk_ids = [c["chunk_id"] for c in chunks if c.get("chunk_id") is not None]
+        if not chunks:
+            timings["total_ms"] = _ms_since(total_start)
+            return {
+                "status": "failed",
+                "error_code": "NO_REPORT_EVIDENCE",
+                "answer": _format_evidence_fallback_answer(
+                    question=normalized_question,
+                    report_context=report_context,
+                    chunks=[],
+                    reason="未检索到可引用的报告证据",
+                ),
+                "source_chunks": [],
+                "review_audit": {},
+                "rag_status": rag_status,
+                "confidence": "low",
+                "evidence_used": [],
+                "data_limitations": ["当前未检索到相关财报片段，不能编造财务数字"],
+                "disclaimer": "本内容基于已接入的公开财报片段，仅供参考，不构成投资建议。",
+                "errors": errors or ["NO_REPORT_EVIDENCE"],
+                "partial": True,
+                "cache_meta": cache_meta,
+                "memory_meta": {
+                    **memory_meta_dict(session_id, len(memory_turns), False),
+                    "report_context": report_context,
+                },
+                "safety_meta": safety_meta,
+                "performance_meta": {
+                    **perf_meta,
+                    "stage_timings_ms": timings,
+                },
+            }
 
         # ── 8. Build LLM prompt (with session memory context) ─────────────────
+        await _emit_report_stage(event_callback, phase="report_synthesis", title="正在生成分析")
         system_prompt = _load_system_prompt()
         chunks_json = _build_chunks_context(chunks)
         report_metadata_json = _build_report_metadata_context(report_context)
@@ -639,6 +1263,7 @@ class ReportChatCopilotAgent:
         # ── 9. LLM call ────────────────────────────────────────────────────────
         raw_llm_result: dict = {}
         llm_error: str | None = None
+        llm_timed_out = False
 
         try:
             from app.core.config import settings
@@ -648,23 +1273,40 @@ class ReportChatCopilotAgent:
                 raise RuntimeError("AI 功能已关闭（AI_ENABLED=false）")
             if not settings.ai_api_key:
                 raise RuntimeError("AI API Key 未配置")
+            perf_meta["llm_model"] = settings.deepseek_model
 
             client = DeepSeekClient()
             loop = asyncio.get_running_loop()
-            raw_text = await loop.run_in_executor(
-                None,
-                lambda: client.chat(
-                    messages,
-                    temperature=0.3,
-                    model=settings.deepseek_model,   # flash model (default)
+            llm_start = time.perf_counter()
+            raw_response = await asyncio.wait_for(
+                loop.run_in_executor(
+                    None,
+                    lambda: client.chat(
+                        messages,
+                        temperature=0.3,
+                        model=settings.deepseek_model,   # flash model (default)
+                    ),
                 ),
+                timeout=_LLM_SYNTHESIS_TIMEOUT_SECONDS,
             )
+            timings["llm_total_ms"] = _ms_since(llm_start)
+            timings["llm_first_token_ms"] = timings["llm_total_ms"]
+            raw_text = _extract_response_text(raw_response)
+            if not raw_text:
+                raise RuntimeError("LLM 返回为空")
             cleaned_text = _strip_json_fence(raw_text)
-            raw_llm_result = json.loads(cleaned_text)
+            raw_llm_result = _normalize_llm_json_result(json.loads(cleaned_text))
 
         except json.JSONDecodeError as e:
             llm_error = f"LLM 输出 JSON 解析失败: {e}"
             log.error("ReportChatCopilot JSON parse failed: %s", e)
+            errors.append(llm_error)
+        except asyncio.TimeoutError:
+            llm_timed_out = True
+            llm_error = "LLM 调用超时"
+            timings["llm_total_ms"] = _LLM_SYNTHESIS_TIMEOUT_SECONDS * 1000
+            perf_meta["timeout_layer"] = "llm_synthesis"
+            log.error("ReportChatCopilot LLM timeout")
             errors.append(llm_error)
         except Exception as e:
             llm_error = f"LLM 调用失败: {e}"
@@ -676,7 +1318,39 @@ class ReportChatCopilotAgent:
             limitations = ["AI 服务暂时不可用"]
             if not chunks:
                 limitations.insert(0, "当前未检索到相关财报片段")
+            timings["total_ms"] = _ms_since(total_start)
+            if chunks:
+                fallback_answer = _format_evidence_fallback_answer(
+                    question=normalized_question,
+                    report_context=report_context,
+                    chunks=chunks,
+                    reason="自动总结未在时限内完成" if llm_timed_out else "自动总结生成失败",
+                )
+                return {
+                    "status": "partial_success",
+                    "error_code": "REPORT_LLM_TIMEOUT" if llm_timed_out else "REPORT_LLM_SYNTHESIS_FAILED",
+                    "answer": fallback_answer,
+                    "source_chunks": chunks,
+                    "review_audit": {"status": "skipped_after_synthesis_failure"},
+                    "rag_status": rag_status,
+                    "confidence": "medium" if chunks else "low",
+                    "data_limitations": limitations + ["已使用检索到的报告证据生成确定性降级回答"],
+                    "errors": errors,
+                    "partial": True,
+                    "cache_meta":  cache_meta,
+                    "memory_meta": {
+                        **memory_meta_dict(session_id, len(memory_turns), memory_context_used),
+                        "report_context": report_context,
+                    },
+                    "safety_meta": safety_meta,
+                    "performance_meta": {
+                        **perf_meta,
+                        "stage_timings_ms": timings,
+                    },
+                }
             return {
+                "status": "failed" if llm_timed_out else "completed",
+                "error_code": "REPORT_LLM_TIMEOUT" if llm_timed_out else None,
                 "answer": (
                     "AI 分析服务暂时不可用。"
                     + _format_data_limited_answer(normalized_question, report_context, chunks, limitations)
@@ -723,8 +1397,19 @@ class ReportChatCopilotAgent:
 
         try:
             from app.agent.fundamental_review_agent import FundamentalReviewAgent
-            review_result = await FundamentalReviewAgent().review(review_input, data_pack_stub)
+            review_start = time.perf_counter()
+            review_result = await asyncio.wait_for(
+                FundamentalReviewAgent().review(review_input, data_pack_stub),
+                timeout=_REVIEW_TIMEOUT_SECONDS,
+            )
+            timings["review_ms"] = _ms_since(review_start)
             review_audit = review_result.get("audit", {})
+        except asyncio.TimeoutError:
+            timings["review_ms"] = int(_REVIEW_TIMEOUT_SECONDS * 1000)
+            perf_meta["timeout_layer"] = perf_meta["timeout_layer"] or "review"
+            errors.append("合规审核超时（使用原始结果）")
+            review_result = {"final": review_input, "status": "skipped"}
+            review_audit = {"status": "timeout_skipped"}
         except Exception as e:
             log.warning("Review agent failed for chat: %s", e)
             errors.append(f"合规审核失败（使用原始结果）: {e}")
@@ -734,12 +1419,28 @@ class ReportChatCopilotAgent:
         # ── 11. Extract final output ──────────────────────────────────────────
         final: dict = review_result.get("final", review_input)
 
-        answer = final.get("answer") or raw_llm_result.get("answer", "当前已接入资料不足以判断此问题。")
+        answer = _extract_response_text(final) or _extract_response_text(raw_llm_result)
         confidence = final.get("confidence") or raw_llm_result.get("confidence", "low")
         evidence_used = final.get("evidence_used") or raw_llm_result.get("evidence_used", [])
         data_limitations = final.get("data_limitations") or raw_llm_result.get("data_limitations", [])
         source_chunks_out = final.get("source_chunks") or []
         disclaimer = final.get("disclaimer") or "本内容基于已接入的公开财报片段，仅供参考，不构成投资建议。"
+
+        if not str(answer or "").strip():
+            answer = (
+                "报告证据已获取，但本次总结生成暂时失败。"
+                + _format_data_limited_answer(
+                    normalized_question,
+                    report_context,
+                    chunks,
+                    ["总结生成返回空白，未编造财务数字"],
+                )
+            )
+            confidence = "low"
+            data_limitations = list(data_limitations or [])
+            if "总结生成返回空白，已降级为证据范围说明" not in data_limitations:
+                data_limitations.insert(0, "总结生成返回空白，已降级为证据范围说明")
+            errors.append("EMPTY_LLM_ANSWER")
 
         review_status = review_result.get("status", "approved")
         if review_status == "rejected":
@@ -766,8 +1467,10 @@ class ReportChatCopilotAgent:
 
         is_rejection = review_status == "rejected" or classification == "rejected"
         partial = bool(errors) or rag_result.get("partial", False) or review_status not in {"approved", "revised", "skipped"}
+        timings["total_ms"] = _ms_since(total_start)
 
         result = {
+            "status":           "partial_success" if partial and chunks else "completed",
             "answer":           answer,
             "source_chunks":    source_chunks_out,
             "review_audit":     review_audit,
@@ -784,6 +1487,10 @@ class ReportChatCopilotAgent:
                 "report_context": report_context,
             },
             "safety_meta":      safety_meta,
+            "performance_meta": {
+                **perf_meta,
+                "stage_timings_ms": timings,
+            },
         }
 
         # ── 12. Write to cache + append session memory ────────────────────────

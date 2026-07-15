@@ -22,6 +22,9 @@ T16  detect_prompt_injection catches CN and EN injection phrases
 T17  detect_prompt_injection returns False for normal questions
 T18  _expand_query performs conversation-aware expansion for short follow-up
 T19  agent.chat returns cache_meta/memory_meta/safety_meta fields on error path
+T20  canonical LLM response extraction supports multiple field shapes
+T21  empty canonical LLM response remains detectable
+T22  agent.chat timeout returns failed non-empty answer
 """
 from __future__ import annotations
 
@@ -524,3 +527,46 @@ def test_agent_error_path_includes_phase6k_fields():
     assert "normalized" in result["safety_meta"]
     assert "prompt_injection_detected" in result["safety_meta"]
     assert result["safety_meta"]["prompt_injection_detected"] is False
+
+
+def test_canonical_llm_response_extraction_supports_multiple_shapes():
+    from app.agent.report_chat_copilot_agent import _normalize_llm_json_result
+
+    assert _normalize_llm_json_result({"final_answer": "最终回答"})["answer"] == "最终回答"
+    assert _normalize_llm_json_result({"content": "正文"})["answer"] == "正文"
+    assert _normalize_llm_json_result({
+        "choices": [{"message": {"content": "choices 正文"}}],
+    })["answer"] == "choices 正文"
+
+
+def test_empty_canonical_llm_response_remains_detectable():
+    from app.agent.report_chat_copilot_agent import _normalize_llm_json_result
+
+    result = _normalize_llm_json_result({"answer": "   "})
+    assert not str(result.get("answer") or "").strip()
+
+
+def test_agent_timeout_returns_failed_non_empty_answer():
+    from app.agent.report_chat_copilot_agent import ReportChatCopilotAgent
+
+    async def slow_do_chat(**kwargs):
+        await asyncio.sleep(0.05)
+        return {"answer": ""}
+
+    async def raise_timeout(coro, timeout):
+        coro.close()
+        raise asyncio.TimeoutError()
+
+    agent = ReportChatCopilotAgent()
+    with patch.object(agent, "_do_chat", new=slow_do_chat), \
+        patch("app.agent.report_chat_copilot_agent.asyncio.wait_for", new=raise_timeout):
+        result = run(agent.chat(
+            market="CN",
+            symbol="600519",
+            question="最新财报表现如何？",
+            db=None,
+        ))
+
+    assert result["status"] == "failed"
+    assert result["error_code"] == "REPORT_AGENT_TIMEOUT"
+    assert result["answer"].strip()

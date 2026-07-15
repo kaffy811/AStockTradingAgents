@@ -30,6 +30,11 @@ class ReportSelection:
     title: str | None
     disclosure_date: str | None
     selection_reason: str
+    pdf_url: str | None = None
+    source_url: str | None = None
+    parsed: bool | None = None
+    rag_status: str | None = None
+    chunk_count: int | None = None
     switched_from_report_id: int | None = None
     error: str | None = None
 
@@ -49,6 +54,11 @@ class ReportSelection:
             "period_end": self.period_end,
             "title": self.title,
             "disclosure_date": self.disclosure_date,
+            "pdf_url": self.pdf_url,
+            "source_url": self.source_url,
+            "parsed": self.parsed,
+            "rag_status": self.rag_status,
+            "chunk_count": self.chunk_count,
             "selection_reason": self.selection_reason,
             "switched_from_report_id": self.switched_from_report_id,
             "error": self.error,
@@ -130,6 +140,11 @@ def _empty_selection(*, market: str, symbol: str, reason: str, error: str, stock
         period_end=None,
         title=None,
         disclosure_date=None,
+        pdf_url=None,
+        source_url=None,
+        parsed=None,
+        rag_status=None,
+        chunk_count=None,
         selection_reason=reason,
         error=error,
     )
@@ -155,6 +170,11 @@ def _from_doc(
         period_end=doc.period_end,
         title=doc.title,
         disclosure_date=doc.disclosure_date,
+        pdf_url=doc.pdf_url,
+        source_url=doc.source_url,
+        parsed=bool(doc.parsed),
+        rag_status=doc.rag_status,
+        chunk_count=doc.chunk_count,
         selection_reason=reason,
         switched_from_report_id=switched_from_report_id,
     )

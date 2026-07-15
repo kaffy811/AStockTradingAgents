@@ -67,7 +67,9 @@ ETYPE_RAG_REVIEW_START    = "rag_review_started"
 ETYPE_RAG_REVIEW_DONE     = "rag_review_completed"
 ETYPE_CONFIRM_REQUIRED    = "confirmation_required"
 ETYPE_ANSWER_DELTA        = "answer_delta"
+ETYPE_ANSWER_COMPLETED    = "answer_completed"
 ETYPE_CARDS_DELTA         = "cards_delta"
+ETYPE_MESSAGE_PERSISTED   = "message_persisted"
 ETYPE_COMPLETED           = "agent_completed"
 ETYPE_ERROR               = "agent_error"
 ETYPE_KEEPALIVE           = "keepalive"
@@ -167,6 +169,22 @@ class ChatStreamEvent:
 _KEEPALIVE_INTERVAL = 15.0   # seconds between keepalive comments
 _ANSWER_CHUNK_SIZE  = 25     # chars per answer_delta chunk
 _TOOL_EVENT_DELAY   = 0.05   # seconds between streaming consecutive tool events
+_EMPTY_FINAL_ANSWER_TEXT = "报告数据已获取，但本次回答生成失败，请重新尝试。"
+
+
+def _answer_text_from_final_payload(payload: dict) -> str:
+    """Build a user-visible text answer from a structured final_answer payload."""
+    if not isinstance(payload, dict):
+        return str(payload or "").strip()
+    for key in ("full_text", "answer", "content", "text", "message", "response"):
+        value = payload.get(key)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+    return "\n\n".join(
+        str(payload.get(key) or "").strip()
+        for key in ("summary", "analysis", "disclaimer")
+        if str(payload.get(key) or "").strip()
+    ).strip()
 
 
 async def stream_chat_message(
@@ -219,6 +237,7 @@ async def stream_chat_message(
         """
         # C25: track whether these critical events have been emitted
         final_answer_sent = [False]
+        answer_completed_sent = [False]
         done_sent         = [False]
         # Track the orchestration result so we can persist it even on error
         _result_ref: list = [None]
@@ -292,6 +311,8 @@ async def stream_chat_message(
                     if event_type in ("final_answer", ETYPE_FINAL_ANSWER):
                         payload = sanitize_financial_answer(payload)
                         final_answer_sent[0] = True
+                    if event_type == ETYPE_ANSWER_COMPLETED:
+                        answer_completed_sent[0] = True
                     if event_type in ("agent_completed", ETYPE_COMPLETED):
                         done_sent[0] = True
                     sse = _make_sse(event_type, payload, mid=assistant_placeholder_id)
@@ -313,6 +334,21 @@ async def stream_chat_message(
             # fallback final_answer (which would show "本次请求未能完成" to the user)
             if result.confirmation is not None and not result.answer:
                 _has_confirmation_only[0] = True
+            else:
+                answer_text = str(result.answer or "").strip()
+                if not answer_text:
+                    result.answer = _EMPTY_FINAL_ANSWER_TEXT
+                    result.metadata = {
+                        **(result.metadata or {}),
+                        "status": "failed",
+                        "error_code": "EMPTY_FINAL_ANSWER",
+                    }
+                else:
+                    result.answer = answer_text
+                    result.metadata = {
+                        **(result.metadata or {}),
+                        "status": (result.metadata or {}).get("status") or "completed",
+                    }
 
             # ── Phase 5: stream tool events from result (fallback for non-real-time) ──
             for te in result.tool_events:
@@ -387,6 +423,21 @@ async def stream_chat_message(
                     ))
                     await asyncio.sleep(0.02)
 
+            # ── Phase 8b: canonical answer completion ───────────────────────
+            if not _has_confirmation_only[0]:
+                await queue.put(_make_sse(
+                    ETYPE_ANSWER_COMPLETED,
+                    {
+                        "answer":        answer,
+                        "final_answer":  answer,
+                        "answer_length": len(answer),
+                        "status":        result.metadata.get("status", "completed"),
+                        "error_code":    result.metadata.get("error_code"),
+                    },
+                    mid=assistant_placeholder_id,
+                ))
+                answer_completed_sent[0] = True
+
             # ── Phase 9: persist assistant message ────────────────────────────
             saved_msg = await save_assistant_message(
                 db=db,
@@ -404,12 +455,26 @@ async def stream_chat_message(
 
             final_mid = str(saved_msg.id)
             await queue.put(_make_sse(
+                ETYPE_MESSAGE_PERSISTED,
+                {
+                    "message_id":           final_mid,
+                    "assistant_message_id": final_mid,
+                    "answer_length":        len(result.answer or ""),
+                    "status":               result.metadata.get("status", "completed"),
+                    "error_code":           result.metadata.get("error_code"),
+                },
+                mid=final_mid,
+            ))
+            await queue.put(_make_sse(
                 ETYPE_COMPLETED,
                 {
-                    "message_id":       final_mid,
-                    "has_confirmation": result.confirmation is not None,
-                    "has_cards":        bool(result.cards),
-                    "answer_length":    len(result.answer),
+                    "message_id":           final_mid,
+                    "assistant_message_id": final_mid,
+                    "has_confirmation":     result.confirmation is not None,
+                    "has_cards":            bool(result.cards),
+                    "answer_length":        len(result.answer or ""),
+                    "status":               result.metadata.get("status", "completed"),
+                    "error_code":           result.metadata.get("error_code"),
                 },
                 mid=final_mid,
             ))
@@ -420,15 +485,30 @@ async def stream_chat_message(
             # C25: guarantee final_answer + done are emitted even on exception
             try:
                 # C32.1.4: skip fallback for confirmation-only flows
-                if not final_answer_sent[0] and not _has_confirmation_only[0]:
+                if not final_answer_sent[0] and not answer_completed_sent[0] and not _has_confirmation_only[0]:
+                    fallback_payload = build_fallback_final_answer(
+                        _sanitize_error_for_user(exc)  # C30.3.6: no raw DB errors
+                    )
                     await queue.put(_make_sse(
                         ETYPE_FINAL_ANSWER,
-                        build_fallback_final_answer(
-                            _sanitize_error_for_user(exc)  # C30.3.6: no raw DB errors
-                        ),
+                        fallback_payload,
                         mid=assistant_placeholder_id,
                     ))
                     final_answer_sent[0] = True
+                    if not answer_completed_sent[0]:
+                        fallback_answer = _answer_text_from_final_payload(fallback_payload) or _EMPTY_FINAL_ANSWER_TEXT
+                        await queue.put(_make_sse(
+                            ETYPE_ANSWER_COMPLETED,
+                            {
+                                "answer":        fallback_answer,
+                                "final_answer":  fallback_answer,
+                                "answer_length": len(fallback_answer),
+                                "status":        "failed",
+                                "error_code":    "STREAM_ORCHESTRATION_ERROR",
+                            },
+                            mid=assistant_placeholder_id,
+                        ))
+                        answer_completed_sent[0] = True
                 await queue.put(_make_sse(
                     ETYPE_ERROR,
                     {"error": "请求处理失败，请稍后重试。"},
@@ -439,9 +519,12 @@ async def stream_chat_message(
                         ETYPE_COMPLETED,
                         {
                             "message_id":       assistant_placeholder_id,
+                            "assistant_message_id": assistant_placeholder_id,
                             "has_confirmation": False,
                             "has_cards":        False,
                             "answer_length":    0,
+                            "status":           "failed",
+                            "error_code":       "STREAM_ORCHESTRATION_ERROR",
                         },
                         mid=assistant_placeholder_id,
                     ))
@@ -476,20 +559,38 @@ async def stream_chat_message(
             # C25: last-resort guarantee — if anything above crashed silently
             try:
                 # C32.1.4: confirmation-only results don't need a final_answer
-                if not final_answer_sent[0] and not _has_confirmation_only[0]:
+                if not final_answer_sent[0] and not answer_completed_sent[0] and not _has_confirmation_only[0]:
+                    fallback_payload = build_fallback_final_answer("")
                     await queue.put(_make_sse(
                         ETYPE_FINAL_ANSWER,
-                        build_fallback_final_answer(""),
+                        fallback_payload,
+                        mid=assistant_placeholder_id,
+                    ))
+                    final_answer_sent[0] = True
+                if not answer_completed_sent[0] and not _has_confirmation_only[0]:
+                    fallback_answer = _answer_text_from_final_payload(build_fallback_final_answer("")) or _EMPTY_FINAL_ANSWER_TEXT
+                    await queue.put(_make_sse(
+                        ETYPE_ANSWER_COMPLETED,
+                        {
+                            "answer":        fallback_answer,
+                            "final_answer":  fallback_answer,
+                            "answer_length": len(fallback_answer),
+                            "status":        "failed",
+                            "error_code":    "EMPTY_FINAL_ANSWER",
+                        },
                         mid=assistant_placeholder_id,
                     ))
                 if not done_sent[0]:
                     await queue.put(_make_sse(
                         ETYPE_COMPLETED,
                         {
-                            "message_id":       assistant_placeholder_id,
-                            "has_confirmation": False,
-                            "has_cards":        False,
-                            "answer_length":    0,
+                            "message_id":           assistant_placeholder_id,
+                            "assistant_message_id": assistant_placeholder_id,
+                            "has_confirmation":     False,
+                            "has_cards":            False,
+                            "answer_length":        0,
+                            "status":               "failed",
+                            "error_code":           "STREAM_INCOMPLETE",
                         },
                         mid=assistant_placeholder_id,
                     ))

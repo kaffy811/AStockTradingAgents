@@ -20,6 +20,22 @@ from app.agents.chat_skills.base import (
 from app.agents.chat_rag import retrieve_context, RAGReviewCoordinator
 from app.agents.chat_events import safe_emit
 
+
+def _extract_answer_text(value) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, str):
+        return value.strip()
+    if isinstance(value, dict):
+        for key in ("answer", "final_answer", "content", "response", "text", "message", "result"):
+            text = _extract_answer_text(value.get(key))
+            if text:
+                return text
+        choices = value.get("choices")
+        if isinstance(choices, list) and choices:
+            return _extract_answer_text(choices[0])
+    return ""
+
 # ── Report-type display labels (never expose internal enum to users) ────────────
 _REPORT_TYPE_LABELS: dict[str, str] = {
     "latest_periodic_report": "最新已披露定期报告",
@@ -382,12 +398,14 @@ class ReportExplanationSkill(BaseSkill):
             report_id=report_id,
             session_id=context.session_id or None,
             use_memory=True,
-            force_refresh=True,
+            force_refresh=False,
+            event_callback=context.event_callback,
         )
-        events.append(self._tool_event("report_chat_copilot", "统一财报解释主链", "success" if isinstance(result, dict) else "error"))
+        result = result if isinstance(result, dict) else {}
+        events.append(self._tool_event("report_chat_copilot", "统一财报解释主链", "success" if result else "error"))
         events = self._rag_events(result.get("source_chunks", []), result.get("confidence")) + events
 
-        answer = str(result.get("answer") or "当前已接入资料不足以判断此问题。")
+        answer = _extract_answer_text(result) or "当前已接入资料不足以判断此问题。"
         disclaimer = str(result.get("disclaimer") or _DISCLAIMER.strip())
         if "不构成投资建议" not in answer:
             answer = answer.rstrip() + "\n\n" + disclaimer
@@ -408,6 +426,8 @@ class ReportExplanationSkill(BaseSkill):
             cards=[],
             data={
                 "partial": bool(result.get("partial")),
+                "status": result.get("status") or "completed",
+                "error_code": result.get("error_code"),
                 "report_context": result.get("report_context") or (result.get("memory_meta") or {}).get("report_context"),
                 "source_chunks": result.get("source_chunks", []),
                 "review_audit": result.get("review_audit", {}),

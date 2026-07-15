@@ -64,6 +64,7 @@ _central_planner = _CentralPlanningAgent()
 log = logging.getLogger(__name__)
 
 _DISCLAIMER = "\n\n_仅供研究参考，不构成投资建议。_"
+_EMPTY_FINAL_ANSWER_TEXT = "报告数据已获取，但本次回答生成失败，请重新尝试。"
 
 # ── Build registry ─────────────────────────────────────────────────────────────
 
@@ -1097,6 +1098,7 @@ async def process_message(
     # C32.1.2: use resolved query so skills receive de-pronominalized content
     skill_result = await _skill_registry.run(_effective_content, context)
     if skill_result is not None:
+        skill_data = getattr(skill_result, "data", None) or {}
         await _emit("skill_completed", {"skill_name": skill_result.skill_name})
 
         # C31.3 — Emit agent_observation, deep_reasoning, risk_review, synthesis
@@ -1109,7 +1111,7 @@ async def process_message(
         await _emit("thinking_event", _central_plan.get_phase_event("synthesis"))
 
         result = OrchestratorResult(
-            answer=skill_result.answer,
+            answer=(skill_result.answer or "").strip() or _EMPTY_FINAL_ANSWER_TEXT,
             tool_events=skill_result.tool_events,
             cards=skill_result.cards,
             metadata={
@@ -1117,10 +1119,18 @@ async def process_message(
                 "source":            "skill_registry",
                 "tools_used":        [e["name"] for e in skill_result.tool_events],
                 "safety_flags":      skill_result.safety_flags,
+                "skill_data":        skill_data,
                 # C9: spec metadata injected by SkillRegistry
                 **skill_result.metadata,
             },
         )
+        if not (skill_result.answer or "").strip():
+            result.metadata["status"] = "failed"
+            result.metadata["error_code"] = "EMPTY_FINAL_ANSWER"
+        elif skill_data.get("status"):
+            result.metadata["status"] = skill_data.get("status")
+            if skill_data.get("error_code"):
+                result.metadata["error_code"] = skill_data.get("error_code")
         # C8: write memory (fire-and-forget)
         await _write_memory_from_result(db, session_id, user_id, msg, result, output_language)
         return result

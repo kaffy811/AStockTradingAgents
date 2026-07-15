@@ -384,6 +384,10 @@ async def save_assistant_message(
     output_language: str,
     extra_metadata: dict | None = None,
 ) -> ChatMessage:
+    answer = str(answer or "")
+    if not answer.strip() and confirmation is None:
+        raise ValueError("assistant message content cannot be empty without confirmation")
+
     # Determine message_type
     if confirmation:
         msg_type = "confirmation"
