@@ -349,6 +349,57 @@ def _annotate_dupont_formula(rows: list[dict[str, Any]]) -> None:
             })
 
 
+def _annotate_plausibility(module_key: str, rows: list[dict[str, Any]]) -> None:
+    """Flag implausible points while preserving raw values for debug/review."""
+    checks: dict[str, tuple[float | None, float | None, str]] = {
+        "roe": (-1.0, 1.0, "ROE 超出常见范围，需核对单位或特殊事项"),
+        "net_margin": (-1.0, 1.0, "净利率超出常见范围，需核对口径"),
+        "gross_margin": (-0.2, 1.0, "毛利率超出常见范围，需核对口径"),
+        "debt_ratio": (0.0, 1.5, "资产负债率超出常见范围，需核对口径"),
+        "equity_multiplier": (0.0, 20.0, "权益乘数出现异常尖峰，需核对单位或权益基数"),
+        "asset_turnover": (0.0, 20.0, "资产周转率超出常见范围，需核对口径"),
+    }
+    for row in rows:
+        for field, (lower, upper, message) in checks.items():
+            value = _safe_float(row.get(field))
+            if value is None:
+                continue
+            if (lower is not None and value < lower) or (upper is not None and value > upper):
+                row.setdefault("warnings", []).append({
+                    "code": "OUTLIER_REQUIRES_REVIEW",
+                    "message": message,
+                    "module_key": module_key,
+                    "field": field,
+                    "period_end": row.get("period"),
+                    "raw_value": value,
+                    "normalized_value": value,
+                    "validation": "industry_plausible_range",
+                })
+
+    for field in checks:
+        values = [(idx, _safe_float(row.get(field))) for idx, row in enumerate(rows)]
+        values = [(idx, value) for idx, value in values if value is not None and abs(value) > 1e-12]
+        if len(values) < 4:
+            continue
+        abs_values = sorted(abs(value) for _, value in values)
+        median = abs_values[len(abs_values) // 2]
+        if median <= 0:
+            continue
+        for idx, value in values:
+            if abs(value) >= median * 50:
+                rows[idx].setdefault("warnings", []).append({
+                    "code": "OUTLIER_REQUIRES_REVIEW",
+                    "message": "同一序列出现数量级突变，需核对是否存在重复百分比缩放或特殊会计事项",
+                    "module_key": module_key,
+                    "field": field,
+                    "period_end": rows[idx].get("period"),
+                    "raw_value": value,
+                    "normalized_value": value,
+                    "median_abs_value": median,
+                    "validation": "double_scaling_or_spike_detection",
+                })
+
+
 def _all_quarters_from_year(start_year: int) -> list[tuple[int, int]]:
     """生成从 start_year 至今所有季度的 (year, quarter) 列表，降序。"""
     today = date.today()
@@ -534,6 +585,7 @@ def _build_module_history_from_rows(
         _annotate_cashflow_quality(filtered)
     if module_key == "dupont":
         _annotate_dupont_formula(filtered)
+    _annotate_plausibility(module_key, filtered)
 
     period_type = _detect_period_type(filtered)
     if period == "annual" and filtered:
@@ -564,6 +616,10 @@ def _build_module_history_from_rows(
         if isinstance(warning, dict)
     ]
     chart_contract = dict(_CHART_CONTRACTS.get(module_key, {}))
+    if any(warning.get("code") == "OUTLIER_REQUIRES_REVIEW" for warning in module_warnings):
+        chart_contract["connect_nulls"] = False
+        chart_contract["outlier_policy"] = "mark_and_break_trend"
+        chart_contract["formula_warning"] = chart_contract.get("formula_warning") or "部分历史点口径待确认，趋势线已避免误导性连接"
     if module_key == "dupont" and latest.get("dupont_formula_status") == "mismatch":
         chart_contract["preferred_chart"] = "metric_cards"
         chart_contract["formula_status"] = "mismatch"

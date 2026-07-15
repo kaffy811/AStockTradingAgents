@@ -425,6 +425,8 @@ class ReportExplanationSkill(BaseSkill):
             tool_events=events,
             cards=[],
             data={
+                "answer_owner": "report_explanation_skill",
+                "verified_financial_data": bool(result.get("source_chunks")),
                 "partial": bool(result.get("partial")),
                 "status": result.get("status") or "completed",
                 "error_code": result.get("error_code"),
@@ -435,5 +437,10 @@ class ReportExplanationSkill(BaseSkill):
                 "confidence": result.get("confidence"),
                 "data_limitations": result.get("data_limitations", []),
                 "errors": result.get("errors", []),
+            },
+            metadata={
+                "answer_owner": "report_explanation_skill",
+                "verified_financial_data": bool(result.get("source_chunks")),
+                "source_chunks_count": len(result.get("source_chunks", []) or []),
             },
         )

@@ -30,6 +30,11 @@ if TYPE_CHECKING:
 from app.agents.thinking_events import make_thinking_event, PHASE_LABELS
 
 
+def _is_financial_report_question(query: str) -> bool:
+    text = str(query or "")
+    return any(token in text for token in ("财报", "年报", "半年报", "季报", "年度报告", "季度报告", "经营现金流"))
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Domain types
 # ─────────────────────────────────────────────────────────────────────────────
@@ -130,6 +135,10 @@ def _tasks_for_intent(intent: str, entities: list[str]) -> list[PlanTask]:
             ("ReportAgent",   f"检索{'关于 ' + ent + ' 的' if ent else ''}历史分析报告"),
             ("ReportAgent",   "读取报告详情，提取技术面、基本面和风险提示章节"),
         ],
+        "report_financial_read": [
+            ("ReportChatCopilotAgent", f"定位{'关于 ' + ent + ' 的' if ent else ''}已索引正式财报"),
+            ("ReportChatCopilotAgent", "检索财报证据、抽取关键财务指标并生成回答"),
+        ],
         "report_generation": [
             ("RiskReviewAgent",  "在提交任务前验证输入参数合规性"),
             ("ReportAgent",      f"生成{ent or '目标股票'}综合分析报告（技术+基本面+新闻+同行）"),
@@ -170,6 +179,7 @@ def _build_problem_analysis(intent: str, query: str, entities: list[str]) -> str
         "tool_answer":           f"用户询问{ent_clause}实时行情或最新资讯，需要调用市场数据和新闻检索工具。",
         "report_generation":     f"用户请求生成{ent_clause}综合分析报告。报告生成需要约 30~60 秒，须经用户确认后才创建后台任务。",
         "historical_report_read":f"用户希望查阅{ent_clause}历史分析报告，需先检索已存储的报告列表，再读取详情内容。",
+        "report_financial_read": f"用户询问{ent_clause}财报/年报/季报表现，需要调用报告解读 Agent 并基于正式财报证据回答。",
         "compare_stocks":        f"用户要求横向对比多支股票（{ent or '列表待解析'}），需获取各股行情、财务指标并进行统一口径对比。",
         "industry_research":     f"用户询问行业研究相关问题{'（涉及 ' + ent + '）' if ent else ''}，需检索行业热度数据、代表公司表现和近期新闻。",
         "portfolio_or_watchlist":f"用户查询自选股或持仓组合情况，需读取用户自选股列表并补充最新行情。",
@@ -184,6 +194,7 @@ def _build_intent_decision(intent: str, entities: list[str], reason: str) -> str
         "tool_answer":            "工具查询（需要实时行情或新闻）",
         "report_generation":      "报告生成（需用户确认 + 后台任务）",
         "historical_report_read": "历史报告读取",
+        "report_financial_read":  "财报解读",
         "compare_stocks":         "多股对比分析",
         "industry_research":      "行业研究与热点分析",
         "portfolio_or_watchlist": "自选股 / 投资组合查询",
@@ -248,6 +259,7 @@ def _build_risk_review(intent: str) -> str:
         "compare_stocks":         "检查对比结论中是否存在直接买卖建议或单只股票评级，确保只呈现客观数据对比。",
         "industry_research":      "核查行业分析结论：热度排名不等于投资价值，行业研究结果不作为买入推荐。",
         "historical_report_read": "验证报告解读不超出原报告内容，不添加未经验证的延伸推断。",
+        "report_financial_read":  "验证财报回答不超出正式报告证据，不追加通用新闻或缺失数据尾注。",
     }
     base = _RISK.get(intent,
         "执行合规审查：过滤无来源财务数字、确定性涨跌表达、隐性买卖建议。")
@@ -263,6 +275,7 @@ def _build_synthesis(intent: str, need_confirmation: bool) -> str:
         "industry_research":      "生成行业概览：热度排名 + 代表公司 + 近期催化因素 + 关注风险，不作为投资建议。",
         "compare_stocks":         "生成多股对比表，按维度展示差异，提供跳转对比页链接。",
         "historical_report_read": "生成报告解读摘要，保留原报告的关键结论和数据边界说明。",
+        "report_financial_read":  "生成财报解读正文，确保表格列对齐、数字有证据、免责声明只出现一次。",
         "portfolio_or_watchlist": "生成自选股快报，标注涨跌异动和数据来源时效。",
     }
     return _SYNTH.get(intent, "整合已验证数据，生成最终回答，说明数据来源和边界。")
@@ -319,9 +332,11 @@ class CentralPlanningAgent:
         if not entities and memory_context:
             from app.agents.intent_decision_agent import _entities_from_memory  # noqa: PLC0415
             entities = _entities_from_memory(memory_context)
+        if _is_financial_report_question(user_query) and intent in {"direct_answer", "historical_report_read", "tool_answer"}:
+            intent = "report_financial_read"
         reason   = intent_result.reason or ""
         need_confirmation = intent_result.need_confirmation
-        need_agent        = intent_result.need_agent
+        need_agent        = intent_result.need_agent or intent == "report_financial_read"
 
         tasks = _tasks_for_intent(intent, entities)
 

@@ -34,6 +34,7 @@ from app.schemas.company_v2_debug import (
 )
 from app.services.cache_service import cache_service, cache_status
 from app.services.company_v2_debug_diagnosis_service import diagnose_company_v2_envelope
+from app.services.company_v2_industry_metric_applicability import apply_applicability_to_coverage
 from app.services.company_v2_computed_field_registry import compute_company_v2_fields
 from app.services.company_v2_data_validation_engine import validate_company_v2_envelope
 from app.services.company_v2_formatter_registry import format_field
@@ -1244,6 +1245,13 @@ class CompanyV2DebugService:
                         modules[module_key]["history_quality"] = history_module.get("history_quality") or {}
                         modules[module_key]["chart_contract_validation"] = history_module.get("chart_contract_validation") or {}
                         modules[module_key]["metric_applicability"] = history_module.get("metric_applicability") or {}
+                        if modules[module_key].get("coverage"):
+                            modules[module_key]["coverage"] = apply_applicability_to_coverage(
+                                modules[module_key]["coverage"],
+                                modules[module_key]["metric_applicability"],
+                            )
+                        if modules[module_key].get("metric_applicability", {}).get("module_status") == "not_applicable":
+                            modules[module_key].setdefault("render", {})["reason"] = "NOT_APPLICABLE_FOR_INDUSTRY"
             except Exception as exc:
                 payload.setdefault("warnings", []).append({
                     "layer": "history",

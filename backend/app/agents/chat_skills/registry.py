@@ -209,9 +209,22 @@ class SkillRegistry:
                 "skill_enabled":      self.is_skill_enabled(skill.name),
                 "skill_available":    self.is_skill_available(skill.name),
             }
+            skill_data = getattr(result, "data", None) or {}
+            report_answer_success = (
+                skill.name == "report_explanation_skill"
+                and str(skill_data.get("status") or "").lower() in {"completed", "partial_success"}
+                and bool(result.answer and result.answer.strip())
+                and len(skill_data.get("source_chunks") or []) > 0
+            )
+            sanitizer_context = {
+                "report_answer_owner": skill.name if skill.name == "report_explanation_skill" else "",
+                "verified_financial_data": report_answer_success,
+                "source_chunks_count": len(skill_data.get("source_chunks") or []),
+                "verified_news_detail": report_answer_success,
+            }
             # C26: sanitize answer text before returning to orchestrator
             if result.answer:
-                result.answer = sanitize_financial_answer(result.answer)
+                result.answer = sanitize_financial_answer(result.answer, context=sanitizer_context)
             # C27: enrich data_quality and sources from tool_events
             if result.tool_events:
                 from app.agents.answer_metadata import (  # noqa: PLC0415
@@ -221,7 +234,7 @@ class SkillRegistry:
                 meta = build_answer_metadata(result.tool_events)
                 result.metadata["data_quality"] = meta["data_quality"]
                 result.metadata["sources_c27"]  = meta["sources"]
-                if result.answer:
+                if result.answer and not report_answer_success:
                     result.answer = add_data_boundary_declaration(
                         result.answer, meta["data_quality"]
                     )

@@ -21,14 +21,81 @@ from __future__ import annotations
 
 from typing import Any
 
-# accounting_type → {field: reason}
+# Public profile names used by Company V2 page/product UI.
+PROFILE_GENERAL = "general_corporate"
+PROFILE_BANK = "bank"
+PROFILE_INSURANCE = "insurance"
+PROFILE_SECURITIES = "securities"
+PROFILE_REAL_ESTATE = "real_estate"
+
+_PROFILE_ALIASES = {
+    "general_industrial": PROFILE_GENERAL,
+    "general_corporate": PROFILE_GENERAL,
+    "unknown": "unknown",
+    "utility": "utility",
+    "bank": PROFILE_BANK,
+    "insurer": PROFILE_INSURANCE,
+    "insurance": PROFILE_INSURANCE,
+    "securities": PROFILE_SECURITIES,
+    "real_estate": PROFILE_REAL_ESTATE,
+}
+
+BANK_RECOMMENDED_METRICS: tuple[str, ...] = (
+    "roa",
+    "roe",
+    "net_interest_margin",
+    "net_interest_spread",
+    "non_performing_loan_ratio",
+    "provision_coverage_ratio",
+    "loan_provision_ratio",
+    "capital_adequacy_ratio",
+    "tier1_capital_adequacy_ratio",
+    "core_tier1_capital_adequacy_ratio",
+    "cost_income_ratio",
+    "deposit_balance_yoy",
+    "loan_balance_yoy",
+    "special_mention_loan_ratio",
+    "overdue_loan_ratio",
+)
+
+_PROFILE_RECOMMENDED_METRICS: dict[str, tuple[str, ...]] = {
+    PROFILE_BANK: BANK_RECOMMENDED_METRICS,
+    PROFILE_INSURANCE: (
+        "roe",
+        "roa",
+        "embedded_value",
+        "new_business_value",
+        "solvency_adequacy_ratio",
+        "combined_ratio",
+        "premium_income",
+    ),
+    PROFILE_SECURITIES: (
+        "roe",
+        "roa",
+        "net_capital",
+        "risk_coverage_ratio",
+        "brokerage_income",
+        "investment_income",
+    ),
+    PROFILE_REAL_ESTATE: (
+        "revenue",
+        "gross_margin",
+        "net_margin",
+        "debt_ratio",
+        "net_debt_ratio",
+        "cash_short_debt_ratio",
+        "contract_sales",
+    ),
+}
+
+# accounting profile → {field: reason}
 # 未列出的字段默认 applicable=True
 _NOT_APPLICABLE_RULES: dict[str, dict[str, str]] = {
-    "general_industrial": {},
+    PROFILE_GENERAL: {},
     "utility": {},
-    "real_estate": {},
+    PROFILE_REAL_ESTATE: {},
     "unknown": {},
-    "bank": {
+    PROFILE_BANK: {
         # 银行无存货概念
         "inventory_turnover": "NOT_APPLICABLE_FOR_BANK",
         # 银行资产负债结构下流动/速动/现金比率不按普通企业含义展示
@@ -39,32 +106,36 @@ _NOT_APPLICABLE_RULES: dict[str, dict[str, str]] = {
         "ocf_to_np": "LIMITED_MEANING_FOR_BANK",
         "ocf_to_revenue": "LIMITED_MEANING_FOR_BANK",
         "receivable_turnover": "NOT_APPLICABLE_FOR_BANK",
+        # 普通企业毛利率不适合作为银行默认盈利能力指标
+        "gross_margin": "NOT_APPLICABLE_FOR_BANK",
     },
-    "insurer": {
+    PROFILE_INSURANCE: {
         "inventory_turnover": "NOT_APPLICABLE_FOR_INSURER",
         "current_ratio": "NOT_APPLICABLE_FOR_INSURER",
         "quick_ratio": "NOT_APPLICABLE_FOR_INSURER",
         "cash_ratio": "NOT_APPLICABLE_FOR_INSURER",
         "receivable_turnover": "NOT_APPLICABLE_FOR_INSURER",
+        "gross_margin": "NOT_APPLICABLE_FOR_INSURER",
         "ocf_to_np": "LIMITED_MEANING_FOR_INSURER",
         "ocf_to_revenue": "LIMITED_MEANING_FOR_INSURER",
     },
-    "securities": {
+    PROFILE_SECURITIES: {
         "inventory_turnover": "NOT_APPLICABLE_FOR_SECURITIES",
         "current_ratio": "NOT_APPLICABLE_FOR_SECURITIES",
         "quick_ratio": "NOT_APPLICABLE_FOR_SECURITIES",
         "cash_ratio": "NOT_APPLICABLE_FOR_SECURITIES",
         "receivable_turnover": "NOT_APPLICABLE_FOR_SECURITIES",
+        "gross_margin": "NOT_APPLICABLE_FOR_SECURITIES",
     },
 }
 
 # 需要谨慎解读（保留展示但加提示）的字段
 _CAUTION_RULES: dict[str, dict[str, str]] = {
-    "bank": {
+    PROFILE_BANK: {
         "equity_multiplier": "HIGH_LEVERAGE_IS_NORMAL_FOR_BANK",
         "debt_ratio": "HIGH_DEBT_RATIO_IS_NORMAL_FOR_BANK",
     },
-    "insurer": {
+    PROFILE_INSURANCE: {
         "equity_multiplier": "DUPONT_CAUTION_FOR_INSURER",
         "debt_ratio": "HIGH_DEBT_RATIO_IS_NORMAL_FOR_INSURER",
     },
@@ -74,8 +145,8 @@ _CAUTION_RULES: dict[str, dict[str, str]] = {
 _INDUSTRY_KEYWORD_MAP: list[tuple[str, str]] = [
     ("银行", "bank"),
     ("保险", "insurer"),
-    ("证券", "securities"),
-    ("房地产", "real_estate"),
+    ("证券", PROFILE_SECURITIES),
+    ("房地产", PROFILE_REAL_ESTATE),
     ("电信", "utility"),
     ("电力", "utility"),
     ("燃气", "utility"),
@@ -98,6 +169,20 @@ def infer_accounting_type(industry: str | None, symbol: str = "") -> str:
     return "general_industrial" if text else "unknown"
 
 
+def normalize_profile(accounting_type: str | None) -> str:
+    return _PROFILE_ALIASES.get(str(accounting_type or "").strip(), str(accounting_type or "").strip() or "unknown")
+
+
+def get_industry_metric_profile(accounting_type: str | None) -> dict[str, Any]:
+    profile = normalize_profile(accounting_type)
+    return {
+        "profile": profile,
+        "recommended_metrics": list(_PROFILE_RECOMMENDED_METRICS.get(profile, ())),
+        "not_applicable_rules": dict(_NOT_APPLICABLE_RULES.get(profile, {})),
+        "caution_rules": dict(_CAUTION_RULES.get(profile, {})),
+    }
+
+
 def check_field_applicability(field: str, accounting_type: str) -> dict[str, Any]:
     """
     单字段适用性判定。
@@ -105,7 +190,8 @@ def check_field_applicability(field: str, accounting_type: str) -> dict[str, Any
     Returns:
         {"field", "applicable", "reason", "display_value", "caution"(optional)}
     """
-    rules = _NOT_APPLICABLE_RULES.get(accounting_type, {})
+    profile = normalize_profile(accounting_type)
+    rules = _NOT_APPLICABLE_RULES.get(profile, {})
     reason = rules.get(field)
     if reason:
         return {
@@ -114,7 +200,7 @@ def check_field_applicability(field: str, accounting_type: str) -> dict[str, Any
             "reason": reason,
             "display_value": "N/A",
         }
-    caution = _CAUTION_RULES.get(accounting_type, {}).get(field)
+    caution = _CAUTION_RULES.get(profile, {}).get(field)
     result: dict[str, Any] = {
         "field": field,
         "applicable": True,
@@ -143,12 +229,55 @@ def build_module_applicability(
           "module_applicable": bool,   # 全部字段不适用时 False
         }
     """
-    field_results = {f: check_field_applicability(f, accounting_type) for f in fields}
+    profile = normalize_profile(accounting_type)
+    field_results = {f: check_field_applicability(f, profile) for f in fields}
     not_applicable = [f for f, r in field_results.items() if not r["applicable"]]
+    applicable = [f for f, r in field_results.items() if r["applicable"]]
     return {
-        "accounting_type": accounting_type,
+        "accounting_type": profile,
+        "industry_profile": profile,
         "module_key": module_key,
         "fields": field_results,
+        "applicable_fields": applicable,
         "not_applicable_fields": not_applicable,
+        "recommended_metrics": list(_PROFILE_RECOMMENDED_METRICS.get(profile, ())),
+        "module_status": "not_applicable" if fields and not applicable else "partial",
         "module_applicable": len(not_applicable) < len(fields) or not fields,
     }
+
+
+def apply_applicability_to_coverage(
+    coverage: dict[str, Any],
+    applicability: dict[str, Any],
+) -> dict[str, Any]:
+    """Recompute coverage denominator using only applicable fields."""
+    required = list(coverage.get("required_field_list") or [])
+    filled = list(coverage.get("filled_field_list") or [])
+    missing_map = dict(coverage.get("missing_field_map") or {})
+    not_applicable = set(applicability.get("not_applicable_fields") or [])
+    applicable_required = [field for field in required if field not in not_applicable]
+    applicable_filled = [field for field in filled if field in applicable_required]
+    applicable_missing_map = {
+        field: reason
+        for field, reason in missing_map.items()
+        if field in applicable_required
+    }
+    required_count = len(applicable_required)
+    coverage_pct = round(len(applicable_filled) / required_count * 100, 2) if required_count else 100.0
+    status = "not_applicable" if required and not required_count else (
+        "complete" if coverage_pct == 100 else ("partial" if required_count else "unavailable")
+    )
+    adjusted = dict(coverage)
+    adjusted.update({
+        "required_fields": required_count,
+        "filled_fields": len(applicable_filled),
+        "missing_fields": len(applicable_missing_map),
+        "coverage_pct": coverage_pct,
+        "required_field_list": applicable_required,
+        "filled_field_list": applicable_filled,
+        "missing_field_map": applicable_missing_map,
+        "not_applicable_fields": sorted(not_applicable),
+        "not_applicable_count": len(not_applicable),
+        "applicable_coverage_status": status,
+    })
+    return adjusted

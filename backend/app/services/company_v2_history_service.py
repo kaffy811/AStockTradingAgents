@@ -30,6 +30,7 @@ from app.services.company_v2_stock_basic_service import (
     get_default_start_year,
     get_stock_basic,
 )
+from app.services.company_v2_industry_metric_applicability import normalize_profile
 
 log = logging.getLogger(__name__)
 
@@ -37,6 +38,48 @@ _CACHE_TTL_ANNUAL = 12 * 3600
 _CACHE_STALE_TTL_ANNUAL = 12 * 3600
 _CACHE_TTL_QUARTERLY = 3600
 _CACHE_STALE_TTL_QUARTERLY = 5 * 3600
+
+
+def _field_has_value(row: dict[str, Any], field: str) -> bool:
+    value = row.get(field)
+    return value is not None and value != ""
+
+
+def _build_series_coverage_stats(
+    rows: list[dict[str, Any]],
+    fields: list[str],
+    applicability: dict[str, Any],
+) -> dict[str, Any]:
+    periods = [row.get("period") for row in rows if row.get("period")]
+    expected_points = len(set(periods))
+    not_applicable = set(applicability.get("not_applicable_fields") or [])
+    stats: dict[str, Any] = {}
+    for field in fields:
+        if field in not_applicable:
+            stats[field] = {
+                "actual_points": 0,
+                "expected_points": expected_points,
+                "not_applicable_points": expected_points,
+                "conflict_points": 0,
+                "missing_points": 0,
+                "status": "not_applicable",
+            }
+            continue
+        actual = sum(1 for row in rows if _field_has_value(row, field))
+        conflict = sum(
+            1 for row in rows
+            for warning in (row.get("warnings") or [])
+            if isinstance(warning, dict) and warning.get("field") == field and warning.get("code") in {"OUTLIER_REQUIRES_REVIEW", "FIELD_CONFLICT"}
+        )
+        stats[field] = {
+            "actual_points": actual,
+            "expected_points": expected_points,
+            "not_applicable_points": 0,
+            "conflict_points": conflict,
+            "missing_points": max(0, expected_points - actual),
+            "status": "complete" if expected_points and actual == expected_points and not conflict else ("partial" if actual else "unavailable"),
+        }
+    return stats
 
 
 def _ts_code(symbol: str) -> str:
@@ -225,7 +268,7 @@ async def build_company_history_dashboard(
         infer_accounting_type,
     )
 
-    accounting_type = infer_accounting_type(stock_basic.get("industry"), symbol)
+    accounting_type = normalize_profile(infer_accounting_type(stock_basic.get("industry"), symbol))
     list_date = stock_basic.get("list_date") or ""
 
     clean_modules: dict[str, Any] = {}
@@ -268,7 +311,12 @@ async def build_company_history_dashboard(
             },
             "metric_applicability": {
                 "accounting_type": accounting_type,
+                "industry_profile": applicability.get("industry_profile") or accounting_type,
+                "applicable_fields": applicability["applicable_fields"],
                 "not_applicable_fields": applicability["not_applicable_fields"],
+                "recommended_metrics": applicability.get("recommended_metrics", []),
+                "module_status": applicability.get("module_status"),
+                "series_coverage": _build_series_coverage_stats(history_rows, contract_fields, applicability),
             },
             "data_success": mdata.get("data_success", False),
             "provider": mdata.get("provider", "baostock"),

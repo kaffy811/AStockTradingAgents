@@ -81,6 +81,10 @@ def has_verified_metric(context: dict | None, metric_type: str) -> bool:
     """Return True if the context contains verified data for this metric type."""
     if not context:
         return False
+    if context.get("verified_financial_data") and metric_type in {"revenue", "profit"}:
+        return True
+    if context.get("report_answer_owner") == "report_explanation_skill" and context.get("source_chunks_count", 0) > 0:
+        return metric_type in {"revenue", "profit", "pe", "pb"}
     keys = _METRIC_CONTEXT_KEYS.get(metric_type, [])
     for k in keys:
         if k in context and context[k] not in (None, "", [], {}):

@@ -398,6 +398,29 @@ def _evidence_chars(chunks: list[dict]) -> int:
     return sum(len(str(c.get("content") or "")) for c in chunks or [])
 
 
+def _table_rows_aligned(text: str) -> bool:
+    for block in re.findall(r"((?:\|[^\n]*\|\n?){2,})", text or ""):
+        rows = [line for line in block.splitlines() if line.strip().startswith("|")]
+        counts = [line.count("|") for line in rows]
+        if counts and len(set(counts)) > 1:
+            return False
+    return True
+
+
+def _answer_consistency_issues(answer: str, *, source_chunks_count: int) -> list[str]:
+    issues: list[str] = []
+    text = answer or ""
+    if "需通过工具获取，此处不自行估算" in text or "归属于上市公司股东的（" in text:
+        issues.append("PLACEHOLDER_LEAK")
+    if source_chunks_count > 0 and "工具仅返回新闻标题" in text:
+        issues.append("NEWS_ONLY_CONTRADICTION")
+    if not _table_rows_aligned(text):
+        issues.append("MARKDOWN_TABLE_MISALIGNED")
+    if text.count("不构成投资建议") > 1:
+        issues.append("DUPLICATE_DISCLAIMER")
+    return issues
+
+
 def _format_pdf_answer(report_context: dict[str, Any]) -> str:
     title = report_context.get("title") or "已选财务报告"
     year = report_context.get("report_year") or "未知年度"
@@ -1229,6 +1252,30 @@ class ReportChatCopilotAgent:
                 },
             }
 
+        structured_financial_data: dict[str, Any] = {"fields": {}, "field_count": 0}
+        structured_cache_key = f"report_financial_fields:{selected_report_id or report_context.get('report_id')}:v1"
+        cached_structured = await _cache_get_json(structured_cache_key)
+        if isinstance(cached_structured, dict) and cached_structured.get("fields"):
+            structured_financial_data = cached_structured
+            perf_meta["cache"]["structured_financial_fields"] = "hit"
+        else:
+            try:
+                from app.services.report_financial_table_extractor_tool import report_financial_table_extractor_tool
+                structured_financial_data = report_financial_table_extractor_tool.extract_from_chunks(
+                    report_id=selected_report_id or report_context.get("report_id") or "",
+                    chunks=chunks,
+                    report_year=report_context.get("report_year"),
+                    source_document_id=report_context.get("source_document_id"),
+                )
+                if structured_financial_data.get("fields"):
+                    await _cache_set_json(structured_cache_key, structured_financial_data, ttl=30 * 86400)
+                    perf_meta["cache"]["structured_financial_fields"] = "written"
+                else:
+                    perf_meta["cache"]["structured_financial_fields"] = "empty"
+            except Exception as exc:
+                perf_meta["cache"]["structured_financial_fields"] = "error"
+                errors.append(f"结构化财报字段提取失败: {str(exc)[:120]}")
+
         # ── 8. Build LLM prompt (with session memory context) ─────────────────
         await _emit_report_stage(event_callback, phase="report_synthesis", title="正在生成分析")
         system_prompt = _load_system_prompt()
@@ -1247,7 +1294,7 @@ class ReportChatCopilotAgent:
             f"股票代码（ts_code）：{ts_code}\n\n"
             f"用户问题：{normalized_question}\n"
             f"\n本次选定报告（report_metadata）：\n{report_metadata_json}\n"
-            "\n结构化财务字段（structured_financial_data）：\n[]\n"
+            f"\n结构化财务字段（structured_financial_data）：\n{json.dumps(structured_financial_data, ensure_ascii=False, default=str)}\n"
             "\nreview_audit：将在模型输出后由系统审核；模型不得假设审核通过。\n"
             f"{memory_section}"
             f"\n已接入财报片段（source_chunks，共 {len(chunks)} 条）：\n"
@@ -1423,7 +1470,7 @@ class ReportChatCopilotAgent:
         confidence = final.get("confidence") or raw_llm_result.get("confidence", "low")
         evidence_used = final.get("evidence_used") or raw_llm_result.get("evidence_used", [])
         data_limitations = final.get("data_limitations") or raw_llm_result.get("data_limitations", [])
-        source_chunks_out = final.get("source_chunks") or []
+        source_chunks_out = final.get("source_chunks") or raw_llm_result.get("source_chunks") or chunks
         disclaimer = final.get("disclaimer") or "本内容基于已接入的公开财报片段，仅供参考，不构成投资建议。"
 
         if not str(answer or "").strip():
@@ -1464,6 +1511,26 @@ class ReportChatCopilotAgent:
                 data_limitations = list(data_limitations or [])
                 data_limitations.insert(0, "当前未检索到相关财报片段，不能编造财务数字")
                 answer = _format_data_limited_answer(normalized_question, report_context, chunks, data_limitations)
+
+        consistency_issues = _answer_consistency_issues(answer, source_chunks_count=len(source_chunks_out or chunks))
+        if consistency_issues:
+            errors.extend(consistency_issues)
+            answer = _format_evidence_fallback_answer(
+                question=normalized_question,
+                report_context=report_context,
+                chunks=chunks,
+                reason="自动生成结果存在格式或证据一致性问题",
+            )
+            confidence = "medium" if chunks else "low"
+            data_limitations = list(data_limitations or [])
+            for issue in consistency_issues:
+                if issue not in data_limitations:
+                    data_limitations.append(issue)
+            review_audit = {
+                **(review_audit or {}),
+                "answer_consistency_guard": "fallback",
+                "issues": consistency_issues,
+            }
 
         is_rejection = review_status == "rejected" or classification == "rejected"
         partial = bool(errors) or rag_result.get("partial", False) or review_status not in {"approved", "revised", "skipped"}
