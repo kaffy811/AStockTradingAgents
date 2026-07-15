@@ -51,9 +51,14 @@
       </div>
     </header>
 
-    <div v-if="loading" class="cv2-loading">加载中...</div>
-    <div v-else-if="error" class="cv2-error">{{ error }}</div>
+    <div v-if="loading && !hasDisplayData" class="cv2-loading">加载中...</div>
+    <div v-else-if="error && !hasDisplayData" class="cv2-error">
+      <span>{{ error }}</span>
+      <button class="cv2-retry" @click="load(true)">重试</button>
+    </div>
     <template v-else>
+      <p v-if="loading" class="cv2-refreshing">正在刷新数据...</p>
+      <p v-if="refreshWarning" class="cv2-refresh-warning">{{ refreshWarning }}</p>
       <CompanyV2CompanyProfileCard
         :stock-basic="stockBasic"
         :symbol="symbol"
@@ -109,9 +114,9 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onActivated, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getCompanyV2FullDebug, refreshCompanyV2Debug, getCompanyV2History, getCompanyV2StockBasic } from '../api/companyV2.js'
+import { getCompanyV2FullDebug, refreshCompanyV2Debug, getCompanyV2History, getCompanyV2Profile } from '../api/companyV2.js'
 import CompanyV2DebugPanel from '../components/company-v2/CompanyV2DebugPanel.vue'
 import CompanyV2Section from '../components/company-v2/CompanyV2Section.vue'
 import CompanyV2FallbackTable from '../components/company-v2/CompanyV2FallbackTable.vue'
@@ -126,6 +131,7 @@ defineProps({
 })
 const loading = ref(false)
 const error = ref('')
+const refreshWarning = ref('')
 const debugData = ref({})
 const historyData = ref({})   // 全历史数据
 const stockBasic = ref({})    // 公司/股票基本信息
@@ -134,6 +140,11 @@ const includeRaw = ref(false)
 const periodTab = ref('annual')
 const quarterlyHistoryData = ref(null)   // 懒加载缓存：切换股票时清空
 const quarterlyLoading = ref(false)
+const COMPANY_V2_SCHEMA_VERSION = 'phase6u-d3'
+const companyV2PageCache = typeof window !== 'undefined'
+  ? (window.__COMPANY_V2_PAGE_CACHE__ || new Map())
+  : new Map()
+if (typeof window !== 'undefined') window.__COMPANY_V2_PAGE_CACHE__ = companyV2PageCache
 
 const market = computed(() => String(route.params.market || '').toUpperCase())
 const symbol = computed(() => String(route.params.symbol || ''))
@@ -158,16 +169,55 @@ const displayHistoryModules = computed(() => {
   }
   return historyModules.value
 })
+const hasDisplayData = computed(() => Object.keys(debugData.value?.modules || {}).length > 0)
+
+function cacheKey(period = periodTab.value || 'annual') {
+  return `${market.value}:${symbol.value}:${period}:${COMPANY_V2_SCHEMA_VERSION}`
+}
+
+function restoreCached(period = 'annual') {
+  const cached = companyV2PageCache.get(cacheKey(period))
+  if (!cached) return false
+  debugData.value = cached.debugData || {}
+  historyData.value = cached.historyData || {}
+  stockBasic.value = cached.stockBasic || {}
+  return true
+}
+
+function resetViewState({ keepCached = true } = {}) {
+  error.value = ''
+  refreshWarning.value = ''
+  quarterlyHistoryData.value = null
+  quarterlyLoading.value = false
+  periodTab.value = 'annual'
+  if (keepCached && restoreCached('annual')) return
+  debugData.value = {}
+  historyData.value = {}
+  stockBasic.value = {}
+}
 
 async function switchToQuarterly() {
   periodTab.value = 'quarterly'
   if (quarterlyHistoryData.value?.modules || quarterlyLoading.value) return
+  const cached = companyV2PageCache.get(cacheKey('quarterly'))
+  if (cached?.historyData?.modules) {
+    quarterlyHistoryData.value = cached.historyData
+    return
+  }
   quarterlyLoading.value = true
-  const seq = _loadSeq
+  const seq = ++_loadSeq
+  const generation = `${market.value}:${symbol.value}:quarterly:${seq}`
   try {
     // 后端默认季度范围为最近 5 年；用户显式扩展时再传 start_year
     const data = await getCompanyV2History(market.value, symbol.value, { period: 'quarterly' })
-    if (seq === _loadSeq) quarterlyHistoryData.value = data || null
+    if (seq === _loadSeq && generation.startsWith(`${market.value}:${symbol.value}:quarterly:`)) {
+      quarterlyHistoryData.value = data || null
+      companyV2PageCache.set(cacheKey('quarterly'), {
+        debugData: debugData.value,
+        historyData: data || {},
+        stockBasic: stockBasic.value,
+      })
+    }
   } catch (e) {
     if (e?.name !== 'AbortError' && seq === _loadSeq) quarterlyHistoryData.value = null
   } finally {
@@ -209,7 +259,9 @@ const moduleEntries = computed(() => {
 
 const statusPanelModules = new Set(['report_documents', 'ai_analysis_status'])
 const visibleModules = computed(() => moduleEntries.value.filter(item => (
-  item.key !== 'ai_analysis_status' && (item.envelope?.render?.has_displayable_data || item.envelope?.ok || statusPanelModules.has(item.key))
+  item.key !== 'ai_analysis_status' && (
+    !debugMode.value || item.envelope?.render?.has_displayable_data || item.envelope?.ok || statusPanelModules.has(item.key)
+  )
 )))
 const unavailableModules = computed(() => moduleEntries.value
   .filter(item => !item.envelope?.render?.has_displayable_data && !item.envelope?.ok && !statusPanelModules.has(item.key))
@@ -228,19 +280,26 @@ const priceLabel = computed(() => quoteRow.value.price_label || '')
 const priceIsRealtime = computed(() => !!quoteRow.value.price_is_realtime)
 
 // Phase 6T-E: 请求取消 + 序号守卫，防止股票快速切换时旧请求覆盖新页面
-let _abortController = null
 let _loadSeq = 0
+let _abortController = null
 
 async function load(force = false) {
   if (_abortController) _abortController.abort()
   _abortController = typeof AbortController !== 'undefined' ? new AbortController() : null
   const signal = _abortController?.signal
   const seq = ++_loadSeq
+  const requestGeneration = `${market.value}:${symbol.value}:annual:${seq}`
+  const restored = !force && restoreCached('annual')
 
   loading.value = true
   error.value = ''
+  refreshWarning.value = ''
   try {
-    // Phase 6T-E1: 切换股票时重置季度懒加载缓存与 tab
+    if (!restored) {
+      debugData.value = {}
+      historyData.value = {}
+      stockBasic.value = {}
+    }
     quarterlyHistoryData.value = null
     quarterlyLoading.value = false
     periodTab.value = 'annual'
@@ -258,9 +317,9 @@ async function load(force = false) {
         signal,
       }),
       getCompanyV2History(market.value, symbol.value, { period: 'annual', force_refresh: force, signal }).catch(() => ({})),
-      getCompanyV2StockBasic(market.value, symbol.value).catch(() => ({})),
+      getCompanyV2Profile(market.value, symbol.value, { signal }).catch(() => ({})),
     ])
-    if (seq !== _loadSeq) return  // 已被更新的请求取代，丢弃旧结果
+    if (seq !== _loadSeq || !requestGeneration.startsWith(`${market.value}:${symbol.value}:annual:`)) return
     if (debugResult.status === 'fulfilled') {
       debugData.value = debugResult.value
       if (debugResult.value?.history) {
@@ -276,11 +335,21 @@ async function load(force = false) {
       historyData.value = Object.keys(historyData.value || {}).length ? historyData.value : (historyResult.value || {})
     }
     if (basicResult.status === 'fulfilled') {
-      stockBasic.value = Object.keys(stockBasic.value || {}).length ? stockBasic.value : (basicResult.value || {})
+      stockBasic.value = { ...(stockBasic.value || {}), ...(basicResult.value || {}) }
     }
+    companyV2PageCache.set(cacheKey('annual'), {
+      debugData: debugData.value,
+      historyData: historyData.value,
+      stockBasic: stockBasic.value,
+    })
   } catch (e) {
     if (e?.name === 'AbortError' || seq !== _loadSeq) return
-    error.value = e.message || 'CompanyV2 加载失败'
+    const message = e.message || 'CompanyV2 加载失败'
+    if (hasDisplayData.value) {
+      refreshWarning.value = `刷新失败，当前显示上次成功数据。${message}`
+    } else {
+      error.value = message
+    }
     emit('load-error', e)
   } finally {
     if (seq === _loadSeq) loading.value = false
@@ -293,7 +362,13 @@ async function refresh() {
 }
 
 onMounted(() => load(false))
-watch([market, symbol], () => load(false))
+onActivated(() => {
+  if (!hasDisplayData.value) load(false)
+})
+watch([market, symbol], () => {
+  resetViewState({ keepCached: true })
+  load(false)
+})
 onUnmounted(() => { if (_abortController) _abortController.abort() })
 </script>
 
@@ -347,6 +422,13 @@ onUnmounted(() => { if (_abortController) _abortController.abort() })
 .cv2-raw-switch { display: flex; align-items: center; gap: 8px; color: #4b5563; font-size: 13px; }
 .cv2-back { border: 1px solid #d1d5db; background: #fff; border-radius: 8px; padding: 8px 12px; cursor: pointer; flex-shrink: 0; }
 .cv2-loading, .cv2-error { padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px; background: #fff; }
+.cv2-error { display: flex; align-items: center; gap: 12px; }
+.cv2-retry { border: 1px solid #d1d5db; background: #fff; border-radius: 6px; padding: 5px 10px; cursor: pointer; }
+.cv2-refreshing, .cv2-refresh-warning {
+  margin: 0 0 12px; padding: 8px 10px; border-radius: 6px; font-size: 12px;
+}
+.cv2-refreshing { background: #eff6ff; color: #1d4ed8; }
+.cv2-refresh-warning { background: #fef3c7; color: #92400e; }
 .cv2-debug-details { margin-top: 4px; margin-bottom: 16px; }
 .cv2-debug-summary {
   cursor: pointer; font-size: 13px; color: #6b7280; padding: 6px 10px;

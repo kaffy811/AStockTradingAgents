@@ -4,10 +4,10 @@
     <div class="cv2-rd-header">
       <div class="cv2-rd-status-row">
         <span :class="['cv2-rd-badge', statusBadgeClass]">{{ statusBadgeText }}</span>
-        <span v-if="envelope?.normalized?.rows?.[0]?.documents_count > 0" class="cv2-rd-count">
-          {{ envelope.normalized.rows[0].documents_count }} 份文件
+        <span v-if="reportSummary.report_count > 0" class="cv2-rd-count">
+          {{ reportSummary.report_count }} 份文件
         </span>
-        <span v-if="ragStatus === 'ready'" class="cv2-rd-rag-badge">RAG 已就绪</span>
+        <span v-if="reportSummary.rag_status === 'indexed'" class="cv2-rd-rag-badge">已可分析</span>
       </div>
       <p class="cv2-rd-hint">{{ statusHint }}</p>
     </div>
@@ -15,6 +15,7 @@
     <CompanyV2ReportTimeline
       :reports="reports"
       :discovering="discovering"
+      :view-state="reportState"
       :default-show="defaultShow"
       :market="market"
       :symbol="symbol"
@@ -56,6 +57,15 @@
       </button>
     </div>
 
+    <div v-if="showNormalManualEntry" class="cv2-rd-normal-actions">
+      <button class="cv2-rd-discover-btn secondary" @click="triggerDiscover(false)">
+        重新获取
+      </button>
+      <button class="cv2-rd-discover-btn secondary" @click="showManual = !showManual">
+        手动添加官方 PDF 链接
+      </button>
+    </div>
+
     <CompanyV2ReportRagIndexManager
       v-if="debugMode && showIndexManager"
       :market="market"
@@ -78,7 +88,7 @@
     />
 
     <!-- 手动录入面板 -->
-    <div v-if="debugMode && showManual" class="cv2-rd-manual">
+    <div v-if="(debugMode || showNormalManualEntry) && showManual" class="cv2-rd-manual">
       <h4>手动录入年报 PDF URL</h4>
       <p class="cv2-rd-hint">仅支持 static.cninfo.com.cn 域名的 PDF 链接。</p>
       <div class="cv2-rd-manual-row">
@@ -105,7 +115,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import {
   addManualReport,
   aiVerifyCompanyV2Report,
@@ -130,6 +140,7 @@ const debugMode = computed(() => props.debugMode)
 
 const defaultShow = 5
 const reports = ref([])
+const reportState = ref('idle')
 const discovering = ref(false)
 const discoverErrors = ref([])
 const showManual = ref(false)
@@ -142,38 +153,60 @@ const manualError = ref('')
 const manualSuccess = ref('')
 const actionMessage = ref('')
 const autoDiscoverKey = ref('')
+let reportRequestSeq = 0
 
-// Status derived from envelope
-const docRow = computed(() => props.envelope?.normalized?.rows?.[0] || {})
-const docCount = computed(() => Number(docRow.value.documents_count) || 0)
-const chunkCount = computed(() => Number(docRow.value.chunks_count) || 0)
-const ragStatus = computed(() => docRow.value.rag_status || 'not_ingested')
-const pdfStatus = computed(() => docRow.value.pdf_status || 'not_found')
+const reportSummary = computed(() => {
+  const list = reports.value || []
+  const annual = list.filter(item => (item.report_type || 'annual') === 'annual').length
+  const chunkCount = list.reduce((sum, item) => sum + (Number(item.chunk_count) || 0), 0)
+  const ragReady = list.some(item => ['rag_ready', 'indexed', 'partial'].includes(item.rag_status) || item.rag_index_status === 'indexed')
+  return {
+    report_count: list.length,
+    annual_count: annual,
+    chunk_count: chunkCount,
+    rag_status: ragReady ? 'indexed' : (list.length ? 'pending' : 'empty'),
+  }
+})
 
 const statusBadgeClass = computed(() => {
-  if (ragStatus.value === 'ready') return 'green'
-  if (pdfStatus.value === 'found') return 'yellow'
+  if (reportSummary.value.rag_status === 'indexed') return 'green'
+  if (reportSummary.value.report_count > 0) return 'yellow'
+  if (reportState.value === 'error') return 'yellow'
   return 'grey'
 })
 const statusBadgeText = computed(() => {
-  if (ragStatus.value === 'ready') return '报告已解析，可用于报告问答。'
-  if (pdfStatus.value === 'found' && chunkCount.value === 0) return '已发现报告文件，尚未建立 RAG 索引。'
-  return '暂未发现可确认报告文件'
+  if (['loading_persisted', 'discovering'].includes(reportState.value)) return '正在获取官方报告'
+  if (reportSummary.value.rag_status === 'indexed') return '报告已可分析'
+  if (reportSummary.value.report_count > 0) return '已发现官方报告'
+  if (reportState.value === 'error') return '报告获取失败'
+  return '暂无已发现的官方财务报告'
 })
 const statusHint = computed(() => {
-  if (docCount.value === 0) return '暂未发现可确认报告文件，可尝试重新发现或手动录入 PDF URL。'
-  if (chunkCount.value === 0) return '已发现报告文件，尚未建立 RAG 索引。'
+  if (['loading_persisted', 'discovering'].includes(reportState.value)) return '正在获取官方报告...'
+  if (reportState.value === 'error') return '报告获取失败，请稍后重试。'
+  if (reportSummary.value.report_count === 0) return '暂无已发现的官方财务报告。'
+  if (reportSummary.value.chunk_count === 0) return '已发现报告文件，尚未建立 RAG 索引。'
   return '报告已解析，可用于报告问答。'
 })
+const showNormalManualEntry = computed(() => !debugMode.value && ['empty', 'error'].includes(reportState.value))
 
 async function loadReports() {
+  const seq = ++reportRequestSeq
+  const key = `${props.market}:${props.symbol}`
+  reportState.value = 'loading_persisted'
   try {
     const res = await getCompanyV2Reports(props.market, props.symbol)
+    if (seq !== reportRequestSeq || key !== `${props.market}:${props.symbol}`) return
     if (res.ok && res.reports) {
       reports.value = res.reports
+      reportState.value = reports.value.length ? 'persisted_found' : 'empty'
       if (!reports.value.length) scheduleAutoDiscover()
     }
   } catch (e) {
+    if (seq !== reportRequestSeq || key !== `${props.market}:${props.symbol}`) return
+    reports.value = []
+    reportState.value = 'error'
+    discoverErrors.value = [e.message || '报告获取失败']
     scheduleAutoDiscover()
   }
 }
@@ -186,20 +219,27 @@ function scheduleAutoDiscover() {
 }
 
 async function triggerDiscover(forceRefresh = false) {
+  const seq = ++reportRequestSeq
+  const key = `${props.market}:${props.symbol}`
   discovering.value = true
+  reportState.value = 'discovering'
   discoverErrors.value = []
   try {
     const res = await discoverCompanyV2Reports(props.market, props.symbol, {
       force_refresh: forceRefresh,
     })
+    if (seq !== reportRequestSeq || key !== `${props.market}:${props.symbol}`) return
     if (res.ok) {
       reports.value = res.reports || []
       discoverErrors.value = res.errors || []
+      reportState.value = reports.value.length ? 'discovered' : 'empty'
     }
   } catch (e) {
+    if (seq !== reportRequestSeq || key !== `${props.market}:${props.symbol}`) return
     discoverErrors.value = [e.message || '发现失败']
+    reportState.value = 'error'
   } finally {
-    discovering.value = false
+    if (seq === reportRequestSeq) discovering.value = false
   }
 }
 
@@ -286,6 +326,19 @@ async function aiVerifyReport(item) {
 }
 
 onMounted(() => loadReports())
+watch(() => [props.market, props.symbol], () => {
+  reports.value = []
+  reportState.value = 'idle'
+  discovering.value = false
+  discoverErrors.value = []
+  showManual.value = false
+  manualError.value = ''
+  manualSuccess.value = ''
+  actionMessage.value = ''
+  autoDiscoverKey.value = ''
+  reportRequestSeq += 1
+  loadReports()
+})
 </script>
 
 <style scoped>

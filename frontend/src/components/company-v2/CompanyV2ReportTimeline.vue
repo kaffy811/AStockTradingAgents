@@ -14,6 +14,10 @@
     </div>
 
     <!-- 报告时间线 -->
+    <div v-if="['loading_persisted', 'discovering'].includes(viewState)" class="cv2-rt-loading" data-testid="report-loading">
+      <span class="cv2-rt-spinner"></span>
+      <span>正在获取官方报告...</span>
+    </div>
     <div v-if="filteredReports.length" class="cv2-rt-list">
       <div
         v-for="item in displayedReports"
@@ -42,15 +46,15 @@
                   {{ item.announcement_date }}
                 </span>
                 <span v-if="item.is_correction" class="cv2-rt-correction-badge">更正版</span>
-                <span class="cv2-rt-source">{{ item.source || 'CNINFO' }}</span>
+                <span v-if="debugMode" class="cv2-rt-source">{{ item.source || 'CNINFO' }}</span>
                 <!-- RAG 状态 badge -->
                 <span
-                  v-if="item.rag_status === 'rag_ready'"
+                  v-if="item.rag_status === 'rag_ready' || item.rag_index_status === 'indexed'"
                   class="cv2-rt-rag-badge ready"
                   title="RAG 已就绪"
-                >RAG✓</span>
+                >可分析</span>
                 <span
-                  v-else-if="item.rag_status === 'downloaded'"
+                  v-else-if="debugMode && item.rag_status === 'downloaded'"
                   class="cv2-rt-rag-badge downloaded"
                   title="已下载"
                 >下载✓</span>
@@ -64,7 +68,7 @@
                   :class="['cv2-rt-ai-badge', aiVerificationClass(item.ai_verification.ai_verification_status)]"
                 >{{ aiVerificationLabel(item.ai_verification) }}</span>
               </div>
-              <div v-if="item.ai_verification?.human_review_queue?.length" class="cv2-rt-ai-review">
+              <div v-if="debugMode && item.ai_verification?.human_review_queue?.length" class="cv2-rt-ai-review">
                 以下字段建议人工抽检：
                 <span
                   v-for="entry in item.ai_verification.human_review_queue.slice(0, 4)"
@@ -75,7 +79,7 @@
                   <em v-if="entry.evidence_excerpt">：{{ shortEvidence(entry.evidence_excerpt) }}</em>
                 </span>
               </div>
-              <div v-if="item.ai_verification?.non_blocking_findings?.length" class="cv2-rt-ai-findings">
+              <div v-if="debugMode && item.ai_verification?.non_blocking_findings?.length" class="cv2-rt-ai-findings">
                 非阻断发现：
                 <span
                   v-for="entry in item.ai_verification.non_blocking_findings.slice(0, 4)"
@@ -95,20 +99,20 @@
                 >
                   打开 PDF
                 </a>
-                <button class="cv2-rt-btn" @click="copyUrl(item.pdf_url)">
+                <button v-if="debugMode" class="cv2-rt-btn" @click="copyUrl(item.pdf_url)">
                   {{ copiedUrl === item.pdf_url ? '已复制 ✓' : '复制链接' }}
                 </button>
-                <button class="cv2-rt-btn" data-testid="parse-report-btn" @click="$emit('download-parse', item)">
+                <button v-if="debugMode" class="cv2-rt-btn" data-testid="parse-report-btn" @click="$emit('download-parse', item)">
                   下载/解析
                 </button>
-                <button class="cv2-rt-btn" data-testid="verify-report-btn" @click="$emit('verify', item)">
+                <button v-if="debugMode" class="cv2-rt-btn" data-testid="verify-report-btn" @click="$emit('verify', item)">
                   查看核验结果
                 </button>
-                <button class="cv2-rt-btn" data-testid="ai-verify-report-btn" @click="$emit('ai-verify', item)">
+                <button v-if="debugMode" class="cv2-rt-btn" data-testid="ai-verify-report-btn" @click="$emit('ai-verify', item)">
                   AI 校对
                 </button>
                 <button class="cv2-rt-btn" data-testid="report-qa-toggle-btn" @click="toggleQa(item)">
-                  Report QA
+                  分析此报告
                 </button>
               </div>
               <CompanyV2ReportQaPanel
@@ -139,13 +143,13 @@
     </div>
 
     <!-- 空状态 -->
-    <div v-else class="cv2-rt-empty" data-testid="report-empty">
-      <p>暂未发现报告文件。</p>
-      <p class="cv2-rt-hint">可点击"发现报告"按钮从 CNINFO 查询，或手动录入 PDF URL。</p>
+    <div v-else-if="!['loading_persisted', 'discovering'].includes(viewState)" class="cv2-rt-empty" data-testid="report-empty">
+      <p>{{ emptyTitle }}</p>
+      <p class="cv2-rt-hint">{{ emptyHint }}</p>
     </div>
 
     <!-- 操作栏 -->
-    <div class="cv2-rt-toolbar">
+    <div v-if="debugMode" class="cv2-rt-toolbar">
       <button
         class="cv2-rt-action-btn"
         :disabled="discovering"
@@ -179,10 +183,13 @@ import CompanyV2ReportQaPanel from './reports/CompanyV2ReportQaPanel.vue'
 const props = defineProps({
   reports: { type: Array, default: () => [] },
   discovering: { type: Boolean, default: false },
+  viewState: { type: String, default: 'idle' },
   defaultShow: { type: Number, default: 20 },
   market: { type: String, default: 'CN' },
   symbol: { type: String, default: '' },
+  debugMode: { type: Boolean, default: false },
 })
+const debugMode = computed(() => props.debugMode)
 
 defineEmits(['discover', 'manual', 'download-parse', 'verify', 'ai-verify'])
 
@@ -273,14 +280,17 @@ function iconClass(type) {
 function pdfStatusLabel(item) {
   const status = item.pdf_status || item.download_status || (item.pdf_url ? 'discovered' : 'failed')
   return {
-    discovered: 'PDF discovered',
-    downloading: 'PDF downloading',
-    downloaded: 'PDF downloaded',
-    parsed: 'PDF parsed',
-    verified: 'PDF verified',
-    failed: 'PDF failed',
-    download_failed: 'PDF failed',
-    parse_failed: 'PDF failed',
+    discovered: '已发现',
+    pending: '已发现',
+    downloading: '正在下载',
+    downloaded: '已下载',
+    parsing: '正在解析',
+    parsed: '可分析',
+    verified: '可分析',
+    indexed: '可分析',
+    failed: '处理失败',
+    download_failed: '处理失败',
+    parse_failed: '处理失败',
   }[status] || status
 }
 
@@ -300,9 +310,19 @@ function verificationLabel(verification, item = {}) {
     verified: `已按 ${item.report_year || ''} 年年度报告核验部分字段。`,
     partial: '部分字段已核验，其余字段缺少可靠抽取结果。',
     conflict: '结构化数据与年报字段存在差异',
-    unverified: 'Unverified',
+    unverified: '未核验',
   }[status] || status
 }
+
+const emptyTitle = computed(() => {
+  if (props.viewState === 'error') return '报告获取失败，请稍后重试。'
+  return '暂无已发现的官方财务报告。'
+})
+
+const emptyHint = computed(() => {
+  if (props.viewState === 'error') return '可以重新获取，或手动添加官方 PDF 链接。'
+  return '可以手动添加官方 PDF 链接。'
+})
 
 function aiVerificationLabel(result) {
   const status = result?.ai_verification_status || result?.verification_status
@@ -389,6 +409,25 @@ async function copyUrl(url) {
 
 <style scoped>
 .cv2-report-timeline { font-size: 13px; }
+.cv2-rt-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 18px 20px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #4b5563;
+}
+.cv2-rt-spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #bfdbfe;
+  border-top-color: #2563eb;
+  animation: cv2-spin 0.8s linear infinite;
+}
+@keyframes cv2-spin { to { transform: rotate(360deg); } }
 
 /* Filter tabs */
 .cv2-rt-filter-tabs {

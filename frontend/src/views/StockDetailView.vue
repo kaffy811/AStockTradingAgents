@@ -689,7 +689,7 @@ function onInsightData(payload) {
 watch(
   () => [route.params.market, route.params.symbol],
   () => {
-    companyTabVisited.value = false
+    companyTabVisited.value = activeDetailTab.value === 'company'
     companyV2TabFailed.value = false
     loadAll()
   },

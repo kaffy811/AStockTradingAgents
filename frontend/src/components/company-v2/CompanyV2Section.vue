@@ -5,7 +5,7 @@
         <h2>{{ title }}</h2>
         <p>{{ statusText }}</p>
       </div>
-      <span :class="['cv2-status', statusClass]">{{ primaryIssue }}</span>
+      <span :class="['cv2-status', statusClass]">{{ statusLabel }}</span>
     </header>
 
     <div class="cv2-quality-row">
@@ -70,7 +70,7 @@
     </template>
 
     <CompanyV2FallbackTable
-      v-else-if="tableRenderable && props.moduleKey !== 'report_documents'"
+      v-else-if="showFallbackTable"
       :rows="tableRows"
       :columns="tableColumns"
     />
@@ -198,6 +198,11 @@ const tableColumns = computed(() => {
   return Object.keys(tableRows.value[0] || {}).filter(key => !key.endsWith('_source')).slice(0, 8)
 })
 const tableRenderable = computed(() => props.envelope.render?.table_renderable && tableRows.value.length && tableColumns.value.length)
+const showFallbackTable = computed(() => (
+  tableRenderable.value &&
+  props.moduleKey !== 'report_documents' &&
+  (debugMode.value || metricItems.value.length === 0)
+))
 
 // Chart decision: use chart if multiple rows and chart-able module
 const periodType = computed(() => classifyRowsPeriod(tableRows.value))
@@ -229,10 +234,19 @@ const cashflowWarning = computed(() => {
 })
 const userQuality = computed(() => {
   if (dupontMismatch.value) return { text: '指标口径待确认', class: 'warn' }
+  if (!props.envelope.render?.has_displayable_data && !props.historyData?.data_success) return { text: '暂无数据', class: 'warn' }
+  const pct = Number(coverage.value.coverage_pct)
+  if (Number.isFinite(pct)) {
+    if (pct >= 100 && !hasSemanticWarning.value) return { text: '数据完整', class: 'ok' }
+    if (pct >= 60) return { text: '部分指标缺失', class: 'warn' }
+    return { text: '数据覆盖有限', class: 'warn' }
+  }
   if (props.historyData?.history_coverage?.periods_count <= 2) return { text: '历史覆盖有限', class: 'warn' }
-  if (props.envelope.render?.has_displayable_data || props.historyData?.data_success) return { text: '数据完整', class: 'ok' }
   return { text: '部分数据缺失', class: 'warn' }
 })
+const hasSemanticWarning = computed(() => validationChecks.value.some(check => (
+  check.status === 'warning' || check.status === 'fail' || (check.tags || []).some(tag => ['DUPONT_FORMULA_MISMATCH', 'CFO_TO_NP_DENOMINATOR_SENSITIVE'].includes(tag))
+)))
 const hasWeakFormulaWarning = computed(() => validationChecks.value.some(check => check.check_strength === 'weak'))
 const hasDupontProviderWarning = computed(() => validationChecks.value.some(check => (check.tags || []).includes('DUPONT_PROVIDER_DEFINED')))
 const hasNetMarginContextWarning = computed(() => validationChecks.value.some(check => check.check_id === 'net_margin_formula' && check.status === 'warning'))
@@ -243,7 +257,24 @@ const validationStatusClass = computed(() => {
   return 'skipped'
 })
 const primaryIssue = computed(() => diagnosis.value.primary_issue || (props.envelope.ok ? 'OK' : 'PROVIDER_EMPTY'))
+const statusLabel = computed(() => {
+  if (debugMode.value) return primaryIssue.value
+  return {
+    OK: '数据正常',
+    OK_WITH_FALLBACK: '部分数据来自备用来源',
+    PARTIAL_DATA: '部分指标缺失',
+    LOW_COVERAGE: '数据覆盖有限',
+    VERY_LOW_COVERAGE: '数据覆盖有限',
+    REPORT_PDF_NOT_FOUND: '暂无可用财报',
+    REPORT_NOT_INGESTED: '财报待解析',
+    PROVIDER_EMPTY: '暂无数据',
+    PROVIDER_TIMEOUT: '数据源超时',
+    PROVIDER_TIMEOUT_WITH_STALE_CACHE: '显示缓存数据',
+    MAPPING_ERROR: '数据暂不可用',
+  }[primaryIssue.value] || userQuality.value.text
+})
 const statusText = computed(() => {
+  if (!debugMode.value) return userQuality.value.text
   if (primaryIssue.value === 'REPORT_PDF_NOT_FOUND') return '暂未接入可确认报告文件。'
   if (primaryIssue.value === 'REPORT_NOT_INGESTED') return '尚未接入可检索的年报片段，暂无法进行基于年报的 RAG 分析。'
   if (props.envelope.render?.reason) return props.envelope.render.reason
@@ -273,7 +304,7 @@ const diagnosisMessage = computed(() => {
 function fieldLabel(field) {
   if (field === 'latest_price') return firstRow.value.price_label || '最新价'
   return ({
-    recent_close: '最近收盘价',
+    recent_close: '前收盘价',
     open: '开盘价',
     high: '最高价',
     low: '最低价',
@@ -295,7 +326,7 @@ function fieldLabel(field) {
     revenue: '营业收入',
     revenue_yoy: '营收同比',
     net_profit_parent: '归母净利润',
-    net_profit_yoy: '归母净利润同比',
+    net_profit_yoy: '净利润同比',
     parent_net_profit_yoy: '归母净利润同比',
     main_business_revenue: '主营业务收入',
     net_profit: '净利润',

@@ -261,6 +261,7 @@ async def get_reports(
         return _json({"ok": True, "reports": [], "total": 0, "message": "Only CN market supported"})
     persisted = await _list_persisted_report_documents(db, symbol, report_type=report_type)
     if persisted:
+        view_model = _reports_view_model(persisted, state="persisted_found")
         return _json({
             "ok": True,
             "symbol": symbol,
@@ -272,7 +273,7 @@ async def get_reports(
             "annual_reports_count": sum(1 for item in persisted if item.get("report_type") == "annual"),
             "quarterly_reports_count": sum(1 for item in persisted if item.get("report_type") != "annual"),
             "from_cache": True,
-            "errors": [],
+            **view_model,
         })
     from app.services.cninfo_report_discovery_agent import cninfo_report_discovery_agent
     report_types = None if report_type in ("all", "", None) else [report_type]
@@ -288,6 +289,7 @@ async def get_reports(
         reports = await _persist_report_documents(db, symbol, reports)
     except Exception as exc:
         result.setdefault("errors", []).append(f"report_persist_failed:{str(exc)[:100]}")
+    view_model = _reports_view_model(reports, state="discovered" if reports else "empty", errors=result.get("errors", []))
     return _json({
         "ok": True,
         "symbol": symbol,
@@ -299,7 +301,7 @@ async def get_reports(
         "annual_reports_count": result.get("annual_reports_count", 0),
         "quarterly_reports_count": result.get("quarterly_reports_count", 0),
         "from_cache": result.get("from_cache", False),
-        "errors": result.get("errors", []),
+        **view_model,
     })
 
 
@@ -332,6 +334,7 @@ async def discover_reports(
         reports = await _persist_report_documents(db, symbol, reports)
     except Exception as exc:
         result.setdefault("errors", []).append(f"report_persist_failed:{str(exc)[:100]}")
+    view_model = _reports_view_model(reports, state="discovered" if reports else "empty", errors=result.get("errors", []))
     return _json({
         "ok": True,
         "symbol": symbol,
@@ -343,7 +346,7 @@ async def discover_reports(
         "annual_reports_count": result.get("annual_reports_count", 0),
         "quarterly_reports_count": result.get("quarterly_reports_count", 0),
         "from_cache": result.get("from_cache", False),
-        "errors": result.get("errors", []),
+        **view_model,
         "discovery_method": "cninfo_his_announcement_query",
     })
 
@@ -376,6 +379,32 @@ def _report_view_state(symbol: str, report: dict[str, Any]) -> dict[str, Any]:
         "report_view_ready": bool(source_url and url_whitelist_valid and (report.get("symbol") in {None, "", symbol})),
         "url_whitelist_valid": url_whitelist_valid,
         "canonical_report": bool(source_url),
+    }
+
+
+def _reports_view_model(reports: list[dict[str, Any]], *, state: str, errors: list[str] | None = None) -> dict[str, Any]:
+    annual_count = sum(1 for item in reports if (item.get("report_type") or "annual") == "annual")
+    chunk_count = sum(int(item.get("chunk_count") or 0) for item in reports)
+    rag_ready = any(
+        item.get("rag_status") in {"rag_ready", "indexed", "partial"}
+        or item.get("rag_index_status") in {"indexed", "partial"}
+        for item in reports
+    )
+    summary = {
+        "report_count": len(reports),
+        "annual_count": annual_count,
+        "chunk_count": chunk_count,
+        "rag_status": "indexed" if rag_ready else ("pending" if reports else "empty"),
+    }
+    return {
+        "report_status": state,
+        "view_state": state,
+        "summary": summary,
+        "report_count": summary["report_count"],
+        "annual_count": summary["annual_count"],
+        "chunk_count": summary["chunk_count"],
+        "rag_status": summary["rag_status"],
+        "errors": errors or [],
     }
 
 
@@ -488,6 +517,7 @@ async def _list_persisted_report_documents(db: AsyncSession, symbol: str, *, rep
             "download_status": doc.download_status,
             "parse_status": doc.parse_status,
             "pdf_status": doc.download_status,
+            "chunk_count": doc.chunk_count or 0,
             "rag_index_status": doc.rag_status,
             "rag_status": "rag_ready" if doc.rag_status in {"indexed", "partial"} else doc.rag_status,
             "qa_ready": bool(doc.parsed and doc.parse_status in {"parsed", "partial"}),
@@ -524,14 +554,18 @@ async def add_manual_report(
             "message": f"PDF URL rejected: {reason}",
         }, 400)
     # Store to DB if available
+    period_end = f"{body.report_year}-12-31" if body.report_year else None
     record = {
         "symbol": symbol,
-        "ts_code": f"{symbol}.SH" if symbol.startswith(("6", "5")) else f"{symbol}.SZ",
+        "ts_code": _ts_code(symbol),
         "market": market.upper(),
         "report_year": body.report_year or 0,
+        "report_type": "annual",
+        "period_end": period_end,
         "title": body.title or f"{symbol} 年报 PDF",
         "announcement_date": body.announcement_date or "",
         "pdf_url": body.pdf_url,
+        "source_url": body.pdf_url,
         "source": "manual",
         "source_host": (urlparse(body.pdf_url).hostname or ""),
         "confidence": 0.80,
@@ -539,7 +573,44 @@ async def add_manual_report(
         "is_summary": False,
         "is_correction": False,
     }
-    return _json({"ok": True, "record": record, "message": "Manual PDF URL accepted"})
+    doc = None
+    try:
+        result = await db.execute(
+            select(ReportDocument).where(
+                ReportDocument.ts_code == record["ts_code"],
+                ReportDocument.pdf_url == body.pdf_url,
+            )
+        )
+        doc = result.scalars().first()
+        if not doc:
+            doc = ReportDocument(
+                ts_code=record["ts_code"],
+                report_type="annual",
+                period_end=period_end,
+                title=record["title"],
+                source_url=body.pdf_url,
+                pdf_url=body.pdf_url,
+                report_year=body.report_year,
+                source="manual",
+                disclosure_date=body.announcement_date or None,
+                confidence=0.80,
+                download_status="discovered",
+                parse_status="pending",
+                rag_status="pending",
+            )
+            db.add(doc)
+            await db.flush()
+        await db.commit()
+        record["id"] = doc.id
+        record["report_id"] = doc.id
+        record["download_status"] = doc.download_status
+        record["parse_status"] = doc.parse_status
+        record["rag_status"] = doc.rag_status
+        record["pdf_status"] = doc.download_status
+    except Exception as exc:
+        await db.rollback()
+        return _json({"ok": False, "error_code": "REPORT_MANUAL_SAVE_FAILED", "message": str(exc)[:300]}, 200)
+    return _json({"ok": True, "record": record, "message": "官方 PDF 链接已保存"})
 
 
 @router.post("/{market}/{symbol}/reports/{report_id}/download")
@@ -924,3 +995,24 @@ async def get_stock_basic(
         return _json({"ok": True, **data})
     except Exception as exc:
         return _json({"ok": False, "error_code": "STOCK_BASIC_ERROR", "message": str(exc)[:500]}, 200)
+
+
+@router.get("/{market}/{symbol}/profile")
+async def get_company_profile(
+    market: str = Path(...),
+    symbol: str = Path(...),
+    user: User | None = Depends(get_optional_user),
+) -> JSONResponse:
+    """Public page profile for Company V2 overview. Additive shape over stock_basic."""
+    if market.upper() != "CN":
+        return _json({"ok": True, "market": market.upper(), "symbol": symbol, "field_availability": {}})
+    try:
+        from app.services.company_v2_stock_basic_service import get_stock_basic as _get_basic
+        data = await _get_basic(symbol)
+        return _json({
+            "ok": True,
+            **data,
+            "as_of_date": data.get("updated_at"),
+        })
+    except Exception as exc:
+        return _json({"ok": False, "error_code": "COMPANY_PROFILE_ERROR", "message": str(exc)[:500]}, 200)

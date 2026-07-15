@@ -2,17 +2,20 @@
   <div class="cv2-metrics">
     <div v-for="item in items" :key="item.field" class="cv2-metric">
       <span class="cv2-metric-label">{{ item.label }}</span>
-      <strong :title="tooltip(item)">{{ item.displayValue || formatValue(item.value) }}</strong>
-      <small>{{ item.source }}<template v-if="item.rawField"> · {{ item.rawField }}</template></small>
-      <span :class="['cv2-source-badge', sourceBadgeClass(item)]">{{ sourceBadgeLabel(item) }}</span>
+      <strong :title="debugMode ? tooltip(item) : ''">{{ item.displayValue || formatValue(item.value) }}</strong>
+      <small v-if="item.periodEnd">{{ item.periodEnd }}</small>
+      <small v-if="debugMode">{{ item.source }}<template v-if="item.rawField"> · {{ item.rawField }}</template></small>
+      <span v-if="debugMode" :class="['cv2-source-badge', sourceBadgeClass(item)]">{{ sourceBadgeLabel(item) }}</span>
     </div>
   </div>
 </template>
 
 <script setup>
-defineProps({
+const props = defineProps({
   items: { type: Array, default: () => [] },
+  debugMode: { type: Boolean, default: false },
 })
+const debugMode = props.debugMode
 
 function formatValue(value) {
   if (value === null || value === undefined || value === '' || Number.isNaN(value)) return '—'

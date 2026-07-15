@@ -9,7 +9,7 @@ app/services/company_v2_stock_basic_service.py — 公司/股票基本信息服�
 
 数据源优先级：
 1. BaoStock query_stock_basic（免费）
-2. AkShare stock_info_a_code_name（补充）
+2. AkShare stock_profile_cninfo（巨潮公司概况补充）
 3. 本地 seed 数据（兜底）
 
 安全原则：
@@ -99,6 +99,13 @@ def _to_bs_code(ts_code: str) -> str:
     return f"{ex.lower()}.{code}"
 
 
+def _clean_profile_value(value: Any) -> str:
+    if value is None:
+        return ""
+    text = str(value).strip()
+    return "" if text.lower() in {"none", "nan", "nat"} else text
+
+
 async def _fetch_baostock_stock_basic(ts_code: str) -> dict[str, Any] | None:
     """
     从 BaoStock 获取股票基本信息。
@@ -177,8 +184,8 @@ async def _fetch_akshare_stock_info(symbol: str) -> dict[str, Any] | None:
 
         def _sync_query() -> dict | None:
             try:
-                # 尝试获取公司简介
-                df = ak.stock_profile_em(symbol=symbol)
+                # 巨潮资讯-个股-公司概况：结构化公司资料，不使用 LLM 生成事实。
+                df = ak.stock_profile_cninfo(symbol=symbol)
                 if df is None or df.empty:
                     return None
                 row = df.iloc[0].to_dict() if len(df) > 0 else {}
@@ -193,14 +200,20 @@ async def _fetch_akshare_stock_info(symbol: str) -> dict[str, Any] | None:
         return {
             "symbol": symbol,
             "ts_code": _to_ts_code(symbol),
-            "company_name": str(info.get("公司名称") or info.get("name") or ""),
-            "exchange": str(info.get("所属交易所") or ""),
-            "industry": str(info.get("行业") or ""),
-            "main_business": str(info.get("主营业务") or ""),
-            "website": str(info.get("公司主页") or ""),
-            "chairman": str(info.get("法人代表") or ""),
-            "area": str(info.get("省份") or ""),
-            "source": "akshare_profile",
+            "company_name": _clean_profile_value(info.get("公司名称") or info.get("name")),
+            "short_name": _clean_profile_value(info.get("A股简称")),
+            "exchange": _clean_profile_value(info.get("所属市场")),
+            "industry": _clean_profile_value(info.get("所属行业") or info.get("行业")),
+            "list_date": _clean_profile_value(info.get("上市日期")),
+            "registered_address": _clean_profile_value(info.get("注册地址")),
+            "office_address": _clean_profile_value(info.get("办公地址")),
+            "main_business": _clean_profile_value(info.get("主营业务")),
+            "business_scope": _clean_profile_value(info.get("经营范围")),
+            "introduction": _clean_profile_value(info.get("机构简介")),
+            "website": _clean_profile_value(info.get("官方网站") or info.get("公司主页")),
+            "chairman": _clean_profile_value(info.get("法人代表")),
+            "area": _clean_profile_value(info.get("省份")),
+            "source": "cninfo_company_profile",
         }
     except Exception as e:
         log.debug("AkShare stock profile [%s] 失败: %s", symbol, e)
@@ -259,10 +272,11 @@ async def get_stock_basic(
             source = "default"
         source_info = bs_info or {}
 
-    # 尝试 AkShare 补充 company info
-    ak_info = None
-    if not source_info.get("company_name") or not source_info.get("industry"):
-        ak_info = await _fetch_akshare_stock_info(code)
+    # 尝试 AkShare/CNINFO 补充 company profile。即使 BaoStock 已成功，也要补充主营业务/简介等字段。
+    ak_info = await _fetch_akshare_stock_info(code)
+    if ak_info and ak_info.get("list_date") and not list_date:
+        list_date = ak_info["list_date"]
+        list_date_status = "exact"
 
     # 解析上市年份
     list_year: int | None = None
@@ -272,12 +286,12 @@ async def get_stock_basic(
         except (ValueError, IndexError):
             pass
 
-    return {
+    profile = {
         "symbol": code,
         "ts_code": ts_code,
         "company_name": (
-            source_info.get("company_name")
-            or (ak_info or {}).get("company_name")
+            (ak_info or {}).get("company_name")
+            or source_info.get("company_name")
             or ""
         ),
         "exchange": (
@@ -299,13 +313,30 @@ async def get_stock_basic(
             or (ak_info or {}).get("area")
             or ""
         ),
+        "short_name": (ak_info or {}).get("short_name") or "",
+        "registered_address": (ak_info or {}).get("registered_address") or "",
+        "office_address": (ak_info or {}).get("office_address") or "",
         "main_business": (ak_info or {}).get("main_business"),
+        "business_scope": (ak_info or {}).get("business_scope"),
+        "introduction": (ak_info or {}).get("introduction"),
         "website": (ak_info or {}).get("website"),
         "chairman": (ak_info or {}).get("chairman"),
         "list_date_status": list_date_status,
         "source": source,
+        "profile_source": (ak_info or {}).get("source") or source,
         "updated_at": today_str,
     }
+    availability_fields = [
+        "company_name", "short_name", "symbol", "exchange", "industry", "list_date",
+        "registered_address", "office_address", "main_business", "business_scope", "introduction",
+    ]
+    profile["field_availability"] = {field: bool(profile.get(field)) for field in availability_fields}
+    profile["source_metadata"] = {
+        "primary": source,
+        "company_profile": (ak_info or {}).get("source") or None,
+        "as_of_date": today_str,
+    }
+    return profile
 
 
 def get_default_start_year(

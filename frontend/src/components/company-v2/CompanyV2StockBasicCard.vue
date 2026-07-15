@@ -47,7 +47,6 @@ function _colorClass(v, type) {
 
 const items = computed(() => {
   const q = props.quoteRow || {}
-  const sb = props.stockBasic || {}
   const result = []
 
   // 价格
@@ -74,54 +73,32 @@ const items = computed(() => {
     })
   }
 
-  // PE/PB/PS
-  const ratios = [
-    { key: 'pe_ttm', label: 'PE(TTM)', type: 'ratio' },
-    { key: 'pb', label: 'PB', type: 'ratio' },
-    { key: 'ps_ttm', label: 'PS(TTM)', type: 'ratio' },
-    { key: 'pcf_ncf_ttm', label: 'PCF(TTM)', type: 'ratio' },
-  ]
-  for (const r of ratios) {
-    const v = q[r.key]
-    if (v != null) {
-      result.push({
-        key: r.key,
-        label: r.label,
-        display: _fmt(v, r.type),
-        unit: '',
-        colorClass: '',
-      })
-    }
+  if (q.amount != null) {
+    result.push({
+      key: 'amount',
+      label: '成交额',
+      display: _fmt(q.amount, 'currency_b'),
+      unit: '',
+      colorClass: '',
+    })
+  }
+  if (q.turnover != null) {
+    result.push({
+      key: 'turnover',
+      label: '换手率',
+      display: _fmt(q.turnover, 'pct_direct'),
+      unit: '',
+      colorClass: '',
+    })
   }
 
   // 市值
   const mcap = q.market_cap
-  const fcap = q.float_market_cap
   if (mcap != null) {
     result.push({
       key: 'market_cap',
       label: '总市值',
       display: _fmt(mcap, 'currency_b'),
-      unit: '',
-      colorClass: '',
-    })
-  }
-  if (fcap != null) {
-    result.push({
-      key: 'float_market_cap',
-      label: '流通市值',
-      display: _fmt(fcap, 'currency_b'),
-      unit: '',
-      colorClass: '',
-    })
-  }
-
-  // 上市日期（来自 stock_basic）
-  if (sb.list_date) {
-    result.push({
-      key: 'list_date',
-      label: '上市日期',
-      display: sb.list_date,
       unit: '',
       colorClass: '',
     })
