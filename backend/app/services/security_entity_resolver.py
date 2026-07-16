@@ -25,9 +25,9 @@ SUPPORTED_MARKETS = ("CN", "HK", "US")
 _CORP_SUFFIX_RE = re.compile(r"(股份有限公司|有限责任公司|有限公司|公司|集团)$")
 _ST_PREFIX_RE = re.compile(r"^\*?ST", re.IGNORECASE)
 _QUERY_NOISE_RE = re.compile(r"最近|表现|如何|怎么样|怎样|财报|年报|对比|比较|相比|看看|分析|一下|它|该股|这家公司|这只股票|呢|吗")
-_TS_CODE_RE = re.compile(r"\b(\d{6})\.(SH|SZ|BJ)\b", re.IGNORECASE)
-_CN_CODE_RE = re.compile(r"\b\d{6}\b")
-_HK_CODE_RE = re.compile(r"\b0?\d{1,5}\b")
+_TS_CODE_RE = re.compile(r"(?<!\d)(\d{6})\.(SH|SZ|BJ)(?![A-Z0-9])", re.IGNORECASE)
+_CN_CODE_RE = re.compile(r"(?<!\d)\d{6}(?!\d)")
+_HK_CODE_RE = re.compile(r"(?<!\d)0?\d{1,5}(?!\d)")
 _US_TICKER_RE = re.compile(r"\b[A-Z]{1,5}(?:[.-][A-Z])?\b")
 
 

@@ -4,14 +4,14 @@
 {
   "phase": "phase6ts_worker_restart",
   "status": "passed",
-  "run_id": "f7d46f89dbc74835b67834d804185313",
-  "started_at": "2026-07-16T01:48:38.790639",
-  "finished_at": "2026-07-16T01:49:01.294494",
+  "run_id": "0d7e9810fe5648bcbe15d93492fa03d4",
+  "started_at": "2026-07-16T09:06:46.330396",
+  "finished_at": "2026-07-16T09:07:39.266782",
   "duration_seconds": 8,
   "requested_duration_seconds": 8.0,
-  "actual_duration_seconds": 13.368,
-  "process_pid": 63867,
-  "git_commit": "f8d3916d9d73a47bef3fd14e5c2f7aa2d8195fe3",
+  "actual_duration_seconds": 21.015,
+  "process_pid": 74711,
+  "git_commit": "69bff1b136ae5b78c83aa127efc4b90723834df8",
   "worker_count": 2,
   "jobs_created": 2,
   "jobs_cancelled": 2,
@@ -22,10 +22,10 @@
   "unknown_jobs_modified": 0,
   "active_leases_end": 0,
   "stale_leases_end": 0,
-  "worker_restart_count": 3,
+  "worker_restart_count": 4,
   "worker_restart_events": [
     {
-      "at_seconds": 2.01,
+      "at_seconds": 2.02,
       "worker_id": "phase6ts-worker-1",
       "reason": "injected"
     }

@@ -6,7 +6,7 @@ import pytest
 
 from app.agents.central_planning_agent import CentralPlanningAgent
 from app.agents.chat_skills.base import SkillContext
-from app.agents.chat_skills.report_comparison_skill import ReportComparisonSkill
+from app.agents.chat_skills.report_comparison_skill import ReportComparisonSkill, _build_comparison_entities
 from app.agents.intent_decision_agent import IntentDecision
 from app.services.company_v2_history_service import _build_module_statuses
 from app.services.report_document_classifier import (
@@ -19,6 +19,7 @@ from app.services.report_document_classifier import (
 )
 from app.services.conversation_memory_service import MemoryContext, ResolvedEntity, resolve_coreferences
 from app.services.security_entity_resolver import SecurityEntityResolver
+from app.services import security_entity_resolver as resolver_module
 
 
 SAMPLE_SECURITIES = [
@@ -81,6 +82,43 @@ def test_d6_report_comparison_skill_can_handle_contextual_followup():
     memory = MemoryContext(active_entities=[ResolvedEntity(type="stock", name="贵州茅台", code="600519", market="CN")])
     context = SkillContext(db=None, user_id="u", session_id="s", memory_context=memory)
     assert ReportComparisonSkill().can_handle("那它和五粮液比呢", context)
+
+
+@pytest.mark.asyncio
+async def test_d6_2_pronoun_and_explicit_entity_merge(monkeypatch):
+    monkeypatch.setattr(resolver_module.security_entity_resolver, "_sample_rows", SAMPLE_SECURITIES)
+    memory = MemoryContext(active_entities=[ResolvedEntity(type="stock", name="贵州茅台", code="600519", market="CN")])
+    context = SkillContext(
+        db=None,
+        user_id="u",
+        session_id="s",
+        memory_context=memory,
+        metadata={"raw_query": "那它和五粮液比呢", "effective_query": "那贵州茅台（CN/600519）和五粮液比呢"},
+    )
+    entities, diagnostics = await _build_comparison_entities("那贵州茅台（CN/600519）和五粮液比呢", context)
+    assert [(e["market"], e["symbol"], e["source"]) for e in entities[:2]] == [
+        ("CN", "600519", "pronoun_context"),
+        ("CN", "000858", "current_query_explicit"),
+    ]
+    assert diagnostics["comparison_parser_output"]["entities"][1]["symbol"] == "000858"
+
+
+@pytest.mark.asyncio
+async def test_d6_2_missing_comparison_entities_keeps_context_pending(monkeypatch):
+    monkeypatch.setattr(resolver_module.security_entity_resolver, "_sample_rows", SAMPLE_SECURITIES)
+    memory = MemoryContext(active_entities=[ResolvedEntity(type="stock", name="贵州茅台", code="600519", market="CN")])
+    context = SkillContext(
+        db=None,
+        user_id="u",
+        session_id="s",
+        memory_context=memory,
+        metadata={"raw_query": "那它比呢", "effective_query": "那贵州茅台（CN/600519）比呢"},
+    )
+    result = await ReportComparisonSkill().run("那贵州茅台（CN/600519）比呢", context)
+    assert result.data["status"] == "failed"
+    assert result.data["error_code"] == "COMPARE_ENTITY_MISSING"
+    assert result.data["pending_context"]["last_failed_intent"] == "financial_report_comparison"
+    assert result.data["diagnostics"]["context_commit_reason"].startswith("not_committed")
 
 
 def test_d6_extreme_ratio_splits_completeness_and_validity():

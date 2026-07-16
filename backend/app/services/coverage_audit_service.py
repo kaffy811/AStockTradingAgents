@@ -442,6 +442,7 @@ class CoverageAuditService:
                 _to_bs_code, _parse_rows, _suppress_bs_output,
                 _safe_float, _get_bs_lock,
             )
+            from app.datasource.baostock_session_manager import run_with_baostock_lock
 
             bs_code = _to_bs_code(ts_code)
             today   = datetime.date.today()
@@ -508,7 +509,9 @@ class CoverageAuditService:
                 return result_kline, result_profit, result_balance, result_growth
 
             async with _get_bs_lock():
-                klines, profits, balances, growths = await asyncio.to_thread(_sync_fetch_all)
+                klines, profits, balances, growths = await asyncio.to_thread(
+                    lambda: run_with_baostock_lock(_sync_fetch_all)
+                )
 
             # ── Parse kline ────────────────────────────────────────────────
             if klines:

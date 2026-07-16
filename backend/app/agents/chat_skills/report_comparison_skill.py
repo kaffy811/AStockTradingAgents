@@ -13,6 +13,9 @@ from app.services.security_entity_resolver import SecurityEntity, security_entit
 
 
 _COMPARE_RE = re.compile(r"对比|比较|相比|和.+比|比呢|哪个更好")
+_PRONOUN_RE = re.compile(r"它|该股|这家公司|这只股票|该公司")
+_FORMER_RE = re.compile(r"前者|第一家|第一只")
+_LATTER_RE = re.compile(r"后者|第二家|第二只")
 _METRICS = [
     ("revenue", "营业收入"),
     ("parent_net_profit", "归母净利润"),
@@ -25,7 +28,11 @@ _METRICS = [
 _METRIC_VERSION = "metric_v1"
 
 
-def _memory_stock(context: SkillContext) -> dict[str, str]:
+def _entity_key(entity: dict[str, Any]) -> tuple[str, str]:
+    return (str(entity.get("market") or "").upper(), str(entity.get("symbol") or ""))
+
+
+def _memory_stock(context: SkillContext) -> dict[str, Any]:
     memory_context = getattr(context, "memory_context", None)
     if not memory_context:
         return {}
@@ -35,6 +42,8 @@ def _memory_stock(context: SkillContext) -> dict[str, str]:
                 "market": getattr(entity, "market", "") or "CN",
                 "symbol": getattr(entity, "code", ""),
                 "name": getattr(entity, "name", "") or getattr(entity, "code", ""),
+                "short_name": getattr(entity, "name", "") or getattr(entity, "code", ""),
+                "source": "conversation_context",
             }
     return {}
 
@@ -51,8 +60,90 @@ def _memory_entities(context: SkillContext) -> list[dict[str, Any]]:
                 "market": getattr(entity, "market", "") or "CN",
                 "symbol": getattr(entity, "code", ""),
                 "short_name": getattr(entity, "name", "") or getattr(entity, "code", ""),
+                "name": getattr(entity, "name", "") or getattr(entity, "code", ""),
+                "source": "conversation_context",
             })
     return entities
+
+
+def _append_unique(out: list[dict[str, Any]], entity: dict[str, Any], *, source: str) -> None:
+    market = str(entity.get("market") or "").upper()
+    symbol = str(entity.get("symbol") or "")
+    if not market or not symbol:
+        return
+    normalized = {
+        **entity,
+        "market": market,
+        "symbol": symbol,
+        "name": entity.get("name") or entity.get("short_name") or symbol,
+        "short_name": entity.get("short_name") or entity.get("name") or symbol,
+        "source": source,
+    }
+    if _entity_key(normalized) in {_entity_key(e) for e in out}:
+        return
+    out.append(normalized)
+
+
+async def _build_comparison_entities(message: str, context: SkillContext) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    raw_query = str((context.metadata or {}).get("raw_query") or message or "")
+    effective_query = str((context.metadata or {}).get("effective_query") or message or "")
+    context_entities = _memory_entities(context)
+    current_resolved = await security_entity_resolver.resolve(
+        context.db,
+        raw_query,
+        context_entities=context_entities,
+        min_confidence=0.72,
+    )
+    explicit_entities: list[SecurityEntity] = list(current_resolved.get("entities") or [])
+    comparison_entities: list[dict[str, Any]] = []
+    resolved_pronouns: dict[str, Any] = {}
+
+    if _PRONOUN_RE.search(raw_query) and context_entities:
+        _append_unique(comparison_entities, context_entities[0], source="pronoun_context")
+        resolved_pronouns["it"] = context_entities[0]
+    if _FORMER_RE.search(raw_query) and context_entities:
+        _append_unique(comparison_entities, context_entities[0], source="ordinal_context")
+        resolved_pronouns["former"] = context_entities[0]
+    if _LATTER_RE.search(raw_query) and len(context_entities) >= 2:
+        _append_unique(comparison_entities, context_entities[1], source="ordinal_context")
+        resolved_pronouns["latter"] = context_entities[1]
+
+    for entity in explicit_entities:
+        _append_unique(comparison_entities, entity.to_hint(), source="current_query_explicit")
+
+    if len(comparison_entities) < 2 and effective_query != raw_query:
+        effective_resolved = await security_entity_resolver.resolve(
+            context.db,
+            effective_query,
+            context_entities=context_entities,
+            min_confidence=0.72,
+        )
+        for entity in list(effective_resolved.get("entities") or []):
+            _append_unique(comparison_entities, entity.to_hint(), source="effective_query")
+    else:
+        effective_resolved = {"entities": [], "ambiguity": False, "candidates": []}
+
+    if len(comparison_entities) == 1 and context_entities:
+        _append_unique(comparison_entities, context_entities[0], source="context_fallback")
+
+    diagnostics = {
+        "raw_query": raw_query,
+        "normalized_query": raw_query.strip(),
+        "effective_query": effective_query,
+        "resolver_candidates": current_resolved.get("candidates", [])[:8],
+        "current_query_entities": [e.to_dict() for e in explicit_entities],
+        "resolved_pronouns": resolved_pronouns,
+        "context_before": {"entities": context_entities},
+        "candidate_context": {"comparison_entities": comparison_entities},
+        "comparison_parser_output": {
+            "entities": comparison_entities,
+            "comparison_type": "financial_report",
+            "dimensions": ["revenue", "profitability", "cashflow"],
+            "time_alignment": "latest_common_annual",
+        },
+        "effective_resolver_candidates": effective_resolved.get("candidates", [])[:8],
+    }
+    return comparison_entities[:5], diagnostics
 
 
 def _last_report_id(context: SkillContext) -> int | None:
@@ -119,9 +210,10 @@ class ReportComparisonSkill(BaseSkill):
         return True
 
     async def run(self, message: str, context: SkillContext) -> SkillResult:
+        raw_query = str((context.metadata or {}).get("raw_query") or message or "")
         resolved = await security_entity_resolver.resolve(
             context.db,
-            message,
+            raw_query,
             context_entities=_memory_entities(context),
             min_confidence=0.72,
         )
@@ -132,19 +224,46 @@ class ReportComparisonSkill(BaseSkill):
             )
             answer = f"对比对象存在歧义，可能指：{names}。请明确选择后再比较。" + _DISCLAIMER
             return SkillResult(ok=True, skill_name=self.name, answer=answer, data={"status": "failed", "error_code": "AMBIGUOUS_SECURITY", "candidates": resolved.get("candidates", [])[:5]})
-        entities: list[SecurityEntity] = list(resolved.get("entities") or [])
-        memory_left = _memory_stock(context)
-        if len(entities) == 1 and memory_left:
-            left, right = memory_left, entities[0].to_hint()
-        elif len(entities) >= 2:
-            left, right = entities[0].to_hint(), entities[1].to_hint()
+        comparison_entities, diagnostics = await _build_comparison_entities(message, context)
+        comparison_input = {
+            "entities": comparison_entities,
+            "comparison_type": "financial_report",
+            "dimensions": diagnostics["comparison_parser_output"]["dimensions"],
+            "time_alignment": "latest_common_annual",
+            "conversation_context_version": getattr(getattr(context, "memory_context", None), "context_version", None),
+        }
+        if len(comparison_entities) >= 2:
+            left, right = comparison_entities[0], comparison_entities[1]
         else:
             answer = "当前没有足够上下文确认对比双方。请明确两家公司或股票代码后再比较。" + _DISCLAIMER
-            return SkillResult(ok=True, skill_name=self.name, answer=answer, data={"status": "failed", "error_code": "COMPARE_ENTITY_MISSING"})
+            diagnostics.update({
+                "comparison_skill_input": comparison_input,
+                "comparison_agent_input": None,
+                "context_after": diagnostics.get("context_before"),
+                "context_commit_reason": "not_committed_failed_entity_missing",
+                "first_entity_loss_layer": "comparison_entity_merge",
+            })
+            return SkillResult(
+                ok=True,
+                skill_name=self.name,
+                answer=answer,
+                data={
+                    "status": "failed",
+                    "error_code": "COMPARE_ENTITY_MISSING",
+                    "diagnostics": diagnostics,
+                    "pending_context": {"last_failed_intent": "financial_report_comparison"},
+                },
+            )
 
         if left.get("symbol") == right.get("symbol"):
             answer = "对比双方解析为同一家公司，请再指定另一家公司。" + _DISCLAIMER
-            return SkillResult(ok=True, skill_name=self.name, answer=answer, data={"status": "failed", "error_code": "COMPARE_SAME_ENTITY"})
+            diagnostics.update({
+                "comparison_skill_input": comparison_input,
+                "comparison_agent_input": comparison_input,
+                "context_after": diagnostics.get("context_before"),
+                "context_commit_reason": "not_committed_failed_same_entity",
+            })
+            return SkillResult(ok=True, skill_name=self.name, answer=answer, data={"status": "failed", "error_code": "COMPARE_SAME_ENTITY", "diagnostics": diagnostics})
 
         left_selection = await resolve_report_selection(
             db=context.db,
@@ -232,14 +351,14 @@ class ReportComparisonSkill(BaseSkill):
         table_lines = [
             f"### {left_name} 与 {right_name} 财报核心指标对比",
             "",
-            f"- {left_name}：{left_selection.title or '未找到正式年报'}（report_id={left_selection.report_id or '—'}，{left_selection.report_year or '未知'}）",
-            f"- {right_name}：{right_selection.title or '未找到正式年报'}（report_id={right_selection.report_id or '—'}，{right_selection.report_year or '未知'}）",
+            f"- {left_name}：{left_selection.title or '未找到正式年报'}（{left_selection.report_year or '未知'}）",
+            f"- {right_name}：{right_selection.title or '未找到正式年报'}（{right_selection.report_year or '未知'}）",
             period_note,
-            "| 指标 | " + left_name + " | " + right_name + " | 证据 |",
+            "| 指标 | " + left_name + " | " + right_name + " | 来源 |",
             "| --- | ---: | ---: | --- |",
         ]
         for row in rows:
-            evidence = "、".join(str(eid) for eid in row["evidence_ids"]) if row["evidence_ids"] else "暂无可靠证据"
+            evidence = "正式年报结构化表格" if row["evidence_ids"] else "暂无可靠证据"
             table_lines.append(
                 f"| {row['label']} | {_fmt_value(row['left_value'])} | {_fmt_value(row['right_value'])} | {evidence} |"
             )
@@ -271,6 +390,17 @@ class ReportComparisonSkill(BaseSkill):
                 "left": left_selection.metadata(),
                 "right": right_selection.metadata(),
                 "comparison_rows": rows,
+                "comparison_input": comparison_input,
+                "diagnostics": {
+                    **diagnostics,
+                    "comparison_skill_input": comparison_input,
+                    "comparison_agent_input": comparison_input,
+                    "context_after": {
+                        "primary_entity": comparison_entities[0],
+                        "secondary_entities": comparison_entities[1:],
+                    },
+                    "context_commit_reason": "completed",
+                },
                 "source_chunks": source_chunks,
             },
             metadata={

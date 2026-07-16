@@ -1077,6 +1077,11 @@ async def process_message(
         session_id=str(session_id) if session_id else "",
         output_language=output_language,
         tool_registry=_registry,
+        metadata={
+            "raw_query": msg,
+            "effective_query": _effective_content,
+            "context_update_mode": "transactional",
+        },
         event_callback=event_callback,
         memory_context=_memory_ctx,  # C32.1.1
     )
@@ -1165,8 +1170,10 @@ async def _write_memory_from_result(
         if hint and hint.get("symbol"):
             await _mem.update_symbols(db, session_id, user_id, hint)
         skill_data = meta.get("skill_data") or {}
+        skill_status = str(skill_data.get("status") or meta.get("status") or "").lower()
+        context_commit_allowed = skill_status in {"completed", "partial_success"} or not skill_status
         report_context = skill_data.get("report_context") if isinstance(skill_data, dict) else None
-        if isinstance(report_context, dict):
+        if context_commit_allowed and isinstance(report_context, dict):
             report_symbol = str(report_context.get("symbol") or "").strip()
             report_market = str(report_context.get("market") or "CN").strip() or "CN"
             if report_symbol:
@@ -1177,6 +1184,17 @@ async def _write_memory_from_result(
                 })
             if report_context.get("report_id"):
                 await _mem.update_last_report(db, session_id, user_id, str(report_context.get("report_id")))
+        comparison_input = skill_data.get("comparison_input") if isinstance(skill_data, dict) else None
+        if context_commit_allowed and isinstance(comparison_input, dict):
+            for entity in comparison_input.get("entities") or []:
+                symbol = str(entity.get("symbol") or "").strip()
+                if not symbol:
+                    continue
+                await _mem.update_symbols(db, session_id, user_id, {
+                    "market": str(entity.get("market") or "CN").strip() or "CN",
+                    "symbol": symbol,
+                    "name": entity.get("name") or entity.get("short_name") or symbol,
+                })
 
         # 2. Output language
         if output_language:

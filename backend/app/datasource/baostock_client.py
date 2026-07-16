@@ -13,10 +13,18 @@ import asyncio
 import importlib.util
 import io
 import logging
+import os
 import sys
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from typing import Any
+
+from app.datasource.baostock_session_manager import (
+    BaoStockBatchAborted,
+    run_baostock_financial_batch,
+    run_provider_subprocess,
+    run_with_baostock_lock,
+)
 
 log = logging.getLogger(__name__)
 
@@ -35,6 +43,16 @@ def baostock_import_status() -> tuple[bool, str | None]:
     if spec is None:
         return False, "No module named 'baostock'"
     return True, None
+
+
+def _financial_provider_execution_mode() -> str:
+    configured = os.getenv("FINANCIAL_PROVIDER_EXECUTION_MODE")
+    if configured:
+        return configured.strip() or "direct_serialized"
+    app_env = os.getenv("APP_ENV", os.getenv("ENVIRONMENT", "development")).strip().lower()
+    if app_env in {"production", "prod", "staging", "stage", "preprod", "pre-production"}:
+        return "subprocess"
+    return "direct_serialized"
 
 
 def _get_bs_lock() -> asyncio.Lock:
@@ -136,53 +154,19 @@ _BULK_TABLE_KEYS = tuple(_BULK_TABLE_FNS.keys())
 def _bulk_fetch_years_worker(
     bs_code: str,
     year_quarters: list[tuple[int, int]],
-) -> tuple[dict[int, dict[str, list[dict]]], int, dict[str, int]]:
+) -> tuple[dict[int, dict[str, list[dict]]], int, dict[str, int], dict[str, Any]]:
     """
     子进程 worker：单次 login/logout 会话内查询分配到的 (year, quarter) 批。
 
     BaoStock python 模块为全局 socket（线程不安全），并发只能通过独立进程实现，
     每个 worker 进程有自己的会话。返回 ({year: {table: rows}}, calls_count)。
     """
-    import baostock as bs  # 子进程内导入
-
-    import io as _io
-    import sys as _sys
-
-    old_out, old_err = _sys.stdout, _sys.stderr
-    _sys.stdout = _io.StringIO()
-    _sys.stderr = _io.StringIO()
-    try:
-        bs.login()
-    finally:
-        _sys.stdout, _sys.stderr = old_out, old_err
-
-    by_year: dict[int, dict[str, list[dict]]] = {}
-    calls = 0
-    calls_by_endpoint: dict[str, int] = {k: 0 for k in _BULK_TABLE_KEYS}
-    try:
-        for year, quarter in year_quarters:
-            year_tables = by_year.setdefault(year, {k: [] for k in _BULK_TABLE_KEYS})
-            for table_key, api_fn_name in _BULK_TABLE_FNS.items():
-                api_fn = getattr(bs, api_fn_name, None)
-                if api_fn is None:
-                    continue
-                calls += 1
-                calls_by_endpoint[table_key] = calls_by_endpoint.get(table_key, 0) + 1
-                try:
-                    rs = api_fn(code=bs_code, year=year, quarter=quarter)
-                    year_tables[table_key].extend(_parse_rows(rs))
-                except Exception:
-                    # 单期失败不影响其他期；缺失如实反映为空
-                    continue
-    finally:
-        old_out, old_err = _sys.stdout, _sys.stderr
-        _sys.stdout = _io.StringIO()
-        _sys.stderr = _io.StringIO()
-        try:
-            bs.logout()
-        finally:
-            _sys.stdout, _sys.stderr = old_out, old_err
-    return by_year, calls, calls_by_endpoint
+    return run_baostock_financial_batch(
+        bs_code=bs_code,
+        year_quarters=year_quarters,
+        table_fns=_BULK_TABLE_FNS,
+        parse_rows=_parse_rows,
+    )
 
 
 def map_aggregate_raw(ts_code: str, raw_all: dict[str, list[dict]]) -> dict[str, list[dict]]:
@@ -288,7 +272,7 @@ class BaoStockClient:
             def _do_login():
                 with _suppress_bs_output():
                     bs.login()
-            await asyncio.to_thread(_do_login)
+            await asyncio.to_thread(lambda: run_with_baostock_lock(_do_login))
         except ImportError:
             log.warning("baostock 未安装，请执行: pip install baostock")
         except Exception as e:
@@ -301,7 +285,7 @@ class BaoStockClient:
             def _do_logout():
                 with _suppress_bs_output():
                     bs.logout()
-            await asyncio.to_thread(_do_logout)
+            await asyncio.to_thread(lambda: run_with_baostock_lock(_do_logout))
         except Exception:
             pass
 
@@ -349,7 +333,7 @@ class BaoStockClient:
 
         try:
             async with _get_bs_lock():
-                all_rows = await asyncio.to_thread(_sync_fetch)
+                all_rows = await asyncio.to_thread(lambda: run_with_baostock_lock(_sync_fetch))
         except Exception as e:
             log.warning("BaoStock _fetch_quarters [%s/%s] 失败: %s", api_fn_name, bs_code, e)
         return all_rows
@@ -558,7 +542,7 @@ class BaoStockClient:
 
         try:
             async with _get_bs_lock():
-                rows = await asyncio.to_thread(_sync_fetch)
+                rows = await asyncio.to_thread(lambda: run_with_baostock_lock(_sync_fetch))
             if not rows:
                 return None
             latest = rows[-1]
@@ -651,7 +635,7 @@ class BaoStockClient:
         raw_all: dict[str, list[dict]] = {}
         try:
             async with _get_bs_lock():
-                raw_all = await asyncio.to_thread(_sync_fetch_all)
+                raw_all = await asyncio.to_thread(lambda: run_with_baostock_lock(_sync_fetch_all))
         except Exception as e:
             log.warning("BaoStock get_all_financial_indicators [%s] 失败: %s", ts_code, e)
             return {k: [] for k in _TABLE_FNS}
@@ -896,46 +880,78 @@ class BaoStockClient:
                     uncached_years.append(year)
 
             if uncached_years:
-                # 分片给 ≤concurrency 个子进程 worker（各自独立 BaoStock 会话）
-                year_quarters_by_chunk: list[list[tuple[int, int]]] = [
-                    [] for _ in range(min(concurrency, len(uncached_years)))
+                # BaoStock uses process-global socket state. One refresh identity
+                # must run as one serialized provider batch: login -> all queries -> logout.
+                uncached_year_set = set(uncached_years)
+                batch_quarters = [
+                    (y, q) for y, q in year_quarters_all if y in uncached_year_set
                 ]
-                for i, year in enumerate(uncached_years):
-                    chunk = year_quarters_by_chunk[i % len(year_quarters_by_chunk)]
-                    chunk.extend((y, q) for y, q in year_quarters_all if y == year)
-
-                loop = asyncio.get_running_loop()
-                from concurrent.futures import ProcessPoolExecutor
-
                 fetched_by_year: dict[int, dict[str, list[dict]]] = {}
-                try:
-                    with ProcessPoolExecutor(max_workers=len(year_quarters_by_chunk)) as pool:
-                        futures = [
-                            loop.run_in_executor(pool, _bulk_fetch_years_worker, bs_code, chunk)
-                            for chunk in year_quarters_by_chunk if chunk
-                        ]
-                        stats["login_batches"] = len(futures)
-                        results = await asyncio.gather(*futures, return_exceptions=True)
-                except Exception as exc:
-                    log.warning("bulk fetch pool failed [%s]: %s，回退单会话串行", ts_code, exc)
-                    results = []
+                provider_mode = _financial_provider_execution_mode()
+                results: list[Any] = []
+                if provider_mode == "subprocess":
                     try:
-                        flat = [yq for chunk in year_quarters_by_chunk for yq in chunk]
-                        async with _get_bs_lock():
-                            results = [await asyncio.to_thread(_bulk_fetch_years_worker, bs_code, flat)]
+                        payload = {
+                            "provider": "baostock",
+                            "operation": "annual_history",
+                            "market": "CN",
+                            "symbol": ts_code.split(".")[0],
+                            "ts_code": ts_code,
+                            "bs_code": bs_code,
+                            "year_quarters": batch_quarters,
+                        }
+                        subprocess_result = await asyncio.to_thread(
+                            run_provider_subprocess,
+                            payload,
+                            timeout=20.0,
+                        )
                         stats["login_batches"] = 1
-                    except Exception as exc2:
-                        log.warning("bulk fetch serial fallback failed [%s]: %s", ts_code, exc2)
+                        if subprocess_result.get("ok"):
+                            results = [(
+                                {int(k): v for k, v in (subprocess_result.get("by_year") or {}).items()},
+                                int(subprocess_result.get("calls") or 0),
+                                subprocess_result.get("calls_by_endpoint") or {},
+                                subprocess_result.get("batch_stats") or {},
+                            )]
+                        else:
+                            stats["errors"].append(str(subprocess_result.get("error_code") or "subprocess_failed"))
+                            stats["reason_code"] = "PROVIDER_UNAVAILABLE"
+                            log.warning("BaoStock subprocess failed [%s]: %s", ts_code, subprocess_result)
+                    except Exception as exc:
+                        stats["errors"].append(f"subprocess failed: {str(exc)[:160]}")
+                        stats["reason_code"] = "PROVIDER_UNAVAILABLE"
+                        log.warning("BaoStock subprocess exception [%s]: %s", ts_code, exc)
+                if not results:
+                    try:
+                        async with _get_bs_lock():
+                            results = [await asyncio.to_thread(_bulk_fetch_years_worker, bs_code, batch_quarters)]
+                        stats["login_batches"] = 1
+                    except BaoStockBatchAborted as exc:
+                        stats["errors"].append(f"PROVIDER_UNAVAILABLE: {str(exc)[:160]}")
+                        stats["reason_code"] = "PROVIDER_UNAVAILABLE"
+                        stats["skipped_query_count"] = exc.skipped_query_count
+                        log.warning("BaoStock serialized batch aborted [%s]: %s", ts_code, exc)
+                    except Exception as exc:
+                        stats["errors"].append(f"serialized batch failed: {str(exc)[:160]}")
+                        stats["reason_code"] = "PROVIDER_UNAVAILABLE"
+                        log.warning("BaoStock serialized batch failed [%s]: %s", ts_code, exc)
 
                 for result in results:
                     if isinstance(result, Exception):
                         log.warning("bulk fetch worker failed [%s]: %s", ts_code, result)
                         continue
-                    if len(result) == 3:
+                    if len(result) == 4:
+                        by_year, calls, calls_by_endpoint, batch_stats = result
+                    elif len(result) == 3:
                         by_year, calls, calls_by_endpoint = result
+                        batch_stats = {}
                     else:
                         by_year, calls = result
                         calls_by_endpoint = {}
+                        batch_stats = {}
+                    if batch_stats:
+                        stats["last_batch"] = batch_stats
+                        stats["skipped_query_count"] = batch_stats.get("skipped_query_count", stats.get("skipped_query_count", 0))
                     stats["provider_calls"] += calls
                     stats["actual_calls"] += calls
                     for endpoint, count in calls_by_endpoint.items():
@@ -944,32 +960,8 @@ class BaoStockClient:
                         fetched_by_year[year] = tables
 
                 missing_years = [year for year in uncached_years if year not in fetched_by_year]
-                if missing_years:
-                    missing_quarters = [
-                        (y, q) for y, q in year_quarters_all if y in set(missing_years)
-                    ]
-                    try:
-                        async with _get_bs_lock():
-                            serial_result = await asyncio.to_thread(
-                                _bulk_fetch_years_worker,
-                                bs_code,
-                                missing_quarters,
-                            )
-                        stats["login_batches"] = max(1, stats["login_batches"]) + 1
-                        by_year, calls, calls_by_endpoint = serial_result
-                        stats["provider_calls"] += calls
-                        stats["actual_calls"] += calls
-                        for endpoint, count in calls_by_endpoint.items():
-                            stats["calls_by_endpoint"][endpoint] = stats["calls_by_endpoint"].get(endpoint, 0) + count
-                        for year, tables in by_year.items():
-                            fetched_by_year[year] = tables
-                    except ImportError as exc:
-                        stats["errors"].append(f"PROVIDER_UNAVAILABLE: {exc}")
-                        stats["reason_code"] = "PROVIDER_UNAVAILABLE"
-                        log.warning("bulk fetch serial fallback unavailable [%s]: %s", ts_code, exc)
-                    except Exception as exc:
-                        stats["errors"].append(f"serial fallback failed: {str(exc)[:160]}")
-                        log.warning("bulk fetch serial fallback failed [%s]: %s", ts_code, exc)
+                if missing_years and stats.get("reason_code") != "PROVIDER_UNAVAILABLE":
+                    stats["errors"].append(f"missing years after serialized batch: {missing_years[:8]}")
 
                 for year in uncached_years:
                     tables = fetched_by_year.get(year)

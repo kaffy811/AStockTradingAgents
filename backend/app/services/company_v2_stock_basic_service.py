@@ -114,24 +114,15 @@ async def _fetch_baostock_stock_basic(ts_code: str) -> dict[str, Any] | None:
     """
     try:
         import baostock as bs
-        import io, sys
-        from contextlib import contextmanager
-
-        @contextmanager
-        def _suppress():
-            old_out, old_err = sys.stdout, sys.stderr
-            sys.stdout = io.StringIO()
-            sys.stderr = io.StringIO()
-            try:
-                yield
-            finally:
-                sys.stdout = old_out
-                sys.stderr = old_err
+        from app.datasource.baostock_session_manager import (
+            run_with_baostock_lock,
+            suppress_baostock_output,
+        )
 
         bs_code = _to_bs_code(ts_code)
 
         def _sync_query() -> dict | None:
-            with _suppress():
+            with suppress_baostock_output():
                 bs.login()
             try:
                 rs = bs.query_stock_basic(code=bs_code)
@@ -140,10 +131,10 @@ async def _fetch_baostock_stock_basic(ts_code: str) -> dict[str, Any] | None:
                     rows.append(dict(zip(rs.fields, rs.get_row_data())))
                 return rows[0] if rows else None
             finally:
-                with _suppress():
+                with suppress_baostock_output():
                     bs.logout()
 
-        row = await asyncio.to_thread(_sync_query)
+        row = await asyncio.to_thread(lambda: run_with_baostock_lock(_sync_query))
         if not row:
             return None
 
