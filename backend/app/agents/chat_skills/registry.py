@@ -235,7 +235,8 @@ class SkillRegistry:
                 meta = build_answer_metadata(result.tool_events)
                 result.metadata["data_quality"] = meta["data_quality"]
                 result.metadata["sources_c27"]  = meta["sources"]
-                if result.answer and not report_answer_success:
+                result_status = str(skill_data.get("status") or "").lower()
+                if result.answer and not report_answer_success and result_status not in {"failed", "error"}:
                     result.answer = add_data_boundary_declaration(
                         result.answer, meta["data_quality"]
                     )

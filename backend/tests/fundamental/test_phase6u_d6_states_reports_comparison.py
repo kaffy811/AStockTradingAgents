@@ -74,8 +74,9 @@ def test_d6_planner_routes_followup_comparison_to_report_comparison():
     plan = CentralPlanningAgent().create_plan("那它和五粮液比呢", decision, memory_context=ctx)
     assert plan.intent == "report_financial_comparison"
     assert plan.tasks
-    assert "ReportComparisonSkill" in {task.agent for task in plan.tasks}
+    assert "MultiCompanyFinancialComparisonAgent" in {task.agent for task in plan.tasks}
     assert "无需调用专业 Agent" not in plan.get_phase_event("planning")["content"]
+    assert [task.agent for task in plan.tasks].count("MultiCompanyFinancialComparisonAgent") == 1
 
 
 def test_d6_report_comparison_skill_can_handle_contextual_followup():

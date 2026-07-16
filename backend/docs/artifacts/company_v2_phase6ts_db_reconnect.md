@@ -4,14 +4,14 @@
 {
   "phase": "phase6ts_db_reconnect",
   "status": "passed",
-  "run_id": "0d7e9810fe5648bcbe15d93492fa03d4",
-  "started_at": "2026-07-16T09:06:46.330396",
-  "finished_at": "2026-07-16T09:07:39.266782",
+  "run_id": "3cfc5dbe77be4d1590392f17c4d5a839",
+  "started_at": "2026-07-16T10:24:33.859543",
+  "finished_at": "2026-07-16T10:25:17.926912",
   "duration_seconds": 8,
   "requested_duration_seconds": 8.0,
-  "actual_duration_seconds": 21.015,
-  "process_pid": 74711,
-  "git_commit": "69bff1b136ae5b78c83aa127efc4b90723834df8",
+  "actual_duration_seconds": 21.492,
+  "process_pid": 79364,
+  "git_commit": "ff4c50e7ab0bcc69e14638be6a48b91b9b9fccf6",
   "worker_count": 2,
   "jobs_created": 2,
   "jobs_cancelled": 2,
@@ -26,7 +26,7 @@
   "db_reconnect_count": 1,
   "db_reconnect_events": [
     {
-      "at_seconds": 4.19,
+      "at_seconds": 4.0,
       "disposed": true
     }
   ],

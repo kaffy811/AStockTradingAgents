@@ -379,8 +379,10 @@ async def test_phase6u_report_explanation_requires_symbol_and_market():
     )
 
     assert result.ok is True
-    assert result.data["partial"] is True
-    assert "symbol_not_confirmed" in result.data["errors"]
+    assert result.data["status"] == "failed"
+    assert result.data["partial"] is False
+    assert result.data["error_code"] == "ENTITY_NOT_RESOLVED"
+    assert "entity_not_resolved" in result.data["errors"]
     assert "请明确" in result.answer
 
 

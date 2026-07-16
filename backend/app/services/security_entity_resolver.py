@@ -20,7 +20,7 @@ from app.models.stock_master import StockMaster
 from app.services.company_v2_snapshot_cache_service import company_v2_snapshot_cache_service
 
 
-INDEX_VERSION = "v1"
+INDEX_VERSION = "v2_d6_3"
 SUPPORTED_MARKETS = ("CN", "HK", "US")
 _CORP_SUFFIX_RE = re.compile(r"(股份有限公司|有限责任公司|有限公司|公司|集团)$")
 _ST_PREFIX_RE = re.compile(r"^\*?ST", re.IGNORECASE)
@@ -187,8 +187,11 @@ class SecurityEntityResolver:
         text = str(query or "")
         markets = [market_hint.upper()] if market_hint else list(SUPPORTED_MARKETS)
         index: list[dict[str, Any]] = []
+        record_count_by_market: dict[str, int] = {}
         for market in markets:
-            index.extend(await self._load_index(db, market))
+            market_rows = await self._load_index(db, market)
+            record_count_by_market[market] = len(market_rows)
+            index.extend(market_rows)
 
         candidates = self._match_candidates(text, index, min_confidence=min_confidence)
         selected = self._dedupe_entities(candidates)
@@ -208,7 +211,12 @@ class SecurityEntityResolver:
             ambiguous = True
         elif len(selected) > 1 and not is_comparison_query and selected[0].confidence < 0.98:
             ambiguous = True
-        elif len(selected) > 1 and not is_comparison_query and abs(selected[0].confidence - selected[1].confidence) < 0.03:
+        elif (
+            len(selected) > 1
+            and not is_comparison_query
+            and selected[0].confidence < 0.98
+            and abs(selected[0].confidence - selected[1].confidence) < 0.03
+        ):
             ambiguous = True
         elif len(selected) == 1:
             close = [
@@ -222,7 +230,9 @@ class SecurityEntityResolver:
             "entities": selected,
             "ambiguity": ambiguous,
             "candidates": [c.to_dict() for c in candidates[:8]],
+            "index_version": INDEX_VERSION,
             "cache_key_version": INDEX_VERSION,
+            "record_count_by_market": record_count_by_market,
         }
 
     async def _load_index(self, db: AsyncSession | None, market: str) -> list[dict[str, Any]]:
@@ -233,7 +243,7 @@ class SecurityEntityResolver:
             return []
         cache_key = f"security_entity_index:{market}:{INDEX_VERSION}"
         cached, swr_status, _ = await company_v2_snapshot_cache_service.get_swr(cache_key)
-        if swr_status in {"fresh", "stale"} and isinstance(cached, list):
+        if swr_status in {"fresh", "stale"} and isinstance(cached, list) and cached:
             return cached
 
         rows = await self._load_master_rows(db, market)
@@ -332,7 +342,9 @@ class SecurityEntityResolver:
                     if normalized_text == name:
                         confidence, match_type = 0.99, "exact_short_name"
                         break
-                    if name in normalized_text or (len(normalized_text) >= 2 and normalized_text in name) or any(term in name for term in query_terms):
+                    if name in normalized_text:
+                        confidence, match_type = max(confidence, 0.97), "continuous_name_match"
+                    elif (len(normalized_text) >= 2 and normalized_text in name) or any(term in name for term in query_terms):
                         confidence, match_type = max(confidence, 0.94), "normalized_name_contains"
                     elif len(name) >= 2:
                         score = SequenceMatcher(None, normalized_text, name).ratio()

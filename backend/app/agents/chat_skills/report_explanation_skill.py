@@ -40,6 +40,29 @@ def _extract_answer_text(value) -> str:
             return _extract_answer_text(choices[0])
     return ""
 
+
+def _hint_from_entity_dict(entity: dict | None, *, source: str = "") -> dict:
+    if not isinstance(entity, dict):
+        return {}
+    market = str(entity.get("market") or "").strip()
+    symbol = str(entity.get("symbol") or "").strip()
+    if not symbol:
+        return {}
+    name = (
+        entity.get("short_name")
+        or entity.get("name")
+        or entity.get("full_name")
+        or symbol
+    )
+    return {
+        "market": market or "CN",
+        "symbol": symbol,
+        "name": name,
+        "query": entity.get("ts_code") or symbol,
+        "source": source,
+        "entity": entity,
+    }
+
 # ── Report-type display labels (never expose internal enum to users) ────────────
 _REPORT_TYPE_LABELS: dict[str, str] = {
     "latest_periodic_report": "最新已披露定期报告",
@@ -367,7 +390,13 @@ class ReportExplanationSkill(BaseSkill):
 
     async def _run_inner(self, message: str, context: SkillContext) -> SkillResult:
         memory_context = getattr(context, "memory_context", None)
-        effective_message = (getattr(memory_context, "resolved_query", "") or message).strip() if memory_context else message
+        metadata = context.metadata or {}
+        raw_query = str(metadata.get("raw_query") or message or "").strip()
+        effective_message = str(
+            metadata.get("effective_query")
+            or (getattr(memory_context, "resolved_query", "") if memory_context else "")
+            or message
+        ).strip()
         try:
             from app.agents.chat_skills.report_comparison_skill import ReportComparisonSkill  # noqa: PLC0415
             comparison_skill = ReportComparisonSkill()
@@ -375,13 +404,36 @@ class ReportExplanationSkill(BaseSkill):
                 return await comparison_skill.run(effective_message, context)
         except Exception:
             log.exception("ReportExplanationSkill: comparison delegation failed")
-        hint = _extract_stock_hint(effective_message) or self._hint_from_memory(context)
+        resolved_entities = metadata.get("resolved_entities") if isinstance(metadata.get("resolved_entities"), list) else []
+        financial_context = metadata.get("financial_context") if isinstance(metadata.get("financial_context"), dict) else {}
+        debug_payload = {
+            "chat_entity_pipeline_version": metadata.get("chat_entity_pipeline_version") or "d6_3",
+            "raw_query": raw_query,
+            "effective_query": effective_message,
+            "resolver_called": bool(metadata.get("resolver_called")),
+            "resolver_result_count": metadata.get("resolver_result_count", 0),
+            "resolved_entities": resolved_entities,
+            "primary_entity": metadata.get("primary_entity"),
+            "report_skill_input_symbol": None,
+            "report_skill_input_entity": None,
+            "report_skill_input_report_id": None,
+            "context_source": metadata.get("context_source") or "",
+            "failure_reason": metadata.get("failure_reason") or "",
+            "record_count_by_market": metadata.get("record_count_by_market") or {},
+            "index_version": metadata.get("index_version"),
+        }
+
+        hint = (
+            _hint_from_entity_dict(metadata.get("primary_entity"), source="payload.primary_entity")
+            or _hint_from_entity_dict(resolved_entities[0] if resolved_entities else None, source="payload.resolved_entities")
+            or _hint_from_entity_dict(financial_context.get("primary_entity"), source="financial_context.primary_entity")
+            or _extract_stock_hint(raw_query)
+        )
         if not hint or not hint.get("symbol"):
-            market_hint = (hint or {}).get("market") or None
             try:
-                resolved = await security_entity_resolver.resolve(context.db, effective_message, market_hint=market_hint, min_confidence=0.78)
-            except Exception:
-                resolved = {"entities": [], "ambiguity": False, "candidates": []}
+                resolved = await security_entity_resolver.resolve(context.db, raw_query, min_confidence=0.72)
+            except Exception as exc:
+                resolved = {"entities": [], "ambiguity": False, "candidates": [], "resolver_error": str(exc)[:160]}
             if resolved.get("ambiguity"):
                 candidates = resolved.get("candidates") or []
                 names = "、".join(
@@ -393,11 +445,29 @@ class ReportExplanationSkill(BaseSkill):
                     ok=True,
                     skill_name=self.name,
                     answer=answer,
-                    data={"status": "failed", "error_code": "AMBIGUOUS_SECURITY", "candidates": candidates[:5]},
+                    data={
+                        "status": "failed",
+                        "error_code": "ENTITY_AMBIGUOUS",
+                        "candidates": candidates[:5],
+                        "debug": {**debug_payload, "failure_reason": "ENTITY_AMBIGUOUS"},
+                    },
                 )
             entity = (resolved.get("entities") or [None])[0]
             if entity is not None:
                 hint = entity.to_hint()
+                hint["source"] = "raw_query_resolver"
+            debug_payload.update({
+                "resolver_called": True,
+                "resolver_result_count": len(resolved.get("entities") or []),
+                "resolved_entities": [e.to_dict() for e in (resolved.get("entities") or [])],
+                "primary_entity": entity.to_dict() if entity is not None else None,
+                "context_source": hint.get("source") if hint else "",
+                "record_count_by_market": resolved.get("record_count_by_market", {}),
+                "index_version": resolved.get("index_version"),
+                "failure_reason": "" if hint else "ENTITY_NOT_RESOLVED",
+            })
+        if not hint or not hint.get("symbol"):
+            hint = self._hint_from_memory(context)
         events: list = []
 
         await safe_emit(context.event_callback, "skill_started", {
@@ -408,10 +478,10 @@ class ReportExplanationSkill(BaseSkill):
 
         if not hint or not hint.get("symbol"):
             answer = (
-                "当前没有足够上下文确认要分析的公司或报告。请明确要分析的公司或股票代码，例如“贵州茅台 2024 年年报表现如何？”"
-                "如果要沿用上一轮报告，请提供可确认的公司或 report_id。"
+                "没有识别到明确的公司或股票代码。请明确公司名称或证券代码，例如“贵州茅台最新财报表现如何”。"
                 + _DISCLAIMER
             )
+            debug_payload["failure_reason"] = "ENTITY_NOT_RESOLVED"
             await safe_emit(context.event_callback, "skill_completed", {
                 "skill_name": self.name,
                 "ok": True,
@@ -424,10 +494,23 @@ class ReportExplanationSkill(BaseSkill):
                 skill_name=self.name,
                 answer=answer,
                 tool_events=self._rag_events([], "low"),
-                data={"partial": True, "errors": ["symbol_not_confirmed"]},
+                data={
+                    "status": "failed",
+                    "error_code": "ENTITY_NOT_RESOLVED",
+                    "partial": False,
+                    "errors": ["entity_not_resolved"],
+                    "debug": debug_payload,
+                },
             )
 
         report_id = parse_explicit_report_id(effective_message)
+        debug_payload.update({
+            "report_skill_input_symbol": hint.get("symbol"),
+            "report_skill_input_entity": hint.get("entity"),
+            "report_skill_input_report_id": report_id,
+            "context_source": hint.get("source") or debug_payload.get("context_source") or "resolved_entity",
+            "failure_reason": "",
+        })
         result = await ReportChatCopilotAgent().chat(
             market=hint.get("market") or "",
             symbol=hint["symbol"],
@@ -476,6 +559,7 @@ class ReportExplanationSkill(BaseSkill):
                 "confidence": result.get("confidence"),
                 "data_limitations": result.get("data_limitations", []),
                 "errors": result.get("errors", []),
+                "debug": debug_payload,
             },
             metadata={
                 "answer_owner": "report_explanation_skill",

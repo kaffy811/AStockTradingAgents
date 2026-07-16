@@ -110,8 +110,14 @@ class CentralPlan:
                 content = "本次请求可直接回答，无需调用专业 Agent。",
                 status  = "completed",
             )
-        agents = "、".join(t.agent for t in self.tasks[:4])
-        descs  = "；".join(f"**{t.agent}** — {t.description}" for t in self.tasks[:4])
+        deduped: dict[str, list[str]] = {}
+        for task in self.tasks[:6]:
+            deduped.setdefault(task.agent, []).append(task.description)
+        agents = "、".join(deduped.keys())
+        descs = "；".join(
+            f"**{agent}** — " + " / ".join(descriptions[:3])
+            for agent, descriptions in deduped.items()
+        )
         return make_thinking_event(
             phase   = "agent_dispatch",
             title   = "Agent 调度",
@@ -155,12 +161,10 @@ def _tasks_for_intent(intent: str, entities: list[str]) -> list[PlanTask]:
             ("ReportAgent",   "读取报告详情，提取技术面、基本面和风险提示章节"),
         ],
         "report_financial_read": [
-            ("ReportChatCopilotAgent", f"定位{'关于 ' + ent + ' 的' if ent else ''}已索引正式财报"),
-            ("ReportChatCopilotAgent", "检索财报证据、抽取关键财务指标并生成回答"),
+            ("ReportChatCopilotAgent", f"定位{'关于 ' + ent + ' 的' if ent else ''}已索引正式财报 / 检索财报证据 / 生成分析"),
         ],
         "report_financial_comparison": [
-            ("ReportComparisonSkill", f"解析{'关于 ' + ent + ' 的' if ent else ''}财报比较上下文"),
-            ("MultiCompanyFinancialComparisonAgent", "选择同期间正式年报、对齐结构化指标并生成对比表"),
+            ("MultiCompanyFinancialComparisonAgent", f"解析{'关于 ' + ent + ' 的' if ent else ''}比较对象 / 对齐报告年度 / 构建对比表 / 生成解读"),
         ],
         "report_generation": [
             ("RiskReviewAgent",  "在提交任务前验证输入参数合规性"),

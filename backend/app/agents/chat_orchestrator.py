@@ -57,6 +57,7 @@ from app.agents.chat_planner.rule_based_planner import RuleBasedPlanner
 from app.agents.chat_planner.executor import PlannerExecutor
 from app.agents.intent_decision_agent import classify_intent
 from app.agents.central_planning_agent import CentralPlanningAgent as _CentralPlanningAgent
+from app.services.security_entity_resolver import security_entity_resolver
 import app.agents.chat_memory as _mem
 
 _central_planner = _CentralPlanningAgent()
@@ -65,6 +66,7 @@ log = logging.getLogger(__name__)
 
 _DISCLAIMER = "\n\n_仅供研究参考，不构成投资建议。_"
 _EMPTY_FINAL_ANSWER_TEXT = "报告数据已获取，但本次回答生成失败，请重新尝试。"
+_CHAT_ENTITY_PIPELINE_VERSION = "d6_3"
 
 # ── Build registry ─────────────────────────────────────────────────────────────
 
@@ -272,6 +274,82 @@ def _extract_stock_hint(msg: str) -> dict:
     if m:
         return {"market": "US", "symbol": m.group(1).upper(), "name": m.group(1).upper(), "query": m.group(1)}
     return {}
+
+
+def _memory_entity_hints(memory_context: object | None) -> list[dict]:
+    entities: list[dict] = []
+    for entity in getattr(memory_context, "active_entities", []) or []:
+        if getattr(entity, "type", "") != "stock" or not getattr(entity, "code", ""):
+            continue
+        entities.append({
+            "entity_type": "equity",
+            "market": getattr(entity, "market", "") or "CN",
+            "symbol": getattr(entity, "code", ""),
+            "short_name": getattr(entity, "name", "") or getattr(entity, "code", ""),
+            "name": getattr(entity, "name", "") or getattr(entity, "code", ""),
+            "source": "conversation_context",
+        })
+    return entities
+
+
+async def _resolve_current_query_entities(
+    db: AsyncSession,
+    *,
+    raw_query: str,
+    effective_query: str,
+    memory_context: object | None,
+) -> dict:
+    """Resolve explicit entities from the current user query before skill routing."""
+    context_entities = _memory_entity_hints(memory_context)
+    debug: dict = {
+        "chat_entity_pipeline_version": _CHAT_ENTITY_PIPELINE_VERSION,
+        "raw_query": raw_query,
+        "effective_query": effective_query,
+        "resolver_called": False,
+        "resolver_result_count": 0,
+        "resolved_entities": [],
+        "primary_entity": None,
+        "context_source": "none",
+        "failure_reason": "",
+    }
+    try:
+        debug["resolver_called"] = True
+        resolved = await security_entity_resolver.resolve(
+            db,
+            raw_query,
+            context_entities=context_entities,
+            min_confidence=0.72,
+        )
+        entities = [entity.to_dict() for entity in (resolved.get("entities") or [])]
+        context_source = "raw_query_explicit"
+        if not entities and effective_query and effective_query != raw_query:
+            resolved = await security_entity_resolver.resolve(
+                db,
+                effective_query,
+                context_entities=context_entities,
+                min_confidence=0.72,
+            )
+            entities = [entity.to_dict() for entity in (resolved.get("entities") or [])]
+            context_source = "effective_query"
+        primary = entities[0] if entities else None
+        debug.update({
+            "resolver_result_count": len(entities),
+            "resolved_entities": entities,
+            "primary_entity": primary,
+            "context_source": context_source if primary else "none",
+            "ambiguity": bool(resolved.get("ambiguity")),
+            "resolver_candidates": resolved.get("candidates", [])[:8],
+            "record_count_by_market": resolved.get("record_count_by_market", {}),
+            "index_version": resolved.get("index_version"),
+            "failure_reason": "" if primary else "ENTITY_NOT_RESOLVED",
+        })
+        return debug
+    except Exception as exc:
+        debug.update({
+            "failure_reason": f"RESOLVER_ERROR:{type(exc).__name__}",
+            "resolver_error": str(exc)[:160],
+        })
+        return debug
 
 
 # ── Intent handlers (async, use real tools) ────────────────────────────────────
@@ -923,6 +1001,12 @@ async def process_message(
     _memory_ctx = await build_memory_context(db, session_id, user_id, content)
     # Use the coreference-resolved query for routing when available
     _effective_content = _memory_ctx.resolved_query or content
+    _entity_payload = await _resolve_current_query_entities(
+        db,
+        raw_query=content,
+        effective_query=_effective_content,
+        memory_context=_memory_ctx,
+    )
 
     # 1.5. C30.2.3: IntentDecisionAgent — classify intent, emit telemetry, drive routing.
     _intent_decision = classify_intent(_effective_content, memory_context=_memory_ctx)
@@ -1046,6 +1130,13 @@ async def process_message(
                 session_id=str(session_id) if session_id else "",
                 output_language=output_language,
                 tool_registry=_registry,
+                metadata={
+                    "raw_query": content,
+                    "effective_query": _effective_content,
+                    "context_update_mode": "transactional",
+                    "intent": _intent_decision.intent,
+                    **_entity_payload,
+                },
                 event_callback=event_callback,
                 memory_context=_memory_ctx,  # C32.1.1
             )
@@ -1078,9 +1169,11 @@ async def process_message(
         output_language=output_language,
         tool_registry=_registry,
         metadata={
-            "raw_query": msg,
+            "raw_query": content,
             "effective_query": _effective_content,
             "context_update_mode": "transactional",
+            "intent": _intent_decision.intent,
+            **_entity_payload,
         },
         event_callback=event_callback,
         memory_context=_memory_ctx,  # C32.1.1
