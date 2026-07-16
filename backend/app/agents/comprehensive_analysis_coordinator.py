@@ -149,7 +149,7 @@ _SYSTEM_PROMPT = """\
    - 不将局部信号概括为全局确定性判断；
    - 不将多个审慎信号合并成确定性结论；
    - 综合报告的结论不得比子报告更乐观或更悲观，只能审慎整合与呈现。
-8. 同行配置为手动映射时（PEER_MAP），不得将对比结论当作严格行业结论。
+8. 同行样本来自动态行业热门数据时，不得将对比结论当作严格行业结论。
 9. 子报告可能经过长度截断，只能基于可见内容整合，不得补充未出现的数据。
 10. 新闻面约束（严格执行）：
     - 新闻面要点只能整合新闻面子报告（子报告 4）中已给出的结论，不得编造新闻。
@@ -369,7 +369,7 @@ class ComprehensiveAnalysisCoordinator:
         """
         Async 版综合分析，供 /analysis/comprehensive 路由调用（Phase 1E）。
 
-        peer_comparison 使用 DynamicPeerDiscoveryService（PEER_MAP > dynamic_hot）。
+        peer_comparison 使用 DynamicPeerDiscoveryService（dynamic_hot）。
         technical / fundamental / news 仍为同步 Agent，通过 asyncio.to_thread 并发执行。
         """
         market = market.upper()
@@ -940,7 +940,7 @@ _KEY_FACT_PATTERNS = (
     "observed_facts", "analysis", "limitations", "watch_items",
     "观察", "事实", "结论", "摘要", "核心", "风险", "限制", "局限", "缺失",
     "不可用", "数据不足", "时间", "报告期", "来源", "source", "period",
-    "date", "新闻", "事件", "同行", "样本", "PEER_MAP", "关键词搜索",
+    "date", "新闻", "事件", "同行", "样本", "关键词搜索",
 )
 
 _DROP_LINE_PATTERNS = (
@@ -1680,7 +1680,7 @@ _FALLBACK_STRINGS: dict[str, dict[str, str]] = {
         "t_sources":  (
             "- 技术面：akshare 历史行情数据\n"
             "- 基本面：akshare/Sina/yfinance 财务字段（字段覆盖视数据源返回而定）\n"
-            "- 同行对比：手动配置 PEER_MAP 样本\n"
+            "- 同行对比：动态行业同行样本\n"
             "- 新闻面：AkShare 新闻接口（时间窗口内数据）\n"
             "- 注：综合 LLM 模块当前不可用，具体字段覆盖详见各子报告"
         ),
@@ -1700,7 +1700,7 @@ _FALLBACK_STRINGS: dict[str, dict[str, str]] = {
         "t_sources":  (
             "- Technical: AkShare historical quotes\n"
             "- Fundamental: AkShare/Sina/yfinance financial fields (coverage depends on data source)\n"
-            "- Peer comparison: manually configured PEER_MAP samples\n"
+            "- Peer comparison: dynamic industry peer samples\n"
             "- News: AkShare news API (within time window)\n"
             "- Note: Synthesis LLM module is currently unavailable; see individual sections."
         ),
@@ -1720,7 +1720,7 @@ _FALLBACK_STRINGS: dict[str, dict[str, str]] = {
         "t_sources":  (
             "- 技術面：AkShare 歷史行情數據\n"
             "- 基本面：AkShare/Sina/yfinance 財務字段\n"
-            "- 同行對比：手動配置 PEER_MAP 樣本\n"
+            "- 同行對比：動態行業同業樣本\n"
             "- 新聞面：AkShare 新聞接口\n"
             "- 注：綜合 LLM 模塊當前不可用"
         ),
@@ -1740,7 +1740,7 @@ _FALLBACK_STRINGS: dict[str, dict[str, str]] = {
         "t_sources":  (
             "- テクニカル：AkShare 歴史データ\n"
             "- ファンダメンタル：AkShare/Sina/yfinance 財務データ\n"
-            "- 同業比較：手動設定 PEER_MAP\n"
+            "- 同業比較：動的な業界同業サンプル\n"
             "- ニュース：AkShare ニュース API\n"
             "- 注：総合 LLM モジュールは現在利用不可"
         ),
@@ -1760,7 +1760,7 @@ _FALLBACK_STRINGS: dict[str, dict[str, str]] = {
         "t_sources":  (
             "- 기술: AkShare 역사 데이터\n"
             "- 기본: AkShare/Sina/yfinance 재무 데이터\n"
-            "- 동종 비교: 수동 구성 PEER_MAP\n"
+            "- 동종 비교: 동적 업종 동종 샘플\n"
             "- 뉴스: AkShare 뉴스 API\n"
             "- 참고: 종합 LLM 모듈 현재 이용 불가"
         ),
@@ -1780,7 +1780,7 @@ _FALLBACK_STRINGS: dict[str, dict[str, str]] = {
         "t_sources":  (
             "- Técnico: datos históricos de AkShare\n"
             "- Fundamental: campos financieros de AkShare/Sina/yfinance\n"
-            "- Comparación: muestras PEER_MAP manuales\n"
+            "- Comparación: muestras dinámicas de pares sectoriales\n"
             "- Noticias: API de noticias AkShare\n"
             "- Nota: módulo LLM de síntesis no disponible"
         ),

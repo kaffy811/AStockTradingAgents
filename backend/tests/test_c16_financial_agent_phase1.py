@@ -171,7 +171,7 @@ def _events_of(events: list[dict], event_type: str) -> list[dict]:
 class TestIntentDetection:
 
     def test_case1_apple_longterm(self):
-        r = _detect_intent("苹果公司适合长期持有吗？")
+        r = _detect_intent("AAPL 适合长期持有吗？")
         assert r["symbol"] == "AAPL"
         assert r["market"] == "US"
         # default: quote + news when no specific intent keyword
@@ -190,13 +190,13 @@ class TestIntentDetection:
         assert r["need_kline"] is True
 
     def test_case4_nvda_news(self):
-        r = _detect_intent("最近英伟达有什么利好或利空新闻？")
+        r = _detect_intent("最近 NVDA 有什么利好或利空新闻？")
         assert r["symbol"] == "NVDA"
         assert r["market"] == "US"
         assert r["need_news"] is True
 
     def test_cn_stock_detected(self):
-        r = _detect_intent("贵州茅台最近财报怎么样")
+        r = _detect_intent("600519 最近财报怎么样")
         assert r["symbol"] == "600519"
         assert r["market"] == "CN"
 
@@ -285,9 +285,9 @@ class TestEventSequence:
 
     @pytest.mark.asyncio
     async def test_case4_nvda_news_tool_events(self):
-        """Case 4: 英伟达 news — must detect NVDA and emit financial_news tool events."""
+        """Case 4: NVDA news — must detect NVDA and emit financial_news tool events."""
         events, response = await _run_agent(
-            "最近英伟达有什么利好或利空新闻？",
+            "最近 NVDA 有什么利好或利空新闻？",
             mock_news=_NEWS_RESULT,
         )
 
@@ -382,7 +382,7 @@ class TestToolFailureResilience:
         """If financial_news fails, the chain must not abort."""
         failed_news = {"ok": False, "error": "API rate limit exceeded"}
         events, response = await _run_agent(
-            "最近英伟达有什么利好或利空新闻？",
+            "最近 NVDA 有什么利好或利空新闻？",
             mock_news=failed_news,
         )
 
@@ -583,7 +583,7 @@ class TestNewsTimestampFormatting:
             ],
         }
         events, _ = await _run_agent(
-            "最近英伟达有什么利好或利空新闻？",
+            "最近 NVDA 有什么利好或利空新闻？",
             mock_news=raw_news_data,
         )
 

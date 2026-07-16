@@ -19,6 +19,7 @@ Design principles:
 """
 from __future__ import annotations
 
+import re
 import uuid
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
@@ -33,6 +34,24 @@ from app.agents.thinking_events import make_thinking_event, PHASE_LABELS
 def _is_financial_report_question(query: str) -> bool:
     text = str(query or "")
     return any(token in text for token in ("财报", "年报", "半年报", "季报", "年度报告", "季度报告", "经营现金流"))
+
+
+def _is_report_comparison_question(query: str, memory_context: "MemoryContext | None" = None) -> bool:
+    text = str(query or "")
+    if not any(token in text for token in ("对比", "比较", "相比", "和", "比", "哪个更好")):
+        return False
+    explicit_codes = re.findall(r"\b(?:\d{6}(?:\.(?:SH|SZ|BJ))?|0?\d{4,5}|[A-Z]{1,5}(?:[.-][A-Z])?)\b", text)
+    name_like_parts = [
+        part.strip()
+        for part in re.split(r"对比|比较|相比|和|与|、|，|,|\s+", text)
+        if 2 <= len(part.strip()) <= 24 and not part.strip() in {"那它", "它", "呢", "哪个更好"}
+    ]
+    has_prior_stock = bool(memory_context and [
+        e for e in (getattr(memory_context, "active_entities", []) or [])
+        if getattr(e, "type", "") == "stock" and getattr(e, "code", "")
+    ])
+    signal_count = len(set(explicit_codes + name_like_parts))
+    return signal_count >= 2 or (signal_count >= 1 and has_prior_stock)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -139,6 +158,10 @@ def _tasks_for_intent(intent: str, entities: list[str]) -> list[PlanTask]:
             ("ReportChatCopilotAgent", f"定位{'关于 ' + ent + ' 的' if ent else ''}已索引正式财报"),
             ("ReportChatCopilotAgent", "检索财报证据、抽取关键财务指标并生成回答"),
         ],
+        "report_financial_comparison": [
+            ("ReportComparisonSkill", f"解析{'关于 ' + ent + ' 的' if ent else ''}财报比较上下文"),
+            ("MultiCompanyFinancialComparisonAgent", "选择同期间正式年报、对齐结构化指标并生成对比表"),
+        ],
         "report_generation": [
             ("RiskReviewAgent",  "在提交任务前验证输入参数合规性"),
             ("ReportAgent",      f"生成{ent or '目标股票'}综合分析报告（技术+基本面+新闻+同行）"),
@@ -180,6 +203,7 @@ def _build_problem_analysis(intent: str, query: str, entities: list[str]) -> str
         "report_generation":     f"用户请求生成{ent_clause}综合分析报告。报告生成需要约 30~60 秒，须经用户确认后才创建后台任务。",
         "historical_report_read":f"用户希望查阅{ent_clause}历史分析报告，需先检索已存储的报告列表，再读取详情内容。",
         "report_financial_read": f"用户询问{ent_clause}财报/年报/季报表现，需要调用报告解读 Agent 并基于正式财报证据回答。",
+        "report_financial_comparison": f"用户要求进行多公司财报比较，需要继承上下文并调用财报比较 Agent。",
         "compare_stocks":        f"用户要求横向对比多支股票（{ent or '列表待解析'}），需获取各股行情、财务指标并进行统一口径对比。",
         "industry_research":     f"用户询问行业研究相关问题{'（涉及 ' + ent + '）' if ent else ''}，需检索行业热度数据、代表公司表现和近期新闻。",
         "portfolio_or_watchlist":f"用户查询自选股或持仓组合情况，需读取用户自选股列表并补充最新行情。",
@@ -195,6 +219,7 @@ def _build_intent_decision(intent: str, entities: list[str], reason: str) -> str
         "report_generation":      "报告生成（需用户确认 + 后台任务）",
         "historical_report_read": "历史报告读取",
         "report_financial_read":  "财报解读",
+        "report_financial_comparison": "多公司财报比较",
         "compare_stocks":         "多股对比分析",
         "industry_research":      "行业研究与热点分析",
         "portfolio_or_watchlist": "自选股 / 投资组合查询",
@@ -244,6 +269,7 @@ def _build_deep_reasoning(intent: str, entities: list[str]) -> str:
         "tool_answer":            f"正在综合{ent}的行情和新闻数据，区分短期波动与中长期趋势，不给出确定性判断。",
         "industry_research":      f"正在分析行业热度来源：区分政策驱动、资金流向和市场情绪，避免把短期热度等同于长期价值。",
         "compare_stocks":         f"正在横向对比{ent}各维度数据，确保对比口径一致，不仅依赖涨跌幅排名。",
+        "report_financial_comparison": f"正在对齐{ent}的正式财报期间、字段口径和证据来源。",
         "historical_report_read": "正在解读历史报告内容，将技术面、基本面和风险提示转为用户友好的语言。",
         "report_generation":      "报告生成任务已提交，正在监控任务状态。完成后将提供直接查看链接。",
         "portfolio_or_watchlist": "正在分析自选股组合整体表现，识别异动标的和潜在关注点。",
@@ -260,6 +286,7 @@ def _build_risk_review(intent: str) -> str:
         "industry_research":      "核查行业分析结论：热度排名不等于投资价值，行业研究结果不作为买入推荐。",
         "historical_report_read": "验证报告解读不超出原报告内容，不添加未经验证的延伸推断。",
         "report_financial_read":  "验证财报回答不超出正式报告证据，不追加通用新闻或缺失数据尾注。",
+        "report_financial_comparison": "验证对比表年份、字段和证据一致，不用缺失值填 0，不给出买卖建议。",
     }
     base = _RISK.get(intent,
         "执行合规审查：过滤无来源财务数字、确定性涨跌表达、隐性买卖建议。")
@@ -276,6 +303,7 @@ def _build_synthesis(intent: str, need_confirmation: bool) -> str:
         "compare_stocks":         "生成多股对比表，按维度展示差异，提供跳转对比页链接。",
         "historical_report_read": "生成报告解读摘要，保留原报告的关键结论和数据边界说明。",
         "report_financial_read":  "生成财报解读正文，确保表格列对齐、数字有证据、免责声明只出现一次。",
+        "report_financial_comparison": "生成双方财报指标对比表，明确报告期间、缺失字段和证据来源。",
         "portfolio_or_watchlist": "生成自选股快报，标注涨跌异动和数据来源时效。",
     }
     return _SYNTH.get(intent, "整合已验证数据，生成最终回答，说明数据来源和边界。")
@@ -332,11 +360,13 @@ class CentralPlanningAgent:
         if not entities and memory_context:
             from app.agents.intent_decision_agent import _entities_from_memory  # noqa: PLC0415
             entities = _entities_from_memory(memory_context)
-        if _is_financial_report_question(user_query) and intent in {"direct_answer", "historical_report_read", "tool_answer"}:
+        if _is_report_comparison_question(user_query, memory_context) and intent in {"direct_answer", "historical_report_read", "tool_answer", "compare_stocks"}:
+            intent = "report_financial_comparison"
+        elif _is_financial_report_question(user_query) and intent in {"direct_answer", "historical_report_read", "tool_answer"}:
             intent = "report_financial_read"
         reason   = intent_result.reason or ""
         need_confirmation = intent_result.need_confirmation
-        need_agent        = intent_result.need_agent or intent == "report_financial_read"
+        need_agent        = intent_result.need_agent or intent in {"report_financial_read", "report_financial_comparison"}
 
         tasks = _tasks_for_intent(intent, entities)
 

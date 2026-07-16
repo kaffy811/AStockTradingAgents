@@ -23,6 +23,7 @@ Phase 6J: 问财报 Chat Copilot — 16 tests
 from __future__ import annotations
 
 import asyncio
+from dataclasses import replace
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -485,3 +486,167 @@ def test_no_v_html_in_report_chat_panel():
         "ReportChatPanel.vue contains v-html — XSS risk! "
         "All content must use {{ }} text interpolation."
     )
+
+
+@pytest.mark.asyncio
+async def test_pdf_question_uses_fast_path_without_rag_or_llm():
+    from app.agent.report_chat_copilot_agent import ReportChatCopilotAgent
+
+    selection = replace(_make_selection(), pdf_url="https://static.cninfo.com.cn/example.pdf")
+
+    with patch("app.agent.report_chat_copilot_agent.resolve_report_selection", AsyncMock(return_value=selection)), \
+        patch("app.services.report_rag_service.ReportRagService") as MockRag, \
+        patch("app.llm.deepseek_client.DeepSeekClient") as MockLLM:
+        result = await ReportChatCopilotAgent().chat(
+            market="CN",
+            symbol="600519",
+            question="这份报告的官方 PDF 在哪里？",
+            db=MagicMock(),
+        )
+
+    assert result["status"] == "completed"
+    assert "https://static.cninfo.com.cn/example.pdf" in result["answer"]
+    MockRag.assert_not_called()
+    MockLLM.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_llm_timeout_with_chunks_returns_evidence_fallback():
+    from app.agent.report_chat_copilot_agent import ReportChatCopilotAgent
+
+    chunks = [_make_chunk(10, "营业收入和净利润相关报告片段。经营活动现金流量净额保持为正。")]
+
+    async def fake_rag_query(*args, **kwargs):
+        return _make_rag_result(chunks=chunks)
+
+    with patch("app.agent.report_chat_copilot_agent.resolve_report_selection", AsyncMock(return_value=_make_selection())), \
+        patch("app.services.report_rag_service.ReportRagService") as MockRag, \
+        patch("app.llm.deepseek_client.DeepSeekClient") as MockLLM, \
+        patch("app.core.config.settings") as mock_settings:
+        mock_rag = MagicMock()
+        mock_rag.query = fake_rag_query
+        MockRag.return_value = mock_rag
+        MockLLM.return_value.chat = MagicMock(side_effect=asyncio.TimeoutError())
+        mock_settings.ai_enabled = True
+        mock_settings.ai_api_key = "test"
+        mock_settings.deepseek_model = "test-model"
+        mock_settings.report_chat_cache_version = "test"
+        mock_settings.enable_report_chat_cache = False
+
+        result = await ReportChatCopilotAgent().chat(
+            market="CN",
+            symbol="600519",
+            question="贵州茅台最新财报表现如何？",
+            db=MagicMock(),
+        )
+
+    assert result["status"] == "partial_success"
+    assert result["error_code"] == "REPORT_LLM_TIMEOUT"
+    assert "自动总结未完成" in result["answer"]
+    assert "经营活动现金流量净额保持为正" in result["answer"]
+    assert result["source_chunks"]
+
+
+def test_evidence_chunks_are_capped():
+    from app.agent.report_chat_copilot_agent import _limit_evidence_chunks
+
+    chunks = [_make_chunk(i, "长文本" * 1000) for i in range(10)]
+    limited = _limit_evidence_chunks(chunks, max_chars=1800)
+    total = sum(len(c["content"]) for c in limited)
+    assert total <= 1800
+    assert len(limited) < len(chunks)
+
+
+@pytest.mark.asyncio
+async def test_report_selection_cache_hit_skips_db_selection():
+    from app.agent.report_chat_copilot_agent import ReportChatCopilotAgent
+
+    selection = replace(_make_selection(), pdf_url="https://static.cninfo.com.cn/example.pdf")
+
+    async def fake_cache_get(key):
+        if "report_chat:selection" in key:
+            return selection.metadata()
+        return None
+
+    with patch("app.agent.report_chat_copilot_agent._cache_get_json", AsyncMock(side_effect=fake_cache_get)), \
+        patch("app.agent.report_chat_copilot_agent.resolve_report_selection", AsyncMock()) as mock_select:
+        result = await ReportChatCopilotAgent().chat(
+            market="CN",
+            symbol="600519",
+            question="这份报告的官方 PDF 在哪里？",
+            db=MagicMock(),
+        )
+
+    assert "官方 PDF" in result["answer"]
+    mock_select.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_rag_evidence_cache_hit_skips_rag_query():
+    from app.agent.report_chat_copilot_agent import ReportChatCopilotAgent
+
+    chunks = [_make_chunk(88, "缓存中的财报证据片段。")]
+
+    async def fake_cache_get(key):
+        if "report_chat:evidence" in key:
+            return {"chunks": chunks, "rag_result": _make_rag_result(chunks=chunks), "rag_status": "mock"}
+        return None
+
+    with patch("app.agent.report_chat_copilot_agent.resolve_report_selection", AsyncMock(return_value=_make_selection())), \
+        patch("app.agent.report_chat_copilot_agent._cache_get_json", AsyncMock(side_effect=fake_cache_get)), \
+        patch("app.services.report_rag_service.ReportRagService") as MockRag, \
+        patch("app.llm.deepseek_client.DeepSeekClient") as MockLLM, \
+        patch("app.agent.fundamental_review_agent.FundamentalReviewAgent") as MockReview, \
+        patch("app.core.config.settings") as mock_settings:
+        MockLLM.return_value.chat = MagicMock(return_value='{"answer":"基于缓存证据的回答","confidence":"medium","source_chunks":[]}')
+        MockReview.return_value.review = AsyncMock(return_value={"final": {"answer": "基于缓存证据的回答", "confidence": "medium"}, "status": "skipped"})
+        mock_settings.ai_enabled = True
+        mock_settings.ai_api_key = "test"
+        mock_settings.deepseek_model = "test-model"
+        mock_settings.report_chat_cache_version = "test"
+        mock_settings.enable_report_chat_cache = False
+
+        result = await ReportChatCopilotAgent().chat(
+            market="CN",
+            symbol="600519",
+            question="主营业务是什么？",
+            db=MagicMock(),
+        )
+
+    assert result["answer"] == "基于缓存证据的回答"
+    MockRag.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_indexed_report_uses_company_v2_fast_path_before_legacy_rag():
+    from app.agent.report_chat_copilot_agent import ReportChatCopilotAgent
+
+    selection = replace(_make_selection(), parsed=True, rag_status="indexed", chunk_count=211)
+
+    async def fake_fast_path(**kwargs):
+        return _make_rag_result(chunks=[_make_chunk(99, "Company V2 indexed evidence")])
+
+    with patch("app.agent.report_chat_copilot_agent.resolve_report_selection", AsyncMock(return_value=selection)), \
+        patch("app.agent.report_chat_copilot_agent._query_indexed_report_db_evidence", AsyncMock(side_effect=fake_fast_path)) as mock_fast, \
+        patch("app.services.report_rag_service.ReportRagService") as MockLegacyRag, \
+        patch("app.llm.deepseek_client.DeepSeekClient") as MockLLM, \
+        patch("app.agent.fundamental_review_agent.FundamentalReviewAgent") as MockReview, \
+        patch("app.core.config.settings") as mock_settings:
+        MockLLM.return_value.chat = MagicMock(return_value='{"answer":"indexed fast path answer","confidence":"medium","source_chunks":[]}')
+        MockReview.return_value.review = AsyncMock(return_value={"final": {"answer": "indexed fast path answer", "confidence": "medium"}, "status": "skipped"})
+        mock_settings.ai_enabled = True
+        mock_settings.ai_api_key = "test"
+        mock_settings.deepseek_model = "test-model"
+        mock_settings.report_chat_cache_version = "test"
+        mock_settings.enable_report_chat_cache = False
+
+        result = await ReportChatCopilotAgent().chat(
+            market="CN",
+            symbol="600519",
+            question="贵州茅台最新财报表现如何？",
+            db=MagicMock(),
+        )
+
+    assert result["answer"] == "indexed fast path answer"
+    mock_fast.assert_called_once()
+    MockLegacyRag.assert_not_called()

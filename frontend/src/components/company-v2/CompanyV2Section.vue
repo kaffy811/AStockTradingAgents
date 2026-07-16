@@ -3,13 +3,15 @@
     <header class="cv2-section-head">
       <div>
         <h2>{{ title }}</h2>
-        <p>{{ statusText }}</p>
+        <p v-if="debugMode || impactStatus?.description">{{ debugMode ? statusText : impactStatus.description }}</p>
       </div>
-      <span :class="['cv2-status', statusClass]">{{ statusLabel }}</span>
+      <span v-if="debugMode || impactStatus" :class="['cv2-status', debugMode ? statusClass : impactStatus.class]">
+        {{ debugMode ? statusLabel : impactStatus.text }}
+      </span>
     </header>
 
-    <div class="cv2-quality-row">
-      <span :class="['cv2-user-quality', userQuality.class]">{{ userQuality.text }}</span>
+    <div v-if="debugMode || latestPeriodLabel" class="cv2-quality-row">
+      <span v-if="debugMode && userQuality.text" :class="['cv2-user-quality', userQuality.class]">{{ userQuality.text }}</span>
       <span v-if="latestPeriodLabel" class="cv2-period-label">数据截至 {{ latestPeriodLabel }}</span>
     </div>
 
@@ -40,8 +42,12 @@
 
     <!-- Phase 6T-E: 金融行业不适用指标提示（中性样式，不计为数据错误） -->
     <p v-if="notApplicableFields.length" class="cv2-na-hint" data-testid="metric-na-hint">
-      该行业下以下指标不适用（N/A）：{{ notApplicableFields.map(f => fieldLabel(f)).join('、') }}
+      该行业不适用这些指标：{{ notApplicableFields.map(f => fieldLabel(f)).join('、') }}
     </p>
+    <p v-if="recommendedIndustryMetrics.length" class="cv2-na-hint" data-testid="industry-recommended-metrics">
+      该行业更适合关注：{{ recommendedIndustryMetrics.map(f => fieldLabel(f)).join('、') }}
+    </p>
+    <p v-if="outlierWarning" class="cv2-business-warning">{{ outlierWarning }}</p>
 
     <CompanyV2MetricCards v-if="metricItems.length" :items="metricItems" :debug-mode="debugMode" />
 
@@ -193,6 +199,9 @@ const tableRows = computed(() => historyRows.value || props.envelope.normalized?
 const notApplicableFields = computed(() => (
   props.historyData?.metric_applicability?.not_applicable_fields || []
 ))
+const recommendedIndustryMetrics = computed(() => (
+  props.historyData?.metric_applicability?.recommended_metrics || []
+).slice(0, 6))
 const tableColumns = computed(() => {
   const visible = props.envelope.render?.visible_fields || []
   if (visible.length) return visible
@@ -233,8 +242,56 @@ const cashflowWarning = computed(() => {
   const hit = warnings.find(w => w?.code === 'CFO_TO_NP_DENOMINATOR_SENSITIVE')
   return hit?.message || ''
 })
+const outlierWarning = computed(() => {
+  const warnings = [
+    ...(latestRow.value.warnings || []),
+    ...(props.historyData?.warnings || []),
+  ]
+  const hit = warnings.find(w => w?.code === 'OUTLIER_REQUIRES_REVIEW')
+  return hit ? '部分历史指标口径待确认，图表已避免误导性连接。' : ''
+})
+const moduleCompletenessStatus = computed(() => props.historyData?.completeness_status || props.historyData?.metric_applicability?.module_status || '')
+const moduleSemanticStatus = computed(() => props.historyData?.semantic_status || '')
+const moduleOutlierStatus = computed(() => props.historyData?.outlier_status || '')
+const moduleFormulaStatus = computed(() => props.historyData?.formula_status || '')
+const moduleUserMessage = computed(() => props.historyData?.user_message || '')
+const hasDisplayableData = computed(() => Boolean(
+  props.envelope.render?.has_displayable_data ||
+  props.historyData?.data_success ||
+  metricItems.value.length ||
+  tableRows.value.length
+))
+const hasHistoryLimited = computed(() => {
+  const count = Number(props.historyData?.history_coverage?.periods_count ?? tableRows.value.length)
+  return Number.isFinite(count) && count > 0 && count <= 2
+})
+const impactStatus = computed(() => {
+  if (moduleFormulaStatus.value === 'mismatch' || dupontMismatch.value) {
+    return { text: '指标口径待确认', description: '指标口径或期间不一致，暂不进行拆解。', class: 'warn' }
+  }
+  if (moduleSemanticStatus.value === 'conflict') {
+    return { text: '指标口径待确认', description: '不同来源的指标口径存在差异。', class: 'warn' }
+  }
+  if (moduleSemanticStatus.value === 'warning' || moduleOutlierStatus.value === 'extreme' || cashflowWarning.value) {
+    return { text: '极端值可能受低基数影响', description: moduleUserMessage.value || cashflowWarning.value || '极端值可能受低基数影响。', class: 'warn' }
+  }
+  if (outlierWarning.value) return { text: '指标口径待确认', description: outlierWarning.value, class: 'warn' }
+  if (props.historyData?.metric_applicability?.module_status === 'not_applicable') {
+    return { text: '该行业不适用', class: 'muted' }
+  }
+  if (hasHistoryLimited.value && hasDisplayableData.value) {
+    return { text: '历史数据不足', description: '历史覆盖有限，趋势仅供辅助参考。', class: 'warn' }
+  }
+  if (primaryIssue.value === 'REPORT_NOT_INGESTED') return { text: '报告正在处理', description: '报告正在解析或索引，完成后可用于分析。', class: 'warn' }
+  if (primaryIssue.value === 'PROVIDER_TIMEOUT' || primaryIssue.value === 'PROVIDER_TIMEOUT_WITH_STALE_CACHE') return { text: '报告获取失败', description: '报告获取暂时失败，请稍后重试。', class: 'warn' }
+  if (primaryIssue.value === 'REPORT_PDF_NOT_FOUND') return { text: '当前无正式报告', description: '当前未发现可用的正式年度报告。', class: 'warn' }
+  return null
+})
 const userQuality = computed(() => {
+  if (impactStatus.value) return impactStatus.value
+  if (props.historyData?.metric_applicability?.module_status === 'not_applicable') return { text: '该行业不适用', class: 'muted' }
   if (dupontMismatch.value) return { text: '指标口径待确认', class: 'warn' }
+  if (outlierWarning.value) return { text: '指标口径待确认', class: 'warn' }
   if (!props.envelope.render?.has_displayable_data && !props.historyData?.data_success) return { text: '暂无数据', class: 'warn' }
   const pct = Number(coverage.value.coverage_pct)
   if (Number.isFinite(pct)) {
@@ -243,7 +300,7 @@ const userQuality = computed(() => {
     return { text: '数据覆盖有限', class: 'warn' }
   }
   if (props.historyData?.history_coverage?.periods_count <= 2) return { text: '历史覆盖有限', class: 'warn' }
-  return { text: '部分数据缺失', class: 'warn' }
+  return { text: '', class: 'ok' }
 })
 const hasSemanticWarning = computed(() => validationChecks.value.some(check => (
   check.status === 'warning' || check.status === 'fail' || (check.tags || []).some(tag => ['DUPONT_FORMULA_MISMATCH', 'CFO_TO_NP_DENOMINATOR_SENSITIVE'].includes(tag))
@@ -266,6 +323,10 @@ const statusLabel = computed(() => {
     PARTIAL_DATA: '部分指标缺失',
     LOW_COVERAGE: '数据覆盖有限',
     VERY_LOW_COVERAGE: '数据覆盖有限',
+    ALL_NULL_ROWS: '暂无可用数据',
+    OUTLIER_REQUIRES_REVIEW: '指标口径待确认',
+    FIELD_CONFLICT: '指标口径待确认',
+    NOT_APPLICABLE_FOR_INDUSTRY: '该行业不适用',
     REPORT_PDF_NOT_FOUND: '暂无可用财报',
     REPORT_NOT_INGESTED: '财报待解析',
     PROVIDER_EMPTY: '暂无数据',
@@ -352,6 +413,19 @@ function fieldLabel(field) {
     chunks_count: '年报片段数',
     embedding_count: '向量片段数',
     summary: '摘要状态',
+    net_interest_margin: '净息差',
+    net_interest_spread: '净利差',
+    non_performing_loan_ratio: '不良贷款率',
+    provision_coverage_ratio: '拨备覆盖率',
+    loan_provision_ratio: '贷款拨备率',
+    capital_adequacy_ratio: '资本充足率',
+    tier1_capital_adequacy_ratio: '一级资本充足率',
+    core_tier1_capital_adequacy_ratio: '核心一级资本充足率',
+    cost_income_ratio: '成本收入比',
+    deposit_balance_yoy: '存款余额及增长',
+    loan_balance_yoy: '贷款余额及增长',
+    special_mention_loan_ratio: '关注类贷款比例',
+    overdue_loan_ratio: '逾期贷款比例',
   })[field] || '指标'
 }
 

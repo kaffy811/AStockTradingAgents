@@ -158,7 +158,8 @@ _RAG_PATTERN = re.compile(
 # US market tickers: 1-5 uppercase letters optionally with .US suffix
 _US_TICKER = re.compile(r"\b([A-Z]{1,5})(?:\.US)?\b")
 # CN 6-digit code
-_CN_CODE = re.compile(r"\b(\d{6})\b")
+_CN_CODE = re.compile(r"(?<!\d)(\d{6})(?!\d)")
+_HK_CODE = re.compile(r"(?<!\d)0?(\d{4,5})(?!\d)")
 
 # Well-known US tickers to avoid false positives on common words
 _KNOWN_US_TICKERS = {
@@ -228,54 +229,15 @@ def _detect_intent(query: str) -> dict:
                     need_news  = True
                 break
 
-    # Named CN/HK stocks
-    _CN_NAMES = {
-        "茅台": ("600519", "CN"),
-        "贵州茅台": ("600519", "CN"),
-        "中船特气": ("688146", "CN"),
-        "宁德时代": ("300750", "CN"),
-        "紫金矿业": ("601899", "CN"),
-        "平安银行": ("000001", "CN"),
-        "腾讯": ("00700", "HK"),
-        "腾讯控股": ("00700", "HK"),
-        "阿里巴巴": ("09988", "HK"),
-        "美团": ("03690", "HK"),
-        "比亚迪": ("002594", "CN"),
-        "招商银行": ("600036", "CN"),
-    }
+    # Try HK numeric code (4-5 digits, often with leading zero)
     if not symbol:
-        for name, (sym, mkt) in _CN_NAMES.items():
-            if name in query:
-                symbol = sym
-                market = mkt
-                if not need_quote and not need_kline and not need_news:
-                    need_quote = True
-                    need_news  = True
-                break
-
-    # Chinese names for US stocks
-    _US_CN_NAMES = {
-        "英伟达": "NVDA",
-        "苹果": "AAPL",
-        "苹果公司": "AAPL",
-        "微软": "MSFT",
-        "谷歌": "GOOGL",
-        "亚马逊": "AMZN",
-        "特斯拉": "TSLA",
-        "脸书": "META",
-        "英特尔": "INTC",
-        "台积电": "TSM",
-    }
-    if not symbol:
-        # Sort by length descending to match longer names first (e.g. 苹果公司 before 苹果)
-        for cn_name, ticker in sorted(_US_CN_NAMES.items(), key=lambda x: -len(x[0])):
-            if cn_name in query:
-                symbol = ticker
-                market = "US"
-                if not need_quote and not need_kline and not need_news:
-                    need_quote = True
-                    need_news  = True
-                break
+        m = _HK_CODE.search(query)
+        if m:
+            symbol = m.group(1).zfill(5)
+            market = "HK"
+            if not need_quote and not need_kline and not need_news:
+                need_quote = True
+                need_news = True
 
     return {
         "symbol":        symbol,

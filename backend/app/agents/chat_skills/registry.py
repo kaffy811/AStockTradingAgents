@@ -184,6 +184,7 @@ class SkillRegistry:
             _SKILL_DISPLAY_NAMES = {
                 "general_financial_answer_skill": "智能问答",
                 "report_explanation_skill":       "报告解读",
+                "report_comparison_skill":        "财报比较",
                 "industry_hotspot_skill":         "行业热点分析",
                 "stock_anomaly_skill":            "股票异动分析",
                 "risk_first_skill":               "风险优先分析",
@@ -211,7 +212,7 @@ class SkillRegistry:
             }
             skill_data = getattr(result, "data", None) or {}
             report_answer_success = (
-                skill.name == "report_explanation_skill"
+                skill.name in {"report_explanation_skill", "report_comparison_skill"}
                 and str(skill_data.get("status") or "").lower() in {"completed", "partial_success"}
                 and bool(result.answer and result.answer.strip())
                 and len(skill_data.get("source_chunks") or []) > 0
@@ -265,7 +266,7 @@ class SkillRegistry:
             # C25.11: Domain-owning skills (e.g. report reading) must NOT fall back
             # to the generic answerer — they handle their own error path internally.
             # If such a skill somehow still raises, return a safe SkillResult directly.
-            _EXCLUSIVE_SKILLS = {"report_explanation_skill"}
+            _EXCLUSIVE_SKILLS = {"report_explanation_skill", "report_comparison_skill"}
             if skill.name in _EXCLUSIVE_SKILLS:
                 return SkillResult(
                     ok=False,

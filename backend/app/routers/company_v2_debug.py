@@ -20,6 +20,10 @@ from app.core.database import get_db
 from app.dependencies import get_optional_user
 from app.models.user import User
 from app.models.report_document import ReportDocument
+from app.services.report_document_classifier import (
+    KIND_ANNUAL_FULL,
+    classify_report_document,
+)
 from app.services.company_v2_ai_verification_response import (
     build_ai_verify_error_payload,
     sanitize_ai_verification_payload,
@@ -674,6 +678,9 @@ async def _list_persisted_report_documents(db: AsyncSession, symbol: str, *, rep
     docs = result.scalars().all()
     out: list[dict[str, Any]] = []
     for doc in docs:
+        classification = classify_report_document(doc.title, report_type=doc.report_type, category=doc.source)
+        if report_type == "annual" and classification.report_document_kind != KIND_ANNUAL_FULL:
+            continue
         item = {
             "id": doc.id,
             "report_id": doc.id,
@@ -698,6 +705,9 @@ async def _list_persisted_report_documents(db: AsyncSession, symbol: str, *, rep
             "qa_ready": bool(doc.parsed and doc.parse_status in {"parsed", "partial"}),
             "fusion_ready": bool(doc.rag_status in {"indexed", "partial"}),
         }
+        item.update(classification.to_dict())
+        if classification.report_year and not item.get("report_year"):
+            item["report_year"] = classification.report_year
         item.update(_report_view_state(symbol, item))
         out.append(item)
     return out

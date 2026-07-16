@@ -8,6 +8,7 @@ from typing import Any
 from sqlalchemy import select
 
 from app.models.report_document import ReportDocument
+from app.services.report_document_classifier import KIND_ANNUAL_FULL, classify_report_document
 
 
 FORMAL_REPORT_TYPES = ("annual", "semi", "semi_annual", "q1", "q3")
@@ -187,6 +188,32 @@ def _formal_stmt(ts_code: str):
     )
 
 
+def _is_formal_doc_for_question(doc: ReportDocument, explicit_type: str | None = None) -> bool:
+    classification = classify_report_document(doc.title, report_type=doc.report_type, category=doc.source)
+    requested_type = explicit_type or doc.report_type
+    if requested_type == "annual":
+        return classification.report_document_kind == KIND_ANNUAL_FULL
+    return classification.report_document_kind in {KIND_ANNUAL_FULL, "semi_annual_full", "quarterly"}
+
+
+def _first_formal_doc(docs: list[ReportDocument], explicit_type: str | None = None) -> ReportDocument | None:
+    for doc in docs:
+        if _is_formal_doc_for_question(doc, explicit_type):
+            return doc
+    return None
+
+
+def _scalars_to_formal_doc(scalars: Any, explicit_type: str | None = None) -> ReportDocument | None:
+    if hasattr(scalars, "all"):
+        docs = scalars.all()
+        if isinstance(docs, (list, tuple)):
+            return _first_formal_doc(list(docs), explicit_type)
+    doc = scalars.first() if hasattr(scalars, "first") else None
+    if doc is not None and _is_formal_doc_for_question(doc, explicit_type):
+        return doc
+    return None
+
+
 async def resolve_report_selection(
     *,
     db: Any,
@@ -258,8 +285,8 @@ async def resolve_report_selection(
             ReportDocument.disclosure_date.desc().nullslast(),
             ReportDocument.id.desc(),
         )
-        result = await db.execute(stmt.limit(1))
-        doc = result.scalars().first()
+        result = await db.execute(stmt.limit(20))
+        doc = _scalars_to_formal_doc(result.scalars(), explicit_type)
         if doc is None:
             detail = f"{explicit_year or explicit_period}"
             return _empty_selection(
@@ -283,8 +310,8 @@ async def resolve_report_selection(
         ReportDocument.disclosure_date.desc().nullslast(),
         ReportDocument.id.desc(),
     )
-    result = await db.execute(stmt.limit(1))
-    doc = result.scalars().first()
+    result = await db.execute(stmt.limit(20))
+    doc = _scalars_to_formal_doc(result.scalars(), None)
     if doc is None:
         return _empty_selection(
             market=market,

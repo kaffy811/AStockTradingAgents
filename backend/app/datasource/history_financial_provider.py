@@ -315,12 +315,16 @@ def _annotate_cashflow_quality(rows: list[dict[str, Any]]) -> None:
             aliases["cashflow_revenue_ratio"] = "ocf_to_revenue"
         cfo_to_np = _safe_float(row.get("ocf_to_np"))
         if cfo_to_np is not None and abs(cfo_to_np) >= 5:
+            row["semantic_status"] = "warning"
+            row["outlier_status"] = "extreme"
+            row["user_message"] = "净利润基数较小，该指标波动较大，仅供辅助参考。"
             warnings.append({
                 "code": "CFO_TO_NP_DENOMINATOR_SENSITIVE",
-                "message": "由于净利润基数较小，该比例波动较大",
+                "message": "净利润基数较小，该指标波动较大，仅供辅助参考。",
                 "field": "ocf_to_np",
                 "period_end": row.get("period"),
                 "value": cfo_to_np,
+                "outlier_status": "extreme",
             })
 
 
@@ -358,6 +362,11 @@ def _annotate_plausibility(module_key: str, rows: list[dict[str, Any]]) -> None:
         "debt_ratio": (0.0, 1.5, "资产负债率超出常见范围，需核对口径"),
         "equity_multiplier": (0.0, 20.0, "权益乘数出现异常尖峰，需核对单位或权益基数"),
         "asset_turnover": (0.0, 20.0, "资产周转率超出常见范围，需核对口径"),
+        "ocf_to_np": (-5.0, 5.0, "经营现金流/净利润极端波动，可能受低基数或符号变化影响"),
+        "ocf_to_revenue": (-2.0, 2.0, "经营现金流/营收超出常见范围，需核对口径"),
+        "net_profit_yoy": (-5.0, 5.0, "同比增速极端波动，需核对基数或口径"),
+        "parent_net_profit_yoy": (-5.0, 5.0, "归母净利润同比极端波动，需核对基数或口径"),
+        "eps_yoy": (-5.0, 5.0, "每股收益同比极端波动，需核对基数或口径"),
     }
     for row in rows:
         for field, (lower, upper, message) in checks.items():
@@ -365,6 +374,9 @@ def _annotate_plausibility(module_key: str, rows: list[dict[str, Any]]) -> None:
             if value is None:
                 continue
             if (lower is not None and value < lower) or (upper is not None and value > upper):
+                row["semantic_status"] = "warning"
+                row["outlier_status"] = "extreme"
+                row.setdefault("user_message", message)
                 row.setdefault("warnings", []).append({
                     "code": "OUTLIER_REQUIRES_REVIEW",
                     "message": message,
@@ -374,6 +386,7 @@ def _annotate_plausibility(module_key: str, rows: list[dict[str, Any]]) -> None:
                     "raw_value": value,
                     "normalized_value": value,
                     "validation": "industry_plausible_range",
+                    "outlier_status": "extreme",
                 })
 
     for field in checks:
@@ -387,6 +400,9 @@ def _annotate_plausibility(module_key: str, rows: list[dict[str, Any]]) -> None:
             continue
         for idx, value in values:
             if abs(value) >= median * 50:
+                rows[idx]["semantic_status"] = "warning"
+                rows[idx]["outlier_status"] = "extreme"
+                rows[idx].setdefault("user_message", "同一序列出现数量级突变，需核对是否存在重复百分比缩放或特殊会计事项")
                 rows[idx].setdefault("warnings", []).append({
                     "code": "OUTLIER_REQUIRES_REVIEW",
                     "message": "同一序列出现数量级突变，需核对是否存在重复百分比缩放或特殊会计事项",
@@ -397,6 +413,7 @@ def _annotate_plausibility(module_key: str, rows: list[dict[str, Any]]) -> None:
                     "normalized_value": value,
                     "median_abs_value": median,
                     "validation": "double_scaling_or_spike_detection",
+                    "outlier_status": "extreme",
                 })
 
 

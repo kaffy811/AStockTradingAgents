@@ -198,6 +198,11 @@ const activeFilter = ref('all')
 const copiedUrl = ref('')
 const qaOpenId = ref(null)
 
+const visibleReports = computed(() => {
+  if (debugMode.value) return props.reports
+  return props.reports.filter(item => !item.report_document_kind || item.report_document_kind === 'annual_full')
+})
+
 const REPORT_TYPE_LABELS = {
   annual: '年报',
   semi_annual: '半年报',
@@ -213,8 +218,8 @@ const REPORT_TYPE_ICONS = {
 
 // 过滤 tabs
 const filterTabs = computed(() => {
-  const counts = { all: props.reports.length }
-  for (const r of props.reports) {
+  const counts = { all: visibleReports.value.length }
+  for (const r of visibleReports.value) {
     const t = r.report_type || 'annual'
     counts[t] = (counts[t] || 0) + 1
   }
@@ -229,8 +234,8 @@ const filterTabs = computed(() => {
 
 // 过滤后的报告
 const filteredReports = computed(() => {
-  if (activeFilter.value === 'all') return props.reports
-  return props.reports.filter(r => r.report_type === activeFilter.value)
+  if (activeFilter.value === 'all') return visibleReports.value
+  return visibleReports.value.filter(r => r.report_type === activeFilter.value)
 })
 
 // 展示的报告（含展开/收起）

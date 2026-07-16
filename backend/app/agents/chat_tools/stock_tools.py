@@ -17,13 +17,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.agents.chat_tools.base import BaseTool
 from app.agents.chat_tools.tool_result import ToolResult
-from app.services.industry_classification_service import IndustryClassificationService
 from app.services.news_data_service import news_data_service
+from app.services.security_entity_resolver import security_entity_resolver
 from app.services.stock_data_service import stock_data_service
 
 log = logging.getLogger(__name__)
-
-_cls_svc = IndustryClassificationService()
 
 # ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -51,12 +49,23 @@ class ResolveStockTool(BaseTool):
             return ToolResult(ok=False, tool_name=self.name, summary="缺少查询词", error="query is empty")
 
         try:
-            results = await _cls_svc.search_stocks(db, market, query, limit=5)
+            resolved = await security_entity_resolver.resolve(db, query, market_hint=market, min_confidence=0.72)
         except Exception as exc:
-            log.warning("resolve_stock_tool: search failed [%s/%s]: %s", market, query, exc)
+            log.warning("resolve_stock_tool: resolver failed [%s/%s]: %s", market, query, exc)
             return ToolResult(ok=False, tool_name=self.name, summary="股票解析失败", error=str(exc))
 
-        if not results:
+        if resolved.get("ambiguity"):
+            return ToolResult(
+                ok=False,
+                tool_name=self.name,
+                summary="证券名称存在歧义，请选择具体标的",
+                error="ambiguous_security",
+                data={"candidates": resolved.get("candidates", [])},
+                source="security_entity_resolver",
+            )
+
+        entities = resolved.get("entities") or []
+        if not entities:
             # Fallback: treat the query itself as a symbol if it looks like a code
             if query.isdigit():
                 return ToolResult(
@@ -68,18 +77,20 @@ class ResolveStockTool(BaseTool):
                 )
             return ToolResult(ok=False, tool_name=self.name, summary=f"未找到股票：{query}", error="no results")
 
-        top = results[0]
+        top = entities[0]
+        data = top.to_dict() if hasattr(top, "to_dict") else dict(top)
         return ToolResult(
             ok=True,
             tool_name=self.name,
-            summary=f"{market}/{top['symbol']} → {top.get('name', top['symbol'])}",
+            summary=f"{data.get('market', market)}/{data['symbol']} → {data.get('short_name') or data.get('full_name') or data['symbol']}",
             data={
-                "market":  top.get("market", market),
-                "symbol":  top["symbol"],
-                "name":    top.get("name", top["symbol"]),
-                "industry_name": top.get("industry_name"),
+                "market":  data.get("market", market),
+                "symbol":  data["symbol"],
+                "name":    data.get("short_name") or data.get("full_name") or data["symbol"],
+                "industry_name": data.get("industry"),
+                "entity": data,
             },
-            source="db",
+            source="security_entity_resolver",
         )
 
 

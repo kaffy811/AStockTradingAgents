@@ -82,6 +82,66 @@ def _build_series_coverage_stats(
     return stats
 
 
+def _build_module_statuses(
+    rows: list[dict[str, Any]],
+    applicability: dict[str, Any],
+    coverage: dict[str, Any],
+    chart_contract: dict[str, Any],
+) -> dict[str, Any]:
+    applicable_fields = list(applicability.get("applicable_fields") or [])
+    if applicability.get("module_status") == "not_applicable":
+        completeness_status = "not_applicable"
+    elif not rows:
+        completeness_status = "unavailable"
+    elif applicable_fields:
+        expected = len(applicable_fields)
+        latest = rows[-1] if rows else {}
+        present = sum(1 for field in applicable_fields if _field_has_value(latest, field))
+        completeness_status = "complete" if present == expected else ("partial" if present else "unavailable")
+    else:
+        completeness_status = "complete" if rows else "unavailable"
+
+    warnings = [
+        warning
+        for row in rows
+        for warning in (row.get("warnings") or [])
+        if isinstance(warning, dict)
+    ]
+    warning_codes = {str(w.get("code") or "") for w in warnings}
+    formula_status = str(chart_contract.get("formula_status") or "")
+    if "DUPONT_FORMULA_MISMATCH" in warning_codes:
+        formula_status = "mismatch"
+    if "FIELD_CONFLICT" in warning_codes:
+        semantic_status = "conflict"
+    elif warning_codes.intersection({"OUTLIER_REQUIRES_REVIEW", "CFO_TO_NP_DENOMINATOR_SENSITIVE", "DUPONT_FORMULA_MISMATCH"}):
+        semantic_status = "warning"
+    else:
+        semantic_status = "normal"
+
+    outlier_status = "extreme" if any(
+        w.get("outlier_status") == "extreme" or w.get("code") in {"OUTLIER_REQUIRES_REVIEW", "CFO_TO_NP_DENOMINATOR_SENSITIVE"}
+        for w in warnings
+    ) else "normal"
+
+    user_message = ""
+    if formula_status == "mismatch":
+        user_message = "指标口径或期间不一致，暂不进行拆解。"
+    elif semantic_status == "conflict":
+        user_message = "不同来源的指标口径存在差异，需结合原始报告核对。"
+    elif outlier_status == "extreme":
+        user_message = next((str(w.get("message") or "") for w in warnings if w.get("message")), "极端值可能受低基数影响。")
+    elif int(coverage.get("periods_count") or 0) <= 2 and rows:
+        user_message = "历史数据不足。"
+
+    return {
+        "completeness_status": completeness_status,
+        "semantic_status": semantic_status,
+        "outlier_status": outlier_status,
+        "formula_status": formula_status or "not_checked",
+        "user_message": user_message,
+    }
+
+
 def _ts_code(symbol: str) -> str:
     """将6位股票代码（CN市场）转为 Tushare 格式。"""
     if "." in symbol:
@@ -296,6 +356,7 @@ async def build_company_history_dashboard(
             period_type=mdata.get("period_type", "unknown"),
             not_applicable_fields=applicability["not_applicable_fields"],
         )
+        module_statuses = _build_module_statuses(history_rows, applicability, mdata.get("history_coverage", {}), contract)
         clean_modules[mk] = {
             "history": history_rows,
             "latest": mdata.get("latest", {}),
@@ -323,6 +384,7 @@ async def build_company_history_dashboard(
             "provider_status": mdata.get("provider_status"),
             "reason_code": mdata.get("reason_code"),
             "errors": mdata.get("errors", []),
+            **module_statuses,
         }
     validation_latency_ms = int((time.perf_counter() - t0) * 1000)
 

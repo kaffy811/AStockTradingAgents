@@ -7,6 +7,7 @@ Handles requests to explain or summarize recent analysis reports:
 from __future__ import annotations
 
 import re
+import logging
 
 from app.agent.report_context import parse_explicit_report_id
 from app.agent.report_chat_copilot_agent import ReportChatCopilotAgent
@@ -19,6 +20,9 @@ from app.agents.chat_skills.base import (
 )
 from app.agents.chat_rag import retrieve_context, RAGReviewCoordinator
 from app.agents.chat_events import safe_emit
+from app.services.security_entity_resolver import security_entity_resolver
+
+log = logging.getLogger(__name__)
 
 
 def _extract_answer_text(value) -> str:
@@ -65,8 +69,8 @@ _FILLER_PATTERNS: list[re.Pattern[str]] = [
     re.compile(r"本报告分析对象"),
     re.compile(r"报告分析对象"),
     re.compile(r"分析对象为"),
-    re.compile(r"本报告.*?（[A-Z]{1,4}/\d{4,6}）"),  # "本报告针对 贵州茅台（CN/600519）"
-    re.compile(r"[A-Z]{1,4}/\d{4,6}"),               # bare "CN/600519"
+    re.compile(r"本报告.*?（[A-Z]{1,4}/\d{4,6}）"),
+    re.compile(r"[A-Z]{1,4}/\d{4,6}"),
     re.compile(r"(?:A股|证券|股票)代码"),
     re.compile(r"本报告覆盖"),
     re.compile(r"本报告针对"),
@@ -296,7 +300,13 @@ class ReportExplanationSkill(BaseSkill):
     priority = 10
 
     def can_handle(self, message: str, context: SkillContext) -> bool:
-        return bool(_PATTERN.search(message))
+        if _PATTERN.search(message):
+            return True
+        try:
+            from app.agents.chat_skills.report_comparison_skill import ReportComparisonSkill  # noqa: PLC0415
+            return ReportComparisonSkill().can_handle(message, context)
+        except Exception:
+            return False
 
     def _rag_events(self, source_chunks: list | None = None, confidence: str | None = None) -> list:
         count = len(source_chunks or [])
@@ -358,7 +368,36 @@ class ReportExplanationSkill(BaseSkill):
     async def _run_inner(self, message: str, context: SkillContext) -> SkillResult:
         memory_context = getattr(context, "memory_context", None)
         effective_message = (getattr(memory_context, "resolved_query", "") or message).strip() if memory_context else message
+        try:
+            from app.agents.chat_skills.report_comparison_skill import ReportComparisonSkill  # noqa: PLC0415
+            comparison_skill = ReportComparisonSkill()
+            if comparison_skill.can_handle(effective_message, context):
+                return await comparison_skill.run(effective_message, context)
+        except Exception:
+            log.exception("ReportExplanationSkill: comparison delegation failed")
         hint = _extract_stock_hint(effective_message) or self._hint_from_memory(context)
+        if not hint or not hint.get("symbol"):
+            market_hint = (hint or {}).get("market") or None
+            try:
+                resolved = await security_entity_resolver.resolve(context.db, effective_message, market_hint=market_hint, min_confidence=0.78)
+            except Exception:
+                resolved = {"entities": [], "ambiguity": False, "candidates": []}
+            if resolved.get("ambiguity"):
+                candidates = resolved.get("candidates") or []
+                names = "、".join(
+                    f"{c.get('short_name') or c.get('symbol')}（{c.get('market')}/{c.get('symbol')}）"
+                    for c in candidates[:5]
+                )
+                answer = f"你提到的证券名称存在歧义，可能指：{names}。请明确选择其中一个标的。" + _DISCLAIMER
+                return SkillResult(
+                    ok=True,
+                    skill_name=self.name,
+                    answer=answer,
+                    data={"status": "failed", "error_code": "AMBIGUOUS_SECURITY", "candidates": candidates[:5]},
+                )
+            entity = (resolved.get("entities") or [None])[0]
+            if entity is not None:
+                hint = entity.to_hint()
         events: list = []
 
         await safe_emit(context.event_callback, "skill_started", {

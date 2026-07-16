@@ -1,24 +1,29 @@
 {
   "phase": "phase6ts_db_reconnect",
   "status": "passed",
-  "run_id": "9548e1efb8ec4f8cb6e40d5bf62b1c1a",
-  "duration_seconds": 7200,
-  "requested_duration_seconds": 7200,
-  "actual_duration_seconds": 7200,
+  "run_id": "f7d46f89dbc74835b67834d804185313",
+  "started_at": "2026-07-16T01:48:38.790639",
+  "finished_at": "2026-07-16T01:49:01.294494",
+  "duration_seconds": 8,
+  "requested_duration_seconds": 8.0,
+  "actual_duration_seconds": 13.368,
+  "process_pid": 63867,
+  "git_commit": "f8d3916d9d73a47bef3fd14e5c2f7aa2d8195fe3",
   "worker_count": 2,
-  "jobs_created": 5,
-  "jobs_cancelled": 5,
+  "jobs_created": 2,
+  "jobs_cancelled": 2,
   "duplicate_claim_count": 0,
-  "simultaneous_claim_conflicts": 0,
+  "reclaim_after_restart_count": 0,
+  "duplicate_claim_events": [],
+  "claim_reclaim_events": [],
   "unknown_jobs_modified": 0,
-  "active_leases_peak": 2,
   "active_leases_end": 0,
   "stale_leases_end": 0,
   "db_disconnect_count": 1,
   "db_reconnect_count": 1,
   "db_reconnect_events": [
     {
-      "at_seconds": 3601.36,
+      "at_seconds": 4.04,
       "disposed": true
     }
   ],
@@ -27,6 +32,5 @@
   "rag_query_count": 0,
   "extractor_call_count": 0,
   "fusion_result_write_count": 0,
-  "blocking_issues": [],
-  "errors": []
+  "blocking_issues": []
 }

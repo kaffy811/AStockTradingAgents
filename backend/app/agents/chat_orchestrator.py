@@ -256,35 +256,21 @@ def _extract_stock_hint(msg: str) -> dict:
     Best-effort extraction of {market, symbol, name_query} from user message.
     C32.2.3: expanded A-share name mapping.
     """
-    # Explicit code / name patterns (order: more specific first)
-    if re.search(r"688146|中船特气", msg):
-        return {"market": "CN", "symbol": "688146", "name": "中船特气", "query": "688146"}
-    if re.search(r"600519|贵州茅台|茅台", msg):
-        return {"market": "CN", "symbol": "600519", "name": "贵州茅台", "query": "600519"}
-    if re.search(r"000858|五粮液", msg):
-        return {"market": "CN", "symbol": "000858", "name": "五粮液", "query": "000858"}
-    if re.search(r"300750|宁德时代", msg):
-        return {"market": "CN", "symbol": "300750", "name": "宁德时代", "query": "300750"}
-    if re.search(r"601899|紫金矿业", msg):
-        return {"market": "CN", "symbol": "601899", "name": "紫金矿业", "query": "601899"}
-    if re.search(r"301269|华大九天", msg):
-        return {"market": "CN", "symbol": "301269", "name": "华大九天", "query": "301269"}
-    if re.search(r"002594|比亚迪", msg):
-        return {"market": "CN", "symbol": "002594", "name": "比亚迪", "query": "002594"}
-    if re.search(r"601012|隆基绿能", msg):
-        return {"market": "CN", "symbol": "601012", "name": "隆基绿能", "query": "601012"}
-    if re.search(r"002475|立讯精密", msg):
-        return {"market": "CN", "symbol": "002475", "name": "立讯精密", "query": "002475"}
-    if re.search(r"688981|中芯国际|SMIC", msg, re.IGNORECASE):
-        return {"market": "CN", "symbol": "688981", "name": "中芯国际", "query": "688981"}
+    ts_code = re.search(r"(?<!\d)(\d{6})\.(SH|SZ|BJ)(?![A-Z0-9])", msg, re.IGNORECASE)
+    if ts_code:
+        symbol = ts_code.group(1)
+        return {"market": "CN", "symbol": symbol, "name": symbol, "query": ts_code.group(0)}
     # Generic CN code: 6-digit number
-    m = re.search(r"\b(\d{6})\b", msg)
+    m = re.search(r"(?<!\d)(\d{6})(?!\d)", msg)
     if m:
         return {"market": "CN", "symbol": m.group(1), "name": m.group(1), "query": m.group(1)}
     # HK code: 5-digit or 4-digit
-    m = re.search(r"\b0?(\d{4,5})\b", msg)
+    m = re.search(r"(?<!\d)0?(\d{4,5})(?!\d)", msg)
     if m:
         return {"market": "HK", "symbol": m.group(1).zfill(5), "name": m.group(1), "query": m.group(1)}
+    m = re.search(r"\b([A-Z]{1,5}(?:[.-][A-Z])?)\b", msg)
+    if m:
+        return {"market": "US", "symbol": m.group(1).upper(), "name": m.group(1).upper(), "query": m.group(1)}
     return {}
 
 
@@ -609,14 +595,14 @@ def _extract_compare_candidates(msg: str, memory_context=None) -> list[str]:
     Returns up to 4 candidates (names or 5-6-digit codes).
 
     C32.2.2/C32.2.3: handles:
-    - "那它和五粮液相比呢？" after coreference → "那贵州茅台（CN/600519）和五粮液相比呢？"
+    - A follow-up comparison after coreference has injected the prior entity
     - "请对比五粮液和贵州茅台的股票" (with "的股票" suffix noise)
     - Numeric code extraction
 
     C32.3.1: When text has stock pronouns AND memory has active_entities, inject
     the entity as a candidate even if coreference resolution didn't fire.
     """
-    # Step 1: extract codes from coreference-injected parentheticals: "（CN/600519）"
+    # Step 1: extract codes from coreference-injected parentheticals.
     paren_codes = re.findall(r'[（(](?:CN|HK)[:/](\d{4,6})[）)]', msg)
     # Also extract bare 5-6-digit codes
     bare_codes = re.findall(r'\b(\d{5,6})\b', msg)
@@ -630,7 +616,7 @@ def _extract_compare_candidates(msg: str, memory_context=None) -> list[str]:
         r"|的\s*股票|的\s*研究",
         " ", msg, flags=re.IGNORECASE,
     )
-    # Remove coreference parentheticals like "（CN/600519）" — name already kept before them
+    # Remove coreference parentheticals; the name is already kept before them.
     cleaned = re.sub(r'[（(](?:CN|HK)[:/]\d{4,6}[）)]', ' ', cleaned)
 
     # Step 3: split on all separators including "和"/"与" (treated as delimiters)
@@ -700,7 +686,7 @@ async def _handle_compare(msg: str, db: AsyncSession, user_id: uuid.UUID, **kw) 
             answer=(
                 f"我尝试识别了以下关键词：{'、'.join(candidates[:4])}，"
                 "但未能找到足够的股票信息。"
-                "请提供完整名称或6位股票代码，例如：「对比 600519 和 300750」。"
+                "请提供完整名称或标准股票代码后再比较。"
                 + _DISCLAIMER
             ),
             tool_events=events,
@@ -1178,6 +1164,19 @@ async def _write_memory_from_result(
         hint = _extract_stock_hint(msg)
         if hint and hint.get("symbol"):
             await _mem.update_symbols(db, session_id, user_id, hint)
+        skill_data = meta.get("skill_data") or {}
+        report_context = skill_data.get("report_context") if isinstance(skill_data, dict) else None
+        if isinstance(report_context, dict):
+            report_symbol = str(report_context.get("symbol") or "").strip()
+            report_market = str(report_context.get("market") or "CN").strip() or "CN"
+            if report_symbol:
+                await _mem.update_symbols(db, session_id, user_id, {
+                    "market": report_market,
+                    "symbol": report_symbol,
+                    "name": report_context.get("stock_name") or report_symbol,
+                })
+            if report_context.get("report_id"):
+                await _mem.update_last_report(db, session_id, user_id, str(report_context.get("report_id")))
 
         # 2. Output language
         if output_language:

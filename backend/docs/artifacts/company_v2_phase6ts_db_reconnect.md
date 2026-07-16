@@ -1,14 +1,40 @@
-# Phase 6T-S DB Reconnect Artifact
+# Phase 6T-S Secondary Artifact
 
-- `run_id`: `9548e1efb8ec4f8cb6e40d5bf62b1c1a`
-- Status: `passed`
-- Duration: `7200` seconds
-- Worker count: `2`
-- DB disconnect/reconnect count: `1 / 1`
-- DB reconnect event: `3601.36` seconds
-- Jobs created/cancelled: `5 / 5`
-- Duplicate claims/conflicts: `0 / 0`
-- Active/stale leases at end: `0 / 0`
-- Unknown jobs modified: `0`
-- Real Fusion/provider/RAG/extractor calls: `0 / 0 / 0 / 0`
-- Stage 3 remains not authorized; Canary not started.
+```json
+{
+  "phase": "phase6ts_db_reconnect",
+  "status": "passed",
+  "run_id": "f7d46f89dbc74835b67834d804185313",
+  "started_at": "2026-07-16T01:48:38.790639",
+  "finished_at": "2026-07-16T01:49:01.294494",
+  "duration_seconds": 8,
+  "requested_duration_seconds": 8.0,
+  "actual_duration_seconds": 13.368,
+  "process_pid": 63867,
+  "git_commit": "f8d3916d9d73a47bef3fd14e5c2f7aa2d8195fe3",
+  "worker_count": 2,
+  "jobs_created": 2,
+  "jobs_cancelled": 2,
+  "duplicate_claim_count": 0,
+  "reclaim_after_restart_count": 0,
+  "duplicate_claim_events": [],
+  "claim_reclaim_events": [],
+  "unknown_jobs_modified": 0,
+  "active_leases_end": 0,
+  "stale_leases_end": 0,
+  "db_disconnect_count": 1,
+  "db_reconnect_count": 1,
+  "db_reconnect_events": [
+    {
+      "at_seconds": 4.04,
+      "disposed": true
+    }
+  ],
+  "real_execution_count": 0,
+  "provider_call_count": 0,
+  "rag_query_count": 0,
+  "extractor_call_count": 0,
+  "fusion_result_write_count": 0,
+  "blocking_issues": []
+}
+```

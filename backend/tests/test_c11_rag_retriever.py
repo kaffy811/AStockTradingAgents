@@ -15,8 +15,13 @@ from app.agents.chat_skills.base import SkillContext
 
 # ── _extract_hint ─────────────────────────────────────────────────────────────
 
-def test_extract_hint_named_stock():
+def test_extract_hint_named_stock_requires_resolver_context():
     hint = _extract_hint("中船特气最近为什么涨")
+    assert hint is None
+
+
+def test_extract_hint_explicit_stock_code():
+    hint = _extract_hint("688146最近为什么涨")
     assert hint is not None
     assert hint["symbol"] == "688146"
     assert hint["market"] == "CN"
@@ -33,10 +38,9 @@ def test_extract_hint_no_match():
     assert hint is None
 
 
-def test_extract_hint_maotai_alias():
+def test_extract_hint_alias_requires_security_resolver():
     hint = _extract_hint("茅台今天表现如何")
-    assert hint is not None
-    assert hint["symbol"] == "600519"
+    assert hint is None
 
 
 # ── retrieve_context ──────────────────────────────────────────────────────────
@@ -68,7 +72,7 @@ def _make_context(news_items=None, report_items=None, industry_items=None):
 async def test_retrieve_context_returns_news():
     news = [{"title": "中船特气获大订单", "summary": "公告", "source": "新华社", "publish_time": "2026-06-01T00:00:00Z"}]
     ctx = _make_context(news_items=news)
-    result = await retrieve_context("中船特气最近为什么涨", ctx)
+    result = await retrieve_context("688146最近为什么涨", ctx)
     assert result.ok
     assert len(result.news_docs) == 1
     assert result.news_docs[0].external_content is True
@@ -98,7 +102,7 @@ async def test_retrieve_context_max_8_docs():
     news = [{"title": f"新闻{i}", "source": "s", "publish_time": "2026-06-01T00:00:00Z"} for i in range(10)]
     reports = [{"id": i, "title": f"报告{i}", "summary": "", "created_at": "2026-06-01T00:00:00Z", "symbol": "688146"} for i in range(5)]
     ctx = _make_context(news_items=news, report_items=reports)
-    result = await retrieve_context("中船特气分析", ctx)
+    result = await retrieve_context("688146分析", ctx)
     assert result.ok
     assert len(result.documents) <= 8
 

@@ -86,20 +86,20 @@ class BaseSkill(abc.ABC):
 
 def _extract_stock_hint(msg: str) -> dict:
     """Best-effort extraction of {market, symbol, name, query} from user message."""
-    if re.search(r"688146|中船特气", msg):
-        return {"market": "CN", "symbol": "688146", "name": "中船特气", "query": "688146"}
-    if re.search(r"600519|茅台", msg):
-        return {"market": "CN", "symbol": "600519", "name": "贵州茅台", "query": "600519"}
-    if re.search(r"300750|宁德时代", msg):
-        return {"market": "CN", "symbol": "300750", "name": "宁德时代", "query": "300750"}
-    if re.search(r"601899|紫金矿业", msg):
-        return {"market": "CN", "symbol": "601899", "name": "紫金矿业", "query": "601899"}
+    ts_code = re.search(r"(?<!\d)(\d{6})\.(SH|SZ|BJ)(?![A-Z0-9])", msg, re.IGNORECASE)
+    if ts_code:
+        symbol = ts_code.group(1)
+        return {"market": "CN", "symbol": symbol, "name": symbol, "query": ts_code.group(0)}
     # Generic CN code: 6-digit
-    m = re.search(r"\b(\d{6})\b", msg)
+    m = re.search(r"(?<!\d)(\d{6})(?!\d)", msg)
     if m:
         return {"market": "CN", "symbol": m.group(1), "name": m.group(1), "query": m.group(1)}
     # HK code: 5-digit or 4-digit
-    m = re.search(r"\b0?(\d{4,5})\b", msg)
+    m = re.search(r"(?<!\d)0?(\d{4,5})(?!\d)", msg)
     if m:
         return {"market": "HK", "symbol": m.group(1).zfill(5), "name": m.group(1), "query": m.group(1)}
+    # US ticker: only for explicit all-caps tokens to avoid guessing prose.
+    m = re.search(r"\b([A-Z]{1,5}(?:[.-][A-Z])?)\b", msg)
+    if m:
+        return {"market": "US", "symbol": m.group(1).upper(), "name": m.group(1).upper(), "query": m.group(1)}
     return {}

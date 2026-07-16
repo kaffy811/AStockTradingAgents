@@ -71,7 +71,7 @@ _SYSTEM_PROMPT = """\
    - 行业分类 / 主营业务 / 护城河 / 管理层
    - 同行公司名单（只能使用用户提供的 peers 列表）
    - 任何未在输入数据中出现的财务数字
-4. 禁止将手动 PEER_MAP 当成严格行业分类。对港股（HK）或业务形态差异大的 peer set，必须在报告开头声明「同行口径较粗，仅供参考」。
+4. 禁止将动态同行样本当成严格行业分类。对港股（HK）或业务形态差异大的 peer set，必须在报告开头声明「同行口径较粗，仅供参考」。
 5. 禁止给出买入/卖出/持有建议。严禁使用：必涨、必跌、稳赚、强烈买入、满仓、梭哈、保证收益、抄底、清仓。
 6. 禁止使用「明显低估」或「明显高估」表达。估值比较只能使用：
    「估值水平相对偏高」「估值水平相对偏低」「仍需结合行业和基本面进一步判断」。
@@ -228,7 +228,7 @@ class PeerComparisonAnalystAgent:
         question:        str | None = None,
     ) -> str:
         """
-        Async 版同行对比分析。使用 DynamicPeerDiscoveryService 获取同行（PEER_MAP > dynamic_hot）。
+        Async 版同行对比分析。使用 DynamicPeerDiscoveryService 获取动态行业同行。
 
         供支持 AsyncSession 的 router 调用。
 
@@ -292,7 +292,7 @@ class PeerComparisonAnalystAgent:
         # ── 特殊场景标志 ─────────────────────────────────────────────────────
         no_peers       = len(peers) == 0
         no_available   = len(available) == 0
-        # HK 或 peers 业务差异大（PEER_MAP 注释中已标注"粗略对比"）
+        # HK 或 peers 业务差异大时需要更保守提示。
         is_hk          = market == "HK"
 
         # dynamic_hot 相关字段
@@ -404,8 +404,8 @@ class PeerComparisonAnalystAgent:
                 )
             else:
                 warnings.append(
-                    "【暂无同行配置警告】当前股票未在 PEER_MAP 中配置同行，"
-                    "peers 列表为空。请生成「暂无同行配置」型报告，"
+                    "【暂无同行数据警告】当前股票未找到可用动态同行，"
+                    "peers 列表为空。请生成「暂无同行」型报告，"
                     "不得编造任何同行公司，不得虚构对比数据。"
                 )
 
@@ -420,8 +420,7 @@ class PeerComparisonAnalystAgent:
         if is_hk:
             warnings.append(
                 "【港股对比口径警告】当前为港股（HK）分析，"
-                "PEER_MAP 中的同行是互联网/科技龙头的粗略对比口径，"
-                "业务形态差异较大。报告必须在「对比样本说明」中声明：「同行口径较粗，仅供参考」，"
+                "当前同行样本可能存在业务形态差异。报告必须在「对比样本说明」中声明：「同行口径较粗，仅供参考」，"
                 "不应做过强的横向估值或经营结论。"
             )
 

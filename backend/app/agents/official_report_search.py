@@ -201,36 +201,6 @@ def _infer_exchange(symbol: str, market: str) -> str:
     return ""
 
 
-_CN_COMPANY_MAP: dict[str, tuple[str, str, str]] = {
-    # name → (symbol, market, company_full_name)
-    "茅台":     ("600519", "CN", "贵州茅台"),
-    "贵州茅台": ("600519", "CN", "贵州茅台"),
-    "中船特气": ("688146", "CN", "中船特气"),
-    "宁德时代": ("300750", "CN", "宁德时代"),
-    "紫金矿业": ("601899", "CN", "紫金矿业"),
-    "平安银行": ("000001", "CN", "平安银行"),
-    "腾讯":     ("00700", "HK", "腾讯控股"),
-    "腾讯控股": ("00700", "HK", "腾讯控股"),
-    "阿里巴巴": ("09988", "HK", "阿里巴巴集团"),
-    "美团":     ("03690", "HK", "美团"),
-    "比亚迪":   ("002594", "CN", "比亚迪股份"),
-    "招商银行": ("600036", "CN", "招商银行"),
-    "工商银行": ("601398", "CN", "工商银行"),
-}
-
-_US_COMPANY_MAP: dict[str, tuple[str, str]] = {
-    "苹果": ("AAPL", "苹果公司"),
-    "苹果公司": ("AAPL", "苹果公司"),
-    "微软": ("MSFT", "微软"),
-    "谷歌": ("GOOGL", "谷歌"),
-    "亚马逊": ("AMZN", "亚马逊"),
-    "特斯拉": ("TSLA", "特斯拉"),
-    "英伟达": ("NVDA", "英伟达"),
-    "Meta": ("META", "Meta"),
-    "脸书": ("META", "Meta"),
-}
-
-
 def parse_financial_analysis_intent(query: str) -> dict:
     """
     Enhanced intent parser for the financial report + kline analysis scenario.
@@ -247,32 +217,11 @@ def parse_financial_analysis_intent(query: str) -> dict:
     symbol  = base["symbol"]
     market  = base["market"]
     company_name = ""
-    exchange = ""
-
-    # Try CN company names
-    for name, (sym, mkt, full_name) in _CN_COMPANY_MAP.items():
-        if name in query:
-            symbol       = sym
-            market       = mkt
-            company_name = full_name
-            exchange     = _infer_exchange(sym, mkt)
-            break
-
-    # Try US company names
-    if not symbol:
-        for name, (sym, full_name) in sorted(
-            _US_COMPANY_MAP.items(), key=lambda x: -len(x[0])
-        ):
-            if name in query:
-                symbol       = sym
-                market       = "US"
-                company_name = full_name
-                exchange     = "NASDAQ"
-                break
+    exchange = _infer_exchange(symbol, market) if symbol and market else ""
 
     # CN 6-digit code
     if not symbol:
-        m = re.search(r"\b(\d{6})\b", query)
+        m = re.search(r"(?<!\d)(\d{6})(?!\d)", query)
         if m:
             symbol  = m.group(1)
             market  = "CN"

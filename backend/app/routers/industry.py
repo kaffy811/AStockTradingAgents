@@ -4,7 +4,7 @@ Industry Router — 行业分类 & 热门股查询。
 路由：
   GET  /industries                                        查询市场下所有已录入行业
   GET  /industries/stocks/{market}/{symbol}               查询单只股票的行业归属
-  GET  /industries/stocks/{market}/{symbol}/dynamic-peers 查询股票动态同行（PEER_MAP > Hot Top5）
+  GET  /industries/stocks/{market}/{symbol}/dynamic-peers 查询股票动态同行（Hot Top5）
   GET  /industries/{market}/{industry_code}/constituents  查询行业成分股
   GET  /industries/{market}/{industry_code}/hot-stocks    查询行业热门股 Top-N
 
@@ -142,9 +142,9 @@ async def get_dynamic_peers(
     db:     AsyncSession = Depends(get_db),
 ) -> DynamicPeerResponse:
     """
-    动态同行发现。优先级：PEER_MAP 手动配置 > CN 行业 Hot Top-N。
+    动态同行发现。CN 市场基于行业 Hot Top-N。
 
-    非 CN 市场且无 PEER_MAP 时返回 peers=[]，HTTP 200，data_quality.message 说明原因。
+    无可用行业同行数据时返回 peers=[]，HTTP 200，data_quality.message 说明原因。
     """
     result = await dynamic_peer_discovery_service.discover_peers(
         db=db,

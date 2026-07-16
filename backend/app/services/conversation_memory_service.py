@@ -76,37 +76,6 @@ _RE_REPORT_PRONOUN = re.compile(
     re.IGNORECASE,
 )
 
-# ── Light-weight stock name/code table for memory fallback ────────────────────
-# C32.3.2: When recent_symbols is empty, scan recent_messages for these patterns.
-_MEMORY_STOCK_TABLE: list[tuple[str, str, str, "re.Pattern[str]"]] = [
-    ("600519", "贵州茅台", "CN", re.compile(r"600519|贵州茅台|茅台")),
-    ("000858", "五粮液",   "CN", re.compile(r"000858|五粮液")),
-    ("300750", "宁德时代", "CN", re.compile(r"300750|宁德时代")),
-    ("601899", "紫金矿业", "CN", re.compile(r"601899|紫金矿业")),
-    ("301269", "华大九天", "CN", re.compile(r"301269|华大九天")),
-    ("688146", "中船特气", "CN", re.compile(r"688146|中船特气")),
-    ("002594", "比亚迪",   "CN", re.compile(r"002594|比亚迪")),
-    ("601012", "隆基绿能", "CN", re.compile(r"601012|隆基绿能")),
-    ("002475", "立讯精密", "CN", re.compile(r"002475|立讯精密")),
-    ("688981", "中芯国际", "CN", re.compile(r"688981|中芯国际|SMIC", re.IGNORECASE)),
-]
-
-
-def _entity_from_text(text: str) -> "ResolvedEntity | None":
-    """
-    C32.3.2: Light-weight entity extractor for memory fallback.
-    Returns the first stock entity found in `text`, or None.
-    """
-    for symbol, name, market, pattern in _MEMORY_STOCK_TABLE:
-        if pattern.search(text):
-            return ResolvedEntity(type="stock", name=name, code=symbol, market=market)
-    # Generic 6-digit CN code
-    m = re.search(r"\b(\d{6})\b", text)
-    if m:
-        code = m.group(1)
-        return ResolvedEntity(type="stock", name=code, code=code, market="CN")
-    return None
-
 # ── Sanitization for summaries ─────────────────────────────────────────────────
 
 _SUMMARY_STRIP_PATTERNS = [
@@ -144,6 +113,40 @@ class ResolvedEntity:
     name:   str
     code:   str = ""
     market: str = ""
+
+
+def _entity_from_text(text: str) -> ResolvedEntity | None:
+    """
+    Backward-compatible explicit-code parser.
+
+    Natural-language security names are resolved by SecurityEntityResolver with
+    database/security-master context. This helper intentionally avoids a
+    production hand-written alias table.
+    """
+    if not text:
+        return None
+
+    ts_match = re.search(r"(?<!\d)(\d{6})\.(SH|SZ|BJ)(?![A-Z0-9])", text, re.IGNORECASE)
+    if ts_match:
+        code = ts_match.group(1)
+        return ResolvedEntity(type="stock", name=code, code=code, market="CN")
+
+    cn_match = re.search(r"(?<!\d)(\d{6})(?!\d)", text)
+    if cn_match:
+        code = cn_match.group(1)
+        return ResolvedEntity(type="stock", name=code, code=code, market="CN")
+
+    hk_match = re.search(r"(?<!\d)0?(\d{4,5})(?!\d)", text)
+    if hk_match:
+        code = hk_match.group(1).zfill(5)
+        return ResolvedEntity(type="stock", name=code, code=code, market="HK")
+
+    us_match = re.search(r"(?<![A-Z0-9.])([A-Z]{1,5}(?:[.-][A-Z])?)(?![A-Z0-9])", text)
+    if us_match:
+        code = us_match.group(1).upper()
+        return ResolvedEntity(type="stock", name=code, code=code, market="US")
+
+    return None
 
 
 @dataclass
@@ -357,9 +360,15 @@ async def build_memory_context(
                     # Skip the current query itself
                     if _cur_snippet_prefix and snippet[:25].strip() == _cur_snippet_prefix:
                         continue
-                    ent = _entity_from_text(snippet)
-                    if ent is not None:
-                        active_entities.append(ent)
+                    from app.services.security_entity_resolver import security_entity_resolver  # noqa: PLC0415
+                    entity = await security_entity_resolver.resolve_one(db, snippet, min_confidence=0.78)
+                    if entity is not None:
+                        active_entities.append(ResolvedEntity(
+                            type="stock",
+                            name=entity.short_name or entity.symbol,
+                            code=entity.symbol,
+                            market=entity.market,
+                        ))
                         break  # only the most recent prior user-mentioned stock
         # Add industry from recent intents if applicable
         for intent in mem.get("recent_intents", [])[:2]:
