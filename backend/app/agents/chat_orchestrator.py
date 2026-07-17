@@ -17,6 +17,7 @@ All answers carry _DISCLAIMER.
 """
 from __future__ import annotations
 
+import asyncio
 import logging
 import re
 import uuid
@@ -25,6 +26,7 @@ from typing import Callable
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.agents.chat_confirmation import make_confirmation
 from app.agents.chat_tools.action_tools import (
     ActionResult,
@@ -66,7 +68,7 @@ log = logging.getLogger(__name__)
 
 _DISCLAIMER = "\n\n_仅供研究参考，不构成投资建议。_"
 _EMPTY_FINAL_ANSWER_TEXT = "报告数据已获取，但本次回答生成失败，请重新尝试。"
-_CHAT_ENTITY_PIPELINE_VERSION = "d6_3"
+_CHAT_ENTITY_PIPELINE_VERSION = "d6_4"
 
 # ── Build registry ─────────────────────────────────────────────────────────────
 
@@ -1008,6 +1010,48 @@ async def process_message(
         memory_context=_memory_ctx,
     )
 
+    runtime_mode = (settings.chat_runtime_mode or "legacy").strip().lower()
+    if runtime_mode in {"layered_v1", "shadow"}:
+        try:
+            from app.agents.financial_runtime.runtime import financial_agent_runtime  # noqa: PLC0415
+
+            if runtime_mode == "shadow":
+                async def _shadow_run() -> None:
+                    result = await financial_agent_runtime.shadow_with_new_session(
+                        raw_query=content,
+                        user_id=str(user_id),
+                        conversation_id=str(session_id) if session_id else "",
+                        page_context={},
+                        memory_context=_memory_ctx,
+                    )
+                    log.debug("layered runtime shadow result: %s", result.get("status"))
+
+                asyncio.create_task(_shadow_run())
+            else:
+                layered = await financial_agent_runtime.run(
+                    raw_query=content,
+                    db=db,
+                    user_id=str(user_id),
+                    conversation_id=str(session_id) if session_id else "",
+                    page_context={},
+                    memory_context=_memory_ctx,
+                    event_callback=event_callback,
+                )
+                if layered.status in {"success", "partial_success", "clarification_required", "failed"}:
+                    return OrchestratorResult(
+                        answer=layered.answer,
+                        tool_events=layered.tool_events,
+                        cards=layered.cards,
+                        metadata={
+                            **(layered.metadata or {}),
+                            "status": layered.status,
+                            "error_code": layered.error_code,
+                            "runtime": "layered_v1",
+                        },
+                    )
+        except Exception as exc:  # noqa: BLE001
+            log.warning("layered runtime failed; falling back to legacy: %s", exc)
+
     # 1.5. C30.2.3: IntentDecisionAgent — classify intent, emit telemetry, drive routing.
     _intent_decision = classify_intent(_effective_content, memory_context=_memory_ctx)
     await _emit("intent_detected", {
@@ -1257,41 +1301,40 @@ async def _write_memory_from_result(
         return
     try:
         meta = result.metadata or {}
-
-        # 1. Recent symbols — extracted from user message
-        hint = _extract_stock_hint(msg)
-        if hint and hint.get("symbol"):
-            await _mem.update_symbols(db, session_id, user_id, hint)
         skill_data = meta.get("skill_data") or {}
         skill_status = str(skill_data.get("status") or meta.get("status") or "").lower()
         context_commit_allowed = skill_status in {"completed", "partial_success"} or not skill_status
+        pending_confirmation = result.confirmation.get("id") if result.confirmation else _mem._UNSET
+        memory_symbols: list[dict] = []
+        last_report_id: str | None = None
+
+        # 1. Recent symbols — extracted from user message
+        hint = _extract_stock_hint(msg) if context_commit_allowed else None
+        if hint and hint.get("symbol"):
+            memory_symbols.append(hint)
         report_context = skill_data.get("report_context") if isinstance(skill_data, dict) else None
         if context_commit_allowed and isinstance(report_context, dict):
             report_symbol = str(report_context.get("symbol") or "").strip()
             report_market = str(report_context.get("market") or "CN").strip() or "CN"
             if report_symbol:
-                await _mem.update_symbols(db, session_id, user_id, {
+                memory_symbols.append({
                     "market": report_market,
                     "symbol": report_symbol,
                     "name": report_context.get("stock_name") or report_symbol,
                 })
             if report_context.get("report_id"):
-                await _mem.update_last_report(db, session_id, user_id, str(report_context.get("report_id")))
+                last_report_id = str(report_context.get("report_id"))
         comparison_input = skill_data.get("comparison_input") if isinstance(skill_data, dict) else None
         if context_commit_allowed and isinstance(comparison_input, dict):
             for entity in comparison_input.get("entities") or []:
                 symbol = str(entity.get("symbol") or "").strip()
                 if not symbol:
                     continue
-                await _mem.update_symbols(db, session_id, user_id, {
+                memory_symbols.append({
                     "market": str(entity.get("market") or "CN").strip() or "CN",
                     "symbol": symbol,
                     "name": entity.get("name") or entity.get("short_name") or symbol,
                 })
-
-        # 2. Output language
-        if output_language:
-            await _mem.update_output_language(db, session_id, user_id, output_language)
 
         # 3. Intent — from metadata
         intent = (
@@ -1299,10 +1342,9 @@ async def _write_memory_from_result(
             or meta.get("skill_name")
             or ("action" if result.confirmation else None)
         )
-        if intent:
-            await _mem.update_intents(db, session_id, user_id, intent)
 
         # 4. Task state — Planner metadata
+        task_state = None
         if meta.get("planner_used"):
             task_state = {
                 "planner_used":      True,
@@ -1314,20 +1356,25 @@ async def _write_memory_from_result(
                     s for s in meta.get("steps", []) if s.get("status") == "failed"
                 ],
             }
-            await _mem.update_task_state(db, session_id, user_id, task_state)
         elif meta.get("skill_name"):
             task_state = {
                 "planner_used": False,
                 "skill_name":   meta.get("skill_name"),
                 "tools_used":   meta.get("tools_used", []),
             }
-            await _mem.update_task_state(db, session_id, user_id, task_state)
 
-        # 5. Pending confirmation
-        if result.confirmation:
-            await _mem.update_pending_confirmation(
-                db, session_id, user_id,
-                result.confirmation.get("id"),
+        # 5. Single per-turn context commit.
+        if context_commit_allowed or result.confirmation:
+            await _mem.apply_memory_updates(
+                db,
+                session_id,
+                user_id,
+                symbols=memory_symbols,
+                intent=intent if context_commit_allowed else None,
+                output_language=output_language if context_commit_allowed else None,
+                last_report_id=last_report_id,
+                task_state=task_state if context_commit_allowed else None,
+                pending_confirmation_id=pending_confirmation,
             )
 
         # C32.1: update extended memory (active_entities, trigger summarization)

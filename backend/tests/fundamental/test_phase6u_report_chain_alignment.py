@@ -365,7 +365,8 @@ async def test_phase6u_report_explanation_skill_uses_copilot_and_preserves_conte
     assert captured["stock_name"] == "贵州茅台"
     assert captured["use_memory"] is True
     assert result.data["report_context"]["report_id"] == 2
-    assert result.answer.count("不构成投资建议") == 1
+    assert result.answer.count("不构成投资建议") == 0
+    assert "数据来源：" in result.answer
 
 
 @pytest.mark.asyncio

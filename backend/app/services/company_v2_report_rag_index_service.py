@@ -111,8 +111,14 @@ class CompanyV2ReportRagRepository:
             return doc
         return None
 
+    async def get_document_async(self, report_id: int) -> ReportRagDocumentRecord | None:
+        return self.get_document(report_id)
+
     def get_any_document(self, report_id: int) -> ReportRagDocumentRecord | None:
         return self._documents.get(int(report_id))
+
+    async def get_any_document_async(self, report_id: int) -> ReportRagDocumentRecord | None:
+        return self.get_any_document(report_id)
 
     def list_documents(self, symbol: str | None = None, *, include_deleted: bool = False) -> list[ReportRagDocumentRecord]:
         docs = list(self._documents.values())

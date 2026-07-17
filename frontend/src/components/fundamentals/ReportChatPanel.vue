@@ -96,7 +96,7 @@
       <!-- Normal answer -->
       <template v-else>
         <!-- Answer text -->
-        <div class="rcp-answer">{{ result.answer }}</div>
+        <div class="rcp-answer">{{ cleanAnswer(result.answer) }}</div>
 
         <!-- Confidence + RAG status + cache + memory badges -->
         <div class="rcp-meta-row">
@@ -106,7 +106,7 @@
           <span v-if="result.rag_status" :class="['rcp-rag-badge', 'rcp-rag-badge--' + result.rag_status]">
             {{ ragStatusLabel(result.rag_status) }}
           </span>
-          <span v-if="result.review_audit?.source_chunks_checked" class="rcp-verified-badge">
+          <span v-if="isDebugMode && result.review_audit?.source_chunks_checked" class="rcp-verified-badge">
             ✓ {{ t('rcp_verified') }}
           </span>
           <span v-if="result.cache_meta?.hit" class="rcp-cache-badge">
@@ -123,9 +123,9 @@
           <span v-for="(l, i) in result.data_limitations" :key="i" class="rcp-limit-item">{{ l }}</span>
         </div>
 
-        <!-- Source chunks -->
-        <div v-if="result.source_chunks?.length" class="rcp-chunks">
-          <div class="rcp-chunks-title">🔍 {{ t('rcp_source_chunks') }}</div>
+        <!-- Source evidence: collapsed in normal mode, internals only in debug mode -->
+        <details v-if="result.source_chunks?.length" class="rcp-chunks">
+          <summary class="rcp-chunks-title">查看数据来源</summary>
           <div
             v-for="(chunk, i) in result.source_chunks"
             :key="chunk.chunk_id || i"
@@ -137,7 +137,7 @@
               </span>
               <span class="rcp-chunk-section">{{ chunk.section_title || t('rcp_chunk_default') }}</span>
               <span class="rcp-chunk-period">{{ chunk.period || '' }}</span>
-              <span v-if="chunk.score != null" class="rcp-chunk-score">
+              <span v-if="isDebugMode && chunk.score != null" class="rcp-chunk-score">
                 {{ (chunk.score * 100).toFixed(0) }}%
               </span>
               <a
@@ -159,12 +159,12 @@
               {{ chunk.content }}
             </div>
             <button
-              v-if="chunk.content"
+              v-if="isDebugMode && chunk.content"
               class="rcp-chunk-toggle"
               @click="toggleChunk(i)"
             >{{ expandedChunks[i] ? t('rcp_collapse') : t('rcp_expand') }}</button>
           </div>
-        </div>
+        </details>
 
         <!-- No index / REPORT_RAG_NOT_READY notice with action suggestions -->
         <div v-else-if="result.rag_status === 'unavailable'" class="rcp-notice rcp-notice--info">
@@ -235,6 +235,7 @@ const forceRefresh   = ref(false)
 const composing      = ref(false)
 const rateLimitHit   = ref(false)
 const retryAfter     = ref(null)
+const isDebugMode    = import.meta.env.VITE_COMPANY_V2_DEBUG === 'true'
 
 // Conversation history for display (not the server-side Redis memory)
 const history = ref([])
@@ -277,6 +278,14 @@ const memoryTurnsLoaded = computed(() => {
 function useSuggestion(s) {
   question.value = s
   submit()
+}
+
+function cleanAnswer(text) {
+  return String(text ?? '')
+    .replace(/\n*\s*_?仅供研究参考，不构成投资建议。?_?\s*/g, '\n')
+    .replace(/source_chunks|review_audit|structuredfinancialdata/gi, '')
+    .replace(/chunk\s*\d+/gi, '')
+    .trim()
 }
 
 function toggleChunk(i) {
@@ -342,14 +351,17 @@ async function submit() {
     }
 
     const data = await resp.json()
-    result.value = data
+    result.value = {
+      ...data,
+      answer: cleanAnswer(data.answer),
+    }
 
     // Append to local conversation display history (only non-rejected answers)
     const audit = data.review_audit || {}
     if (!audit.investment_advice_blocked && data.answer) {
       history.value.push({
         question: q,
-        answer: data.answer.slice(0, 120) + (data.answer.length > 120 ? '…' : ''),
+        answer: cleanAnswer(data.answer).slice(0, 120) + (cleanAnswer(data.answer).length > 120 ? '…' : ''),
         cacheHit: !!data.cache_meta?.hit,
       })
       // Keep at most 5 visible history turns

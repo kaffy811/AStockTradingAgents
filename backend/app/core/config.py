@@ -67,12 +67,29 @@ class Settings(BaseSettings):
     # Database
     database_url: str = Field(..., description="postgresql+asyncpg://...")
     redis_url: str | None = "redis://localhost:6379"
+    database_connection_mode: str = "transaction_pooler"  # direct | session_pooler | transaction_pooler
+    database_transaction_pool_strategy: str = "small_queue_pool"  # small_queue_pool | null_pool
+    database_pool_pre_ping: bool = True
+    database_pool_size: int = 2
+    database_max_overflow: int = 2
+    database_direct_pool_size: int = 5
+    database_direct_max_overflow: int = 10
+    database_pool_recycle_seconds: int = 1800
+    database_pool_timeout_seconds: float = 30.0
+    database_command_timeout_seconds: float = 45.0
+    auth_db_lookup_timeout_seconds: float = 4.0
+    auth_user_cache_ttl_seconds: int = 60
+    auth_db_timeout_threshold: int = 3
+    auth_circuit_open_seconds: float = 20.0
 
     # Company V2 RAG repository backend（Phase 6T-J1）
     # 合法值：database（默认，PostgreSQL 永久持久化）/ memory（仅隔离测试用，非永久）
     # database 初始化失败时抛结构化错误，禁止静默 fallback 到 memory。
     company_v2_rag_repository_backend: str = "database"
     company_v2_rag_chunk_batch_size: int = 200
+    company_v2_rag_db_run_timeout_seconds: float = 60.0
+    chat_runtime_mode: str = "legacy"  # legacy | layered_v1 | shadow
+    chat_layered_intents: str = "financial_report,financial_comparison,official_report_pdf,financial_snapshot,quote_query"
     # Set to False in production to skip Base.metadata.create_all at startup.
     # Production deployments should run: uv run alembic upgrade head
     enable_create_all: bool = True

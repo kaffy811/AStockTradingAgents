@@ -1,0 +1,60 @@
+{
+  "version": "v3_d6_4",
+  "generated_at": 1784210202.684393,
+  "markets": {
+    "CN": {
+      "total_securities": 5166,
+      "securities_with_short_name": 5166,
+      "indexed_securities": 5166,
+      "exact_short_name_resolvable": 5166,
+      "exact_short_name_tested": 5166,
+      "exact_full_name_resolvable": 5166,
+      "code_resolvable": 5166,
+      "duplicate_normalized_names": 0,
+      "ambiguous_names_sample": [],
+      "unresolved_records_count": 0,
+      "unresolved_records_sample": [],
+      "records_excluded_by_reason": {},
+      "source_counts": {
+        "stock_master:sw_industry_map": 5166,
+        "stock_industry_map:sw_2021_swsresearch": 5166
+      },
+      "elapsed_ms": 25306.75
+    },
+    "HK": {
+      "total_securities": 30,
+      "securities_with_short_name": 30,
+      "indexed_securities": 30,
+      "exact_short_name_resolvable": 30,
+      "exact_short_name_tested": 30,
+      "exact_full_name_resolvable": 30,
+      "code_resolvable": 30,
+      "duplicate_normalized_names": 0,
+      "ambiguous_names_sample": [],
+      "unresolved_records_count": 0,
+      "unresolved_records_sample": [],
+      "records_excluded_by_reason": {},
+      "source_counts": {
+        "stock_master:hk_manual": 30
+      },
+      "elapsed_ms": 286.53
+    },
+    "US": {
+      "total_securities": 0,
+      "securities_with_short_name": 0,
+      "indexed_securities": 0,
+      "exact_short_name_resolvable": 0,
+      "exact_short_name_tested": 0,
+      "exact_full_name_resolvable": 0,
+      "code_resolvable": 0,
+      "duplicate_normalized_names": 0,
+      "ambiguous_names_sample": [],
+      "unresolved_records_count": 0,
+      "unresolved_records_sample": [],
+      "records_excluded_by_reason": {},
+      "source_counts": {},
+      "elapsed_ms": 244.16
+    }
+  },
+  "elapsed_ms": 25957.51
+}

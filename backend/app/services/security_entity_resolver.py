@@ -7,6 +7,9 @@ stock maps are intentionally not used here.
 from __future__ import annotations
 
 import re
+import asyncio
+import hashlib
+import time
 import unicodedata
 from dataclasses import dataclass, field
 from difflib import SequenceMatcher
@@ -20,9 +23,10 @@ from app.models.stock_master import StockMaster
 from app.services.company_v2_snapshot_cache_service import company_v2_snapshot_cache_service
 
 
-INDEX_VERSION = "v2_d6_3"
+INDEX_VERSION = "v3_d6_4"
 SUPPORTED_MARKETS = ("CN", "HK", "US")
-_CORP_SUFFIX_RE = re.compile(r"(股份有限公司|有限责任公司|有限公司|公司|集团)$")
+_REQUEST_CACHE_KEY = "_security_entity_index_snapshot_cache"
+_CORP_SUFFIX_RE = re.compile(r"(股份有限公司|有限责任公司|有限公司|公司)$")
 _ST_PREFIX_RE = re.compile(r"^\*?ST", re.IGNORECASE)
 _QUERY_NOISE_RE = re.compile(r"最近|表现|如何|怎么样|怎样|财报|年报|对比|比较|相比|看看|分析|一下|它|该股|这家公司|这只股票|呢|吗")
 _TS_CODE_RE = re.compile(r"(?<!\d)(\d{6})\.(SH|SZ|BJ)(?![A-Z0-9])", re.IGNORECASE)
@@ -42,6 +46,7 @@ class SecurityEntity:
     full_name: str = ""
     aliases: list[str] = field(default_factory=list)
     industry: str = ""
+    source: str = ""
     confidence: float = 0.0
     match_type: str = ""
     ambiguity: bool = False
@@ -58,6 +63,7 @@ class SecurityEntity:
             "full_name": self.full_name,
             "aliases": self.aliases,
             "industry": self.industry,
+            "source": self.source,
             "confidence": self.confidence,
             "match_type": self.match_type,
             "ambiguity": self.ambiguity,
@@ -74,6 +80,37 @@ class SecurityEntity:
             "match_type": self.match_type,
             "entity": self.to_dict(),
         }
+
+
+@dataclass(frozen=True)
+class _IndexSnapshot:
+    market: str
+    version: str
+    rows: tuple[dict[str, Any], ...]
+    metadata: dict[str, Any]
+    built_at: float
+
+
+_APP_INDEX_SNAPSHOTS: dict[str, _IndexSnapshot] = {}
+_APP_INDEX_LOCKS: dict[str, asyncio.Lock] = {}
+_SECURITY_INDEX_METRICS: dict[str, int | str] = {
+    "security_index_cache_hit": 0,
+    "security_index_cache_miss": 0,
+    "security_index_rebuild": 0,
+    "security_index_db_full_scan": 0,
+    "security_index_version": INDEX_VERSION,
+}
+
+
+def get_security_index_metrics() -> dict[str, int | str]:
+    return dict(_SECURITY_INDEX_METRICS)
+
+
+def reset_security_index_runtime_state() -> None:
+    _APP_INDEX_SNAPSHOTS.clear()
+    _APP_INDEX_LOCKS.clear()
+    for key in list(_SECURITY_INDEX_METRICS):
+        _SECURITY_INDEX_METRICS[key] = 0 if key != "security_index_version" else INDEX_VERSION
 
 
 def normalize_security_text(text: str | None, *, strip_corp_suffix: bool = True, strip_st_prefix: bool = False) -> str:
@@ -145,6 +182,7 @@ def normalize_symbol_for_market(market: str, symbol: str) -> str:
 class SecurityEntityResolver:
     def __init__(self, *, sample_rows: list[dict[str, Any]] | None = None) -> None:
         self._sample_rows = sample_rows or []
+        self._compiled_indexes: dict[str, dict[str, Any]] = {}
 
     async def resolve_one(
         self,
@@ -242,45 +280,209 @@ class SecurityEntityResolver:
         if db is None:
             return []
         cache_key = f"security_entity_index:{market}:{INDEX_VERSION}"
-        cached, swr_status, _ = await company_v2_snapshot_cache_service.get_swr(cache_key)
-        if swr_status in {"fresh", "stale"} and isinstance(cached, list) and cached:
-            return cached
+        request_cache = self._request_cache(db)
+        if request_cache is not None and cache_key in request_cache:
+            _SECURITY_INDEX_METRICS["security_index_cache_hit"] = int(_SECURITY_INDEX_METRICS["security_index_cache_hit"]) + 1
+            return self._copy_rows(request_cache[cache_key].rows)
 
-        rows = await self._load_master_rows(db, market)
-        if rows:
-            await company_v2_snapshot_cache_service.set_swr(cache_key, rows, fresh_ttl=6 * 3600, stale_ttl=24 * 3600)
+        app_snapshot = _APP_INDEX_SNAPSHOTS.get(cache_key)
+        if app_snapshot is not None and self._index_is_usable(list(app_snapshot.rows), market):
+            if request_cache is not None:
+                request_cache[cache_key] = app_snapshot
+            _SECURITY_INDEX_METRICS["security_index_cache_hit"] = int(_SECURITY_INDEX_METRICS["security_index_cache_hit"]) + 1
+            return self._copy_rows(app_snapshot.rows)
+
+        cached, swr_status, _ = await company_v2_snapshot_cache_service.get_swr(cache_key)
+        cached_rows = self._rows_from_cached_index(cached, market)
+        if swr_status in {"fresh", "stale"} and self._index_is_usable(cached_rows, market):
+            snapshot = self._snapshot_from_rows(market, cached_rows, cached.get("metadata") if isinstance(cached, dict) else None)
+            _APP_INDEX_SNAPSHOTS[cache_key] = snapshot
+            if request_cache is not None:
+                request_cache[cache_key] = snapshot
+            _SECURITY_INDEX_METRICS["security_index_cache_hit"] = int(_SECURITY_INDEX_METRICS["security_index_cache_hit"]) + 1
+            return cached_rows
+
+        _SECURITY_INDEX_METRICS["security_index_cache_miss"] = int(_SECURITY_INDEX_METRICS["security_index_cache_miss"]) + 1
+        lock = _APP_INDEX_LOCKS.setdefault(cache_key, asyncio.Lock())
+        async with lock:
+            app_snapshot = _APP_INDEX_SNAPSHOTS.get(cache_key)
+            if app_snapshot is not None and self._index_is_usable(list(app_snapshot.rows), market):
+                if request_cache is not None:
+                    request_cache[cache_key] = app_snapshot
+                _SECURITY_INDEX_METRICS["security_index_cache_hit"] = int(_SECURITY_INDEX_METRICS["security_index_cache_hit"]) + 1
+                return self._copy_rows(app_snapshot.rows)
+
+            cached, swr_status, _ = await company_v2_snapshot_cache_service.get_swr(cache_key)
+            cached_rows = self._rows_from_cached_index(cached, market)
+            if swr_status in {"fresh", "stale"} and self._index_is_usable(cached_rows, market):
+                snapshot = self._snapshot_from_rows(market, cached_rows, cached.get("metadata") if isinstance(cached, dict) else None)
+                _APP_INDEX_SNAPSHOTS[cache_key] = snapshot
+                if request_cache is not None:
+                    request_cache[cache_key] = snapshot
+                _SECURITY_INDEX_METRICS["security_index_cache_hit"] = int(_SECURITY_INDEX_METRICS["security_index_cache_hit"]) + 1
+                return cached_rows
+
+            _SECURITY_INDEX_METRICS["security_index_rebuild"] = int(_SECURITY_INDEX_METRICS["security_index_rebuild"]) + 1
+            try:
+                rows = await self._load_master_rows(db, market)
+            except Exception:
+                fallback = _APP_INDEX_SNAPSHOTS.get(cache_key)
+                if fallback is not None:
+                    return self._copy_rows(fallback.rows)
+                raise
+
+        if self._index_is_usable(rows, market):
+            snapshot = self._snapshot_from_rows(market, rows)
+            _APP_INDEX_SNAPSHOTS[cache_key] = snapshot
+            if request_cache is not None:
+                request_cache[cache_key] = snapshot
+            await company_v2_snapshot_cache_service.set_swr(
+                cache_key,
+                self._index_payload(rows, market),
+                fresh_ttl=6 * 3600,
+                stale_ttl=24 * 3600,
+            )
+        elif rows:
+            await company_v2_snapshot_cache_service.set_swr(
+                cache_key,
+                self._index_payload(rows, market),
+                fresh_ttl=60,
+                stale_ttl=120,
+            )
         return rows
 
     async def _load_master_rows(self, db: AsyncSession, market: str) -> list[dict[str, Any]]:
-        stmt = select(StockMaster).where(StockMaster.market == market, StockMaster.status == "active").limit(20000)
-        rows = (await db.execute(stmt)).scalars().all()
-        if rows:
-            return [
-                self._normalize_row({
-                    "market": row.market,
-                    "symbol": row.symbol,
-                    "short_name": row.name,
-                    "full_name": getattr(row, "full_name", "") or row.name,
-                    "exchange": row.exchange,
-                    "entity_type": row.asset_type or "equity",
-                    "source": row.source,
-                })
-                for row in rows
-            ]
-        fallback_stmt = select(StockIndustryMap).where(StockIndustryMap.market == market, StockIndustryMap.is_primary.is_(True)).limit(20000)
-        fallback = (await db.execute(fallback_stmt)).scalars().all()
-        return [
-            self._normalize_row({
+        _SECURITY_INDEX_METRICS["security_index_db_full_scan"] = int(_SECURITY_INDEX_METRICS["security_index_db_full_scan"]) + 1
+        by_key: dict[tuple[str, str], dict[str, Any]] = {}
+
+        industry_stmt = (
+            select(StockIndustryMap)
+            .where(StockIndustryMap.market == market, StockIndustryMap.is_primary.is_(True))
+            .limit(30000)
+        )
+        industry_rows = (await db.execute(industry_stmt)).scalars().all()
+        for row in industry_rows:
+            normalized = self._normalize_row({
                 "market": row.market,
                 "symbol": row.symbol,
                 "short_name": row.stock_name,
                 "full_name": row.stock_name,
                 "industry": row.industry_name,
                 "entity_type": "equity",
-                "source": row.source,
+                "source": f"stock_industry_map:{row.source}",
             })
-            for row in fallback
+            by_key[(normalized["market"], normalized["symbol"])] = normalized
+
+        master_stmt = select(StockMaster).where(StockMaster.market == market, StockMaster.status == "active").limit(30000)
+        master_rows = (await db.execute(master_stmt)).scalars().all()
+        for row in master_rows:
+            normalized = self._normalize_row({
+                "market": row.market,
+                "symbol": row.symbol,
+                "short_name": row.name,
+                "full_name": getattr(row, "full_name", "") or row.name,
+                "exchange": row.exchange,
+                "entity_type": row.asset_type or "equity",
+                "source": f"stock_master:{row.source}",
+            })
+            key = (normalized["market"], normalized["symbol"])
+            existing = by_key.get(key)
+            if existing:
+                normalized["industry"] = normalized.get("industry") or existing.get("industry") or ""
+                normalized["aliases"] = sorted(set((normalized.get("aliases") or []) + (existing.get("aliases") or [])))
+                normalized["source"] = f"{normalized.get('source')};{existing.get('source')}"
+                normalized["normalized_names"] = sorted(set((normalized.get("normalized_names") or []) + (existing.get("normalized_names") or [])))
+            by_key[key] = normalized
+
+        return sorted(by_key.values(), key=lambda r: (r.get("market", ""), r.get("symbol", "")))
+
+    def _request_cache(self, db: AsyncSession | None) -> dict[str, _IndexSnapshot] | None:
+        if db is None:
+            return None
+        info = getattr(db, "info", None)
+        if not isinstance(info, dict):
+            sync_session = getattr(db, "sync_session", None)
+            info = getattr(sync_session, "info", None)
+        if not isinstance(info, dict):
+            return None
+        cache = info.setdefault(_REQUEST_CACHE_KEY, {})
+        return cache if isinstance(cache, dict) else None
+
+    def _snapshot_from_rows(
+        self,
+        market: str,
+        rows: list[dict[str, Any]],
+        metadata: dict[str, Any] | None = None,
+    ) -> _IndexSnapshot:
+        payload_meta = metadata or self._index_payload(rows, market).get("metadata") or {}
+        return _IndexSnapshot(
+            market=market.upper(),
+            version=INDEX_VERSION,
+            rows=tuple(dict(row) for row in rows),
+            metadata=dict(payload_meta),
+            built_at=time.time(),
+        )
+
+    def _copy_rows(self, rows: tuple[dict[str, Any], ...] | list[dict[str, Any]]) -> list[dict[str, Any]]:
+        return [dict(row) for row in rows]
+
+    def _index_checksum(self, rows: list[dict[str, Any]]) -> str:
+        parts = [
+            "|".join([
+                str(row.get("market") or ""),
+                str(row.get("symbol") or ""),
+                str(row.get("short_name") or ""),
+                str(row.get("full_name") or ""),
+                ",".join(sorted(row.get("normalized_names") or [])),
+            ])
+            for row in rows
         ]
+        return hashlib.sha1("\n".join(parts).encode("utf-8")).hexdigest()
+
+    def _index_payload(self, rows: list[dict[str, Any]], market: str) -> dict[str, Any]:
+        source_counts: dict[str, int] = {}
+        for row in rows:
+            for source in str(row.get("source") or "unknown").split(";"):
+                source_counts[source] = source_counts.get(source, 0) + 1
+        return {
+            "version": INDEX_VERSION,
+            "market": market,
+            "rows": rows,
+            "metadata": {
+                "version": INDEX_VERSION,
+                "market": market,
+                "source_counts": source_counts,
+                "indexed_count": len(rows),
+                "built_at": time.time(),
+                "checksum": self._index_checksum(rows),
+            },
+        }
+
+    def _rows_from_cached_index(self, cached: Any, market: str) -> list[dict[str, Any]]:
+        if isinstance(cached, list):
+            return []
+        if not isinstance(cached, dict):
+            return []
+        if cached.get("version") != INDEX_VERSION:
+            return []
+        metadata = cached.get("metadata") or {}
+        rows = cached.get("rows")
+        if not isinstance(rows, list):
+            return []
+        if metadata.get("checksum") and metadata.get("checksum") != self._index_checksum(rows):
+            return []
+        if metadata.get("market") and str(metadata.get("market")).upper() != market.upper():
+            return []
+        return rows
+
+    def _index_is_usable(self, rows: list[dict[str, Any]], market: str) -> bool:
+        if not rows:
+            return False
+        minimums = {"CN": 1000, "HK": 10, "US": 1}
+        if len(rows) < minimums.get(market.upper(), 1):
+            return False
+        named = sum(1 for row in rows if row.get("short_name") and row.get("normalized_names"))
+        return named > 0
 
     def _normalize_row(self, row: dict[str, Any], *, market_hint: str | None = None) -> dict[str, Any]:
         market = str(row.get("market") or market_hint or "CN").upper()
@@ -307,6 +509,7 @@ class SecurityEntityResolver:
             "full_name": full_name,
             "aliases": aliases + former_names,
             "industry": row.get("industry") or row.get("industry_name") or "",
+            "source": row.get("source") or "",
             "normalized_names": list(normalized_names),
             "english_name": row.get("english_name") or "",
             "pinyin": row.get("pinyin") or "",
@@ -316,35 +519,64 @@ class SecurityEntityResolver:
     def _match_candidates(self, text: str, index: list[dict[str, Any]], *, min_confidence: float) -> list[SecurityEntity]:
         normalized_text = normalize_security_text(text)
         query_terms = _query_terms(text)
-        candidates: list[SecurityEntity] = []
+        candidates_by_key: dict[tuple[str, str, str], SecurityEntity] = {}
+        candidate_rank: dict[tuple[str, str, str], int] = {}
+        candidate_position: dict[tuple[str, str, str], int] = {}
         code_tokens = set(_CN_CODE_RE.findall(text))
         ts_tokens = {(m.group(1), m.group(2).upper()) for m in _TS_CODE_RE.finditer(text)}
         hk_tokens = {token for token in _HK_CODE_RE.findall(text) if token.isdigit()}
         us_tokens = set(_US_TICKER_RE.findall(text.upper()))
 
-        for row in index:
-            market = row["market"]
-            symbol = row["symbol"]
-            match_type = ""
-            confidence = 0.0
-            if market == "CN" and symbol in code_tokens:
-                confidence, match_type = 1.0, "exact_code"
-            elif market == "CN" and any(symbol == code and row["ts_code"].endswith(f".{suffix}") for code, suffix in ts_tokens):
-                confidence, match_type = 1.0, "exact_ts_code"
-            elif market == "HK" and symbol in {normalize_symbol_for_market("HK", token) for token in hk_tokens}:
-                confidence, match_type = 0.98, "exact_code"
-            elif market == "US" and symbol.upper() in us_tokens:
-                confidence, match_type = 0.98, "exact_ticker"
-            else:
+        compiled = self._compile_index(index)
+
+        def add(row: dict[str, Any] | None, confidence: float, match_type: str, *, rank: int = 0, position: int = 9999) -> None:
+            if not row or confidence < min_confidence:
+                return
+            entity = self._entity_from_row(row, confidence=round(confidence, 4), match_type=match_type)
+            key = (entity.market, entity.symbol, match_type)
+            existing = candidates_by_key.get(key)
+            existing_rank = candidate_rank.get(key, -1)
+            existing_position = candidate_position.get(key, 9999)
+            if (
+                existing is None
+                or entity.confidence > existing.confidence
+                or (entity.confidence == existing.confidence and position < existing_position)
+                or (entity.confidence == existing.confidence and position == existing_position and rank > existing_rank)
+            ):
+                candidates_by_key[key] = entity
+                candidate_rank[key] = rank
+                candidate_position[key] = position
+
+        suffix_to_exchange = {"SH": "SSE", "SZ": "SZSE", "BJ": "BSE"}
+        for code in code_tokens:
+            add(compiled["cn_code"].get(code), 1.0, "exact_code", rank=1000, position=max(text.find(code), 0))
+        for code, suffix in ts_tokens:
+            row = compiled["cn_code"].get(code)
+            if row and row.get("exchange") == suffix_to_exchange.get(suffix):
+                add(row, 1.0, "exact_ts_code", rank=1000, position=max(text.upper().find(f"{code}.{suffix}"), 0))
+        normalized_hk_tokens = {normalize_symbol_for_market("HK", token) for token in hk_tokens}
+        for token in normalized_hk_tokens:
+            add(compiled["hk_code"].get(token), 0.98, "exact_code", rank=1000, position=max(text.find(token.lstrip("0")), 0))
+        for token in us_tokens:
+            add(compiled["us_ticker"].get(token.upper()), 0.98, "exact_ticker", rank=1000, position=max(text.upper().find(token.upper()), 0))
+
+        for row in compiled["exact_name"].get(normalized_text, []):
+            add(row, 0.99, "exact_short_name", rank=len(normalized_text))
+
+        for row, match_len, position in self._continuous_name_matches(compiled["name_trie"], normalized_text):
+            add(row, 1.0, "continuous_name_match", rank=match_len, position=position)
+
+        # Fallback scans are intentionally behind compiled lookups. They keep
+        # fuzzy/candidate behavior for ambiguous names without making the common
+        # continuous Chinese path scan every listed security.
+        if not candidates_by_key:
+            for row in index:
+                confidence = 0.0
+                match_type = ""
                 for name in row["normalized_names"]:
                     if not name:
                         continue
-                    if normalized_text == name:
-                        confidence, match_type = 0.99, "exact_short_name"
-                        break
-                    if name in normalized_text:
-                        confidence, match_type = max(confidence, 0.97), "continuous_name_match"
-                    elif (len(normalized_text) >= 2 and normalized_text in name) or any(term in name for term in query_terms):
+                    if (len(normalized_text) >= 2 and normalized_text in name) or any(term in name for term in query_terms):
                         confidence, match_type = max(confidence, 0.94), "normalized_name_contains"
                     elif len(name) >= 2:
                         score = SequenceMatcher(None, normalized_text, name).ratio()
@@ -354,10 +586,81 @@ class SecurityEntityResolver:
                     confidence, match_type = max(confidence, 0.9), "pinyin"
                 if row.get("pinyin_initials") and row["pinyin_initials"].upper() in normalized_text:
                     confidence, match_type = max(confidence, 0.88), "pinyin_initials"
-            if confidence >= min_confidence:
-                candidates.append(self._entity_from_row(row, confidence=round(confidence, 4), match_type=match_type))
-        candidates.sort(key=lambda c: (-c.confidence, c.market, c.symbol))
+                add(row, confidence, match_type, rank=max((len(name) for name in row.get("normalized_names") or []), default=0))
+
+        candidates = list(candidates_by_key.values())
+        candidates.sort(key=lambda c: (
+            -c.confidence,
+            candidate_position.get((c.market, c.symbol, c.match_type), 9999),
+            -candidate_rank.get((c.market, c.symbol, c.match_type), 0),
+            c.market,
+            c.symbol,
+        ))
         return candidates
+
+    def _compile_index(self, index: list[dict[str, Any]]) -> dict[str, Any]:
+        checksum = self._index_checksum(index)
+        cached = self._compiled_indexes.get(checksum)
+        if cached is not None:
+            return cached
+
+        compiled: dict[str, Any] = {
+            "cn_code": {},
+            "hk_code": {},
+            "us_ticker": {},
+            "exact_name": {},
+            "name_trie": {},
+        }
+
+        for row in index:
+            normalized = self._normalize_row(row)
+            market = normalized["market"]
+            symbol = normalized["symbol"]
+            if market == "CN":
+                compiled["cn_code"][symbol] = normalized
+                if normalized.get("ts_code"):
+                    compiled["cn_code"][str(normalized["ts_code"]).upper()] = normalized
+            elif market == "HK":
+                compiled["hk_code"][symbol] = normalized
+                compiled["hk_code"][symbol.lstrip("0") or symbol] = normalized
+            elif market == "US":
+                compiled["us_ticker"][symbol.upper()] = normalized
+
+            for name in normalized.get("normalized_names") or []:
+                if not name:
+                    continue
+                compiled["exact_name"].setdefault(name, []).append(normalized)
+                node = compiled["name_trie"]
+                for char in name:
+                    node = node.setdefault(char, {})
+                node.setdefault("_rows", []).append(normalized)
+
+        self._compiled_indexes[checksum] = compiled
+        return compiled
+
+    def _continuous_name_matches(self, trie: dict[str, Any], normalized_text: str) -> list[tuple[dict[str, Any], int, int]]:
+        matches: list[tuple[dict[str, Any], int, int]] = []
+        seen: set[tuple[str, str]] = set()
+        if not normalized_text or not trie:
+            return matches
+        for start in range(len(normalized_text)):
+            node = trie
+            best_rows: list[dict[str, Any]] = []
+            best_len = 0
+            for pos in range(start, len(normalized_text)):
+                node = node.get(normalized_text[pos])
+                if node is None:
+                    break
+                if node.get("_rows"):
+                    best_rows = node["_rows"]
+                    best_len = pos - start + 1
+            for row in best_rows:
+                key = (row.get("market", ""), row.get("symbol", ""))
+                if key in seen:
+                    continue
+                seen.add(key)
+                matches.append((row, best_len, start))
+        return matches
 
     def _entity_from_row(self, row: dict[str, Any], *, confidence: float, match_type: str) -> SecurityEntity:
         normalized = self._normalize_row(row)
@@ -371,6 +674,7 @@ class SecurityEntityResolver:
             full_name=str(normalized["full_name"]),
             aliases=list(normalized["aliases"]),
             industry=str(normalized["industry"]),
+            source=str(normalized["source"]),
             confidence=confidence,
             match_type=match_type,
         )

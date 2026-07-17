@@ -24,6 +24,7 @@ Design notes:
 from __future__ import annotations
 
 import asyncio
+from concurrent.futures import TimeoutError as FutureTimeoutError
 import datetime as dt
 import json
 import threading
@@ -64,6 +65,10 @@ class DatabaseCompanyV2ReportRagRepository:
 
     backend = "database"
     persistent = True
+    _shared_lock = threading.Lock()
+    _shared_loop: asyncio.AbstractEventLoop | None = None
+    _shared_thread: threading.Thread | None = None
+    _shared_sessionmakers: dict[str, tuple[AsyncEngine, async_sessionmaker[AsyncSession]]] = {}
 
     def __init__(self, database_url: str | None = None, *, chunk_batch_size: int | None = None) -> None:
         self._database_url = database_url or settings.database_url
@@ -78,8 +83,9 @@ class DatabaseCompanyV2ReportRagRepository:
     # ── private loop-thread bridge ────────────────────────────────────────────
 
     def _ensure_loop(self) -> asyncio.AbstractEventLoop:
-        with self._lock:
-            if self._loop is None:
+        cls = type(self)
+        with cls._shared_lock:
+            if cls._shared_loop is None or cls._shared_loop.is_closed():
                 loop = asyncio.new_event_loop()
 
                 def _run() -> None:
@@ -88,14 +94,30 @@ class DatabaseCompanyV2ReportRagRepository:
 
                 thread = threading.Thread(target=_run, name="company-v2-rag-db", daemon=True)
                 thread.start()
-                self._loop = loop
-                self._thread = thread
-            return self._loop
+                cls._shared_loop = loop
+                cls._shared_thread = thread
+            self._loop = cls._shared_loop
+            self._thread = cls._shared_thread
+            return cls._shared_loop
 
     def _run(self, coro: Any) -> Any:
         loop = self._ensure_loop()
+        timeout = float(settings.company_v2_rag_db_run_timeout_seconds or 60.0)
+        outer_timeout = timeout + 5.0
+
+        async def _with_timeout() -> Any:
+            return await asyncio.wait_for(coro, timeout=timeout)
+
+        future = asyncio.run_coroutine_threadsafe(_with_timeout(), loop)
         try:
-            return asyncio.run_coroutine_threadsafe(coro, loop).result()
+            return future.result(timeout=outer_timeout)
+        except (FutureTimeoutError, TimeoutError) as exc:
+            future.cancel()
+            self._discard_shared_resources(loop)
+            raise CompanyV2RagRepositoryError(
+                "RAG_DB_QUERY_TIMEOUT",
+                f"timeout_after={timeout:.1f}s",
+            ) from exc
         except CompanyV2RagRepositoryError:
             raise
         except Exception as exc:  # noqa: BLE001 — surface as structured error, never fallback
@@ -104,22 +126,47 @@ class DatabaseCompanyV2ReportRagRepository:
     async def _get_sessionmaker(self) -> async_sessionmaker[AsyncSession]:
         if self._sessionmaker is None:
             try:
+                database_url = make_url(self._database_url)
+                cache_key = database_url.render_as_string(hide_password=False)
+                shared = type(self)._shared_sessionmakers.get(cache_key)
+                if shared is not None:
+                    self._engine, self._sessionmaker = shared
+                    return self._sessionmaker
+
                 # Supabase transaction pooler (pgbouncer) does not support
                 # prepared statements across multiplexed connections — mirror
-                # app.core.database: disable statement cache and use a small
-                # async queue pool for steady-state connection reuse.
-                database_url = make_url(self._database_url)
-                poolclass = AsyncAdaptedQueuePool if database_url.drivername.startswith("postgresql") else NullPool
+                # app.core.database: disable statement cache, pre-ping pooled
+                # connections, and share one bounded pool across repository
+                # instances to avoid long Chat/RAG requests exhausting slots.
+                connection_mode = (settings.database_connection_mode or "transaction_pooler").strip().lower()
+                transaction_strategy = (settings.database_transaction_pool_strategy or "small_queue_pool").strip().lower()
+                is_postgres = database_url.drivername.startswith("postgresql")
+                if not is_postgres:
+                    poolclass = NullPool
+                elif connection_mode == "transaction_pooler" and transaction_strategy == "null_pool":
+                    poolclass = NullPool
+                else:
+                    poolclass = AsyncAdaptedQueuePool
                 engine_kwargs = {
                     "poolclass": poolclass,
-                    "connect_args": {"statement_cache_size": 0},
+                    "connect_args": {
+                        "statement_cache_size": 0,
+                        "command_timeout": settings.database_command_timeout_seconds,
+                    },
+                    "pool_pre_ping": settings.database_pool_pre_ping,
                 }
                 if poolclass is AsyncAdaptedQueuePool:
+                    pool_size = settings.database_pool_size
+                    max_overflow = settings.database_max_overflow
+                    if connection_mode in {"direct", "session_pooler"}:
+                        pool_size = settings.database_direct_pool_size
+                        max_overflow = settings.database_direct_max_overflow
                     engine_kwargs.update(
                         {
-                            "pool_size": 5,
-                            "max_overflow": 10,
-                            "pool_recycle": 1800,
+                            "pool_size": pool_size,
+                            "max_overflow": max_overflow,
+                            "pool_recycle": settings.database_pool_recycle_seconds,
+                            "pool_timeout": settings.database_pool_timeout_seconds,
                         }
                     )
                 self._engine = create_async_engine(
@@ -128,9 +175,54 @@ class DatabaseCompanyV2ReportRagRepository:
                     **engine_kwargs,
                 )
                 self._sessionmaker = async_sessionmaker(self._engine, expire_on_commit=False)
+                type(self)._shared_sessionmakers[cache_key] = (self._engine, self._sessionmaker)
             except Exception as exc:  # noqa: BLE001
                 raise CompanyV2RagRepositoryError("RAG_DB_INIT_FAILED", str(exc)[:400]) from exc
         return self._sessionmaker
+
+    @classmethod
+    def _discard_shared_resources(cls, loop: asyncio.AbstractEventLoop) -> None:
+        """Drop a timed-out loop/engine so later calls start from clean state."""
+        with cls._shared_lock:
+            if cls._shared_loop is not loop:
+                return
+            thread = cls._shared_thread
+            cls._shared_sessionmakers = {}
+            cls._shared_loop = None
+            cls._shared_thread = None
+        if loop.is_running():
+            loop.call_soon_threadsafe(loop.stop)
+            if thread is not None:
+                thread.join(timeout=1.0)
+
+    @classmethod
+    def close_shared_resources(cls, *, timeout: float | None = None) -> None:
+        """Dispose shared DB resources, primarily for tests and app shutdown hooks."""
+        with cls._shared_lock:
+            loop = cls._shared_loop
+            thread = cls._shared_thread
+            engines = [engine for engine, _ in cls._shared_sessionmakers.values()]
+            cls._shared_sessionmakers = {}
+            cls._shared_loop = None
+            cls._shared_thread = None
+        if loop is None:
+            return
+
+        async def _dispose() -> None:
+            for engine in engines:
+                await engine.dispose()
+
+        if loop.is_running():
+            future = asyncio.run_coroutine_threadsafe(_dispose(), loop)
+            try:
+                future.result(timeout=timeout or settings.company_v2_rag_db_run_timeout_seconds)
+            except Exception:
+                future.cancel()
+            loop.call_soon_threadsafe(loop.stop)
+            if thread is not None:
+                thread.join(timeout=timeout or 5.0)
+        if not loop.is_closed():
+            loop.close()
 
     def status(self) -> dict[str, Any]:
         return {"repository_backend": self.backend, "persistent": self.persistent}
@@ -242,11 +334,55 @@ class DatabaseCompanyV2ReportRagRepository:
     get_active_document = get_document
     get_document_by_report_id = get_document
 
+    async def get_document_async(self, report_id: int):
+        """Native async active document lookup for request-path tools."""
+        return await self._get_document_async(report_id, active_only=True)
+
     def get_any_document(self, report_id: int):
         return self._run(self._get_document_async(report_id, active_only=False))
 
+    async def get_any_document_async(self, report_id: int):
+        """Native async document lookup, including stale/deleted generations."""
+        return await self._get_document_async(report_id, active_only=False)
+
     def get_any_document_metadata(self, report_id: int):
         return self._run(self._get_document_metadata_async(report_id, active_only=False))
+
+    async def get_any_document_metadata_async(self, report_id: int):
+        """Native async metadata lookup without loading chunks."""
+        return await self._get_document_metadata_async(report_id, active_only=False)
+
+    async def query_chunks_async(self, report_id: int, *, limit: int = 8):
+        """Native async chunk lookup for layered Chat request paths."""
+        doc = await self.get_document_async(report_id)
+        if not doc:
+            return []
+        return list(doc.chunks or [])[: max(1, min(int(limit or 8), 20))]
+
+    async def get_structured_fields_async(self, report_id: int):
+        """Native async structured-field facade.
+
+        Field extraction is owned by the report financial extractor service; this
+        repository method exists so runtime tools have an async, non-bridge entry
+        point and never need the deprecated sync facade.
+        """
+        return {"report_id": int(report_id), "fields": {}}
+
+    async def get_latest_indexed_report_async(self, *, symbol: str, market: str | None = None):
+        """Native async latest active indexed report metadata lookup."""
+        maker = await self._get_sessionmaker()
+        async with maker() as session:
+            stmt = (
+                select(DocumentRow)
+                .where(DocumentRow.symbol == symbol, DocumentRow.active_index == 1, DocumentRow.deleted_at.is_(None))
+                .order_by(DocumentRow.report_year.desc(), DocumentRow.index_generation.desc())
+            )
+            if market:
+                stmt = stmt.where(DocumentRow.market == market)
+            row = (await session.execute(stmt)).scalars().first()
+            if not row:
+                return None
+            return self._document_record(row, [])
 
     def list_documents(self, symbol: str | None = None, *, include_deleted: bool = False):
         async def _list() -> list[Any]:

@@ -1,4 +1,5 @@
 from collections.abc import AsyncGenerator
+import logging
 
 from redis.asyncio import Redis, from_url
 from sqlalchemy.engine import make_url
@@ -12,33 +13,63 @@ from sqlalchemy.pool import AsyncAdaptedQueuePool, NullPool
 
 from app.core.config import settings
 
+log = logging.getLogger(__name__)
+
 # ── SQLAlchemy ────────────────────────────────────────────────────────────────
-# NullPool: disables SQLAlchemy's local connection pool.
-#   Supabase Transaction Pooler (PgBouncer) already manages pooling server-side;
-#   running a second pool on top causes prepared-statement conflicts.
-# statement_cache_size=0: asyncpg caches prepared statements by default.
-#   PgBouncer in transaction mode routes statements to different backend
-#   connections, so a statement cached on connection A may not exist on
-#   connection B → DuplicatePreparedStatementError. Setting cache size to 0
-#   disables client-side prepared statement caching entirely.
+# DB_CONNECTION_MODE explicitly controls local pooling policy:
+# - transaction_pooler: Supabase/PgBouncer transaction pooling; no prepared
+#   statements, short transactions, and either NullPool or a very small queue
+#   pool. Never use 5+10 burst connections here.
+# - session_pooler/direct: bounded AsyncAdaptedQueuePool with pre-ping/recycle.
 
 _database_url = make_url(settings.database_url)
-_poolclass = AsyncAdaptedQueuePool if _database_url.drivername.startswith("postgresql") else NullPool
+_is_postgres = _database_url.drivername.startswith("postgresql")
+_connection_mode = (settings.database_connection_mode or "transaction_pooler").strip().lower()
+_transaction_strategy = (settings.database_transaction_pool_strategy or "small_queue_pool").strip().lower()
+if not _is_postgres:
+    _poolclass = NullPool
+elif _connection_mode == "transaction_pooler" and _transaction_strategy == "null_pool":
+    _poolclass = NullPool
+else:
+    _poolclass = AsyncAdaptedQueuePool
+
 _engine_kwargs = {
     "poolclass": _poolclass,
-    "connect_args": {"statement_cache_size": 0},
+    "connect_args": {
+        "statement_cache_size": 0,
+        "command_timeout": settings.database_command_timeout_seconds,
+    },
     "echo": settings.debug,
+    "pool_pre_ping": settings.database_pool_pre_ping,
 }
 if _poolclass is AsyncAdaptedQueuePool:
+    pool_size = settings.database_pool_size
+    max_overflow = settings.database_max_overflow
+    if _connection_mode in {"direct", "session_pooler"}:
+        pool_size = settings.database_direct_pool_size
+        max_overflow = settings.database_direct_max_overflow
     _engine_kwargs.update(
         {
-            "pool_size": 5,
-            "max_overflow": 10,
-            "pool_recycle": 1800,
+            "pool_size": pool_size,
+            "max_overflow": max_overflow,
+            "pool_recycle": settings.database_pool_recycle_seconds,
+            "pool_timeout": settings.database_pool_timeout_seconds,
         }
     )
 
 async_engine = create_async_engine(settings.database_url, **_engine_kwargs)
+
+log.info(
+    "database engine configured mode=%s host_class=%s port=%s pool=%s pool_size=%s max_overflow=%s pool_timeout=%s command_timeout=%s",
+    _connection_mode,
+    "supabase_pooler" if "pooler.supabase.com" in (_database_url.host or "") else "database_host",
+    _database_url.port,
+    _poolclass.__name__,
+    _engine_kwargs.get("pool_size"),
+    _engine_kwargs.get("max_overflow"),
+    _engine_kwargs.get("pool_timeout"),
+    settings.database_command_timeout_seconds,
+)
 
 AsyncSessionLocal = async_sessionmaker(
     async_engine,

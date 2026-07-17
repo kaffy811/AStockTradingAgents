@@ -1,0 +1,92 @@
+{
+  "schema_version": "live_environment_preflight.v1",
+  "environment": {
+    "environment_id": "local_unverified",
+    "os": "macOS-26.3-arm64-arm-64bit",
+    "python_version": "3.12.10",
+    "region": "unknown",
+    "database_mode": "transaction_pooler",
+    "database_host_class": "supabase_pooler",
+    "dns_provider": "unknown",
+    "ipv4_available": false,
+    "ipv6_available": false
+  },
+  "dns": {
+    "supabase_pooler": {
+      "status": "failed",
+      "latency_ms": 0,
+      "error_code": "gaierror",
+      "details": {
+        "message": "[Errno 8] nodename nor servname provided, or not known"
+      }
+    }
+  },
+  "tcp": {
+    "supabase_pooler": {
+      "status": "skipped",
+      "latency_ms": null,
+      "error_code": "DNS_FAILED",
+      "details": {}
+    }
+  },
+  "tls": {
+    "supabase_pooler": {
+      "status": "skipped",
+      "latency_ms": null,
+      "error_code": "TCP_FAILED",
+      "details": {}
+    }
+  },
+  "postgres": {
+    "status": "skipped",
+    "latency_ms": null,
+    "error_code": "TLS_FAILED",
+    "details": {}
+  },
+  "redis": {
+    "status": "failed",
+    "latency_ms": 1,
+    "error_code": "ConnectionError",
+    "details": {
+      "message": "Error 1 connecting to localhost:6379. Operation not permitted."
+    }
+  },
+  "cninfo": {
+    "status": "failed",
+    "latency_ms": 7,
+    "error_code": "URLError",
+    "details": {
+      "message": "<urlopen error [Errno 1] Operation not permitted>"
+    }
+  },
+  "baostock": {
+    "status": "failed",
+    "latency_ms": 0,
+    "error_code": "gaierror",
+    "details": {
+      "message": "[Errno 8] nodename nor servname provided, or not known"
+    }
+  },
+  "rag": {
+    "status": "skipped",
+    "latency_ms": null,
+    "error_code": "POSTGRES_NOT_READY",
+    "details": {}
+  },
+  "llm": {
+    "status": "skipped",
+    "latency_ms": null,
+    "error_code": "LLM_PREFLIGHT_DISABLED",
+    "details": {}
+  },
+  "environment_ready": false,
+  "blockers": [
+    "DNS_gaierror",
+    "TCP_DNS_FAILED",
+    "TLS_TCP_FAILED",
+    "POSTGRES_TLS_FAILED",
+    "CNINFO_URLError",
+    "BAOSTOCK_gaierror",
+    "RAG_POSTGRES_NOT_READY"
+  ]
+}

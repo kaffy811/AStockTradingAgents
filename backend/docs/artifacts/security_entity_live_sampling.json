@@ -1,0 +1,72 @@
+{
+  "schema_version": "security_entity_live_sampling.v1",
+  "generated_at": "2026-07-16T20:47:41.334489+00:00",
+  "status": "blocked",
+  "environment_ready": false,
+  "markets": {
+    "CN": {
+      "requested_active_full_scan": 5166,
+      "executed_active_full_scan": 0,
+      "requested_stratified_sample": {
+        "sse_main": 20,
+        "szse_main": 20,
+        "chinext": 20,
+        "star": 20,
+        "bse": 10,
+        "st": 10,
+        "former_name_or_alias": 10,
+        "ambiguous_name_groups": 10
+      },
+      "executed_stratified_sample": 0
+    },
+    "HK": {
+      "requested_active_full_scan": 30,
+      "executed_active_full_scan": 0
+    },
+    "US": {
+      "requested_active_full_scan": 0,
+      "executed_active_full_scan": 0,
+      "reason": "current local SecurityMaster US coverage is 0"
+    }
+  },
+  "checks": {
+    "code_resolution": {
+      "executed": 0,
+      "passed": null
+    },
+    "short_name_resolution": {
+      "executed": 0,
+      "passed": null
+    },
+    "full_name_resolution": {
+      "executed": 0,
+      "passed": null
+    },
+    "continuous_chinese_query": {
+      "executed": 0,
+      "passed": null
+    },
+    "market_isolation": {
+      "executed": 0,
+      "passed": null
+    },
+    "hardcode_scan": {
+      "executed": 0,
+      "passed": null
+    },
+    "ambiguity_behavior": {
+      "executed": 0,
+      "passed": null
+    }
+  },
+  "success_rate": null,
+  "blockers": [
+    "DNS_gaierror",
+    "TCP_DNS_FAILED",
+    "TLS_TCP_FAILED",
+    "POSTGRES_TLS_FAILED",
+    "CNINFO_URLError",
+    "BAOSTOCK_gaierror",
+    "RAG_POSTGRES_NOT_READY"
+  ]
+}

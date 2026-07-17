@@ -17,6 +17,7 @@ from sqlalchemy import text
 
 from app.core.config import settings
 from app.core.database import async_engine, get_redis
+from app.core.runtime_reliability import runtime_reliability_snapshot
 
 log = logging.getLogger(__name__)
 
@@ -62,6 +63,17 @@ async def health():
         "redis_status": "ok" if redis_ok else "unavailable",
         "data_mode": settings.data_mode,
         "report_rag_enabled": settings.enable_report_rag,
+    }
+
+
+@router.get("/runtime")
+async def health_runtime():
+    """Runtime reliability metrics. No URL, JWT, email, or user labels."""
+    return {
+        "status": "ok",
+        "database_connection_mode": settings.database_connection_mode,
+        "database_transaction_pool_strategy": settings.database_transaction_pool_strategy,
+        "runtime": runtime_reliability_snapshot(),
     }
 
 

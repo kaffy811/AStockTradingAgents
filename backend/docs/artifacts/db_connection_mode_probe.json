@@ -1,0 +1,28 @@
+{
+  "generated_at": "2026-07-16T18:49:34.741164+00:00",
+  "target": {
+    "host_class": "supabase_pooler",
+    "port": 6543,
+    "driver": "postgresql+asyncpg"
+  },
+  "groups": [
+    {
+      "name": "transaction_pooler_current_queue",
+      "pool_class": "AsyncAdaptedQueuePool",
+      "status": "incomplete_timeout",
+      "group_timeout_seconds": 60
+    },
+    {
+      "name": "transaction_pooler_null_pool",
+      "pool_class": "NullPool",
+      "status": "incomplete_timeout",
+      "group_timeout_seconds": 60
+    },
+    {
+      "name": "transaction_pooler_small_queue",
+      "pool_class": "AsyncAdaptedQueuePool",
+      "status": "incomplete_timeout",
+      "group_timeout_seconds": 60
+    }
+  ]
+}

@@ -34,6 +34,17 @@ export async function baseFetch(path, options = {}) {
     throw err
   }
 
+  if (res.status === 503) {
+    const data = await res.json().catch(() => ({}))
+    const err = new Error(
+      data?.detail?.message || data?.message || '连接暂时不稳定，请重试'
+    )
+    err.status = 503
+    err.errorCode = data?.detail?.error_code || data?.error_code || 'SERVICE_UNAVAILABLE'
+    err.retryAfter = res.headers.get('Retry-After')
+    throw err
+  }
+
   if (res.status === 204) {
     return null
   }

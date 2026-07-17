@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pytest
+from pathlib import Path
 
 from app.services.security_entity_resolver import (
     SecurityEntityResolver,
@@ -92,6 +93,7 @@ def test_normalization_rules():
 
 
 def test_no_new_hardcoded_sample_symbols_in_resolver_paths():
+    repo_root = Path(__file__).resolve().parents[3]
     checked = [
         "backend/app/services/security_entity_resolver.py",
         "backend/app/agents/chat_skills/base.py",
@@ -102,6 +104,6 @@ def test_no_new_hardcoded_sample_symbols_in_resolver_paths():
     ]
     banned = {"600519", "000858", "300750", "000725"}
     for path in checked:
-        text = open(path, encoding="utf-8").read()
+        text = (repo_root / path).read_text(encoding="utf-8")
         for token in banned:
             assert token not in text, f"{token} must not appear in production resolver path {path}"

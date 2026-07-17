@@ -140,6 +140,12 @@ _SECTION_HEADER_RE = re.compile(
 
 _RISK_SECTION = re.compile(r"#{1,3}\s*(风险[^\n]*)\n+(.*?)(?=#{1,3}|\Z)", re.S)
 _DISCLAIMER_LINE = re.compile(r"_?仅供研究参考.*?_?")
+_STANDARD_DISCLAIMER_RE = re.compile(r"\n*\s*_?仅供研究参考，不构成投资建议。?_?\s*", re.I)
+_INTERNAL_ANSWER_LINE_RE = re.compile(
+    r"(source_chunks|source_chunks\[\d+\]|review_audit|structured\s*financial\s*fields|"
+    r"structuredfinancialdata|report_id|chunk\s*\d+|片段\s*[0-9a-f-]{4,})",
+    re.I,
+)
 
 
 def _is_filler(clause: str) -> bool:
@@ -152,6 +158,43 @@ def _apply_rewrites(text: str) -> str:
     for pattern, replacement in _PLAIN_REWRITES:
         text = pattern.sub(replacement, text)
     return text
+
+
+def _strip_standard_disclaimer(text: str) -> str:
+    return _STANDARD_DISCLAIMER_RE.sub("\n", str(text or "")).strip()
+
+
+def _source_summary(stock_name: str | None, result: dict) -> str:
+    report_context = result.get("report_context") or (result.get("memory_meta") or {}).get("report_context") or {}
+    year = report_context.get("report_year") or report_context.get("year") or ""
+    name = stock_name or report_context.get("stock_name") or report_context.get("short_name") or ""
+    prefix = f"{name}{year}年年度报告" if name and year else (f"{name}年度报告" if name else "正式年度报告")
+    return f"数据来源：{prefix}中的主要会计数据表、财务指标说明、现金流变动说明及利润分配预案。"
+
+
+def _sanitize_public_report_answer(answer: str, *, stock_name: str | None, result: dict) -> str:
+    cleaned = _strip_standard_disclaimer(answer)
+    lines: list[str] = []
+    for raw_line in cleaned.splitlines():
+        if _INTERNAL_ANSWER_LINE_RE.search(raw_line):
+            continue
+        lines.append(raw_line)
+    cleaned = "\n".join(lines).strip()
+    cleaned = cleaned.replace(
+        "现金流大幅下降并非主营业务恶化",
+        "现金流下降与财务公司存款项目变动有关，仅凭当前资料不能直接判断主营业务收款能力是否恶化",
+    )
+    cleaned = cleaned.replace(
+        "现金流下降并非主营业务恶化",
+        "现金流下降与财务公司存款项目变动有关，仅凭当前资料不能直接判断主营业务收款能力是否恶化",
+    )
+    cleaned = cleaned.replace(
+        "不代表主业造血能力恶化",
+        "仅凭当前财报片段，不能直接判断主营业务收款能力是否恶化",
+    )
+    if result.get("source_chunks") and "数据来源：" not in cleaned:
+        cleaned = cleaned.rstrip() + "\n\n" + _source_summary(stock_name, result)
+    return cleaned
 
 
 def _header_is_skippable(header: str) -> bool:
@@ -407,7 +450,7 @@ class ReportExplanationSkill(BaseSkill):
         resolved_entities = metadata.get("resolved_entities") if isinstance(metadata.get("resolved_entities"), list) else []
         financial_context = metadata.get("financial_context") if isinstance(metadata.get("financial_context"), dict) else {}
         debug_payload = {
-            "chat_entity_pipeline_version": metadata.get("chat_entity_pipeline_version") or "d6_3",
+            "chat_entity_pipeline_version": metadata.get("chat_entity_pipeline_version") or "d6_4",
             "raw_query": raw_query,
             "effective_query": effective_message,
             "resolver_called": bool(metadata.get("resolver_called")),
@@ -440,7 +483,7 @@ class ReportExplanationSkill(BaseSkill):
                     f"{c.get('short_name') or c.get('symbol')}（{c.get('market')}/{c.get('symbol')}）"
                     for c in candidates[:5]
                 )
-                answer = f"你提到的证券名称存在歧义，可能指：{names}。请明确选择其中一个标的。" + _DISCLAIMER
+                answer = f"你提到的证券名称存在歧义，可能指：{names}。请明确选择其中一个标的。"
                 return SkillResult(
                     ok=True,
                     skill_name=self.name,
@@ -479,7 +522,6 @@ class ReportExplanationSkill(BaseSkill):
         if not hint or not hint.get("symbol"):
             answer = (
                 "没有识别到明确的公司或股票代码。请明确公司名称或证券代码，例如“贵州茅台最新财报表现如何”。"
-                + _DISCLAIMER
             )
             debug_payload["failure_reason"] = "ENTITY_NOT_RESOLVED"
             await safe_emit(context.event_callback, "skill_completed", {
@@ -527,10 +569,11 @@ class ReportExplanationSkill(BaseSkill):
         events.append(self._tool_event("report_chat_copilot", "统一财报解释主链", "success" if result else "error"))
         events = self._rag_events(result.get("source_chunks", []), result.get("confidence")) + events
 
-        answer = _extract_answer_text(result) or "当前已接入资料不足以判断此问题。"
-        disclaimer = str(result.get("disclaimer") or _DISCLAIMER.strip())
-        if "不构成投资建议" not in answer:
-            answer = answer.rstrip() + "\n\n" + disclaimer
+        answer = _sanitize_public_report_answer(
+            _extract_answer_text(result) or "当前已接入资料不足以判断此问题。",
+            stock_name=hint.get("name") or None,
+            result=result,
+        )
 
         await safe_emit(context.event_callback, "skill_completed", {
             "skill_name": self.name,

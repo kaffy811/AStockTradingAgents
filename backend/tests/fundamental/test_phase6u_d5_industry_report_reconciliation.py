@@ -146,6 +146,6 @@ def test_phase6u_d5_central_planner_trace_routes_financial_report_to_agent():
     )
     dispatch = plan.get_agent_dispatch_event()
     planning = plan.get_phase_event("planning")
-    assert "ReportChatCopilotAgent" in dispatch["content"]
+    assert "定位关于 贵州茅台 的已索引正式财报" in dispatch["content"]
+    assert "ReportChatCopilotAgent" not in dispatch["content"]
     assert "无需调用专业 Agent" not in planning["content"]
-

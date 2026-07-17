@@ -122,7 +122,7 @@
               </div>
 
               <!-- Text content (markdown rendered) -->
-              <div v-if="msg.content" class="msg-text-md" v-html="renderMarkdown(msg.content)"></div>
+              <div v-if="msg.content" class="msg-text-md" v-html="renderMarkdown(stripStandardDisclaimer(msg.content))"></div>
 
               <!-- Typing indicator when no content yet -->
               <div v-else-if="msg.isStreaming && !SHOW_THINKING_MINI" class="msg-typing">
@@ -270,6 +270,12 @@ function _fmtMs(ms) {
 function _fmtTs(ts) {
   if (!ts) return '–'
   return new Date(ts).toLocaleTimeString()
+}
+
+function stripStandardDisclaimer(text) {
+  return String(text ?? '')
+    .replace(/\n*\s*_?仅供研究参考，不构成投资建议。?_?\s*/g, '\n')
+    .trim()
 }
 
 // Auto-scroll to bottom on new messages or toolTrace changes

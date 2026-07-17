@@ -185,6 +185,29 @@ describe('baseFetch auth propagation', () => {
     expect(classifyApiError(thrown).category).not.toBe('auth_required')
     vi.unstubAllGlobals()
   })
+
+  it('503 AUTH_DATABASE_UNAVAILABLE 不清除登录状态，提示可重试', async () => {
+    localStorage.setItem('ta_token', 'tok-keep')
+    const { baseFetch } = await import('../api/http.js')
+    const { useAuthStore } = await import('../stores/auth.js')
+    vi.stubGlobal('fetch', vi.fn(async () =>
+      new Response(JSON.stringify({
+        detail: {
+          status: 'failed',
+          error_code: 'AUTH_DATABASE_UNAVAILABLE',
+          message: '服务暂时无法验证账户状态，请稍后重试。',
+        },
+      }), { status: 503, headers: { 'Retry-After': '3' } })
+    ))
+    const store = useAuthStore()
+    let thrown = null
+    try { await baseFetch('/chat/sessions') } catch (e) { thrown = e }
+    expect(thrown.status).toBe(503)
+    expect(thrown.errorCode).toBe('AUTH_DATABASE_UNAVAILABLE')
+    expect(store.token).toBe('tok-keep')
+    expect(store.sessionExpired).toBe(false)
+    vi.unstubAllGlobals()
+  })
 })
 
 // ── E. 组件源码契约（无 @vue/test-utils，用 ?raw 校验关键逻辑存在）────────────

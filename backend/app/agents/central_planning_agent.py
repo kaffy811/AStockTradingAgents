@@ -106,22 +106,21 @@ class CentralPlan:
         if not self.tasks:
             return make_thinking_event(
                 phase   = "agent_dispatch",
-                title   = "Agent 调度",
-                content = "本次请求可直接回答，无需调用专业 Agent。",
+                title   = "执行过程",
+                content = "可直接整理可用信息并生成回答。",
                 status  = "completed",
             )
-        deduped: dict[str, list[str]] = {}
+        stages: list[str] = []
         for task in self.tasks[:6]:
-            deduped.setdefault(task.agent, []).append(task.description)
-        agents = "、".join(deduped.keys())
-        descs = "；".join(
-            f"**{agent}** — " + " / ".join(descriptions[:3])
-            for agent, descriptions in deduped.items()
-        )
+            for desc in task.description.split("/"):
+                item = desc.strip()
+                if item and item not in stages:
+                    stages.append(item)
+        content = "执行过程：" + "".join(f"\n- {stage}" for stage in stages[:5])
         return make_thinking_event(
             phase   = "agent_dispatch",
-            title   = "Agent 调度",
-            content = f"将调用 {agents}。{descs}。",
+            title   = "执行过程",
+            content = content,
             status  = status,
             importance = "high",
         )
@@ -236,25 +235,30 @@ def _build_intent_decision(intent: str, entities: list[str], reason: str) -> str
 
 def _build_planning(intent: str, tasks: list[PlanTask], need_confirmation: bool) -> str:
     if not tasks:
-        return "本次请求可由 AI 直接基于知识库回答，无需调用专业 Agent，响应更快。"
+        return "正在识别问题类型并整理可用信息。"
 
     confirm_note = "⚠️ 本次操作需要用户确认后才会执行，避免误启动耗时任务。" if need_confirmation else ""
-    task_bullets = "；".join(f"{t.agent}（{t.description}）" for t in tasks[:3])
-    return f"规划需要调用以下 Agent：{task_bullets}。{confirm_note}"
+    task_bullets = "；".join(t.description for t in tasks[:3])
+    return f"执行过程已规划：{task_bullets}。{confirm_note}"
 
 
 def _build_task_decomposition(tasks: list[PlanTask]) -> str:
     if not tasks:
         return "本次请求无需拆解任务，直接进入回答生成阶段。"
-    items = "".join(f"\n  • {t.agent} — {t.description}" for t in tasks)
+    items = "".join(f"\n  • {t.description}" for t in tasks)
     return f"任务拆解如下：{items}"
 
 
 def _build_agent_dispatch(tasks: list[PlanTask]) -> str:
     if not tasks:
-        return "无需调度外部 Agent，将直接生成回答。"
-    agents = "、".join(t.agent for t in tasks[:4])
-    return f"正在调度：{agents}。各 Agent 并行执行，结果汇总后进入深度思考阶段。"
+        return "正在整理已识别信息并生成回答。"
+    stages: list[str] = []
+    for task in tasks[:4]:
+        for desc in task.description.split("/"):
+            item = desc.strip()
+            if item and item not in stages:
+                stages.append(item)
+    return "正在执行：" + "；".join(stages[:5]) + "。"
 
 
 def _build_agent_observation(intent: str, tasks: list[PlanTask]) -> str:

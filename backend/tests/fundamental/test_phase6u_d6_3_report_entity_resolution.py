@@ -175,6 +175,6 @@ async def test_d6_3_orchestrator_passes_primary_entity_to_skill_context(monkeypa
     monkeypatch.setattr("app.agents.chat_orchestrator._skill_registry.run", _fake_run)
     result = await process_message("贵州茅台最新财报表现如何？", None, "user-id")
     assert result.answer == "ok"
-    assert captured["metadata"]["chat_entity_pipeline_version"] == "d6_3"
+    assert captured["metadata"]["chat_entity_pipeline_version"] == "d6_4"
     assert captured["metadata"]["primary_entity"]["symbol"] == "600519"
     assert captured["metadata"]["resolved_entities"][0]["ts_code"] == "600519.SH"

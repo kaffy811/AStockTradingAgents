@@ -7,6 +7,7 @@ cross between users.
 from __future__ import annotations
 
 import logging
+import json
 import uuid
 from datetime import datetime, timezone
 
@@ -348,6 +349,118 @@ async def safe_flush(db: AsyncSession, *, context: str) -> None:
         raise
 
 
+_COMPACT_METADATA_KEYS = {
+    "trace_id",
+    "request_id",
+    "intent",
+    "status",
+    "error_code",
+    "skill_name",
+    "source",
+    "runtime_mode",
+    "answer_owner",
+    "output_language",
+    "disclaimer_version",
+    "streamed",
+    "verified_financial_data",
+    "source_chunks_count",
+    "common_metric_count",
+    "fallback",
+}
+_DROP_METADATA_KEYS = {
+    "source_chunks",
+    "chunks",
+    "diagnostics",
+    "compliance_review",
+    "review_audit",
+    "agent_response",
+    "plan",
+    "planner_state",
+    "shadow_diagnostics",
+    "tool_responses",
+    "prompt",
+    "system_prompt",
+}
+
+
+def _compact_entities(value: object) -> list[dict]:
+    entities = value if isinstance(value, list) else []
+    compact = []
+    for entity in entities[:5]:
+        if not isinstance(entity, dict):
+            continue
+        compact.append({
+            "market": entity.get("market"),
+            "symbol": entity.get("symbol"),
+            "name": entity.get("name") or entity.get("short_name"),
+        })
+    return compact
+
+
+def compact_chat_message_metadata(metadata: dict | None) -> dict:
+    """Keep chat_messages metadata small; large diagnostics belong in debug storage."""
+    raw = dict(metadata or {})
+    compact: dict = {
+        "mock_mode": raw.get("mock_mode", False),
+        "orchestrator": raw.get("orchestrator", "c8_memory_audit"),
+    }
+    for key in _COMPACT_METADATA_KEYS:
+        if key in raw and raw.get(key) is not None:
+            compact[key] = raw.get(key)
+
+    skill_data = raw.get("skill_data") if isinstance(raw.get("skill_data"), dict) else {}
+    if skill_data:
+        compact["status"] = skill_data.get("status") or compact.get("status")
+        if skill_data.get("error_code"):
+            compact["error_code"] = skill_data.get("error_code")
+        comparison_input = skill_data.get("comparison_input") or {}
+        if isinstance(comparison_input, dict):
+            compact["entities"] = _compact_entities(comparison_input.get("entities"))
+        report_context = skill_data.get("report_context") or {}
+        if isinstance(report_context, dict):
+            compact["report_context"] = {
+                "market": report_context.get("market"),
+                "symbol": report_context.get("symbol"),
+                "report_year": report_context.get("report_year"),
+                "report_type": report_context.get("report_type"),
+            }
+        if isinstance(skill_data.get("comparison_summary"), dict):
+            compact["comparison_summary"] = skill_data["comparison_summary"]
+        if isinstance(skill_data.get("availability"), dict):
+            compact["availability_summary"] = skill_data["availability"]
+
+    tool_names = raw.get("tools_used") or []
+    if tool_names:
+        compact["tools_used"] = list(tool_names)[:12]
+
+    for key in _DROP_METADATA_KEYS:
+        compact.pop(key, None)
+
+    encoded = json.dumps(compact, ensure_ascii=False, default=str)
+    if len(encoded.encode("utf-8")) > 8 * 1024:
+        compact = {
+            key: compact.get(key)
+            for key in (
+                "trace_id",
+                "intent",
+                "status",
+                "error_code",
+                "skill_name",
+                "runtime_mode",
+                "output_language",
+                "entities",
+                "report_context",
+                "comparison_summary",
+                "source_chunks_count",
+                "common_metric_count",
+                "streamed",
+            )
+            if compact.get(key) is not None
+        }
+        compact["metadata_compacted"] = True
+    return compact
+
+
 # ── Message CRUD ───────────────────────────────────────────────────────────────
 
 async def save_user_message(
@@ -403,6 +516,7 @@ async def save_assistant_message(
     }
     if extra_metadata:
         base_meta.update(extra_metadata)
+    base_meta = compact_chat_message_metadata(base_meta)
 
     msg = ChatMessage(
         session_id=session_id,

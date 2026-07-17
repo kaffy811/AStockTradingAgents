@@ -32,4 +32,26 @@ describe('CompanyV2 Phase 6U-D6 states, reports, and contextual chat', () => {
     const raw = await import('../components/company-v2/CompanyV2ReportTimeline.vue?raw')
     expect(raw.default).toContain('分析此报告')
   })
+
+  it('D6.4 strips body disclaimer and keeps footer as the single owner', async () => {
+    const listRaw = await import('../components/chat/ChatMessageList.vue?raw')
+    const viewRaw = await import('../views/ChatCopilotView.vue?raw')
+    expect(listRaw.default).toContain('stripStandardDisclaimer(msg.content)')
+    expect(listRaw.default).toContain('仅供研究参考，不构成投资建议')
+    expect(viewRaw.default).toContain('chat-disclaimer')
+  })
+
+  it('D6.4 report chat source evidence is collapsed by default', async () => {
+    const raw = await import('../components/fundamentals/ReportChatPanel.vue?raw')
+    expect(raw.default).toContain('<details v-if="result.source_chunks?.length"')
+    expect(raw.default).toContain('查看数据来源')
+    expect(raw.default).toContain('isDebugMode && result.review_audit?.source_chunks_checked')
+  })
+
+  it('D6.4 normal thinking trace hides internal agent and skill names', async () => {
+    const raw = await import('../components/chat/ChatThinkingMiniPanel.vue?raw')
+    expect(raw.default).toContain('sanitizeTraceContent')
+    expect(raw.default).toContain('ReportChatCopilotAgent|MultiCompanyFinancialComparisonAgent')
+    expect(raw.default).toContain("agent:   ''")
+  })
 })

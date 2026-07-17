@@ -12,6 +12,7 @@ RID = 990006
 
 
 def test_batch_insert_counts():
+    cleanup([RID])
     repo = DatabaseCompanyV2ReportRagRepository(chunk_batch_size=2)
     try:
         drafts = make_drafts(RID, 5)
