@@ -1,10 +1,12 @@
 # Pi Shadow Browser Acceptance
 
-- Executed: `False`
-- Passed: `False`
-- Notes: `not_run: no authenticated browser session was provided to this runner`
+- Executed: `false`
+- Passed: `false`
+- Environment: `local_live`
+- Commit SHA: `ab0d0367e7bf7f0a14cb6786adac7f58c0d79c92`
+- Tester: `codex_acceptance_runner`
+- Screenshot/reference: `not_run`
+- Blocker: `browser_acceptance_not_run_due_core_http_sse_blocker`
 
-Required manual conversations:
-- 贵州茅台最新财报表现如何？ -> 这份报告的官方 PDF 在哪里？
-- 五粮液2025年年度报告PDF在哪里？
-- 平安的年报PDF在哪里？
+Required browser conversations are tracked by case label/hash only in artifacts; full query text intentionally omitted.
+

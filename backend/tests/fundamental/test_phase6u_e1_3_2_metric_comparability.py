@@ -253,4 +253,5 @@ async def test_e1_3_3_latest_snapshot_may_return_interim_with_period(monkeypatch
     item = result["financial_fields"]["revenue"]
     assert item["period_end"] == "2025-06-30"
     assert item["period_type"] == "semi_annual"
-    assert item["selection_reason"] == "latest_available_fallback"
+    assert item["selection_reason"] == "latest_available_unverified"
+    assert item["validation_status"] == "unverified"

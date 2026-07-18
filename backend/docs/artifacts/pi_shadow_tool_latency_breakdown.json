@@ -1,0 +1,49 @@
+{
+  "schema_version": "pi_shadow_tool_latency_breakdown_v1",
+  "cases": [
+    {
+      "case_id": "A01",
+      "status": "success",
+      "latency_ms": 977,
+      "tool_call_count": 1,
+      "llm_call_count": 0,
+      "breakdown": {
+        "adapter_overhead_ms": 0,
+        "adapter_total_ms": 976,
+        "cache_lookup_ms": 0,
+        "db_query_ms": 858,
+        "external_network_ms": 0,
+        "official_domain_validation_ms": 0,
+        "report_selection_ms": 0,
+        "resolver_ms": 0,
+        "total_ms": 976
+      }
+    },
+    {
+      "case_id": "A02",
+      "status": "success",
+      "latency_ms": 1066,
+      "tool_call_count": 1,
+      "llm_call_count": 0,
+      "breakdown": {
+        "adapter_overhead_ms": 0,
+        "adapter_total_ms": 1066,
+        "cache_lookup_ms": 0,
+        "db_query_ms": 948,
+        "external_network_ms": 0,
+        "official_domain_validation_ms": 0,
+        "report_selection_ms": 0,
+        "resolver_ms": 0,
+        "total_ms": 1066
+      }
+    },
+    {
+      "case_id": "A03",
+      "status": "clarification_required",
+      "latency_ms": 0,
+      "tool_call_count": 0,
+      "llm_call_count": 0,
+      "breakdown": {}
+    }
+  ]
+}

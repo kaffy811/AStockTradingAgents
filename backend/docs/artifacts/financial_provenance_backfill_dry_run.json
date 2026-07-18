@@ -1,0 +1,393 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-07-17T06:41:08.177245+00:00",
+  "environment_ready": false,
+  "blockers": [
+    "TLS_SSLError",
+    "POSTGRES_TLS_FAILED",
+    "RAG_POSTGRES_NOT_READY"
+  ],
+  "samples": [
+    {
+      "schema_version": "1.0",
+      "generated_at": "2026-07-17T06:39:53.058657+00:00",
+      "request": {
+        "market": "CN",
+        "symbol": "000858",
+        "report_year": 2025,
+        "dry_run": true,
+        "apply": false,
+        "confirm_symbol": false,
+        "limit": 50
+      },
+      "write_allowed": false,
+      "write_validation_errors": [],
+      "write_performed": false,
+      "summary": {
+        "rows_checked": 6,
+        "complete_rows": 3,
+        "legacy_unverified_rows": 3,
+        "empty_rows": 0,
+        "proposed_write_count": 0
+      },
+      "coverage": {
+        "requested_metrics": 42,
+        "available_metrics": 42,
+        "verified_metrics": 16,
+        "annual_exact_metrics": 16,
+        "legacy_unverified": 9,
+        "unit_unknown": 9,
+        "period_unknown": 0,
+        "conflicts": 0,
+        "coverage_rate": 0.381
+      },
+      "idempotency": {
+        "safe_to_repeat": true,
+        "expected_second_run_write_count": "depends_on_provider_refresh_result",
+        "dedupe_key": "CN:000858:2025:financial_metric_v1"
+      },
+      "rollback": {
+        "deletes_existing_values": false,
+        "old_values_preserved": true,
+        "mechanism": "existing Company V2 refresh/cache path; no destructive schema operation"
+      },
+      "actions": [
+        "dry_run_only_no_writes",
+        "legacy rows remain unverified until refreshed with financial_metric_v1 provenance"
+      ],
+      "rows": [
+        {
+          "module": "profitability",
+          "period": "2025-12-31",
+          "report_year": 2025,
+          "period_type": "annual",
+          "schema_version": "financial_metric_v1",
+          "valued_field_count": 9,
+          "provenance_field_count": 7,
+          "missing_fields": [
+            "total_share",
+            "float_share"
+          ],
+          "status": "legacy_unverified"
+        },
+        {
+          "module": "growth",
+          "period": "2025-12-31",
+          "report_year": 2025,
+          "period_type": "annual",
+          "schema_version": "financial_metric_v1",
+          "valued_field_count": 8,
+          "provenance_field_count": 8,
+          "missing_fields": [],
+          "status": "complete"
+        },
+        {
+          "module": "solvency",
+          "period": "2025-12-31",
+          "report_year": 2025,
+          "period_type": "annual",
+          "schema_version": "financial_metric_v1",
+          "valued_field_count": 5,
+          "provenance_field_count": 5,
+          "missing_fields": [],
+          "status": "complete"
+        },
+        {
+          "module": "operation_capability",
+          "period": "2025-12-31",
+          "report_year": 2025,
+          "period_type": "annual",
+          "schema_version": "financial_metric_v1",
+          "valued_field_count": 4,
+          "provenance_field_count": 3,
+          "missing_fields": [
+            "ca_turn_ratio"
+          ],
+          "status": "legacy_unverified"
+        },
+        {
+          "module": "cashflow_quality",
+          "period": "2025-12-31",
+          "report_year": 2025,
+          "period_type": "annual",
+          "schema_version": "financial_metric_v1",
+          "valued_field_count": 3,
+          "provenance_field_count": 3,
+          "missing_fields": [],
+          "status": "complete"
+        },
+        {
+          "module": "dupont",
+          "period": "2025-12-31",
+          "report_year": 2025,
+          "period_type": "annual",
+          "schema_version": "financial_metric_v1",
+          "valued_field_count": 13,
+          "provenance_field_count": 7,
+          "missing_fields": [
+            "net_margin",
+            "dupont_tax",
+            "dupont_int",
+            "formula_roe",
+            "dupont_formula_diff",
+            "dupont_formula_status"
+          ],
+          "status": "legacy_unverified"
+        }
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "generated_at": "2026-07-17T06:21:05.577098+00:00",
+      "request": {
+        "market": "CN",
+        "symbol": "600519",
+        "report_year": 2025,
+        "dry_run": true,
+        "apply": false,
+        "confirm_symbol": false,
+        "limit": 50
+      },
+      "write_allowed": false,
+      "write_validation_errors": [],
+      "write_performed": false,
+      "summary": {
+        "rows_checked": 0,
+        "complete_rows": 0,
+        "legacy_unverified_rows": 0,
+        "empty_rows": 0,
+        "proposed_write_count": 0
+      },
+      "coverage": {
+        "requested_metrics": 0,
+        "available_metrics": 0,
+        "verified_metrics": 0,
+        "annual_exact_metrics": 0,
+        "legacy_unverified": 0,
+        "unit_unknown": 0,
+        "period_unknown": 0,
+        "conflicts": 0,
+        "coverage_rate": 0.0
+      },
+      "idempotency": {
+        "safe_to_repeat": true,
+        "expected_second_run_write_count": "depends_on_provider_refresh_result",
+        "dedupe_key": "CN:600519:2025:financial_metric_v1"
+      },
+      "rollback": {
+        "deletes_existing_values": false,
+        "old_values_preserved": true,
+        "mechanism": "existing Company V2 refresh/cache path; no destructive schema operation"
+      },
+      "actions": [
+        "dry_run_only_no_writes",
+        "legacy rows remain unverified until refreshed with financial_metric_v1 provenance"
+      ],
+      "rows": []
+    },
+    {
+      "schema_version": "1.0",
+      "generated_at": "2026-07-17T06:21:20.227791+00:00",
+      "request": {
+        "market": "CN",
+        "symbol": "000001",
+        "report_year": 2025,
+        "dry_run": true,
+        "apply": false,
+        "confirm_symbol": false,
+        "limit": 50
+      },
+      "write_allowed": false,
+      "write_validation_errors": [],
+      "write_performed": false,
+      "summary": {
+        "rows_checked": 0,
+        "complete_rows": 0,
+        "legacy_unverified_rows": 0,
+        "empty_rows": 0,
+        "proposed_write_count": 0
+      },
+      "coverage": {
+        "requested_metrics": 0,
+        "available_metrics": 0,
+        "verified_metrics": 0,
+        "annual_exact_metrics": 0,
+        "legacy_unverified": 0,
+        "unit_unknown": 0,
+        "period_unknown": 0,
+        "conflicts": 0,
+        "coverage_rate": 0.0
+      },
+      "idempotency": {
+        "safe_to_repeat": true,
+        "expected_second_run_write_count": "depends_on_provider_refresh_result",
+        "dedupe_key": "CN:000001:2025:financial_metric_v1"
+      },
+      "rollback": {
+        "deletes_existing_values": false,
+        "old_values_preserved": true,
+        "mechanism": "existing Company V2 refresh/cache path; no destructive schema operation"
+      },
+      "actions": [
+        "dry_run_only_no_writes",
+        "legacy rows remain unverified until refreshed with financial_metric_v1 provenance"
+      ],
+      "rows": []
+    },
+    {
+      "schema_version": "1.0",
+      "generated_at": "2026-07-17T06:21:35.469631+00:00",
+      "request": {
+        "market": "CN",
+        "symbol": "601318",
+        "report_year": 2025,
+        "dry_run": true,
+        "apply": false,
+        "confirm_symbol": false,
+        "limit": 50
+      },
+      "write_allowed": false,
+      "write_validation_errors": [],
+      "write_performed": false,
+      "summary": {
+        "rows_checked": 0,
+        "complete_rows": 0,
+        "legacy_unverified_rows": 0,
+        "empty_rows": 0,
+        "proposed_write_count": 0
+      },
+      "coverage": {
+        "requested_metrics": 0,
+        "available_metrics": 0,
+        "verified_metrics": 0,
+        "annual_exact_metrics": 0,
+        "legacy_unverified": 0,
+        "unit_unknown": 0,
+        "period_unknown": 0,
+        "conflicts": 0,
+        "coverage_rate": 0.0
+      },
+      "idempotency": {
+        "safe_to_repeat": true,
+        "expected_second_run_write_count": "depends_on_provider_refresh_result",
+        "dedupe_key": "CN:601318:2025:financial_metric_v1"
+      },
+      "rollback": {
+        "deletes_existing_values": false,
+        "old_values_preserved": true,
+        "mechanism": "existing Company V2 refresh/cache path; no destructive schema operation"
+      },
+      "actions": [
+        "dry_run_only_no_writes",
+        "legacy rows remain unverified until refreshed with financial_metric_v1 provenance"
+      ],
+      "rows": []
+    },
+    {
+      "schema_version": "1.0",
+      "generated_at": "2026-07-17T06:22:02.996928+00:00",
+      "request": {
+        "market": "CN",
+        "symbol": "600036",
+        "report_year": 2025,
+        "dry_run": true,
+        "apply": false,
+        "confirm_symbol": false,
+        "limit": 50
+      },
+      "write_allowed": false,
+      "write_validation_errors": [],
+      "write_performed": false,
+      "summary": {
+        "rows_checked": 0,
+        "complete_rows": 0,
+        "legacy_unverified_rows": 0,
+        "empty_rows": 0,
+        "proposed_write_count": 0
+      },
+      "coverage": {
+        "requested_metrics": 0,
+        "available_metrics": 0,
+        "verified_metrics": 0,
+        "annual_exact_metrics": 0,
+        "legacy_unverified": 0,
+        "unit_unknown": 0,
+        "period_unknown": 0,
+        "conflicts": 0,
+        "coverage_rate": 0.0
+      },
+      "idempotency": {
+        "safe_to_repeat": true,
+        "expected_second_run_write_count": "depends_on_provider_refresh_result",
+        "dedupe_key": "CN:600036:2025:financial_metric_v1"
+      },
+      "rollback": {
+        "deletes_existing_values": false,
+        "old_values_preserved": true,
+        "mechanism": "existing Company V2 refresh/cache path; no destructive schema operation"
+      },
+      "actions": [
+        "dry_run_only_no_writes",
+        "legacy rows remain unverified until refreshed with financial_metric_v1 provenance"
+      ],
+      "rows": []
+    },
+    {
+      "schema_version": "1.0",
+      "generated_at": "2026-07-17T06:22:19.273988+00:00",
+      "request": {
+        "market": "CN",
+        "symbol": "300750",
+        "report_year": 2025,
+        "dry_run": true,
+        "apply": false,
+        "confirm_symbol": false,
+        "limit": 50
+      },
+      "write_allowed": false,
+      "write_validation_errors": [],
+      "write_performed": false,
+      "summary": {
+        "rows_checked": 0,
+        "complete_rows": 0,
+        "legacy_unverified_rows": 0,
+        "empty_rows": 0,
+        "proposed_write_count": 0
+      },
+      "coverage": {
+        "requested_metrics": 0,
+        "available_metrics": 0,
+        "verified_metrics": 0,
+        "annual_exact_metrics": 0,
+        "legacy_unverified": 0,
+        "unit_unknown": 0,
+        "period_unknown": 0,
+        "conflicts": 0,
+        "coverage_rate": 0.0
+      },
+      "idempotency": {
+        "safe_to_repeat": true,
+        "expected_second_run_write_count": "depends_on_provider_refresh_result",
+        "dedupe_key": "CN:300750:2025:financial_metric_v1"
+      },
+      "rollback": {
+        "deletes_existing_values": false,
+        "old_values_preserved": true,
+        "mechanism": "existing Company V2 refresh/cache path; no destructive schema operation"
+      },
+      "actions": [
+        "dry_run_only_no_writes",
+        "legacy rows remain unverified until refreshed with financial_metric_v1 provenance"
+      ],
+      "rows": []
+    }
+  ],
+  "summary": {
+    "sample_count": 6,
+    "dry_run_count": 6,
+    "write_count": 0,
+    "rows_checked": 6,
+    "verified_metrics": 16,
+    "legacy_unverified": 9
+  }
+}

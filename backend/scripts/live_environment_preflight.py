@@ -13,6 +13,7 @@ import os
 import platform
 import socket
 import ssl
+import struct
 import sys
 import time
 import urllib.request
@@ -82,14 +83,35 @@ def _tcp_check(host: str | None, port: int | None, timeout: float) -> dict[str, 
 
 
 def _tls_check(host: str | None, port: int | None, timeout: float) -> dict[str, Any]:
+    """Verify PostgreSQL TLS using the PostgreSQL SSLRequest handshake.
+
+    PostgreSQL does not speak raw TLS on the TCP port. Clients first send an
+    SSLRequest packet, wait for ``S``, then wrap the socket with TLS. A generic
+    ``ssl.wrap_socket`` immediately after TCP connect misclassifies healthy
+    PostgreSQL endpoints as TLS failures.
+    """
     if not host or not port:
         return _status("failed", error_code="DATABASE_HOST_MISSING")
     started = time.perf_counter()
     try:
         context = ssl.create_default_context()
         with socket.create_connection((host, port), timeout=timeout) as sock:
+            sock.settimeout(timeout)
+            sock.sendall(struct.pack("!II", 8, 80877103))
+            response = sock.recv(1)
+            if response != b"S":
+                return _status(
+                    "failed",
+                    latency_ms=int((time.perf_counter() - started) * 1000),
+                    error_code="POSTGRES_SSL_NOT_SUPPORTED",
+                    details={"server_response": response.decode("ascii", errors="replace") if response else "empty"},
+                )
             with context.wrap_socket(sock, server_hostname=host):
-                return _status("passed", latency_ms=int((time.perf_counter() - started) * 1000))
+                return _status(
+                    "passed",
+                    latency_ms=int((time.perf_counter() - started) * 1000),
+                    details={"protocol": "postgres_ssl_request"},
+                )
     except Exception as exc:  # noqa: BLE001
         return _status("failed", latency_ms=int((time.perf_counter() - started) * 1000), error_code=type(exc).__name__, details={"message": str(exc)[:180]})
 

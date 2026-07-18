@@ -1,18 +1,14 @@
 {
-  "phase": "6V-P1.3",
+  "phase": "6V-P1.5",
   "runtime_implemented": true,
-  "shadow_samples": 0,
+  "shadow_samples": 3,
   "shadow_passed": false,
+  "smoke_passed": true,
+  "recommended_to_run_full_30": true,
   "pi_executor_enabled": false,
   "authorized_agents": [],
   "decision": "do_not_enable_pi_compatible",
   "blockers": [
-    "Live shadow samples incomplete: executed 0/30.",
-    "local_fixture is allowed only for runner self-test and cannot count as live acceptance.",
-    "Pi shadow env is not enabled with the explicit P1.3 values.",
-    "PI_AGENT_SHADOW_DIAGNOSTICS_PATH is required for HTTP shadow result polling.",
-    "PI_SHADOW_ACCEPTANCE_BASE_URL / --base-url is required for HTTP Chat acceptance.",
-    "Database readiness check failed.",
-    "No acceptance service account token/user id and local fixture creation was not explicitly allowed."
+    "Gate thresholds were not fully met."
   ]
 }

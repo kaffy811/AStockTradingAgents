@@ -22,8 +22,11 @@ _PROHIBITED_RE = re.compile(
     re.IGNORECASE,
 )
 _COMPARISON_RE = re.compile(r"对比|比较|相比|和.+比|vs\.?|versus", re.IGNORECASE)
-_REPORT_RE = re.compile(r"财报|年报|季报|报告表现|经营现金流|官方\s*PDF|PDF\s*在哪|报告链接")
-_PDF_RE = re.compile(r"官方\s*PDF|PDF\s*在哪|报告链接|pdf链接", re.IGNORECASE)
+_REPORT_RE = re.compile(r"财报|年报|季报|报告表现|经营现金流|官方\s*PDF|PDF\s*在哪|报告链接|报告原文|官方报告地址")
+_PDF_RE = re.compile(
+    r"官方\s*PDF|PDF\s*在哪|pdf链接|报告链接|年报链接|报告原文|年报原文|年度报告原文|这份报告.*在哪|这个报告.*在哪|官方报告地址",
+    re.IGNORECASE,
+)
 _QUOTE_RE = re.compile(r"现在多少|当前价|最新价|报价|股价")
 _SNAPSHOT_RE = re.compile(r"基本面|财务快照|盈利能力|资产负债|现金流质量|估值")
 _NEWS_RE = re.compile(r"新闻|消息|公告|舆情")

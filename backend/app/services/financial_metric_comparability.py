@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from app.services.company_v2_field_metadata import get_field_metadata
+from app.services.provider_field_registry import get_provider_field_definition
 
 
 FLOW_METRICS = {"revenue", "parent_net_profit", "operating_cashflow"}
@@ -177,6 +178,16 @@ class MetricNormalizer:
     def _raw_unit_from_schema(self, metric: str, item: dict[str, Any]) -> str | None:
         source_key = str(item.get("source_key") or item.get("source_field") or metric)
         source = str(item.get("source") or "")
+        provider = str(item.get("source_provider") or "").strip()
+        endpoint = str(item.get("source_endpoint") or "").strip()
+        if not provider and str(item.get("source_system") or "").startswith("baostock."):
+            provider = "baostock"
+        if not endpoint and str(item.get("source_system") or "").startswith("baostock."):
+            endpoint = str(item.get("source_system")).split(".", 1)[1]
+        if provider and endpoint and source_key:
+            definition = get_provider_field_definition(provider, endpoint, source_key)
+            if definition:
+                return definition.raw_unit
         if item.get("unit") in {"元/股", "CNY/share"}:
             return "CNY/share"
         if item.get("unit") in {"元", "万元", "亿元", "CNY"}:

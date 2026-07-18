@@ -9,8 +9,10 @@ import pytest
 
 from app.agent_runtime.shadow_acceptance import (
     ShadowSideEffectSnapshot,
+    _sql_logging_audit,
     build_agent_gate,
     build_runtime_gate,
+    build_write_attribution,
     compute_pi_side_effect_count,
     summarize_shadow_results,
 )
@@ -198,6 +200,43 @@ def test_context_extra_update_detected():
     assert compute_pi_side_effect_count(before, after, expected_legacy_chat_message_delta=2) == 1
 
 
+def test_legacy_context_writes_are_attributed_not_counted_as_pi_side_effect():
+    before = ShadowSideEffectSnapshot(
+        1, 10, 0, 0, 0, 0, 0, 0, 0,
+        target_session_id="00000000-0000-0000-0000-000000000001",
+        target_session_context_version=3,
+        target_session_metadata_keys=["memory_v1"],
+    )
+    after = ShadowSideEffectSnapshot(
+        1, 12, 2, 0, 0, 0, 0, 0, 0,
+        target_session_id="00000000-0000-0000-0000-000000000001",
+        target_session_context_version=5,
+        target_session_metadata_keys=["memory_v1"],
+        target_session_last_context_commit_at="2026-07-18T10:00:00+00:00",
+    )
+    assert compute_pi_side_effect_count(
+        before,
+        after,
+        expected_legacy_chat_message_delta=2,
+        expected_legacy_context_version_delta=2,
+    ) == 0
+    attribution = build_write_attribution(case_id="A01", before=before, after=after)
+    assert attribution["pi_shadow_business_write_delta"] == 0
+    owners = {item["owner"] for item in attribution["writes"]}
+    assert owners == {"legacy"}
+
+
+def test_pi_extra_context_write_still_fails_after_attribution():
+    before = ShadowSideEffectSnapshot(1, 10, 0, 0, 0, 0, 0, 0, 0, target_session_context_version=3)
+    after = ShadowSideEffectSnapshot(1, 12, 3, 0, 0, 0, 0, 0, 0, target_session_context_version=6)
+    assert compute_pi_side_effect_count(
+        before,
+        after,
+        expected_legacy_chat_message_delta=2,
+        expected_legacy_context_version_delta=2,
+    ) == 1
+
+
 def test_29_of_30_does_not_pass_or_compute_rates():
     results = [_passing_case_result(str(i)) for i in range(29)]
     summary = summarize_shadow_results(results, planned_samples=30)
@@ -214,6 +253,33 @@ def test_30_samples_computes_gate_when_browser_passed():
     assert summary["metrics"]["status_match_rate"] == 1.0
     assert summary["metrics"]["url_match_rate"] == 1.0
     assert gate["recommended_for_next_authorization"] is True
+
+
+def test_three_smoke_gate_requires_three_passes_without_authorization():
+    results = [_passing_case_result(str(i)) for i in range(3)]
+    summary = summarize_shadow_results(results, planned_samples=3)
+    gate = build_agent_gate(summary)
+    runtime_gate = build_runtime_gate(gate)
+    assert gate["smoke_passed"] is True
+    assert gate["recommended_to_run_full_30"] is True
+    assert gate["recommended_for_next_authorization"] is False
+    assert runtime_gate["decision"] == "do_not_enable_pi_compatible"
+
+
+def test_runner_smoke_cases_are_fixed_p1_5_cases():
+    cases = runner._smoke_cases()
+    assert [case.case_id for case in cases] == ["A01", "A02", "A03"]
+    assert cases[0].query == "五粮液2025年年度报告PDF在哪里？"
+    assert cases[1].query == "600519官方年报链接"
+    assert cases[2].query == "平安的年报PDF在哪里？"
+    assert cases[2].expected_status == "clarification_required"
+
+
+def test_legacy_status_from_answer_detects_clarification():
+    assert runner._legacy_status_from_answer("找到多个平安相关证券，请选择") == "clarification_required"
+    assert runner._legacy_status_from_answer("没有识别到明确的公司或股票代码。请明确公司名称或证券代码。") == "clarification_required"
+    assert runner._legacy_status_from_answer("暂未找到可验证的官方报告 PDF。") == "unavailable"
+    assert runner._legacy_status_from_answer("官方 PDF 链接如下") == "success"
 
 
 def test_input_snapshot_hash_shared_from_diagnostic():
@@ -241,6 +307,14 @@ def test_artifact_secret_scan(tmp_path):
     assert "Bearer " not in text
     assert "password" not in text.lower()
     assert "sk-" not in text
+
+
+def test_sql_logging_audit_defaults_to_no_parameter_exposure():
+    audit = _sql_logging_audit()
+    assert audit["database_sql_echo"] is False
+    assert audit["database_sql_hide_parameters"] is True
+    assert audit["sql_parameter_exposure"] == 0
+    assert audit["decision"] == "pass"
 
 
 def test_cleanup_safe_placeholder():

@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-07-17T06:22:02.996928+00:00",
+  "request": {
+    "market": "CN",
+    "symbol": "600036",
+    "report_year": 2025,
+    "dry_run": true,
+    "apply": false,
+    "confirm_symbol": false,
+    "limit": 50
+  },
+  "write_allowed": false,
+  "write_validation_errors": [],
+  "write_performed": false,
+  "summary": {
+    "rows_checked": 0,
+    "complete_rows": 0,
+    "legacy_unverified_rows": 0,
+    "empty_rows": 0,
+    "proposed_write_count": 0
+  },
+  "coverage": {
+    "requested_metrics": 0,
+    "available_metrics": 0,
+    "verified_metrics": 0,
+    "annual_exact_metrics": 0,
+    "legacy_unverified": 0,
+    "unit_unknown": 0,
+    "period_unknown": 0,
+    "conflicts": 0,
+    "coverage_rate": 0.0
+  },
+  "idempotency": {
+    "safe_to_repeat": true,
+    "expected_second_run_write_count": "depends_on_provider_refresh_result",
+    "dedupe_key": "CN:600036:2025:financial_metric_v1"
+  },
+  "rollback": {
+    "deletes_existing_values": false,
+    "old_values_preserved": true,
+    "mechanism": "existing Company V2 refresh/cache path; no destructive schema operation"
+  },
+  "actions": [
+    "dry_run_only_no_writes",
+    "legacy rows remain unverified until refreshed with financial_metric_v1 provenance"
+  ],
+  "rows": []
+}

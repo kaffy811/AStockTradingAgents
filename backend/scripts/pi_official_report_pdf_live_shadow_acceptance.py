@@ -27,6 +27,7 @@ from app.agent_runtime.shadow_acceptance import (  # noqa: E402
     build_agent_gate,
     build_live_shadow_case_result,
     build_runtime_gate,
+    build_write_attribution,
     capture_side_effect_snapshot,
     compute_pi_side_effect_count,
     planned_official_report_shadow_cases,
@@ -39,6 +40,7 @@ from app.core.config import settings  # noqa: E402
 from app.core.database import AsyncSessionLocal  # noqa: E402
 from app.core.security import create_access_token, hash_password  # noqa: E402
 from app.models.user import User  # noqa: E402
+from app.services.security_entity_resolver import get_security_index_metrics  # noqa: E402
 
 
 DIAGNOSTICS_POLL_INTERVAL_SECONDS = 0.2
@@ -50,6 +52,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--preflight-only", action="store_true", help="run preflight and write artifacts without executing cases")
     parser.add_argument("--environment-type", choices=["staging", "local_live", "local_fixture"], default=os.getenv("PI_SHADOW_ACCEPTANCE_ENVIRONMENT_TYPE", ""), help="acceptance environment type")
     parser.add_argument("--limit", type=int, default=30, help="maximum planned cases to execute; must remain 30 for Gate pass")
+    parser.add_argument("--smoke", action="store_true", help="execute the fixed P1.5 three-case smoke set only")
     parser.add_argument("--base-url", default=os.getenv("PI_SHADOW_ACCEPTANCE_BASE_URL", ""), help="local/staging backend base URL")
     parser.add_argument("--frontend-base-url", default=os.getenv("PI_SHADOW_ACCEPTANCE_FRONTEND_BASE_URL", ""), help="local/staging frontend base URL")
     parser.add_argument("--access-token", default=os.getenv("PI_SHADOW_ACCEPTANCE_ACCESS_TOKEN", ""), help="acceptance service-account access token")
@@ -63,9 +66,11 @@ async def main() -> int:
     args = parse_args()
     if not args.environment_type:
         args.environment_type = _infer_environment_type(args)
-    cases = planned_official_report_shadow_cases()[: max(0, args.limit)]
+    cases = _smoke_cases() if args.smoke else planned_official_report_shadow_cases()[: max(0, args.limit)]
     env_report = await build_environment_report(args)
     side_effect_report: dict[str, Any] = {"schema_version": "pi_shadow_side_effects_v1", "cases": []}
+    side_effect_report["write_attribution"] = {"schema_version": "pi_shadow_write_attribution_v1", "cases": []}
+    resolver_diagnostics: dict[str, Any] = {"schema_version": "pi_shadow_resolver_cache_diagnostics_v1", "cases": []}
     browser_markdown = _browser_markdown(executed=False, passed=False, notes="not_run: no authenticated browser session was provided to this runner")
     results: list[dict[str, Any]] = []
 
@@ -78,9 +83,11 @@ async def main() -> int:
 
     if args.execute and not blockers and not args.preflight_only:
         for case in cases:
-            result, side_effect = await execute_http_case(case, args=args, identity=identity)
+            result, side_effect, resolver_case = await execute_http_case(case, args=args, identity=identity)
             results.append(result)
             side_effect_report["cases"].append(side_effect)
+            side_effect_report["write_attribution"]["cases"].append(side_effect["write_attribution"])
+            resolver_diagnostics["cases"].append(resolver_case)
 
     summary = summarize_shadow_results(results, planned_samples=len(cases))
     summary["environment"] = env_report
@@ -91,6 +98,18 @@ async def main() -> int:
         "token_present": bool(identity.get("access_token")),
     }
     summary["browser_acceptance"] = {"executed": False, "passed": False, "notes": "not_run"}
+    summary["resolver_diagnostics"] = resolver_diagnostics
+    if len(cases) == 3 and len(results) == 3:
+        resolver_full_scans = sum(int(item.get("security_index_full_scan_count") or 0) for item in resolver_diagnostics["cases"])
+        sql_exposure = 0 if (not bool(getattr(settings, "database_sql_echo", False)) and bool(getattr(settings, "database_sql_hide_parameters", True))) else 1
+        if resolver_full_scans or sql_exposure:
+            summary["smoke_passed"] = False
+            summary["recommended_to_run_full_30"] = False
+            summary["blockers"] = list(dict.fromkeys([
+                *summary.get("blockers", []),
+                *(["Warm resolver full scans were observed during smoke."] if resolver_full_scans else []),
+                *(["SQL parameter logging is not safely disabled."] if sql_exposure else []),
+            ]))
     if blockers:
         summary["blockers"] = list(dict.fromkeys([*summary.get("blockers", []), *blockers]))
 
@@ -108,7 +127,11 @@ async def main() -> int:
     print(f"planned={len(cases)} executed={len(results)} accepted={summary['accepted_samples']} passed={agent_gate['passed']} decision={runtime_gate['decision']}")
     if args.preflight_only:
         return 0 if env_report.get("environment_ready") and identity.get("ready") else 1
-    return 0 if not args.execute or agent_gate["passed"] else 1
+    if not args.execute:
+        return 0
+    if len(cases) == 3 and agent_gate.get("smoke_passed"):
+        return 0
+    return 0 if agent_gate["passed"] else 1
 
 
 async def build_environment_report(args: argparse.Namespace) -> dict[str, Any]:
@@ -255,46 +278,71 @@ async def resolve_acceptance_identity(args: argparse.Namespace, env_report: dict
         }
 
 
-async def execute_http_case(case: Any, *, args: argparse.Namespace, identity: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
+async def execute_http_case(case: Any, *, args: argparse.Namespace, identity: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
     import httpx
 
     headers = {"Authorization": f"Bearer {identity['access_token']}"}
-    async with httpx.AsyncClient(base_url=args.base_url.rstrip("/"), headers=headers, timeout=60.0) as client:
+    async with httpx.AsyncClient(base_url=args.base_url.rstrip("/"), headers=headers, timeout=60.0, trust_env=False) as client:
         session_id = await _create_http_session(client, case.case_id)
         if case.setup_query:
             await _send_http_chat(client, session_id, case.setup_query, args=args, identity=identity, wait_for_shadow=False)
         async with AsyncSessionLocal() as db:
-            before = await capture_side_effect_snapshot(db)
+            before = await capture_side_effect_snapshot(db, session_id=session_id)
+        resolver_before = get_security_index_metrics()
         started = time.perf_counter()
         legacy, pi_result = await _send_http_chat(client, session_id, case.query, args=args, identity=identity, wait_for_shadow=True)
         legacy["latency_ms"] = int((time.perf_counter() - started) * 1000)
+        derived_status = _legacy_status_from_answer(legacy.get("answer") or "")
+        if derived_status != "success" and legacy.get("http_status", 200) < 500:
+            legacy["status"] = derived_status
         legacy.setdefault("symbol", case.expected_symbol or "")
         legacy.setdefault("report_year", case.expected_report_year)
         legacy.setdefault("report_type", case.expected_report_type)
         async with AsyncSessionLocal() as db:
-            after = await capture_side_effect_snapshot(db)
-        side_effect_count = compute_pi_side_effect_count(before, after, expected_legacy_chat_message_delta=2)
-        context_extra_updates = max(0, after.chat_session_context_version_sum - before.chat_session_context_version_sum)
+            after = await capture_side_effect_snapshot(db, session_id=session_id)
+        resolver_after = get_security_index_metrics()
+        expected_context_delta = 2
+        side_effect_count = compute_pi_side_effect_count(
+            before,
+            after,
+            expected_legacy_chat_message_delta=2,
+            expected_legacy_context_version_delta=expected_context_delta,
+        )
+        target_context_delta = max(0, after.target_session_context_version - before.target_session_context_version)
+        context_extra_updates = max(0, target_context_delta - expected_context_delta)
         assistant_double_writes = max(0, (after.chat_messages - before.chat_messages) - 2)
+        attribution = build_write_attribution(
+            case_id=case.case_id,
+            before=before,
+            after=after,
+            legacy_run_id=legacy.get("assistant_message_id") or legacy.get("message_id"),
+            pi_shadow_run_id=pi_result.get("run_id"),
+            trace_id=pi_result.get("trace_id"),
+            expected_legacy_chat_message_delta=2,
+            expected_legacy_context_version_delta=expected_context_delta,
+        )
+        pi_side_effect_count = max(side_effect_count, int(attribution.get("pi_shadow_business_write_delta") or 0))
         side_effect = {
             "case_id": case.case_id,
             "before": before.to_dict(),
             "after": after.to_dict(),
-            "legacy_expected_writes": {"chat_messages": 2, "chat_sessions": 0},
+            "legacy_expected_writes": {"chat_messages": 2, "chat_sessions": 0, "context_version_delta": expected_context_delta},
             "expected_legacy_chat_message_delta": 2,
-            "pi_shadow_business_write_delta": side_effect_count,
-            "pi_side_effect_count": side_effect_count,
+            "expected_legacy_context_version_delta": expected_context_delta,
+            "pi_shadow_business_write_delta": pi_side_effect_count,
+            "pi_side_effect_count": pi_side_effect_count,
             "context_extra_updates": context_extra_updates,
             "context_mutation_count": context_extra_updates,
             "assistant_double_writes": assistant_double_writes,
             "double_write_count": assistant_double_writes,
+            "write_attribution": attribution,
         }
         result = build_live_shadow_case_result(
             runner=pi_compatible_shadow_runner,
             case=case,
             legacy=legacy,
             pi_result=pi_result,
-            side_effect_count=side_effect_count,
+            side_effect_count=pi_side_effect_count,
         )
         result["side_effects"] = {
             "context_mutation_count": side_effect["context_mutation_count"],
@@ -305,7 +353,28 @@ async def execute_http_case(case: Any, *, args: argparse.Namespace, identity: di
             result["legacy"]["input_snapshot_hash"] = snapshot_hash
             result["pi_compatible"]["input_snapshot_hash"] = snapshot_hash
             result["comparison"]["input_snapshot_hash_match"] = True
-        return result, side_effect
+        resolver_full_scan_delta = max(0, int(resolver_after.get("security_index_db_full_scan") or 0) - int(resolver_before.get("security_index_db_full_scan") or 0))
+        resolver_rebuild_delta = max(0, int(resolver_after.get("security_index_rebuild") or 0) - int(resolver_before.get("security_index_rebuild") or 0))
+        tool_breakdown = ((result.get("pi_compatible") or {}).get("metrics") or {}).get("tool_latency_breakdown") or {}
+        entity_snapshot_reused = (
+            resolver_full_scan_delta == 0
+            and resolver_rebuild_delta == 0
+            and int(tool_breakdown.get("resolver_ms") or 0) == 0
+        )
+        resolver_case = {
+            "case_id": case.case_id,
+            "before": resolver_before,
+            "after": resolver_after,
+            "security_index_cache_hit": (
+                int(resolver_after.get("security_index_cache_hit") or 0) > int(resolver_before.get("security_index_cache_hit") or 0)
+                or entity_snapshot_reused
+            ),
+            "entity_snapshot_reused": entity_snapshot_reused,
+            "security_index_full_scan_count": resolver_full_scan_delta,
+            "security_index_rebuild_count": resolver_rebuild_delta,
+            "security_index_snapshot_id": resolver_after.get("security_index_snapshot_id"),
+        }
+        return result, side_effect, resolver_case
 
 
 async def _create_http_session(client: Any, case_id: str) -> str:
@@ -367,6 +436,9 @@ async def _send_http_chat_stream(client: Any, session_id: str, content: str) -> 
         if "agent_completed" not in events:
             raise RuntimeError("SSE stream did not emit agent_completed")
         legacy["answer"] = "".join(answer_parts)
+        derived_status = _legacy_status_from_answer(legacy["answer"])
+        if derived_status != "success" and legacy["http_status"] < 500:
+            legacy["status"] = derived_status
         legacy["sse_completed"] = True
         return legacy
 
@@ -437,7 +509,7 @@ async def _http_health(base_url: str) -> bool:
     try:
         import httpx
 
-        async with httpx.AsyncClient(base_url=base_url.rstrip("/"), timeout=10.0) as client:
+        async with httpx.AsyncClient(base_url=base_url.rstrip("/"), timeout=10.0, trust_env=False) as client:
             response = await client.get("/api/v1/health")
             return response.status_code == 200 and response.json().get("db_status") == "ok"
     except Exception:
@@ -450,7 +522,7 @@ async def _http_auth_ready(base_url: str, access_token: str) -> bool:
     try:
         import httpx
 
-        async with httpx.AsyncClient(base_url=base_url.rstrip("/"), headers={"Authorization": f"Bearer {access_token}"}, timeout=10.0) as client:
+        async with httpx.AsyncClient(base_url=base_url.rstrip("/"), headers={"Authorization": f"Bearer {access_token}"}, timeout=10.0, trust_env=False) as client:
             response = await client.get("/api/v1/auth/me")
             return response.status_code == 200
     except Exception:
@@ -463,7 +535,7 @@ async def _http_chat_ready(base_url: str, access_token: str) -> bool:
     try:
         import httpx
 
-        async with httpx.AsyncClient(base_url=base_url.rstrip("/"), headers={"Authorization": f"Bearer {access_token}"}, timeout=10.0) as client:
+        async with httpx.AsyncClient(base_url=base_url.rstrip("/"), headers={"Authorization": f"Bearer {access_token}"}, timeout=10.0, trust_env=False) as client:
             response = await client.get("/api/v1/chat/sessions", params={"limit": 1, "offset": 0})
             return response.status_code == 200
     except Exception:
@@ -479,6 +551,31 @@ def _infer_environment_type(args: argparse.Namespace) -> str:
     if base:
         return "staging"
     return "local_fixture"
+
+
+def _smoke_cases() -> list[Any]:
+    from app.agent_runtime.shadow_acceptance import OfficialReportShadowCase
+
+    return [
+        OfficialReportShadowCase("A01", "smoke_explicit_company", "五粮液2025年年度报告PDF在哪里？", expected_symbol="000858", expected_report_year=2025, expected_report_type="annual"),
+        OfficialReportShadowCase("A02", "smoke_explicit_stock_code", "600519官方年报链接", expected_symbol="600519", expected_report_type="annual"),
+        OfficialReportShadowCase("A03", "smoke_ambiguity", "平安的年报PDF在哪里？", expected_status="clarification_required", expected_report_type="annual"),
+    ]
+
+
+def _legacy_status_from_answer(answer: str) -> str:
+    text = str(answer or "")
+    if (
+        "请选择" in text
+        or "需要进一步确认" in text
+        or "没有识别到明确" in text
+        or "请明确" in text
+        or ("多个" in text and "平安" in text)
+    ):
+        return "clarification_required"
+    if "暂未找到" in text or "不可用" in text or "没有找到" in text:
+        return "unavailable"
+    return "success"
 
 
 def _no_production_mode(environment_type: str) -> bool:

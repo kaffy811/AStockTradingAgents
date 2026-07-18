@@ -29,10 +29,15 @@ _REQUEST_CACHE_KEY = "_security_entity_index_snapshot_cache"
 _CORP_SUFFIX_RE = re.compile(r"(股份有限公司|有限责任公司|有限公司|公司)$")
 _ST_PREFIX_RE = re.compile(r"^\*?ST", re.IGNORECASE)
 _QUERY_NOISE_RE = re.compile(r"最近|表现|如何|怎么样|怎样|财报|年报|对比|比较|相比|看看|分析|一下|它|该股|这家公司|这只股票|呢|吗")
+_CONTEXT_REFERENCE_RE = re.compile(
+    r"它(?:的|们)?|这只|这支|该股|这家公司|该公司|这份报告|那份报告|上一份报告|刚才的报告|之前的报告|这个报告|那个报告|这个年报|该报告"
+)
+_COMPARISON_QUERY_RE = re.compile(r"对比|比较|相比|和|与|、|VS|vs|比呢|比一下|比一比")
 _TS_CODE_RE = re.compile(r"(?<!\d)(\d{6})\.(SH|SZ|BJ)(?![A-Z0-9])", re.IGNORECASE)
 _CN_CODE_RE = re.compile(r"(?<!\d)\d{6}(?!\d)")
 _HK_CODE_RE = re.compile(r"(?<!\d)0?\d{1,5}(?!\d)")
 _US_TICKER_RE = re.compile(r"\b[A-Z]{1,5}(?:[.-][A-Z])?\b")
+_US_TICKER_STOPWORDS = {"PDF", "URL", "HTTP", "HTTPS", "RAG", "QPDF"}
 
 
 @dataclass(frozen=True)
@@ -103,7 +108,12 @@ _SECURITY_INDEX_METRICS: dict[str, int | str] = {
 
 
 def get_security_index_metrics() -> dict[str, int | str]:
-    return dict(_SECURITY_INDEX_METRICS)
+    metrics = dict(_SECURITY_INDEX_METRICS)
+    metrics["security_index_snapshot_count"] = len(_APP_INDEX_SNAPSHOTS)
+    metrics["security_index_snapshot_id"] = hashlib.sha1(
+        "|".join(sorted(_APP_INDEX_SNAPSHOTS)).encode("utf-8")
+    ).hexdigest()[:12] if _APP_INDEX_SNAPSHOTS else ""
+    return metrics
 
 
 def reset_security_index_runtime_state() -> None:
@@ -223,7 +233,26 @@ class SecurityEntityResolver:
         min_confidence: float = 0.82,
     ) -> dict[str, Any]:
         text = str(query or "")
-        markets = [market_hint.upper()] if market_hint else list(SUPPORTED_MARKETS)
+        context_rows = list(context_entities or [])
+        if context_entity:
+            context_rows.insert(0, context_entity)
+        context_reference = self._context_reference_entity(text, context_rows, min_confidence=min_confidence)
+        if context_reference is not None:
+            return {
+                "query": query,
+                "entities": [context_reference],
+                "ambiguity": False,
+                "candidates": [context_reference.to_dict()],
+                "index_version": INDEX_VERSION,
+                "cache_key_version": INDEX_VERSION,
+                "record_count_by_market": {},
+                "security_index_cache_hit": True,
+                "security_index_full_scan_count": int(_SECURITY_INDEX_METRICS["security_index_db_full_scan"]),
+                "security_index_rebuild_count": int(_SECURITY_INDEX_METRICS["security_index_rebuild"]),
+                "security_index_snapshot_id": get_security_index_metrics().get("security_index_snapshot_id"),
+            }
+
+        markets = [market_hint.upper()] if market_hint else self._markets_for_query(text)
         index: list[dict[str, Any]] = []
         record_count_by_market: dict[str, int] = {}
         for market in markets:
@@ -271,7 +300,42 @@ class SecurityEntityResolver:
             "index_version": INDEX_VERSION,
             "cache_key_version": INDEX_VERSION,
             "record_count_by_market": record_count_by_market,
+            "security_index_cache_hit": int(_SECURITY_INDEX_METRICS["security_index_cache_hit"]) > 0,
+            "security_index_full_scan_count": int(_SECURITY_INDEX_METRICS["security_index_db_full_scan"]),
+            "security_index_rebuild_count": int(_SECURITY_INDEX_METRICS["security_index_rebuild"]),
+            "security_index_snapshot_id": get_security_index_metrics().get("security_index_snapshot_id"),
         }
+
+    def _context_reference_entity(
+        self,
+        text: str,
+        context_entities: list[dict[str, Any]],
+        *,
+        min_confidence: float,
+    ) -> SecurityEntity | None:
+        if not context_entities or not _CONTEXT_REFERENCE_RE.search(text or ""):
+            return None
+        if _COMPARISON_QUERY_RE.search(text or ""):
+            return None
+        if _CN_CODE_RE.search(text or "") or _TS_CODE_RE.search(text or ""):
+            return None
+        entity = self._entity_from_row(context_entities[0], confidence=0.99, match_type="context_report_reference")
+        return entity if entity.confidence >= min_confidence and entity.symbol else None
+
+    def _markets_for_query(self, text: str) -> list[str]:
+        if _TS_CODE_RE.search(text or "") or _CN_CODE_RE.search(text or ""):
+            return ["CN"]
+        has_cjk = bool(re.search(r"[\u4e00-\u9fff]", text or ""))
+        hk_tokens = {token for token in _HK_CODE_RE.findall(text or "") if token.isdigit()}
+        if hk_tokens and not has_cjk:
+            return ["HK"]
+        us_tokens = {
+            token for token in _US_TICKER_RE.findall((text or "").upper())
+            if token not in _US_TICKER_STOPWORDS
+        }
+        if us_tokens and not has_cjk:
+            return ["US"]
+        return list(SUPPORTED_MARKETS)
 
     async def _load_index(self, db: AsyncSession | None, market: str) -> list[dict[str, Any]]:
         market = market.upper()
@@ -525,7 +589,10 @@ class SecurityEntityResolver:
         code_tokens = set(_CN_CODE_RE.findall(text))
         ts_tokens = {(m.group(1), m.group(2).upper()) for m in _TS_CODE_RE.finditer(text)}
         hk_tokens = {token for token in _HK_CODE_RE.findall(text) if token.isdigit()}
-        us_tokens = set(_US_TICKER_RE.findall(text.upper()))
+        us_tokens = {
+            token for token in _US_TICKER_RE.findall(text.upper())
+            if token not in _US_TICKER_STOPWORDS
+        }
 
         compiled = self._compile_index(index)
 

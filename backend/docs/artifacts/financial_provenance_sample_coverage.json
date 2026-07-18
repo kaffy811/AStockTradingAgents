@@ -1,0 +1,147 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-07-17T06:41:08.177245+00:00",
+  "environment_ready": false,
+  "samples": [
+    {
+      "market": "CN",
+      "symbol": "000858",
+      "coverage": {
+        "requested_metrics": 42,
+        "available_metrics": 42,
+        "verified_metrics": 16,
+        "annual_exact_metrics": 16,
+        "legacy_unverified": 9,
+        "unit_unknown": 9,
+        "period_unknown": 0,
+        "conflicts": 0,
+        "coverage_rate": 0.381
+      },
+      "summary": {
+        "rows_checked": 6,
+        "complete_rows": 3,
+        "legacy_unverified_rows": 3,
+        "empty_rows": 0,
+        "proposed_write_count": 0
+      }
+    },
+    {
+      "market": "CN",
+      "symbol": "600519",
+      "coverage": {
+        "requested_metrics": 0,
+        "available_metrics": 0,
+        "verified_metrics": 0,
+        "annual_exact_metrics": 0,
+        "legacy_unverified": 0,
+        "unit_unknown": 0,
+        "period_unknown": 0,
+        "conflicts": 0,
+        "coverage_rate": 0.0
+      },
+      "summary": {
+        "rows_checked": 0,
+        "complete_rows": 0,
+        "legacy_unverified_rows": 0,
+        "empty_rows": 0,
+        "proposed_write_count": 0
+      }
+    },
+    {
+      "market": "CN",
+      "symbol": "000001",
+      "coverage": {
+        "requested_metrics": 0,
+        "available_metrics": 0,
+        "verified_metrics": 0,
+        "annual_exact_metrics": 0,
+        "legacy_unverified": 0,
+        "unit_unknown": 0,
+        "period_unknown": 0,
+        "conflicts": 0,
+        "coverage_rate": 0.0
+      },
+      "summary": {
+        "rows_checked": 0,
+        "complete_rows": 0,
+        "legacy_unverified_rows": 0,
+        "empty_rows": 0,
+        "proposed_write_count": 0
+      }
+    },
+    {
+      "market": "CN",
+      "symbol": "601318",
+      "coverage": {
+        "requested_metrics": 0,
+        "available_metrics": 0,
+        "verified_metrics": 0,
+        "annual_exact_metrics": 0,
+        "legacy_unverified": 0,
+        "unit_unknown": 0,
+        "period_unknown": 0,
+        "conflicts": 0,
+        "coverage_rate": 0.0
+      },
+      "summary": {
+        "rows_checked": 0,
+        "complete_rows": 0,
+        "legacy_unverified_rows": 0,
+        "empty_rows": 0,
+        "proposed_write_count": 0
+      }
+    },
+    {
+      "market": "CN",
+      "symbol": "600036",
+      "coverage": {
+        "requested_metrics": 0,
+        "available_metrics": 0,
+        "verified_metrics": 0,
+        "annual_exact_metrics": 0,
+        "legacy_unverified": 0,
+        "unit_unknown": 0,
+        "period_unknown": 0,
+        "conflicts": 0,
+        "coverage_rate": 0.0
+      },
+      "summary": {
+        "rows_checked": 0,
+        "complete_rows": 0,
+        "legacy_unverified_rows": 0,
+        "empty_rows": 0,
+        "proposed_write_count": 0
+      }
+    },
+    {
+      "market": "CN",
+      "symbol": "300750",
+      "coverage": {
+        "requested_metrics": 0,
+        "available_metrics": 0,
+        "verified_metrics": 0,
+        "annual_exact_metrics": 0,
+        "legacy_unverified": 0,
+        "unit_unknown": 0,
+        "period_unknown": 0,
+        "conflicts": 0,
+        "coverage_rate": 0.0
+      },
+      "summary": {
+        "rows_checked": 0,
+        "complete_rows": 0,
+        "legacy_unverified_rows": 0,
+        "empty_rows": 0,
+        "proposed_write_count": 0
+      }
+    }
+  ],
+  "aggregate": {
+    "sample_count": 6,
+    "dry_run_count": 6,
+    "write_count": 0,
+    "rows_checked": 6,
+    "verified_metrics": 16,
+    "legacy_unverified": 9
+  }
+}

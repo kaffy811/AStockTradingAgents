@@ -137,6 +137,7 @@ def _normalize_profit_row(r: dict) -> dict:
     period = r.get("stat_date") or ""
     return {
         "period": period,
+        "disclosure_date": r.get("pub_date"),
         "roe": _safe_float(r.get("roe_avg")),
         "gross_margin": _safe_float(r.get("gross_margin")),
         "net_margin": _safe_float(r.get("net_margin")),
@@ -157,6 +158,7 @@ def _normalize_growth_row(r: dict) -> dict:
     period = r.get("stat_date") or ""
     return {
         "period": period,
+        "disclosure_date": r.get("pub_date"),
         "net_profit_yoy": _safe_float(r.get("yoy_ni")),          # YOYNI = 净利润同比
         "parent_net_profit_yoy": _safe_float(r.get("yoy_pni")),  # YOYPNI = 归母净利润同比
         "net_profit_parent_yoy": _safe_float(r.get("yoy_pni")),  # backward-compatible alias
@@ -173,6 +175,7 @@ def _normalize_balance_row(r: dict) -> dict:
     equity_multiplier = _safe_float(r.get("asset_to_equity"))
     return {
         "period": period,
+        "disclosure_date": r.get("pub_date"),
         "current_ratio": _safe_float(r.get("current_ratio")),
         "quick_ratio": _safe_float(r.get("quick_ratio")),
         "cash_ratio": _safe_float(r.get("cash_ratio")),
@@ -186,6 +189,7 @@ def _normalize_operation_row(r: dict) -> dict:
     period = r.get("stat_date") or ""
     return {
         "period": period,
+        "disclosure_date": r.get("pub_date"),
         "asset_turnover": _safe_float(r.get("asset_turn_ratio")),
         "inventory_turnover": _safe_float(r.get("inv_turn_ratio")),
         "receivable_turnover": _safe_float(r.get("nr_turn_ratio")),
@@ -198,6 +202,7 @@ def _normalize_cashflow_row(r: dict) -> dict:
     period = r.get("stat_date") or ""
     return {
         "period": period,
+        "disclosure_date": r.get("pub_date"),
         "ocf_to_np": _safe_float(r.get("cfo_to_np")),
         "ocf_to_revenue": _safe_float(r.get("cfo_to_gr")) if _safe_float(r.get("cfo_to_gr")) is not None else _safe_float(r.get("cfo_to_or")),
         "cashflow_revenue_ratio": _safe_float(r.get("cfo_to_or")) if _safe_float(r.get("cfo_to_or")) is not None else _safe_float(r.get("cfo_to_gr")),
@@ -212,6 +217,7 @@ def _normalize_dupont_row(r: dict) -> dict:
     net_margin = round(npi * nitogr, 6) if npi is not None and nitogr is not None else None
     return {
         "period": period,
+        "disclosure_date": r.get("pub_date"),
         "roe": _safe_float(r.get("dupont_roe")),
         "net_margin": net_margin,
         "asset_turnover": _safe_float(r.get("dupont_at")),
@@ -244,6 +250,15 @@ _MODULE_BAOSTOCK_TABLE = {
     "dupont": "dupont",
 }
 
+_BAOSTOCK_ENDPOINTS = {
+    "profit": "query_profit_data",
+    "growth": "query_growth_data",
+    "balance": "query_balance_data",
+    "operation": "query_operation_data",
+    "cash_flow": "query_cash_flow_data",
+    "dupont": "query_dupont_data",
+}
+
 
 # ── 辅助函数 ─────────────────────────────────────────────────────────────────
 
@@ -255,6 +270,71 @@ def _safe_float(v: Any) -> float | None:
         return None if f != f else f
     except (TypeError, ValueError):
         return None
+
+
+def _period_start(period_end: str, report_period_type: str) -> str | None:
+    if not period_end or len(period_end) < 4:
+        return None
+    year = period_end[:4]
+    if report_period_type == "annual":
+        return f"{year}-01-01"
+    if report_period_type == "semi_annual":
+        return f"{year}-01-01"
+    if report_period_type == "q1":
+        return f"{year}-01-01"
+    if report_period_type == "q3":
+        return f"{year}-01-01"
+    return None
+
+
+def _attach_financial_metric_provenance(row: dict[str, Any], module_key: str, source_table: str) -> None:
+    """Attach field-level provenance without storing complete raw provider payload."""
+    from app.services.provider_field_registry import get_normalized_field_definition
+
+    period_end = str(row.get("period") or "")
+    report_period_type = str(row.get("report_period_type") or "")
+    field_provenance: dict[str, Any] = {}
+    for field, value in list(row.items()):
+        if field.startswith("_") or field in {
+            "period",
+            "disclosure_date",
+            "source",
+            "warnings",
+            "aliases",
+            "report_year",
+            "quarter",
+            "report_period_type",
+            "value_basis",
+            "source_provider",
+            "source_table",
+            "semantic_status",
+            "outlier_status",
+            "user_message",
+            "field_provenance",
+            "financial_metric_schema_version",
+        }:
+            continue
+        if value in (None, ""):
+            continue
+        definition = get_normalized_field_definition(module_key, field, provider="baostock")
+        if not definition:
+            continue
+        payload = definition.payload()
+        payload.update({
+            "source_system": f"baostock.{payload['endpoint']}",
+            "source_endpoint": payload["endpoint"],
+            "source_key": payload["field"],
+            "period_start": _period_start(period_end, report_period_type),
+            "period_end": period_end or None,
+            "period_type": report_period_type or row.get("period_type"),
+            "report_year": row.get("report_year"),
+            "disclosed_at": row.get("disclosure_date"),
+            "source_table": source_table,
+        })
+        field_provenance[field] = payload
+    if field_provenance:
+        row["field_provenance"] = field_provenance
+        row["financial_metric_schema_version"] = "financial_metric_v1"
 
 
 def _detect_period_type(rows: list[dict]) -> str:
@@ -598,6 +678,7 @@ def _build_module_history_from_rows(
             source_provider="baostock",
             requested_period=period,
         )
+        _attach_financial_metric_provenance(row, module_key, table_key)
     if module_key == "cashflow_quality":
         _annotate_cashflow_quality(filtered)
     if module_key == "dupont":

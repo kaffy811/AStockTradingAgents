@@ -1,5 +1,325 @@
 {
   "schema_version": "pi_official_report_shadow_v1",
-  "generated_at": "2026-07-18T09:27:54.453057+00:00",
-  "results": []
+  "generated_at": "2026-07-18T14:08:53.711490+00:00",
+  "results": [
+    {
+      "schema_version": "pi_official_report_shadow_v1",
+      "trace_id": "trace_c64eeb3d3e40",
+      "case_id": "A01",
+      "query_type": "smoke_explicit_company",
+      "legacy": {
+        "status": "success",
+        "market": "CN",
+        "symbol": "000858",
+        "company_name": "",
+        "report_year": 2025,
+        "report_type": "annual",
+        "source_page_url": null,
+        "pdf_url": "https://static.cninfo.com.cn/finalpage/2026-04-30/1225273091.PDF",
+        "official_domain_verified": true,
+        "latency_ms": 6942,
+        "error_code": null,
+        "input_snapshot_hash": "7ee675c3b03e5765"
+      },
+      "pi_compatible": {
+        "status": "success",
+        "market": "CN",
+        "symbol": "000858",
+        "company_name": "五粮液",
+        "report_year": 2025,
+        "report_type": "annual",
+        "source_page_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=1225273091&orgId=gssz0000858",
+        "pdf_url": "https://static.cninfo.com.cn/finalpage/2026-04-30/1225273091.PDF",
+        "official_domain_verified": true,
+        "latency_ms": 977,
+        "error_code": null,
+        "turn_count": 1,
+        "tool_call_count": 1,
+        "llm_call_count": 0,
+        "metrics": {
+          "input_tokens": 0,
+          "latency_ms": 977,
+          "model_calls": 0,
+          "output_tokens": 0,
+          "tool_calls": 1,
+          "tool_latency_breakdown": {
+            "adapter_overhead_ms": 0,
+            "adapter_total_ms": 976,
+            "cache_lookup_ms": 0,
+            "db_query_ms": 858,
+            "external_network_ms": 0,
+            "official_domain_validation_ms": 0,
+            "report_selection_ms": 0,
+            "resolver_ms": 0,
+            "total_ms": 976
+          }
+        },
+        "input_snapshot_hash": "7ee675c3b03e5765"
+      },
+      "comparison": {
+        "status_match": true,
+        "entity_match": true,
+        "year_match": true,
+        "report_type_match": true,
+        "source_url_match": true,
+        "pdf_url_match": true,
+        "provenance_complete": true,
+        "unsupported_url_count": 0,
+        "side_effect_count": 0,
+        "decision": "pass",
+        "input_snapshot_hash_match": true
+      },
+      "event_summary": [
+        {
+          "event_type": "run_start",
+          "timestamp": "2026-07-18T14:08:30.368507+00:00",
+          "sequence": 1,
+          "status": null
+        },
+        {
+          "event_type": "turn_start",
+          "timestamp": "2026-07-18T14:08:30.368512+00:00",
+          "sequence": 2,
+          "status": null
+        },
+        {
+          "event_type": "tool_call_start",
+          "timestamp": "2026-07-18T14:08:30.368522+00:00",
+          "sequence": 3,
+          "status": null
+        },
+        {
+          "event_type": "tool_execution_start",
+          "timestamp": "2026-07-18T14:08:30.368528+00:00",
+          "sequence": 4,
+          "status": null
+        },
+        {
+          "event_type": "tool_execution_end",
+          "timestamp": "2026-07-18T14:08:31.345669+00:00",
+          "sequence": 5,
+          "status": null
+        },
+        {
+          "event_type": "turn_end",
+          "timestamp": "2026-07-18T14:08:31.345717+00:00",
+          "sequence": 6,
+          "status": null
+        },
+        {
+          "event_type": "compliance_start",
+          "timestamp": "2026-07-18T14:08:31.345721+00:00",
+          "sequence": 7,
+          "status": null
+        },
+        {
+          "event_type": "compliance_end",
+          "timestamp": "2026-07-18T14:08:31.345739+00:00",
+          "sequence": 8,
+          "status": null
+        },
+        {
+          "event_type": "run_end",
+          "timestamp": "2026-07-18T14:08:31.345742+00:00",
+          "sequence": 9,
+          "status": null
+        }
+      ],
+      "side_effects": {
+        "context_mutation_count": 0,
+        "double_write_count": 0
+      }
+    },
+    {
+      "schema_version": "pi_official_report_shadow_v1",
+      "trace_id": "trace_85d33b99aadf",
+      "case_id": "A02",
+      "query_type": "smoke_explicit_stock_code",
+      "legacy": {
+        "status": "success",
+        "market": "CN",
+        "symbol": "600519",
+        "company_name": "",
+        "report_year": null,
+        "report_type": "annual",
+        "source_page_url": null,
+        "pdf_url": "https://static.cninfo.com.cn/finalpage/2026-04-17/1225114741.PDF",
+        "official_domain_verified": true,
+        "latency_ms": 3791,
+        "error_code": null,
+        "input_snapshot_hash": "d869bd1d8c2386fb"
+      },
+      "pi_compatible": {
+        "status": "success",
+        "market": "CN",
+        "symbol": "600519",
+        "company_name": "贵州茅台",
+        "report_year": 2025,
+        "report_type": "annual",
+        "source_page_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=1225114741&orgId=gssh0600519",
+        "pdf_url": "https://static.cninfo.com.cn/finalpage/2026-04-17/1225114741.PDF",
+        "official_domain_verified": true,
+        "latency_ms": 1066,
+        "error_code": null,
+        "turn_count": 1,
+        "tool_call_count": 1,
+        "llm_call_count": 0,
+        "metrics": {
+          "input_tokens": 0,
+          "latency_ms": 1066,
+          "model_calls": 0,
+          "output_tokens": 0,
+          "tool_calls": 1,
+          "tool_latency_breakdown": {
+            "adapter_overhead_ms": 0,
+            "adapter_total_ms": 1066,
+            "cache_lookup_ms": 0,
+            "db_query_ms": 948,
+            "external_network_ms": 0,
+            "official_domain_validation_ms": 0,
+            "report_selection_ms": 0,
+            "resolver_ms": 0,
+            "total_ms": 1066
+          }
+        },
+        "input_snapshot_hash": "d869bd1d8c2386fb"
+      },
+      "comparison": {
+        "status_match": true,
+        "entity_match": true,
+        "year_match": true,
+        "report_type_match": true,
+        "source_url_match": true,
+        "pdf_url_match": true,
+        "provenance_complete": true,
+        "unsupported_url_count": 0,
+        "side_effect_count": 0,
+        "decision": "pass",
+        "input_snapshot_hash_match": true
+      },
+      "event_summary": [
+        {
+          "event_type": "run_start",
+          "timestamp": "2026-07-18T14:08:40.594640+00:00",
+          "sequence": 1,
+          "status": null
+        },
+        {
+          "event_type": "turn_start",
+          "timestamp": "2026-07-18T14:08:40.594645+00:00",
+          "sequence": 2,
+          "status": null
+        },
+        {
+          "event_type": "tool_call_start",
+          "timestamp": "2026-07-18T14:08:40.594658+00:00",
+          "sequence": 3,
+          "status": null
+        },
+        {
+          "event_type": "tool_execution_start",
+          "timestamp": "2026-07-18T14:08:40.594666+00:00",
+          "sequence": 4,
+          "status": null
+        },
+        {
+          "event_type": "tool_execution_end",
+          "timestamp": "2026-07-18T14:08:41.661327+00:00",
+          "sequence": 5,
+          "status": null
+        },
+        {
+          "event_type": "turn_end",
+          "timestamp": "2026-07-18T14:08:41.661390+00:00",
+          "sequence": 6,
+          "status": null
+        },
+        {
+          "event_type": "compliance_start",
+          "timestamp": "2026-07-18T14:08:41.661394+00:00",
+          "sequence": 7,
+          "status": null
+        },
+        {
+          "event_type": "compliance_end",
+          "timestamp": "2026-07-18T14:08:41.661416+00:00",
+          "sequence": 8,
+          "status": null
+        },
+        {
+          "event_type": "run_end",
+          "timestamp": "2026-07-18T14:08:41.661420+00:00",
+          "sequence": 9,
+          "status": null
+        }
+      ],
+      "side_effects": {
+        "context_mutation_count": 0,
+        "double_write_count": 0
+      }
+    },
+    {
+      "schema_version": "pi_official_report_shadow_v1",
+      "trace_id": "trace_6533dbf97e64",
+      "case_id": "A03",
+      "query_type": "smoke_ambiguity",
+      "legacy": {
+        "status": "clarification_required",
+        "market": "CN",
+        "symbol": "",
+        "company_name": "",
+        "report_year": null,
+        "report_type": "annual",
+        "source_page_url": null,
+        "pdf_url": null,
+        "official_domain_verified": false,
+        "latency_ms": 3501,
+        "error_code": null,
+        "input_snapshot_hash": "974e7f8931bc2d1c"
+      },
+      "pi_compatible": {
+        "status": "clarification_required",
+        "market": "",
+        "symbol": "",
+        "company_name": "",
+        "report_year": null,
+        "report_type": null,
+        "source_page_url": null,
+        "pdf_url": null,
+        "official_domain_verified": false,
+        "latency_ms": 0,
+        "error_code": null,
+        "turn_count": 0,
+        "tool_call_count": 0,
+        "llm_call_count": 0,
+        "metrics": {
+          "input_tokens": 0,
+          "latency_ms": 0,
+          "model_calls": 0,
+          "output_tokens": 0,
+          "tool_calls": 0,
+          "tool_latency_breakdown": {}
+        },
+        "input_snapshot_hash": "974e7f8931bc2d1c"
+      },
+      "comparison": {
+        "status_match": true,
+        "entity_match": true,
+        "year_match": true,
+        "report_type_match": true,
+        "source_url_match": true,
+        "pdf_url_match": true,
+        "provenance_complete": true,
+        "unsupported_url_count": 0,
+        "side_effect_count": 0,
+        "decision": "pass",
+        "input_snapshot_hash_match": true
+      },
+      "event_summary": [],
+      "side_effects": {
+        "context_mutation_count": 0,
+        "double_write_count": 0
+      }
+    }
+  ]
 }

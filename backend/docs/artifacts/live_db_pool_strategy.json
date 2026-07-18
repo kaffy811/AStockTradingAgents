@@ -1,94 +1,15 @@
 {
-  "schema_version": "live_db_pool_strategy.v1",
-  "generated_at": "2026-07-16T20:47:41.250644+00:00",
-  "environment_ready": false,
-  "database_mode": "transaction_pooler",
-  "status": "blocked",
-  "selected_strategy": null,
-  "selection_reason": null,
-  "strategies": [
-    {
-      "strategy": "transaction_pooler_small_queue_pool",
-      "status": "not_run",
-      "serial_select_1": {
-        "requested": 20,
-        "executed": 0
-      },
-      "concurrent_select_1": {
-        "requested": 20,
-        "executed": 0
-      },
-      "sequential_short_transactions": {
-        "requested": 100,
-        "executed": 0
-      },
-      "auth_revalidation_calls": {
-        "requested": 10,
-        "executed": 0
-      },
-      "rag_metadata_queries": {
-        "requested": 10,
-        "executed": 0
-      },
-      "connect_p50_ms": null,
-      "connect_p95_ms": null,
-      "checkout_p50_ms": null,
-      "checkout_p95_ms": null,
-      "query_p50_ms": null,
-      "query_p95_ms": null,
-      "timeout_count": null,
-      "cancellation_count": null,
-      "checked_out_baseline": null,
-      "checked_out_after": null,
-      "rollback_storm": null,
-      "connection_terminate_error_storm": null,
-      "reason": "PREFLIGHT_NOT_READY"
-    },
-    {
-      "strategy": "transaction_pooler_null_pool",
-      "status": "not_run",
-      "serial_select_1": {
-        "requested": 20,
-        "executed": 0
-      },
-      "concurrent_select_1": {
-        "requested": 20,
-        "executed": 0
-      },
-      "sequential_short_transactions": {
-        "requested": 100,
-        "executed": 0
-      },
-      "auth_revalidation_calls": {
-        "requested": 10,
-        "executed": 0
-      },
-      "rag_metadata_queries": {
-        "requested": 10,
-        "executed": 0
-      },
-      "connect_p50_ms": null,
-      "connect_p95_ms": null,
-      "checkout_p50_ms": null,
-      "checkout_p95_ms": null,
-      "query_p50_ms": null,
-      "query_p95_ms": null,
-      "timeout_count": null,
-      "cancellation_count": null,
-      "checked_out_baseline": null,
-      "checked_out_after": null,
-      "rollback_storm": null,
-      "connection_terminate_error_storm": null,
-      "reason": "PREFLIGHT_NOT_READY"
-    }
-  ],
-  "blockers": [
-    "DNS_gaierror",
-    "TCP_DNS_FAILED",
-    "TLS_TCP_FAILED",
-    "POSTGRES_TLS_FAILED",
-    "CNINFO_URLError",
-    "BAOSTOCK_gaierror",
-    "RAG_POSTGRES_NOT_READY"
-  ]
+  "schema_version": "1.0",
+  "generated_at": "2026-07-17T06:52:18.253422+00:00",
+  "executed": false,
+  "blocked": true,
+  "reason": "TLS certificate verification failed before Postgres connection mode benchmark.",
+  "connection_mode": "transaction_pooler",
+  "port": 6543,
+  "pool_strategy": "not_selected",
+  "requirements": {
+    "tls_verified": false,
+    "postgres_select_1": false,
+    "rag_minimal_query": false
+  }
 }

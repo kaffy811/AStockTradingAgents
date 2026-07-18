@@ -1,0 +1,8 @@
+{
+  "schema_version": "pi_shadow_sql_logging_audit_v1",
+  "database_sql_echo": false,
+  "database_sql_hide_parameters": true,
+  "sql_parameter_exposure": 0,
+  "token_user_query_bind_values_logged": false,
+  "decision": "pass"
+}

@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-07-17T06:52:18.253422+00:00",
+  "scope": {
+    "market": "CN",
+    "symbol": "000858",
+    "report_year": 2025
+  },
+  "executed": false,
+  "blocked": true,
+  "reason": "first apply was blocked; idempotency write check not applicable",
+  "duplicate_inserts": 0,
+  "verified_value_changed": false,
+  "write_count": 0
+}

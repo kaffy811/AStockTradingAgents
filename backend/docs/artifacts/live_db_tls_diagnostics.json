@@ -1,0 +1,80 @@
+{
+  "schema_version": "live_db_tls_diagnostics.v1",
+  "generated_at": "2026-07-17T06:51:13.691843+00:00",
+  "environment": {
+    "environment_id": "local_unverified",
+    "os": "macOS-26.3-arm64-arm-64bit",
+    "python_version": "3.12.10",
+    "python_executable": "/Users/kaffy/Documents/TradingAgents/backend/.venv/bin/python",
+    "openssl_version": "OpenSSL 3.5.0 8 Apr 2025",
+    "system_time_utc": "2026-07-17T06:51:13.711735+00:00"
+  },
+  "target": {
+    "port": 6543,
+    "host_class": "supabase_pooler",
+    "host_suffix": "pooler.supabase.com",
+    "driver": "postgresql+asyncpg",
+    "query_keys": [],
+    "sslmode": null
+  },
+  "ca": {
+    "default_verify_paths": {
+      "cafile": "/Users/kaffy/miniforge3/ssl/cert.pem",
+      "capath": "/Users/kaffy/miniforge3/ssl/certs",
+      "openssl_cafile_env": "SSL_CERT_FILE",
+      "openssl_capath_env": "SSL_CERT_DIR"
+    },
+    "certifi_where": "/Users/kaffy/Documents/TradingAgents/backend/.venv/lib/python3.12/site-packages/certifi/cacert.pem"
+  },
+  "dns": {
+    "status": "passed",
+    "latency_ms": 5,
+    "error_code": null,
+    "details": {
+      "address_families": [
+        "ipv4"
+      ],
+      "address_count": 2
+    }
+  },
+  "tcp": {
+    "status": "passed",
+    "latency_ms": 80,
+    "error_code": null,
+    "details": {}
+  },
+  "tls_handshake": {
+    "status": "failed",
+    "latency_ms": 308,
+    "error_code": "SSLCertVerificationError",
+    "details": {
+      "ca_source": "default",
+      "classification": "certificate_verification_failure",
+      "message": "[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1010)",
+      "certificate_verified": false,
+      "hostname_verified": false
+    }
+  },
+  "tls_handshake_certifi": {
+    "status": "failed",
+    "latency_ms": 344,
+    "error_code": "SSLCertVerificationError",
+    "details": {
+      "ca_source": "certifi",
+      "classification": "certificate_verification_failure",
+      "message": "[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1010)",
+      "certificate_verified": false,
+      "hostname_verified": false
+    }
+  },
+  "postgres_select_1": {
+    "status": "skipped",
+    "latency_ms": null,
+    "error_code": "TLS_FAILED",
+    "details": {}
+  },
+  "certificate_verified": false,
+  "hostname_verified": false,
+  "root_cause": "certificate_verification_failure",
+  "safe_fix": "Install/update CA bundle or correct the hostname/endpoint; do not disable TLS verification."
+}

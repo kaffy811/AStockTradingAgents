@@ -88,6 +88,10 @@ class OfficialReportPdfAgent:
         )
         metrics.tool_calls = 1
         tool_response = responses[0]
+        metrics.tool_latency_breakdown = {
+            **(tool_response.quality.get("latency_breakdown") or {}),
+            "adapter_total_ms": tool_response.latency_ms,
+        }
         if tool_response.status != STATUS_SUCCESS:
             return self._finish(
                 request=request,

@@ -68,6 +68,7 @@ class PiRuntimeMetrics:
     tool_validation_failures: int = 0
     input_tokens: int = 0
     output_tokens: int = 0
+    tool_latency_breakdown: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)

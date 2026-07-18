@@ -197,6 +197,7 @@ async def _run(args: argparse.Namespace) -> dict[str, Any]:
         ],
         "metrics": audits,
         "availability": result.get("availability") or {},
+        "metric_coverage": result.get("metric_coverage") or {},
         "warnings": result.get("warnings") or [],
     }
 

@@ -39,7 +39,8 @@ _engine_kwargs = {
         "statement_cache_size": 0,
         "command_timeout": settings.database_command_timeout_seconds,
     },
-    "echo": settings.debug,
+    "echo": settings.database_sql_echo,
+    "hide_parameters": settings.database_sql_hide_parameters,
     "pool_pre_ping": settings.database_pool_pre_ping,
 }
 if _poolclass is AsyncAdaptedQueuePool:

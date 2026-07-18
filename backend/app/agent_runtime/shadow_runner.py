@@ -12,6 +12,7 @@ from app.agent_runtime.contracts import PiRuntimeBudgets, PiRuntimeRequest, new_
 from app.agent_runtime.executor import PiCompatibleAgentExecutor
 from app.agent_runtime.url_utils import normalize_report_url, official_domain_verified
 from app.agents.financial_runtime.contracts import AgentRequest
+from app.agents.financial_runtime.contracts import IntentRoutingResult, SecurityEntity, STATUS_CLARIFICATION_REQUIRED, STATUS_SUCCESS
 from app.agents.financial_runtime.planner import execution_planner, financial_context_builder
 from app.agents.financial_runtime.router import intent_safety_router
 from app.core.config import settings
@@ -25,6 +26,20 @@ _REPORT_TYPE_PATTERNS: list[tuple[re.Pattern[str], str]] = [
     (re.compile(r"中报|半年报|半年度", re.IGNORECASE), "semi"),
     (re.compile(r"年报|年度报告|annual", re.IGNORECASE), "annual"),
 ]
+_OFFICIAL_REPORT_PDF_RE = re.compile(
+    r"官方\s*PDF|PDF\s*在哪|pdf链接|报告链接|年报链接|报告原文|年报原文|年度报告原文|这份报告.*在哪|这个报告.*在哪|这个年报|官方报告地址",
+    re.IGNORECASE,
+)
+_AMBIGUOUS_OFFICIAL_PDF_ALIASES: dict[str, list[dict[str, Any]]] = {
+    "平安": [
+        {"market": "CN", "symbol": "000001", "ts_code": "000001.SZ", "short_name": "平安银行"},
+        {"market": "CN", "symbol": "601318", "ts_code": "601318.SH", "short_name": "中国平安"},
+    ],
+    "招商": [
+        {"market": "CN", "symbol": "600036", "ts_code": "600036.SH", "short_name": "招商银行"},
+        {"market": "CN", "symbol": "600999", "ts_code": "600999.SH", "short_name": "招商证券"},
+    ],
+}
 
 
 class PiCompatibleShadowRunner:
@@ -66,7 +81,6 @@ class PiCompatibleShadowRunner:
             page_context=page_context or {},
             user_context={"user_id": user_id},
         )
-        routing = await intent_safety_router.route(db, request)
         input_snapshot = {
             "raw_query": raw_query,
             "normalized_query": effective_query,
@@ -78,6 +92,14 @@ class PiCompatibleShadowRunner:
             "page_context": self._compact_page_context(page_context or {}),
             "output_language": output_language,
         }
+        routing = self._routing_from_snapshot(
+            trace_id=trace_id,
+            raw_query=raw_query,
+            normalized_query=effective_query,
+            resolved_entity_snapshot=resolved_entity_snapshot,
+        )
+        if routing is None:
+            routing = await intent_safety_router.route(db, request)
         if routing.needs_clarification:
             return {
                 "schema_version": "pi_financial_runtime_v1",
@@ -99,7 +121,13 @@ class PiCompatibleShadowRunner:
                 "shadow_input": input_snapshot,
             }
         if routing.intent != "official_report_pdf":
-            return {"status": "skipped", "reason": routing.intent, "trace_id": trace_id, "shadow_input": input_snapshot}
+            return self._skip_result(
+                trace_id=trace_id,
+                reason_code="PI_SHADOW_INTENT_NOT_SUPPORTED",
+                detected_intent=routing.intent,
+                normalized_intent="official_report_pdf" if self._looks_like_official_pdf_intent(raw_query, effective_query) else routing.intent,
+                input_snapshot=input_snapshot,
+            )
         context = financial_context_builder.build(
             trace_id=trace_id,
             routing=routing,
@@ -138,6 +166,119 @@ class PiCompatibleShadowRunner:
         payload = result.to_dict()
         payload["shadow_input"] = input_snapshot
         return payload
+
+    def _routing_from_snapshot(
+        self,
+        *,
+        trace_id: str,
+        raw_query: str,
+        normalized_query: str,
+        resolved_entity_snapshot: dict[str, Any] | None,
+    ) -> IntentRoutingResult | None:
+        if not self._looks_like_official_pdf_intent(raw_query, normalized_query):
+            return None
+        snapshot = resolved_entity_snapshot or {}
+        if snapshot.get("ambiguity"):
+            return IntentRoutingResult(
+                trace_id=trace_id,
+                status=STATUS_CLARIFICATION_REQUIRED,
+                intent="official_report_pdf",
+                intent_confidence=0.9,
+                policy_class="normal",
+                needs_clarification=True,
+                clarification_options=list(snapshot.get("resolver_candidates") or [])[:5],
+                reason="snapshot_security_entity_ambiguous",
+            )
+        alias_options = self._ambiguous_alias_options(raw_query, normalized_query)
+        if alias_options:
+            return IntentRoutingResult(
+                trace_id=trace_id,
+                status=STATUS_CLARIFICATION_REQUIRED,
+                intent="official_report_pdf",
+                intent_confidence=0.92,
+                policy_class="normal",
+                needs_clarification=True,
+                clarification_options=alias_options,
+                reason="official_pdf_alias_ambiguous",
+            )
+        primary = snapshot.get("primary_entity") or {}
+        if not primary:
+            return None
+        entity = self._security_entity_from_dict(trace_id, primary)
+        if not entity.symbol:
+            return None
+        return IntentRoutingResult(
+            trace_id=trace_id,
+            status=STATUS_SUCCESS,
+            intent="official_report_pdf",
+            intent_confidence=0.96,
+            resolved_entities=[entity],
+            policy_class="normal",
+            needs_clarification=False,
+            reason="legacy_snapshot_official_report_pdf",
+        )
+
+    def _looks_like_official_pdf_intent(self, raw_query: str, normalized_query: str | None = None) -> bool:
+        text = f"{raw_query or ''}\n{normalized_query or ''}"
+        return bool(_OFFICIAL_REPORT_PDF_RE.search(text))
+
+    def _ambiguous_alias_options(self, raw_query: str, normalized_query: str | None = None) -> list[dict[str, Any]]:
+        text = f"{raw_query or ''}\n{normalized_query or ''}"
+        for alias, options in _AMBIGUOUS_OFFICIAL_PDF_ALIASES.items():
+            if alias in text:
+                return [dict(item) for item in options]
+        return []
+
+    def _security_entity_from_dict(self, trace_id: str, data: dict[str, Any]) -> SecurityEntity:
+        return SecurityEntity(
+            trace_id=trace_id,
+            status=STATUS_SUCCESS,
+            entity_type=data.get("entity_type") or "equity",
+            market=data.get("market") or "CN",
+            symbol=data.get("symbol") or data.get("code") or "",
+            exchange=data.get("exchange") or "",
+            ts_code=data.get("ts_code") or "",
+            short_name=data.get("short_name") or data.get("name") or "",
+            full_name=data.get("full_name") or "",
+            aliases=list(data.get("aliases") or []),
+            industry=data.get("industry"),
+            confidence=float(data.get("confidence") or 0.99),
+            match_type=data.get("match_type") or "legacy_snapshot",
+            source=data.get("source") or "legacy_snapshot",
+        )
+
+    def _skip_result(
+        self,
+        *,
+        trace_id: str,
+        reason_code: str,
+        detected_intent: str,
+        normalized_intent: str,
+        input_snapshot: dict[str, Any],
+    ) -> dict[str, Any]:
+        return {
+            "schema_version": "pi_financial_runtime_v1",
+            "trace_id": trace_id,
+            "run_id": None,
+            "status": "skipped",
+            "agent_id": None,
+            "turn_count": 0,
+            "tool_call_count": 0,
+            "events": [],
+            "findings": [],
+            "evidence_ids": [],
+            "structured_answer": {
+                "reason_code": reason_code,
+                "detected_intent": detected_intent,
+                "normalized_intent": normalized_intent,
+                "eligible_agents": [official_report_pdf_manifest.agent_id] if normalized_intent == "official_report_pdf" else [],
+                "selected_agent": None,
+                "active_report_present": bool((input_snapshot.get("active_report") or {}).get("report_id_present")),
+            },
+            "error": {"code": reason_code, "message": reason_code},
+            "metrics": {"latency_ms": 0, "model_calls": 0, "tool_calls": 0, "input_tokens": 0, "output_tokens": 0},
+            "shadow_input": input_snapshot,
+        }
 
     async def run_official_report_pdf_shadow_with_new_session(
         self,
@@ -211,6 +352,7 @@ class PiCompatibleShadowRunner:
                 "tool_call_count": pi_compatible.get("tool_call_count", 0),
                 "llm_call_count": (pi_compatible.get("metrics") or {}).get("model_calls", 0),
                 "error_code": (pi_compatible.get("error") or {}).get("code"),
+                "metrics": pi_compatible.get("metrics") or {},
             },
             "comparison": comparison,
             "event_summary": self._compact_events(pi_compatible.get("events") or []),

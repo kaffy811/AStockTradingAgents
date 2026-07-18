@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-07-17T06:52:18.253422+00:00",
+  "scope": {
+    "market": "CN",
+    "symbol": "000858",
+    "report_year": 2025
+  },
+  "executed": false,
+  "blocked": true,
+  "blockers": [
+    "TLS_SSLCertVerificationError",
+    "POSTGRES_TLS_FAILED",
+    "RAG_POSTGRES_NOT_READY"
+  ],
+  "tls_root_cause": "certificate_verification_failure",
+  "certificate_verification_enabled": true,
+  "sslmode_disable_used": false,
+  "affected_rows": 0,
+  "inserted": 0,
+  "updated": 0,
+  "no_op": 0,
+  "conflicts": [],
+  "message": "Apply was not executed because TLS/Postgres/RAG gate did not pass."
+}

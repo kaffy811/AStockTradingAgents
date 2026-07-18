@@ -11,6 +11,34 @@ from app.services.report_document_classifier import KIND_ANNUAL_FULL, classify_r
 
 
 class OfficialReportDomainService:
+    async def get_official_report_by_id(
+        self,
+        db: AsyncSession,
+        *,
+        report_id: int,
+    ) -> dict[str, Any] | None:
+        row = await db.get(ReportDocument, report_id)
+        if row is None:
+            return None
+        classification = classify_report_document(row.title, report_type=row.report_type)
+        return {
+            "report_id": row.id,
+            "ts_code": row.ts_code,
+            "title": row.title,
+            "report_type": row.report_type,
+            "report_year": row.report_year,
+            "period_end": row.period_end,
+            "disclosure_date": row.disclosure_date,
+            "source_page_url": row.source_url,
+            "source_url": row.source_url,
+            "pdf_url": row.pdf_url or row.source_url,
+            "parsed": bool(row.parsed),
+            "rag_status": row.rag_status,
+            "chunk_count": row.chunk_count,
+            "report_document_kind": classification.report_document_kind,
+            "classification_reason": classification.classification_reason,
+        }
+
     async def list_official_annual_reports(
         self,
         db: AsyncSession,
@@ -39,6 +67,8 @@ class OfficialReportDomainService:
                 "report_year": row.report_year,
                 "period_end": row.period_end,
                 "disclosure_date": row.disclosure_date,
+                "source_url": row.source_url,
+                "source_page_url": row.source_url,
                 "pdf_url": row.pdf_url or row.source_url,
                 "parsed": bool(row.parsed),
                 "rag_status": row.rag_status,

@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-07-17T06:52:18.253422+00:00",
+  "executed": false,
+  "blocked": true,
+  "reason": "No apply/persistence reload was performed because Postgres/RAG preflight failed.",
+  "conversation": [
+    "贵州茅台最新财报表现如何？",
+    "那它和五粮液比呢"
+  ],
+  "expected_after_gate": [
+    "五粮液营业收入显示 verified 2025 annual revenue if persisted",
+    "ROE remains unavailable unless real 2025 annual provenance exists"
+  ],
+  "raw_500": false
+}

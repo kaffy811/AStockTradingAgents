@@ -1,0 +1,40 @@
+{
+  "schema_version": "pi_official_report_pdf_smoke_diagnostics_v1",
+  "planned_samples": 3,
+  "executed_samples": 3,
+  "accepted_samples": 3,
+  "smoke_passed": true,
+  "recommended_to_run_full_30": true,
+  "cases": [
+    {
+      "case_id": "A01",
+      "decision": "pass",
+      "pi_status": "success",
+      "pi_error_code": null,
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "llm_call_count": 0
+    },
+    {
+      "case_id": "A02",
+      "decision": "pass",
+      "pi_status": "success",
+      "pi_error_code": null,
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "llm_call_count": 0
+    },
+    {
+      "case_id": "A03",
+      "decision": "pass",
+      "pi_status": "clarification_required",
+      "pi_error_code": null,
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "llm_call_count": 0
+    }
+  ]
+}

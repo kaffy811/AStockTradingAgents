@@ -1,0 +1,10 @@
+{
+  "schema_version": "pi_shadow_resource_leak_audit_v1",
+  "generated_at": "2026-07-18T15:01:24.416659+00:00",
+  "environment": "local_live",
+  "commit_sha": "ab0d0367e7bf7f0a14cb6786adac7f58c0d79c92",
+  "cases": [],
+  "db_checked_out_returned_to_baseline": null,
+  "task_count_returned_to_baseline": null,
+  "blocker": "runner_aborted_during_A01_sse_wait; leak metrics unavailable for completed cases"
+}

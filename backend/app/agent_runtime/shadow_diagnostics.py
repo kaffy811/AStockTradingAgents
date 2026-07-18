@@ -85,6 +85,11 @@ class PiShadowDiagnosticsSink:
             "tool_calls": int(metrics.get("tool_calls") or 0),
             "input_tokens": int(metrics.get("input_tokens") or 0),
             "output_tokens": int(metrics.get("output_tokens") or 0),
+            "tool_latency_breakdown": {
+                str(key): int(value or 0)
+                for key, value in (metrics.get("tool_latency_breakdown") or {}).items()
+                if isinstance(value, int | float)
+            },
         }
 
     def _compact_findings(self, findings: list[dict[str, Any]]) -> list[dict[str, Any]]:

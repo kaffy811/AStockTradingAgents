@@ -1,8 +1,10 @@
 {
   "agent_id": "official_report_pdf_pi_v1",
-  "planned_samples": 30,
-  "executed_samples": 0,
+  "planned_samples": 3,
+  "executed_samples": 3,
   "passed": false,
+  "smoke_passed": true,
+  "recommended_to_run_full_30": true,
   "recommended_for_next_authorization": false,
   "metrics": {
     "status_match_rate": null,
@@ -21,12 +23,6 @@
     "p95_latency_ms": null
   },
   "blockers": [
-    "Live shadow samples incomplete: executed 0/30.",
-    "local_fixture is allowed only for runner self-test and cannot count as live acceptance.",
-    "Pi shadow env is not enabled with the explicit P1.3 values.",
-    "PI_AGENT_SHADOW_DIAGNOSTICS_PATH is required for HTTP shadow result polling.",
-    "PI_SHADOW_ACCEPTANCE_BASE_URL / --base-url is required for HTTP Chat acceptance.",
-    "Database readiness check failed.",
-    "No acceptance service account token/user id and local fixture creation was not explicitly allowed."
+    "Gate thresholds were not fully met."
   ]
 }

@@ -62,22 +62,37 @@ def _metric_from_row(row: dict[str, Any], field: str, *, source: str) -> dict[st
     if value in (None, ""):
         return None
     period = row.get("period") or row.get("period_end") or row.get("date")
+    provenance = (row.get("field_provenance") or {}).get(source_key or field) or {}
+    legacy_without_provenance = not bool(provenance)
     raw_item = {
         "field": field,
         "raw_value": value,
         "normalized_value": value,
-        "unit": "元/股" if field == "eps" else ("CNY" if field != "roe" else None),
+        "raw_unit": provenance.get("raw_unit"),
+        "unit": provenance.get("raw_unit"),
         "period_end": period,
-        "period_type": row.get("period_type") or row.get("report_period_type") or infer_period_type(period),
+        "period_start": provenance.get("period_start") or row.get("period_start"),
+        "period_type": provenance.get("period_type") or row.get("period_type") or row.get("report_period_type") or infer_period_type(period),
         "report_year": row.get("report_year") or (int(str(period)[:4]) if str(period or "")[:4].isdigit() else None),
-        "accounting_scope": accounting_scope_for(field),
-        "value_type": value_type_for(field),
+        "disclosure_date": provenance.get("disclosed_at") or row.get("disclosure_date"),
+        "accounting_scope": provenance.get("accounting_scope") or accounting_scope_for(field),
+        "value_type": provenance.get("value_type") or value_type_for(field),
         "source": source,
         "source_key": source_key or field,
+        "source_system": provenance.get("source_system") or source,
+        "source_endpoint": provenance.get("source_endpoint"),
+        "normalization_rule": provenance.get("normalization_rule"),
         "source_type": "company_history",
         "evidence_id": f"{source}:{field}:{period or 'latest'}",
     }
-    return metric_normalizer.normalize(raw_item, field)
+    normalized = metric_normalizer.normalize(raw_item, field)
+    if normalized and legacy_without_provenance:
+        warnings = set(normalized.get("warnings") or [])
+        warnings.add("LEGACY_PROVENANCE_MISSING")
+        normalized["warnings"] = sorted(warnings)
+        normalized["validation_status"] = "unverified"
+        normalized["legacy_unverified"] = True
+    return normalized
 
 
 def _financial_candidates_from_dashboard(dashboard: dict[str, Any]) -> dict[str, list[dict[str, Any]]]:
@@ -155,7 +170,48 @@ def _select_metric_candidate(
         selected = dict(available[0])
         selected["selection_reason"] = "latest_available_fallback"
         return selected
+    fallback = list(candidates)
+    fallback.sort(key=lambda item: str(item.get("period_end") or ""), reverse=True)
+    if fallback:
+        selected = dict(fallback[0])
+        selected["selection_reason"] = "latest_available_unverified"
+        return selected
     return None
+
+
+def _coverage_summary(
+    requested_metrics: list[str],
+    selected: dict[str, Any],
+    unavailable: dict[str, Any],
+    *,
+    target_period_type: str | None,
+    target_report_year: int | None,
+) -> dict[str, Any]:
+    requested_count = len(requested_metrics)
+    available_count = len(selected)
+    verified_count = sum(
+        1 for item in selected.values()
+        if item.get("validation_status") in {"verified", "normalized"}
+    )
+    annual_exact = sum(
+        1 for item in selected.values()
+        if (target_period_type is None or item.get("period_type") == target_period_type)
+        and (target_report_year is None or item.get("report_year") == target_report_year)
+    )
+    all_items = list(selected.values()) + list(unavailable.values())
+    unit_unknown = sum(1 for item in all_items if "UNIT_UNKNOWN" in (item.get("warnings") or []))
+    period_unknown = sum(1 for item in all_items if "PERIOD_UNKNOWN" in (item.get("warnings") or []))
+    conflicts = sum(1 for item in all_items if item.get("validation_status") == "conflict")
+    return {
+        "requested_metrics": requested_count,
+        "available_metrics": available_count,
+        "verified_metrics": verified_count,
+        "annual_exact_metrics": annual_exact,
+        "unit_unknown": unit_unknown,
+        "period_unknown": period_unknown,
+        "conflicts": conflicts,
+        "coverage_rate": round(verified_count / requested_count, 4) if requested_count else 0.0,
+    }
 
 
 class CompanyChatDataService:
@@ -243,7 +299,11 @@ class CompanyChatDataService:
                 target_report_year=target_report_year,
                 allow_fallback=allow_fallback,
             )
-            if item and item.get("normalized_value") is not None and item.get("validation_status") in {"verified", "normalized"}:
+            if (
+                item
+                and item.get("normalized_value") is not None
+                and (allow_fallback or item.get("validation_status") in {"verified", "normalized"})
+            ):
                 selected[metric] = item
             else:
                 unavailable[metric] = item or {
@@ -255,6 +315,13 @@ class CompanyChatDataService:
             **domain,
             "financial_fields": selected,
             "unavailable_metrics": unavailable,
+            "metric_coverage": _coverage_summary(
+                requested_metrics,
+                selected,
+                unavailable,
+                target_period_type=target_period_type,
+                target_report_year=target_report_year,
+            ),
             "selection_request": {
                 "target_period_type": target_period_type,
                 "target_report_year": target_report_year,

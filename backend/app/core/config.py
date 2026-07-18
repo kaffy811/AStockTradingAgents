@@ -77,6 +77,8 @@ class Settings(BaseSettings):
     database_pool_recycle_seconds: int = 1800
     database_pool_timeout_seconds: float = 30.0
     database_command_timeout_seconds: float = 45.0
+    database_sql_echo: bool = False
+    database_sql_hide_parameters: bool = True
     auth_db_lookup_timeout_seconds: float = 4.0
     auth_user_cache_ttl_seconds: int = 60
     auth_db_timeout_threshold: int = 3

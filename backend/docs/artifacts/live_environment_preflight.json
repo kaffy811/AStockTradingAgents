@@ -8,33 +8,38 @@
     "database_mode": "transaction_pooler",
     "database_host_class": "supabase_pooler",
     "dns_provider": "unknown",
-    "ipv4_available": false,
+    "ipv4_available": true,
     "ipv6_available": false
   },
   "dns": {
     "supabase_pooler": {
-      "status": "failed",
-      "latency_ms": 0,
-      "error_code": "gaierror",
+      "status": "passed",
+      "latency_ms": 1691,
+      "error_code": null,
       "details": {
-        "message": "[Errno 8] nodename nor servname provided, or not known"
+        "resolved_addresses": [
+          "ipv4:masked:6543",
+          "ipv4:masked:6543"
+        ]
       }
     }
   },
   "tcp": {
     "supabase_pooler": {
-      "status": "skipped",
-      "latency_ms": null,
-      "error_code": "DNS_FAILED",
+      "status": "passed",
+      "latency_ms": 85,
+      "error_code": null,
       "details": {}
     }
   },
   "tls": {
     "supabase_pooler": {
-      "status": "skipped",
-      "latency_ms": null,
-      "error_code": "TCP_FAILED",
-      "details": {}
+      "status": "failed",
+      "latency_ms": 286,
+      "error_code": "SSLCertVerificationError",
+      "details": {
+        "message": "[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1010)"
+      }
     }
   },
   "postgres": {
@@ -44,27 +49,27 @@
     "details": {}
   },
   "redis": {
-    "status": "failed",
-    "latency_ms": 1,
-    "error_code": "ConnectionError",
-    "details": {
-      "message": "Error 1 connecting to localhost:6379. Operation not permitted."
-    }
+    "status": "passed",
+    "latency_ms": 3,
+    "error_code": null,
+    "details": {}
   },
   "cninfo": {
-    "status": "failed",
-    "latency_ms": 7,
-    "error_code": "URLError",
+    "status": "passed",
+    "latency_ms": 207,
+    "error_code": null,
     "details": {
-      "message": "<urlopen error [Errno 1] Operation not permitted>"
+      "http_status": 200
     }
   },
   "baostock": {
-    "status": "failed",
-    "latency_ms": 0,
-    "error_code": "gaierror",
+    "status": "passed",
+    "latency_ms": 23,
+    "error_code": null,
     "details": {
-      "message": "[Errno 8] nodename nor servname provided, or not known"
+      "resolved_addresses": [
+        "ipv4:masked:443"
+      ]
     }
   },
   "rag": {
@@ -81,12 +86,8 @@
   },
   "environment_ready": false,
   "blockers": [
-    "DNS_gaierror",
-    "TCP_DNS_FAILED",
-    "TLS_TCP_FAILED",
+    "TLS_SSLCertVerificationError",
     "POSTGRES_TLS_FAILED",
-    "CNINFO_URLError",
-    "BAOSTOCK_gaierror",
     "RAG_POSTGRES_NOT_READY"
   ]
 }

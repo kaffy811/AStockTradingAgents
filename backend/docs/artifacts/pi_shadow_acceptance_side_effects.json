@@ -1,4 +1,406 @@
 {
   "schema_version": "pi_shadow_side_effects_v1",
-  "cases": []
+  "cases": [
+    {
+      "case_id": "A01",
+      "before": {
+        "chat_sessions": 114,
+        "chat_messages": 325,
+        "chat_session_context_version_sum": 32,
+        "watchlist_items": 3,
+        "analysis_reports": 20,
+        "report_documents": 66,
+        "report_indexing_jobs": 0,
+        "financial_jobs": 195,
+        "background_tasks": 0,
+        "pool_checked_out": 1,
+        "target_session_context_version": 0,
+        "target_session_metadata_keys": [
+          "mock_mode",
+          "orchestrator"
+        ],
+        "target_session_last_context_commit_at": null,
+        "target_session_id_hash": "e239de2a60b1642a"
+      },
+      "after": {
+        "chat_sessions": 114,
+        "chat_messages": 327,
+        "chat_session_context_version_sum": 33,
+        "watchlist_items": 3,
+        "analysis_reports": 20,
+        "report_documents": 66,
+        "report_indexing_jobs": 0,
+        "financial_jobs": 195,
+        "background_tasks": 0,
+        "pool_checked_out": 1,
+        "target_session_context_version": 1,
+        "target_session_metadata_keys": [
+          "memory_v1",
+          "mock_mode",
+          "orchestrator"
+        ],
+        "target_session_last_context_commit_at": "2026-07-18T14:08:30.817100+00:00",
+        "target_session_id_hash": "e239de2a60b1642a"
+      },
+      "legacy_expected_writes": {
+        "chat_messages": 2,
+        "chat_sessions": 0,
+        "context_version_delta": 2
+      },
+      "expected_legacy_chat_message_delta": 2,
+      "expected_legacy_context_version_delta": 2,
+      "pi_shadow_business_write_delta": 0,
+      "pi_side_effect_count": 0,
+      "context_extra_updates": 0,
+      "context_mutation_count": 0,
+      "assistant_double_writes": 0,
+      "double_write_count": 0,
+      "write_attribution": {
+        "case_id": "A01",
+        "trace_id": "trace_c64eeb3d3e40",
+        "legacy_run_id": null,
+        "pi_shadow_run_id": "run_7f12b52e805d",
+        "target_session_id_hash": "e239de2a60b1642a",
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "owner": "legacy",
+            "expected": true,
+            "call_site": "chat_service/orchestrator message persistence",
+            "ordinal": 1
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "owner": "legacy",
+            "expected": true,
+            "call_site": "chat_service/orchestrator message persistence",
+            "ordinal": 2
+          },
+          {
+            "resource": "chat_sessions.session_metadata",
+            "operation": "update",
+            "owner": "legacy",
+            "expected": true,
+            "call_site": "chat_memory.apply_memory_updates",
+            "timestamp": "2026-07-18T14:08:30.817100+00:00",
+            "context_version_before": 0,
+            "context_version_after": 1,
+            "changed_keys": [
+              "memory_v1"
+            ]
+          }
+        ],
+        "legacy_expected_writes": {
+          "chat_messages": 2,
+          "context_version_delta": 1
+        },
+        "pi_shadow_business_write_delta": 0
+      }
+    },
+    {
+      "case_id": "A02",
+      "before": {
+        "chat_sessions": 115,
+        "chat_messages": 327,
+        "chat_session_context_version_sum": 33,
+        "watchlist_items": 3,
+        "analysis_reports": 20,
+        "report_documents": 66,
+        "report_indexing_jobs": 0,
+        "financial_jobs": 195,
+        "background_tasks": 0,
+        "pool_checked_out": 1,
+        "target_session_context_version": 0,
+        "target_session_metadata_keys": [
+          "mock_mode",
+          "orchestrator"
+        ],
+        "target_session_last_context_commit_at": null,
+        "target_session_id_hash": "4f367e20ef2292f3"
+      },
+      "after": {
+        "chat_sessions": 115,
+        "chat_messages": 329,
+        "chat_session_context_version_sum": 34,
+        "watchlist_items": 3,
+        "analysis_reports": 20,
+        "report_documents": 66,
+        "report_indexing_jobs": 0,
+        "financial_jobs": 195,
+        "background_tasks": 0,
+        "pool_checked_out": 1,
+        "target_session_context_version": 1,
+        "target_session_metadata_keys": [
+          "memory_v1",
+          "mock_mode",
+          "orchestrator"
+        ],
+        "target_session_last_context_commit_at": "2026-07-18T14:08:41.016745+00:00",
+        "target_session_id_hash": "4f367e20ef2292f3"
+      },
+      "legacy_expected_writes": {
+        "chat_messages": 2,
+        "chat_sessions": 0,
+        "context_version_delta": 2
+      },
+      "expected_legacy_chat_message_delta": 2,
+      "expected_legacy_context_version_delta": 2,
+      "pi_shadow_business_write_delta": 0,
+      "pi_side_effect_count": 0,
+      "context_extra_updates": 0,
+      "context_mutation_count": 0,
+      "assistant_double_writes": 0,
+      "double_write_count": 0,
+      "write_attribution": {
+        "case_id": "A02",
+        "trace_id": "trace_85d33b99aadf",
+        "legacy_run_id": null,
+        "pi_shadow_run_id": "run_4021da72ae4c",
+        "target_session_id_hash": "4f367e20ef2292f3",
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "owner": "legacy",
+            "expected": true,
+            "call_site": "chat_service/orchestrator message persistence",
+            "ordinal": 1
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "owner": "legacy",
+            "expected": true,
+            "call_site": "chat_service/orchestrator message persistence",
+            "ordinal": 2
+          },
+          {
+            "resource": "chat_sessions.session_metadata",
+            "operation": "update",
+            "owner": "legacy",
+            "expected": true,
+            "call_site": "chat_memory.apply_memory_updates",
+            "timestamp": "2026-07-18T14:08:41.016745+00:00",
+            "context_version_before": 0,
+            "context_version_after": 1,
+            "changed_keys": [
+              "memory_v1"
+            ]
+          }
+        ],
+        "legacy_expected_writes": {
+          "chat_messages": 2,
+          "context_version_delta": 1
+        },
+        "pi_shadow_business_write_delta": 0
+      }
+    },
+    {
+      "case_id": "A03",
+      "before": {
+        "chat_sessions": 116,
+        "chat_messages": 329,
+        "chat_session_context_version_sum": 34,
+        "watchlist_items": 3,
+        "analysis_reports": 20,
+        "report_documents": 66,
+        "report_indexing_jobs": 0,
+        "financial_jobs": 195,
+        "background_tasks": 0,
+        "pool_checked_out": 1,
+        "target_session_context_version": 0,
+        "target_session_metadata_keys": [
+          "mock_mode",
+          "orchestrator"
+        ],
+        "target_session_last_context_commit_at": null,
+        "target_session_id_hash": "5024d96b72d93716"
+      },
+      "after": {
+        "chat_sessions": 116,
+        "chat_messages": 331,
+        "chat_session_context_version_sum": 34,
+        "watchlist_items": 3,
+        "analysis_reports": 20,
+        "report_documents": 66,
+        "report_indexing_jobs": 0,
+        "financial_jobs": 195,
+        "background_tasks": 0,
+        "pool_checked_out": 1,
+        "target_session_context_version": 0,
+        "target_session_metadata_keys": [
+          "mock_mode",
+          "orchestrator"
+        ],
+        "target_session_last_context_commit_at": null,
+        "target_session_id_hash": "5024d96b72d93716"
+      },
+      "legacy_expected_writes": {
+        "chat_messages": 2,
+        "chat_sessions": 0,
+        "context_version_delta": 2
+      },
+      "expected_legacy_chat_message_delta": 2,
+      "expected_legacy_context_version_delta": 2,
+      "pi_shadow_business_write_delta": 0,
+      "pi_side_effect_count": 0,
+      "context_extra_updates": 0,
+      "context_mutation_count": 0,
+      "assistant_double_writes": 0,
+      "double_write_count": 0,
+      "write_attribution": {
+        "case_id": "A03",
+        "trace_id": "trace_6533dbf97e64",
+        "legacy_run_id": null,
+        "pi_shadow_run_id": "run_cd598d3076a6",
+        "target_session_id_hash": "5024d96b72d93716",
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "owner": "legacy",
+            "expected": true,
+            "call_site": "chat_service/orchestrator message persistence",
+            "ordinal": 1
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "owner": "legacy",
+            "expected": true,
+            "call_site": "chat_service/orchestrator message persistence",
+            "ordinal": 2
+          }
+        ],
+        "legacy_expected_writes": {
+          "chat_messages": 2,
+          "context_version_delta": 0
+        },
+        "pi_shadow_business_write_delta": 0
+      }
+    }
+  ],
+  "write_attribution": {
+    "schema_version": "pi_shadow_write_attribution_v1",
+    "cases": [
+      {
+        "case_id": "A01",
+        "trace_id": "trace_c64eeb3d3e40",
+        "legacy_run_id": null,
+        "pi_shadow_run_id": "run_7f12b52e805d",
+        "target_session_id_hash": "e239de2a60b1642a",
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "owner": "legacy",
+            "expected": true,
+            "call_site": "chat_service/orchestrator message persistence",
+            "ordinal": 1
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "owner": "legacy",
+            "expected": true,
+            "call_site": "chat_service/orchestrator message persistence",
+            "ordinal": 2
+          },
+          {
+            "resource": "chat_sessions.session_metadata",
+            "operation": "update",
+            "owner": "legacy",
+            "expected": true,
+            "call_site": "chat_memory.apply_memory_updates",
+            "timestamp": "2026-07-18T14:08:30.817100+00:00",
+            "context_version_before": 0,
+            "context_version_after": 1,
+            "changed_keys": [
+              "memory_v1"
+            ]
+          }
+        ],
+        "legacy_expected_writes": {
+          "chat_messages": 2,
+          "context_version_delta": 1
+        },
+        "pi_shadow_business_write_delta": 0
+      },
+      {
+        "case_id": "A02",
+        "trace_id": "trace_85d33b99aadf",
+        "legacy_run_id": null,
+        "pi_shadow_run_id": "run_4021da72ae4c",
+        "target_session_id_hash": "4f367e20ef2292f3",
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "owner": "legacy",
+            "expected": true,
+            "call_site": "chat_service/orchestrator message persistence",
+            "ordinal": 1
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "owner": "legacy",
+            "expected": true,
+            "call_site": "chat_service/orchestrator message persistence",
+            "ordinal": 2
+          },
+          {
+            "resource": "chat_sessions.session_metadata",
+            "operation": "update",
+            "owner": "legacy",
+            "expected": true,
+            "call_site": "chat_memory.apply_memory_updates",
+            "timestamp": "2026-07-18T14:08:41.016745+00:00",
+            "context_version_before": 0,
+            "context_version_after": 1,
+            "changed_keys": [
+              "memory_v1"
+            ]
+          }
+        ],
+        "legacy_expected_writes": {
+          "chat_messages": 2,
+          "context_version_delta": 1
+        },
+        "pi_shadow_business_write_delta": 0
+      },
+      {
+        "case_id": "A03",
+        "trace_id": "trace_6533dbf97e64",
+        "legacy_run_id": null,
+        "pi_shadow_run_id": "run_cd598d3076a6",
+        "target_session_id_hash": "5024d96b72d93716",
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "owner": "legacy",
+            "expected": true,
+            "call_site": "chat_service/orchestrator message persistence",
+            "ordinal": 1
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "owner": "legacy",
+            "expected": true,
+            "call_site": "chat_service/orchestrator message persistence",
+            "ordinal": 2
+          }
+        ],
+        "legacy_expected_writes": {
+          "chat_messages": 2,
+          "context_version_delta": 0
+        },
+        "pi_shadow_business_write_delta": 0
+      }
+    ]
+  }
 }

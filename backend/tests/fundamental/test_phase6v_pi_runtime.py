@@ -440,3 +440,42 @@ def test_default_config_and_rollout_flags_unchanged():
     assert settings.company_v2_financial_fusion_auto_run is False
     assert settings.company_v2_financial_fusion_rollout_percent == 0
     assert settings.company_v2_financial_fusion_stage3_authorized is False
+    assert settings.database_sql_echo is False
+    assert settings.database_sql_hide_parameters is True
+
+
+def test_official_pdf_intent_variants_are_eligible_for_shadow_agent():
+    runner = PiCompatibleShadowRunner()
+    for query in ["这份报告原文在哪里？", "年报链接", "官方报告地址", "这个年报的官方PDF链接"]:
+        assert runner._looks_like_official_pdf_intent(query, query) is True
+
+
+def test_shadow_uses_legacy_snapshot_for_official_pdf_without_reroute():
+    runner = PiCompatibleShadowRunner()
+    routing = runner._routing_from_snapshot(
+        trace_id="trace",
+        raw_query="这份报告原文在哪里？",
+        normalized_query="这份报告原文在哪里？",
+        resolved_entity_snapshot={
+            "primary_entity": {"market": "CN", "symbol": "300750", "ts_code": "300750.SZ", "short_name": "宁德时代"},
+            "ambiguity": False,
+        },
+    )
+    assert routing is not None
+    assert routing.intent == "official_report_pdf"
+    assert routing.resolved_entities[0].symbol == "300750"
+
+
+def test_shadow_ambiguous_official_pdf_alias_enters_clarification():
+    runner = PiCompatibleShadowRunner()
+    routing = runner._routing_from_snapshot(
+        trace_id="trace",
+        raw_query="平安的年报PDF在哪里？",
+        normalized_query="平安的年报PDF在哪里？",
+        resolved_entity_snapshot={},
+    )
+    assert routing is not None
+    assert routing.intent == "official_report_pdf"
+    assert routing.needs_clarification is True
+    names = {item["short_name"] for item in routing.clarification_options}
+    assert {"平安银行", "中国平安"}.issubset(names)

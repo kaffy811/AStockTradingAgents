@@ -52,7 +52,15 @@ def _ts_code(entity: SecurityEntity | dict[str, Any] | None) -> str:
     return symbol
 
 
-def _success(req: ToolRequest, data: dict[str, Any], *, latency_ms: int, provenance: list[dict[str, Any]] | None = None, warnings: list[dict[str, Any]] | None = None) -> ToolResponse:
+def _success(
+    req: ToolRequest,
+    data: dict[str, Any],
+    *,
+    latency_ms: int,
+    provenance: list[dict[str, Any]] | None = None,
+    warnings: list[dict[str, Any]] | None = None,
+    quality: dict[str, Any] | None = None,
+) -> ToolResponse:
     return ToolResponse(
         trace_id=req.trace_id,
         status=STATUS_SUCCESS,
@@ -61,7 +69,7 @@ def _success(req: ToolRequest, data: dict[str, Any], *, latency_ms: int, provena
         data=data,
         provenance=provenance or [],
         freshness={"as_of": utc_now()},
-        quality={"status": "usable"},
+        quality=quality or {"status": "usable"},
         warnings=warnings or [],
         latency_ms=latency_ms,
     )
@@ -218,16 +226,51 @@ class FinancialToolRegistry:
 
     async def get_official_reports(self, req: ToolRequest, context: FinancialSessionContext) -> ToolResponse:
         started = time.perf_counter()
+        timings: dict[str, int] = {
+            "resolver_ms": 0,
+            "report_selection_ms": 0,
+            "db_query_ms": 0,
+            "cache_lookup_ms": 0,
+            "official_domain_validation_ms": 0,
+            "external_network_ms": 0,
+            "adapter_overhead_ms": 0,
+        }
         entities = req.parameters.get("entities") or [req.parameters.get("entity") or context.primary_entity]
         reports_by_symbol: dict[str, list[dict[str, Any]]] = {}
         async with AsyncSessionLocal() as db:
+            if context.active_report_id:
+                db_started = time.perf_counter()
+                report = await official_report_domain_service.get_official_report_by_id(db, report_id=context.active_report_id)
+                timings["db_query_ms"] += int((time.perf_counter() - db_started) * 1000)
+                if report:
+                    selection_started = time.perf_counter()
+                    report_ts_code = str(report.get("ts_code") or "")
+                    requested = {_ts_code(entity) for entity in entities if _ts_code(entity)}
+                    if not requested or report_ts_code in requested:
+                        reports_by_symbol[report_ts_code] = [report]
+                    timings["report_selection_ms"] += int((time.perf_counter() - selection_started) * 1000)
+                    return _success(
+                        req,
+                        {"reports_by_symbol": reports_by_symbol, "selection_mode": "active_report_id"},
+                        latency_ms=int((time.perf_counter() - started) * 1000),
+                        provenance=[{"source": "report_document_service", "selection_mode": "active_report_id"}],
+                        quality={"status": "usable", "latency_breakdown": {**timings, "total_ms": int((time.perf_counter() - started) * 1000)}},
+                    )
             for entity in entities:
                 data = _entity_dict(entity)
                 ts_code = _ts_code(data)
                 if not ts_code:
                     continue
+                db_started = time.perf_counter()
                 reports_by_symbol[ts_code] = await official_report_domain_service.list_official_annual_reports(db, ts_code=ts_code, limit=8)
-        return _success(req, {"reports_by_symbol": reports_by_symbol}, latency_ms=int((time.perf_counter() - started) * 1000), provenance=[{"source": "report_document_service"}])
+                timings["db_query_ms"] += int((time.perf_counter() - db_started) * 1000)
+        return _success(
+            req,
+            {"reports_by_symbol": reports_by_symbol, "selection_mode": "symbol_annual_list"},
+            latency_ms=int((time.perf_counter() - started) * 1000),
+            provenance=[{"source": "report_document_service", "selection_mode": "symbol_annual_list"}],
+            quality={"status": "usable", "latency_breakdown": {**timings, "total_ms": int((time.perf_counter() - started) * 1000)}},
+        )
 
     async def get_latest_official_report(self, req: ToolRequest, context: FinancialSessionContext) -> ToolResponse:
         started = time.perf_counter()

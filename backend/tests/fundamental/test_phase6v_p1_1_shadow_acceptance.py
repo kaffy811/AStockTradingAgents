@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 from typing import Any
 
 import pytest
@@ -21,6 +22,7 @@ from app.agent_runtime.shadow_runner import PiCompatibleShadowRunner
 from app.agent_runtime.tool_adapter import PiFinancialToolAdapter
 from app.agent_runtime.url_utils import normalize_report_url, official_domain_verified
 from app.agents.financial_runtime.contracts import FinancialSessionContext, SecurityEntity, ToolResponse
+from app.services.security_entity_resolver import SecurityEntityResolver
 
 
 def _entity(symbol: str = "600519", name: str = "贵州茅台") -> SecurityEntity:
@@ -100,6 +102,30 @@ def test_live_gate_rejects_zero_samples_without_fake_rates():
     assert runtime_gate["pi_executor_enabled"] is False
     assert runtime_gate["authorized_agents"] == []
     assert runtime_gate["decision"] == "do_not_enable_pi_compatible"
+
+
+def test_side_effect_snapshot_artifact_redacts_session_id():
+    snapshot = ShadowSideEffectSnapshot(
+        1, 2, 0, 0, 0, 0, 0, 0, 0,
+        target_session_id="00000000-0000-0000-0000-000000000001",
+    )
+    payload = snapshot.to_dict()
+    assert "target_session_id" not in payload
+    assert payload["target_session_id_hash"]
+    assert "00000000-0000-0000-0000-000000000001" not in json.dumps(payload)
+
+
+@pytest.mark.asyncio
+async def test_resolver_context_reference_avoids_full_index_load():
+    resolver = SecurityEntityResolver()
+    result = await resolver.resolve(
+        None,
+        "这份报告原文在哪里？",
+        context_entities=[{"market": "CN", "symbol": "300750", "short_name": "宁德时代"}],
+        min_confidence=0.72,
+    )
+    assert result["entities"][0].symbol == "300750"
+    assert result["record_count_by_market"] == {}
 
 
 def test_url_normalization_removes_tracking_but_preserves_signed_query():
