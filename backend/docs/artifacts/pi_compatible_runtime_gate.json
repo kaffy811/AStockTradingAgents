@@ -1,5 +1,5 @@
 {
-  "phase": "6V-P1.2",
+  "phase": "6V-P1.3",
   "runtime_implemented": true,
   "shadow_samples": 0,
   "shadow_passed": false,
@@ -8,7 +8,8 @@
   "decision": "do_not_enable_pi_compatible",
   "blockers": [
     "Live shadow samples incomplete: executed 0/30.",
-    "Pi shadow env is not enabled with the explicit P1.2 values.",
+    "local_fixture is allowed only for runner self-test and cannot count as live acceptance.",
+    "Pi shadow env is not enabled with the explicit P1.3 values.",
     "PI_AGENT_SHADOW_DIAGNOSTICS_PATH is required for HTTP shadow result polling.",
     "PI_SHADOW_ACCEPTANCE_BASE_URL / --base-url is required for HTTP Chat acceptance.",
     "Database readiness check failed.",

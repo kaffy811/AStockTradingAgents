@@ -18,6 +18,11 @@ def user_hash(value: str | None) -> str:
     return hashlib.sha256((value or "").encode("utf-8")).hexdigest()[:12] if value else ""
 
 
+def stable_payload_hash(value: Any) -> str:
+    payload = json.dumps(value or {}, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()[:16]
+
+
 class PiShadowDiagnosticsSink:
     def path(self) -> Path | None:
         raw = str(getattr(settings, "pi_agent_shadow_diagnostics_path", "") or "").strip()
@@ -64,6 +69,7 @@ class PiShadowDiagnosticsSink:
             "evidence_ids_count": len(result.get("evidence_ids") or []),
             "error_code": (result.get("error") or {}).get("code"),
             "events": self._compact_events(result.get("events") or []),
+            "input_snapshot_hash": stable_payload_hash(result.get("shadow_input") or {}),
         }
         try:
             path.parent.mkdir(parents=True, exist_ok=True)

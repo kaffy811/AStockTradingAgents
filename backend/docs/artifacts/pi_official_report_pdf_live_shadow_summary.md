@@ -6,6 +6,7 @@
 - Accepted samples: 0
 - Scenario counts: `{}`
 - Status/entity/year/type/url match: `None` / `None` / `None` / `None` / `None`
+- Source URL / clarification match: `None` / `None`
 - Provenance completeness: `None`
 - Unsupported URL count: `None`
 - Deterministic LLM calls: `None`
@@ -19,7 +20,8 @@
 ## Blockers
 
 - Live shadow samples incomplete: executed 0/30.
-- Pi shadow env is not enabled with the explicit P1.2 values.
+- local_fixture is allowed only for runner self-test and cannot count as live acceptance.
+- Pi shadow env is not enabled with the explicit P1.3 values.
 - PI_AGENT_SHADOW_DIAGNOSTICS_PATH is required for HTTP shadow result polling.
 - PI_SHADOW_ACCEPTANCE_BASE_URL / --base-url is required for HTTP Chat acceptance.
 - Database readiness check failed.

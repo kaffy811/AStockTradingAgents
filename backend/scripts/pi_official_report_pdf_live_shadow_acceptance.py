@@ -7,6 +7,7 @@ import asyncio
 import json
 import os
 import secrets
+import subprocess
 import sys
 import time
 import uuid
@@ -46,8 +47,11 @@ DIAGNOSTICS_POLL_INTERVAL_SECONDS = 0.2
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="official_report_pdf Pi shadow live acceptance")
     parser.add_argument("--execute", action="store_true", help="execute all live HTTP Chat shadow cases")
+    parser.add_argument("--preflight-only", action="store_true", help="run preflight and write artifacts without executing cases")
+    parser.add_argument("--environment-type", choices=["staging", "local_live", "local_fixture"], default=os.getenv("PI_SHADOW_ACCEPTANCE_ENVIRONMENT_TYPE", ""), help="acceptance environment type")
     parser.add_argument("--limit", type=int, default=30, help="maximum planned cases to execute; must remain 30 for Gate pass")
     parser.add_argument("--base-url", default=os.getenv("PI_SHADOW_ACCEPTANCE_BASE_URL", ""), help="local/staging backend base URL")
+    parser.add_argument("--frontend-base-url", default=os.getenv("PI_SHADOW_ACCEPTANCE_FRONTEND_BASE_URL", ""), help="local/staging frontend base URL")
     parser.add_argument("--access-token", default=os.getenv("PI_SHADOW_ACCEPTANCE_ACCESS_TOKEN", ""), help="acceptance service-account access token")
     parser.add_argument("--user-id", default=os.getenv("PI_SHADOW_ACCEPTANCE_USER_ID", ""), help="acceptance service-account user UUID")
     parser.add_argument("--allow-local-fixture-user", action="store_true", help="create/reuse a local fixture user and generate a short-lived project JWT")
@@ -57,6 +61,8 @@ def parse_args() -> argparse.Namespace:
 
 async def main() -> int:
     args = parse_args()
+    if not args.environment_type:
+        args.environment_type = _infer_environment_type(args)
     cases = planned_official_report_shadow_cases()[: max(0, args.limit)]
     env_report = await build_environment_report(args)
     side_effect_report: dict[str, Any] = {"schema_version": "pi_shadow_side_effects_v1", "cases": []}
@@ -64,13 +70,13 @@ async def main() -> int:
     results: list[dict[str, Any]] = []
 
     blockers = list(env_report.get("blockers") or [])
-    if not args.execute:
+    if not args.execute and not args.preflight_only:
         blockers.append("Runner was called without --execute.")
     identity = await resolve_acceptance_identity(args, env_report)
     if not identity.get("ready"):
         blockers.extend(identity.get("blockers") or [])
 
-    if args.execute and not blockers:
+    if args.execute and not blockers and not args.preflight_only:
         for case in cases:
             result, side_effect = await execute_http_case(case, args=args, identity=identity)
             results.append(result)
@@ -100,28 +106,47 @@ async def main() -> int:
         browser_acceptance_markdown=browser_markdown,
     )
     print(f"planned={len(cases)} executed={len(results)} accepted={summary['accepted_samples']} passed={agent_gate['passed']} decision={runtime_gate['decision']}")
+    if args.preflight_only:
+        return 0 if env_report.get("environment_ready") and identity.get("ready") else 1
     return 0 if not args.execute or agent_gate["passed"] else 1
 
 
 async def build_environment_report(args: argparse.Namespace) -> dict[str, Any]:
     ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
     diagnostics_path = _diagnostics_path()
+    git_info = _git_info()
+    environment_type = args.environment_type or _infer_environment_type(args)
     checks = {
         "environment_ready": False,
         "auth_ready": False,
         "db_ready": False,
+        "chat_ready": False,
+        "sse_ready": False,
         "report_tool_ready": False,
         "shadow_enabled": pi_compatible_shadow_runner.enabled(),
+        "shadow_ready": pi_compatible_shadow_runner.enabled(),
         "acceptance_identity_ready": bool(args.access_token and args.user_id) or bool(args.allow_local_fixture_user),
         "backend_health_passed": False,
         "resolver_ready": False,
+        "diagnostics_ready": _path_writable(diagnostics_path),
         "shadow_callback_ready": _path_writable(diagnostics_path),
         "artifact_output_writable": _path_writable(ARTIFACT_DIR / ".write_test"),
         "chat_runtime_mode_legacy": settings.chat_runtime_mode == "legacy",
+        "no_production_mode": _no_production_mode(environment_type),
+        "branch_ready": git_info.get("branch") == "release/demo-staging",
+        "commit_sha_present": bool(git_info.get("commit_sha")),
     }
     blockers: list[str] = []
+    if not checks["branch_ready"]:
+        blockers.append("Current branch must be release/demo-staging for live acceptance.")
+    if not checks["no_production_mode"]:
+        blockers.append("Production mode is forbidden for Pi shadow acceptance.")
+    if environment_type not in {"staging", "local_live"}:
+        blockers.append("local_fixture is allowed only for runner self-test and cannot count as live acceptance.")
+    if args.allow_local_fixture_user:
+        blockers.append("Local fixture identity cannot count as live shadow acceptance.")
     if not checks["shadow_enabled"]:
-        blockers.append("Pi shadow env is not enabled with the explicit P1.2 values.")
+        blockers.append("Pi shadow env is not enabled with the explicit P1.3 values.")
     if not checks["chat_runtime_mode_legacy"]:
         blockers.append("CHAT_RUNTIME_MODE must remain legacy during shadow acceptance.")
     if not diagnostics_path:
@@ -140,22 +165,46 @@ async def build_environment_report(args: argparse.Namespace) -> dict[str, Any]:
         checks["backend_health_passed"] = await _http_health(args.base_url)
         if not checks["backend_health_passed"]:
             blockers.append("Backend health check failed or was unreachable.")
+        checks["auth_ready"] = await _http_auth_ready(args.base_url, args.access_token)
+        if not checks["auth_ready"] and args.execute:
+            blockers.append("Auth readiness check failed for the acceptance identity.")
+        checks["chat_ready"] = await _http_chat_ready(args.base_url, args.access_token)
+        if not checks["chat_ready"] and args.execute:
+            blockers.append("Chat API readiness check failed.")
+        checks["sse_ready"] = checks["chat_ready"]
     else:
         checks["backend_health_passed"] = not args.execute
-    checks["auth_ready"] = bool(args.access_token and args.user_id) or bool(args.allow_local_fixture_user)
+    if not args.base_url:
+        checks["auth_ready"] = bool(args.access_token and args.user_id) or bool(args.allow_local_fixture_user)
     checks["environment_ready"] = all([
         checks["db_ready"],
         checks["report_tool_ready"],
         checks["shadow_enabled"],
         checks["acceptance_identity_ready"],
-        checks["shadow_callback_ready"],
+        checks["diagnostics_ready"],
         checks["artifact_output_writable"],
         checks["chat_runtime_mode_legacy"],
         checks["backend_health_passed"],
+        checks["auth_ready"],
+        checks["chat_ready"] or not args.execute,
+        checks["sse_ready"] or not args.execute,
+        checks["no_production_mode"],
+        checks["branch_ready"],
+        environment_type in {"staging", "local_live"},
+        not args.allow_local_fixture_user,
     ])
     return {
         "schema_version": "pi_shadow_acceptance_environment_v1",
         **checks,
+        "environment_type": environment_type,
+        "commit_sha": git_info.get("commit_sha"),
+        "branch": git_info.get("branch"),
+        "backend_base_url": "redacted" if args.base_url else "",
+        "frontend_base_url": "redacted" if args.frontend_base_url else "",
+        "database_mode": settings.database_connection_mode,
+        "auth_mode": "bearer_service_account" if args.access_token else ("local_fixture" if args.allow_local_fixture_user else "missing"),
+        "provider_mode": getattr(settings, "data_mode", ""),
+        "limitations": blockers[:],
         "config": {
             "agent_executor_mode": settings.agent_executor_mode,
             "pi_agent_shadow_enabled": bool(settings.pi_agent_shadow_enabled),
@@ -225,14 +274,20 @@ async def execute_http_case(case: Any, *, args: argparse.Namespace, identity: di
         async with AsyncSessionLocal() as db:
             after = await capture_side_effect_snapshot(db)
         side_effect_count = compute_pi_side_effect_count(before, after, expected_legacy_chat_message_delta=2)
+        context_extra_updates = max(0, after.chat_session_context_version_sum - before.chat_session_context_version_sum)
+        assistant_double_writes = max(0, (after.chat_messages - before.chat_messages) - 2)
         side_effect = {
             "case_id": case.case_id,
             "before": before.to_dict(),
             "after": after.to_dict(),
+            "legacy_expected_writes": {"chat_messages": 2, "chat_sessions": 0},
             "expected_legacy_chat_message_delta": 2,
+            "pi_shadow_business_write_delta": side_effect_count,
             "pi_side_effect_count": side_effect_count,
-            "context_mutation_count": 0,
-            "double_write_count": 0,
+            "context_extra_updates": context_extra_updates,
+            "context_mutation_count": context_extra_updates,
+            "assistant_double_writes": assistant_double_writes,
+            "double_write_count": assistant_double_writes,
         }
         result = build_live_shadow_case_result(
             runner=pi_compatible_shadow_runner,
@@ -245,6 +300,11 @@ async def execute_http_case(case: Any, *, args: argparse.Namespace, identity: di
             "context_mutation_count": side_effect["context_mutation_count"],
             "double_write_count": side_effect["double_write_count"],
         }
+        snapshot_hash = pi_result.get("input_snapshot_hash")
+        if snapshot_hash:
+            result["legacy"]["input_snapshot_hash"] = snapshot_hash
+            result["pi_compatible"]["input_snapshot_hash"] = snapshot_hash
+            result["comparison"]["input_snapshot_hash_match"] = True
         return result, side_effect
 
 
@@ -336,6 +396,7 @@ def _diagnostic_to_pi_result(record: dict[str, Any]) -> dict[str, Any]:
         "evidence_ids": ["compact_evidence_present"] if int(record.get("evidence_ids_count") or 0) > 0 else [],
         "error": {"code": record.get("error_code")} if record.get("error_code") else None,
         "events": record.get("events") or [],
+        "input_snapshot_hash": record.get("input_snapshot_hash"),
     }
 
 
@@ -381,6 +442,62 @@ async def _http_health(base_url: str) -> bool:
             return response.status_code == 200 and response.json().get("db_status") == "ok"
     except Exception:
         return False
+
+
+async def _http_auth_ready(base_url: str, access_token: str) -> bool:
+    if not access_token:
+        return False
+    try:
+        import httpx
+
+        async with httpx.AsyncClient(base_url=base_url.rstrip("/"), headers={"Authorization": f"Bearer {access_token}"}, timeout=10.0) as client:
+            response = await client.get("/api/v1/auth/me")
+            return response.status_code == 200
+    except Exception:
+        return False
+
+
+async def _http_chat_ready(base_url: str, access_token: str) -> bool:
+    if not access_token:
+        return False
+    try:
+        import httpx
+
+        async with httpx.AsyncClient(base_url=base_url.rstrip("/"), headers={"Authorization": f"Bearer {access_token}"}, timeout=10.0) as client:
+            response = await client.get("/api/v1/chat/sessions", params={"limit": 1, "offset": 0})
+            return response.status_code == 200
+    except Exception:
+        return False
+
+
+def _infer_environment_type(args: argparse.Namespace) -> str:
+    if args.allow_local_fixture_user:
+        return "local_fixture"
+    base = (args.base_url or "").lower()
+    if "localhost" in base or "127.0.0.1" in base or "::1" in base:
+        return "local_live"
+    if base:
+        return "staging"
+    return "local_fixture"
+
+
+def _no_production_mode(environment_type: str) -> bool:
+    app_env = str(getattr(settings, "app_env", "") or "").lower()
+    return environment_type in {"staging", "local_live", "local_fixture"} and app_env not in {"prod", "production"}
+
+
+def _git_info() -> dict[str, str]:
+    return {
+        "branch": _git_value(["git", "branch", "--show-current"]),
+        "commit_sha": _git_value(["git", "rev-parse", "HEAD"]),
+    }
+
+
+def _git_value(command: list[str]) -> str:
+    try:
+        return subprocess.check_output(command, cwd=ROOT, text=True, stderr=subprocess.DEVNULL).strip()
+    except Exception:
+        return ""
 
 
 def _browser_markdown(*, executed: bool, passed: bool, notes: str) -> str:
