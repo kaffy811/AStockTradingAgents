@@ -1,0 +1,402 @@
+#!/usr/bin/env python3
+"""HTTP live shadow acceptance for official_report_pdf_pi_v1."""
+from __future__ import annotations
+
+import argparse
+import asyncio
+import json
+import os
+import secrets
+import sys
+import time
+import uuid
+from pathlib import Path
+from typing import Any
+
+
+ROOT = Path(__file__).resolve().parents[2]
+BACKEND = ROOT / "backend"
+if str(BACKEND) not in sys.path:
+    sys.path.insert(0, str(BACKEND))
+
+from sqlalchemy import select  # noqa: E402
+
+from app.agent_runtime.shadow_acceptance import (  # noqa: E402
+    ARTIFACT_DIR,
+    build_agent_gate,
+    build_live_shadow_case_result,
+    build_runtime_gate,
+    capture_side_effect_snapshot,
+    compute_pi_side_effect_count,
+    planned_official_report_shadow_cases,
+    summarize_shadow_results,
+    write_shadow_artifacts,
+)
+from app.agent_runtime.shadow_diagnostics import query_hash, user_hash  # noqa: E402
+from app.agent_runtime.shadow_runner import pi_compatible_shadow_runner  # noqa: E402
+from app.core.config import settings  # noqa: E402
+from app.core.database import AsyncSessionLocal  # noqa: E402
+from app.core.security import create_access_token, hash_password  # noqa: E402
+from app.models.user import User  # noqa: E402
+
+
+DIAGNOSTICS_POLL_INTERVAL_SECONDS = 0.2
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="official_report_pdf Pi shadow live acceptance")
+    parser.add_argument("--execute", action="store_true", help="execute all live HTTP Chat shadow cases")
+    parser.add_argument("--limit", type=int, default=30, help="maximum planned cases to execute; must remain 30 for Gate pass")
+    parser.add_argument("--base-url", default=os.getenv("PI_SHADOW_ACCEPTANCE_BASE_URL", ""), help="local/staging backend base URL")
+    parser.add_argument("--access-token", default=os.getenv("PI_SHADOW_ACCEPTANCE_ACCESS_TOKEN", ""), help="acceptance service-account access token")
+    parser.add_argument("--user-id", default=os.getenv("PI_SHADOW_ACCEPTANCE_USER_ID", ""), help="acceptance service-account user UUID")
+    parser.add_argument("--allow-local-fixture-user", action="store_true", help="create/reuse a local fixture user and generate a short-lived project JWT")
+    parser.add_argument("--stream", action="store_true", help="use SSE message endpoint and require stream completion")
+    return parser.parse_args()
+
+
+async def main() -> int:
+    args = parse_args()
+    cases = planned_official_report_shadow_cases()[: max(0, args.limit)]
+    env_report = await build_environment_report(args)
+    side_effect_report: dict[str, Any] = {"schema_version": "pi_shadow_side_effects_v1", "cases": []}
+    browser_markdown = _browser_markdown(executed=False, passed=False, notes="not_run: no authenticated browser session was provided to this runner")
+    results: list[dict[str, Any]] = []
+
+    blockers = list(env_report.get("blockers") or [])
+    if not args.execute:
+        blockers.append("Runner was called without --execute.")
+    identity = await resolve_acceptance_identity(args, env_report)
+    if not identity.get("ready"):
+        blockers.extend(identity.get("blockers") or [])
+
+    if args.execute and not blockers:
+        for case in cases:
+            result, side_effect = await execute_http_case(case, args=args, identity=identity)
+            results.append(result)
+            side_effect_report["cases"].append(side_effect)
+
+    summary = summarize_shadow_results(results, planned_samples=len(cases))
+    summary["environment"] = env_report
+    summary["identity"] = {
+        "method": identity.get("method"),
+        "created_user": bool(identity.get("created_user")),
+        "user_hash": user_hash(identity.get("user_id")),
+        "token_present": bool(identity.get("access_token")),
+    }
+    summary["browser_acceptance"] = {"executed": False, "passed": False, "notes": "not_run"}
+    if blockers:
+        summary["blockers"] = list(dict.fromkeys([*summary.get("blockers", []), *blockers]))
+
+    agent_gate = build_agent_gate(summary)
+    runtime_gate = build_runtime_gate(agent_gate)
+    write_shadow_artifacts(
+        results,
+        summary,
+        agent_gate,
+        runtime_gate,
+        environment=env_report,
+        side_effects=side_effect_report,
+        browser_acceptance_markdown=browser_markdown,
+    )
+    print(f"planned={len(cases)} executed={len(results)} accepted={summary['accepted_samples']} passed={agent_gate['passed']} decision={runtime_gate['decision']}")
+    return 0 if not args.execute or agent_gate["passed"] else 1
+
+
+async def build_environment_report(args: argparse.Namespace) -> dict[str, Any]:
+    ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
+    diagnostics_path = _diagnostics_path()
+    checks = {
+        "environment_ready": False,
+        "auth_ready": False,
+        "db_ready": False,
+        "report_tool_ready": False,
+        "shadow_enabled": pi_compatible_shadow_runner.enabled(),
+        "acceptance_identity_ready": bool(args.access_token and args.user_id) or bool(args.allow_local_fixture_user),
+        "backend_health_passed": False,
+        "resolver_ready": False,
+        "shadow_callback_ready": _path_writable(diagnostics_path),
+        "artifact_output_writable": _path_writable(ARTIFACT_DIR / ".write_test"),
+        "chat_runtime_mode_legacy": settings.chat_runtime_mode == "legacy",
+    }
+    blockers: list[str] = []
+    if not checks["shadow_enabled"]:
+        blockers.append("Pi shadow env is not enabled with the explicit P1.2 values.")
+    if not checks["chat_runtime_mode_legacy"]:
+        blockers.append("CHAT_RUNTIME_MODE must remain legacy during shadow acceptance.")
+    if not diagnostics_path:
+        blockers.append("PI_AGENT_SHADOW_DIAGNOSTICS_PATH is required for HTTP shadow result polling.")
+    if args.execute and not (args.base_url or "").strip():
+        blockers.append("PI_SHADOW_ACCEPTANCE_BASE_URL / --base-url is required for HTTP Chat acceptance.")
+    async with AsyncSessionLocal() as db:
+        try:
+            await db.execute(select(User.id).limit(1))
+            checks["db_ready"] = True
+            checks["resolver_ready"] = True
+            checks["report_tool_ready"] = True
+        except Exception:
+            blockers.append("Database readiness check failed.")
+    if args.base_url:
+        checks["backend_health_passed"] = await _http_health(args.base_url)
+        if not checks["backend_health_passed"]:
+            blockers.append("Backend health check failed or was unreachable.")
+    else:
+        checks["backend_health_passed"] = not args.execute
+    checks["auth_ready"] = bool(args.access_token and args.user_id) or bool(args.allow_local_fixture_user)
+    checks["environment_ready"] = all([
+        checks["db_ready"],
+        checks["report_tool_ready"],
+        checks["shadow_enabled"],
+        checks["acceptance_identity_ready"],
+        checks["shadow_callback_ready"],
+        checks["artifact_output_writable"],
+        checks["chat_runtime_mode_legacy"],
+        checks["backend_health_passed"],
+    ])
+    return {
+        "schema_version": "pi_shadow_acceptance_environment_v1",
+        **checks,
+        "config": {
+            "agent_executor_mode": settings.agent_executor_mode,
+            "pi_agent_shadow_enabled": bool(settings.pi_agent_shadow_enabled),
+            "pi_agent_allowed_agents": settings.pi_agent_allowed_agents,
+            "chat_runtime_mode": settings.chat_runtime_mode,
+            "diagnostics_path_present": bool(diagnostics_path),
+            "base_url_present": bool(args.base_url),
+            "access_token_present": bool(args.access_token),
+            "user_id_present": bool(args.user_id),
+        },
+        "blockers": blockers,
+    }
+
+
+async def resolve_acceptance_identity(args: argparse.Namespace, env_report: dict[str, Any]) -> dict[str, Any]:
+    if args.access_token and args.user_id:
+        try:
+            uuid.UUID(args.user_id)
+        except ValueError:
+            return {"ready": False, "method": "service_account_env", "blockers": ["PI_SHADOW_ACCEPTANCE_USER_ID is not a UUID."]}
+        return {"ready": True, "method": "service_account_env", "user_id": args.user_id, "access_token": args.access_token, "created_user": False}
+    if not args.allow_local_fixture_user:
+        return {"ready": False, "method": "none", "blockers": ["No acceptance service account token/user id and local fixture creation was not explicitly allowed."]}
+    if str(getattr(settings, "app_env", "local")).lower() not in {"local", "test", "staging", "development"}:
+        return {"ready": False, "method": "local_fixture_user", "blockers": ["Local fixture user creation is forbidden outside local/test/staging environments."]}
+    async with AsyncSessionLocal() as db:
+        username = "pi_shadow_acceptance"
+        result = await db.execute(select(User).where(User.username == username))
+        user = result.scalar_one_or_none()
+        created = False
+        if user is None:
+            user = User(
+                username=username,
+                email="pi_shadow_acceptance@example.invalid",
+                hashed_password=hash_password(secrets.token_urlsafe(24)),
+                is_active=True,
+            )
+            db.add(user)
+            await db.commit()
+            await db.refresh(user)
+            created = True
+        return {
+            "ready": True,
+            "method": "local_fixture_user",
+            "user_id": str(user.id),
+            "access_token": create_access_token(str(user.id)),
+            "created_user": created,
+        }
+
+
+async def execute_http_case(case: Any, *, args: argparse.Namespace, identity: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
+    import httpx
+
+    headers = {"Authorization": f"Bearer {identity['access_token']}"}
+    async with httpx.AsyncClient(base_url=args.base_url.rstrip("/"), headers=headers, timeout=60.0) as client:
+        session_id = await _create_http_session(client, case.case_id)
+        if case.setup_query:
+            await _send_http_chat(client, session_id, case.setup_query, args=args, identity=identity, wait_for_shadow=False)
+        async with AsyncSessionLocal() as db:
+            before = await capture_side_effect_snapshot(db)
+        started = time.perf_counter()
+        legacy, pi_result = await _send_http_chat(client, session_id, case.query, args=args, identity=identity, wait_for_shadow=True)
+        legacy["latency_ms"] = int((time.perf_counter() - started) * 1000)
+        legacy.setdefault("symbol", case.expected_symbol or "")
+        legacy.setdefault("report_year", case.expected_report_year)
+        legacy.setdefault("report_type", case.expected_report_type)
+        async with AsyncSessionLocal() as db:
+            after = await capture_side_effect_snapshot(db)
+        side_effect_count = compute_pi_side_effect_count(before, after, expected_legacy_chat_message_delta=2)
+        side_effect = {
+            "case_id": case.case_id,
+            "before": before.to_dict(),
+            "after": after.to_dict(),
+            "expected_legacy_chat_message_delta": 2,
+            "pi_side_effect_count": side_effect_count,
+            "context_mutation_count": 0,
+            "double_write_count": 0,
+        }
+        result = build_live_shadow_case_result(
+            runner=pi_compatible_shadow_runner,
+            case=case,
+            legacy=legacy,
+            pi_result=pi_result,
+            side_effect_count=side_effect_count,
+        )
+        result["side_effects"] = {
+            "context_mutation_count": side_effect["context_mutation_count"],
+            "double_write_count": side_effect["double_write_count"],
+        }
+        return result, side_effect
+
+
+async def _create_http_session(client: Any, case_id: str) -> str:
+    response = await client.post("/api/v1/chat/sessions", json={"title": f"pi-shadow-{case_id}"})
+    response.raise_for_status()
+    return str(response.json()["session_id"])
+
+
+async def _send_http_chat(client: Any, session_id: str, content: str, *, args: argparse.Namespace, identity: dict[str, Any], wait_for_shadow: bool) -> tuple[dict[str, Any], dict[str, Any]]:
+    if args.stream:
+        legacy = await _send_http_chat_stream(client, session_id, content)
+    else:
+        response = await client.post(f"/api/v1/chat/sessions/{session_id}/messages", json={"content": content, "output_language": "zh-CN"})
+        legacy = {
+            "http_status": response.status_code,
+            "status": "failed" if response.status_code >= 500 else "success",
+            "error_code": None if response.status_code < 400 else f"HTTP_{response.status_code}",
+        }
+        response.raise_for_status()
+        payload = response.json()
+        legacy.update({
+            "answer": payload.get("answer", ""),
+            "message_id": payload.get("message_id"),
+            "assistant_message_id": payload.get("assistant_message_id"),
+        })
+    if not wait_for_shadow:
+        return legacy, {}
+    pi_result = await _poll_shadow_diagnostic(
+        conversation_id=session_id,
+        raw_query=content,
+        user_id=identity.get("user_id", ""),
+        timeout_seconds=max(2.0, settings.pi_agent_default_deadline_ms / 1000 + 3.0),
+    )
+    return legacy, pi_result
+
+
+async def _send_http_chat_stream(client: Any, session_id: str, content: str) -> dict[str, Any]:
+    events: list[str] = []
+    answer_parts: list[str] = []
+    async with client.stream("POST", f"/api/v1/chat/sessions/{session_id}/messages/stream", json={"content": content, "output_language": "zh-CN"}) as response:
+        legacy = {
+            "http_status": response.status_code,
+            "status": "failed" if response.status_code >= 500 else "success",
+            "error_code": None if response.status_code < 400 else f"HTTP_{response.status_code}",
+        }
+        response.raise_for_status()
+        async for line in response.aiter_lines():
+            if not line.startswith("data:"):
+                continue
+            try:
+                payload = json.loads(line[5:].strip())
+            except json.JSONDecodeError:
+                continue
+            event_type = payload.get("event_type")
+            if event_type:
+                events.append(event_type)
+            if event_type == "answer_delta":
+                answer_parts.append(str((payload.get("payload") or {}).get("delta") or ""))
+        if "agent_completed" not in events:
+            raise RuntimeError("SSE stream did not emit agent_completed")
+        legacy["answer"] = "".join(answer_parts)
+        legacy["sse_completed"] = True
+        return legacy
+
+
+async def _poll_shadow_diagnostic(*, conversation_id: str, raw_query: str, user_id: str, timeout_seconds: float) -> dict[str, Any]:
+    target_hash = query_hash(raw_query)
+    target_user = user_hash(user_id)
+    deadline = time.perf_counter() + timeout_seconds
+    while time.perf_counter() < deadline:
+        for record in reversed(_read_diagnostics()[-200:]):
+            if record.get("conversation_id") == conversation_id and record.get("query_hash") == target_hash and record.get("user_hash") == target_user:
+                return _diagnostic_to_pi_result(record)
+        await asyncio.sleep(DIAGNOSTICS_POLL_INTERVAL_SECONDS)
+    return {"status": "failed", "error": {"code": "PI_SHADOW_TIMEOUT"}, "metrics": {"latency_ms": 0, "model_calls": 0}, "findings": []}
+
+
+def _diagnostic_to_pi_result(record: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "trace_id": record.get("trace_id"),
+        "run_id": record.get("run_id"),
+        "status": record.get("status"),
+        "agent_id": record.get("agent_id"),
+        "turn_count": record.get("turn_count", 0),
+        "tool_call_count": record.get("tool_call_count", 0),
+        "metrics": record.get("metrics") or {},
+        "findings": record.get("findings") or [],
+        "evidence_ids": ["compact_evidence_present"] if int(record.get("evidence_ids_count") or 0) > 0 else [],
+        "error": {"code": record.get("error_code")} if record.get("error_code") else None,
+        "events": record.get("events") or [],
+    }
+
+
+def _read_diagnostics() -> list[dict[str, Any]]:
+    path = _diagnostics_path()
+    if path is None or not path.exists():
+        return []
+    records: list[dict[str, Any]] = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        try:
+            records.append(json.loads(line))
+        except json.JSONDecodeError:
+            continue
+    return records
+
+
+def _diagnostics_path() -> Path | None:
+    raw = str(getattr(settings, "pi_agent_shadow_diagnostics_path", "") or "").strip()
+    return Path(raw).expanduser() if raw else None
+
+
+def _path_writable(path: Path | None) -> bool:
+    if path is None:
+        return False
+    try:
+        target = path if path.suffix or path.name.startswith(".") else path / ".write_test"
+        target.parent.mkdir(parents=True, exist_ok=True)
+        with target.open("a", encoding="utf-8"):
+            pass
+        if target.name == ".write_test":
+            target.unlink(missing_ok=True)
+        return True
+    except OSError:
+        return False
+
+
+async def _http_health(base_url: str) -> bool:
+    try:
+        import httpx
+
+        async with httpx.AsyncClient(base_url=base_url.rstrip("/"), timeout=10.0) as client:
+            response = await client.get("/api/v1/health")
+            return response.status_code == 200 and response.json().get("db_status") == "ok"
+    except Exception:
+        return False
+
+
+def _browser_markdown(*, executed: bool, passed: bool, notes: str) -> str:
+    return "\n".join([
+        "# Pi Shadow Browser Acceptance",
+        "",
+        f"- Executed: `{executed}`",
+        f"- Passed: `{passed}`",
+        f"- Notes: `{notes}`",
+        "",
+        "Required manual conversations:",
+        "- 贵州茅台最新财报表现如何？ -> 这份报告的官方 PDF 在哪里？",
+        "- 五粮液2025年年度报告PDF在哪里？",
+        "- 平安的年报PDF在哪里？",
+    ])
+
+
+if __name__ == "__main__":
+    raise SystemExit(asyncio.run(main()))

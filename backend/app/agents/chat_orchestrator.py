@@ -954,6 +954,7 @@ async def process_message(
     output_language: str = "zh-CN",
     session_id: uuid.UUID | None = None,
     event_callback: Callable | None = None,
+    shadow_result_callback: Callable | None = None,
 ) -> OrchestratorResult:
     """
     Route user message to appropriate intent handler with real tool calls.
@@ -1009,6 +1010,55 @@ async def process_message(
         effective_query=_effective_content,
         memory_context=_memory_ctx,
     )
+
+    if (getattr(settings, "agent_executor_mode", "legacy") or "legacy").strip().lower() == "pi_compatible_shadow":
+        try:
+            from app.agent_runtime.shadow_runner import pi_compatible_shadow_runner  # noqa: PLC0415
+
+            if not pi_compatible_shadow_runner.enabled():
+                raise RuntimeError("pi-compatible shadow is not enabled or agent is not allowed")
+
+            async def _pi_shadow_run() -> None:
+                result = await pi_compatible_shadow_runner.run_official_report_pdf_shadow_with_new_session(
+                    raw_query=content,
+                    normalized_query=_effective_content,
+                    user_id=str(user_id),
+                    conversation_id=str(session_id) if session_id else "",
+                    page_context={},
+                    memory_context=_memory_ctx,
+                    resolved_entity_snapshot=_entity_payload,
+                    output_language=output_language,
+                )
+                log.debug("pi-compatible shadow result: %s", result.get("status"))
+                try:
+                    from app.agent_runtime.shadow_diagnostics import pi_shadow_diagnostics_sink  # noqa: PLC0415
+
+                    pi_shadow_diagnostics_sink.record(
+                        raw_query=content,
+                        conversation_id=str(session_id) if session_id else "",
+                        user_id=str(user_id),
+                        result=result,
+                    )
+                except Exception as exc:  # noqa: BLE001
+                    log.debug("pi-compatible shadow diagnostics failed: %s", exc)
+                if shadow_result_callback is not None:
+                    maybe_awaitable = shadow_result_callback(result)
+                    if hasattr(maybe_awaitable, "__await__"):
+                        await maybe_awaitable
+
+            task = asyncio.create_task(_pi_shadow_run())
+
+            def _consume_pi_shadow_error(done_task: asyncio.Task) -> None:
+                try:
+                    done_task.exception()
+                except asyncio.CancelledError:
+                    log.debug("pi-compatible shadow task cancelled")
+                except Exception as exc:  # noqa: BLE001
+                    log.debug("pi-compatible shadow task failed: %s", exc)
+
+            task.add_done_callback(_consume_pi_shadow_error)
+        except Exception as exc:  # noqa: BLE001
+            log.debug("pi-compatible shadow scheduling failed: %s", exc)
 
     runtime_mode = (settings.chat_runtime_mode or "legacy").strip().lower()
     if runtime_mode in {"layered_v1", "shadow"}:

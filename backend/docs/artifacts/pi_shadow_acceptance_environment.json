@@ -1,0 +1,30 @@
+{
+  "schema_version": "pi_shadow_acceptance_environment_v1",
+  "environment_ready": false,
+  "auth_ready": false,
+  "db_ready": false,
+  "report_tool_ready": false,
+  "shadow_enabled": false,
+  "acceptance_identity_ready": false,
+  "backend_health_passed": false,
+  "resolver_ready": false,
+  "shadow_callback_ready": false,
+  "artifact_output_writable": true,
+  "chat_runtime_mode_legacy": true,
+  "config": {
+    "agent_executor_mode": "legacy",
+    "pi_agent_shadow_enabled": false,
+    "pi_agent_allowed_agents": "",
+    "chat_runtime_mode": "legacy",
+    "diagnostics_path_present": false,
+    "base_url_present": false,
+    "access_token_present": false,
+    "user_id_present": false
+  },
+  "blockers": [
+    "Pi shadow env is not enabled with the explicit P1.2 values.",
+    "PI_AGENT_SHADOW_DIAGNOSTICS_PATH is required for HTTP shadow result polling.",
+    "PI_SHADOW_ACCEPTANCE_BASE_URL / --base-url is required for HTTP Chat acceptance.",
+    "Database readiness check failed."
+  ]
+}

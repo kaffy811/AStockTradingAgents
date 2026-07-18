@@ -90,6 +90,14 @@ class Settings(BaseSettings):
     company_v2_rag_db_run_timeout_seconds: float = 60.0
     chat_runtime_mode: str = "legacy"  # legacy | layered_v1 | shadow
     chat_layered_intents: str = "financial_report,financial_comparison,official_report_pdf,financial_snapshot,quote_query"
+    agent_executor_mode: str = "legacy"  # legacy | pi_compatible_shadow | pi_compatible
+    pi_agent_max_turns: int = 3
+    pi_agent_max_tool_calls: int = 4
+    pi_agent_max_parallel_tools: int = 2
+    pi_agent_default_deadline_ms: int = 5000
+    pi_agent_shadow_enabled: bool = False
+    pi_agent_allowed_agents: str = ""
+    pi_agent_shadow_diagnostics_path: str = ""
     # Set to False in production to skip Base.metadata.create_all at startup.
     # Production deployments should run: uv run alembic upgrade head
     enable_create_all: bool = True
