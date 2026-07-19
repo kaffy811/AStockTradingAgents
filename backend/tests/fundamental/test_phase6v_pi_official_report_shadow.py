@@ -382,10 +382,11 @@ def test_three_smoke_gate_requires_three_passes_without_authorization():
     assert runtime_gate["decision"] == "do_not_enable_pi_compatible"
 
 
-def test_runner_smoke_cases_are_fixed_p1_5_cases():
+def test_runner_smoke_cases_are_fixed_p1_6_3_cases():
     cases = runner._smoke_cases()
     assert [case.case_id for case in cases] == ["A01", "A02", "A03"]
-    assert cases[0].query == "五粮液2025年年度报告PDF在哪里？"
+    assert cases[0].setup_query == "贵州茅台最新财报表现如何？"
+    assert cases[0].query == "这份报告的官方 PDF 在哪里？"
     assert cases[1].query == "600519官方年报链接"
     assert cases[2].query == "平安的年报PDF在哪里？"
     assert cases[2].expected_status == "clarification_required"
