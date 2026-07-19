@@ -1,6 +1,7 @@
 """L2 Financial Data Fabric / Tool Runtime."""
 from __future__ import annotations
 
+import asyncio
 import time
 from dataclasses import asdict
 from typing import Any, Awaitable, Callable
@@ -17,6 +18,7 @@ from app.agents.financial_runtime.contracts import (
     utc_now,
 )
 from app.core.database import AsyncSessionLocal
+from app.core.config import settings
 from app.services.company_chat_data_service import company_chat_data_service
 from app.services.company_v2_report_evidence_service import company_v2_report_evidence_service
 from app.services.official_report_domain_service import official_report_domain_service
@@ -226,7 +228,7 @@ class FinancialToolRegistry:
 
     async def get_official_reports(self, req: ToolRequest, context: FinancialSessionContext) -> ToolResponse:
         started = time.perf_counter()
-        timings: dict[str, int] = {
+        breakdown: dict[str, int] = {
             "resolver_ms": 0,
             "report_selection_ms": 0,
             "db_query_ms": 0,
@@ -234,27 +236,70 @@ class FinancialToolRegistry:
             "official_domain_validation_ms": 0,
             "external_network_ms": 0,
             "adapter_overhead_ms": 0,
+            "entity_snapshot_reuse_ms": 0,
+            "report_db_session_create_ms": 0,
+            "report_db_query_ms": 0,
+            "provenance_validation_ms": 0,
+            "event_recording_ms": 0,
+            "diagnostics_write_ms": 0,
+            "cleanup_ms": 0,
         }
+        query_timeout = max(0.001, (getattr(settings, "pi_official_report_tool_timeout_ms", 10000) / 1000) - 1.0)
+        entity_started = time.perf_counter()
         entities = req.parameters.get("entities") or [req.parameters.get("entity") or context.primary_entity]
+        breakdown["entity_snapshot_reuse_ms"] = int((time.perf_counter() - entity_started) * 1000)
         reports_by_symbol: dict[str, list[dict[str, Any]]] = {}
+        session_started = time.perf_counter()
         async with AsyncSessionLocal() as db:
+            breakdown["report_db_session_create_ms"] = int((time.perf_counter() - session_started) * 1000)
             if context.active_report_id:
                 db_started = time.perf_counter()
-                report = await official_report_domain_service.get_official_report_by_id(db, report_id=context.active_report_id)
-                timings["db_query_ms"] += int((time.perf_counter() - db_started) * 1000)
+                try:
+                    report = await asyncio.wait_for(
+                        official_report_domain_service.get_official_report_by_id(db, report_id=context.active_report_id),
+                        timeout=query_timeout,
+                    )
+                except asyncio.TimeoutError:
+                    elapsed = int((time.perf_counter() - db_started) * 1000)
+                    breakdown["db_query_ms"] += elapsed
+                    breakdown["report_db_query_ms"] += elapsed
+                    cleanup_started = time.perf_counter()
+                    try:
+                        await asyncio.wait_for(db.rollback(), timeout=3.0)
+                    except Exception:  # noqa: BLE001
+                        pass
+                    breakdown["cleanup_ms"] = int((time.perf_counter() - cleanup_started) * 1000)
+                    failed = _failure(
+                        req,
+                        "AGENT_TOOL_TIMEOUT",
+                        "official report active report lookup timed out",
+                        latency_ms=int((time.perf_counter() - started) * 1000),
+                    )
+                    failed.quality["latency_breakdown"] = {
+                        **breakdown,
+                        "timeout_phase": "active_report_lookup",
+                        "total_ms": int((time.perf_counter() - started) * 1000),
+                    }
+                    return failed
+                elapsed = int((time.perf_counter() - db_started) * 1000)
+                breakdown["db_query_ms"] += elapsed
+                breakdown["report_db_query_ms"] += elapsed
                 if report:
                     selection_started = time.perf_counter()
                     report_ts_code = str(report.get("ts_code") or "")
                     requested = {_ts_code(entity) for entity in entities if _ts_code(entity)}
                     if not requested or report_ts_code in requested:
                         reports_by_symbol[report_ts_code] = [report]
-                    timings["report_selection_ms"] += int((time.perf_counter() - selection_started) * 1000)
+                    breakdown["report_selection_ms"] += int((time.perf_counter() - selection_started) * 1000)
+                    cleanup_started = time.perf_counter()
+                    await asyncio.wait_for(db.rollback(), timeout=3.0)
+                    breakdown["cleanup_ms"] = int((time.perf_counter() - cleanup_started) * 1000)
                     return _success(
                         req,
-                        {"reports_by_symbol": reports_by_symbol, "selection_mode": "active_report_id"},
+                        {"reports_by_symbol": reports_by_symbol, "selection_mode": "active_report_id", "latency_breakdown": breakdown},
                         latency_ms=int((time.perf_counter() - started) * 1000),
                         provenance=[{"source": "report_document_service", "selection_mode": "active_report_id"}],
-                        quality={"status": "usable", "latency_breakdown": {**timings, "total_ms": int((time.perf_counter() - started) * 1000)}},
+                        quality={"status": "usable", "latency_breakdown": {**breakdown, "total_ms": int((time.perf_counter() - started) * 1000)}},
                     )
             for entity in entities:
                 data = _entity_dict(entity)
@@ -262,15 +307,51 @@ class FinancialToolRegistry:
                 if not ts_code:
                     continue
                 db_started = time.perf_counter()
-                reports_by_symbol[ts_code] = await official_report_domain_service.list_official_annual_reports(db, ts_code=ts_code, limit=8)
-                timings["db_query_ms"] += int((time.perf_counter() - db_started) * 1000)
-        return _success(
+                try:
+                    reports = await asyncio.wait_for(
+                        official_report_domain_service.list_official_annual_reports(db, ts_code=ts_code, limit=8),
+                        timeout=query_timeout,
+                    )
+                except asyncio.TimeoutError:
+                    elapsed = int((time.perf_counter() - db_started) * 1000)
+                    breakdown["db_query_ms"] += elapsed
+                    breakdown["report_db_query_ms"] += elapsed
+                    cleanup_started = time.perf_counter()
+                    try:
+                        await asyncio.wait_for(db.rollback(), timeout=3.0)
+                    except Exception:  # noqa: BLE001
+                        pass
+                    breakdown["cleanup_ms"] = int((time.perf_counter() - cleanup_started) * 1000)
+                    failed = _failure(
+                        req,
+                        "AGENT_TOOL_TIMEOUT",
+                        "official report DB query timed out",
+                        latency_ms=int((time.perf_counter() - started) * 1000),
+                    )
+                    failed.quality["latency_breakdown"] = {
+                        **breakdown,
+                        "timeout_phase": "report_db_query",
+                        "total_ms": int((time.perf_counter() - started) * 1000),
+                    }
+                    return failed
+                elapsed = int((time.perf_counter() - db_started) * 1000)
+                breakdown["db_query_ms"] += elapsed
+                breakdown["report_db_query_ms"] += elapsed
+                selection_started = time.perf_counter()
+                reports_by_symbol[ts_code] = reports
+                breakdown["report_selection_ms"] += int((time.perf_counter() - selection_started) * 1000)
+            cleanup_started = time.perf_counter()
+            await asyncio.wait_for(db.rollback(), timeout=3.0)
+            breakdown["cleanup_ms"] = int((time.perf_counter() - cleanup_started) * 1000)
+        total_ms = int((time.perf_counter() - started) * 1000)
+        response = _success(
             req,
-            {"reports_by_symbol": reports_by_symbol, "selection_mode": "symbol_annual_list"},
-            latency_ms=int((time.perf_counter() - started) * 1000),
+            {"reports_by_symbol": reports_by_symbol, "selection_mode": "symbol_annual_list", "latency_breakdown": breakdown},
+            latency_ms=total_ms,
             provenance=[{"source": "report_document_service", "selection_mode": "symbol_annual_list"}],
-            quality={"status": "usable", "latency_breakdown": {**timings, "total_ms": int((time.perf_counter() - started) * 1000)}},
+            quality={"status": "usable", "latency_breakdown": {**breakdown, "total_ms": total_ms}},
         )
+        return response
 
     async def get_latest_official_report(self, req: ToolRequest, context: FinancialSessionContext) -> ToolResponse:
         started = time.perf_counter()

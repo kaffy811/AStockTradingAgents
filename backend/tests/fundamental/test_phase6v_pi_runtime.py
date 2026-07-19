@@ -440,6 +440,13 @@ def test_default_config_and_rollout_flags_unchanged():
     assert settings.company_v2_financial_fusion_auto_run is False
     assert settings.company_v2_financial_fusion_rollout_percent == 0
     assert settings.company_v2_financial_fusion_stage3_authorized is False
+    assert settings.pi_official_report_tool_timeout_ms >= 10000
+
+
+def test_database_sql_logging_defaults_hide_binds():
+    from app.core.config import settings
+    from app.core.database import _engine_kwargs
+
     assert settings.database_sql_echo is False
     assert settings.database_sql_hide_parameters is True
 
@@ -479,3 +486,10 @@ def test_shadow_ambiguous_official_pdf_alias_enters_clarification():
     assert routing.needs_clarification is True
     names = {item["short_name"] for item in routing.clarification_options}
     assert {"平安银行", "中国平安"}.issubset(names)
+
+def test_official_report_tool_timeout_uses_configured_live_deadline():
+    from app.core.config import settings
+
+    adapter = PiFinancialToolAdapter(FakeRegistry())
+    assert adapter.get_definition("get_official_reports").timeout_ms == settings.pi_official_report_tool_timeout_ms
+    assert adapter.get_definition("get_official_reports").timeout_ms >= 10000

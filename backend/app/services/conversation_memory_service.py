@@ -33,6 +33,7 @@ from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.attributes import flag_modified
 
+from app.core.database import AsyncSessionLocal
 from app.models.chat import ChatMessage, ChatSession
 import app.agents.chat_memory as _mem
 
@@ -422,10 +423,19 @@ async def build_memory_context(
 
         return ctx
 
-    except Exception:
+    except Exception as exc:
+        try:
+            await db.rollback()
+        except Exception as rollback_exc:  # noqa: BLE001
+            log.warning(
+                "conversation_memory_service.build_memory_context: rollback failed for session %s error_class=%s",
+                session_id,
+                type(rollback_exc).__name__,
+            )
         log.warning(
-            "conversation_memory_service.build_memory_context: failed for session %s (non-fatal)",
+            "conversation_memory_service.build_memory_context: failed for session %s error_class=%s (non-fatal)",
             session_id,
+            type(exc).__name__,
         )
         return MemoryContext(resolved_query=current_query)
 
@@ -458,16 +468,52 @@ async def update_memory_after_message(
 
         # Trigger lazy summarization once threshold exceeded
         if msg_count > SUMMARY_TRIGGER and not mem.get("session_summary"):
-            # Fire-and-forget summarization
+            messages_snapshot = [
+                {"role": item.role, "content": item.content or ""}
+                for item in rows[-RECENT_MSG_LIMIT:]
+            ]
             asyncio.create_task(
-                _trigger_summarization(db, session_id, user_id, rows)
+                _trigger_summarization_with_new_session(session_id, user_id, messages_snapshot)
             )
 
-    except Exception:
+    except Exception as exc:
+        try:
+            await db.rollback()
+        except Exception as rollback_exc:  # noqa: BLE001
+            log.warning(
+                "conversation_memory_service.update_memory_after_message: rollback failed for session %s error_class=%s",
+                session_id,
+                type(rollback_exc).__name__,
+            )
         log.warning(
-            "conversation_memory_service.update_memory_after_message: failed for session %s",
+            "conversation_memory_service.update_memory_after_message: failed for session %s error_class=%s",
             session_id,
+            type(exc).__name__,
         )
+
+
+async def _trigger_summarization_with_new_session(
+    session_id: uuid.UUID,
+    user_id: uuid.UUID,
+    messages: list,
+) -> None:
+    async with AsyncSessionLocal() as db:
+        try:
+            await _trigger_summarization(db, session_id, user_id, messages)
+        except Exception as exc:
+            try:
+                await db.rollback()
+            except Exception as rollback_exc:  # noqa: BLE001
+                log.warning(
+                    "conversation_memory_service._trigger_summarization: rollback failed for session %s error_class=%s",
+                    session_id,
+                    type(rollback_exc).__name__,
+                )
+            log.warning(
+                "conversation_memory_service._trigger_summarization: failed for session %s error_class=%s",
+                session_id,
+                type(exc).__name__,
+            )
 
 
 async def _trigger_summarization(
@@ -484,8 +530,10 @@ async def _trigger_summarization(
         # Build a text block from recent messages for summarization
         text_parts: list[str] = []
         for m in messages[-RECENT_MSG_LIMIT:]:
-            role_label = "用户" if m.role == "user" else "AI"
-            snippet = _sanitize_for_summary(m.content or "")[:100]
+            role = m.get("role") if isinstance(m, dict) else getattr(m, "role", "")
+            content = m.get("content") if isinstance(m, dict) else getattr(m, "content", "")
+            role_label = "用户" if role == "user" else "AI"
+            snippet = _sanitize_for_summary(content or "")[:100]
             if snippet:
                 text_parts.append(f"{role_label}：{snippet}")
 
@@ -511,10 +559,11 @@ async def _trigger_summarization(
         except Exception:
             # Fallback: rule-based summary from most recent user message
             last_user = next(
-                (m for m in reversed(messages) if m.role == "user"), None
+                (m for m in reversed(messages) if (m.get("role") if isinstance(m, dict) else getattr(m, "role", "")) == "user"), None
             )
             if last_user:
-                summary = _sanitize_for_summary(last_user.content or "")[:60]
+                last_user_content = last_user.get("content") if isinstance(last_user, dict) else getattr(last_user, "content", "")
+                summary = _sanitize_for_summary(last_user_content or "")[:60]
             else:
                 return
 
@@ -530,6 +579,10 @@ async def _trigger_summarization(
         await db.commit()
 
     except Exception:
+        try:
+            await db.rollback()
+        except Exception:  # noqa: BLE001
+            pass
         log.warning(
             "conversation_memory_service._trigger_summarization: failed for session %s",
             session_id,

@@ -6,10 +6,11 @@ Handles requests to explain or summarize recent analysis reports:
 """
 from __future__ import annotations
 
+import asyncio
 import re
 import logging
 
-from app.agent.report_context import parse_explicit_report_id
+from app.agent.report_context import parse_explicit_report_id, resolve_report_selection
 from app.agent.report_chat_copilot_agent import ReportChatCopilotAgent
 from app.agents.chat_skills.base import (
     BaseSkill,
@@ -21,6 +22,7 @@ from app.agents.chat_skills.base import (
 from app.agents.chat_rag import retrieve_context, RAGReviewCoordinator
 from app.agents.chat_events import safe_emit
 from app.services.security_entity_resolver import security_entity_resolver
+from app.services.official_report_entity_hints import unambiguous_official_report_entity_hint
 
 log = logging.getLogger(__name__)
 
@@ -348,6 +350,12 @@ _BUY_DECISION_PATTERN = re.compile(
     r"继续买入|该不该.{0,4}买|要不要.{0,4}买|应该.{0,4}买|值不值得.{0,4}买|加仓|补仓",
     re.IGNORECASE,
 )
+_LATEST_REPORT_SETUP_PATTERN = re.compile(
+    r"(最新|最近).{0,4}(财报|报告).{0,8}(表现|情况|如何|怎么样)",
+    re.IGNORECASE,
+)
+def _unambiguous_name_hint(message: str) -> dict:
+    return unambiguous_official_report_entity_hint(message, include_query=True)
 
 
 class ReportExplanationSkill(BaseSkill):
@@ -471,6 +479,7 @@ class ReportExplanationSkill(BaseSkill):
             or _hint_from_entity_dict(resolved_entities[0] if resolved_entities else None, source="payload.resolved_entities")
             or _hint_from_entity_dict(financial_context.get("primary_entity"), source="financial_context.primary_entity")
             or _extract_stock_hint(raw_query)
+            or _unambiguous_name_hint(raw_query)
         )
         if not hint or not hint.get("symbol"):
             try:
@@ -553,6 +562,61 @@ class ReportExplanationSkill(BaseSkill):
             "context_source": hint.get("source") or debug_payload.get("context_source") or "resolved_entity",
             "failure_reason": "",
         })
+        if context.db is not None and _LATEST_REPORT_SETUP_PATTERN.search(effective_message):
+            selection = await asyncio.wait_for(
+                resolve_report_selection(
+                    db=context.db,
+                    market=hint.get("market") or "CN",
+                    symbol=hint["symbol"],
+                    stock_name=hint.get("name") or None,
+                    question=effective_message,
+                    report_id=report_id,
+                ),
+                timeout=5.0,
+            )
+            if selection.ok:
+                report_context = selection.metadata()
+                report_label = report_context.get("title") or "最新正式财报"
+                year_label = f"{report_context.get('report_year')}年" if report_context.get("report_year") else ""
+                answer = (
+                    f"已定位到{hint.get('name') or hint['symbol']}的{year_label}{report_label}。"
+                    "这轮先基于已索引的正式报告建立上下文；如果需要原文，请继续问这份报告的官方 PDF。"
+                    + _DISCLAIMER
+                )
+                await safe_emit(context.event_callback, "skill_completed", {
+                    "skill_name": self.name,
+                    "ok": True,
+                    "tools_used": ["resolve_report_selection"],
+                    "cards_count": 0,
+                    "source": "skill_registry",
+                })
+                return SkillResult(
+                    ok=True,
+                    skill_name=self.name,
+                    answer=answer,
+                    tool_events=[self._tool_event("resolve_report_selection", "定位最新正式报告", "success")],
+                    cards=[],
+                    data={
+                        "answer_owner": "report_explanation_skill",
+                        "verified_financial_data": False,
+                        "partial": True,
+                        "status": "partial_success",
+                        "error_code": None,
+                        "report_context": report_context,
+                        "source_chunks": [],
+                        "review_audit": {},
+                        "rag_status": "not_used",
+                        "confidence": "metadata_only",
+                        "data_limitations": ["未进入RAG/LLM总结，仅建立当前报告上下文。"],
+                        "errors": [],
+                        "debug": debug_payload,
+                    },
+                    metadata={
+                        "answer_owner": "report_explanation_skill",
+                        "verified_financial_data": False,
+                        "source_chunks_count": 0,
+                    },
+                )
         result = await ReportChatCopilotAgent().chat(
             market=hint.get("market") or "",
             symbol=hint["symbol"],

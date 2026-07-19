@@ -60,6 +60,8 @@ class PiShadowDiagnosticsSink:
             "query_hash": query_hash(raw_query),
             "user_hash": user_hash(user_id),
             "status": result.get("status"),
+            "terminal": True,
+            "completed_at": utc_now(),
             "agent_id": result.get("agent_id"),
             "turn_count": result.get("turn_count", 0),
             "tool_call_count": result.get("tool_call_count", 0),
@@ -70,6 +72,7 @@ class PiShadowDiagnosticsSink:
             "error_code": (result.get("error") or {}).get("code"),
             "events": self._compact_events(result.get("events") or []),
             "input_snapshot_hash": stable_payload_hash(result.get("shadow_input") or {}),
+            "side_effect_count": int(result.get("side_effect_count") or 0),
         }
         try:
             path.parent.mkdir(parents=True, exist_ok=True)

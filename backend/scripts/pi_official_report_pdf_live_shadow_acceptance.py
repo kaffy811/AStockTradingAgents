@@ -284,8 +284,21 @@ async def execute_http_case(case: Any, *, args: argparse.Namespace, identity: di
     headers = {"Authorization": f"Bearer {identity['access_token']}"}
     async with httpx.AsyncClient(base_url=args.base_url.rstrip("/"), headers=headers, timeout=60.0, trust_env=False) as client:
         session_id = await _create_http_session(client, case.case_id)
+        setup_legacy: dict[str, Any] | None = None
+        setup_pi_result: dict[str, Any] | None = None
         if case.setup_query:
-            await _send_http_chat(client, session_id, case.setup_query, args=args, identity=identity, wait_for_shadow=False)
+            setup_legacy, setup_pi_result = await _send_http_chat(
+                client,
+                session_id,
+                case.setup_query,
+                args=args,
+                identity=identity,
+                wait_for_shadow=True,
+            )
+            if not setup_legacy.get("sse_terminal_received", True):
+                raise RuntimeError(f"Setup SSE terminal missing for {case.case_id}")
+            if not setup_pi_result.get("shadow_terminal_received", False):
+                raise RuntimeError(f"Setup shadow terminal missing for {case.case_id}")
         async with AsyncSessionLocal() as db:
             before = await capture_side_effect_snapshot(db, session_id=session_id)
         resolver_before = get_security_index_metrics()
@@ -353,6 +366,11 @@ async def execute_http_case(case: Any, *, args: argparse.Namespace, identity: di
             result["legacy"]["input_snapshot_hash"] = snapshot_hash
             result["pi_compatible"]["input_snapshot_hash"] = snapshot_hash
             result["comparison"]["input_snapshot_hash_match"] = True
+        if setup_legacy is not None or setup_pi_result is not None:
+            result["setup_turn"] = {
+                "legacy": _compact_turn_status(setup_legacy or {}),
+                "pi_compatible": _compact_turn_status(setup_pi_result or {}),
+            }
         resolver_full_scan_delta = max(0, int(resolver_after.get("security_index_db_full_scan") or 0) - int(resolver_before.get("security_index_db_full_scan") or 0))
         resolver_rebuild_delta = max(0, int(resolver_after.get("security_index_rebuild") or 0) - int(resolver_before.get("security_index_rebuild") or 0))
         tool_breakdown = ((result.get("pi_compatible") or {}).get("metrics") or {}).get("tool_latency_breakdown") or {}
@@ -414,11 +432,17 @@ async def _send_http_chat(client: Any, session_id: str, content: str, *, args: a
 async def _send_http_chat_stream(client: Any, session_id: str, content: str) -> dict[str, Any]:
     events: list[str] = []
     answer_parts: list[str] = []
+    terminal_payloads: list[dict[str, Any]] = []
     async with client.stream("POST", f"/api/v1/chat/sessions/{session_id}/messages/stream", json={"content": content, "output_language": "zh-CN"}) as response:
         legacy = {
+            "http_response_started": True,
             "http_status": response.status_code,
             "status": "failed" if response.status_code >= 500 else "success",
             "error_code": None if response.status_code < 400 else f"HTTP_{response.status_code}",
+            "sse_terminal_received": False,
+            "sse_terminal_event_count": 0,
+            "legacy_terminal_status": None,
+            "legacy_message_persisted": False,
         }
         response.raise_for_status()
         async for line in response.aiter_lines():
@@ -431,14 +455,27 @@ async def _send_http_chat_stream(client: Any, session_id: str, content: str) -> 
             event_type = payload.get("event_type")
             if event_type:
                 events.append(event_type)
+            event_payload = payload.get("payload") or {}
+            if event_type == "agent_completed":
+                terminal_payloads.append(event_payload)
+            if event_type == "message_persisted":
+                legacy["legacy_message_persisted"] = True
             if event_type == "answer_delta":
-                answer_parts.append(str((payload.get("payload") or {}).get("delta") or ""))
-        if "agent_completed" not in events:
-            raise RuntimeError("SSE stream did not emit agent_completed")
+                answer_parts.append(str(event_payload.get("delta") or ""))
+        terminal_count = len(terminal_payloads)
+        legacy["sse_terminal_event_count"] = terminal_count
+        legacy["sse_terminal_received"] = terminal_count == 1
+        if terminal_count != 1:
+            raise RuntimeError(f"SSE stream must emit exactly one agent_completed; observed {terminal_count}")
+        terminal_payload = terminal_payloads[-1]
+        legacy["legacy_terminal_status"] = terminal_payload.get("status") or "completed"
         legacy["answer"] = "".join(answer_parts)
         derived_status = _legacy_status_from_answer(legacy["answer"])
         if derived_status != "success" and legacy["http_status"] < 500:
             legacy["status"] = derived_status
+        if legacy["legacy_terminal_status"] == "failed":
+            legacy["status"] = "failed"
+            legacy["error_code"] = terminal_payload.get("error_code") or legacy.get("error_code")
         legacy["sse_completed"] = True
         return legacy
 
@@ -450,9 +487,17 @@ async def _poll_shadow_diagnostic(*, conversation_id: str, raw_query: str, user_
     while time.perf_counter() < deadline:
         for record in reversed(_read_diagnostics()[-200:]):
             if record.get("conversation_id") == conversation_id and record.get("query_hash") == target_hash and record.get("user_hash") == target_user:
-                return _diagnostic_to_pi_result(record)
+                if record.get("terminal") is True:
+                    return _diagnostic_to_pi_result(record)
         await asyncio.sleep(DIAGNOSTICS_POLL_INTERVAL_SECONDS)
-    return {"status": "failed", "error": {"code": "PI_SHADOW_TIMEOUT"}, "metrics": {"latency_ms": 0, "model_calls": 0}, "findings": []}
+    return {
+        "status": "failed",
+        "terminal": False,
+        "shadow_terminal_received": False,
+        "error": {"code": "PI_SHADOW_TIMEOUT"},
+        "metrics": {"latency_ms": 0, "model_calls": 0},
+        "findings": [],
+    }
 
 
 def _diagnostic_to_pi_result(record: dict[str, Any]) -> dict[str, Any]:
@@ -460,6 +505,9 @@ def _diagnostic_to_pi_result(record: dict[str, Any]) -> dict[str, Any]:
         "trace_id": record.get("trace_id"),
         "run_id": record.get("run_id"),
         "status": record.get("status"),
+        "terminal": bool(record.get("terminal")),
+        "shadow_terminal_received": bool(record.get("terminal")),
+        "completed_at": record.get("completed_at"),
         "agent_id": record.get("agent_id"),
         "turn_count": record.get("turn_count", 0),
         "tool_call_count": record.get("tool_call_count", 0),
@@ -557,10 +605,26 @@ def _smoke_cases() -> list[Any]:
     from app.agent_runtime.shadow_acceptance import OfficialReportShadowCase
 
     return [
-        OfficialReportShadowCase("A01", "smoke_explicit_company", "五粮液2025年年度报告PDF在哪里？", expected_symbol="000858", expected_report_year=2025, expected_report_type="annual"),
+        OfficialReportShadowCase("A01", "smoke_multi_turn_current_report", "这份报告的官方 PDF 在哪里？", setup_query="贵州茅台最新财报表现如何？", expected_symbol="600519", expected_report_type="annual"),
         OfficialReportShadowCase("A02", "smoke_explicit_stock_code", "600519官方年报链接", expected_symbol="600519", expected_report_type="annual"),
         OfficialReportShadowCase("A03", "smoke_ambiguity", "平安的年报PDF在哪里？", expected_status="clarification_required", expected_report_type="annual"),
     ]
+
+
+def _compact_turn_status(payload: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "status": payload.get("status"),
+        "http_status": payload.get("http_status"),
+        "sse_terminal_received": payload.get("sse_terminal_received"),
+        "sse_terminal_event_count": payload.get("sse_terminal_event_count"),
+        "legacy_terminal_status": payload.get("legacy_terminal_status"),
+        "legacy_message_persisted": payload.get("legacy_message_persisted"),
+        "shadow_terminal_received": payload.get("shadow_terminal_received"),
+        "shadow_terminal_status": payload.get("status"),
+        "error_code": (payload.get("error") or {}).get("code") or payload.get("error_code"),
+        "run_id": payload.get("run_id"),
+        "trace_id": payload.get("trace_id"),
+    }
 
 
 def _legacy_status_from_answer(answer: str) -> str:

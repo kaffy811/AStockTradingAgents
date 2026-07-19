@@ -17,6 +17,7 @@ from app.agents.financial_runtime.planner import execution_planner, financial_co
 from app.agents.financial_runtime.router import intent_safety_router
 from app.core.config import settings
 from app.core.database import AsyncSessionLocal
+from app.services.official_report_entity_hints import ambiguous_official_report_entity_hint
 
 
 _YEAR_RE = re.compile(r"(20\d{2}|19\d{2})\s*年?")
@@ -120,6 +121,12 @@ class PiCompatibleShadowRunner:
                 "metrics": {"latency_ms": 0, "model_calls": 0, "tool_calls": 0, "input_tokens": 0, "output_tokens": 0},
                 "shadow_input": input_snapshot,
             }
+        snapshot_entity = (resolved_entity_snapshot or {}).get("primary_entity")
+        is_official_report_query = self._looks_like_official_pdf_intent(raw_query, effective_query)
+        if routing.intent != "official_report_pdf" and is_official_report_query:
+            routing.intent = "official_report_pdf"
+            if snapshot_entity and not routing.resolved_entities:
+                routing.resolved_entities = [self._security_entity_from_snapshot(snapshot_entity, trace_id=trace_id)]
         if routing.intent != "official_report_pdf":
             return self._skip_result(
                 trace_id=trace_id,
@@ -139,6 +146,8 @@ class PiCompatibleShadowRunner:
         context_dict = context.to_dict()
         context_dict["report_year"] = year
         context_dict["report_type"] = report_type
+        if snapshot_entity and not context_dict.get("primary_entity"):
+            context_dict["primary_entity"] = snapshot_entity
         input_snapshot["financial_context_snapshot"] = self._compact_financial_context(context_dict)
         plan = execution_planner.plan(trace_id=trace_id, routing=routing, context=context)
         pi_request = PiRuntimeRequest(
@@ -147,7 +156,7 @@ class PiCompatibleShadowRunner:
             conversation_id=conversation_id,
             user_id=user_id,
             intent="official_report_pdf",
-            entities=[asdict(entity) for entity in routing.resolved_entities],
+            entities=[asdict(entity) for entity in routing.resolved_entities] or ([snapshot_entity] if snapshot_entity else []),
             context=context_dict,
             execution_plan=plan.to_dict(),
             allowed_tools=list(official_report_pdf_manifest.allowed_tools),
@@ -227,7 +236,15 @@ class PiCompatibleShadowRunner:
         for alias, options in _AMBIGUOUS_OFFICIAL_PDF_ALIASES.items():
             if alias in text:
                 return [dict(item) for item in options]
-        return []
+        hint = ambiguous_official_report_entity_hint(text)
+        return [
+            {
+                "market": item.get("market") or "CN",
+                "symbol": item.get("symbol") or "",
+                "short_name": item.get("short_name") or item.get("name") or item.get("symbol") or "",
+            }
+            for item in (hint.get("candidates") or [])
+        ]
 
     def _security_entity_from_dict(self, trace_id: str, data: dict[str, Any]) -> SecurityEntity:
         return SecurityEntity(
@@ -416,6 +433,20 @@ class PiCompatibleShadowRunner:
             "report_year": prefs.get("last_report_year"),
             "report_type": prefs.get("last_report_type"),
         }
+
+    def _security_entity_from_snapshot(self, entity: dict[str, Any], *, trace_id: str) -> SecurityEntity:
+        return SecurityEntity(
+            trace_id=trace_id,
+            status="success",
+            entity_type=str(entity.get("entity_type") or "equity"),
+            market=str(entity.get("market") or "CN"),
+            symbol=str(entity.get("symbol") or entity.get("code") or ""),
+            short_name=str(entity.get("short_name") or entity.get("name") or entity.get("symbol") or ""),
+            full_name=str(entity.get("name") or entity.get("short_name") or entity.get("symbol") or ""),
+            source=str(entity.get("source") or "shadow_input_snapshot"),
+            confidence=1.0,
+            match_type="snapshot",
+        )
 
     def _compact_entity_snapshot(self, snapshot: dict[str, Any] | None) -> dict[str, Any]:
         if not snapshot:

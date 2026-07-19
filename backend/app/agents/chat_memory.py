@@ -215,8 +215,21 @@ async def apply_memory_updates(
             latest_session.session_metadata = latest_meta
             flag_modified(latest_session, "session_metadata")
             await db.flush()
-    except Exception:
-        log.warning("chat_memory.apply_memory_updates: failed for session %s", session_id)
+    except Exception as exc:
+        try:
+            await db.rollback()
+        except Exception as rollback_exc:  # noqa: BLE001
+            log.warning(
+                "chat_memory.apply_memory_updates: rollback failed for session %s error_class=%s",
+                session_id,
+                type(rollback_exc).__name__,
+            )
+            pass
+        log.warning(
+            "chat_memory.apply_memory_updates: failed for session %s error_class=%s",
+            session_id,
+            type(exc).__name__,
+        )
 
 
 # ── Public read ────────────────────────────────────────────────────────────────
@@ -230,8 +243,21 @@ async def get_memory(
     try:
         _, memory = await _load(db, session_id, user_id)
         return memory
-    except Exception:
-        log.warning("chat_memory.get_memory: failed for session %s", session_id)
+    except Exception as exc:
+        try:
+            await db.rollback()
+        except Exception as rollback_exc:  # noqa: BLE001
+            log.warning(
+                "chat_memory.get_memory: rollback failed for session %s error_class=%s",
+                session_id,
+                type(rollback_exc).__name__,
+            )
+            pass
+        log.warning(
+            "chat_memory.get_memory: failed for session %s error_class=%s",
+            session_id,
+            type(exc).__name__,
+        )
         return _empty_memory()
 
 

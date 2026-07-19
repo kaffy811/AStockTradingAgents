@@ -282,6 +282,81 @@ class TestAssistantMessagePersistence:
         assert kwargs["confirmation"] == conf
 
 
+class TestStreamingTransactionIsolation:
+
+    @pytest.mark.asyncio
+    async def test_short_db_operation_failure_rolls_back(self):
+        from app.agents.chat_streaming import _run_short_db_operation
+
+        db = AsyncMock()
+
+        async def _fail(_db):
+            raise RuntimeError("first db exception")
+
+        with pytest.raises(RuntimeError, match="first db exception"):
+            await _run_short_db_operation("test.owner", _fail, db_override=db)
+
+        db.rollback.assert_awaited_once()
+        db.commit.assert_not_awaited()
+
+    @pytest.mark.asyncio
+    async def test_rollback_failure_does_not_mask_first_exception(self):
+        from app.agents.chat_streaming import _run_short_db_operation
+
+        db = AsyncMock()
+        db.rollback = AsyncMock(side_effect=RuntimeError("rollback failed"))
+
+        async def _fail(_db):
+            raise ValueError("first db exception")
+
+        with pytest.raises(ValueError, match="first db exception"):
+            await _run_short_db_operation("test.owner", _fail, db_override=db)
+
+        db.rollback.assert_awaited_once()
+        db.commit.assert_not_awaited()
+
+    @pytest.mark.asyncio
+    async def test_downstream_agent_completed_is_not_reemitted(self):
+        from app.agents.chat_orchestrator import OrchestratorResult
+        from app.agents.chat_streaming import stream_chat_message
+
+        async def fake_process(*_args, **kwargs):
+            await kwargs["event_callback"]("agent_completed", {"status": "completed"})
+            return OrchestratorResult(answer="ok", tool_events=[], cards=[], confirmation=None)
+
+        chunks: list[str] = []
+        with (
+            patch("app.agents.chat_streaming.process_message", fake_process),
+            patch("app.agents.chat_streaming.save_user_message", return_value=MagicMock(id=uuid.uuid4())),
+            patch("app.agents.chat_streaming.save_assistant_message", return_value=MagicMock(id=uuid.uuid4())),
+            patch("app.agents.chat_streaming.update_session_last_message"),
+        ):
+            async for chunk in stream_chat_message(uuid.uuid4(), _make_uid(), "test", "zh-CN", AsyncMock()):
+                chunks.append(chunk)
+
+        events = _event_types(chunks)
+        assert events.count("agent_completed") == 1
+
+    @pytest.mark.asyncio
+    async def test_no_yield_after_terminal_event(self):
+        from app.agents.chat_orchestrator import OrchestratorResult
+        from app.agents.chat_streaming import stream_chat_message
+
+        chunks: list[str] = []
+        with (
+            patch("app.agents.chat_streaming.process_message", return_value=OrchestratorResult(answer="ok", tool_events=[], cards=[], confirmation=None)),
+            patch("app.agents.chat_streaming.save_user_message", return_value=MagicMock(id=uuid.uuid4())),
+            patch("app.agents.chat_streaming.save_assistant_message", return_value=MagicMock(id=uuid.uuid4())),
+            patch("app.agents.chat_streaming.update_session_last_message"),
+        ):
+            async for chunk in stream_chat_message(uuid.uuid4(), _make_uid(), "test", "zh-CN", AsyncMock()):
+                chunks.append(chunk)
+
+        events = _event_types(chunks)
+        terminal_index = events.index("agent_completed")
+        assert events[terminal_index + 1:] == []
+
+
 # ── 3. Session restore after streaming ────────────────────────────────────────
 
 class TestSessionRestoreAfterStreaming:

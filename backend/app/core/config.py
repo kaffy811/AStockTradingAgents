@@ -79,7 +79,10 @@ class Settings(BaseSettings):
     database_command_timeout_seconds: float = 45.0
     database_sql_echo: bool = False
     database_sql_hide_parameters: bool = True
-    auth_db_lookup_timeout_seconds: float = 4.0
+    auth_db_lookup_timeout_seconds: float = 10.0
+    auth_db_connect_timeout_seconds: float = 10.0
+    auth_db_query_timeout_seconds: float = 10.0
+    auth_db_cleanup_timeout_seconds: float = 3.0
     auth_user_cache_ttl_seconds: int = 60
     auth_db_timeout_threshold: int = 3
     auth_circuit_open_seconds: float = 20.0
@@ -97,6 +100,7 @@ class Settings(BaseSettings):
     pi_agent_max_tool_calls: int = 4
     pi_agent_max_parallel_tools: int = 2
     pi_agent_default_deadline_ms: int = 5000
+    pi_official_report_tool_timeout_ms: int = 10000
     pi_agent_shadow_enabled: bool = False
     pi_agent_allowed_agents: str = ""
     pi_agent_shadow_diagnostics_path: str = ""

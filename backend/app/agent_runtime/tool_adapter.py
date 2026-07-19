@@ -18,6 +18,7 @@ from app.agent_runtime.errors import (
     AGENT_TOOL_NOT_ALLOWED,
     AGENT_TOOL_TIMEOUT,
 )
+from app.core.config import settings
 from app.agents.financial_runtime.contracts import FinancialSessionContext, ToolResponse as FinancialToolResponse
 from app.agents.financial_runtime.tool_runtime import financial_tool_registry
 
@@ -117,7 +118,7 @@ class PiFinancialToolAdapter:
                         "report_type": {"type": ["string", "null"]},
                     },
                 },
-                timeout_ms=3000,
+                timeout_ms=int(getattr(settings, "pi_official_report_tool_timeout_ms", 10000)),
             ),
         }
 

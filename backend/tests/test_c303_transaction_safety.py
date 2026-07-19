@@ -42,57 +42,41 @@ def _mock_db():
 # ══════════════════════════════════════════════════════════════════════════════
 
 class TestStreamingTransactionIsolation:
-    """Verify chat_streaming commits user message before orchestration starts."""
+    """Verify chat_streaming uses isolated short DB operations."""
 
     def test_t1_chat_streaming_imports_commit_after_user_message(self):
-        """T1: chat_streaming._orchestrate() calls db.commit() after save_user_message."""
+        """T1: user-message persistence is wrapped in a short transaction."""
         import inspect
         import app.agents.chat_streaming as cs
         src = inspect.getsource(cs)
-        # After save_user_message, there must be an await db.commit()
-        # Look for the pattern: save_user_message ... commit
         save_pos = src.find("save_user_message(")
-        commit_pos = src.find("await db.commit()", save_pos)
+        helper_pos = src.find("_run_short_db_operation(", 0)
         assert save_pos > 0, "save_user_message must be in chat_streaming"
-        assert commit_pos > 0, "db.commit() must follow save_user_message"
-        assert commit_pos > save_pos, "db.commit() must come AFTER save_user_message"
+        assert helper_pos > 0, "short DB operation helper must be in chat_streaming"
+        assert '"chat_stream.user_message"' in src, "user message save must declare an operation owner"
 
     def test_t2_title_catch_block_calls_rollback(self):
-        """T2: The title update except block calls db.rollback() before continuing."""
+        """T2: short DB operation helper rolls back on failure."""
         import inspect
         import app.agents.chat_streaming as cs
         src = inspect.getsource(cs)
-        # Locate the title-update try/except block
         title_try = src.find("maybe_update_session_title(")
         assert title_try > 0, "maybe_update_session_title must be in chat_streaming"
-        # Find the except block that follows
-        except_pos = src.find("except Exception:", title_try)
-        assert except_pos > 0, "except block must follow maybe_update_session_title"
-        # rollback must appear between except and the next non-indented section
-        rollback_pos = src.find("await db.rollback()", except_pos)
-        assert rollback_pos > 0, "db.rollback() must appear in title update except block"
-        # rollback must come before the next Phase comment
-        next_phase = src.find("# ── Phase 2:", except_pos)
-        assert rollback_pos < next_phase, (
-            "db.rollback() in title except block must appear before Phase 2 starts"
-        )
+        helper_pos = src.find("async def _run_short_db_operation")
+        rollback_pos = src.find("_rollback_safely(session", helper_pos)
+        close_pos = src.find("async with _session_context", helper_pos)
+        assert rollback_pos > helper_pos, "short DB operation helper must rollback failed operations"
+        assert close_pos > helper_pos, "short DB operation helper must scope/close sessions"
 
     def test_t3_title_update_commits_when_successful(self):
-        """T3: When title update succeeds, a db.commit() is called for it."""
+        """T3: title update uses the short transaction helper."""
         import inspect
         import app.agents.chat_streaming as cs
         src = inspect.getsource(cs)
-        # After maybe_update_session_title + new_title check, there must be commit
         title_pos = src.find("maybe_update_session_title(")
-        new_title_pos = src.find("if new_title:", title_pos)
-        assert new_title_pos > title_pos
-        commit_in_title = src.find("await db.commit()", new_title_pos)
-        # That commit must appear before the except block
-        except_pos = src.find("except Exception:", title_pos)
-        assert commit_in_title > 0, "commit inside 'if new_title' block required"
-        assert commit_in_title < except_pos, (
-            "Title commit must be inside the try block, not the except"
-        )
+        owner_pos = src.find('"chat_stream.session_title"', 0)
+        assert title_pos > 0
+        assert owner_pos > 0, "title update must declare an operation owner"
 
     def test_t4_user_message_commit_is_c3031_annotated(self):
         """T4: The commit after save_user_message has a C30.3.1 annotation."""
@@ -260,8 +244,8 @@ class TestP3CompletedRegressionAfterC303:
         assert "save_assistant_message(" in src, (
             "chat_streaming must still call save_assistant_message in Phase 9"
         )
-        assert "await db.commit()" in src, (
-            "chat_streaming must still commit after saving assistant message"
+        assert '"chat_stream.assistant_message"' in src and "_run_short_db_operation(" in src, (
+            "chat_streaming must persist assistant messages through the short transaction helper"
         )
 
 

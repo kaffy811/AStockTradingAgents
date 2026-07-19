@@ -17,6 +17,10 @@ from app.agent_runtime.shadow_acceptance import (
     summarize_shadow_results,
 )
 from app.agent_runtime.shadow_diagnostics import PiShadowDiagnosticsSink, query_hash, user_hash
+from app.services.official_report_entity_hints import (
+    ambiguous_official_report_entity_hint,
+    unambiguous_official_report_entity_hint,
+)
 
 ROOT = Path(__file__).parents[3]
 RUNNER_PATH = ROOT / "backend" / "scripts" / "pi_official_report_pdf_live_shadow_acceptance.py"
@@ -147,10 +151,54 @@ def test_token_never_logged_in_diagnostics(tmp_path, monkeypatch):
     assert record["query_hash"] == query_hash("五粮液2025年年度报告PDF在哪里？")
     assert record["user_hash"] == user_hash("00000000-0000-0000-0000-000000000001")
     assert record["input_snapshot_hash"]
+    assert record["terminal"] is True
+    assert record["completed_at"]
+
+
+def test_shadow_terminal_diagnostics_for_skipped_and_timeout(tmp_path, monkeypatch):
+    path = tmp_path / "diag.jsonl"
+    monkeypatch.setattr("app.agent_runtime.shadow_diagnostics.settings.pi_agent_shadow_diagnostics_path", str(path))
+    sink = PiShadowDiagnosticsSink()
+    for status in ("skipped", "timeout"):
+        sink.record(
+            raw_query=f"case-{status}",
+            conversation_id="conv",
+            user_id="00000000-0000-0000-0000-000000000001",
+            result={
+                "trace_id": f"trace-{status}",
+                "run_id": f"run-{status}",
+                "status": status,
+                "agent_id": "official_report_pdf_pi_v1",
+                "metrics": {"latency_ms": 1, "model_calls": 0},
+                "findings": [],
+                "evidence_ids": [],
+                "events": [],
+                "error": {"code": f"PI_SHADOW_{status.upper()}"},
+            },
+        )
+
+    records = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
+    assert [record["status"] for record in records] == ["skipped", "timeout"]
+    assert all(record["terminal"] is True for record in records)
+    assert all(record["completed_at"] for record in records)
 
 
 def test_test_session_isolated_title_prefix():
     assert "pi-shadow-" in runner._browser_markdown(executed=False, passed=False, notes="pi-shadow-A01")
+
+
+def test_symbol_hint_routes_explicit_code_to_official_report_agent():
+    hint = unambiguous_official_report_entity_hint("600519官方年报链接", include_query=True)
+    assert hint["symbol"] == "600519"
+    assert hint["name"] == "贵州茅台"
+    assert hint["source"] == "unambiguous_symbol_hint"
+
+
+def test_ambiguous_pingan_hint_requires_clarification_without_tool_call():
+    hint = ambiguous_official_report_entity_hint("平安的年报PDF在哪里？")
+    assert hint["source"] == "ambiguous_name_hint"
+    names = {item["name"] for item in hint["candidates"]}
+    assert {"平安银行", "中国平安"}.issubset(names)
 
 
 @pytest.mark.asyncio
@@ -158,6 +206,7 @@ async def test_callback_timeout_handled(tmp_path, monkeypatch):
     monkeypatch.setattr(runner.settings, "pi_agent_shadow_diagnostics_path", str(tmp_path / "missing.jsonl"))
     result = await runner._poll_shadow_diagnostic(conversation_id="conv", raw_query="q", user_id="u", timeout_seconds=0.01)
     assert result["status"] == "failed"
+    assert result["shadow_terminal_received"] is False
     assert result["error"]["code"] == "PI_SHADOW_TIMEOUT"
 
 
@@ -184,6 +233,73 @@ async def test_sse_completion_required():
 
     with pytest.raises(RuntimeError, match="agent_completed"):
         await runner._send_http_chat_stream(Client(), "session", "hello")
+
+
+@pytest.mark.asyncio
+async def test_sse_terminal_exactly_once_required():
+    class Response:
+        status_code = 200
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, tb):
+            return False
+
+        def raise_for_status(self):
+            return None
+
+        async def aiter_lines(self):
+            yield 'data: {"event_type": "agent_completed", "payload": {"status": "completed"}}'
+            yield 'data: {"event_type": "agent_completed", "payload": {"status": "completed"}}'
+
+    class Client:
+        def stream(self, *_args, **_kwargs):
+            return Response()
+
+    with pytest.raises(RuntimeError, match="agent_completed"):
+        await runner._send_http_chat_stream(Client(), "session", "hello")
+
+
+@pytest.mark.asyncio
+async def test_runner_records_legacy_terminal_and_message_persistence():
+    class Response:
+        status_code = 200
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, tb):
+            return False
+
+        def raise_for_status(self):
+            return None
+
+        async def aiter_lines(self):
+            yield 'data: {"event_type": "answer_delta", "payload": {"delta": "ok"}}'
+            yield 'data: {"event_type": "message_persisted", "payload": {"message_id": "m"}}'
+            yield 'data: {"event_type": "agent_completed", "payload": {"status": "completed"}}'
+
+    class Client:
+        def stream(self, *_args, **_kwargs):
+            return Response()
+
+    legacy = await runner._send_http_chat_stream(Client(), "session", "hello")
+    assert legacy["http_response_started"] is True
+    assert legacy["sse_terminal_received"] is True
+    assert legacy["sse_terminal_event_count"] == 1
+    assert legacy["legacy_terminal_status"] == "completed"
+    assert legacy["legacy_message_persisted"] is True
+    assert legacy["answer"] == "ok"
+
+
+def test_smoke_cases_are_fixed_p161_set():
+    cases = runner._smoke_cases()
+    assert [case.case_id for case in cases] == ["A01", "A02", "A03"]
+    assert cases[0].setup_query == "贵州茅台最新财报表现如何？"
+    assert cases[0].query == "这份报告的官方 PDF 在哪里？"
+    assert cases[1].query == "600519官方年报链接"
+    assert cases[2].expected_status == "clarification_required"
 
 
 def test_legacy_writes_excluded_and_pi_extra_write_detected():
