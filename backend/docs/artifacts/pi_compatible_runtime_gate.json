@@ -1,22 +1,23 @@
 {
-  "phase": "6V-P1.6.4",
-  "shadow_passed": false,
-  "planned": 30,
-  "executed": 30,
-  "accepted": 10,
+  "schema_version": "pi_compatible_runtime_gate_v1",
+  "phase": "6V-P1.6.5",
+  "updated_at": "2026-07-19T10:47:51.467382+00:00",
+  "trace_mismatch_root_cause_identified": true,
+  "shadow_terminal_trace_mismatch_count": 0,
+  "pi_business_write_delta": 0,
+  "assistant_double_write_count": 0,
+  "unknown_owner_write_count": 0,
+  "unexpected_deadline_exceeded_count": 0,
+  "status_taxonomy_validated": true,
+  "clarification_applicable_correctness": 1.0,
+  "status_specific_provenance_completeness": 1.0,
+  "blocker_subset_passed": true,
+  "recommended_to_retry_full30": true,
   "recommended_for_next_authorization": false,
-  "recommended_next_step": null,
   "pi_executor_enabled": false,
   "authorized_agents": [],
   "decision": "do_not_enable_pi_compatible",
   "blockers": [
-    "Full30 Gate thresholds were not met.",
-    "status_match_rate below 99%.",
-    "provenance_completeness_rate below 100%.",
-    "pi_business_write_delta was non-zero.",
-    "assistant_double_write_count was non-zero.",
-    "shadow terminal trace mismatch count was 15",
-    "agent_deadline_exceeded_count was 2",
-    "browser acceptance not run because Full30 had core blockers."
+    "formal Full30 and browser acceptance intentionally not run in this phase"
   ]
 }

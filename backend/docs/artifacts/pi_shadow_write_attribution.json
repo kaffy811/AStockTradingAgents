@@ -1,12 +1,12 @@
 {
-  "schema_version": "pi_shadow_write_attribution_v1",
+  "schema_version": "pi_shadow_write_attribution_v2",
   "cases": [
     {
       "case_id": "A01",
-      "trace_id": "trace_dd225f1e5ea3",
-      "legacy_run_id": null,
-      "pi_shadow_run_id": "run_93f914e15dfd",
-      "target_session_id_hash": "f5a8255b57bcfd95",
+      "trace_id": "trace_31c166a260a2",
+      "legacy_run_id": "",
+      "pi_shadow_run_id": "run_ae2052b83afd",
+      "target_session_id_hash": "19518f1eee7ef24a",
       "writes": [
         {
           "resource": "chat_messages",
@@ -29,14 +29,65 @@
         "chat_messages": 2,
         "context_version_delta": 0
       },
-      "pi_shadow_business_write_delta": 0
+      "pi_shadow_business_write_delta": 0,
+      "v2": {
+        "schema_version": "pi_shadow_write_attribution_v2",
+        "case_id": "A01",
+        "correlation": {
+          "acceptance_run_id": "acc_99739f63b615",
+          "case_id": "A01",
+          "case_attempt": 1,
+          "turn_id": "A01.a1.t2",
+          "request_trace_id": "trace_31c166a260a2",
+          "legacy_run_id": "",
+          "shadow_run_id": "run_ae2052b83afd",
+          "input_snapshot_hash": "087b6bdd0a7f9632"
+        },
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "6c076e2decddfea6",
+            "session_id_hash": "19518f1eee7ef24a",
+            "turn_id": "A01.a1.t2",
+            "request_trace_id": "trace_31c166a260a2",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "user",
+            "owner": "legacy",
+            "expected": true
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "637422d24362f7d5",
+            "session_id_hash": "19518f1eee7ef24a",
+            "turn_id": "A01.a1.t2",
+            "request_trace_id": "trace_31c166a260a2",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "assistant",
+            "owner": "legacy",
+            "expected": true,
+            "assistant_logical_response_id": "f018ff3d457e80db"
+          }
+        ],
+        "pi_business_write_delta": 0,
+        "assistant_double_write_count": 0,
+        "unknown_owner_write_count": 0,
+        "other_case_write_count": 0,
+        "legacy_write_count": 2,
+        "system_write_count": 0
+      }
     },
     {
       "case_id": "A02",
-      "trace_id": "trace_132023b7d8ae",
-      "legacy_run_id": null,
-      "pi_shadow_run_id": "run_b3ae4c7e2802",
-      "target_session_id_hash": "6c55ce61971f6c3d",
+      "trace_id": "trace_1a8274aaa1dc",
+      "legacy_run_id": "",
+      "pi_shadow_run_id": "run_945e08f15488",
+      "target_session_id_hash": "4498cf2ad22be574",
       "writes": [
         {
           "resource": "chat_messages",
@@ -59,14 +110,65 @@
         "chat_messages": 2,
         "context_version_delta": 0
       },
-      "pi_shadow_business_write_delta": 0
+      "pi_shadow_business_write_delta": 0,
+      "v2": {
+        "schema_version": "pi_shadow_write_attribution_v2",
+        "case_id": "A02",
+        "correlation": {
+          "acceptance_run_id": "acc_99739f63b615",
+          "case_id": "A02",
+          "case_attempt": 1,
+          "turn_id": "A02.a1.t2",
+          "request_trace_id": "trace_1a8274aaa1dc",
+          "legacy_run_id": "",
+          "shadow_run_id": "run_945e08f15488",
+          "input_snapshot_hash": "cc26ca20e8a36eb1"
+        },
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "3bf0a256b210c76f",
+            "session_id_hash": "4498cf2ad22be574",
+            "turn_id": "A02.a1.t2",
+            "request_trace_id": "trace_1a8274aaa1dc",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "user",
+            "owner": "legacy",
+            "expected": true
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "179ce44d38884f4a",
+            "session_id_hash": "4498cf2ad22be574",
+            "turn_id": "A02.a1.t2",
+            "request_trace_id": "trace_1a8274aaa1dc",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "assistant",
+            "owner": "legacy",
+            "expected": true,
+            "assistant_logical_response_id": "963d5072830d8c52"
+          }
+        ],
+        "pi_business_write_delta": 0,
+        "assistant_double_write_count": 0,
+        "unknown_owner_write_count": 0,
+        "other_case_write_count": 0,
+        "legacy_write_count": 2,
+        "system_write_count": 0
+      }
     },
     {
       "case_id": "A03",
-      "trace_id": "trace_6432b87167db",
-      "legacy_run_id": null,
-      "pi_shadow_run_id": "run_f3b32279fbb4",
-      "target_session_id_hash": "c01e166377242467",
+      "trace_id": "trace_14403a1a631b",
+      "legacy_run_id": "",
+      "pi_shadow_run_id": "run_c3019fa93aa8",
+      "target_session_id_hash": "a6524992f748a3e4",
       "writes": [
         {
           "resource": "chat_messages",
@@ -89,14 +191,65 @@
         "chat_messages": 2,
         "context_version_delta": 0
       },
-      "pi_shadow_business_write_delta": 0
+      "pi_shadow_business_write_delta": 0,
+      "v2": {
+        "schema_version": "pi_shadow_write_attribution_v2",
+        "case_id": "A03",
+        "correlation": {
+          "acceptance_run_id": "acc_99739f63b615",
+          "case_id": "A03",
+          "case_attempt": 1,
+          "turn_id": "A03.a1.t2",
+          "request_trace_id": "trace_14403a1a631b",
+          "legacy_run_id": "",
+          "shadow_run_id": "run_c3019fa93aa8",
+          "input_snapshot_hash": "fc68bea65cee4365"
+        },
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "f00361317a3fecf6",
+            "session_id_hash": "a6524992f748a3e4",
+            "turn_id": "A03.a1.t2",
+            "request_trace_id": "trace_14403a1a631b",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "user",
+            "owner": "legacy",
+            "expected": true
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "a0cd8dc54a8859e6",
+            "session_id_hash": "a6524992f748a3e4",
+            "turn_id": "A03.a1.t2",
+            "request_trace_id": "trace_14403a1a631b",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "assistant",
+            "owner": "legacy",
+            "expected": true,
+            "assistant_logical_response_id": "37162dd5c00e2fc2"
+          }
+        ],
+        "pi_business_write_delta": 0,
+        "assistant_double_write_count": 0,
+        "unknown_owner_write_count": 0,
+        "other_case_write_count": 0,
+        "legacy_write_count": 2,
+        "system_write_count": 0
+      }
     },
     {
       "case_id": "B01",
-      "trace_id": "trace_370eab0da812",
-      "legacy_run_id": null,
-      "pi_shadow_run_id": "run_00219f555005",
-      "target_session_id_hash": "5ada421933b40cd5",
+      "trace_id": "trace_8ba7011fc47b",
+      "legacy_run_id": "",
+      "pi_shadow_run_id": "run_83682c6b0209",
+      "target_session_id_hash": "5fe54754ddb9fbb6",
       "writes": [
         {
           "resource": "chat_messages",
@@ -119,14 +272,65 @@
         "chat_messages": 2,
         "context_version_delta": 0
       },
-      "pi_shadow_business_write_delta": 0
+      "pi_shadow_business_write_delta": 0,
+      "v2": {
+        "schema_version": "pi_shadow_write_attribution_v2",
+        "case_id": "B01",
+        "correlation": {
+          "acceptance_run_id": "acc_99739f63b615",
+          "case_id": "B01",
+          "case_attempt": 1,
+          "turn_id": "B01.a1.t1",
+          "request_trace_id": "trace_8ba7011fc47b",
+          "legacy_run_id": "",
+          "shadow_run_id": "run_83682c6b0209",
+          "input_snapshot_hash": "fead2d25c29555a8"
+        },
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "59ea84af6e68b5f7",
+            "session_id_hash": "5fe54754ddb9fbb6",
+            "turn_id": "B01.a1.t1",
+            "request_trace_id": "trace_8ba7011fc47b",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "user",
+            "owner": "legacy",
+            "expected": true
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "a531e9b88369fc9f",
+            "session_id_hash": "5fe54754ddb9fbb6",
+            "turn_id": "B01.a1.t1",
+            "request_trace_id": "trace_8ba7011fc47b",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "assistant",
+            "owner": "legacy",
+            "expected": true,
+            "assistant_logical_response_id": "7ad0582472eb84e1"
+          }
+        ],
+        "pi_business_write_delta": 0,
+        "assistant_double_write_count": 0,
+        "unknown_owner_write_count": 0,
+        "other_case_write_count": 0,
+        "legacy_write_count": 2,
+        "system_write_count": 0
+      }
     },
     {
       "case_id": "B02",
-      "trace_id": "trace_854dc15ec2e0",
-      "legacy_run_id": null,
-      "pi_shadow_run_id": "run_a6196a1057ff",
-      "target_session_id_hash": "66444fb1348e2324",
+      "trace_id": "trace_851cbaa780f4",
+      "legacy_run_id": "",
+      "pi_shadow_run_id": "run_481ae6296654",
+      "target_session_id_hash": "3effc58ece28a5b4",
       "writes": [
         {
           "resource": "chat_messages",
@@ -149,14 +353,65 @@
         "chat_messages": 2,
         "context_version_delta": 0
       },
-      "pi_shadow_business_write_delta": 0
+      "pi_shadow_business_write_delta": 0,
+      "v2": {
+        "schema_version": "pi_shadow_write_attribution_v2",
+        "case_id": "B02",
+        "correlation": {
+          "acceptance_run_id": "acc_99739f63b615",
+          "case_id": "B02",
+          "case_attempt": 1,
+          "turn_id": "B02.a1.t1",
+          "request_trace_id": "trace_851cbaa780f4",
+          "legacy_run_id": "",
+          "shadow_run_id": "run_481ae6296654",
+          "input_snapshot_hash": "bea936c04ce24f8f"
+        },
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "70a6ca32ba600aa2",
+            "session_id_hash": "3effc58ece28a5b4",
+            "turn_id": "B02.a1.t1",
+            "request_trace_id": "trace_851cbaa780f4",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "user",
+            "owner": "legacy",
+            "expected": true
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "2b07494252fd9d6d",
+            "session_id_hash": "3effc58ece28a5b4",
+            "turn_id": "B02.a1.t1",
+            "request_trace_id": "trace_851cbaa780f4",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "assistant",
+            "owner": "legacy",
+            "expected": true,
+            "assistant_logical_response_id": "099909b8674b7933"
+          }
+        ],
+        "pi_business_write_delta": 0,
+        "assistant_double_write_count": 0,
+        "unknown_owner_write_count": 0,
+        "other_case_write_count": 0,
+        "legacy_write_count": 2,
+        "system_write_count": 0
+      }
     },
     {
       "case_id": "B03",
-      "trace_id": "trace_49c06f92ae4e",
-      "legacy_run_id": null,
-      "pi_shadow_run_id": "run_5db855d23c70",
-      "target_session_id_hash": "8445e127a311c685",
+      "trace_id": "trace_89e6c46bef1b",
+      "legacy_run_id": "",
+      "pi_shadow_run_id": "run_43f39b8468d2",
+      "target_session_id_hash": "2daa5008021bcf46",
       "writes": [
         {
           "resource": "chat_messages",
@@ -179,14 +434,65 @@
         "chat_messages": 2,
         "context_version_delta": 0
       },
-      "pi_shadow_business_write_delta": 0
+      "pi_shadow_business_write_delta": 0,
+      "v2": {
+        "schema_version": "pi_shadow_write_attribution_v2",
+        "case_id": "B03",
+        "correlation": {
+          "acceptance_run_id": "acc_99739f63b615",
+          "case_id": "B03",
+          "case_attempt": 1,
+          "turn_id": "B03.a1.t1",
+          "request_trace_id": "trace_89e6c46bef1b",
+          "legacy_run_id": "",
+          "shadow_run_id": "run_43f39b8468d2",
+          "input_snapshot_hash": "3e6299454c566698"
+        },
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "258f6524e14105f9",
+            "session_id_hash": "2daa5008021bcf46",
+            "turn_id": "B03.a1.t1",
+            "request_trace_id": "trace_89e6c46bef1b",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "user",
+            "owner": "legacy",
+            "expected": true
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "e68e4a43fedc2faf",
+            "session_id_hash": "2daa5008021bcf46",
+            "turn_id": "B03.a1.t1",
+            "request_trace_id": "trace_89e6c46bef1b",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "assistant",
+            "owner": "legacy",
+            "expected": true,
+            "assistant_logical_response_id": "e8e26234ba6cf509"
+          }
+        ],
+        "pi_business_write_delta": 0,
+        "assistant_double_write_count": 0,
+        "unknown_owner_write_count": 0,
+        "other_case_write_count": 0,
+        "legacy_write_count": 2,
+        "system_write_count": 0
+      }
     },
     {
       "case_id": "B04",
-      "trace_id": "trace_686be8cba5ea",
-      "legacy_run_id": null,
-      "pi_shadow_run_id": "run_4d1b956c2e1d",
-      "target_session_id_hash": "af59226b8e058129",
+      "trace_id": "trace_8b82cf424411",
+      "legacy_run_id": "",
+      "pi_shadow_run_id": "run_26395de508b6",
+      "target_session_id_hash": "6bd305fb3f347827",
       "writes": [
         {
           "resource": "chat_messages",
@@ -209,14 +515,65 @@
         "chat_messages": 2,
         "context_version_delta": 0
       },
-      "pi_shadow_business_write_delta": 0
+      "pi_shadow_business_write_delta": 0,
+      "v2": {
+        "schema_version": "pi_shadow_write_attribution_v2",
+        "case_id": "B04",
+        "correlation": {
+          "acceptance_run_id": "acc_99739f63b615",
+          "case_id": "B04",
+          "case_attempt": 1,
+          "turn_id": "B04.a1.t1",
+          "request_trace_id": "trace_8b82cf424411",
+          "legacy_run_id": "",
+          "shadow_run_id": "run_26395de508b6",
+          "input_snapshot_hash": "296209df9a4b5dca"
+        },
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "e180b0a7f0c00be7",
+            "session_id_hash": "6bd305fb3f347827",
+            "turn_id": "B04.a1.t1",
+            "request_trace_id": "trace_8b82cf424411",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "user",
+            "owner": "legacy",
+            "expected": true
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "b3094030247ef726",
+            "session_id_hash": "6bd305fb3f347827",
+            "turn_id": "B04.a1.t1",
+            "request_trace_id": "trace_8b82cf424411",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "assistant",
+            "owner": "legacy",
+            "expected": true,
+            "assistant_logical_response_id": "4b5a5a489dbcef55"
+          }
+        ],
+        "pi_business_write_delta": 0,
+        "assistant_double_write_count": 0,
+        "unknown_owner_write_count": 0,
+        "other_case_write_count": 0,
+        "legacy_write_count": 2,
+        "system_write_count": 0
+      }
     },
     {
       "case_id": "B05",
-      "trace_id": "trace_b919a0eb3394",
-      "legacy_run_id": null,
-      "pi_shadow_run_id": "run_f39d1e080987",
-      "target_session_id_hash": "9c744aa87317698c",
+      "trace_id": "trace_880ce0963a4c",
+      "legacy_run_id": "",
+      "pi_shadow_run_id": "run_b4b317f7f20f",
+      "target_session_id_hash": "be562b0f1e86a186",
       "writes": [
         {
           "resource": "chat_messages",
@@ -239,14 +596,65 @@
         "chat_messages": 2,
         "context_version_delta": 0
       },
-      "pi_shadow_business_write_delta": 0
+      "pi_shadow_business_write_delta": 0,
+      "v2": {
+        "schema_version": "pi_shadow_write_attribution_v2",
+        "case_id": "B05",
+        "correlation": {
+          "acceptance_run_id": "acc_99739f63b615",
+          "case_id": "B05",
+          "case_attempt": 1,
+          "turn_id": "B05.a1.t1",
+          "request_trace_id": "trace_880ce0963a4c",
+          "legacy_run_id": "",
+          "shadow_run_id": "run_b4b317f7f20f",
+          "input_snapshot_hash": "f7cbf0f121f1849e"
+        },
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "b9504bf136f69289",
+            "session_id_hash": "be562b0f1e86a186",
+            "turn_id": "B05.a1.t1",
+            "request_trace_id": "trace_880ce0963a4c",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "user",
+            "owner": "legacy",
+            "expected": true
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "f5129de84209ba8d",
+            "session_id_hash": "be562b0f1e86a186",
+            "turn_id": "B05.a1.t1",
+            "request_trace_id": "trace_880ce0963a4c",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "assistant",
+            "owner": "legacy",
+            "expected": true,
+            "assistant_logical_response_id": "e4c77b6010cfde90"
+          }
+        ],
+        "pi_business_write_delta": 0,
+        "assistant_double_write_count": 0,
+        "unknown_owner_write_count": 0,
+        "other_case_write_count": 0,
+        "legacy_write_count": 2,
+        "system_write_count": 0
+      }
     },
     {
       "case_id": "B06",
-      "trace_id": "trace_ac9fa4343ce0",
-      "legacy_run_id": null,
-      "pi_shadow_run_id": "run_2ea3e82894f4",
-      "target_session_id_hash": "f65be6f02c688f17",
+      "trace_id": "trace_cbff9a2c9328",
+      "legacy_run_id": "",
+      "pi_shadow_run_id": "run_3401d94cad63",
+      "target_session_id_hash": "8daa8575d4153f62",
       "writes": [
         {
           "resource": "chat_messages",
@@ -269,14 +677,65 @@
         "chat_messages": 2,
         "context_version_delta": 0
       },
-      "pi_shadow_business_write_delta": 0
+      "pi_shadow_business_write_delta": 0,
+      "v2": {
+        "schema_version": "pi_shadow_write_attribution_v2",
+        "case_id": "B06",
+        "correlation": {
+          "acceptance_run_id": "acc_99739f63b615",
+          "case_id": "B06",
+          "case_attempt": 1,
+          "turn_id": "B06.a1.t1",
+          "request_trace_id": "trace_cbff9a2c9328",
+          "legacy_run_id": "",
+          "shadow_run_id": "run_3401d94cad63",
+          "input_snapshot_hash": "6a91281b33ce0fa6"
+        },
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "c5ea0aa246c48f02",
+            "session_id_hash": "8daa8575d4153f62",
+            "turn_id": "B06.a1.t1",
+            "request_trace_id": "trace_cbff9a2c9328",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "user",
+            "owner": "legacy",
+            "expected": true
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "0d8000d249c78236",
+            "session_id_hash": "8daa8575d4153f62",
+            "turn_id": "B06.a1.t1",
+            "request_trace_id": "trace_cbff9a2c9328",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "assistant",
+            "owner": "legacy",
+            "expected": true,
+            "assistant_logical_response_id": "3d599965ad712cfc"
+          }
+        ],
+        "pi_business_write_delta": 0,
+        "assistant_double_write_count": 0,
+        "unknown_owner_write_count": 0,
+        "other_case_write_count": 0,
+        "legacy_write_count": 2,
+        "system_write_count": 0
+      }
     },
     {
       "case_id": "B07",
-      "trace_id": "trace_23997c0b97c4",
-      "legacy_run_id": null,
-      "pi_shadow_run_id": "run_0b5841c89e6f",
-      "target_session_id_hash": "a515eb59c770c972",
+      "trace_id": "trace_f1e40b665464",
+      "legacy_run_id": "",
+      "pi_shadow_run_id": "run_94fcdbfb2e34",
+      "target_session_id_hash": "2a99e1cf6d3311af",
       "writes": [
         {
           "resource": "chat_messages",
@@ -299,14 +758,65 @@
         "chat_messages": 2,
         "context_version_delta": 0
       },
-      "pi_shadow_business_write_delta": 0
+      "pi_shadow_business_write_delta": 0,
+      "v2": {
+        "schema_version": "pi_shadow_write_attribution_v2",
+        "case_id": "B07",
+        "correlation": {
+          "acceptance_run_id": "acc_99739f63b615",
+          "case_id": "B07",
+          "case_attempt": 1,
+          "turn_id": "B07.a1.t1",
+          "request_trace_id": "trace_f1e40b665464",
+          "legacy_run_id": "",
+          "shadow_run_id": "run_94fcdbfb2e34",
+          "input_snapshot_hash": "071d6313f332ba44"
+        },
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "e8c7a528a865e061",
+            "session_id_hash": "2a99e1cf6d3311af",
+            "turn_id": "B07.a1.t1",
+            "request_trace_id": "trace_f1e40b665464",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "user",
+            "owner": "legacy",
+            "expected": true
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "8e6c29c4d3c117c1",
+            "session_id_hash": "2a99e1cf6d3311af",
+            "turn_id": "B07.a1.t1",
+            "request_trace_id": "trace_f1e40b665464",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "assistant",
+            "owner": "legacy",
+            "expected": true,
+            "assistant_logical_response_id": "5884c7f3c5bc06ed"
+          }
+        ],
+        "pi_business_write_delta": 0,
+        "assistant_double_write_count": 0,
+        "unknown_owner_write_count": 0,
+        "other_case_write_count": 0,
+        "legacy_write_count": 2,
+        "system_write_count": 0
+      }
     },
     {
       "case_id": "C01",
-      "trace_id": "trace_7c6259164d6e",
-      "legacy_run_id": null,
-      "pi_shadow_run_id": "run_c63ccdef4012",
-      "target_session_id_hash": "0af88b2f3d3ba714",
+      "trace_id": "trace_d6b01d68ef96",
+      "legacy_run_id": "",
+      "pi_shadow_run_id": "run_6700cfa2a240",
+      "target_session_id_hash": "cd1130eb263e3cc7",
       "writes": [
         {
           "resource": "chat_messages",
@@ -329,14 +839,65 @@
         "chat_messages": 2,
         "context_version_delta": 0
       },
-      "pi_shadow_business_write_delta": 0
+      "pi_shadow_business_write_delta": 0,
+      "v2": {
+        "schema_version": "pi_shadow_write_attribution_v2",
+        "case_id": "C01",
+        "correlation": {
+          "acceptance_run_id": "acc_99739f63b615",
+          "case_id": "C01",
+          "case_attempt": 1,
+          "turn_id": "C01.a1.t1",
+          "request_trace_id": "trace_d6b01d68ef96",
+          "legacy_run_id": "",
+          "shadow_run_id": "run_6700cfa2a240",
+          "input_snapshot_hash": "e235986658f62d57"
+        },
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "e870ce5368981ad3",
+            "session_id_hash": "cd1130eb263e3cc7",
+            "turn_id": "C01.a1.t1",
+            "request_trace_id": "trace_d6b01d68ef96",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "user",
+            "owner": "legacy",
+            "expected": true
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "e742b2536aac206d",
+            "session_id_hash": "cd1130eb263e3cc7",
+            "turn_id": "C01.a1.t1",
+            "request_trace_id": "trace_d6b01d68ef96",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "assistant",
+            "owner": "legacy",
+            "expected": true,
+            "assistant_logical_response_id": "31c2293eccff5531"
+          }
+        ],
+        "pi_business_write_delta": 0,
+        "assistant_double_write_count": 0,
+        "unknown_owner_write_count": 0,
+        "other_case_write_count": 0,
+        "legacy_write_count": 2,
+        "system_write_count": 0
+      }
     },
     {
       "case_id": "C02",
-      "trace_id": "trace_45d91d73352d",
-      "legacy_run_id": null,
-      "pi_shadow_run_id": "run_dadae13b47b2",
-      "target_session_id_hash": "bcadafd5127cc85c",
+      "trace_id": "trace_fa49a7e3fc23",
+      "legacy_run_id": "",
+      "pi_shadow_run_id": "run_b1640878aeb2",
+      "target_session_id_hash": "faccffe163458531",
       "writes": [
         {
           "resource": "chat_messages",
@@ -359,14 +920,65 @@
         "chat_messages": 2,
         "context_version_delta": 0
       },
-      "pi_shadow_business_write_delta": 0
+      "pi_shadow_business_write_delta": 0,
+      "v2": {
+        "schema_version": "pi_shadow_write_attribution_v2",
+        "case_id": "C02",
+        "correlation": {
+          "acceptance_run_id": "acc_99739f63b615",
+          "case_id": "C02",
+          "case_attempt": 1,
+          "turn_id": "C02.a1.t1",
+          "request_trace_id": "trace_fa49a7e3fc23",
+          "legacy_run_id": "",
+          "shadow_run_id": "run_b1640878aeb2",
+          "input_snapshot_hash": "659c921ea25317ec"
+        },
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "393b1e5c059a1dff",
+            "session_id_hash": "faccffe163458531",
+            "turn_id": "C02.a1.t1",
+            "request_trace_id": "trace_fa49a7e3fc23",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "user",
+            "owner": "legacy",
+            "expected": true
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "564e4a0e5ae0f5f4",
+            "session_id_hash": "faccffe163458531",
+            "turn_id": "C02.a1.t1",
+            "request_trace_id": "trace_fa49a7e3fc23",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "assistant",
+            "owner": "legacy",
+            "expected": true,
+            "assistant_logical_response_id": "b6e12323f5d36fa6"
+          }
+        ],
+        "pi_business_write_delta": 0,
+        "assistant_double_write_count": 0,
+        "unknown_owner_write_count": 0,
+        "other_case_write_count": 0,
+        "legacy_write_count": 2,
+        "system_write_count": 0
+      }
     },
     {
       "case_id": "C03",
-      "trace_id": "trace_92441b5491c3",
-      "legacy_run_id": null,
-      "pi_shadow_run_id": "run_ccff4a5015b0",
-      "target_session_id_hash": "581ccb312f79d34a",
+      "trace_id": "trace_779318f40cd8",
+      "legacy_run_id": "",
+      "pi_shadow_run_id": "run_42fdc6cc6d72",
+      "target_session_id_hash": "da6ac5eaca1a6c11",
       "writes": [
         {
           "resource": "chat_messages",
@@ -389,14 +1001,65 @@
         "chat_messages": 2,
         "context_version_delta": 0
       },
-      "pi_shadow_business_write_delta": 0
+      "pi_shadow_business_write_delta": 0,
+      "v2": {
+        "schema_version": "pi_shadow_write_attribution_v2",
+        "case_id": "C03",
+        "correlation": {
+          "acceptance_run_id": "acc_99739f63b615",
+          "case_id": "C03",
+          "case_attempt": 1,
+          "turn_id": "C03.a1.t1",
+          "request_trace_id": "trace_779318f40cd8",
+          "legacy_run_id": "",
+          "shadow_run_id": "run_42fdc6cc6d72",
+          "input_snapshot_hash": "0f9e47739974ae14"
+        },
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "f22ee43401260b8b",
+            "session_id_hash": "da6ac5eaca1a6c11",
+            "turn_id": "C03.a1.t1",
+            "request_trace_id": "trace_779318f40cd8",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "user",
+            "owner": "legacy",
+            "expected": true
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "92a7e7b434acf330",
+            "session_id_hash": "da6ac5eaca1a6c11",
+            "turn_id": "C03.a1.t1",
+            "request_trace_id": "trace_779318f40cd8",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "assistant",
+            "owner": "legacy",
+            "expected": true,
+            "assistant_logical_response_id": "7b7b0d167bad7c2a"
+          }
+        ],
+        "pi_business_write_delta": 0,
+        "assistant_double_write_count": 0,
+        "unknown_owner_write_count": 0,
+        "other_case_write_count": 0,
+        "legacy_write_count": 2,
+        "system_write_count": 0
+      }
     },
     {
       "case_id": "C04",
-      "trace_id": "trace_a32451501f0d",
-      "legacy_run_id": null,
-      "pi_shadow_run_id": null,
-      "target_session_id_hash": "e57102e7a2ee8a31",
+      "trace_id": "trace_10a4e440741f",
+      "legacy_run_id": "",
+      "pi_shadow_run_id": "run_44f5ed59ba6e",
+      "target_session_id_hash": "1eb54fac4f095dfa",
       "writes": [
         {
           "resource": "chat_messages",
@@ -419,14 +1082,65 @@
         "chat_messages": 2,
         "context_version_delta": 0
       },
-      "pi_shadow_business_write_delta": 0
+      "pi_shadow_business_write_delta": 0,
+      "v2": {
+        "schema_version": "pi_shadow_write_attribution_v2",
+        "case_id": "C04",
+        "correlation": {
+          "acceptance_run_id": "acc_99739f63b615",
+          "case_id": "C04",
+          "case_attempt": 1,
+          "turn_id": "C04.a1.t1",
+          "request_trace_id": "trace_10a4e440741f",
+          "legacy_run_id": "",
+          "shadow_run_id": "run_44f5ed59ba6e",
+          "input_snapshot_hash": "fce0145f62178e80"
+        },
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "eae49ba8b8564a65",
+            "session_id_hash": "1eb54fac4f095dfa",
+            "turn_id": "C04.a1.t1",
+            "request_trace_id": "trace_10a4e440741f",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "user",
+            "owner": "legacy",
+            "expected": true
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "d116c02e20c04da7",
+            "session_id_hash": "1eb54fac4f095dfa",
+            "turn_id": "C04.a1.t1",
+            "request_trace_id": "trace_10a4e440741f",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "assistant",
+            "owner": "legacy",
+            "expected": true,
+            "assistant_logical_response_id": "af8d409d075e7fee"
+          }
+        ],
+        "pi_business_write_delta": 0,
+        "assistant_double_write_count": 0,
+        "unknown_owner_write_count": 0,
+        "other_case_write_count": 0,
+        "legacy_write_count": 2,
+        "system_write_count": 0
+      }
     },
     {
       "case_id": "C05",
-      "trace_id": "trace_ffe036f38ec5",
-      "legacy_run_id": null,
-      "pi_shadow_run_id": null,
-      "target_session_id_hash": "f26dd9541f08737f",
+      "trace_id": "trace_7c7bd26633f4",
+      "legacy_run_id": "",
+      "pi_shadow_run_id": "run_ebfb7294f871",
+      "target_session_id_hash": "35428ea95b5a03d0",
       "writes": [
         {
           "resource": "chat_messages",
@@ -449,44 +1163,65 @@
         "chat_messages": 2,
         "context_version_delta": 0
       },
-      "pi_shadow_business_write_delta": 0
-    },
-    {
-      "case_id": "C06",
-      "trace_id": "trace_1f4045ad0647",
-      "legacy_run_id": null,
-      "pi_shadow_run_id": "run_d08e034a0b10",
-      "target_session_id_hash": "5f18f28b601a25cc",
-      "writes": [
-        {
-          "resource": "chat_messages",
-          "operation": "insert",
-          "owner": "legacy",
-          "expected": true,
-          "call_site": "chat_service/orchestrator message persistence",
-          "ordinal": 1
+      "pi_shadow_business_write_delta": 0,
+      "v2": {
+        "schema_version": "pi_shadow_write_attribution_v2",
+        "case_id": "C05",
+        "correlation": {
+          "acceptance_run_id": "acc_99739f63b615",
+          "case_id": "C05",
+          "case_attempt": 1,
+          "turn_id": "C05.a1.t1",
+          "request_trace_id": "trace_7c7bd26633f4",
+          "legacy_run_id": "",
+          "shadow_run_id": "run_ebfb7294f871",
+          "input_snapshot_hash": "c52344342a0369cc"
         },
-        {
-          "resource": "chat_messages",
-          "operation": "insert",
-          "owner": "legacy",
-          "expected": true,
-          "call_site": "chat_service/orchestrator message persistence",
-          "ordinal": 2
-        }
-      ],
-      "legacy_expected_writes": {
-        "chat_messages": 2,
-        "context_version_delta": 0
-      },
-      "pi_shadow_business_write_delta": 0
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "399984215bfa8748",
+            "session_id_hash": "35428ea95b5a03d0",
+            "turn_id": "C05.a1.t1",
+            "request_trace_id": "trace_7c7bd26633f4",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "user",
+            "owner": "legacy",
+            "expected": true
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "eb0603e4aa6a97c0",
+            "session_id_hash": "35428ea95b5a03d0",
+            "turn_id": "C05.a1.t1",
+            "request_trace_id": "trace_7c7bd26633f4",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "assistant",
+            "owner": "legacy",
+            "expected": true,
+            "assistant_logical_response_id": "93cd609dacb25a3b"
+          }
+        ],
+        "pi_business_write_delta": 0,
+        "assistant_double_write_count": 0,
+        "unknown_owner_write_count": 0,
+        "other_case_write_count": 0,
+        "legacy_write_count": 2,
+        "system_write_count": 0
+      }
     },
     {
       "case_id": "D01",
-      "trace_id": "trace_4e5280f74e1a",
-      "legacy_run_id": null,
-      "pi_shadow_run_id": null,
-      "target_session_id_hash": "738854469e7a512d",
+      "trace_id": "trace_284e85d4dd62",
+      "legacy_run_id": "",
+      "pi_shadow_run_id": "run_2d988c0c0ceb",
+      "target_session_id_hash": "93b390527e948cc5",
       "writes": [
         {
           "resource": "chat_messages",
@@ -503,28 +1238,71 @@
           "expected": true,
           "call_site": "chat_service/orchestrator message persistence",
           "ordinal": 2
-        },
-        {
-          "resource": "chat_messages",
-          "operation": "insert",
-          "owner": "unknown",
-          "expected": false,
-          "call_site": "unknown extra message write",
-          "count": 2
         }
       ],
       "legacy_expected_writes": {
         "chat_messages": 2,
         "context_version_delta": 0
       },
-      "pi_shadow_business_write_delta": 1
+      "pi_shadow_business_write_delta": 0,
+      "v2": {
+        "schema_version": "pi_shadow_write_attribution_v2",
+        "case_id": "D01",
+        "correlation": {
+          "acceptance_run_id": "acc_99739f63b615",
+          "case_id": "D01",
+          "case_attempt": 1,
+          "turn_id": "D01.a1.t1",
+          "request_trace_id": "trace_284e85d4dd62",
+          "legacy_run_id": "",
+          "shadow_run_id": "run_2d988c0c0ceb",
+          "input_snapshot_hash": "7fe50c85784c99d7"
+        },
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "d91c2aab8422215a",
+            "session_id_hash": "93b390527e948cc5",
+            "turn_id": "D01.a1.t1",
+            "request_trace_id": "trace_284e85d4dd62",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "user",
+            "owner": "legacy",
+            "expected": true
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "33040b08b853113b",
+            "session_id_hash": "93b390527e948cc5",
+            "turn_id": "D01.a1.t1",
+            "request_trace_id": "trace_284e85d4dd62",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "assistant",
+            "owner": "legacy",
+            "expected": true,
+            "assistant_logical_response_id": "07ff4eb069ab8acc"
+          }
+        ],
+        "pi_business_write_delta": 0,
+        "assistant_double_write_count": 0,
+        "unknown_owner_write_count": 0,
+        "other_case_write_count": 0,
+        "legacy_write_count": 2,
+        "system_write_count": 0
+      }
     },
     {
       "case_id": "D02",
-      "trace_id": "trace_5104692a2c7e",
-      "legacy_run_id": null,
-      "pi_shadow_run_id": null,
-      "target_session_id_hash": "bd2d99415e75376d",
+      "trace_id": "trace_9dc339082ce0",
+      "legacy_run_id": "",
+      "pi_shadow_run_id": "run_c037bbdc23f0",
+      "target_session_id_hash": "9cfdf8ce54193f61",
       "writes": [
         {
           "resource": "chat_messages",
@@ -541,28 +1319,71 @@
           "expected": true,
           "call_site": "chat_service/orchestrator message persistence",
           "ordinal": 2
-        },
-        {
-          "resource": "chat_messages",
-          "operation": "insert",
-          "owner": "unknown",
-          "expected": false,
-          "call_site": "unknown extra message write",
-          "count": 2
         }
       ],
       "legacy_expected_writes": {
         "chat_messages": 2,
         "context_version_delta": 0
       },
-      "pi_shadow_business_write_delta": 1
+      "pi_shadow_business_write_delta": 0,
+      "v2": {
+        "schema_version": "pi_shadow_write_attribution_v2",
+        "case_id": "D02",
+        "correlation": {
+          "acceptance_run_id": "acc_99739f63b615",
+          "case_id": "D02",
+          "case_attempt": 1,
+          "turn_id": "D02.a1.t1",
+          "request_trace_id": "trace_9dc339082ce0",
+          "legacy_run_id": "",
+          "shadow_run_id": "run_c037bbdc23f0",
+          "input_snapshot_hash": "b4b08d015f08ef16"
+        },
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "e5dfa184cf6439f3",
+            "session_id_hash": "9cfdf8ce54193f61",
+            "turn_id": "D02.a1.t1",
+            "request_trace_id": "trace_9dc339082ce0",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "user",
+            "owner": "legacy",
+            "expected": true
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "3a52fc3714ee2241",
+            "session_id_hash": "9cfdf8ce54193f61",
+            "turn_id": "D02.a1.t1",
+            "request_trace_id": "trace_9dc339082ce0",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "assistant",
+            "owner": "legacy",
+            "expected": true,
+            "assistant_logical_response_id": "ebd8c659aacd66ee"
+          }
+        ],
+        "pi_business_write_delta": 0,
+        "assistant_double_write_count": 0,
+        "unknown_owner_write_count": 0,
+        "other_case_write_count": 0,
+        "legacy_write_count": 2,
+        "system_write_count": 0
+      }
     },
     {
       "case_id": "D03",
-      "trace_id": "trace_c0b860f80c23",
-      "legacy_run_id": null,
-      "pi_shadow_run_id": null,
-      "target_session_id_hash": "abe875e06435b373",
+      "trace_id": "trace_67dbc9aed13d",
+      "legacy_run_id": "",
+      "pi_shadow_run_id": "run_dac9f735a684",
+      "target_session_id_hash": "4a3daccdc6b38b7e",
       "writes": [
         {
           "resource": "chat_messages",
@@ -579,28 +1400,71 @@
           "expected": true,
           "call_site": "chat_service/orchestrator message persistence",
           "ordinal": 2
-        },
-        {
-          "resource": "chat_messages",
-          "operation": "insert",
-          "owner": "unknown",
-          "expected": false,
-          "call_site": "unknown extra message write",
-          "count": 3
         }
       ],
       "legacy_expected_writes": {
         "chat_messages": 2,
         "context_version_delta": 0
       },
-      "pi_shadow_business_write_delta": 1
+      "pi_shadow_business_write_delta": 0,
+      "v2": {
+        "schema_version": "pi_shadow_write_attribution_v2",
+        "case_id": "D03",
+        "correlation": {
+          "acceptance_run_id": "acc_99739f63b615",
+          "case_id": "D03",
+          "case_attempt": 1,
+          "turn_id": "D03.a1.t1",
+          "request_trace_id": "trace_67dbc9aed13d",
+          "legacy_run_id": "",
+          "shadow_run_id": "run_dac9f735a684",
+          "input_snapshot_hash": "3df320d3bfebc8af"
+        },
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "12f057f954051c4b",
+            "session_id_hash": "4a3daccdc6b38b7e",
+            "turn_id": "D03.a1.t1",
+            "request_trace_id": "trace_67dbc9aed13d",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "user",
+            "owner": "legacy",
+            "expected": true
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "07f013dd5524fa59",
+            "session_id_hash": "4a3daccdc6b38b7e",
+            "turn_id": "D03.a1.t1",
+            "request_trace_id": "trace_67dbc9aed13d",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "assistant",
+            "owner": "legacy",
+            "expected": true,
+            "assistant_logical_response_id": "bbdc6087fe84d38f"
+          }
+        ],
+        "pi_business_write_delta": 0,
+        "assistant_double_write_count": 0,
+        "unknown_owner_write_count": 0,
+        "other_case_write_count": 0,
+        "legacy_write_count": 2,
+        "system_write_count": 0
+      }
     },
     {
       "case_id": "D04",
-      "trace_id": "trace_c9d33dcd3ade",
-      "legacy_run_id": null,
-      "pi_shadow_run_id": "run_be823739a023",
-      "target_session_id_hash": "1ea0f76a4c64d435",
+      "trace_id": "trace_c1532969df9a",
+      "legacy_run_id": "",
+      "pi_shadow_run_id": "run_5560c0562a66",
+      "target_session_id_hash": "36bdd269df9afea1",
       "writes": [
         {
           "resource": "chat_messages",
@@ -617,28 +1481,71 @@
           "expected": true,
           "call_site": "chat_service/orchestrator message persistence",
           "ordinal": 2
-        },
-        {
-          "resource": "chat_messages",
-          "operation": "insert",
-          "owner": "unknown",
-          "expected": false,
-          "call_site": "unknown extra message write",
-          "count": 1
         }
       ],
       "legacy_expected_writes": {
         "chat_messages": 2,
         "context_version_delta": 0
       },
-      "pi_shadow_business_write_delta": 1
+      "pi_shadow_business_write_delta": 0,
+      "v2": {
+        "schema_version": "pi_shadow_write_attribution_v2",
+        "case_id": "D04",
+        "correlation": {
+          "acceptance_run_id": "acc_99739f63b615",
+          "case_id": "D04",
+          "case_attempt": 1,
+          "turn_id": "D04.a1.t1",
+          "request_trace_id": "trace_c1532969df9a",
+          "legacy_run_id": "",
+          "shadow_run_id": "run_5560c0562a66",
+          "input_snapshot_hash": "92b46554fa8209d2"
+        },
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "c2cdd28de0fd4ff4",
+            "session_id_hash": "36bdd269df9afea1",
+            "turn_id": "D04.a1.t1",
+            "request_trace_id": "trace_c1532969df9a",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "user",
+            "owner": "legacy",
+            "expected": true
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "ddef802c6be7e221",
+            "session_id_hash": "36bdd269df9afea1",
+            "turn_id": "D04.a1.t1",
+            "request_trace_id": "trace_c1532969df9a",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "assistant",
+            "owner": "legacy",
+            "expected": true,
+            "assistant_logical_response_id": "4f8d6d10af126564"
+          }
+        ],
+        "pi_business_write_delta": 0,
+        "assistant_double_write_count": 0,
+        "unknown_owner_write_count": 0,
+        "other_case_write_count": 0,
+        "legacy_write_count": 2,
+        "system_write_count": 0
+      }
     },
     {
       "case_id": "D05",
-      "trace_id": "trace_975aa35b8550",
-      "legacy_run_id": null,
-      "pi_shadow_run_id": null,
-      "target_session_id_hash": "a128d861e6fecd57",
+      "trace_id": "trace_6bedb54b34cd",
+      "legacy_run_id": "",
+      "pi_shadow_run_id": "run_20bb2d362758",
+      "target_session_id_hash": "f88c03ce26b9b588",
       "writes": [
         {
           "resource": "chat_messages",
@@ -655,28 +1562,71 @@
           "expected": true,
           "call_site": "chat_service/orchestrator message persistence",
           "ordinal": 2
-        },
-        {
-          "resource": "chat_messages",
-          "operation": "insert",
-          "owner": "unknown",
-          "expected": false,
-          "call_site": "unknown extra message write",
-          "count": 2
         }
       ],
       "legacy_expected_writes": {
         "chat_messages": 2,
         "context_version_delta": 0
       },
-      "pi_shadow_business_write_delta": 1
+      "pi_shadow_business_write_delta": 0,
+      "v2": {
+        "schema_version": "pi_shadow_write_attribution_v2",
+        "case_id": "D05",
+        "correlation": {
+          "acceptance_run_id": "acc_99739f63b615",
+          "case_id": "D05",
+          "case_attempt": 1,
+          "turn_id": "D05.a1.t1",
+          "request_trace_id": "trace_6bedb54b34cd",
+          "legacy_run_id": "",
+          "shadow_run_id": "run_20bb2d362758",
+          "input_snapshot_hash": "84e6d11fd14eea27"
+        },
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "f4594df947126ec6",
+            "session_id_hash": "f88c03ce26b9b588",
+            "turn_id": "D05.a1.t1",
+            "request_trace_id": "trace_6bedb54b34cd",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "user",
+            "owner": "legacy",
+            "expected": true
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "89c8be0f025bd088",
+            "session_id_hash": "f88c03ce26b9b588",
+            "turn_id": "D05.a1.t1",
+            "request_trace_id": "trace_6bedb54b34cd",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "assistant",
+            "owner": "legacy",
+            "expected": true,
+            "assistant_logical_response_id": "fe412d6c318911ad"
+          }
+        ],
+        "pi_business_write_delta": 0,
+        "assistant_double_write_count": 0,
+        "unknown_owner_write_count": 0,
+        "other_case_write_count": 0,
+        "legacy_write_count": 2,
+        "system_write_count": 0
+      }
     },
     {
       "case_id": "E01",
-      "trace_id": "trace_131cba176e78",
-      "legacy_run_id": null,
-      "pi_shadow_run_id": "run_993a76675048",
-      "target_session_id_hash": "12765fdc9231b948",
+      "trace_id": "trace_c57cb510d697",
+      "legacy_run_id": "",
+      "pi_shadow_run_id": "run_06a8379e3d09",
+      "target_session_id_hash": "55f36c67c8193968",
       "writes": [
         {
           "resource": "chat_messages",
@@ -693,28 +1643,71 @@
           "expected": true,
           "call_site": "chat_service/orchestrator message persistence",
           "ordinal": 2
-        },
-        {
-          "resource": "chat_messages",
-          "operation": "insert",
-          "owner": "unknown",
-          "expected": false,
-          "call_site": "unknown extra message write",
-          "count": 2
         }
       ],
       "legacy_expected_writes": {
         "chat_messages": 2,
         "context_version_delta": 0
       },
-      "pi_shadow_business_write_delta": 1
+      "pi_shadow_business_write_delta": 0,
+      "v2": {
+        "schema_version": "pi_shadow_write_attribution_v2",
+        "case_id": "E01",
+        "correlation": {
+          "acceptance_run_id": "acc_99739f63b615",
+          "case_id": "E01",
+          "case_attempt": 1,
+          "turn_id": "E01.a1.t1",
+          "request_trace_id": "trace_c57cb510d697",
+          "legacy_run_id": "",
+          "shadow_run_id": "run_06a8379e3d09",
+          "input_snapshot_hash": "cb1275a78d374fb9"
+        },
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "33af2e8f9b3eec28",
+            "session_id_hash": "55f36c67c8193968",
+            "turn_id": "E01.a1.t1",
+            "request_trace_id": "trace_c57cb510d697",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "user",
+            "owner": "legacy",
+            "expected": true
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "33ffb2c2c7bd5439",
+            "session_id_hash": "55f36c67c8193968",
+            "turn_id": "E01.a1.t1",
+            "request_trace_id": "trace_c57cb510d697",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "assistant",
+            "owner": "legacy",
+            "expected": true,
+            "assistant_logical_response_id": "e868ab11d99e33f6"
+          }
+        ],
+        "pi_business_write_delta": 0,
+        "assistant_double_write_count": 0,
+        "unknown_owner_write_count": 0,
+        "other_case_write_count": 0,
+        "legacy_write_count": 2,
+        "system_write_count": 0
+      }
     },
     {
       "case_id": "E02",
-      "trace_id": "trace_270686c3ff7e",
-      "legacy_run_id": null,
-      "pi_shadow_run_id": "run_7b055ed1bf97",
-      "target_session_id_hash": "a9537195a3a0886f",
+      "trace_id": "trace_784fe24486f7",
+      "legacy_run_id": "",
+      "pi_shadow_run_id": "run_f53c7082ee50",
+      "target_session_id_hash": "37b474c88dfc9d6e",
       "writes": [
         {
           "resource": "chat_messages",
@@ -731,66 +1724,71 @@
           "expected": true,
           "call_site": "chat_service/orchestrator message persistence",
           "ordinal": 2
-        },
-        {
-          "resource": "chat_messages",
-          "operation": "insert",
-          "owner": "unknown",
-          "expected": false,
-          "call_site": "unknown extra message write",
-          "count": 2
         }
       ],
       "legacy_expected_writes": {
         "chat_messages": 2,
         "context_version_delta": 0
       },
-      "pi_shadow_business_write_delta": 1
-    },
-    {
-      "case_id": "F01",
-      "trace_id": "trace_a155cb0efb21",
-      "legacy_run_id": null,
-      "pi_shadow_run_id": "run_c3be8ac11dca",
-      "target_session_id_hash": "911dbb86568707cd",
-      "writes": [
-        {
-          "resource": "chat_messages",
-          "operation": "insert",
-          "owner": "legacy",
-          "expected": true,
-          "call_site": "chat_service/orchestrator message persistence",
-          "ordinal": 1
+      "pi_shadow_business_write_delta": 0,
+      "v2": {
+        "schema_version": "pi_shadow_write_attribution_v2",
+        "case_id": "E02",
+        "correlation": {
+          "acceptance_run_id": "acc_99739f63b615",
+          "case_id": "E02",
+          "case_attempt": 1,
+          "turn_id": "E02.a1.t1",
+          "request_trace_id": "trace_784fe24486f7",
+          "legacy_run_id": "",
+          "shadow_run_id": "run_f53c7082ee50",
+          "input_snapshot_hash": "7d18a576221a9e63"
         },
-        {
-          "resource": "chat_messages",
-          "operation": "insert",
-          "owner": "legacy",
-          "expected": true,
-          "call_site": "chat_service/orchestrator message persistence",
-          "ordinal": 2
-        },
-        {
-          "resource": "chat_messages",
-          "operation": "insert",
-          "owner": "unknown",
-          "expected": false,
-          "call_site": "unknown extra message write",
-          "count": 1
-        }
-      ],
-      "legacy_expected_writes": {
-        "chat_messages": 2,
-        "context_version_delta": 0
-      },
-      "pi_shadow_business_write_delta": 1
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "d4d859795917940c",
+            "session_id_hash": "37b474c88dfc9d6e",
+            "turn_id": "E02.a1.t1",
+            "request_trace_id": "trace_784fe24486f7",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "user",
+            "owner": "legacy",
+            "expected": true
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "b1f723ee1db8f3ea",
+            "session_id_hash": "37b474c88dfc9d6e",
+            "turn_id": "E02.a1.t1",
+            "request_trace_id": "trace_784fe24486f7",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "assistant",
+            "owner": "legacy",
+            "expected": true,
+            "assistant_logical_response_id": "1ee78cd43be584c5"
+          }
+        ],
+        "pi_business_write_delta": 0,
+        "assistant_double_write_count": 0,
+        "unknown_owner_write_count": 0,
+        "other_case_write_count": 0,
+        "legacy_write_count": 2,
+        "system_write_count": 0
+      }
     },
     {
       "case_id": "F02",
-      "trace_id": "trace_dfb4e48a245a",
-      "legacy_run_id": null,
-      "pi_shadow_run_id": "run_4dd6bd45a948",
-      "target_session_id_hash": "c758a1c44d802342",
+      "trace_id": "trace_6c9d2c999521",
+      "legacy_run_id": "",
+      "pi_shadow_run_id": "run_ededf5a5d3e3",
+      "target_session_id_hash": "6e0746dad5de9b18",
       "writes": [
         {
           "resource": "chat_messages",
@@ -813,52 +1811,65 @@
         "chat_messages": 2,
         "context_version_delta": 0
       },
-      "pi_shadow_business_write_delta": 0
-    },
-    {
-      "case_id": "F03",
-      "trace_id": "trace_4c2f722e0079",
-      "legacy_run_id": null,
-      "pi_shadow_run_id": "run_4523d7a52812",
-      "target_session_id_hash": "138d93ebd2dedfda",
-      "writes": [
-        {
-          "resource": "chat_messages",
-          "operation": "insert",
-          "owner": "legacy",
-          "expected": true,
-          "call_site": "chat_service/orchestrator message persistence",
-          "ordinal": 1
+      "pi_shadow_business_write_delta": 0,
+      "v2": {
+        "schema_version": "pi_shadow_write_attribution_v2",
+        "case_id": "F02",
+        "correlation": {
+          "acceptance_run_id": "acc_99739f63b615",
+          "case_id": "F02",
+          "case_attempt": 1,
+          "turn_id": "F02.a1.t1",
+          "request_trace_id": "trace_6c9d2c999521",
+          "legacy_run_id": "",
+          "shadow_run_id": "run_ededf5a5d3e3",
+          "input_snapshot_hash": "24d56d96a1839206"
         },
-        {
-          "resource": "chat_messages",
-          "operation": "insert",
-          "owner": "legacy",
-          "expected": true,
-          "call_site": "chat_service/orchestrator message persistence",
-          "ordinal": 2
-        },
-        {
-          "resource": "chat_messages",
-          "operation": "insert",
-          "owner": "unknown",
-          "expected": false,
-          "call_site": "unknown extra message write",
-          "count": 2
-        }
-      ],
-      "legacy_expected_writes": {
-        "chat_messages": 2,
-        "context_version_delta": 0
-      },
-      "pi_shadow_business_write_delta": 1
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "2db5da5ccde9122b",
+            "session_id_hash": "6e0746dad5de9b18",
+            "turn_id": "F02.a1.t1",
+            "request_trace_id": "trace_6c9d2c999521",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "user",
+            "owner": "legacy",
+            "expected": true
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "43d9da43ba120997",
+            "session_id_hash": "6e0746dad5de9b18",
+            "turn_id": "F02.a1.t1",
+            "request_trace_id": "trace_6c9d2c999521",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "assistant",
+            "owner": "legacy",
+            "expected": true,
+            "assistant_logical_response_id": "3a1f6d351409e0a8"
+          }
+        ],
+        "pi_business_write_delta": 0,
+        "assistant_double_write_count": 0,
+        "unknown_owner_write_count": 0,
+        "other_case_write_count": 0,
+        "legacy_write_count": 2,
+        "system_write_count": 0
+      }
     },
     {
       "case_id": "F04",
-      "trace_id": "trace_048a787027a8",
-      "legacy_run_id": null,
-      "pi_shadow_run_id": "run_120575c6e3ce",
-      "target_session_id_hash": "5734db6db2b1980b",
+      "trace_id": "trace_ce37fb693a51",
+      "legacy_run_id": "",
+      "pi_shadow_run_id": "run_99e84fbfca3b",
+      "target_session_id_hash": "d6da285bdc17f1f7",
       "writes": [
         {
           "resource": "chat_messages",
@@ -875,28 +1886,71 @@
           "expected": true,
           "call_site": "chat_service/orchestrator message persistence",
           "ordinal": 2
-        },
-        {
-          "resource": "chat_messages",
-          "operation": "insert",
-          "owner": "unknown",
-          "expected": false,
-          "call_site": "unknown extra message write",
-          "count": 1
         }
       ],
       "legacy_expected_writes": {
         "chat_messages": 2,
         "context_version_delta": 0
       },
-      "pi_shadow_business_write_delta": 1
+      "pi_shadow_business_write_delta": 0,
+      "v2": {
+        "schema_version": "pi_shadow_write_attribution_v2",
+        "case_id": "F04",
+        "correlation": {
+          "acceptance_run_id": "acc_99739f63b615",
+          "case_id": "F04",
+          "case_attempt": 1,
+          "turn_id": "F04.a1.t1",
+          "request_trace_id": "trace_ce37fb693a51",
+          "legacy_run_id": "",
+          "shadow_run_id": "run_99e84fbfca3b",
+          "input_snapshot_hash": "44b5d783bc68d827"
+        },
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "ff5e27f26953ab84",
+            "session_id_hash": "d6da285bdc17f1f7",
+            "turn_id": "F04.a1.t1",
+            "request_trace_id": "trace_ce37fb693a51",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "user",
+            "owner": "legacy",
+            "expected": true
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "9774c8f3c617dbba",
+            "session_id_hash": "d6da285bdc17f1f7",
+            "turn_id": "F04.a1.t1",
+            "request_trace_id": "trace_ce37fb693a51",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "assistant",
+            "owner": "legacy",
+            "expected": true,
+            "assistant_logical_response_id": "1ad311c381950af6"
+          }
+        ],
+        "pi_business_write_delta": 0,
+        "assistant_double_write_count": 0,
+        "unknown_owner_write_count": 0,
+        "other_case_write_count": 0,
+        "legacy_write_count": 2,
+        "system_write_count": 0
+      }
     },
     {
       "case_id": "F05",
-      "trace_id": "trace_28b90c539e86",
-      "legacy_run_id": null,
-      "pi_shadow_run_id": null,
-      "target_session_id_hash": "afe4ea38291807c0",
+      "trace_id": "trace_e080fc23af9a",
+      "legacy_run_id": "",
+      "pi_shadow_run_id": "run_928bd650d0b8",
+      "target_session_id_hash": "bab0ded082d37b16",
       "writes": [
         {
           "resource": "chat_messages",
@@ -913,66 +1967,71 @@
           "expected": true,
           "call_site": "chat_service/orchestrator message persistence",
           "ordinal": 2
-        },
-        {
-          "resource": "chat_messages",
-          "operation": "insert",
-          "owner": "unknown",
-          "expected": false,
-          "call_site": "unknown extra message write",
-          "count": 1
         }
       ],
       "legacy_expected_writes": {
         "chat_messages": 2,
         "context_version_delta": 0
       },
-      "pi_shadow_business_write_delta": 1
-    },
-    {
-      "case_id": "F06",
-      "trace_id": "trace_8f41c9c96bf9",
-      "legacy_run_id": null,
-      "pi_shadow_run_id": "run_3c1c540c12a0",
-      "target_session_id_hash": "803d6362906e28a0",
-      "writes": [
-        {
-          "resource": "chat_messages",
-          "operation": "insert",
-          "owner": "legacy",
-          "expected": true,
-          "call_site": "chat_service/orchestrator message persistence",
-          "ordinal": 1
+      "pi_shadow_business_write_delta": 0,
+      "v2": {
+        "schema_version": "pi_shadow_write_attribution_v2",
+        "case_id": "F05",
+        "correlation": {
+          "acceptance_run_id": "acc_99739f63b615",
+          "case_id": "F05",
+          "case_attempt": 1,
+          "turn_id": "F05.a1.t1",
+          "request_trace_id": "trace_e080fc23af9a",
+          "legacy_run_id": "",
+          "shadow_run_id": "run_928bd650d0b8",
+          "input_snapshot_hash": "27c4d2581ca1a58c"
         },
-        {
-          "resource": "chat_messages",
-          "operation": "insert",
-          "owner": "legacy",
-          "expected": true,
-          "call_site": "chat_service/orchestrator message persistence",
-          "ordinal": 2
-        },
-        {
-          "resource": "chat_messages",
-          "operation": "insert",
-          "owner": "unknown",
-          "expected": false,
-          "call_site": "unknown extra message write",
-          "count": 2
-        }
-      ],
-      "legacy_expected_writes": {
-        "chat_messages": 2,
-        "context_version_delta": 0
-      },
-      "pi_shadow_business_write_delta": 1
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "ff0aa49d772565d7",
+            "session_id_hash": "bab0ded082d37b16",
+            "turn_id": "F05.a1.t1",
+            "request_trace_id": "trace_e080fc23af9a",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "user",
+            "owner": "legacy",
+            "expected": true
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "99ead10311ee6042",
+            "session_id_hash": "bab0ded082d37b16",
+            "turn_id": "F05.a1.t1",
+            "request_trace_id": "trace_e080fc23af9a",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "assistant",
+            "owner": "legacy",
+            "expected": true,
+            "assistant_logical_response_id": "f5143aa12c28f4ea"
+          }
+        ],
+        "pi_business_write_delta": 0,
+        "assistant_double_write_count": 0,
+        "unknown_owner_write_count": 0,
+        "other_case_write_count": 0,
+        "legacy_write_count": 2,
+        "system_write_count": 0
+      }
     },
     {
       "case_id": "F07",
-      "trace_id": "trace_806daa75431a",
-      "legacy_run_id": null,
-      "pi_shadow_run_id": null,
-      "target_session_id_hash": "8d7fc625ccba07cf",
+      "trace_id": "trace_9ec9fe81c957",
+      "legacy_run_id": "",
+      "pi_shadow_run_id": "run_1c1e5ccf76de",
+      "target_session_id_hash": "56f225c5026825c8",
       "writes": [
         {
           "resource": "chat_messages",
@@ -989,21 +2048,72 @@
           "expected": true,
           "call_site": "chat_service/orchestrator message persistence",
           "ordinal": 2
-        },
-        {
-          "resource": "chat_messages",
-          "operation": "insert",
-          "owner": "unknown",
-          "expected": false,
-          "call_site": "unknown extra message write",
-          "count": 1
         }
       ],
       "legacy_expected_writes": {
         "chat_messages": 2,
         "context_version_delta": 0
       },
-      "pi_shadow_business_write_delta": 1
+      "pi_shadow_business_write_delta": 0,
+      "v2": {
+        "schema_version": "pi_shadow_write_attribution_v2",
+        "case_id": "F07",
+        "correlation": {
+          "acceptance_run_id": "acc_99739f63b615",
+          "case_id": "F07",
+          "case_attempt": 1,
+          "turn_id": "F07.a1.t1",
+          "request_trace_id": "trace_9ec9fe81c957",
+          "legacy_run_id": "",
+          "shadow_run_id": "run_1c1e5ccf76de",
+          "input_snapshot_hash": "cf86f8a7183d430b"
+        },
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "419c0c3d7aa96eaf",
+            "session_id_hash": "56f225c5026825c8",
+            "turn_id": "F07.a1.t1",
+            "request_trace_id": "trace_9ec9fe81c957",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "user",
+            "owner": "legacy",
+            "expected": true
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "a61b3a2310581a3d",
+            "session_id_hash": "56f225c5026825c8",
+            "turn_id": "F07.a1.t1",
+            "request_trace_id": "trace_9ec9fe81c957",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "assistant",
+            "owner": "legacy",
+            "expected": true,
+            "assistant_logical_response_id": "8fbb5bfd6b746fa5"
+          }
+        ],
+        "pi_business_write_delta": 0,
+        "assistant_double_write_count": 0,
+        "unknown_owner_write_count": 0,
+        "other_case_write_count": 0,
+        "legacy_write_count": 2,
+        "system_write_count": 0
+      }
     }
-  ]
+  ],
+  "phase": "6V-P1.6.5",
+  "generated_at": "2026-07-19T10:47:51.467382+00:00",
+  "totals": {
+    "pi_business_write_delta": 0,
+    "assistant_double_write_count": 0,
+    "unknown_owner_write_count": 0,
+    "other_case_write_count": 0
+  }
 }

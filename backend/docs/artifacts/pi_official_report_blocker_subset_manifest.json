@@ -1,0 +1,298 @@
+{
+  "schema_version": "pi_official_report_blocker_subset_manifest_v1",
+  "phase": "6V-P1.6.5",
+  "source_manifest": "planned_official_report_shadow_cases",
+  "max_concurrency": 1,
+  "is_formal_full30": false,
+  "case_ids": [
+    "A01",
+    "A02",
+    "A03",
+    "B01",
+    "B02",
+    "B03",
+    "B04",
+    "B05",
+    "B06",
+    "B07",
+    "C01",
+    "C02",
+    "C03",
+    "C04",
+    "C05",
+    "D01",
+    "D02",
+    "D03",
+    "D04",
+    "D05",
+    "E01",
+    "E02",
+    "F02",
+    "F04",
+    "F05",
+    "F07"
+  ],
+  "cases": [
+    {
+      "case_id": "A01",
+      "query_type": "multi_turn_current_report",
+      "query_hash": "eef8502571e12f7e",
+      "setup_query_hash": "20db10b98f73f2ae",
+      "expected_status": null,
+      "expected_symbol": "600519",
+      "expected_report_year": null,
+      "expected_report_type": "annual"
+    },
+    {
+      "case_id": "A02",
+      "query_type": "multi_turn_current_report",
+      "query_hash": "a414efbfa1cb2b58",
+      "setup_query_hash": "8105c7ae5934f89a",
+      "expected_status": null,
+      "expected_symbol": "000858",
+      "expected_report_year": null,
+      "expected_report_type": "annual"
+    },
+    {
+      "case_id": "A03",
+      "query_type": "multi_turn_current_report",
+      "query_hash": "699e846826c1ed26",
+      "setup_query_hash": "7e4035f07ce67399",
+      "expected_status": null,
+      "expected_symbol": "300750",
+      "expected_report_year": null,
+      "expected_report_type": "annual"
+    },
+    {
+      "case_id": "B01",
+      "query_type": "explicit_company_name",
+      "query_hash": "8e96dbca8aeb1d52",
+      "setup_query_hash": null,
+      "expected_status": null,
+      "expected_symbol": "000858",
+      "expected_report_year": 2025,
+      "expected_report_type": "annual"
+    },
+    {
+      "case_id": "B02",
+      "query_type": "explicit_company_name",
+      "query_hash": "3ad10bd661392611",
+      "setup_query_hash": null,
+      "expected_status": null,
+      "expected_symbol": "600519",
+      "expected_report_year": 2024,
+      "expected_report_type": "annual"
+    },
+    {
+      "case_id": "B03",
+      "query_type": "explicit_company_name",
+      "query_hash": "8dc7261c5e4c867e",
+      "setup_query_hash": null,
+      "expected_status": null,
+      "expected_symbol": "300750",
+      "expected_report_year": null,
+      "expected_report_type": "annual"
+    },
+    {
+      "case_id": "B04",
+      "query_type": "explicit_company_name",
+      "query_hash": "66858c9bbae91e5c",
+      "setup_query_hash": null,
+      "expected_status": null,
+      "expected_symbol": "601318",
+      "expected_report_year": 2025,
+      "expected_report_type": "annual"
+    },
+    {
+      "case_id": "B05",
+      "query_type": "explicit_company_name",
+      "query_hash": "09badf34a2090ad2",
+      "setup_query_hash": null,
+      "expected_status": null,
+      "expected_symbol": "000001",
+      "expected_report_year": 2024,
+      "expected_report_type": "annual"
+    },
+    {
+      "case_id": "B06",
+      "query_type": "explicit_company_name",
+      "query_hash": "845bd9e1b5f2e1a4",
+      "setup_query_hash": null,
+      "expected_status": null,
+      "expected_symbol": "600036",
+      "expected_report_year": 2025,
+      "expected_report_type": "annual"
+    },
+    {
+      "case_id": "B07",
+      "query_type": "explicit_company_name",
+      "query_hash": "120228144ac09944",
+      "setup_query_hash": null,
+      "expected_status": null,
+      "expected_symbol": "002594",
+      "expected_report_year": 2024,
+      "expected_report_type": "annual"
+    },
+    {
+      "case_id": "C01",
+      "query_type": "explicit_stock_code",
+      "query_hash": "896961b48eacccdf",
+      "setup_query_hash": null,
+      "expected_status": null,
+      "expected_symbol": "000858",
+      "expected_report_year": 2025,
+      "expected_report_type": "annual"
+    },
+    {
+      "case_id": "C02",
+      "query_type": "explicit_stock_code",
+      "query_hash": "9f9ae5fa3e3ab6ae",
+      "setup_query_hash": null,
+      "expected_status": null,
+      "expected_symbol": "600519",
+      "expected_report_year": null,
+      "expected_report_type": "annual"
+    },
+    {
+      "case_id": "C03",
+      "query_type": "explicit_stock_code",
+      "query_hash": "783cb961cb54291e",
+      "setup_query_hash": null,
+      "expected_status": null,
+      "expected_symbol": "300750",
+      "expected_report_year": null,
+      "expected_report_type": "annual"
+    },
+    {
+      "case_id": "C04",
+      "query_type": "explicit_stock_code",
+      "query_hash": "a424372e8524d001",
+      "setup_query_hash": null,
+      "expected_status": null,
+      "expected_symbol": "601318",
+      "expected_report_year": 2025,
+      "expected_report_type": "annual"
+    },
+    {
+      "case_id": "C05",
+      "query_type": "explicit_stock_code",
+      "query_hash": "b722d6df8f7f87df",
+      "setup_query_hash": null,
+      "expected_status": null,
+      "expected_symbol": "000001",
+      "expected_report_year": 2024,
+      "expected_report_type": "annual"
+    },
+    {
+      "case_id": "D01",
+      "query_type": "report_type",
+      "query_hash": "45c4ba79444dbd8e",
+      "setup_query_hash": null,
+      "expected_status": null,
+      "expected_symbol": "600519",
+      "expected_report_year": 2025,
+      "expected_report_type": "semi"
+    },
+    {
+      "case_id": "D02",
+      "query_type": "report_type",
+      "query_hash": "b81fd78578595bc2",
+      "setup_query_hash": null,
+      "expected_status": null,
+      "expected_symbol": "000858",
+      "expected_report_year": 2025,
+      "expected_report_type": "q1"
+    },
+    {
+      "case_id": "D03",
+      "query_type": "report_type",
+      "query_hash": "c8e36f6065a6f55f",
+      "setup_query_hash": null,
+      "expected_status": null,
+      "expected_symbol": "601318",
+      "expected_report_year": 2025,
+      "expected_report_type": "q3"
+    },
+    {
+      "case_id": "D04",
+      "query_type": "report_type",
+      "query_hash": "35223feebf71eeba",
+      "setup_query_hash": null,
+      "expected_status": null,
+      "expected_symbol": "300750",
+      "expected_report_year": 2024,
+      "expected_report_type": "semi"
+    },
+    {
+      "case_id": "D05",
+      "query_type": "report_type",
+      "query_hash": "eb810d7935156f73",
+      "setup_query_hash": null,
+      "expected_status": null,
+      "expected_symbol": "600036",
+      "expected_report_year": 2025,
+      "expected_report_type": "q1"
+    },
+    {
+      "case_id": "E01",
+      "query_type": "ambiguity",
+      "query_hash": "c36cd4decac8dbf2",
+      "setup_query_hash": null,
+      "expected_status": "clarification_required",
+      "expected_symbol": null,
+      "expected_report_year": null,
+      "expected_report_type": "annual"
+    },
+    {
+      "case_id": "E02",
+      "query_type": "ambiguity",
+      "query_hash": "5d4ecee83b2d5aca",
+      "setup_query_hash": null,
+      "expected_status": null,
+      "expected_symbol": null,
+      "expected_report_year": null,
+      "expected_report_type": "annual"
+    },
+    {
+      "case_id": "F02",
+      "query_type": "missing",
+      "query_hash": "ea7c822572881bc6",
+      "setup_query_hash": null,
+      "expected_status": "unavailable",
+      "expected_symbol": "600519",
+      "expected_report_year": 1900,
+      "expected_report_type": "annual"
+    },
+    {
+      "case_id": "F04",
+      "query_type": "missing",
+      "query_hash": "6050268311b2a4d6",
+      "setup_query_hash": null,
+      "expected_status": "unavailable",
+      "expected_symbol": "600519",
+      "expected_report_year": 2035,
+      "expected_report_type": "annual"
+    },
+    {
+      "case_id": "F05",
+      "query_type": "missing",
+      "query_hash": "e4646e073bd66e73",
+      "setup_query_hash": null,
+      "expected_status": "unavailable",
+      "expected_symbol": "000858",
+      "expected_report_year": 1900,
+      "expected_report_type": "annual"
+    },
+    {
+      "case_id": "F07",
+      "query_type": "missing",
+      "query_hash": "11139d2c5f3ab831",
+      "setup_query_hash": null,
+      "expected_status": null,
+      "expected_symbol": "600519",
+      "expected_report_year": 2024,
+      "expected_report_type": "annual"
+    }
+  ],
+  "manifest_hash": "b92cef60132038f66d7b024a6647123c8aa2660db1f95bd08aac73e3413c47a0"
+}
