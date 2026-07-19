@@ -17,6 +17,7 @@ from app.agent_runtime.errors import (
     AGENT_TOOL_ARGUMENT_INVALID,
     AGENT_TOOL_NOT_ALLOWED,
     AGENT_TOOL_TIMEOUT,
+    PI_SHADOW_WRITE_FORBIDDEN,
 )
 from app.core.config import settings
 from app.agents.financial_runtime.contracts import FinancialSessionContext, ToolResponse as FinancialToolResponse
@@ -143,7 +144,9 @@ class PiFinancialToolAdapter:
         if call.name not in allowed_tools:
             return self._error(call, trace_id, AGENT_TOOL_NOT_ALLOWED, "Tool is not allowed for this agent", started)
         if definition.mode != "read_only":
-            return self._error(call, trace_id, AGENT_TOOL_NOT_ALLOWED, "Only read-only tools are allowed", started)
+            # Shadow persistence boundary: any non-read-only tool is rejected
+            # outright — Pi shadow must never persist business writes.
+            return self._error(call, trace_id, PI_SHADOW_WRITE_FORBIDDEN, "Pi shadow write tools are forbidden", started)
         try:
             validate_json_schema(call.arguments, definition.input_schema)
         except ToolSchemaError as exc:

@@ -97,6 +97,105 @@ def planned_official_report_shadow_cases() -> list[OfficialReportShadowCase]:
     ]
 
 
+BLOCKER_SUBSET_CASE_IDS: tuple[str, ...] = (
+    # P1.6.5 fixed blocker subset — derived from the P1.6.4 Full30 blocker audit.
+    # 15 trace-mismatch cases:
+    "A01", "A02", "A03", "B01", "B02", "B03", "B04", "B05", "B06", "B07",
+    "C01", "C02", "C03", "C04", "C05",
+    # double-write high-risk representative cases:
+    "D01", "D02", "D03", "D04", "D05",
+    # clarification applicable cases:
+    "E01", "E02",
+    # deadline / slow-path cases:
+    "F02", "F04",
+    # skipped-intent provenance cases:
+    "F05", "F07",
+)
+
+
+def blocker_subset_cases() -> list[OfficialReportShadowCase]:
+    by_id = {case.case_id: case for case in planned_official_report_shadow_cases()}
+    return [by_id[case_id] for case_id in BLOCKER_SUBSET_CASE_IDS if case_id in by_id]
+
+
+def blocker_subset_manifest() -> dict[str, Any]:
+    cases = [
+        {
+            "case_id": case.case_id,
+            "query_type": case.query_type,
+            "query_hash": _hash_id(case.query),
+            "setup_query_hash": _hash_id(case.setup_query) if case.setup_query else None,
+            "expected_status": case.expected_status,
+            "expected_symbol": case.expected_symbol,
+            "expected_report_year": case.expected_report_year,
+            "expected_report_type": case.expected_report_type,
+        }
+        for case in blocker_subset_cases()
+    ]
+    import hashlib
+
+    manifest_hash = hashlib.sha256(
+        json.dumps(cases, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    return {
+        "schema_version": "pi_official_report_blocker_subset_manifest_v1",
+        "phase": "6V-P1.6.5",
+        "source_manifest": "planned_official_report_shadow_cases",
+        "max_concurrency": 1,
+        "is_formal_full30": False,
+        "case_ids": list(BLOCKER_SUBSET_CASE_IDS),
+        "cases": cases,
+        "manifest_hash": manifest_hash,
+    }
+
+
+async def list_new_chat_messages(db: AsyncSession, *, since: Any) -> list[Any]:
+    from app.agent_runtime.shadow_write_attribution import ObservedMessageRow, utc_iso
+
+    try:
+        rows = (
+            await db.execute(
+                select(ChatMessage.id, ChatMessage.session_id, ChatMessage.role, ChatMessage.created_at)
+                .where(ChatMessage.created_at >= since)
+                .order_by(ChatMessage.created_at)
+            )
+        ).all()
+    except Exception:
+        return []
+    return [
+        ObservedMessageRow(
+            message_id=str(row[0]),
+            session_id=str(row[1]),
+            role=str(row[2] or ""),
+            created_at=utc_iso(row[3]),
+        )
+        for row in rows
+    ]
+
+
+async def list_new_chat_sessions(db: AsyncSession, *, since: Any) -> list[Any]:
+    from app.agent_runtime.shadow_write_attribution import ObservedSessionRow, parse_case_marker, utc_iso
+
+    try:
+        rows = (
+            await db.execute(
+                select(ChatSession.id, ChatSession.title, ChatSession.created_at)
+                .where(ChatSession.created_at >= since)
+                .order_by(ChatSession.created_at)
+            )
+        ).all()
+    except Exception:
+        return []
+    return [
+        ObservedSessionRow(
+            session_id=str(row[0]),
+            title_case_marker=parse_case_marker(row[1]),
+            created_at=utc_iso(row[2]),
+        )
+        for row in rows
+    ]
+
+
 async def capture_side_effect_snapshot(db: AsyncSession, *, session_id: str | None = None) -> ShadowSideEffectSnapshot:
     target = await _target_session_snapshot(db, session_id)
     return ShadowSideEffectSnapshot(
@@ -249,6 +348,7 @@ def build_live_shadow_case_result(
         case_id=case.case_id,
         query_type=case.query_type,
         side_effect_count=side_effect_count,
+        expected_status=case.expected_status,
     )
 
 
