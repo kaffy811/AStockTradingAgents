@@ -14,6 +14,7 @@ from app.agent_runtime.contracts import (
     STATUS_SUCCESS,
     STATUS_UNAVAILABLE,
     new_id,
+    utc_now,
 )
 from app.agent_runtime.event_stream import PiEventRecorder
 from app.agent_runtime.tool_adapter import PiFinancialToolAdapter
@@ -68,7 +69,35 @@ class OfficialReportPdfAgent:
                 started=started,
                 status=STATUS_UNAVAILABLE,
                 error_code="REPORT_TYPE_UNSUPPORTED",
-                structured=self._unavailable_structured(request.trace_id),
+                structured=self._unavailable_structured(
+                    request.trace_id,
+                    reason_code="REPORT_TYPE_UNSUPPORTED",
+                    reason="only annual reports are indexed by the official report tool",
+                    entity=entity,
+                    report_year=report_year,
+                    report_type=report_type,
+                ),
+            )
+        # Deterministic year-range guard: a requested year outside the plausible
+        # official-report index range must short-circuit as REPORT_NOT_FOUND
+        # without a full report DB scan (P1.6.4 F04-type deadline root cause).
+        out_of_range = self._year_out_of_range(report_year)
+        if out_of_range:
+            return self._finish(
+                request=request,
+                events=events,
+                metrics=metrics,
+                started=started,
+                status=STATUS_UNAVAILABLE,
+                error_code="REPORT_NOT_FOUND",
+                structured=self._unavailable_structured(
+                    request.trace_id,
+                    reason_code="REPORT_NOT_FOUND",
+                    reason=out_of_range,
+                    entity=entity,
+                    report_year=report_year,
+                    report_type=report_type or "annual",
+                ),
             )
         call = PiToolCall(
             id=new_id("toolcall"),
@@ -175,6 +204,11 @@ class OfficialReportPdfAgent:
                 "pdf_url": pdf_url,
                 "official_url": pdf_url,
                 "official_domain_verified": official_verified,
+                "tool_call_id": call.id,
+                "retrieved_at": utc_now(),
+                "verification_method": "official_domain_allowlist",
+                "provider": "official_report_domain_service",
+                "report_document_key": self._evidence_id(entity, report),
             }],
             evidence_ids=[self._evidence_id(entity, report)],
             structured_answer=asdict(structured),
@@ -233,14 +267,46 @@ class OfficialReportPdfAgent:
             return None
         return sorted(candidates, key=lambda item: (item.get("report_year") or 0, str(item.get("period_end") or "")), reverse=True)[0]
 
-    def _unavailable_structured(self, trace_id: str) -> dict[str, Any]:
-        return asdict(StructuredAnswer(
+    def _unavailable_structured(
+        self,
+        trace_id: str,
+        *,
+        reason_code: str | None = None,
+        reason: str | None = None,
+        entity: dict[str, Any] | None = None,
+        report_year: int | None = None,
+        report_type: str | None = None,
+    ) -> dict[str, Any]:
+        payload = asdict(StructuredAnswer(
             trace_id=trace_id,
             status=STATUS_UNAVAILABLE,
             title="官方报告入口",
             conclusion="暂未找到可验证的官方报告 PDF。",
             sources=[],
         ))
+        payload.update({
+            "reason_code": reason_code,
+            "reason": reason,
+            "provider": "official_report_domain_service",
+            "checked_source_scope": "official_report_index",
+            "requested_symbol": (entity or {}).get("symbol"),
+            "requested_report_year": report_year,
+            "requested_report_type": report_type,
+            "no_url_emitted": True,
+        })
+        return payload
+
+    def _year_out_of_range(self, report_year: int | None) -> str | None:
+        if report_year is None:
+            return None
+        from datetime import datetime, timezone  # noqa: PLC0415
+
+        current_year = datetime.now(timezone.utc).year
+        if report_year > current_year:
+            return "requested_report_year_is_in_the_future"
+        if report_year < 2000:
+            return "requested_report_year_predates_official_report_index"
+        return None
 
     def _finish(
         self,

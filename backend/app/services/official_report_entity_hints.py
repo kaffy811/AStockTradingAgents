@@ -23,6 +23,12 @@ _OFFICIAL_REPORT_AMBIGUOUS_HINTS: dict[str, list[dict[str, str]]] = {
     ],
 }
 
+# A bare ambiguous keyword must not fire when the message already contains an
+# unambiguous longer company name that embeds it (P1.6.4 B04/B05/B06 root cause).
+_AMBIGUOUS_KEYWORD_LONGER_NAMES: dict[str, tuple[str, ...]] = {
+    "平安": ("平安银行", "中国平安"),
+}
+
 
 def unambiguous_official_report_entity_hint(message: str, *, include_query: bool = False) -> dict[str, Any]:
     text = message or ""
@@ -44,6 +50,8 @@ def unambiguous_official_report_entity_hint(message: str, *, include_query: bool
 def ambiguous_official_report_entity_hint(message: str) -> dict[str, Any]:
     text = message or ""
     for keyword, candidates in _OFFICIAL_REPORT_AMBIGUOUS_HINTS.items():
+        if keyword in text and any(longer in text for longer in _AMBIGUOUS_KEYWORD_LONGER_NAMES.get(keyword, ())):
+            continue
         if keyword in text and not any(name in text for name in _OFFICIAL_REPORT_ENTITY_HINTS):
             return {
                 "keyword": keyword,
