@@ -1,14 +1,18 @@
 {
-  "phase": "6V-P1.5",
-  "runtime_implemented": true,
-  "shadow_samples": 3,
-  "shadow_passed": false,
+  "schema_version": "pi_compatible_runtime_gate_v1",
+  "phase": "6V-P1.6.3",
+  "updated_at": "2026-07-19T05:29:55.495068+00:00",
+  "database_pool_test_fix_passed": true,
+  "backend_full_passed": true,
+  "smoke_planned": 3,
+  "smoke_executed": 3,
+  "smoke_accepted": 3,
   "smoke_passed": true,
-  "recommended_to_run_full_30": true,
+  "full30_gate_passed": false,
+  "recommended_to_retry_full30": true,
+  "recommended_for_next_authorization": false,
   "pi_executor_enabled": false,
   "authorized_agents": [],
   "decision": "do_not_enable_pi_compatible",
-  "blockers": [
-    "Gate thresholds were not fully met."
-  ]
+  "blockers": []
 }

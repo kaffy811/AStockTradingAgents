@@ -1,0 +1,188 @@
+{
+  "schema_version": "pi_official_report_a01_regression_v2",
+  "phase": "6V-P1.6.3",
+  "generated_at": "2026-07-19T05:29:55.495068+00:00",
+  "environment_type": "local_live",
+  "commit_sha": "ab0d0367e7bf7f0a14cb6786adac7f58c0d79c92",
+  "accepted": true,
+  "result": {
+    "schema_version": "pi_official_report_shadow_v1",
+    "trace_id": "trace_ed0ae7afaa8a",
+    "case_id": "A01",
+    "query_type": "smoke_multi_turn_current_report",
+    "legacy": {
+      "status": "success",
+      "market": "CN",
+      "symbol": "600519",
+      "company_name": "",
+      "report_year": null,
+      "report_type": "annual",
+      "source_page_url": null,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/2026-04-17/1225114741.PDF",
+      "official_domain_verified": true,
+      "latency_ms": 8661,
+      "error_code": null,
+      "input_snapshot_hash": "ec67d115546dc51b"
+    },
+    "pi_compatible": {
+      "status": "success",
+      "market": "CN",
+      "symbol": "600519",
+      "company_name": "贵州茅台",
+      "report_year": 2025,
+      "report_type": "annual",
+      "source_page_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=1225114741&orgId=gssh0600519",
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/2026-04-17/1225114741.PDF",
+      "official_domain_verified": true,
+      "latency_ms": 979,
+      "error_code": null,
+      "turn_count": 1,
+      "tool_call_count": 1,
+      "llm_call_count": 0,
+      "input_snapshot_hash": "ec67d115546dc51b"
+    },
+    "comparison": {
+      "status_match": true,
+      "entity_match": true,
+      "year_match": true,
+      "report_type_match": true,
+      "source_url_match": true,
+      "pdf_url_match": true,
+      "provenance_complete": true,
+      "unsupported_url_count": 0,
+      "fabricated_url_count": 0,
+      "safety_correctness": true,
+      "side_effect_count": 0,
+      "decision": "pass",
+      "input_snapshot_hash_match": true
+    },
+    "event_summary": [
+      {
+        "event_type": "run_start",
+        "timestamp": "2026-07-19T05:24:34.738539+00:00",
+        "sequence": 1,
+        "status": null
+      },
+      {
+        "event_type": "turn_start",
+        "timestamp": "2026-07-19T05:24:34.738545+00:00",
+        "sequence": 2,
+        "status": null
+      },
+      {
+        "event_type": "tool_call_start",
+        "timestamp": "2026-07-19T05:24:34.738557+00:00",
+        "sequence": 3,
+        "status": null
+      },
+      {
+        "event_type": "tool_execution_start",
+        "timestamp": "2026-07-19T05:24:34.738564+00:00",
+        "sequence": 4,
+        "status": null
+      },
+      {
+        "event_type": "tool_execution_end",
+        "timestamp": "2026-07-19T05:24:35.717775+00:00",
+        "sequence": 5,
+        "status": null
+      },
+      {
+        "event_type": "turn_end",
+        "timestamp": "2026-07-19T05:24:35.717832+00:00",
+        "sequence": 6,
+        "status": null
+      },
+      {
+        "event_type": "compliance_start",
+        "timestamp": "2026-07-19T05:24:35.717837+00:00",
+        "sequence": 7,
+        "status": null
+      },
+      {
+        "event_type": "compliance_end",
+        "timestamp": "2026-07-19T05:24:35.717857+00:00",
+        "sequence": 8,
+        "status": null
+      },
+      {
+        "event_type": "run_end",
+        "timestamp": "2026-07-19T05:24:35.717862+00:00",
+        "sequence": 9,
+        "status": null
+      }
+    ],
+    "resource_baseline": {
+      "before": {
+        "chat_sessions": 179,
+        "chat_messages": 497,
+        "chat_session_context_version_sum": 64,
+        "watchlist_items": 3,
+        "analysis_reports": 20,
+        "report_documents": 66,
+        "report_indexing_jobs": 0,
+        "financial_jobs": 195,
+        "background_tasks": 0,
+        "pool_checked_out": 1,
+        "target_session_context_version": 0,
+        "target_session_metadata_keys": [
+          "mock_mode",
+          "orchestrator"
+        ],
+        "target_session_last_context_commit_at": null,
+        "target_session_id_hash": "3eacbb248bf706bc"
+      },
+      "after": {
+        "chat_sessions": 179,
+        "chat_messages": 499,
+        "chat_session_context_version_sum": 64,
+        "watchlist_items": 3,
+        "analysis_reports": 20,
+        "report_documents": 66,
+        "report_indexing_jobs": 0,
+        "financial_jobs": 195,
+        "background_tasks": 0,
+        "pool_checked_out": 1,
+        "target_session_context_version": 0,
+        "target_session_metadata_keys": [
+          "mock_mode",
+          "orchestrator"
+        ],
+        "target_session_last_context_commit_at": null,
+        "target_session_id_hash": "3eacbb248bf706bc"
+      }
+    },
+    "side_effects": {
+      "context_mutation_count": 0,
+      "double_write_count": 0
+    },
+    "setup_turn": {
+      "legacy": {
+        "status": "success",
+        "http_status": 200,
+        "sse_terminal_received": true,
+        "sse_terminal_event_count": 1,
+        "legacy_terminal_status": "partial_success",
+        "legacy_message_persisted": true,
+        "shadow_terminal_received": null,
+        "shadow_terminal_status": "success",
+        "error_code": null,
+        "run_id": null,
+        "trace_id": null
+      },
+      "pi_compatible": {
+        "status": "skipped",
+        "http_status": null,
+        "sse_terminal_received": null,
+        "sse_terminal_event_count": null,
+        "legacy_terminal_status": null,
+        "legacy_message_persisted": null,
+        "shadow_terminal_received": true,
+        "shadow_terminal_status": "skipped",
+        "error_code": "PI_SHADOW_SKIPPED",
+        "run_id": "run_d395b300534d",
+        "trace_id": "trace_a6bda44cd44b"
+      }
+    }
+  }
+}

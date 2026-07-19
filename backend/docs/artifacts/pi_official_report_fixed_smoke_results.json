@@ -1,0 +1,120 @@
+{
+  "schema_version": "pi_official_report_fixed_smoke_results_v1",
+  "phase": "6V-P1.6.3",
+  "generated_at": "2026-07-19T05:29:55.495068+00:00",
+  "environment_type": "local_live",
+  "commit_sha": "ab0d0367e7bf7f0a14cb6786adac7f58c0d79c92",
+  "planned": 3,
+  "executed": 3,
+  "accepted": 3,
+  "smoke_passed": true,
+  "recommended_to_retry_full30": true,
+  "recommended_for_next_authorization": false,
+  "pi_executor_enabled": false,
+  "authorized_agents": [],
+  "decision": "do_not_enable_pi_compatible",
+  "cases": [
+    {
+      "case_id": "A01",
+      "query_type": "smoke_multi_turn_current_report",
+      "case_hash": "e98ed8057af14fe0",
+      "http_status": 200,
+      "sse_terminal_event_count": 1,
+      "shadow_terminal_received": true,
+      "shadow_status": "success",
+      "symbol": "600519",
+      "tool_call_count": 1,
+      "llm_call_count": 0,
+      "latency_ms": 979,
+      "decision": "pass",
+      "provenance_complete": true,
+      "safety_correctness": true,
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "pending_rollback_count": 0,
+      "raw_500_count": 0,
+      "http_503_count": 0,
+      "agent_tool_timeout_count": 0,
+      "runner_diagnostics_timeout_count": 0
+    },
+    {
+      "case_id": "A02",
+      "query_type": "smoke_explicit_stock_code",
+      "case_hash": "b23280c959e5c753",
+      "http_status": 200,
+      "sse_terminal_event_count": 1,
+      "shadow_terminal_received": true,
+      "shadow_status": "success",
+      "symbol": "600519",
+      "tool_call_count": 1,
+      "llm_call_count": 0,
+      "latency_ms": 930,
+      "decision": "pass",
+      "provenance_complete": true,
+      "safety_correctness": true,
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "pending_rollback_count": 0,
+      "raw_500_count": 0,
+      "http_503_count": 0,
+      "agent_tool_timeout_count": 0,
+      "runner_diagnostics_timeout_count": 0
+    },
+    {
+      "case_id": "A03",
+      "query_type": "smoke_ambiguity",
+      "case_hash": "6d9145c86bba9558",
+      "http_status": 200,
+      "sse_terminal_event_count": 1,
+      "shadow_terminal_received": true,
+      "shadow_status": "clarification_required",
+      "symbol": "",
+      "tool_call_count": 0,
+      "llm_call_count": 0,
+      "latency_ms": 0,
+      "decision": "pass",
+      "provenance_complete": true,
+      "safety_correctness": true,
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "pending_rollback_count": 0,
+      "raw_500_count": 0,
+      "http_503_count": 0,
+      "agent_tool_timeout_count": 0,
+      "runner_diagnostics_timeout_count": 0,
+      "clarification_candidates": [
+        {
+          "name": "平安银行",
+          "symbol_hash": "1c6f4057"
+        },
+        {
+          "name": "中国平安",
+          "symbol_hash": "b52d04a5"
+        }
+      ]
+    }
+  ],
+  "latency": {
+    "pi_total_p50_ms": 930,
+    "pi_total_p95_ms": 979
+  },
+  "auth": {
+    "cold_lookup_ms": 1029,
+    "connection_checkout_ms": 508,
+    "db_execute_ms": 403,
+    "cache_hit_p95_ms": 0,
+    "cache_hits": 8,
+    "cache_misses": 1
+  },
+  "tests": {
+    "pool_tests": "13 passed twice under sqlite; 13 passed under PostgreSQL-style URL",
+    "targeted_backend": "71 passed, 12 warnings",
+    "backend_full": "3359 passed, 15 skipped, 299 warnings",
+    "frontend_test": "679 passed",
+    "frontend_build": "passed",
+    "npm_ci": "failed: package-lock.json missing @esbuild/linux-s390x@0.28.1; npm install was not used to update lockfile"
+  }
+}
