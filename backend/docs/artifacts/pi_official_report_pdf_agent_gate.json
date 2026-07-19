@@ -20,7 +20,9 @@
     "context_mutation_count": 0,
     "double_write_count": 22,
     "raw_500_count": 0,
-    "p95_latency_ms": 3645
+    "p95_latency_ms": 3645,
+    "terminal_missing_count": 15,
+    "agent_deadline_exceeded_count": 2
   },
   "blockers": [
     "Full30 Gate thresholds were not met.",
@@ -28,6 +30,8 @@
     "provenance_completeness_rate below 100%.",
     "pi_business_write_delta was non-zero.",
     "assistant_double_write_count was non-zero.",
+    "shadow terminal trace mismatch count was 15",
+    "agent_deadline_exceeded_count was 2",
     "browser acceptance not run because Full30 had core blockers."
   ],
   "phase": "6V-P1.6.4",

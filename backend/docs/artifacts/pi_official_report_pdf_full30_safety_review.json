@@ -256,6 +256,8 @@
     "provenance_completeness_rate below 100%.",
     "pi_business_write_delta was non-zero.",
     "assistant_double_write_count was non-zero.",
+    "shadow terminal trace mismatch count was 15",
+    "agent_deadline_exceeded_count was 2",
     "browser acceptance not run because Full30 had core blockers."
   ]
 }

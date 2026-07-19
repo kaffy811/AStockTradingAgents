@@ -17,5 +17,5 @@
   "all_case_traces_have_terminal": false,
   "legacy_terminal_missing_count": 0,
   "legacy_duplicate_terminal_count": 0,
-  "note": "31 diagnostics records includes multi-turn setup shadows plus 30 counted Full30 cases."
+  "note": "diagnostics records include multi-turn setup shadows plus counted Full30 cases; trace matching failed for a subset and is a Gate blocker."
 }
