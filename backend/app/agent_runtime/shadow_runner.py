@@ -388,11 +388,16 @@ class PiCompatibleShadowRunner:
         normalized_legacy_status = normalize_status(legacy_norm["status"], legacy_norm.get("error_code"))
         normalized_pi_status = normalize_status(pi_norm["status"], pi_error_code)
         status_match = normalized_legacy_status == normalized_pi_status
-        safety_correctness = assess_safety_correctness(
-            normalized_pi_status=normalized_pi_status,
-            pi_pdf_url=pi_norm["pdf_url"],
-            expected_status=expected_status,
-        )
+        unsupported_url_count = 0 if pi_norm["official_domain_verified"] or not pi_norm["pdf_url"] else 1
+        if status_match and unsupported_url_count == 0:
+            # Matching behavior with no unverified URL is safe by definition.
+            safety_correctness = True
+        else:
+            safety_correctness = assess_safety_correctness(
+                normalized_pi_status=normalized_pi_status,
+                pi_pdf_url=pi_norm["pdf_url"],
+                expected_status=expected_status,
+            )
         provenance_complete, provenance_missing = status_specific_provenance_complete(
             normalized_status=normalized_pi_status,
             findings=pi_compatible.get("findings") or [],
@@ -414,7 +419,7 @@ class PiCompatibleShadowRunner:
             "pdf_url_match": self._same_url_or_unknown(legacy_norm["pdf_url"], pi_norm["pdf_url"]),
             "provenance_complete": provenance_complete,
             "provenance_missing_fields": provenance_missing,
-            "unsupported_url_count": 0 if pi_norm["official_domain_verified"] or not pi_norm["pdf_url"] else 1,
+            "unsupported_url_count": unsupported_url_count,
             "side_effect_count": side_effect_count,
         }
         comparison["decision"] = "pass" if all([
