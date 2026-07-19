@@ -662,6 +662,7 @@ async def execute_http_case(
             side_effect_count=pi_side_effect_count,
         )
         result["correlation"] = {key: value for key, value in correlation.items() if key != "session_id"}
+        result["structured_answer"] = pi_result.get("structured_answer") or {}
         result["write_attribution_v2"] = attribution_v2.to_dict()
         result["trace_match"] = trace_match
         result["shadow_terminal_received"] = bool(pi_result.get("shadow_terminal_received"))
