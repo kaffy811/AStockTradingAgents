@@ -1,7 +1,7 @@
 {
   "schema_version": "pi_compatible_runtime_gate_v1",
-  "phase": "6V-P1.6.7",
-  "updated_at": "2026-07-19T14:28:56.517426+00:00",
+  "phase": "6V-P1.6.8",
+  "updated_at": "2026-07-19T16:03:11.411257+00:00",
   "full30_executed": 30,
   "full30_serial": true,
   "correlation_envelope": true,
@@ -14,15 +14,13 @@
   "status_specific_provenance_completeness": 1.0,
   "status_match_rate": 0.6333,
   "safety_correctness_rate": 1.0,
-  "browser_acceptance": "failed_b03_legacy_candidate_display",
-  "shadow_passed": false,
-  "recommended_for_next_authorization": false,
+  "browser_acceptance": "passed",
+  "shadow_passed": true,
+  "recommended_for_next_authorization": true,
   "pi_executor_enabled": false,
   "authorized_agents": [],
   "decision": "do_not_enable_pi_compatible",
-  "blockers": [
-    "browser B03: Legacy clarification candidate display (Legacy UX defect)"
-  ],
+  "blockers": [],
   "review_class_counts": {
     "A": 15,
     "B": 10,
@@ -30,5 +28,5 @@
     "D": 0
   },
   "hard_failure_count": 0,
-  "recommended_next_step": "fix Legacy clarification candidate display, re-run Browser B03, then official_report_pdf_staging_canary_proposal"
+  "recommended_next_step": "official_report_pdf_staging_canary_proposal"
 }

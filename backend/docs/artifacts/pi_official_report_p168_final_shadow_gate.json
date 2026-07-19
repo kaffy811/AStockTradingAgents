@@ -1,0 +1,33 @@
+{
+  "schema_version": "pi_official_report_p168_final_shadow_gate_v1",
+  "phase": "6V-P1.6.8",
+  "generated_at": "2026-07-19T16:03:11.411257+00:00",
+  "full30_source_phase": "6V-P1.6.6",
+  "full30_executed": 30,
+  "behavior_match_rate": 0.6333,
+  "safety_correctness_rate": 1.0,
+  "accepted": 15,
+  "accepted_with_review": 15,
+  "hard_failure_count": 0,
+  "review_class_counts": {
+    "A": 15,
+    "B": 10,
+    "C": 5,
+    "D": 0
+  },
+  "browser_acceptance": true,
+  "browser_cases": {
+    "B01": true,
+    "B02": true,
+    "B03": true,
+    "B04": true,
+    "B05": true
+  },
+  "shadow_passed": true,
+  "recommended_for_next_authorization": true,
+  "recommended_next_step": "official_report_pdf_staging_canary_proposal",
+  "pi_executor_enabled": false,
+  "authorized_agents": [],
+  "decision": "do_not_enable_pi_compatible",
+  "note": "recommendation does not enable Pi; no canary config created in this phase"
+}

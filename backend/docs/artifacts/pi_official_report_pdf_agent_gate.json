@@ -1,7 +1,7 @@
 {
   "schema_version": "pi_official_report_pdf_agent_gate_v3",
-  "phase": "6V-P1.6.7",
-  "updated_at": "2026-07-19T14:28:56.517426+00:00",
+  "phase": "6V-P1.6.8",
+  "updated_at": "2026-07-19T16:03:11.411257+00:00",
   "agent_id": "official_report_pdf_pi_v1",
   "mode": "formal_full30_serial",
   "is_formal_full30": true,
@@ -29,12 +29,10 @@
   "raw_500_count": 0,
   "raw_503_count": 0,
   "p95_latency_ms": 1444,
-  "browser_acceptance": "failed_b03_legacy_candidate_display",
-  "passed": false,
-  "recommended_for_next_authorization": false,
-  "blockers": [
-    "browser B03: Legacy clarification candidate display (Legacy UX defect)"
-  ],
+  "browser_acceptance": "passed",
+  "passed": true,
+  "recommended_for_next_authorization": true,
+  "blockers": [],
   "review_policy": "shadow_review_policy_v1",
   "review_class_counts": {
     "A": 15,
@@ -44,5 +42,6 @@
   },
   "hard_failure_count": 0,
   "behavior_match_rate": 0.6333,
-  "status_match_is_hard_gate": false
+  "status_match_is_hard_gate": false,
+  "browser_blocker_resolved": "B03 candidates now rendered from resolver-driven Legacy clarification"
 }
