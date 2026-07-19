@@ -1,9 +1,26 @@
-# Official Report PDF Fixed Smoke Summary
+# Pi-Compatible official_report_pdf Live Shadow Summary
 
-Phase 6V-P1.6.3 executed the fixed three-case local_live Smoke through HTTP Chat API and SSE.
+- Agent: `official_report_pdf_pi_v1`
+- Planned samples: 3
+- Executed samples: 3
+- Accepted samples: 3
+- Scenario counts: `{'smoke_multi_turn_current_report': 1, 'smoke_explicit_stock_code': 1, 'smoke_ambiguity': 1}`
+- Status/entity/year/type/url match: `1.0` / `None` / `None` / `None` / `None`
+- Source URL / clarification match: `None` / `1.0`
+- Provenance completeness: `1.0`
+- Unsupported URL count: `None`
+- Deterministic LLM calls: `None`
+- Latency p50/p95 ms: `None` / `None`
+- Side effect count: `0`
+- Context mutation / double writes / raw 500: `None` / `0` / `0`
+- Browser acceptance: `{'executed': False, 'passed': False, 'notes': 'not_run'}`
+- Gate passed: `False`
+- Smoke passed: `True`
+- Recommended to run full 30: `True`
+- Recommended for next authorization: `False`
 
-Result: planned=3, executed=3, accepted=3, smoke_passed=true. A01 and A02 returned verified official report PDF provenance with tool_calls=1 and llm_calls=0. A03 returned deterministic clarification_required with tool_calls=0 and llm_calls=0. Pi business side effects, extra context mutation, and double assistant writes were all 0.
+## Blockers
 
-Backend full passed: 3359 passed, 15 skipped. Frontend test/build passed. npm ci remains blocked by an out-of-sync lockfile entry and was not repaired in this commit.
+- Gate thresholds were not fully met.
 
-Formal Pi path remains disabled. Recommended next step: retry Full30 in a later phase.
+Production defaults remain disabled: `AGENT_EXECUTOR_MODE=legacy`, `PI_AGENT_SHADOW_ENABLED=false`, `CHAT_RUNTIME_MODE=legacy`, `authorized_agents=[]`.

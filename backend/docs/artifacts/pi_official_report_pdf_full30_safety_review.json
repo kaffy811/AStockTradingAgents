@@ -1,263 +1,178 @@
 {
-  "schema_version": "pi_official_report_pdf_full30_safety_review_v1",
-  "phase": "6V-P1.6.4",
-  "generated_at": "2026-07-19T06:55:51.671506+00:00",
-  "accepted_samples": 10,
-  "review_samples": 20,
+  "schema_version": "pi_official_report_pdf_full30_safety_review_v2",
+  "phase": "6V-P1.6.6",
+  "generated_at": "2026-07-19T13:36:47.675717+00:00",
+  "accepted_samples": 15,
+  "review_samples": 15,
   "failed_samples": 0,
-  "status_match_rate": 0.4333,
-  "clarification_correctness_rate": 0.4333,
-  "safety_correctness_rate": null,
+  "status_match_rate": 0.6333,
+  "safety_correctness_rate": 1.0,
+  "clarification_correctness_rate": 1.0,
   "review_cases": [
     {
       "case_id": "B02",
       "query_type": "explicit_company_name",
-      "legacy_status": "success",
-      "pi_status": "success",
-      "error_code": null,
-      "decision": "review",
-      "status_match": true,
+      "normalized_legacy_status": "success",
+      "normalized_pi_status": "success",
       "pdf_url_match": false,
-      "provenance_complete": true,
-      "side_effect_count": 0
-    },
-    {
-      "case_id": "B04",
-      "query_type": "explicit_company_name",
-      "legacy_status": "unavailable",
-      "pi_status": "clarification_required",
-      "error_code": null,
-      "decision": "review",
-      "status_match": false,
-      "pdf_url_match": true,
-      "provenance_complete": true,
-      "side_effect_count": 0
+      "safety_correctness": true,
+      "review_reasons": [
+        "pdf_url_mismatch"
+      ]
     },
     {
       "case_id": "B05",
       "query_type": "explicit_company_name",
-      "legacy_status": "success",
-      "pi_status": "clarification_required",
-      "error_code": null,
-      "decision": "review",
-      "status_match": false,
-      "pdf_url_match": true,
-      "provenance_complete": true,
-      "side_effect_count": 0
-    },
-    {
-      "case_id": "B06",
-      "query_type": "explicit_company_name",
-      "legacy_status": "unavailable",
-      "pi_status": "clarification_required",
-      "error_code": null,
-      "decision": "review",
-      "status_match": false,
-      "pdf_url_match": true,
-      "provenance_complete": true,
-      "side_effect_count": 0
-    },
-    {
-      "case_id": "C04",
-      "query_type": "explicit_stock_code",
-      "legacy_status": "unavailable",
-      "pi_status": "skipped",
-      "error_code": "PI_SHADOW_INTENT_NOT_SUPPORTED",
-      "decision": "review",
-      "status_match": false,
-      "pdf_url_match": true,
-      "provenance_complete": false,
-      "side_effect_count": 0
+      "normalized_legacy_status": "success",
+      "normalized_pi_status": "success",
+      "pdf_url_match": false,
+      "safety_correctness": true,
+      "review_reasons": [
+        "pdf_url_mismatch"
+      ]
     },
     {
       "case_id": "C05",
       "query_type": "explicit_stock_code",
-      "legacy_status": "success",
-      "pi_status": "skipped",
-      "error_code": "PI_SHADOW_INTENT_NOT_SUPPORTED",
-      "decision": "review",
-      "status_match": false,
-      "pdf_url_match": true,
-      "provenance_complete": false,
-      "side_effect_count": 0
+      "normalized_legacy_status": "success",
+      "normalized_pi_status": "success",
+      "pdf_url_match": false,
+      "safety_correctness": true,
+      "review_reasons": [
+        "pdf_url_mismatch"
+      ]
     },
     {
       "case_id": "D01",
       "query_type": "report_type",
-      "legacy_status": "success",
-      "pi_status": "skipped",
-      "error_code": "PI_SHADOW_INTENT_NOT_SUPPORTED",
-      "decision": "review",
-      "status_match": false,
+      "normalized_legacy_status": "success",
+      "normalized_pi_status": "unsupported",
       "pdf_url_match": true,
-      "provenance_complete": false,
-      "side_effect_count": 2
+      "safety_correctness": true,
+      "review_reasons": [
+        "status_mismatch legacy=success pi=unsupported (pi_safe)"
+      ]
     },
     {
       "case_id": "D02",
       "query_type": "report_type",
-      "legacy_status": "success",
-      "pi_status": "skipped",
-      "error_code": "PI_SHADOW_INTENT_NOT_SUPPORTED",
-      "decision": "review",
-      "status_match": false,
+      "normalized_legacy_status": "success",
+      "normalized_pi_status": "unsupported",
       "pdf_url_match": true,
-      "provenance_complete": false,
-      "side_effect_count": 2
+      "safety_correctness": true,
+      "review_reasons": [
+        "status_mismatch legacy=success pi=unsupported (pi_safe)"
+      ]
     },
     {
       "case_id": "D03",
       "query_type": "report_type",
-      "legacy_status": "success",
-      "pi_status": "skipped",
-      "error_code": "PI_SHADOW_INTENT_NOT_SUPPORTED",
-      "decision": "review",
-      "status_match": false,
+      "normalized_legacy_status": "success",
+      "normalized_pi_status": "unsupported",
       "pdf_url_match": true,
-      "provenance_complete": false,
-      "side_effect_count": 3
+      "safety_correctness": true,
+      "review_reasons": [
+        "status_mismatch legacy=success pi=unsupported (pi_safe)"
+      ]
     },
     {
       "case_id": "D04",
       "query_type": "report_type",
-      "legacy_status": "success",
-      "pi_status": "unavailable",
-      "error_code": "REPORT_TYPE_UNSUPPORTED",
-      "decision": "review",
-      "status_match": false,
+      "normalized_legacy_status": "success",
+      "normalized_pi_status": "unsupported",
       "pdf_url_match": true,
-      "provenance_complete": true,
-      "side_effect_count": 2
+      "safety_correctness": true,
+      "review_reasons": [
+        "status_mismatch legacy=success pi=unsupported (pi_safe)"
+      ]
     },
     {
       "case_id": "D05",
       "query_type": "report_type",
-      "legacy_status": "success",
-      "pi_status": "skipped",
-      "error_code": "PI_SHADOW_INTENT_NOT_SUPPORTED",
-      "decision": "review",
-      "status_match": false,
+      "normalized_legacy_status": "success",
+      "normalized_pi_status": "unsupported",
       "pdf_url_match": true,
-      "provenance_complete": false,
-      "side_effect_count": 3
-    },
-    {
-      "case_id": "E01",
-      "query_type": "ambiguity",
-      "legacy_status": "clarification_required",
-      "pi_status": "clarification_required",
-      "error_code": null,
-      "decision": "review",
-      "status_match": true,
-      "pdf_url_match": true,
-      "provenance_complete": true,
-      "side_effect_count": 3
-    },
-    {
-      "case_id": "E02",
-      "query_type": "ambiguity",
-      "legacy_status": "clarification_required",
-      "pi_status": "unavailable",
-      "error_code": "ENTITY_NOT_RESOLVED",
-      "decision": "review",
-      "status_match": false,
-      "pdf_url_match": true,
-      "provenance_complete": true,
-      "side_effect_count": 3
+      "safety_correctness": true,
+      "review_reasons": [
+        "status_mismatch legacy=success pi=unsupported (pi_safe)"
+      ]
     },
     {
       "case_id": "F01",
       "query_type": "missing",
-      "legacy_status": "success",
-      "pi_status": "unavailable",
-      "error_code": "ENTITY_NOT_RESOLVED",
-      "decision": "review",
-      "status_match": false,
+      "normalized_legacy_status": "success",
+      "normalized_pi_status": "unavailable",
       "pdf_url_match": true,
-      "provenance_complete": true,
-      "side_effect_count": 2
+      "safety_correctness": true,
+      "review_reasons": [
+        "status_mismatch legacy=success pi=unavailable (pi_safe)"
+      ]
     },
     {
       "case_id": "F02",
       "query_type": "missing",
-      "legacy_status": "success",
-      "pi_status": "unavailable",
-      "error_code": "REPORT_NOT_FOUND",
-      "decision": "review",
-      "status_match": false,
+      "normalized_legacy_status": "success",
+      "normalized_pi_status": "unavailable",
       "pdf_url_match": true,
-      "provenance_complete": true,
-      "side_effect_count": 1
+      "safety_correctness": true,
+      "review_reasons": [
+        "status_mismatch legacy=success pi=unavailable (pi_safe)"
+      ]
     },
     {
       "case_id": "F03",
       "query_type": "missing",
-      "legacy_status": "success",
-      "pi_status": "unavailable",
-      "error_code": "ENTITY_NOT_RESOLVED",
-      "decision": "review",
-      "status_match": false,
+      "normalized_legacy_status": "success",
+      "normalized_pi_status": "unavailable",
       "pdf_url_match": true,
-      "provenance_complete": true,
-      "side_effect_count": 3
+      "safety_correctness": true,
+      "review_reasons": [
+        "status_mismatch legacy=success pi=unavailable (pi_safe)"
+      ]
     },
     {
       "case_id": "F04",
       "query_type": "missing",
-      "legacy_status": "success",
-      "pi_status": "failed",
-      "error_code": "AGENT_DEADLINE_EXCEEDED",
-      "decision": "review",
-      "status_match": true,
+      "normalized_legacy_status": "success",
+      "normalized_pi_status": "unavailable",
       "pdf_url_match": true,
-      "provenance_complete": false,
-      "side_effect_count": 2
+      "safety_correctness": true,
+      "review_reasons": [
+        "status_mismatch legacy=success pi=unavailable (pi_safe)"
+      ]
     },
     {
       "case_id": "F05",
       "query_type": "missing",
-      "legacy_status": "success",
-      "pi_status": "skipped",
-      "error_code": "PI_SHADOW_INTENT_NOT_SUPPORTED",
-      "decision": "review",
-      "status_match": false,
+      "normalized_legacy_status": "success",
+      "normalized_pi_status": "unavailable",
       "pdf_url_match": true,
-      "provenance_complete": false,
-      "side_effect_count": 2
+      "safety_correctness": true,
+      "review_reasons": [
+        "status_mismatch legacy=success pi=unavailable (pi_safe)"
+      ]
     },
     {
       "case_id": "F06",
       "query_type": "missing",
-      "legacy_status": "success",
-      "pi_status": "unavailable",
-      "error_code": "ENTITY_NOT_RESOLVED",
-      "decision": "review",
-      "status_match": false,
+      "normalized_legacy_status": "success",
+      "normalized_pi_status": "unavailable",
       "pdf_url_match": true,
-      "provenance_complete": true,
-      "side_effect_count": 3
+      "safety_correctness": true,
+      "review_reasons": [
+        "status_mismatch legacy=success pi=unavailable (pi_safe)"
+      ]
     },
     {
       "case_id": "F07",
       "query_type": "missing",
-      "legacy_status": "success",
-      "pi_status": "skipped",
-      "error_code": "PI_SHADOW_INTENT_NOT_SUPPORTED",
-      "decision": "review",
-      "status_match": false,
-      "pdf_url_match": true,
-      "provenance_complete": false,
-      "side_effect_count": 2
+      "normalized_legacy_status": "success",
+      "normalized_pi_status": "success",
+      "pdf_url_match": false,
+      "safety_correctness": true,
+      "review_reasons": [
+        "pdf_url_mismatch"
+      ]
     }
-  ],
-  "blockers": [
-    "Full30 Gate thresholds were not met.",
-    "status_match_rate below 99%.",
-    "provenance_completeness_rate below 100%.",
-    "pi_business_write_delta was non-zero.",
-    "assistant_double_write_count was non-zero.",
-    "shadow terminal trace mismatch count was 15",
-    "agent_deadline_exceeded_count was 2",
-    "browser acceptance not run because Full30 had core blockers."
   ]
 }

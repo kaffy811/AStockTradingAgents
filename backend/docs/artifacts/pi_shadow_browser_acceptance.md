@@ -1,12 +1,10 @@
 # Pi Shadow Browser Acceptance
 
-- Phase: `6V-P1.6.4`
-- Environment: `local_live`
-- Commit SHA: `e0dee3ebe133f74c3437748561e5476d74f10e6e`
 - Executed: `False`
 - Passed: `False`
-- Tester: `codex`
-- Blocker: Full30 Gate failed before browser acceptance.
-- Evidence reference: `pi_official_report_pdf_full30_final_results.json`
+- Notes: `not_run: no authenticated browser session was provided to this runner`
 
-Browser acceptance was intentionally not run because Full30 produced core Gate blockers.
+Required manual conversations:
+- 贵州茅台最新财报表现如何？ -> 这份报告的官方 PDF 在哪里？
+- 五粮液2025年年度报告PDF在哪里？
+- 平安的年报PDF在哪里？

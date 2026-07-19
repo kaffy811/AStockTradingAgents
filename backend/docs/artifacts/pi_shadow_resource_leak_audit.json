@@ -1,14 +1,13 @@
 {
   "schema_version": "pi_shadow_resource_leak_audit_v2",
-  "phase": "6V-P1.6.5",
-  "updated_at": "2026-07-19T10:48:58.746304+00:00",
-  "pool_matrix_runs": 2,
-  "pool_matrix_passed": true,
-  "serial_blocker_subset_executed": 26,
+  "phase": "6V-P1.6.6",
+  "updated_at": "2026-07-19T13:37:28.522809+00:00",
+  "serial_full30_executed": 30,
   "pending_rollback_errors": 0,
   "raw_500": 0,
   "raw_503": 0,
   "orphan_shadow_tasks_observed": 0,
   "diagnostics_tmp_files_left": 0,
-  "note": "26-case serial subset + concurrency isolation probe left no leaked shadow tasks, tmp diagnostics files or pool checkouts; connection pool reuse matrix passed twice"
+  "stale_terminal_ignored": 0,
+  "note": "fresh clone at 0860831; serial Full30 + smoke left no leaked tasks, tmp diagnostics or pool checkouts"
 }

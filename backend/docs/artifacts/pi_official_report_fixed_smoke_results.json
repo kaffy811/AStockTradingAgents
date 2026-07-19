@@ -1,120 +1,627 @@
 {
-  "schema_version": "pi_official_report_fixed_smoke_results_v1",
-  "phase": "6V-P1.6.3",
-  "generated_at": "2026-07-19T05:29:55.495068+00:00",
-  "environment_type": "local_live",
-  "commit_sha": "ab0d0367e7bf7f0a14cb6786adac7f58c0d79c92",
-  "planned": 3,
-  "executed": 3,
-  "accepted": 3,
-  "smoke_passed": true,
-  "recommended_to_retry_full30": true,
-  "recommended_for_next_authorization": false,
-  "pi_executor_enabled": false,
-  "authorized_agents": [],
-  "decision": "do_not_enable_pi_compatible",
-  "cases": [
+  "schema_version": "pi_official_report_shadow_v1",
+  "generated_at": "2026-07-19T13:26:23.569851+00:00",
+  "results": [
     {
+      "schema_version": "pi_official_report_shadow_v1",
+      "trace_id": "trace_255879a2cf72",
       "case_id": "A01",
       "query_type": "smoke_multi_turn_current_report",
-      "case_hash": "e98ed8057af14fe0",
-      "http_status": 200,
-      "sse_terminal_event_count": 1,
-      "shadow_terminal_received": true,
-      "shadow_status": "success",
-      "symbol": "600519",
-      "tool_call_count": 1,
-      "llm_call_count": 0,
-      "latency_ms": 979,
-      "decision": "pass",
-      "provenance_complete": true,
-      "safety_correctness": true,
-      "side_effect_count": 0,
-      "context_mutation_count": 0,
-      "double_write_count": 0,
-      "pending_rollback_count": 0,
-      "raw_500_count": 0,
-      "http_503_count": 0,
-      "agent_tool_timeout_count": 0,
-      "runner_diagnostics_timeout_count": 0
-    },
-    {
-      "case_id": "A02",
-      "query_type": "smoke_explicit_stock_code",
-      "case_hash": "b23280c959e5c753",
-      "http_status": 200,
-      "sse_terminal_event_count": 1,
-      "shadow_terminal_received": true,
-      "shadow_status": "success",
-      "symbol": "600519",
-      "tool_call_count": 1,
-      "llm_call_count": 0,
-      "latency_ms": 930,
-      "decision": "pass",
-      "provenance_complete": true,
-      "safety_correctness": true,
-      "side_effect_count": 0,
-      "context_mutation_count": 0,
-      "double_write_count": 0,
-      "pending_rollback_count": 0,
-      "raw_500_count": 0,
-      "http_503_count": 0,
-      "agent_tool_timeout_count": 0,
-      "runner_diagnostics_timeout_count": 0
-    },
-    {
-      "case_id": "A03",
-      "query_type": "smoke_ambiguity",
-      "case_hash": "6d9145c86bba9558",
-      "http_status": 200,
-      "sse_terminal_event_count": 1,
-      "shadow_terminal_received": true,
-      "shadow_status": "clarification_required",
-      "symbol": "",
-      "tool_call_count": 0,
-      "llm_call_count": 0,
-      "latency_ms": 0,
-      "decision": "pass",
-      "provenance_complete": true,
-      "safety_correctness": true,
-      "side_effect_count": 0,
-      "context_mutation_count": 0,
-      "double_write_count": 0,
-      "pending_rollback_count": 0,
-      "raw_500_count": 0,
-      "http_503_count": 0,
-      "agent_tool_timeout_count": 0,
-      "runner_diagnostics_timeout_count": 0,
-      "clarification_candidates": [
+      "legacy": {
+        "status": "success",
+        "market": "CN",
+        "symbol": "600519",
+        "company_name": "",
+        "report_year": null,
+        "report_type": "annual",
+        "source_page_url": null,
+        "pdf_url": "https://static.cninfo.com.cn/finalpage/2026-04-17/1225114741.PDF",
+        "official_domain_verified": true,
+        "latency_ms": 6515,
+        "error_code": null,
+        "input_snapshot_hash": "773cfedb80668c23"
+      },
+      "pi_compatible": {
+        "status": "success",
+        "market": "CN",
+        "symbol": "600519",
+        "company_name": "贵州茅台",
+        "report_year": 2025,
+        "report_type": "annual",
+        "source_page_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=1225114741&orgId=gssh0600519",
+        "pdf_url": "https://static.cninfo.com.cn/finalpage/2026-04-17/1225114741.PDF",
+        "official_domain_verified": true,
+        "latency_ms": 1195,
+        "error_code": null,
+        "turn_count": 1,
+        "tool_call_count": 1,
+        "llm_call_count": 0,
+        "metrics": {
+          "input_tokens": 0,
+          "latency_ms": 1195,
+          "model_calls": 0,
+          "output_tokens": 0,
+          "tool_calls": 1,
+          "tool_latency_breakdown": {
+            "adapter_overhead_ms": 0,
+            "adapter_total_ms": 1194,
+            "cache_lookup_ms": 0,
+            "cleanup_ms": 148,
+            "db_query_ms": 1045,
+            "diagnostics_write_ms": 0,
+            "entity_snapshot_reuse_ms": 0,
+            "event_recording_ms": 0,
+            "external_network_ms": 0,
+            "official_domain_validation_ms": 0,
+            "provenance_validation_ms": 0,
+            "report_db_query_ms": 1045,
+            "report_db_session_create_ms": 0,
+            "report_selection_ms": 0,
+            "resolver_ms": 0,
+            "total_ms": 1194
+          }
+        },
+        "input_snapshot_hash": "773cfedb80668c23"
+      },
+      "comparison": {
+        "status_match": true,
+        "normalized_legacy_status": "success",
+        "normalized_pi_status": "success",
+        "behavior_match": true,
+        "safety_correctness": true,
+        "entity_match": true,
+        "year_match": true,
+        "report_type_match": true,
+        "source_url_match": true,
+        "pdf_url_match": true,
+        "provenance_complete": true,
+        "provenance_missing_fields": [],
+        "unsupported_url_count": 0,
+        "side_effect_count": 0,
+        "decision": "pass",
+        "input_snapshot_hash_match": true
+      },
+      "event_summary": [
         {
-          "name": "平安银行",
-          "symbol_hash": "1c6f4057"
+          "event_type": "run_start",
+          "timestamp": "2026-07-19T13:25:48.177670+00:00",
+          "sequence": 1,
+          "status": null
         },
         {
-          "name": "中国平安",
-          "symbol_hash": "b52d04a5"
+          "event_type": "turn_start",
+          "timestamp": "2026-07-19T13:25:48.177682+00:00",
+          "sequence": 2,
+          "status": null
+        },
+        {
+          "event_type": "tool_call_start",
+          "timestamp": "2026-07-19T13:25:48.177706+00:00",
+          "sequence": 3,
+          "status": null
+        },
+        {
+          "event_type": "tool_execution_start",
+          "timestamp": "2026-07-19T13:25:48.177718+00:00",
+          "sequence": 4,
+          "status": null
+        },
+        {
+          "event_type": "tool_execution_end",
+          "timestamp": "2026-07-19T13:25:49.372351+00:00",
+          "sequence": 5,
+          "status": null
+        },
+        {
+          "event_type": "turn_end",
+          "timestamp": "2026-07-19T13:25:49.372524+00:00",
+          "sequence": 6,
+          "status": null
+        },
+        {
+          "event_type": "compliance_start",
+          "timestamp": "2026-07-19T13:25:49.372542+00:00",
+          "sequence": 7,
+          "status": null
+        },
+        {
+          "event_type": "compliance_end",
+          "timestamp": "2026-07-19T13:25:49.372606+00:00",
+          "sequence": 8,
+          "status": null
+        },
+        {
+          "event_type": "run_end",
+          "timestamp": "2026-07-19T13:25:49.372621+00:00",
+          "sequence": 9,
+          "status": null
         }
-      ]
+      ],
+      "correlation": {
+        "acceptance_run_id": "acc_a6cd1bd928f4",
+        "case_id": "A01",
+        "case_attempt": 1,
+        "turn_id": "A01.a1.t2",
+        "request_trace_id": "trace_255879a2cf72",
+        "legacy_run_id": "",
+        "shadow_run_id": "run_8c171d571a3d",
+        "input_snapshot_hash": "f415bb3fe842706d"
+      },
+      "structured_answer": {
+        "ambiguity_term": null,
+        "checked_source_scope": null,
+        "clarification_options": [],
+        "detected_intent": null,
+        "normalized_intent": null,
+        "provider": null,
+        "reason": null,
+        "reason_code": null,
+        "requested_report_type": null,
+        "requested_report_year": null,
+        "selection_not_performed_reason": null,
+        "status": "success"
+      },
+      "write_attribution_v2": {
+        "schema_version": "pi_shadow_write_attribution_v2",
+        "case_id": "A01",
+        "correlation": {
+          "acceptance_run_id": "acc_a6cd1bd928f4",
+          "case_id": "A01",
+          "case_attempt": 1,
+          "turn_id": "A01.a1.t2",
+          "request_trace_id": "trace_255879a2cf72",
+          "legacy_run_id": "",
+          "shadow_run_id": "run_8c171d571a3d",
+          "input_snapshot_hash": "f415bb3fe842706d"
+        },
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "8159b45fe2765aec",
+            "session_id_hash": "35d24bcf74493a2a",
+            "turn_id": "A01.a1.t2",
+            "request_trace_id": "trace_255879a2cf72",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "user",
+            "owner": "legacy",
+            "expected": true
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "1018263d51870fbe",
+            "session_id_hash": "35d24bcf74493a2a",
+            "turn_id": "A01.a1.t2",
+            "request_trace_id": "trace_255879a2cf72",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "assistant",
+            "owner": "legacy",
+            "expected": true,
+            "assistant_logical_response_id": "e6a85834f0066060"
+          }
+        ],
+        "pi_business_write_delta": 0,
+        "assistant_double_write_count": 0,
+        "unknown_owner_write_count": 0,
+        "other_case_write_count": 0,
+        "legacy_write_count": 2,
+        "system_write_count": 0
+      },
+      "trace_match": true,
+      "shadow_terminal_received": true,
+      "deadline_classification": "none",
+      "side_effects": {
+        "context_mutation_count": 0,
+        "double_write_count": 0
+      },
+      "setup_turn": {
+        "legacy": {
+          "status": "success",
+          "http_status": 200,
+          "sse_terminal_received": true,
+          "sse_terminal_event_count": 1,
+          "legacy_terminal_status": "partial_success",
+          "legacy_message_persisted": true,
+          "shadow_terminal_received": null,
+          "shadow_terminal_status": "success",
+          "error_code": null,
+          "run_id": null,
+          "trace_id": null
+        },
+        "pi_compatible": {
+          "status": "skipped",
+          "http_status": null,
+          "sse_terminal_received": null,
+          "sse_terminal_event_count": null,
+          "legacy_terminal_status": null,
+          "legacy_message_persisted": null,
+          "shadow_terminal_received": true,
+          "shadow_terminal_status": "skipped",
+          "error_code": "PI_SHADOW_SKIPPED",
+          "run_id": "run_1f9a77a0a4c4",
+          "trace_id": "trace_91de17a16b2f"
+        }
+      }
+    },
+    {
+      "schema_version": "pi_official_report_shadow_v1",
+      "trace_id": "trace_cf1a720ead96",
+      "case_id": "A02",
+      "query_type": "smoke_explicit_stock_code",
+      "legacy": {
+        "status": "success",
+        "market": "CN",
+        "symbol": "600519",
+        "company_name": "",
+        "report_year": null,
+        "report_type": "annual",
+        "source_page_url": null,
+        "pdf_url": "https://static.cninfo.com.cn/finalpage/2026-04-17/1225114741.PDF",
+        "official_domain_verified": true,
+        "latency_ms": 5130,
+        "error_code": null,
+        "input_snapshot_hash": "053a3469333c2d8a"
+      },
+      "pi_compatible": {
+        "status": "success",
+        "market": "CN",
+        "symbol": "600519",
+        "company_name": "贵州茅台",
+        "report_year": 2025,
+        "report_type": "annual",
+        "source_page_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=1225114741&orgId=gssh0600519",
+        "pdf_url": "https://static.cninfo.com.cn/finalpage/2026-04-17/1225114741.PDF",
+        "official_domain_verified": true,
+        "latency_ms": 1017,
+        "error_code": null,
+        "turn_count": 1,
+        "tool_call_count": 1,
+        "llm_call_count": 0,
+        "metrics": {
+          "input_tokens": 0,
+          "latency_ms": 1017,
+          "model_calls": 0,
+          "output_tokens": 0,
+          "tool_calls": 1,
+          "tool_latency_breakdown": {
+            "adapter_overhead_ms": 0,
+            "adapter_total_ms": 1016,
+            "cache_lookup_ms": 0,
+            "cleanup_ms": 122,
+            "db_query_ms": 894,
+            "diagnostics_write_ms": 0,
+            "entity_snapshot_reuse_ms": 0,
+            "event_recording_ms": 0,
+            "external_network_ms": 0,
+            "official_domain_validation_ms": 0,
+            "provenance_validation_ms": 0,
+            "report_db_query_ms": 894,
+            "report_db_session_create_ms": 0,
+            "report_selection_ms": 0,
+            "resolver_ms": 0,
+            "total_ms": 1016
+          }
+        },
+        "input_snapshot_hash": "053a3469333c2d8a"
+      },
+      "comparison": {
+        "status_match": true,
+        "normalized_legacy_status": "success",
+        "normalized_pi_status": "success",
+        "behavior_match": true,
+        "safety_correctness": true,
+        "entity_match": true,
+        "year_match": true,
+        "report_type_match": true,
+        "source_url_match": true,
+        "pdf_url_match": true,
+        "provenance_complete": true,
+        "provenance_missing_fields": [],
+        "unsupported_url_count": 0,
+        "side_effect_count": 0,
+        "decision": "pass",
+        "input_snapshot_hash_match": true
+      },
+      "event_summary": [
+        {
+          "event_type": "run_start",
+          "timestamp": "2026-07-19T13:26:00.132787+00:00",
+          "sequence": 1,
+          "status": null
+        },
+        {
+          "event_type": "turn_start",
+          "timestamp": "2026-07-19T13:26:00.132800+00:00",
+          "sequence": 2,
+          "status": null
+        },
+        {
+          "event_type": "tool_call_start",
+          "timestamp": "2026-07-19T13:26:00.132827+00:00",
+          "sequence": 3,
+          "status": null
+        },
+        {
+          "event_type": "tool_execution_start",
+          "timestamp": "2026-07-19T13:26:00.132843+00:00",
+          "sequence": 4,
+          "status": null
+        },
+        {
+          "event_type": "tool_execution_end",
+          "timestamp": "2026-07-19T13:26:01.149956+00:00",
+          "sequence": 5,
+          "status": null
+        },
+        {
+          "event_type": "turn_end",
+          "timestamp": "2026-07-19T13:26:01.150123+00:00",
+          "sequence": 6,
+          "status": null
+        },
+        {
+          "event_type": "compliance_start",
+          "timestamp": "2026-07-19T13:26:01.150145+00:00",
+          "sequence": 7,
+          "status": null
+        },
+        {
+          "event_type": "compliance_end",
+          "timestamp": "2026-07-19T13:26:01.150234+00:00",
+          "sequence": 8,
+          "status": null
+        },
+        {
+          "event_type": "run_end",
+          "timestamp": "2026-07-19T13:26:01.150255+00:00",
+          "sequence": 9,
+          "status": null
+        }
+      ],
+      "correlation": {
+        "acceptance_run_id": "acc_a6cd1bd928f4",
+        "case_id": "A02",
+        "case_attempt": 1,
+        "turn_id": "A02.a1.t1",
+        "request_trace_id": "trace_cf1a720ead96",
+        "legacy_run_id": "",
+        "shadow_run_id": "run_800eed9e2975",
+        "input_snapshot_hash": "c9e00083aaaf828e"
+      },
+      "structured_answer": {
+        "ambiguity_term": null,
+        "checked_source_scope": null,
+        "clarification_options": [],
+        "detected_intent": null,
+        "normalized_intent": null,
+        "provider": null,
+        "reason": null,
+        "reason_code": null,
+        "requested_report_type": null,
+        "requested_report_year": null,
+        "selection_not_performed_reason": null,
+        "status": "success"
+      },
+      "write_attribution_v2": {
+        "schema_version": "pi_shadow_write_attribution_v2",
+        "case_id": "A02",
+        "correlation": {
+          "acceptance_run_id": "acc_a6cd1bd928f4",
+          "case_id": "A02",
+          "case_attempt": 1,
+          "turn_id": "A02.a1.t1",
+          "request_trace_id": "trace_cf1a720ead96",
+          "legacy_run_id": "",
+          "shadow_run_id": "run_800eed9e2975",
+          "input_snapshot_hash": "c9e00083aaaf828e"
+        },
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "e2e37d1b6675d3d7",
+            "session_id_hash": "0b2079c87e07203e",
+            "turn_id": "A02.a1.t1",
+            "request_trace_id": "trace_cf1a720ead96",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "user",
+            "owner": "legacy",
+            "expected": true
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "0e9260d1867baad4",
+            "session_id_hash": "0b2079c87e07203e",
+            "turn_id": "A02.a1.t1",
+            "request_trace_id": "trace_cf1a720ead96",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "assistant",
+            "owner": "legacy",
+            "expected": true,
+            "assistant_logical_response_id": "0613c302b7877fac"
+          }
+        ],
+        "pi_business_write_delta": 0,
+        "assistant_double_write_count": 0,
+        "unknown_owner_write_count": 0,
+        "other_case_write_count": 0,
+        "legacy_write_count": 2,
+        "system_write_count": 0
+      },
+      "trace_match": true,
+      "shadow_terminal_received": true,
+      "deadline_classification": "none",
+      "side_effects": {
+        "context_mutation_count": 0,
+        "double_write_count": 0
+      }
+    },
+    {
+      "schema_version": "pi_official_report_shadow_v1",
+      "trace_id": "trace_450ba01b9259",
+      "case_id": "A03",
+      "query_type": "smoke_ambiguity",
+      "legacy": {
+        "status": "clarification_required",
+        "market": "CN",
+        "symbol": "",
+        "company_name": "",
+        "report_year": null,
+        "report_type": "annual",
+        "source_page_url": null,
+        "pdf_url": null,
+        "official_domain_verified": false,
+        "latency_ms": 12412,
+        "error_code": "ENTITY_NOT_RESOLVED",
+        "input_snapshot_hash": "251f8bd5e2cfed5a"
+      },
+      "pi_compatible": {
+        "status": "clarification_required",
+        "market": "",
+        "symbol": "",
+        "company_name": "",
+        "report_year": null,
+        "report_type": null,
+        "source_page_url": null,
+        "pdf_url": null,
+        "official_domain_verified": false,
+        "latency_ms": 0,
+        "error_code": null,
+        "turn_count": 0,
+        "tool_call_count": 0,
+        "llm_call_count": 0,
+        "metrics": {
+          "input_tokens": 0,
+          "latency_ms": 0,
+          "model_calls": 0,
+          "output_tokens": 0,
+          "tool_calls": 0,
+          "tool_latency_breakdown": {}
+        },
+        "input_snapshot_hash": "251f8bd5e2cfed5a"
+      },
+      "comparison": {
+        "status_match": true,
+        "normalized_legacy_status": "clarification_required",
+        "normalized_pi_status": "clarification_required",
+        "behavior_match": true,
+        "safety_correctness": true,
+        "entity_match": true,
+        "year_match": true,
+        "report_type_match": true,
+        "source_url_match": true,
+        "pdf_url_match": true,
+        "provenance_complete": true,
+        "provenance_missing_fields": [],
+        "unsupported_url_count": 0,
+        "side_effect_count": 0,
+        "decision": "pass",
+        "input_snapshot_hash_match": true
+      },
+      "event_summary": [],
+      "correlation": {
+        "acceptance_run_id": "acc_a6cd1bd928f4",
+        "case_id": "A03",
+        "case_attempt": 1,
+        "turn_id": "A03.a1.t1",
+        "request_trace_id": "trace_450ba01b9259",
+        "legacy_run_id": "",
+        "shadow_run_id": "run_c64049e79cf7",
+        "input_snapshot_hash": "76ac9e2c471bf2b1"
+      },
+      "structured_answer": {
+        "ambiguity_term": "平安",
+        "checked_source_scope": null,
+        "clarification_options": [
+          {
+            "market": "CN",
+            "short_name": "平安银行",
+            "symbol": "000001"
+          },
+          {
+            "market": "CN",
+            "short_name": "中国平安",
+            "symbol": "601318"
+          }
+        ],
+        "detected_intent": null,
+        "normalized_intent": null,
+        "provider": "security_entity_resolver_hint",
+        "reason": null,
+        "reason_code": null,
+        "requested_report_type": null,
+        "requested_report_year": null,
+        "selection_not_performed_reason": "candidate_selection_requires_user_confirmation",
+        "status": "clarification_required"
+      },
+      "write_attribution_v2": {
+        "schema_version": "pi_shadow_write_attribution_v2",
+        "case_id": "A03",
+        "correlation": {
+          "acceptance_run_id": "acc_a6cd1bd928f4",
+          "case_id": "A03",
+          "case_attempt": 1,
+          "turn_id": "A03.a1.t1",
+          "request_trace_id": "trace_450ba01b9259",
+          "legacy_run_id": "",
+          "shadow_run_id": "run_c64049e79cf7",
+          "input_snapshot_hash": "76ac9e2c471bf2b1"
+        },
+        "writes": [
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "d0fa76d668ca55dc",
+            "session_id_hash": "6fdff04ce2b5ad88",
+            "turn_id": "A03.a1.t1",
+            "request_trace_id": "trace_450ba01b9259",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "user",
+            "owner": "legacy",
+            "expected": true
+          },
+          {
+            "resource": "chat_messages",
+            "operation": "insert",
+            "record_id_hash": "1dae4a00b0ddbbaf",
+            "session_id_hash": "6fdff04ce2b5ad88",
+            "turn_id": "A03.a1.t1",
+            "request_trace_id": "trace_450ba01b9259",
+            "legacy_run_id": "",
+            "shadow_run_id": null,
+            "writer_component": "chat_service.message_persistence",
+            "role": "assistant",
+            "owner": "legacy",
+            "expected": true,
+            "assistant_logical_response_id": "b587d8281aed49c0"
+          }
+        ],
+        "pi_business_write_delta": 0,
+        "assistant_double_write_count": 0,
+        "unknown_owner_write_count": 0,
+        "other_case_write_count": 0,
+        "legacy_write_count": 2,
+        "system_write_count": 0
+      },
+      "trace_match": true,
+      "shadow_terminal_received": true,
+      "deadline_classification": "none",
+      "side_effects": {
+        "context_mutation_count": 0,
+        "double_write_count": 0
+      }
     }
-  ],
-  "latency": {
-    "pi_total_p50_ms": 930,
-    "pi_total_p95_ms": 979
-  },
-  "auth": {
-    "cold_lookup_ms": 1029,
-    "connection_checkout_ms": 508,
-    "db_execute_ms": 403,
-    "cache_hit_p95_ms": 0,
-    "cache_hits": 8,
-    "cache_misses": 1
-  },
-  "tests": {
-    "pool_tests": "13 passed twice under sqlite; 13 passed under PostgreSQL-style URL",
-    "targeted_backend": "71 passed, 12 warnings",
-    "backend_full": "3359 passed, 15 skipped, 299 warnings",
-    "frontend_test": "679 passed",
-    "frontend_build": "passed",
-    "npm_ci": "failed: package-lock.json missing @esbuild/linux-s390x@0.28.1; npm install was not used to update lockfile"
-  }
+  ]
 }

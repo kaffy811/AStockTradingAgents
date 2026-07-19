@@ -1,23 +1,27 @@
 {
   "schema_version": "pi_compatible_runtime_gate_v1",
-  "phase": "6V-P1.6.5",
-  "updated_at": "2026-07-19T10:47:51.467382+00:00",
-  "trace_mismatch_root_cause_identified": true,
+  "phase": "6V-P1.6.6",
+  "updated_at": "2026-07-19T13:37:28.522809+00:00",
+  "full30_executed": 30,
+  "full30_serial": true,
+  "correlation_envelope": true,
   "shadow_terminal_trace_mismatch_count": 0,
   "pi_business_write_delta": 0,
   "assistant_double_write_count": 0,
   "unknown_owner_write_count": 0,
   "unexpected_deadline_exceeded_count": 0,
-  "status_taxonomy_validated": true,
   "clarification_applicable_correctness": 1.0,
   "status_specific_provenance_completeness": 1.0,
-  "blocker_subset_passed": true,
-  "recommended_to_retry_full30": true,
+  "status_match_rate": 0.6333,
+  "safety_correctness_rate": 1.0,
+  "browser_acceptance": "not_run",
+  "shadow_passed": false,
   "recommended_for_next_authorization": false,
   "pi_executor_enabled": false,
   "authorized_agents": [],
   "decision": "do_not_enable_pi_compatible",
   "blockers": [
-    "formal Full30 and browser acceptance intentionally not run in this phase"
+    "status_match_rate below 99% threshold: 15 review cases are documented safe behavior differences (Pi unsupported/unavailable vs Legacy claimed success; Legacy wrong-year documents on B02/B05/C05/F07).",
+    "browser acceptance not_run: requires an authenticated manual browser session."
   ]
 }
