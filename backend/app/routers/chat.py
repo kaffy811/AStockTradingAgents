@@ -166,7 +166,7 @@ async def get_chat_session(
 async def send_chat_message(
     session_id: uuid.UUID,
     body: ChatMessageSendRequest,
-    request: Request,
+    request: Request = None,
     user: User         = Depends(get_current_user),
     db:   AsyncSession = Depends(get_db),
 ) -> ChatMessageSendResponse:
@@ -176,7 +176,9 @@ async def send_chat_message(
         set_correlation_from_header,
     )
 
-    set_correlation_from_header(request.headers.get(SHADOW_CORRELATION_HEADER))
+    set_correlation_from_header(
+        request.headers.get(SHADOW_CORRELATION_HEADER) if request is not None else None
+    )
     # Verify session belongs to user
     session = await chat_service.get_session(db, session_id, user.id)
     if session is None:

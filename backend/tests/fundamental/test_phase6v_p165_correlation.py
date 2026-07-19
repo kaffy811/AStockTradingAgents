@@ -267,7 +267,7 @@ def test_pi_shadow_write_forbidden_at_tool_boundary():
         input_schema={"type": "object", "properties": {}},
         mode="write",
     )
-    response = asyncio.get_event_loop().run_until_complete(
+    response = asyncio.run(
         adapter.execute(
             PiToolCall(id="tc1", name="mutate_things", arguments={}),
             trace_id="trace",
