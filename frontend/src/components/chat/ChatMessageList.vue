@@ -144,6 +144,14 @@
                 @action="(link) => $emit('action', msg.id, link)"
               />
 
+              <!-- P1.6.8: entity clarification candidates -->
+              <ChatClarificationCard
+                v-if="msg.clarification?.candidates?.length && !msg.isStreaming"
+                :clarification="msg.clarification"
+                :disabled="isSending"
+                @select="(cand) => $emit('select-candidate', msg.id, cand)"
+              />
+
               <!-- C29.1.6: Data quality card — debug only -->
               <DataQualityCard
                 v-if="SHOW_DATA_QUALITY && (msg.dataQuality || msg.finalAnswer?.data_quality)"
@@ -193,6 +201,7 @@ import { useI18n } from '../../utils/i18n.js'
 import ChatThinkingMiniPanel from './ChatThinkingMiniPanel.vue'
 import ChatReasoningPanel    from './ChatReasoningPanel.vue'
 import ChatResultCard        from './ChatResultCard.vue'
+import ChatClarificationCard from './ChatClarificationCard.vue'
 import ChatConfirmationCard  from './ChatConfirmationCard.vue'
 import DataQualityCard       from './DataQualityCard.vue'
 import ChatSourceList        from './ChatSourceList.vue'
@@ -213,7 +222,7 @@ const props = defineProps({
   highlightedId: { type: String, default: null },
 })
 
-const emit = defineEmits(['confirm', 'cancel', 'action', 'edit-user', 'retry-ai'])
+const emit = defineEmits(['confirm', 'cancel', 'action', 'edit-user', 'retry-ai', 'select-candidate'])
 
 const { t } = useI18n()
 const listRef = ref(null)
