@@ -1,0 +1,21 @@
+{
+  "schema_version": "pi_official_report_pdf_full30_terminal_audit_v1",
+  "phase": "6V-P1.6.4",
+  "generated_at": "2026-07-19T06:55:51.671506+00:00",
+  "diagnostics_records": 33,
+  "case_shadow_terminal_missing_count": 15,
+  "trace_mismatch_count": 15,
+  "diagnostics_timeout_count": 0,
+  "agent_deadline_exceeded_count": 2,
+  "status_counts": {
+    "unavailable": 7,
+    "skipped": 11,
+    "success": 9,
+    "clarification_required": 4,
+    "failed": 2
+  },
+  "all_case_traces_have_terminal": false,
+  "legacy_terminal_missing_count": 0,
+  "legacy_duplicate_terminal_count": 0,
+  "note": "31 diagnostics records includes multi-turn setup shadows plus 30 counted Full30 cases."
+}

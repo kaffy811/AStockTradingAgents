@@ -78,6 +78,708 @@
       "security_index_full_scan_count": 0,
       "security_index_rebuild_count": 0,
       "security_index_snapshot_id": ""
+    },
+    {
+      "case_id": "B01",
+      "before": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "after": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "security_index_cache_hit": true,
+      "entity_snapshot_reused": true,
+      "security_index_full_scan_count": 0,
+      "security_index_rebuild_count": 0,
+      "security_index_snapshot_id": ""
+    },
+    {
+      "case_id": "B02",
+      "before": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "after": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "security_index_cache_hit": true,
+      "entity_snapshot_reused": true,
+      "security_index_full_scan_count": 0,
+      "security_index_rebuild_count": 0,
+      "security_index_snapshot_id": ""
+    },
+    {
+      "case_id": "B03",
+      "before": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "after": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "security_index_cache_hit": true,
+      "entity_snapshot_reused": true,
+      "security_index_full_scan_count": 0,
+      "security_index_rebuild_count": 0,
+      "security_index_snapshot_id": ""
+    },
+    {
+      "case_id": "B04",
+      "before": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "after": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "security_index_cache_hit": true,
+      "entity_snapshot_reused": true,
+      "security_index_full_scan_count": 0,
+      "security_index_rebuild_count": 0,
+      "security_index_snapshot_id": ""
+    },
+    {
+      "case_id": "B05",
+      "before": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "after": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "security_index_cache_hit": true,
+      "entity_snapshot_reused": true,
+      "security_index_full_scan_count": 0,
+      "security_index_rebuild_count": 0,
+      "security_index_snapshot_id": ""
+    },
+    {
+      "case_id": "B06",
+      "before": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "after": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "security_index_cache_hit": true,
+      "entity_snapshot_reused": true,
+      "security_index_full_scan_count": 0,
+      "security_index_rebuild_count": 0,
+      "security_index_snapshot_id": ""
+    },
+    {
+      "case_id": "B07",
+      "before": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "after": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "security_index_cache_hit": true,
+      "entity_snapshot_reused": true,
+      "security_index_full_scan_count": 0,
+      "security_index_rebuild_count": 0,
+      "security_index_snapshot_id": ""
+    },
+    {
+      "case_id": "C01",
+      "before": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "after": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "security_index_cache_hit": true,
+      "entity_snapshot_reused": true,
+      "security_index_full_scan_count": 0,
+      "security_index_rebuild_count": 0,
+      "security_index_snapshot_id": ""
+    },
+    {
+      "case_id": "C02",
+      "before": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "after": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "security_index_cache_hit": true,
+      "entity_snapshot_reused": true,
+      "security_index_full_scan_count": 0,
+      "security_index_rebuild_count": 0,
+      "security_index_snapshot_id": ""
+    },
+    {
+      "case_id": "C03",
+      "before": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "after": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "security_index_cache_hit": true,
+      "entity_snapshot_reused": true,
+      "security_index_full_scan_count": 0,
+      "security_index_rebuild_count": 0,
+      "security_index_snapshot_id": ""
+    },
+    {
+      "case_id": "C04",
+      "before": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "after": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "security_index_cache_hit": true,
+      "entity_snapshot_reused": true,
+      "security_index_full_scan_count": 0,
+      "security_index_rebuild_count": 0,
+      "security_index_snapshot_id": ""
+    },
+    {
+      "case_id": "C05",
+      "before": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "after": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "security_index_cache_hit": true,
+      "entity_snapshot_reused": true,
+      "security_index_full_scan_count": 0,
+      "security_index_rebuild_count": 0,
+      "security_index_snapshot_id": ""
+    },
+    {
+      "case_id": "C06",
+      "before": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "after": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "security_index_cache_hit": true,
+      "entity_snapshot_reused": true,
+      "security_index_full_scan_count": 0,
+      "security_index_rebuild_count": 0,
+      "security_index_snapshot_id": ""
+    },
+    {
+      "case_id": "D01",
+      "before": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "after": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "security_index_cache_hit": true,
+      "entity_snapshot_reused": true,
+      "security_index_full_scan_count": 0,
+      "security_index_rebuild_count": 0,
+      "security_index_snapshot_id": ""
+    },
+    {
+      "case_id": "D02",
+      "before": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "after": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "security_index_cache_hit": true,
+      "entity_snapshot_reused": true,
+      "security_index_full_scan_count": 0,
+      "security_index_rebuild_count": 0,
+      "security_index_snapshot_id": ""
+    },
+    {
+      "case_id": "D03",
+      "before": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "after": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "security_index_cache_hit": true,
+      "entity_snapshot_reused": true,
+      "security_index_full_scan_count": 0,
+      "security_index_rebuild_count": 0,
+      "security_index_snapshot_id": ""
+    },
+    {
+      "case_id": "D04",
+      "before": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "after": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "security_index_cache_hit": true,
+      "entity_snapshot_reused": true,
+      "security_index_full_scan_count": 0,
+      "security_index_rebuild_count": 0,
+      "security_index_snapshot_id": ""
+    },
+    {
+      "case_id": "D05",
+      "before": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "after": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "security_index_cache_hit": true,
+      "entity_snapshot_reused": true,
+      "security_index_full_scan_count": 0,
+      "security_index_rebuild_count": 0,
+      "security_index_snapshot_id": ""
+    },
+    {
+      "case_id": "E01",
+      "before": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "after": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "security_index_cache_hit": true,
+      "entity_snapshot_reused": true,
+      "security_index_full_scan_count": 0,
+      "security_index_rebuild_count": 0,
+      "security_index_snapshot_id": ""
+    },
+    {
+      "case_id": "E02",
+      "before": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "after": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "security_index_cache_hit": true,
+      "entity_snapshot_reused": true,
+      "security_index_full_scan_count": 0,
+      "security_index_rebuild_count": 0,
+      "security_index_snapshot_id": ""
+    },
+    {
+      "case_id": "F01",
+      "before": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "after": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "security_index_cache_hit": true,
+      "entity_snapshot_reused": true,
+      "security_index_full_scan_count": 0,
+      "security_index_rebuild_count": 0,
+      "security_index_snapshot_id": ""
+    },
+    {
+      "case_id": "F02",
+      "before": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "after": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "security_index_cache_hit": true,
+      "entity_snapshot_reused": true,
+      "security_index_full_scan_count": 0,
+      "security_index_rebuild_count": 0,
+      "security_index_snapshot_id": ""
+    },
+    {
+      "case_id": "F03",
+      "before": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "after": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "security_index_cache_hit": true,
+      "entity_snapshot_reused": true,
+      "security_index_full_scan_count": 0,
+      "security_index_rebuild_count": 0,
+      "security_index_snapshot_id": ""
+    },
+    {
+      "case_id": "F04",
+      "before": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "after": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "security_index_cache_hit": true,
+      "entity_snapshot_reused": true,
+      "security_index_full_scan_count": 0,
+      "security_index_rebuild_count": 0,
+      "security_index_snapshot_id": ""
+    },
+    {
+      "case_id": "F05",
+      "before": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "after": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "security_index_cache_hit": true,
+      "entity_snapshot_reused": true,
+      "security_index_full_scan_count": 0,
+      "security_index_rebuild_count": 0,
+      "security_index_snapshot_id": ""
+    },
+    {
+      "case_id": "F06",
+      "before": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "after": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "security_index_cache_hit": true,
+      "entity_snapshot_reused": true,
+      "security_index_full_scan_count": 0,
+      "security_index_rebuild_count": 0,
+      "security_index_snapshot_id": ""
+    },
+    {
+      "case_id": "F07",
+      "before": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "after": {
+        "security_index_cache_hit": 0,
+        "security_index_cache_miss": 0,
+        "security_index_rebuild": 0,
+        "security_index_db_full_scan": 0,
+        "security_index_version": "v3_d6_4",
+        "security_index_snapshot_count": 0,
+        "security_index_snapshot_id": ""
+      },
+      "security_index_cache_hit": true,
+      "entity_snapshot_reused": true,
+      "security_index_full_scan_count": 0,
+      "security_index_rebuild_count": 0,
+      "security_index_snapshot_id": ""
     }
   ]
 }

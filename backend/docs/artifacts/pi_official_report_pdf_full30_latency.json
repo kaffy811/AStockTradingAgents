@@ -1,0 +1,36 @@
+{
+  "schema_version": "pi_official_report_pdf_full30_latency_v1",
+  "phase": "6V-P1.6.4",
+  "generated_at": "2026-07-19T06:55:51.671506+00:00",
+  "legacy_latency_ms": {
+    "p50": 7227.5,
+    "p95": 20014.35
+  },
+  "pi_total_latency_ms": {
+    "p50": 0.0,
+    "p95": 2768.4,
+    "max": 6290
+  },
+  "tool_latency_ms": {
+    "p50": 1046.0,
+    "p95": 2573.05
+  },
+  "report_db_query_ms": {
+    "p50": 923.5,
+    "p95": 2326.55
+  },
+  "cleanup_latency_ms": {
+    "p50": 137.0,
+    "p95": 246.05
+  },
+  "auth": {
+    "source": "pi_auth_principal_cache_audit.json",
+    "cache_hit_p95_ms": 0,
+    "cold_lookup_ms": 1029
+  },
+  "executor_overhead_ms": {
+    "p50": 0,
+    "p95": 0,
+    "note": "runner artifact exposes adapter_overhead_ms; all recorded values were zero"
+  }
+}

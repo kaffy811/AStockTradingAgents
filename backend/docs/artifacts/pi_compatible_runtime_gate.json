@@ -1,18 +1,20 @@
 {
-  "schema_version": "pi_compatible_runtime_gate_v1",
-  "phase": "6V-P1.6.3",
-  "updated_at": "2026-07-19T05:29:55.495068+00:00",
-  "database_pool_test_fix_passed": true,
-  "backend_full_passed": true,
-  "smoke_planned": 3,
-  "smoke_executed": 3,
-  "smoke_accepted": 3,
-  "smoke_passed": true,
-  "full30_gate_passed": false,
-  "recommended_to_retry_full30": true,
+  "phase": "6V-P1.6.4",
+  "shadow_passed": false,
+  "planned": 30,
+  "executed": 30,
+  "accepted": 10,
   "recommended_for_next_authorization": false,
+  "recommended_next_step": null,
   "pi_executor_enabled": false,
   "authorized_agents": [],
   "decision": "do_not_enable_pi_compatible",
-  "blockers": []
+  "blockers": [
+    "Full30 Gate thresholds were not met.",
+    "status_match_rate below 99%.",
+    "provenance_completeness_rate below 100%.",
+    "pi_business_write_delta was non-zero.",
+    "assistant_double_write_count was non-zero.",
+    "browser acceptance not run because Full30 had core blockers."
+  ]
 }

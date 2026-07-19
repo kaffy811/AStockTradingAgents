@@ -19,7 +19,7 @@
   "branch_ready": true,
   "commit_sha_present": true,
   "environment_type": "local_live",
-  "commit_sha": "bbc3379790b9a5308ed0089b98ad276b44d71adf",
+  "commit_sha": "e0dee3ebe133f74c3437748561e5476d74f10e6e",
   "branch": "release/demo-staging",
   "backend_base_url": "redacted",
   "frontend_base_url": "",

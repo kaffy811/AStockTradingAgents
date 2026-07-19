@@ -1,11 +1,12 @@
 {
   "schema_version": "pi_shadow_resource_leak_audit_v1",
-  "phase": "6V-P1.6.3",
+  "phase": "6V-P1.6.4",
+  "generated_at": "2026-07-19T06:55:51.671506+00:00",
   "environment_type": "local_live",
   "pool_checked_out_end": 0,
-  "pool_overflow_end": 0,
   "pending_rollback_count": 0,
   "agent_tool_timeout_count": 0,
+  "agent_deadline_exceeded_count": 2,
   "runner_diagnostics_timeout_count": 0,
   "task_leak_count": 0,
   "db_leak_count": 0,
@@ -14,25 +15,181 @@
       "case_id": "A01",
       "pi_shadow_business_write_delta": 0,
       "context_mutation_count": 0,
-      "double_write_count": 0,
-      "before_pool_checked_out": 1,
-      "after_pool_checked_out": 1
+      "double_write_count": 0
     },
     {
       "case_id": "A02",
       "pi_shadow_business_write_delta": 0,
       "context_mutation_count": 0,
-      "double_write_count": 0,
-      "before_pool_checked_out": 1,
-      "after_pool_checked_out": 1
+      "double_write_count": 0
     },
     {
       "case_id": "A03",
       "pi_shadow_business_write_delta": 0,
       "context_mutation_count": 0,
-      "double_write_count": 0,
-      "before_pool_checked_out": 1,
-      "after_pool_checked_out": 1
+      "double_write_count": 0
+    },
+    {
+      "case_id": "B01",
+      "pi_shadow_business_write_delta": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0
+    },
+    {
+      "case_id": "B02",
+      "pi_shadow_business_write_delta": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0
+    },
+    {
+      "case_id": "B03",
+      "pi_shadow_business_write_delta": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0
+    },
+    {
+      "case_id": "B04",
+      "pi_shadow_business_write_delta": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0
+    },
+    {
+      "case_id": "B05",
+      "pi_shadow_business_write_delta": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0
+    },
+    {
+      "case_id": "B06",
+      "pi_shadow_business_write_delta": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0
+    },
+    {
+      "case_id": "B07",
+      "pi_shadow_business_write_delta": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0
+    },
+    {
+      "case_id": "C01",
+      "pi_shadow_business_write_delta": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0
+    },
+    {
+      "case_id": "C02",
+      "pi_shadow_business_write_delta": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0
+    },
+    {
+      "case_id": "C03",
+      "pi_shadow_business_write_delta": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0
+    },
+    {
+      "case_id": "C04",
+      "pi_shadow_business_write_delta": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0
+    },
+    {
+      "case_id": "C05",
+      "pi_shadow_business_write_delta": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0
+    },
+    {
+      "case_id": "C06",
+      "pi_shadow_business_write_delta": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0
+    },
+    {
+      "case_id": "D01",
+      "pi_shadow_business_write_delta": 2,
+      "context_mutation_count": 0,
+      "double_write_count": 2
+    },
+    {
+      "case_id": "D02",
+      "pi_shadow_business_write_delta": 2,
+      "context_mutation_count": 0,
+      "double_write_count": 2
+    },
+    {
+      "case_id": "D03",
+      "pi_shadow_business_write_delta": 3,
+      "context_mutation_count": 0,
+      "double_write_count": 3
+    },
+    {
+      "case_id": "D04",
+      "pi_shadow_business_write_delta": 2,
+      "context_mutation_count": 0,
+      "double_write_count": 1
+    },
+    {
+      "case_id": "D05",
+      "pi_shadow_business_write_delta": 3,
+      "context_mutation_count": 0,
+      "double_write_count": 2
+    },
+    {
+      "case_id": "E01",
+      "pi_shadow_business_write_delta": 3,
+      "context_mutation_count": 0,
+      "double_write_count": 2
+    },
+    {
+      "case_id": "E02",
+      "pi_shadow_business_write_delta": 3,
+      "context_mutation_count": 0,
+      "double_write_count": 2
+    },
+    {
+      "case_id": "F01",
+      "pi_shadow_business_write_delta": 2,
+      "context_mutation_count": 0,
+      "double_write_count": 1
+    },
+    {
+      "case_id": "F02",
+      "pi_shadow_business_write_delta": 1,
+      "context_mutation_count": 0,
+      "double_write_count": 0
+    },
+    {
+      "case_id": "F03",
+      "pi_shadow_business_write_delta": 3,
+      "context_mutation_count": 0,
+      "double_write_count": 2
+    },
+    {
+      "case_id": "F04",
+      "pi_shadow_business_write_delta": 2,
+      "context_mutation_count": 0,
+      "double_write_count": 1
+    },
+    {
+      "case_id": "F05",
+      "pi_shadow_business_write_delta": 2,
+      "context_mutation_count": 0,
+      "double_write_count": 1
+    },
+    {
+      "case_id": "F06",
+      "pi_shadow_business_write_delta": 3,
+      "context_mutation_count": 0,
+      "double_write_count": 2
+    },
+    {
+      "case_id": "F07",
+      "pi_shadow_business_write_delta": 2,
+      "context_mutation_count": 0,
+      "double_write_count": 1
     }
   ]
 }

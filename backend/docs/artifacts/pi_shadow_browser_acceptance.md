@@ -1,12 +1,12 @@
 # Pi Shadow Browser Acceptance
 
-- Executed: `false`
-- Passed: `false`
+- Phase: `6V-P1.6.4`
 - Environment: `local_live`
-- Commit SHA: `ab0d0367e7bf7f0a14cb6786adac7f58c0d79c92`
-- Tester: `codex_acceptance_runner`
-- Screenshot/reference: `not_run`
-- Blocker: `browser_acceptance_not_run_due_core_http_sse_blocker`
+- Commit SHA: `e0dee3ebe133f74c3437748561e5476d74f10e6e`
+- Executed: `False`
+- Passed: `False`
+- Tester: `codex`
+- Blocker: Full30 Gate failed before browser acceptance.
+- Evidence reference: `pi_official_report_pdf_full30_final_results.json`
 
-Required browser conversations are tracked by case label/hash only in artifacts; full query text intentionally omitted.
-
+Browser acceptance was intentionally not run because Full30 produced core Gate blockers.
