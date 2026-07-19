@@ -33,9 +33,9 @@ from typing import Any
 from sqlalchemy import delete, func, insert, select
 from sqlalchemy.engine import make_url
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
-from sqlalchemy.pool import AsyncAdaptedQueuePool, NullPool
 
 from app.core.config import settings
+from app.core.database_pool_policy import resolve_database_pool_policy
 from app.models.company_v2_report_rag import ReportRagChunk as ChunkRow
 from app.models.company_v2_report_rag import ReportRagDocument as DocumentRow
 from app.services.company_v2_report_chunker import ReportChunkDraft
@@ -133,42 +133,22 @@ class DatabaseCompanyV2ReportRagRepository:
                     self._engine, self._sessionmaker = shared
                     return self._sessionmaker
 
-                # Supabase transaction pooler (pgbouncer) does not support
-                # prepared statements across multiplexed connections — mirror
-                # app.core.database: disable statement cache, pre-ping pooled
-                # connections, and share one bounded pool across repository
-                # instances to avoid long Chat/RAG requests exhausting slots.
-                connection_mode = (settings.database_connection_mode or "transaction_pooler").strip().lower()
-                transaction_strategy = (settings.database_transaction_pool_strategy or "small_queue_pool").strip().lower()
-                is_postgres = database_url.drivername.startswith("postgresql")
-                if not is_postgres:
-                    poolclass = NullPool
-                elif connection_mode == "transaction_pooler" and transaction_strategy == "null_pool":
-                    poolclass = NullPool
-                else:
-                    poolclass = AsyncAdaptedQueuePool
-                engine_kwargs = {
-                    "poolclass": poolclass,
-                    "connect_args": {
-                        "statement_cache_size": 0,
-                        "command_timeout": settings.database_command_timeout_seconds,
-                    },
-                    "pool_pre_ping": settings.database_pool_pre_ping,
-                }
-                if poolclass is AsyncAdaptedQueuePool:
-                    pool_size = settings.database_pool_size
-                    max_overflow = settings.database_max_overflow
-                    if connection_mode in {"direct", "session_pooler"}:
-                        pool_size = settings.database_direct_pool_size
-                        max_overflow = settings.database_direct_max_overflow
-                    engine_kwargs.update(
-                        {
-                            "pool_size": pool_size,
-                            "max_overflow": max_overflow,
-                            "pool_recycle": settings.database_pool_recycle_seconds,
-                            "pool_timeout": settings.database_pool_timeout_seconds,
-                        }
-                    )
+                # Mirror app.core.database without constructing or importing
+                # the request-loop engine in this private loop-thread bridge.
+                policy = resolve_database_pool_policy(
+                    self._database_url,
+                    settings.database_transaction_pool_strategy,
+                    connection_mode=settings.database_connection_mode,
+                    pool_pre_ping=settings.database_pool_pre_ping,
+                    command_timeout_seconds=settings.database_command_timeout_seconds,
+                    pool_size=settings.database_pool_size,
+                    max_overflow=settings.database_max_overflow,
+                    direct_pool_size=settings.database_direct_pool_size,
+                    direct_max_overflow=settings.database_direct_max_overflow,
+                    pool_recycle_seconds=settings.database_pool_recycle_seconds,
+                    pool_timeout_seconds=settings.database_pool_timeout_seconds,
+                )
+                engine_kwargs = dict(policy.pool_kwargs)
                 self._engine = create_async_engine(
                     self._database_url,
                     echo=False,

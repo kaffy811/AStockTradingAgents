@@ -9,9 +9,9 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy.pool import AsyncAdaptedQueuePool, NullPool
 
 from app.core.config import settings
+from app.core.database_pool_policy import resolve_database_pool_policy
 
 log = logging.getLogger(__name__)
 
@@ -22,50 +22,34 @@ log = logging.getLogger(__name__)
 #   pool. Never use 5+10 burst connections here.
 # - session_pooler/direct: bounded AsyncAdaptedQueuePool with pre-ping/recycle.
 
+_pool_policy = resolve_database_pool_policy(
+    settings.database_url,
+    settings.database_transaction_pool_strategy,
+    connection_mode=settings.database_connection_mode,
+    pool_pre_ping=settings.database_pool_pre_ping,
+    command_timeout_seconds=settings.database_command_timeout_seconds,
+    pool_size=settings.database_pool_size,
+    max_overflow=settings.database_max_overflow,
+    direct_pool_size=settings.database_direct_pool_size,
+    direct_max_overflow=settings.database_direct_max_overflow,
+    pool_recycle_seconds=settings.database_pool_recycle_seconds,
+    pool_timeout_seconds=settings.database_pool_timeout_seconds,
+)
 _database_url = make_url(settings.database_url)
-_is_postgres = _database_url.drivername.startswith("postgresql")
-_connection_mode = (settings.database_connection_mode or "transaction_pooler").strip().lower()
-_transaction_strategy = (settings.database_transaction_pool_strategy or "small_queue_pool").strip().lower()
-if not _is_postgres:
-    _poolclass = NullPool
-elif _connection_mode == "transaction_pooler" and _transaction_strategy == "null_pool":
-    _poolclass = NullPool
-else:
-    _poolclass = AsyncAdaptedQueuePool
-
 _engine_kwargs = {
-    "poolclass": _poolclass,
-    "connect_args": {
-        "statement_cache_size": 0,
-        "command_timeout": settings.database_command_timeout_seconds,
-    },
+    **_pool_policy.pool_kwargs,
     "echo": settings.database_sql_echo,
     "hide_parameters": settings.database_sql_hide_parameters,
-    "pool_pre_ping": settings.database_pool_pre_ping,
 }
-if _poolclass is AsyncAdaptedQueuePool:
-    pool_size = settings.database_pool_size
-    max_overflow = settings.database_max_overflow
-    if _connection_mode in {"direct", "session_pooler"}:
-        pool_size = settings.database_direct_pool_size
-        max_overflow = settings.database_direct_max_overflow
-    _engine_kwargs.update(
-        {
-            "pool_size": pool_size,
-            "max_overflow": max_overflow,
-            "pool_recycle": settings.database_pool_recycle_seconds,
-            "pool_timeout": settings.database_pool_timeout_seconds,
-        }
-    )
 
 async_engine = create_async_engine(settings.database_url, **_engine_kwargs)
 
 log.info(
     "database engine configured mode=%s host_class=%s port=%s pool=%s pool_size=%s max_overflow=%s pool_timeout=%s command_timeout=%s",
-    _connection_mode,
+    _pool_policy.connection_mode,
     "supabase_pooler" if "pooler.supabase.com" in (_database_url.host or "") else "database_host",
     _database_url.port,
-    _poolclass.__name__,
+    _pool_policy.pool_class.__name__,
     _engine_kwargs.get("pool_size"),
     _engine_kwargs.get("max_overflow"),
     _engine_kwargs.get("pool_timeout"),
