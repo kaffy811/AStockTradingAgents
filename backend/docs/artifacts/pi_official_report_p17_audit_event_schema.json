@@ -1,0 +1,35 @@
+{
+  "schema_version": "pi_official_report_p17_audit_event_schema_v1",
+  "phase": "6V-P1.7",
+  "generated_at": "2026-07-19T16:52:12.517384+00:00",
+  "schema": {
+    "config_version": "int",
+    "environment": "staging",
+    "agent_id": "official_report_pdf_pi_v1",
+    "authorization_status": "enum",
+    "rollout_percent": "float",
+    "eligible": "bool",
+    "eligibility_reason": "bounded enum string",
+    "bucket_selected": "bool",
+    "decision": "pi_canary|legacy",
+    "fallback_reason": "enum|null",
+    "kill_switch_state": {
+      "global": "bool",
+      "environment": "bool",
+      "agent": "bool"
+    },
+    "correlation": {
+      "request_trace_hash": "<=16 chars",
+      "anon_user_key": "<=16 chars"
+    }
+  },
+  "guarantees": [
+    "no full query",
+    "no full URL",
+    "no full user id",
+    "no authorization secret",
+    "audit writes are system-owned and never counted as Pi business writes",
+    "audit failure never breaks the user request; it forces the safe legacy fallback"
+  ],
+  "builder": "canary_policy.build_audit_event (sanitization test #31)"
+}

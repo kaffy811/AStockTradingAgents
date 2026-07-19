@@ -1,7 +1,7 @@
 {
   "schema_version": "pi_shadow_resource_leak_audit_v2",
-  "phase": "6V-P1.6.8",
-  "updated_at": "2026-07-19T16:04:26.578500+00:00",
+  "phase": "6V-P1.7",
+  "updated_at": "2026-07-19T16:54:37.260228+00:00",
   "serial_full30_executed": 30,
   "pending_rollback_errors": 0,
   "raw_500": 0,
@@ -9,7 +9,7 @@
   "orphan_shadow_tasks_observed": 0,
   "diagnostics_tmp_files_left": 0,
   "stale_terminal_ignored": 0,
-  "note": "P1.6.8 B03 browser acceptance + regressions: raw500/503=0, no leaked tasks/tmp files; dev servers stopped after acceptance",
+  "note": "P1.7 policy simulations are in-memory only; no servers started, no traffic, no leaks",
   "browser_acceptance_http_5xx": {
     "500": 0,
     "503": 0

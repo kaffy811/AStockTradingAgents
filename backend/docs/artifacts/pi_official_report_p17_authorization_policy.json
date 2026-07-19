@@ -1,0 +1,56 @@
+{
+  "schema_version": "pi_official_report_p17_authorization_policy_v1",
+  "phase": "6V-P1.7",
+  "generated_at": "2026-07-19T16:52:12.517384+00:00",
+  "authorization_object": {
+    "environment": "staging",
+    "agent_id": "official_report_pdf_pi_v1",
+    "authorization_status": "proposed",
+    "rollout_percent": 0,
+    "max_rollout_percent": 5,
+    "allowed_request_types": [
+      "official_annual_report_pdf"
+    ],
+    "fallback": "legacy",
+    "kill_switch_enabled": true,
+    "expires_at": null,
+    "approved_by": [],
+    "approval_ticket": null,
+    "config_version": 1
+  },
+  "rules": {
+    "environment_binding": "staging only; production requires an independent authorization object",
+    "agent_matching": "exact id, no wildcards (wildcards fail closed)",
+    "unapproved_behavior": "agent present in config but status!=approved never executes",
+    "revocation": "status set to revoked/disabled takes effect on next decision",
+    "expiry": "expires_at enforced fail-closed (unreadable expiry = expired)",
+    "versioning": "config_version participates in bucketing; changes re-bucket",
+    "approval_privacy": "approved_by holds role identifiers only; ticket is a redacted reference"
+  },
+  "config_priority": [
+    "global_kill_switch",
+    "environment_hard_disable",
+    "authorization_status",
+    "exact_agent_allowlist",
+    "rollout_percent",
+    "request_eligibility",
+    "runtime_health_gate",
+    "pi_execution",
+    "legacy_fallback"
+  ],
+  "runtime_module": "app/agent_runtime/canary_policy.py",
+  "config_fields_defaults_off": {
+    "pi_executor_global_kill_switch": false,
+    "pi_canary_environment": "staging",
+    "pi_canary_authorization_status": "proposed",
+    "pi_canary_allowed_agents": "",
+    "pi_canary_rollout_percent": 0.0,
+    "pi_canary_max_rollout_percent": 5.0,
+    "pi_canary_fallback_mode": "legacy",
+    "pi_canary_auto_rollback_enabled": true,
+    "pi_canary_health_window_minutes": 30,
+    "pi_canary_min_sample_size": 50,
+    "auto_run": false,
+    "production_enabled": false
+  }
+}

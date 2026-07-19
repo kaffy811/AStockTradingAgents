@@ -1,0 +1,78 @@
+{
+  "schema_version": "pi_official_report_p17_monitoring_spec_v1",
+  "phase": "6V-P1.7",
+  "generated_at": "2026-07-19T16:52:12.517384+00:00",
+  "eligibility": [
+    "requests_total",
+    "eligible_requests",
+    "ineligible_reason{enum}",
+    "bucket_selected",
+    "rollout_not_selected"
+  ],
+  "execution": [
+    "pi_started",
+    "pi_completed",
+    "pi_failed",
+    "fallback_started",
+    "fallback_completed",
+    "fallback_failed"
+  ],
+  "safety": [
+    "fabricated_url",
+    "wrong_entity",
+    "wrong_year",
+    "wrong_report_type",
+    "provenance_failure",
+    "business_write",
+    "double_write",
+    "unknown_write",
+    "trace_mismatch",
+    "terminal_missing",
+    "diagnostics_timeout",
+    "clarification_error"
+  ],
+  "reliability": [
+    "raw500",
+    "raw503",
+    "expected_timeout",
+    "unexpected_timeout",
+    "cancellation",
+    "task_leak",
+    "db_leak",
+    "PendingRollbackError"
+  ],
+  "performance": [
+    "pi_latency_p50_p95",
+    "tool_latency_p50_p95",
+    "legacy_latency_p50_p95",
+    "fallback_latency_p50_p95",
+    "auth_cache_hit_latency",
+    "db_checkout_latency"
+  ],
+  "product": [
+    "accepted",
+    "safety_review",
+    "capability_gap",
+    "legacy_defect",
+    "behavior_match",
+    "safety_correctness"
+  ],
+  "label_rules": {
+    "forbidden": [
+      "full user id",
+      "full query",
+      "token",
+      "full URL",
+      "high-cardinality session id",
+      "full trace id"
+    ],
+    "allowed": [
+      "16-char hashes",
+      "bounded enums",
+      "agent_id",
+      "environment",
+      "config_version"
+    ]
+  },
+  "existing_sinks": "runtime_metrics_sink counters + per-run diagnostics (P1.6.5 correlation) + compact canary audit events"
+}

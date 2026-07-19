@@ -1,7 +1,7 @@
 {
   "schema_version": "pi_official_report_pdf_agent_gate_v3",
-  "phase": "6V-P1.6.8",
-  "updated_at": "2026-07-19T16:03:11.411257+00:00",
+  "phase": "6V-P1.7",
+  "updated_at": "2026-07-19T16:54:37.260228+00:00",
   "agent_id": "official_report_pdf_pi_v1",
   "mode": "formal_full30_serial",
   "is_formal_full30": true,
@@ -43,5 +43,8 @@
   "hard_failure_count": 0,
   "behavior_match_rate": 0.6333,
   "status_match_is_hard_gate": false,
-  "browser_blocker_resolved": "B03 candidates now rendered from resolver-driven Legacy clarification"
+  "browser_blocker_resolved": "B03 candidates now rendered from resolver-driven Legacy clarification",
+  "staging_canary_proposal_ready": true,
+  "recommended_for_staging_canary_authorization": true,
+  "recommended_for_production_authorization": false
 }

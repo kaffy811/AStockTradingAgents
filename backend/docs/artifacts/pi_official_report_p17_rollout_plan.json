@@ -1,0 +1,46 @@
+{
+  "schema_version": "pi_official_report_p17_rollout_plan_v1",
+  "phase": "6V-P1.7",
+  "generated_at": "2026-07-19T16:52:12.517384+00:00",
+  "bucketing": "sha256(environment|agent_id|anon_user_key|config_version) % 10000; hit iff bucket < rollout_percent*100; no builtin hash/time/random; anon key = sha256(user_id)[:16]",
+  "stages": [
+    {
+      "stage": "C0",
+      "rollout_percent": 0,
+      "traffic": "none",
+      "actions": [
+        "config validation",
+        "dry-run eligibility tests",
+        "simulations"
+      ],
+      "duration": "until human approval",
+      "status": "current"
+    },
+    {
+      "stage": "C1",
+      "rollout_percent": 1,
+      "min_eligible_requests": 50,
+      "duration_hours": 24,
+      "start": "manual only",
+      "auto_rollback": true
+    },
+    {
+      "stage": "C2",
+      "rollout_percent": 5,
+      "min_eligible_requests": 200,
+      "duration_hours": 48,
+      "precondition": "C1 manual review"
+    },
+    {
+      "stage": "C3",
+      "rollout_percent": "requires a NEW authorization; this proposal caps at max_rollout_percent=5"
+    }
+  ],
+  "constraints": {
+    "initial_rollout": 0,
+    "max_rollout_percent": 5,
+    "no_pre_authorized_100": true,
+    "no_auto_promotion": true,
+    "rollback_blocks_auto_reraise": true
+  }
+}
