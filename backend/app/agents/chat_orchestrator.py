@@ -631,12 +631,14 @@ async def _record_pi_shadow_skipped(
 ) -> None:
     try:
         from app.agent_runtime.contracts import new_id  # noqa: PLC0415
+        from app.agent_runtime.shadow_correlation import current_correlation  # noqa: PLC0415
         from app.agent_runtime.shadow_diagnostics import pi_shadow_diagnostics_sink  # noqa: PLC0415
 
+        correlation = current_correlation()
         skipped_result = {
             "schema_version": "pi_financial_runtime_v1",
-            "trace_id": new_id("trace"),
-            "run_id": new_id("run"),
+            "trace_id": correlation.get("request_trace_id") or new_id("trace"),
+            "run_id": correlation.get("shadow_run_id") or new_id("run"),
             "status": "skipped",
             "reason": "intent_not_official_report_pdf",
             "agent_id": "official_report_pdf_pi_v1",
@@ -659,6 +661,7 @@ async def _record_pi_shadow_skipped(
             conversation_id=str(session_id) if session_id else "",
             user_id=str(user_id),
             result=skipped_result,
+            correlation=correlation,
         )
         if shadow_result_callback is not None:
             maybe_awaitable = shadow_result_callback(skipped_result)
@@ -680,10 +683,15 @@ def _schedule_pi_official_report_shadow(
 ) -> None:
     try:
         from app.agent_runtime.contracts import new_id  # noqa: PLC0415
+        from app.agent_runtime.shadow_correlation import current_correlation  # noqa: PLC0415
         from app.agent_runtime.shadow_runner import pi_compatible_shadow_runner  # noqa: PLC0415
 
         if not pi_compatible_shadow_runner.enabled():
             raise RuntimeError("pi-compatible shadow is not enabled or agent is not allowed")
+
+        correlation = current_correlation()
+        shadow_trace_id = correlation.get("request_trace_id") or new_id("trace")
+        shadow_run_id = correlation.get("shadow_run_id") or new_id("run")
 
         async def _pi_shadow_run() -> None:
             result: dict | None = None
@@ -697,12 +705,13 @@ def _schedule_pi_official_report_shadow(
                     memory_context=None,
                     resolved_entity_snapshot=entity_payload,
                     output_language=output_language,
+                    correlation=correlation,
                 )
                 log.debug("pi-compatible shadow result: %s", result.get("status"))
             except asyncio.CancelledError:
                 result = {
-                    "trace_id": new_id("trace"),
-                    "run_id": new_id("run"),
+                    "trace_id": shadow_trace_id,
+                    "run_id": shadow_run_id,
                     "status": "cancelled",
                     "agent_id": "official_report_pdf_pi_v1",
                     "metrics": {"latency_ms": 0, "model_calls": 0, "tool_calls": 0},
@@ -715,8 +724,8 @@ def _schedule_pi_official_report_shadow(
                 raise
             except Exception as exc:  # noqa: BLE001
                 result = {
-                    "trace_id": new_id("trace"),
-                    "run_id": new_id("run"),
+                    "trace_id": shadow_trace_id,
+                    "run_id": shadow_run_id,
                     "status": "failed",
                     "agent_id": "official_report_pdf_pi_v1",
                     "metrics": {"latency_ms": 0, "model_calls": 0, "tool_calls": 0},
@@ -737,6 +746,7 @@ def _schedule_pi_official_report_shadow(
                             conversation_id=str(session_id) if session_id else "",
                             user_id=str(user_id),
                             result=result,
+                            correlation=correlation,
                         )
                     except Exception as exc:  # noqa: BLE001
                         log.debug("pi-compatible shadow diagnostics failed: %s", exc)
@@ -1564,15 +1574,19 @@ async def process_message(
         try:
             from app.agent_runtime.shadow_runner import pi_compatible_shadow_runner  # noqa: PLC0415
             from app.agent_runtime.contracts import new_id  # noqa: PLC0415
+            from app.agent_runtime.shadow_correlation import current_correlation  # noqa: PLC0415
 
             if not pi_compatible_shadow_runner.enabled():
                 raise RuntimeError("pi-compatible shadow is not enabled or agent is not allowed")
 
+            _shadow_correlation = current_correlation()
+            _shadow_trace_id = _shadow_correlation.get("request_trace_id") or new_id("trace")
+            _shadow_run_id = _shadow_correlation.get("shadow_run_id") or new_id("run")
             if not _is_official_report_shadow_query:
                 skipped_result = {
                     "schema_version": "pi_financial_runtime_v1",
-                    "trace_id": new_id("trace"),
-                    "run_id": new_id("run"),
+                    "trace_id": _shadow_trace_id,
+                    "run_id": _shadow_run_id,
                     "status": "skipped",
                     "reason": "intent_not_official_report_pdf",
                     "agent_id": "official_report_pdf_pi_v1",
@@ -1598,6 +1612,7 @@ async def process_message(
                         conversation_id=str(session_id) if session_id else "",
                         user_id=str(user_id),
                         result=skipped_result,
+                        correlation=_shadow_correlation,
                     )
                 except Exception as exc:  # noqa: BLE001
                     log.debug("pi-compatible skipped diagnostics failed: %s", exc)
@@ -1619,12 +1634,13 @@ async def process_message(
                             memory_context=_memory_ctx,
                             resolved_entity_snapshot=_entity_payload,
                             output_language=output_language,
+                            correlation=_shadow_correlation,
                         )
                         log.debug("pi-compatible shadow result: %s", result.get("status"))
                     except asyncio.CancelledError:
                         result = {
-                            "trace_id": new_id("trace"),
-                            "run_id": new_id("run"),
+                            "trace_id": _shadow_trace_id,
+                            "run_id": _shadow_run_id,
                             "status": "cancelled",
                             "agent_id": "official_report_pdf_pi_v1",
                             "metrics": {"latency_ms": 0, "model_calls": 0, "tool_calls": 0},
@@ -1637,8 +1653,8 @@ async def process_message(
                         raise
                     except Exception as exc:  # noqa: BLE001
                         result = {
-                            "trace_id": new_id("trace"),
-                            "run_id": new_id("run"),
+                            "trace_id": _shadow_trace_id,
+                            "run_id": _shadow_run_id,
                             "status": "failed",
                             "agent_id": "official_report_pdf_pi_v1",
                             "metrics": {"latency_ms": 0, "model_calls": 0, "tool_calls": 0},
@@ -1659,6 +1675,7 @@ async def process_message(
                                     conversation_id=str(session_id) if session_id else "",
                                     user_id=str(user_id),
                                     result=result,
+                                    correlation=_shadow_correlation,
                                 )
                             except Exception as exc:  # noqa: BLE001
                                 log.debug("pi-compatible shadow diagnostics failed: %s", exc)

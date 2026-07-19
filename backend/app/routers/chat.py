@@ -166,9 +166,17 @@ async def get_chat_session(
 async def send_chat_message(
     session_id: uuid.UUID,
     body: ChatMessageSendRequest,
+    request: Request,
     user: User         = Depends(get_current_user),
     db:   AsyncSession = Depends(get_db),
 ) -> ChatMessageSendResponse:
+    # Acceptance-only shadow correlation (no-op unless shadow executor mode).
+    from app.agent_runtime.shadow_correlation import (  # noqa: PLC0415
+        SHADOW_CORRELATION_HEADER,
+        set_correlation_from_header,
+    )
+
+    set_correlation_from_header(request.headers.get(SHADOW_CORRELATION_HEADER))
     # Verify session belongs to user
     session = await chat_service.get_session(db, session_id, user.id)
     if session is None:
@@ -246,6 +254,13 @@ async def send_chat_message_stream(
       - tool_completed carries tool_name / status / summary only.
     """
     from app.agents.chat_streaming import stream_chat_message
+    from app.agent_runtime.shadow_correlation import (  # noqa: PLC0415
+        SHADOW_CORRELATION_HEADER,
+        set_correlation_from_header,
+    )
+
+    # Acceptance-only shadow correlation (no-op unless shadow executor mode).
+    set_correlation_from_header(request.headers.get(SHADOW_CORRELATION_HEADER))
 
     # Verify session belongs to user in a short transaction.  Do not keep a
     # request-scoped AsyncSession alive for the StreamingResponse lifetime.

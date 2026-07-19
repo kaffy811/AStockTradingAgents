@@ -28,7 +28,8 @@ _REPORT_TYPE_PATTERNS: list[tuple[re.Pattern[str], str]] = [
     (re.compile(r"年报|年度报告|annual", re.IGNORECASE), "annual"),
 ]
 _OFFICIAL_REPORT_PDF_RE = re.compile(
-    r"官方\s*PDF|PDF\s*在哪|pdf链接|报告链接|年报链接|报告原文|年报原文|年度报告原文|这份报告.*在哪|这个报告.*在哪|这个年报|官方报告地址",
+    r"官方\s*PDF|PDF\s*在哪|pdf链接|报告链接|年报链接|报告原文|年报原文|年度报告原文|这份报告.*在哪|这个报告.*在哪|这个年报|官方报告地址"
+    r"|年报\s*PDF|季报\s*PDF|中报\s*PDF|年度报告\s*PDF|半年报\s*PDF|季报原文|中报原文|半年报原文|年报官方|官方年报",
     re.IGNORECASE,
 )
 _AMBIGUOUS_OFFICIAL_PDF_ALIASES: dict[str, list[dict[str, Any]]] = {
@@ -40,6 +41,16 @@ _AMBIGUOUS_OFFICIAL_PDF_ALIASES: dict[str, list[dict[str, Any]]] = {
         {"market": "CN", "symbol": "600036", "ts_code": "600036.SH", "short_name": "招商银行"},
         {"market": "CN", "symbol": "600999", "ts_code": "600999.SH", "short_name": "招商证券"},
     ],
+    "茅台": [
+        {"market": "CN", "symbol": "600519", "ts_code": "600519.SH", "short_name": "贵州茅台"},
+    ],
+}
+# A bare alias must not fire when the text already contains an unambiguous
+# longer company name (e.g. "中国平安" contains "平安" but is not ambiguous).
+_ALIAS_LONGER_NAMES: dict[str, tuple[str, ...]] = {
+    "平安": ("平安银行", "中国平安"),
+    "招商": ("招商银行", "招商证券"),
+    "茅台": ("贵州茅台",),
 }
 
 
@@ -71,8 +82,11 @@ class PiCompatibleShadowRunner:
         memory_context: Any = None,
         resolved_entity_snapshot: dict[str, Any] | None = None,
         output_language: str = "zh-CN",
+        correlation: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
-        trace_id = new_id("trace")
+        correlation = dict(correlation or {})
+        trace_id = str(correlation.get("request_trace_id") or "") or new_id("trace")
+        run_id = str(correlation.get("shadow_run_id") or "") or new_id("run")
         effective_query = normalized_query or raw_query
         request = AgentRequest(
             trace_id=trace_id,
@@ -102,10 +116,11 @@ class PiCompatibleShadowRunner:
         if routing is None:
             routing = await intent_safety_router.route(db, request)
         if routing.needs_clarification:
+            options = self._dedup_clarification_options(list(routing.clarification_options or []))[:5]
             return {
                 "schema_version": "pi_financial_runtime_v1",
                 "trace_id": trace_id,
-                "run_id": new_id("run"),
+                "run_id": run_id,
                 "status": "clarification_required",
                 "agent_id": official_report_pdf_manifest.agent_id,
                 "turn_count": 0,
@@ -115,7 +130,10 @@ class PiCompatibleShadowRunner:
                 "evidence_ids": [],
                 "structured_answer": {
                     "status": "clarification_required",
-                    "clarification_options": list(routing.clarification_options or [])[:5],
+                    "clarification_options": options,
+                    "ambiguity_term": self._ambiguity_term(raw_query, effective_query),
+                    "provider": "security_entity_resolver_hint",
+                    "selection_not_performed_reason": "candidate_selection_requires_user_confirmation",
                 },
                 "error": None,
                 "metrics": {"latency_ms": 0, "model_calls": 0, "tool_calls": 0, "input_tokens": 0, "output_tokens": 0},
@@ -130,6 +148,7 @@ class PiCompatibleShadowRunner:
         if routing.intent != "official_report_pdf":
             return self._skip_result(
                 trace_id=trace_id,
+                run_id=run_id,
                 reason_code="PI_SHADOW_INTENT_NOT_SUPPORTED",
                 detected_intent=routing.intent,
                 normalized_intent="official_report_pdf" if self._looks_like_official_pdf_intent(raw_query, effective_query) else routing.intent,
@@ -152,7 +171,7 @@ class PiCompatibleShadowRunner:
         plan = execution_planner.plan(trace_id=trace_id, routing=routing, context=context)
         pi_request = PiRuntimeRequest(
             trace_id=trace_id,
-            run_id=new_id("run"),
+            run_id=run_id,
             conversation_id=conversation_id,
             user_id=user_id,
             intent="official_report_pdf",
@@ -231,10 +250,32 @@ class PiCompatibleShadowRunner:
         text = f"{raw_query or ''}\n{normalized_query or ''}"
         return bool(_OFFICIAL_REPORT_PDF_RE.search(text))
 
+    def _ambiguity_term(self, raw_query: str, normalized_query: str | None = None) -> str | None:
+        text = f"{raw_query or ''}\n{normalized_query or ''}"
+        for alias in _AMBIGUOUS_OFFICIAL_PDF_ALIASES:
+            if alias in text and not any(longer in text for longer in _ALIAS_LONGER_NAMES.get(alias, ())):
+                return alias
+        return None
+
+    def _dedup_clarification_options(self, options: list[Any]) -> list[dict[str, Any]]:
+        seen: set[tuple[str, str]] = set()
+        deduped: list[dict[str, Any]] = []
+        for item in options:
+            if not isinstance(item, dict):
+                continue
+            key = (str(item.get("market") or "CN"), str(item.get("symbol") or item.get("code") or ""))
+            if key in seen:
+                continue
+            seen.add(key)
+            deduped.append(dict(item))
+        return deduped
+
     def _ambiguous_alias_options(self, raw_query: str, normalized_query: str | None = None) -> list[dict[str, Any]]:
         text = f"{raw_query or ''}\n{normalized_query or ''}"
         for alias, options in _AMBIGUOUS_OFFICIAL_PDF_ALIASES.items():
             if alias in text:
+                if any(longer in text for longer in _ALIAS_LONGER_NAMES.get(alias, ())):
+                    continue
                 return [dict(item) for item in options]
         hint = ambiguous_official_report_entity_hint(text)
         return [
@@ -272,11 +313,12 @@ class PiCompatibleShadowRunner:
         detected_intent: str,
         normalized_intent: str,
         input_snapshot: dict[str, Any],
+        run_id: str | None = None,
     ) -> dict[str, Any]:
         return {
             "schema_version": "pi_financial_runtime_v1",
             "trace_id": trace_id,
-            "run_id": None,
+            "run_id": run_id or new_id("run"),
             "status": "skipped",
             "agent_id": None,
             "turn_count": 0,
@@ -308,6 +350,7 @@ class PiCompatibleShadowRunner:
         memory_context: Any = None,
         resolved_entity_snapshot: dict[str, Any] | None = None,
         output_language: str = "zh-CN",
+        correlation: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         async with AsyncSessionLocal() as db:
             return await self.run_official_report_pdf_shadow(
@@ -320,6 +363,7 @@ class PiCompatibleShadowRunner:
                 memory_context=memory_context,
                 resolved_entity_snapshot=resolved_entity_snapshot,
                 output_language=output_language,
+                correlation=correlation,
             )
 
     def compare(
@@ -330,18 +374,46 @@ class PiCompatibleShadowRunner:
         case_id: str = "",
         query_type: str = "",
         side_effect_count: int = 0,
+        expected_status: str | None = None,
     ) -> dict[str, Any]:
+        from app.agent_runtime.shadow_taxonomy import (  # noqa: PLC0415
+            assess_safety_correctness,
+            normalize_status,
+            status_specific_provenance_complete,
+        )
+
         legacy_norm = self._normalize_observation(legacy)
         pi_norm = self._normalize_observation(self._pi_observation(pi_compatible))
-        status_match = legacy_norm["status"] == pi_norm["status"] or "failed" in {legacy_norm["status"], pi_norm["status"]}
+        pi_error_code = (pi_compatible.get("error") or {}).get("code")
+        normalized_legacy_status = normalize_status(legacy_norm["status"], legacy_norm.get("error_code"))
+        normalized_pi_status = normalize_status(pi_norm["status"], pi_error_code)
+        status_match = normalized_legacy_status == normalized_pi_status
+        safety_correctness = assess_safety_correctness(
+            normalized_pi_status=normalized_pi_status,
+            pi_pdf_url=pi_norm["pdf_url"],
+            expected_status=expected_status,
+        )
+        provenance_complete, provenance_missing = status_specific_provenance_complete(
+            normalized_status=normalized_pi_status,
+            findings=pi_compatible.get("findings") or [],
+            structured_answer=pi_compatible.get("structured_answer") or {},
+            evidence_ids=pi_compatible.get("evidence_ids") or [],
+            error_code=pi_error_code,
+            pdf_url=pi_norm["pdf_url"],
+        )
         comparison = {
             "status_match": status_match,
+            "normalized_legacy_status": normalized_legacy_status,
+            "normalized_pi_status": normalized_pi_status,
+            "behavior_match": status_match,
+            "safety_correctness": safety_correctness,
             "entity_match": self._same_or_unknown(legacy_norm["symbol"], pi_norm["symbol"]),
             "year_match": self._same_or_unknown(legacy_norm["report_year"], pi_norm["report_year"]),
             "report_type_match": self._same_or_unknown(legacy_norm["report_type"], pi_norm["report_type"]),
             "source_url_match": self._same_url_or_unknown(legacy_norm["source_page_url"], pi_norm["source_page_url"]),
             "pdf_url_match": self._same_url_or_unknown(legacy_norm["pdf_url"], pi_norm["pdf_url"]),
-            "provenance_complete": bool(pi_compatible.get("evidence_ids")) or pi_norm["status"] in {"unavailable", "clarification_required"},
+            "provenance_complete": provenance_complete,
+            "provenance_missing_fields": provenance_missing,
             "unsupported_url_count": 0 if pi_norm["official_domain_verified"] or not pi_norm["pdf_url"] else 1,
             "side_effect_count": side_effect_count,
         }
@@ -356,6 +428,20 @@ class PiCompatibleShadowRunner:
             comparison["unsupported_url_count"] == 0,
             comparison["side_effect_count"] == 0,
         ]) else "review"
+        if comparison["decision"] == "review":
+            reasons = []
+            if not status_match:
+                reasons.append(
+                    f"status_mismatch legacy={normalized_legacy_status} pi={normalized_pi_status}"
+                    + (" (pi_safe)" if safety_correctness else "")
+                )
+            if not comparison["pdf_url_match"]:
+                reasons.append("pdf_url_mismatch")
+            if not provenance_complete:
+                reasons.append("provenance_incomplete:" + ",".join(provenance_missing))
+            if side_effect_count:
+                reasons.append(f"side_effects={side_effect_count}")
+            comparison["review_reasons"] = reasons
         return {
             "schema_version": "pi_official_report_shadow_v1",
             "trace_id": pi_compatible.get("trace_id"),

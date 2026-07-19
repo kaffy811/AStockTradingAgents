@@ -800,19 +800,22 @@ async def _persist_error_assistant_message_best_effort(
 def _record_shadow_timeout_diagnostic(*, raw_query: str, conversation_id: str, user_id: str) -> None:
     try:
         from app.agent_runtime.contracts import new_id  # noqa: PLC0415
+        from app.agent_runtime.shadow_correlation import current_correlation  # noqa: PLC0415
         from app.agent_runtime.shadow_diagnostics import pi_shadow_diagnostics_sink  # noqa: PLC0415
         from app.core.config import settings  # noqa: PLC0415
 
         if (getattr(settings, "agent_executor_mode", "legacy") or "").strip().lower() != "pi_compatible_shadow":
             return
+        correlation = current_correlation()
         pi_shadow_diagnostics_sink.record(
             raw_query=raw_query,
             conversation_id=conversation_id,
             user_id=user_id,
+            correlation=correlation,
             result={
                 "schema_version": "pi_financial_runtime_v1",
-                "trace_id": new_id("trace"),
-                "run_id": new_id("run"),
+                "trace_id": correlation.get("request_trace_id") or new_id("trace"),
+                "run_id": correlation.get("shadow_run_id") or new_id("run"),
                 "status": "timeout",
                 "agent_id": "official_report_pdf_pi_v1",
                 "turn_count": 0,
