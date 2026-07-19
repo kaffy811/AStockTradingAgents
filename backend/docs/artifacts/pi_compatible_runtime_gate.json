@@ -1,7 +1,7 @@
 {
   "schema_version": "pi_compatible_runtime_gate_v1",
-  "phase": "6V-P1.6.6",
-  "updated_at": "2026-07-19T13:37:28.522809+00:00",
+  "phase": "6V-P1.6.7",
+  "updated_at": "2026-07-19T14:28:56.517426+00:00",
   "full30_executed": 30,
   "full30_serial": true,
   "correlation_envelope": true,
@@ -14,14 +14,21 @@
   "status_specific_provenance_completeness": 1.0,
   "status_match_rate": 0.6333,
   "safety_correctness_rate": 1.0,
-  "browser_acceptance": "not_run",
+  "browser_acceptance": "failed_b03_legacy_candidate_display",
   "shadow_passed": false,
   "recommended_for_next_authorization": false,
   "pi_executor_enabled": false,
   "authorized_agents": [],
   "decision": "do_not_enable_pi_compatible",
   "blockers": [
-    "status_match_rate below 99% threshold: 15 review cases are documented safe behavior differences (Pi unsupported/unavailable vs Legacy claimed success; Legacy wrong-year documents on B02/B05/C05/F07).",
-    "browser acceptance not_run: requires an authenticated manual browser session."
-  ]
+    "browser B03: Legacy clarification candidate display (Legacy UX defect)"
+  ],
+  "review_class_counts": {
+    "A": 15,
+    "B": 10,
+    "C": 5,
+    "D": 0
+  },
+  "hard_failure_count": 0,
+  "recommended_next_step": "fix Legacy clarification candidate display, re-run Browser B03, then official_report_pdf_staging_canary_proposal"
 }

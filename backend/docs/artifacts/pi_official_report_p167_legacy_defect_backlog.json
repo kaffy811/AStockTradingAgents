@@ -1,0 +1,96 @@
+{
+  "schema_version": "pi_official_report_p167_legacy_defect_backlog_v1",
+  "phase": "6V-P1.6.7",
+  "generated_at": "2026-07-19T14:28:10.205919+00:00",
+  "decision": "Pi must not replicate Legacy defects; Legacy remediation is an independent backlog; no Legacy business behavior changed in this phase.",
+  "items": [
+    {
+      "case_id": "B02",
+      "defect": [
+        "legacy returned a different official document than the requested year; pi document is provenance-backed for the requested year"
+      ],
+      "legacy_status": "success",
+      "pi_status": "success"
+    },
+    {
+      "case_id": "B05",
+      "defect": [
+        "legacy returned a different official document than the requested year; pi document is provenance-backed for the requested year"
+      ],
+      "legacy_status": "success",
+      "pi_status": "success"
+    },
+    {
+      "case_id": "C05",
+      "defect": [
+        "legacy returned a different official document than the requested year; pi document is provenance-backed for the requested year"
+      ],
+      "legacy_status": "success",
+      "pi_status": "success"
+    },
+    {
+      "case_id": "F01",
+      "defect": [
+        "legacy claimed success for an unreliable/nonexistent request; pi refused safely with no URL"
+      ],
+      "legacy_status": "success",
+      "pi_status": "unavailable"
+    },
+    {
+      "case_id": "F02",
+      "defect": [
+        "legacy claimed success for an unreliable/nonexistent request; pi refused safely with no URL"
+      ],
+      "legacy_status": "success",
+      "pi_status": "unavailable"
+    },
+    {
+      "case_id": "F03",
+      "defect": [
+        "legacy claimed success for an unreliable/nonexistent request; pi refused safely with no URL"
+      ],
+      "legacy_status": "success",
+      "pi_status": "unavailable"
+    },
+    {
+      "case_id": "F04",
+      "defect": [
+        "legacy claimed success for an unreliable/nonexistent request; pi refused safely with no URL"
+      ],
+      "legacy_status": "success",
+      "pi_status": "unavailable"
+    },
+    {
+      "case_id": "F05",
+      "defect": [
+        "legacy claimed success for an unreliable/nonexistent request; pi refused safely with no URL"
+      ],
+      "legacy_status": "success",
+      "pi_status": "unavailable"
+    },
+    {
+      "case_id": "F06",
+      "defect": [
+        "legacy claimed success for an unreliable/nonexistent request; pi refused safely with no URL"
+      ],
+      "legacy_status": "success",
+      "pi_status": "unavailable"
+    },
+    {
+      "case_id": "F07",
+      "defect": [
+        "legacy returned a different official document than the requested year; pi document is provenance-backed for the requested year"
+      ],
+      "legacy_status": "success",
+      "pi_status": "success"
+    },
+    {
+      "case_id": "Browser-B03",
+      "defect": [
+        "Legacy clarification answer does not display candidate list for ambiguous 平安"
+      ],
+      "legacy_status": "clarification_required",
+      "pi_status": "clarification_required(shadow, with candidates)"
+    }
+  ]
+}
