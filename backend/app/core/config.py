@@ -104,6 +104,24 @@ class Settings(BaseSettings):
     pi_agent_shadow_enabled: bool = False
     pi_agent_allowed_agents: str = ""
     pi_agent_shadow_diagnostics_path: str = ""
+    # ── Phase 6V-P1.7: staging canary proposal — everything defaults OFF ──
+    # Formal enablement requires an approved, versioned authorization; these
+    # defaults keep the canary fully disabled (proposal only).
+    pi_executor_global_kill_switch: bool = False
+    pi_canary_environment: str = "staging"          # staging only; production needs its own authorization
+    pi_canary_authorization_status: str = "proposed"  # proposed|approved|rejected|revoked|disabled
+    pi_canary_allowed_agents: str = ""              # exact agent ids, comma separated, no wildcards
+    pi_canary_rollout_percent: float = 0.0
+    pi_canary_max_rollout_percent: float = 5.0
+    pi_canary_fallback_mode: str = "legacy"
+    pi_canary_environment_kill_switch: bool = False
+    pi_canary_agent_kill_switch: bool = False
+    pi_canary_authorization_expires_at: str = ""
+    pi_canary_config_version: int = 1
+    pi_canary_approval_reference: str = ""
+    pi_canary_auto_rollback_enabled: bool = True
+    pi_canary_health_window_minutes: int = 30
+    pi_canary_min_sample_size: int = 50
     # Set to False in production to skip Base.metadata.create_all at startup.
     # Production deployments should run: uv run alembic upgrade head
     enable_create_all: bool = True
