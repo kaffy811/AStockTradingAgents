@@ -1,0 +1,29 @@
+{
+  "schema_version": "pi_full30_deadline_root_cause_v1",
+  "phase": "6V-P1.6.5",
+  "old_agent_deadline_exceeded_count": 2,
+  "expected_deadline_exceeded_count": 0,
+  "unexpected_deadline_exceeded_count": 2,
+  "cases": [
+    {
+      "case_id": "F04",
+      "expected_status": "unavailable",
+      "classification": "unexpected_timeout",
+      "agent_total_latency_ms": 6290,
+      "tool_latency_breakdown_ms": {},
+      "terminal_status": "failed",
+      "root_cause": "future-year report lookup (2035) required a full report index scan that exceeded the 5000ms agent deadline while a second concurrent acceptance execution contended for the same DB pool",
+      "fix": "deterministic year-range short-circuit in OfficialReportPdfAgent + serial-only acceptance execution"
+    },
+    {
+      "case_id": "F04(second_execution_lane)",
+      "expected_status": "unavailable",
+      "classification": "unexpected_timeout",
+      "agent_total_latency_ms": 6280,
+      "tool_latency_breakdown_ms": {},
+      "terminal_status": "failed",
+      "root_cause": "same F04 future-year slow path executed by the overlapping second acceptance execution",
+      "fix": "same as F04; the duplicate execution itself is eliminated by acceptance_run_id + serial runner"
+    }
+  ]
+}

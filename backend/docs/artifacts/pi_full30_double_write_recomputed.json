@@ -1,0 +1,113 @@
+{
+  "schema_version": "pi_full30_double_write_recomputed_v1",
+  "phase": "6V-P1.6.5",
+  "old_assistant_double_write_count": 22,
+  "recomputed_true_duplicate_count": 0,
+  "recomputed_other_case_contamination_count": 22,
+  "recomputed_setup_followup_normal_pairs": 0,
+  "recomputed_retry_residue": 0,
+  "recomputed_runner_recount": 0,
+  "recomputed_unknown": 0,
+  "definition": "same session_id + turn_id + assistant role duplicated for one logical response",
+  "evidence": "no session in the P1.6.4 window has assistant_count != user_count (DB row check)",
+  "cases": [
+    {
+      "case_id": "D01",
+      "old_double_write_count": 2,
+      "reclassification": "other_case_contamination",
+      "true_duplicate": 0,
+      "evidence": "no session in the window has assistant_count != user_count"
+    },
+    {
+      "case_id": "D02",
+      "old_double_write_count": 2,
+      "reclassification": "other_case_contamination",
+      "true_duplicate": 0,
+      "evidence": "no session in the window has assistant_count != user_count"
+    },
+    {
+      "case_id": "D03",
+      "old_double_write_count": 3,
+      "reclassification": "other_case_contamination",
+      "true_duplicate": 0,
+      "evidence": "no session in the window has assistant_count != user_count"
+    },
+    {
+      "case_id": "D04",
+      "old_double_write_count": 1,
+      "reclassification": "other_case_contamination",
+      "true_duplicate": 0,
+      "evidence": "no session in the window has assistant_count != user_count"
+    },
+    {
+      "case_id": "D05",
+      "old_double_write_count": 2,
+      "reclassification": "other_case_contamination",
+      "true_duplicate": 0,
+      "evidence": "no session in the window has assistant_count != user_count"
+    },
+    {
+      "case_id": "E01",
+      "old_double_write_count": 2,
+      "reclassification": "other_case_contamination",
+      "true_duplicate": 0,
+      "evidence": "no session in the window has assistant_count != user_count"
+    },
+    {
+      "case_id": "E02",
+      "old_double_write_count": 2,
+      "reclassification": "other_case_contamination",
+      "true_duplicate": 0,
+      "evidence": "no session in the window has assistant_count != user_count"
+    },
+    {
+      "case_id": "F01",
+      "old_double_write_count": 1,
+      "reclassification": "other_case_contamination",
+      "true_duplicate": 0,
+      "evidence": "no session in the window has assistant_count != user_count"
+    },
+    {
+      "case_id": "F02",
+      "old_double_write_count": 0,
+      "reclassification": "other_case_contamination",
+      "true_duplicate": 0,
+      "evidence": "no session in the window has assistant_count != user_count"
+    },
+    {
+      "case_id": "F03",
+      "old_double_write_count": 2,
+      "reclassification": "other_case_contamination",
+      "true_duplicate": 0,
+      "evidence": "no session in the window has assistant_count != user_count"
+    },
+    {
+      "case_id": "F04",
+      "old_double_write_count": 1,
+      "reclassification": "other_case_contamination",
+      "true_duplicate": 0,
+      "evidence": "no session in the window has assistant_count != user_count"
+    },
+    {
+      "case_id": "F05",
+      "old_double_write_count": 1,
+      "reclassification": "other_case_contamination",
+      "true_duplicate": 0,
+      "evidence": "no session in the window has assistant_count != user_count"
+    },
+    {
+      "case_id": "F06",
+      "old_double_write_count": 2,
+      "reclassification": "other_case_contamination",
+      "true_duplicate": 0,
+      "evidence": "no session in the window has assistant_count != user_count"
+    },
+    {
+      "case_id": "F07",
+      "old_double_write_count": 1,
+      "reclassification": "other_case_contamination",
+      "true_duplicate": 0,
+      "evidence": "no session in the window has assistant_count != user_count"
+    }
+  ]
+}

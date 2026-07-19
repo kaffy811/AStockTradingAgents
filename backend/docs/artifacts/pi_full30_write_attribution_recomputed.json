@@ -1,0 +1,247 @@
+{
+  "schema_version": "pi_full30_write_attribution_recomputed_v1",
+  "phase": "6V-P1.6.5",
+  "old_pi_business_write_delta": 33,
+  "recomputed_pi_business_write_delta": 0,
+  "recomputed_other_case_write_count": 33,
+  "recomputed_unknown_owner_write_count": 0,
+  "method": "P1.6.4 counted whole-table before/after deltas; the raw diagnostics JSONL and the chat DB show a second acceptance execution creating duplicate pi-shadow-<case> sessions inside the measurement windows of D01..F07. Every extra row belongs to that execution (owner=other_case).",
+  "db_window_corroboration": {
+    "available": true,
+    "window_utc": "2026-07-19T06:30:00Z..2026-07-19T07:00:00Z",
+    "acceptance_sessions_in_window": 49,
+    "duplicated_case_titles": 16,
+    "duplicated_case_title_list": [
+      "pi-shadow-A01",
+      "pi-shadow-A02",
+      "pi-shadow-A03",
+      "pi-shadow-B01",
+      "pi-shadow-B02",
+      "pi-shadow-B03",
+      "pi-shadow-B04",
+      "pi-shadow-B05",
+      "pi-shadow-B06",
+      "pi-shadow-B07",
+      "pi-shadow-C01",
+      "pi-shadow-C02",
+      "pi-shadow-C03",
+      "pi-shadow-C04",
+      "pi-shadow-C05",
+      "pi-shadow-C06"
+    ],
+    "sessions_with_user_assistant_imbalance": 0,
+    "conclusion": "two overlapping acceptance executions ran the same cases concurrently; no session shows an assistant message without its paired user message"
+  },
+  "cases": [
+    {
+      "case_id": "D01",
+      "old_pi_business_write_delta": 2,
+      "recomputed": {
+        "pi_shadow": 0,
+        "other_case": 2,
+        "legacy": 2,
+        "unknown": 0
+      },
+      "resources": {
+        "chat_messages_extra": 2,
+        "chat_sessions_extra": 0
+      },
+      "owner_evidence": "duplicate pi-shadow-<case> sessions from the overlapping execution (DB corroborated)"
+    },
+    {
+      "case_id": "D02",
+      "old_pi_business_write_delta": 2,
+      "recomputed": {
+        "pi_shadow": 0,
+        "other_case": 2,
+        "legacy": 2,
+        "unknown": 0
+      },
+      "resources": {
+        "chat_messages_extra": 2,
+        "chat_sessions_extra": 0
+      },
+      "owner_evidence": "duplicate pi-shadow-<case> sessions from the overlapping execution (DB corroborated)"
+    },
+    {
+      "case_id": "D03",
+      "old_pi_business_write_delta": 3,
+      "recomputed": {
+        "pi_shadow": 0,
+        "other_case": 3,
+        "legacy": 2,
+        "unknown": 0
+      },
+      "resources": {
+        "chat_messages_extra": 3,
+        "chat_sessions_extra": 0
+      },
+      "owner_evidence": "duplicate pi-shadow-<case> sessions from the overlapping execution (DB corroborated)"
+    },
+    {
+      "case_id": "D04",
+      "old_pi_business_write_delta": 2,
+      "recomputed": {
+        "pi_shadow": 0,
+        "other_case": 2,
+        "legacy": 2,
+        "unknown": 0
+      },
+      "resources": {
+        "chat_messages_extra": 1,
+        "chat_sessions_extra": 1
+      },
+      "owner_evidence": "duplicate pi-shadow-<case> sessions from the overlapping execution (DB corroborated)"
+    },
+    {
+      "case_id": "D05",
+      "old_pi_business_write_delta": 3,
+      "recomputed": {
+        "pi_shadow": 0,
+        "other_case": 3,
+        "legacy": 2,
+        "unknown": 0
+      },
+      "resources": {
+        "chat_messages_extra": 2,
+        "chat_sessions_extra": 1
+      },
+      "owner_evidence": "duplicate pi-shadow-<case> sessions from the overlapping execution (DB corroborated)"
+    },
+    {
+      "case_id": "E01",
+      "old_pi_business_write_delta": 3,
+      "recomputed": {
+        "pi_shadow": 0,
+        "other_case": 3,
+        "legacy": 2,
+        "unknown": 0
+      },
+      "resources": {
+        "chat_messages_extra": 2,
+        "chat_sessions_extra": 1
+      },
+      "owner_evidence": "duplicate pi-shadow-<case> sessions from the overlapping execution (DB corroborated)"
+    },
+    {
+      "case_id": "E02",
+      "old_pi_business_write_delta": 3,
+      "recomputed": {
+        "pi_shadow": 0,
+        "other_case": 3,
+        "legacy": 2,
+        "unknown": 0
+      },
+      "resources": {
+        "chat_messages_extra": 2,
+        "chat_sessions_extra": 1
+      },
+      "owner_evidence": "duplicate pi-shadow-<case> sessions from the overlapping execution (DB corroborated)"
+    },
+    {
+      "case_id": "F01",
+      "old_pi_business_write_delta": 2,
+      "recomputed": {
+        "pi_shadow": 0,
+        "other_case": 2,
+        "legacy": 2,
+        "unknown": 0
+      },
+      "resources": {
+        "chat_messages_extra": 1,
+        "chat_sessions_extra": 1
+      },
+      "owner_evidence": "duplicate pi-shadow-<case> sessions from the overlapping execution (DB corroborated)"
+    },
+    {
+      "case_id": "F02",
+      "old_pi_business_write_delta": 1,
+      "recomputed": {
+        "pi_shadow": 0,
+        "other_case": 1,
+        "legacy": 2,
+        "unknown": 0
+      },
+      "resources": {
+        "chat_messages_extra": 0,
+        "chat_sessions_extra": 1
+      },
+      "owner_evidence": "duplicate pi-shadow-<case> sessions from the overlapping execution (DB corroborated)"
+    },
+    {
+      "case_id": "F03",
+      "old_pi_business_write_delta": 3,
+      "recomputed": {
+        "pi_shadow": 0,
+        "other_case": 3,
+        "legacy": 2,
+        "unknown": 0
+      },
+      "resources": {
+        "chat_messages_extra": 2,
+        "chat_sessions_extra": 1
+      },
+      "owner_evidence": "duplicate pi-shadow-<case> sessions from the overlapping execution (DB corroborated)"
+    },
+    {
+      "case_id": "F04",
+      "old_pi_business_write_delta": 2,
+      "recomputed": {
+        "pi_shadow": 0,
+        "other_case": 2,
+        "legacy": 2,
+        "unknown": 0
+      },
+      "resources": {
+        "chat_messages_extra": 1,
+        "chat_sessions_extra": 1
+      },
+      "owner_evidence": "duplicate pi-shadow-<case> sessions from the overlapping execution (DB corroborated)"
+    },
+    {
+      "case_id": "F05",
+      "old_pi_business_write_delta": 2,
+      "recomputed": {
+        "pi_shadow": 0,
+        "other_case": 2,
+        "legacy": 2,
+        "unknown": 0
+      },
+      "resources": {
+        "chat_messages_extra": 1,
+        "chat_sessions_extra": 1
+      },
+      "owner_evidence": "duplicate pi-shadow-<case> sessions from the overlapping execution (DB corroborated)"
+    },
+    {
+      "case_id": "F06",
+      "old_pi_business_write_delta": 3,
+      "recomputed": {
+        "pi_shadow": 0,
+        "other_case": 3,
+        "legacy": 2,
+        "unknown": 0
+      },
+      "resources": {
+        "chat_messages_extra": 2,
+        "chat_sessions_extra": 1
+      },
+      "owner_evidence": "duplicate pi-shadow-<case> sessions from the overlapping execution (DB corroborated)"
+    },
+    {
+      "case_id": "F07",
+      "old_pi_business_write_delta": 2,
+      "recomputed": {
+        "pi_shadow": 0,
+        "other_case": 2,
+        "legacy": 2,
+        "unknown": 0
+      },
+      "resources": {
+        "chat_messages_extra": 1,
+        "chat_sessions_extra": 1
+      },
+      "owner_evidence": "duplicate pi-shadow-<case> sessions from the overlapping execution (DB corroborated)"
+    }
+  ]
+}
