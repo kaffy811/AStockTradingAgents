@@ -576,6 +576,10 @@ async def stream_chat_message(
                     "answer_length":        len(result.answer or ""),
                     "status":               result.metadata.get("status", "completed"),
                     "error_code":           result.metadata.get("error_code"),
+                    # P1.6.8: structured clarification rides the single terminal
+                    # event; old clients ignore unknown fields.
+                    "response_kind":        result.metadata.get("response_kind"),
+                    "clarification":        result.metadata.get("clarification"),
                 },
                 mid=final_mid,
             ))

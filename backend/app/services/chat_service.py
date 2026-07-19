@@ -156,6 +156,7 @@ async def get_session_with_messages(
             cards=m.cards or [],
             confirmation=m.confirmation,
             created_at=m.created_at,
+            metadata=public_message_metadata(m.msg_metadata),
         )
         for m in msg_rows
     ]
@@ -366,6 +367,7 @@ _COMPACT_METADATA_KEYS = {
     "source_chunks_count",
     "common_metric_count",
     "fallback",
+    "response_kind",
 }
 _DROP_METADATA_KEYS = {
     "source_chunks",
@@ -397,6 +399,17 @@ def _compact_entities(value: object) -> list[dict]:
     return compact
 
 
+def public_message_metadata(metadata: dict | None) -> dict:
+    """Sanitized metadata subset exposed to chat clients (P1.6.8)."""
+    raw = metadata or {}
+    public: dict = {}
+    if raw.get("response_kind"):
+        public["response_kind"] = raw.get("response_kind")
+    if isinstance(raw.get("clarification"), dict):
+        public["clarification"] = raw.get("clarification")
+    return public
+
+
 def compact_chat_message_metadata(metadata: dict | None) -> dict:
     """Keep chat_messages metadata small; large diagnostics belong in debug storage."""
     raw = dict(metadata or {})
@@ -407,6 +420,20 @@ def compact_chat_message_metadata(metadata: dict | None) -> dict:
     for key in _COMPACT_METADATA_KEYS:
         if key in raw and raw.get(key) is not None:
             compact[key] = raw.get(key)
+
+    # P1.6.8: persist the sanitized clarification contract so candidates can
+    # be restored after refresh (existing JSONB metadata; no migration).
+    clarification = raw.get("clarification")
+    if not isinstance(clarification, dict):
+        skill_data_probe = raw.get("skill_data") if isinstance(raw.get("skill_data"), dict) else {}
+        clarification = skill_data_probe.get("clarification")
+    if isinstance(clarification, dict):
+        from app.services.entity_clarification import compact_clarification_for_metadata  # noqa: PLC0415
+
+        compact_clar = compact_clarification_for_metadata(clarification)
+        if compact_clar is not None:
+            compact["response_kind"] = "clarification"
+            compact["clarification"] = compact_clar
 
     skill_data = raw.get("skill_data") if isinstance(raw.get("skill_data"), dict) else {}
     if skill_data:

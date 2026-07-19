@@ -1969,6 +1969,15 @@ async def process_message(
             result.metadata["status"] = skill_data.get("status")
             if skill_data.get("error_code"):
                 result.metadata["error_code"] = skill_data.get("error_code")
+        # P1.6.8: hoist structured clarification so sync/SSE payloads and
+        # message persistence carry it without digging into skill_data.
+        if isinstance(skill_data.get("clarification"), dict):
+            from app.services.entity_clarification import compact_clarification_for_metadata  # noqa: PLC0415
+
+            compact_clar = compact_clarification_for_metadata(skill_data.get("clarification"))
+            if compact_clar is not None:
+                result.metadata["response_kind"] = "clarification"
+                result.metadata["clarification"] = compact_clar
         # C8: write memory (fire-and-forget)
         await _write_memory_from_result(db, session_id, user_id, msg, result, output_language)
         return result

@@ -212,6 +212,14 @@ async def send_chat_message(
     await chat_service.update_session_last_message(db, session_id)
     await db.commit()
 
+    public_meta = {
+        key: value
+        for key, value in {
+            "response_kind": (result.metadata or {}).get("response_kind"),
+            "clarification": (result.metadata or {}).get("clarification"),
+        }.items()
+        if value
+    }
     return ChatMessageSendResponse(
         message_id=user_msg.id,
         assistant_message_id=asst_msg.id,
@@ -220,6 +228,7 @@ async def send_chat_message(
         tool_events=result.tool_events,
         cards=result.cards,
         confirmation=result.confirmation,
+        metadata=public_meta or None,
     )
 
 

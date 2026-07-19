@@ -306,6 +306,92 @@ class SecurityEntityResolver:
             "security_index_snapshot_id": get_security_index_metrics().get("security_index_snapshot_id"),
         }
 
+    # Generic tokens that must never be treated as an ambiguous company alias.
+    _ALIAS_STOPWORDS = frozenset({
+        "年报", "季报", "中报", "半年", "报告", "公告", "财报", "业绩", "官方",
+        "最新", "今天", "股票", "证券", "市场", "公司", "集团", "控股", "股份",
+        "银行", "保险", "科技", "能源", "汽车", "医药", "地产", "电子", "通信",
+    })
+    _ALIAS_MIN_CANDIDATES = 2
+    _ALIAS_MAX_MATCHES = 8
+
+    async def resolve_short_alias_candidates(
+        self,
+        db: AsyncSession | None,
+        query: str,
+        *,
+        max_candidates: int = 5,
+    ) -> dict[str, Any] | None:
+        """Return deterministic clarification candidates for a bare short alias.
+
+        Used only after normal resolution found no entity: a short Chinese
+        alias (e.g. a two-character brand fragment) that is contained in the
+        short names of several distinct listed companies yields an ambiguity
+        candidate list.  Purely index-driven — no per-company hardcoding, no
+        report tool calls, no URLs, no auto-selection.
+        """
+        text = str(query or "")
+        runs = re.findall(r"[\u4e00-\u9fff]{2,}", text)
+        if not runs:
+            return None
+        markets = self._markets_for_query(text)
+        index: list[dict[str, Any]] = []
+        for market in markets:
+            index.extend(await self._load_index(db, market))
+        if not index:
+            return None
+        for run in runs:
+            for length in (4, 3, 2):
+                if len(run) < length:
+                    continue
+                token = run[:length]
+                if token in self._ALIAS_STOPWORDS:
+                    continue
+                matches = self._alias_matches(token, index)
+                if self._ALIAS_MIN_CANDIDATES <= len(matches) <= self._ALIAS_MAX_MATCHES:
+                    return {
+                        "query_term": token,
+                        "source": "security_entity_resolver_short_alias",
+                        "candidates": matches[:max_candidates],
+                    }
+        return None
+
+    def _alias_matches(self, token: str, index: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        market_priority = {"CN": 0, "HK": 1, "US": 2}
+        seen: set[tuple[str, str]] = set()
+        scored: list[tuple[int, int, int, str, dict[str, Any]]] = []
+        for row in index:
+            short_name = str(row.get("short_name") or "")
+            if not short_name or token not in short_name:
+                continue
+            # an exact full-name match belongs to normal resolution, not here
+            if short_name == token:
+                continue
+            market = str(row.get("market") or "CN").upper()
+            symbol = str(row.get("symbol") or "")
+            key = (market, symbol)
+            if key in seen:
+                continue
+            seen.add(key)
+            prefix_rank = 0 if short_name.startswith(token) else 1
+            scored.append((prefix_rank, len(short_name), market_priority.get(market, 9), symbol, {
+                "display_name": short_name,
+                "symbol": symbol,
+                "market": market,
+                "reason": (f"名称以“{token}”开头" if prefix_rank == 0 else f"名称包含“{token}”"),
+            }))
+        scored.sort(key=lambda item: (item[0], item[1], item[2], item[3]))
+        # cross-market duplicates of the same listed name keep the highest-priority market
+        deduped: list[dict[str, Any]] = []
+        seen_names: set[str] = set()
+        for item in scored:
+            name = str(item[4]["display_name"])
+            if name in seen_names:
+                continue
+            seen_names.add(name)
+            deduped.append(item[4])
+        return deduped
+
     def _context_reference_entity(
         self,
         text: str,

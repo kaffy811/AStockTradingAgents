@@ -487,19 +487,40 @@ class ReportExplanationSkill(BaseSkill):
             except Exception as exc:
                 resolved = {"entities": [], "ambiguity": False, "candidates": [], "resolver_error": str(exc)[:160]}
             if resolved.get("ambiguity"):
-                candidates = resolved.get("candidates") or []
-                names = "、".join(
-                    f"{c.get('short_name') or c.get('symbol')}（{c.get('market')}/{c.get('symbol')}）"
-                    for c in candidates[:5]
+                from app.services.entity_clarification import (  # noqa: PLC0415
+                    build_entity_clarification,
+                    clarification_answer_text,
                 )
-                answer = f"你提到的证券名称存在歧义，可能指：{names}。请明确选择其中一个标的。"
+
+                candidates = resolved.get("candidates") or []
+                clarification = build_entity_clarification(
+                    query_term="",
+                    candidates=[
+                        {
+                            "display_name": c.get("short_name") or c.get("symbol"),
+                            "symbol": c.get("symbol"),
+                            "market": c.get("market"),
+                        }
+                        for c in candidates[:5]
+                    ],
+                )
+                if clarification is not None:
+                    answer = clarification_answer_text(clarification)
+                else:
+                    names = "、".join(
+                        f"{c.get('short_name') or c.get('symbol')}（{c.get('market')}/{c.get('symbol')}）"
+                        for c in candidates[:5]
+                    )
+                    answer = f"你提到的证券名称存在歧义，可能指：{names}。请明确选择其中一个标的。"
                 return SkillResult(
                     ok=True,
                     skill_name=self.name,
                     answer=answer,
                     data={
-                        "status": "failed",
+                        "status": "clarification_required",
                         "error_code": "ENTITY_AMBIGUOUS",
+                        "response_kind": "clarification",
+                        "clarification": clarification,
                         "candidates": candidates[:5],
                         "debug": {**debug_payload, "failure_reason": "ENTITY_AMBIGUOUS"},
                     },
@@ -529,10 +550,31 @@ class ReportExplanationSkill(BaseSkill):
         })
 
         if not hint or not hint.get("symbol"):
+            # P1.6.8: before giving up, ask the resolver for short-alias
+            # candidates (e.g. bare “平安”) so the clarification can list the
+            # concrete companies instead of a generic prompt.  Index-driven,
+            # no report tool call, no URL, no auto-selection.
+            clarification = None
             answer = (
                 "没有识别到明确的公司或股票代码。请明确公司名称或证券代码，例如“贵州茅台最新财报表现如何”。"
             )
-            debug_payload["failure_reason"] = "ENTITY_NOT_RESOLVED"
+            try:
+                alias_hit = await security_entity_resolver.resolve_short_alias_candidates(context.db, raw_query)
+            except Exception:  # noqa: BLE001 - clarification must never break the answer
+                alias_hit = None
+            if alias_hit and alias_hit.get("candidates"):
+                from app.services.entity_clarification import (  # noqa: PLC0415
+                    build_entity_clarification,
+                    clarification_answer_text,
+                )
+
+                clarification = build_entity_clarification(
+                    query_term=alias_hit.get("query_term") or "",
+                    candidates=alias_hit["candidates"],
+                )
+                if clarification is not None:
+                    answer = clarification_answer_text(clarification)
+            debug_payload["failure_reason"] = "ENTITY_AMBIGUOUS" if clarification else "ENTITY_NOT_RESOLVED"
             await safe_emit(context.event_callback, "skill_completed", {
                 "skill_name": self.name,
                 "ok": True,
@@ -546,10 +588,12 @@ class ReportExplanationSkill(BaseSkill):
                 answer=answer,
                 tool_events=self._rag_events([], "low"),
                 data={
-                    "status": "failed",
-                    "error_code": "ENTITY_NOT_RESOLVED",
+                    "status": "clarification_required" if clarification else "failed",
+                    "error_code": "ENTITY_AMBIGUOUS" if clarification else "ENTITY_NOT_RESOLVED",
+                    "response_kind": "clarification" if clarification else None,
+                    "clarification": clarification,
                     "partial": False,
-                    "errors": ["entity_not_resolved"],
+                    "errors": [] if clarification else ["entity_not_resolved"],
                     "debug": debug_payload,
                 },
             )

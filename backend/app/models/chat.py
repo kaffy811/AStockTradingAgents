@@ -153,6 +153,9 @@ class ChatMessageItem(BaseModel):
     cards: list
     confirmation: dict | None
     created_at: datetime
+    # P1.6.8: sanitized structured payload (e.g. clarification candidates);
+    # additive — old clients ignore unknown fields.
+    metadata: dict = {}
 
 
 class ChatSessionDetailResponse(BaseModel):
@@ -192,6 +195,8 @@ class ChatMessageSendResponse(BaseModel):
     tool_events: list
     cards: list
     confirmation: dict | None
+    # P1.6.8: sanitized structured payload subset (response_kind/clarification)
+    metadata: dict | None = None
 
 
 class ChatConfirmRequest(BaseModel):
