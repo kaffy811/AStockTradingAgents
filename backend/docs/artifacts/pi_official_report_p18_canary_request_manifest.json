@@ -1,0 +1,331 @@
+{
+  "schema_version": "pi_official_report_p18_canary_request_manifest_v1",
+  "phase": "6V-P1.8",
+  "generated_at": "2026-07-20T11:29:04.537740+00:00",
+  "note": "queries stored as hashes/case types only; combos verified against the live official-report tool; 600186 excluded and 300209/2024 excluded due to a pre-existing tool year-subset gap (tool defect backlog)",
+  "eligible_specs": [
+    {
+      "style": "S1_explicit_year_2025",
+      "symbol": "600519",
+      "expected_year": 2025,
+      "kind": "single",
+      "query_hash": "7a4674d4c42e5172"
+    },
+    {
+      "style": "S3_code_year_2024",
+      "symbol": "600519",
+      "expected_year": 2024,
+      "kind": "single",
+      "query_hash": "51a5004ac16a0bcb"
+    },
+    {
+      "style": "S4_latest",
+      "symbol": "600519",
+      "expected_year": null,
+      "kind": "single",
+      "query_hash": "1b67e438b0c0fb1e"
+    },
+    {
+      "style": "S2_official_link",
+      "symbol": "600519",
+      "expected_year": null,
+      "kind": "single",
+      "query_hash": "9f9ae5fa3e3ab6ae"
+    },
+    {
+      "style": "S1_explicit_year_2025",
+      "symbol": "000858",
+      "expected_year": 2025,
+      "kind": "single",
+      "query_hash": "8e96dbca8aeb1d52"
+    },
+    {
+      "style": "S3_code_year_2024",
+      "symbol": "000858",
+      "expected_year": 2024,
+      "kind": "single",
+      "query_hash": "0a79384f05c0b7ff"
+    },
+    {
+      "style": "S4_latest",
+      "symbol": "000858",
+      "expected_year": null,
+      "kind": "single",
+      "query_hash": "362d6f4de8e1ba44"
+    },
+    {
+      "style": "S2_official_link",
+      "symbol": "000858",
+      "expected_year": null,
+      "kind": "single",
+      "query_hash": "aedb21f7de3f285c"
+    },
+    {
+      "style": "S1_explicit_year_2025",
+      "symbol": "000001",
+      "expected_year": 2025,
+      "kind": "single",
+      "query_hash": "1c16f1438e12005b"
+    },
+    {
+      "style": "S3_code_year_2024",
+      "symbol": "000001",
+      "expected_year": 2024,
+      "kind": "single",
+      "query_hash": "ccbc926a8e7e5879"
+    },
+    {
+      "style": "S4_latest",
+      "symbol": "000001",
+      "expected_year": null,
+      "kind": "single",
+      "query_hash": "e1ef8f9fe1f86a1c"
+    },
+    {
+      "style": "S2_official_link",
+      "symbol": "000001",
+      "expected_year": null,
+      "kind": "single",
+      "query_hash": "7e4a8fc556428bad"
+    },
+    {
+      "style": "S1_explicit_year_2025",
+      "symbol": "300750",
+      "expected_year": 2025,
+      "kind": "single",
+      "query_hash": "1e05143da7da4eb7"
+    },
+    {
+      "style": "S3_code_year_2024",
+      "symbol": "300750",
+      "expected_year": 2024,
+      "kind": "single",
+      "query_hash": "49a37ede1f26a27e"
+    },
+    {
+      "style": "S4_latest",
+      "symbol": "300750",
+      "expected_year": null,
+      "kind": "single",
+      "query_hash": "8dc7261c5e4c867e"
+    },
+    {
+      "style": "S2_official_link",
+      "symbol": "300750",
+      "expected_year": null,
+      "kind": "single",
+      "query_hash": "89b45fc69607cdb9"
+    },
+    {
+      "style": "S1_explicit_year_2025",
+      "symbol": "000725",
+      "expected_year": 2025,
+      "kind": "single",
+      "query_hash": "a2c6855340be7756"
+    },
+    {
+      "style": "S3_code_year_2024",
+      "symbol": "000725",
+      "expected_year": 2024,
+      "kind": "single",
+      "query_hash": "6957669159ffe5ae"
+    },
+    {
+      "style": "S4_latest",
+      "symbol": "000725",
+      "expected_year": null,
+      "kind": "single",
+      "query_hash": "58104b427e4ba54f"
+    },
+    {
+      "style": "S2_official_link",
+      "symbol": "000725",
+      "expected_year": null,
+      "kind": "single",
+      "query_hash": "ddef0ee2fcd2b27d"
+    },
+    {
+      "style": "S1_explicit_year_2025",
+      "symbol": "300209",
+      "expected_year": 2025,
+      "kind": "single",
+      "query_hash": "b541a62f770b0975"
+    },
+    {
+      "style": "S4_latest",
+      "symbol": "300209",
+      "expected_year": null,
+      "kind": "single",
+      "query_hash": "2b35f36555371ace"
+    },
+    {
+      "style": "S2_official_link",
+      "symbol": "300209",
+      "expected_year": null,
+      "kind": "single",
+      "query_hash": "7f1a49e24b347178"
+    },
+    {
+      "style": "S1_explicit_year_2025",
+      "symbol": "301396",
+      "expected_year": 2025,
+      "kind": "single",
+      "query_hash": "ddeadcf3cb2fff4d"
+    },
+    {
+      "style": "S3_code_year_2024",
+      "symbol": "301396",
+      "expected_year": 2024,
+      "kind": "single",
+      "query_hash": "06319b61bebea0c0"
+    },
+    {
+      "style": "S4_latest",
+      "symbol": "301396",
+      "expected_year": null,
+      "kind": "single",
+      "query_hash": "0d08e8922044d694"
+    },
+    {
+      "style": "S2_official_link",
+      "symbol": "301396",
+      "expected_year": null,
+      "kind": "single",
+      "query_hash": "dc435a63254b8cfc"
+    },
+    {
+      "style": "S1_explicit_year_2025",
+      "symbol": "601686",
+      "expected_year": 2025,
+      "kind": "single",
+      "query_hash": "23ca4fbb734a4ed4"
+    },
+    {
+      "style": "S3_code_year_2024",
+      "symbol": "601686",
+      "expected_year": 2024,
+      "kind": "single",
+      "query_hash": "6f2ebbcf211e5c09"
+    },
+    {
+      "style": "S4_latest",
+      "symbol": "601686",
+      "expected_year": null,
+      "kind": "single",
+      "query_hash": "81c6a9707a1c6f22"
+    },
+    {
+      "style": "S2_official_link",
+      "symbol": "601686",
+      "expected_year": null,
+      "kind": "single",
+      "query_hash": "ea2d6d57ffaa311a"
+    },
+    {
+      "style": "S1_explicit_year_2025",
+      "symbol": "688146",
+      "expected_year": 2025,
+      "kind": "single",
+      "query_hash": "edfc1e539f71e8ca"
+    },
+    {
+      "style": "S3_code_year_2024",
+      "symbol": "688146",
+      "expected_year": 2024,
+      "kind": "single",
+      "query_hash": "4120c23bed541c61"
+    },
+    {
+      "style": "S4_latest",
+      "symbol": "688146",
+      "expected_year": null,
+      "kind": "single",
+      "query_hash": "b30d6156def735b2"
+    },
+    {
+      "style": "S2_official_link",
+      "symbol": "688146",
+      "expected_year": null,
+      "kind": "single",
+      "query_hash": "75e13f27cac1a155"
+    },
+    {
+      "style": "S1_explicit_year_2025",
+      "symbol": "688549",
+      "expected_year": 2025,
+      "kind": "single",
+      "query_hash": "93eac1d699dc9c00"
+    },
+    {
+      "style": "S3_code_year_2024",
+      "symbol": "688549",
+      "expected_year": 2024,
+      "kind": "single",
+      "query_hash": "8a7d05d86d00fa0a"
+    },
+    {
+      "style": "S4_latest",
+      "symbol": "688549",
+      "expected_year": null,
+      "kind": "single",
+      "query_hash": "75db80322cc80211"
+    },
+    {
+      "style": "S2_official_link",
+      "symbol": "688549",
+      "expected_year": null,
+      "kind": "single",
+      "query_hash": "42b1e55b4d8e92ef"
+    },
+    {
+      "style": "S5_followup",
+      "symbol": "600519",
+      "expected_year": null,
+      "kind": "multi_turn",
+      "query_hash": "eef8502571e12f7e"
+    },
+    {
+      "style": "S5_followup",
+      "symbol": "000858",
+      "expected_year": null,
+      "kind": "multi_turn",
+      "query_hash": "eef8502571e12f7e"
+    },
+    {
+      "style": "S5_followup",
+      "symbol": "300750",
+      "expected_year": null,
+      "kind": "multi_turn",
+      "query_hash": "eef8502571e12f7e"
+    },
+    {
+      "style": "S5_followup",
+      "symbol": "000001",
+      "expected_year": null,
+      "kind": "multi_turn",
+      "query_hash": "eef8502571e12f7e"
+    },
+    {
+      "style": "S5_followup",
+      "symbol": "000725",
+      "expected_year": null,
+      "kind": "multi_turn",
+      "query_hash": "eef8502571e12f7e"
+    }
+  ],
+  "non_counted_demonstrations": [
+    {
+      "kind": "known_unavailable",
+      "query_hash": "7e8bb89d59425fd3"
+    },
+    {
+      "kind": "clarification",
+      "query_hash": "c36cd4decac8dbf2"
+    },
+    {
+      "kind": "unsupported",
+      "query_hash": "e9ba0eaa2ebf822c"
+    }
+  ],
+  "manifest_hash": "3d13e0c291283f52344e969b1b921870"
+}

@@ -1,0 +1,16 @@
+{
+  "schema_version": "pi_official_report_p18_canary_fallback_audit_v1",
+  "phase": "6V-P1.8",
+  "generated_at": "2026-07-20T11:29:04.537740+00:00",
+  "pi_started": 50,
+  "pi_completed": 50,
+  "fallback_started": 0,
+  "fallback_completed": 0,
+  "fallback_failed": 0,
+  "fallback_rate": 0.0,
+  "single_legacy_answer_per_request": true,
+  "terminal_exactly_once_all_requests": true,
+  "raw500": 0,
+  "raw503": 0,
+  "run1_lessons": "run1 (preserved as _run1_invalid) mixed 7 runner-manifest-malformed queries and 2 tool data-gap combos into the counted set and lacked >=50 ratio enforcement; run2 fixed the runner and pre-screened tool-verified combos"
+}

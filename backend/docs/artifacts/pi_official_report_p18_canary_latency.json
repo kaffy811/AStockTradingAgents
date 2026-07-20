@@ -1,0 +1,25 @@
+{
+  "schema_version": "pi_official_report_p18_canary_latency_v1",
+  "phase": "6V-P1.8",
+  "generated_at": "2026-07-20T11:29:04.537740+00:00",
+  "latency_ms": {
+    "pi_p50": 2810,
+    "pi_p95": 4134,
+    "tool_p50": 2810,
+    "tool_p95": 4134,
+    "legacy_p50": 16983,
+    "legacy_p95": 21810,
+    "fallback_p50": null,
+    "fallback_p95": null
+  },
+  "selected_samples": 50,
+  "alert_thresholds": {
+    "pi_p95_ms": 5000,
+    "tool_p95_ms": 4000
+  },
+  "alerts": {
+    "pi_p95_over_5s": false,
+    "tool_p95_over_4s": true
+  },
+  "note": "tool_p95 4134ms slightly over the 4s alert line -> performance review noted (no safety/reliability impact; no rollback per policy); legacy latencies reflect current staging environment load"
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": "pi_official_report_p18_auto_rollback_audit_v1",
+  "phase": "6V-P1.8",
+  "generated_at": "2026-07-20T11:29:04.537740+00:00",
+  "zero_tolerance_evaluated_after_every_request": true,
+  "ratio_and_safety_gates_enforced_at_50": true,
+  "run1_enforcement_gap": "run1 runner passed raw counters without the ratio keys and skipped the final safety check; fixed in run2 (explicit fallback_rate/unexpected_timeout_rate/safety checks after >=50)",
+  "rollback_triggered_run2": false,
+  "final_state": "completed_c1",
+  "final_rollout_percent": 1.0,
+  "auto_recovery_forbidden": true,
+  "config_landing": "controller lands rollout=0 immediately in runner scope; server env changes apply on restart (documented restart-required semantics)"
+}
