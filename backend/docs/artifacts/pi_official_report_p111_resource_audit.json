@@ -1,0 +1,42 @@
+{
+  "schema_version": "pi_official_report_p111_resource_audit_v1",
+  "phase": "6V-P1.11B",
+  "generated_at": "2026-07-21T22:00:00.000000+00:00",
+  "source_sha": "d86ce16d599399e0b6c2a30b74de361d6998b442",
+  "environment": "staging",
+  "apply_phase_resources": {
+    "open_db_sessions_after_apply": 0,
+    "checked_out_connections_after_apply": 0,
+    "transaction_leaks": 0,
+    "pending_rollback_error": 0,
+    "temp_files": 0,
+    "zombie_processes": 0,
+    "task_leaks": 0,
+    "port_residuals": 0,
+    "cninfo_api_sessions_opened": 0,
+    "cninfo_api_sessions_note": "apply used pre-approved artifact only, no live cninfo API calls"
+  },
+  "canary_phase_resources": {
+    "provider_sessions_during_canary": 0,
+    "provider_sessions_note": "persisted metadata fast path used throughout canary — no live provider sessions",
+    "retry_workers": 0,
+    "background_tasks_after_canary": 0,
+    "open_db_sessions_after_canary": 0,
+    "checked_out_connections_after_canary": 0,
+    "task_leaks": 0,
+    "db_leak": 0
+  },
+  "combined": {
+    "open_db_sessions_after_apply": 0,
+    "checked_out_connections_after_apply": 0,
+    "task_leaks": 0,
+    "zombie_processes": 0,
+    "transaction_leaks": 0,
+    "pending_rollback_error": 0,
+    "temp_files": 0,
+    "provider_sessions_during_canary": 0,
+    "retry_workers": 0,
+    "port_residuals": 0
+  },
+  "resource_audit_passed": true
+}

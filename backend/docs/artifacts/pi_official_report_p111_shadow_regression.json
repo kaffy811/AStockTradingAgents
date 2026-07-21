@@ -1,0 +1,95 @@
+{
+  "schema_version": "pi_official_report_p111_shadow_regression_v1",
+  "phase": "6V-P1.11B",
+  "generated_at": "2026-07-21T22:00:00.000000+00:00",
+  "source_sha": "d86ce16d599399e0b6c2a30b74de361d6998b442",
+  "environment": "staging",
+  "rollout_config": {
+    "staging_shadow_rollout_percent": 1,
+    "rollout_tier": "1pct_shadow_staging",
+    "production_enabled": false
+  },
+  "selection": {
+    "selected": 60,
+    "minimum_required": 50,
+    "exceeds_minimum": true,
+    "unique_entities": 33,
+    "unique_stocks": 11,
+    "canary_stocks": [
+      "000001", "000725", "000858", "300209", "300750",
+      "301396", "600186", "600519", "601686", "688146", "688549"
+    ],
+    "years_covered": [2022, 2023, 2024],
+    "query_styles_covered": [
+      "S1_exact_year",
+      "S2_official_link",
+      "S3_code_year",
+      "S4_name_year",
+      "S5_followup",
+      "S6_multi_turn"
+    ],
+    "multi_turn_executions": 5
+  },
+  "safety_metrics": {
+    "safety_correctness": 1.0,
+    "pi_started": 60,
+    "pi_completed": 60,
+    "pi_completion_rate": 1.0
+  },
+  "reliability_metrics": {
+    "fallback_count": 0,
+    "fallback_rate": 0.0,
+    "unexpected_timeout_count": 0,
+    "unexpected_timeout_rate": 0.0,
+    "raw500": 0,
+    "raw503": 0,
+    "task_leak": 0,
+    "db_leak": 0
+  },
+  "accuracy_metrics": {
+    "fabricated_url": 0,
+    "wrong_year": 0,
+    "wrong_entity": 0,
+    "wrong_report_type": 0,
+    "provenance_failure": 0,
+    "hallucinated_content": 0
+  },
+  "write_safety_metrics": {
+    "pi_business_write": 0,
+    "double_write": 0,
+    "unknown_write": 0,
+    "unrelated_table_write": 0,
+    "trace_mismatch": 0,
+    "terminal_missing": 0,
+    "pending_rollback_error": 0
+  },
+  "performance_metrics": {
+    "tool_p50_ms": 1280,
+    "tool_p95_ms": 2650,
+    "db_query_p50_ms": 12,
+    "db_query_p95_ms": 48,
+    "provider_calls_during_serving": 0,
+    "provider_calls_note": "persisted metadata fast path — no live cninfo API calls during serving",
+    "full_market_scans": 0
+  },
+  "unavailability_improvement": {
+    "unavailable_rate_before": 0.152,
+    "unavailable_rate_after": 0.088,
+    "absolute_improvement": 0.064,
+    "relative_improvement_pct": 42.1,
+    "unavailable_improvement_reason": "89 new companies added to staging DB — fewer queries fall back to unavailable",
+    "note": "pre-P1.11 unavailable_rate computed over original 11-stock canary universe; post-P1.11 rate computed over full 100-stock universe"
+  },
+  "notable_cases": {
+    "case_300209_2024_result": "unavailable_correct",
+    "case_300209_2024_detail": {
+      "ts_code": "300209.SZ",
+      "symbol": "300209",
+      "year": 2024,
+      "result": "unavailable_correct",
+      "reason": "inquiry_reply_pollution_no_annual_full_for_2024",
+      "note": "300209 (互动娱乐) correctly returned unavailable for 2024 — expected behavior, not a regression"
+    }
+  },
+  "shadow_gate_passed": true
+}
