@@ -63,5 +63,15 @@
     "shadow_correctness": 1.0,
     "tool_p95_ms": 2980,
     "production_enabled": false
+  },
+  "p113_audit": {
+    "phase": "6V-P1.13",
+    "five_percent_shadow_passed": true,
+    "shadow_selected": 517,
+    "safety_correctness": 1.0,
+    "tool_p95_ms": 3020,
+    "rollout_percent": 5,
+    "production_enabled": false,
+    "auto_rollback_triggered": false
   }
 }

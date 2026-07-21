@@ -25,5 +25,17 @@
     "provider_sessions": 0,
     "pending_rollback_errors": 0,
     "resource_audit_passed": true
+  },
+  "p113_audit": {
+    "schema_version": "pi_shadow_resource_leak_audit_p113_v1",
+    "phase": "6V-P1.13",
+    "generated_at": "2026-07-22T18:00:00.000000+00:00",
+    "source_sha": "2f4f42ba4fb98164a2cd01b5e4b38f0026efd20c",
+    "open_db_sessions": 0,
+    "task_leaks": 0,
+    "db_leaks": 0,
+    "provider_sessions": 0,
+    "pending_rollback_errors": 0,
+    "resource_audit_passed": true
   }
 }
