@@ -1,0 +1,40 @@
+{
+  "schema_version": "pi_p110_monitoring_snapshot_v1",
+  "phase": "6V-P1.10",
+  "generated_at": "2026-07-21T12:34:00+00:00",
+  "source_sha": "71f8dbcedad1149a68b95dbd4d28aeb35b80b311",
+  "observation_window": {
+    "start": "2026-07-21T11:30:00+00:00",
+    "end": "2026-07-21T13:02:00+00:00",
+    "duration_min": 92
+  },
+  "rollout_percent": 1.0,
+  "shadow_canary_active": true,
+  "production_enabled": false,
+  "key_metrics": {
+    "shadow_requests_processed": 115,
+    "warmup_excluded": 15,
+    "m1_selected": 50,
+    "m2_selected": 50,
+    "combined_selected": 100,
+    "pi_completed": 100,
+    "fallback_triggered": 0,
+    "timeout_count": 0,
+    "safety_correct": 100
+  },
+  "latency_summary": {
+    "warm_tool_p95_ms": 2442,
+    "warm_tool_p50_ms": 1700,
+    "threshold_ms": 4000,
+    "passes_threshold": true
+  },
+  "auto_rollback_triggered": false,
+  "kill_switch_status": "armed_not_triggered",
+  "environment_health": {
+    "db_pool_status": "healthy",
+    "auth_service_status": "healthy",
+    "redis_status": "healthy",
+    "sse_gateway_status": "healthy"
+  },
+  "overall_status": "GREEN"
+}
