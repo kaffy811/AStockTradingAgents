@@ -39,5 +39,13 @@
   "canary_state": "completed_c1",
   "recommended_to_continue_staging_observation": true,
   "recommended_to_raise_to_five_percent": false,
-  "recommended_for_production": false
+  "recommended_for_production": false,
+  "p112_audit": {
+    "phase": "6V-P1.12",
+    "five_percent_readiness_passed": true,
+    "shadow_selected": 160,
+    "shadow_correctness": 1.0,
+    "tool_p95_ms": 2980,
+    "production_enabled": false
+  }
 }
