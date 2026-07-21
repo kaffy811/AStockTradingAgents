@@ -1,0 +1,728 @@
+{
+  "schema_version": "official_report_staging_universe_v1",
+  "description": "Phase 6V-P1.11 staging 官方年报数据覆盖宇宙 — 100 只 A 股公司固定版本",
+  "created_at": "2026-07-21",
+  "target_years": [
+    2022,
+    2023,
+    2024
+  ],
+  "report_type": "annual",
+  "note_2025": "2025 年度报告仅在 CNINFO 上有正式年报时导入，不强制覆盖",
+  "total_companies": 100,
+  "canary_eligible_overlap": [
+    "000001",
+    "000725",
+    "000858",
+    "300209",
+    "300750",
+    "301396",
+    "600186",
+    "600519",
+    "601686",
+    "688146",
+    "688549"
+  ],
+  "companies": [
+    {
+      "symbol": "000001",
+      "ts_code": "000001.SZ",
+      "name": "平安银行",
+      "exchange": "SZ",
+      "sector": "banking"
+    },
+    {
+      "symbol": "000002",
+      "ts_code": "000002.SZ",
+      "name": "万科A",
+      "exchange": "SZ",
+      "sector": "real_estate"
+    },
+    {
+      "symbol": "000333",
+      "ts_code": "000333.SZ",
+      "name": "美的集团",
+      "exchange": "SZ",
+      "sector": "consumer_appliances"
+    },
+    {
+      "symbol": "000568",
+      "ts_code": "000568.SZ",
+      "name": "泸州老窖",
+      "exchange": "SZ",
+      "sector": "consumer_staples"
+    },
+    {
+      "symbol": "000625",
+      "ts_code": "000625.SZ",
+      "name": "长安汽车",
+      "exchange": "SZ",
+      "sector": "auto"
+    },
+    {
+      "symbol": "000651",
+      "ts_code": "000651.SZ",
+      "name": "格力电器",
+      "exchange": "SZ",
+      "sector": "consumer_appliances"
+    },
+    {
+      "symbol": "000725",
+      "ts_code": "000725.SZ",
+      "name": "京东方A",
+      "exchange": "SZ",
+      "sector": "technology"
+    },
+    {
+      "symbol": "000776",
+      "ts_code": "000776.SZ",
+      "name": "广发证券",
+      "exchange": "SZ",
+      "sector": "securities"
+    },
+    {
+      "symbol": "000858",
+      "ts_code": "000858.SZ",
+      "name": "五粮液",
+      "exchange": "SZ",
+      "sector": "consumer_staples"
+    },
+    {
+      "symbol": "000895",
+      "ts_code": "000895.SZ",
+      "name": "双汇发展",
+      "exchange": "SZ",
+      "sector": "food"
+    },
+    {
+      "symbol": "002001",
+      "ts_code": "002001.SZ",
+      "name": "新和成",
+      "exchange": "SZ",
+      "sector": "chemicals"
+    },
+    {
+      "symbol": "002027",
+      "ts_code": "002027.SZ",
+      "name": "分众传媒",
+      "exchange": "SZ",
+      "sector": "media"
+    },
+    {
+      "symbol": "002049",
+      "ts_code": "002049.SZ",
+      "name": "紫光国微",
+      "exchange": "SZ",
+      "sector": "technology"
+    },
+    {
+      "symbol": "002142",
+      "ts_code": "002142.SZ",
+      "name": "宁波银行",
+      "exchange": "SZ",
+      "sector": "banking"
+    },
+    {
+      "symbol": "002202",
+      "ts_code": "002202.SZ",
+      "name": "金风科技",
+      "exchange": "SZ",
+      "sector": "new_energy"
+    },
+    {
+      "symbol": "002236",
+      "ts_code": "002236.SZ",
+      "name": "大华股份",
+      "exchange": "SZ",
+      "sector": "technology"
+    },
+    {
+      "symbol": "002304",
+      "ts_code": "002304.SZ",
+      "name": "洋河股份",
+      "exchange": "SZ",
+      "sector": "consumer_staples"
+    },
+    {
+      "symbol": "002352",
+      "ts_code": "002352.SZ",
+      "name": "顺丰控股",
+      "exchange": "SZ",
+      "sector": "logistics"
+    },
+    {
+      "symbol": "002371",
+      "ts_code": "002371.SZ",
+      "name": "北方华创",
+      "exchange": "SZ",
+      "sector": "semiconductor"
+    },
+    {
+      "symbol": "002415",
+      "ts_code": "002415.SZ",
+      "name": "海康威视",
+      "exchange": "SZ",
+      "sector": "technology"
+    },
+    {
+      "symbol": "002475",
+      "ts_code": "002475.SZ",
+      "name": "立讯精密",
+      "exchange": "SZ",
+      "sector": "technology"
+    },
+    {
+      "symbol": "002594",
+      "ts_code": "002594.SZ",
+      "name": "比亚迪",
+      "exchange": "SZ",
+      "sector": "new_energy"
+    },
+    {
+      "symbol": "002714",
+      "ts_code": "002714.SZ",
+      "name": "牧原股份",
+      "exchange": "SZ",
+      "sector": "agriculture"
+    },
+    {
+      "symbol": "300014",
+      "ts_code": "300014.SZ",
+      "name": "亿纬锂能",
+      "exchange": "SZ",
+      "sector": "new_energy"
+    },
+    {
+      "symbol": "300059",
+      "ts_code": "300059.SZ",
+      "name": "东方财富",
+      "exchange": "SZ",
+      "sector": "fintech"
+    },
+    {
+      "symbol": "300122",
+      "ts_code": "300122.SZ",
+      "name": "智飞生物",
+      "exchange": "SZ",
+      "sector": "biotech"
+    },
+    {
+      "symbol": "300124",
+      "ts_code": "300124.SZ",
+      "name": "汇川技术",
+      "exchange": "SZ",
+      "sector": "industrial_automation"
+    },
+    {
+      "symbol": "300209",
+      "ts_code": "300209.SZ",
+      "name": "天泽信息",
+      "exchange": "SZ",
+      "sector": "technology"
+    },
+    {
+      "symbol": "300274",
+      "ts_code": "300274.SZ",
+      "name": "阳光电源",
+      "exchange": "SZ",
+      "sector": "new_energy"
+    },
+    {
+      "symbol": "300750",
+      "ts_code": "300750.SZ",
+      "name": "宁德时代",
+      "exchange": "SZ",
+      "sector": "new_energy"
+    },
+    {
+      "symbol": "300760",
+      "ts_code": "300760.SZ",
+      "name": "迈瑞医疗",
+      "exchange": "SZ",
+      "sector": "medical_devices"
+    },
+    {
+      "symbol": "301396",
+      "ts_code": "301396.SZ",
+      "name": "华科精准",
+      "exchange": "SZ",
+      "sector": "medical_devices"
+    },
+    {
+      "symbol": "600000",
+      "ts_code": "600000.SH",
+      "name": "浦发银行",
+      "exchange": "SH",
+      "sector": "banking"
+    },
+    {
+      "symbol": "600009",
+      "ts_code": "600009.SH",
+      "name": "上海机场",
+      "exchange": "SH",
+      "sector": "transportation"
+    },
+    {
+      "symbol": "600011",
+      "ts_code": "600011.SH",
+      "name": "华能国际",
+      "exchange": "SH",
+      "sector": "utilities"
+    },
+    {
+      "symbol": "600016",
+      "ts_code": "600016.SH",
+      "name": "民生银行",
+      "exchange": "SH",
+      "sector": "banking"
+    },
+    {
+      "symbol": "600028",
+      "ts_code": "600028.SH",
+      "name": "中国石化",
+      "exchange": "SH",
+      "sector": "energy"
+    },
+    {
+      "symbol": "600030",
+      "ts_code": "600030.SH",
+      "name": "中信证券",
+      "exchange": "SH",
+      "sector": "securities"
+    },
+    {
+      "symbol": "600036",
+      "ts_code": "600036.SH",
+      "name": "招商银行",
+      "exchange": "SH",
+      "sector": "banking"
+    },
+    {
+      "symbol": "600048",
+      "ts_code": "600048.SH",
+      "name": "保利发展",
+      "exchange": "SH",
+      "sector": "real_estate"
+    },
+    {
+      "symbol": "600196",
+      "ts_code": "600196.SH",
+      "name": "复星医药",
+      "exchange": "SH",
+      "sector": "pharma"
+    },
+    {
+      "symbol": "600276",
+      "ts_code": "600276.SH",
+      "name": "恒瑞医药",
+      "exchange": "SH",
+      "sector": "pharma"
+    },
+    {
+      "symbol": "600309",
+      "ts_code": "600309.SH",
+      "name": "万华化学",
+      "exchange": "SH",
+      "sector": "chemicals"
+    },
+    {
+      "symbol": "600438",
+      "ts_code": "600438.SH",
+      "name": "通威股份",
+      "exchange": "SH",
+      "sector": "new_energy"
+    },
+    {
+      "symbol": "600519",
+      "ts_code": "600519.SH",
+      "name": "贵州茅台",
+      "exchange": "SH",
+      "sector": "consumer_staples"
+    },
+    {
+      "symbol": "600547",
+      "ts_code": "600547.SH",
+      "name": "山东黄金",
+      "exchange": "SH",
+      "sector": "mining"
+    },
+    {
+      "symbol": "600660",
+      "ts_code": "600660.SH",
+      "name": "福耀玻璃",
+      "exchange": "SH",
+      "sector": "materials"
+    },
+    {
+      "symbol": "600809",
+      "ts_code": "600809.SH",
+      "name": "山西汾酒",
+      "exchange": "SH",
+      "sector": "consumer_staples"
+    },
+    {
+      "symbol": "600887",
+      "ts_code": "600887.SH",
+      "name": "伊利股份",
+      "exchange": "SH",
+      "sector": "food"
+    },
+    {
+      "symbol": "600900",
+      "ts_code": "600900.SH",
+      "name": "长江电力",
+      "exchange": "SH",
+      "sector": "utilities"
+    },
+    {
+      "symbol": "600999",
+      "ts_code": "600999.SH",
+      "name": "招商证券",
+      "exchange": "SH",
+      "sector": "securities"
+    },
+    {
+      "symbol": "601012",
+      "ts_code": "601012.SH",
+      "name": "隆基绿能",
+      "exchange": "SH",
+      "sector": "new_energy"
+    },
+    {
+      "symbol": "601088",
+      "ts_code": "601088.SH",
+      "name": "中国神华",
+      "exchange": "SH",
+      "sector": "energy"
+    },
+    {
+      "symbol": "601166",
+      "ts_code": "601166.SH",
+      "name": "兴业银行",
+      "exchange": "SH",
+      "sector": "banking"
+    },
+    {
+      "symbol": "601186",
+      "ts_code": "601186.SH",
+      "name": "中国铁建",
+      "exchange": "SH",
+      "sector": "construction"
+    },
+    {
+      "symbol": "600186",
+      "ts_code": "600186.SH",
+      "name": "莲花健康",
+      "exchange": "SH",
+      "sector": "food"
+    },
+    {
+      "symbol": "601229",
+      "ts_code": "601229.SH",
+      "name": "上海银行",
+      "exchange": "SH",
+      "sector": "banking"
+    },
+    {
+      "symbol": "601288",
+      "ts_code": "601288.SH",
+      "name": "农业银行",
+      "exchange": "SH",
+      "sector": "banking"
+    },
+    {
+      "symbol": "601318",
+      "ts_code": "601318.SH",
+      "name": "中国平安",
+      "exchange": "SH",
+      "sector": "insurance"
+    },
+    {
+      "symbol": "601328",
+      "ts_code": "601328.SH",
+      "name": "交通银行",
+      "exchange": "SH",
+      "sector": "banking"
+    },
+    {
+      "symbol": "601336",
+      "ts_code": "601336.SH",
+      "name": "新华保险",
+      "exchange": "SH",
+      "sector": "insurance"
+    },
+    {
+      "symbol": "601398",
+      "ts_code": "601398.SH",
+      "name": "工商银行",
+      "exchange": "SH",
+      "sector": "banking"
+    },
+    {
+      "symbol": "601601",
+      "ts_code": "601601.SH",
+      "name": "中国太保",
+      "exchange": "SH",
+      "sector": "insurance"
+    },
+    {
+      "symbol": "601668",
+      "ts_code": "601668.SH",
+      "name": "中国建筑",
+      "exchange": "SH",
+      "sector": "construction"
+    },
+    {
+      "symbol": "601686",
+      "ts_code": "601686.SH",
+      "name": "金域医学",
+      "exchange": "SH",
+      "sector": "medical_services"
+    },
+    {
+      "symbol": "601688",
+      "ts_code": "601688.SH",
+      "name": "华泰证券",
+      "exchange": "SH",
+      "sector": "securities"
+    },
+    {
+      "symbol": "601818",
+      "ts_code": "601818.SH",
+      "name": "光大银行",
+      "exchange": "SH",
+      "sector": "banking"
+    },
+    {
+      "symbol": "601857",
+      "ts_code": "601857.SH",
+      "name": "中国石油",
+      "exchange": "SH",
+      "sector": "energy"
+    },
+    {
+      "symbol": "601888",
+      "ts_code": "601888.SH",
+      "name": "中国中免",
+      "exchange": "SH",
+      "sector": "retail"
+    },
+    {
+      "symbol": "601899",
+      "ts_code": "601899.SH",
+      "name": "紫金矿业",
+      "exchange": "SH",
+      "sector": "mining"
+    },
+    {
+      "symbol": "601985",
+      "ts_code": "601985.SH",
+      "name": "中国核电",
+      "exchange": "SH",
+      "sector": "utilities"
+    },
+    {
+      "symbol": "601988",
+      "ts_code": "601988.SH",
+      "name": "中国银行",
+      "exchange": "SH",
+      "sector": "banking"
+    },
+    {
+      "symbol": "603288",
+      "ts_code": "603288.SH",
+      "name": "海天味业",
+      "exchange": "SH",
+      "sector": "food"
+    },
+    {
+      "symbol": "603501",
+      "ts_code": "603501.SH",
+      "name": "韦尔股份",
+      "exchange": "SH",
+      "sector": "semiconductor"
+    },
+    {
+      "symbol": "603806",
+      "ts_code": "603806.SH",
+      "name": "福斯特",
+      "exchange": "SH",
+      "sector": "new_energy"
+    },
+    {
+      "symbol": "688012",
+      "ts_code": "688012.SH",
+      "name": "中微公司",
+      "exchange": "SH",
+      "sector": "semiconductor"
+    },
+    {
+      "symbol": "688036",
+      "ts_code": "688036.SH",
+      "name": "传音控股",
+      "exchange": "SH",
+      "sector": "technology"
+    },
+    {
+      "symbol": "688111",
+      "ts_code": "688111.SH",
+      "name": "金山办公",
+      "exchange": "SH",
+      "sector": "software"
+    },
+    {
+      "symbol": "688146",
+      "ts_code": "688146.SH",
+      "name": "中航光电",
+      "exchange": "SH",
+      "sector": "aerospace"
+    },
+    {
+      "symbol": "688223",
+      "ts_code": "688223.SH",
+      "name": "晶科能源",
+      "exchange": "SH",
+      "sector": "new_energy"
+    },
+    {
+      "symbol": "688363",
+      "ts_code": "688363.SH",
+      "name": "华熙生物",
+      "exchange": "SH",
+      "sector": "biotech"
+    },
+    {
+      "symbol": "688472",
+      "ts_code": "688472.SH",
+      "name": "阿特斯",
+      "exchange": "SH",
+      "sector": "new_energy"
+    },
+    {
+      "symbol": "688549",
+      "ts_code": "688549.SH",
+      "name": "中远海科",
+      "exchange": "SH",
+      "sector": "logistics_tech"
+    },
+    {
+      "symbol": "688981",
+      "ts_code": "688981.SH",
+      "name": "中芯国际",
+      "exchange": "SH",
+      "sector": "semiconductor"
+    },
+    {
+      "symbol": "000538",
+      "ts_code": "000538.SZ",
+      "name": "云南白药",
+      "exchange": "SZ",
+      "sector": "pharma"
+    },
+    {
+      "symbol": "000166",
+      "ts_code": "000166.SZ",
+      "name": "申万宏源",
+      "exchange": "SZ",
+      "sector": "securities"
+    },
+    {
+      "symbol": "002230",
+      "ts_code": "002230.SZ",
+      "name": "科大讯飞",
+      "exchange": "SZ",
+      "sector": "ai_tech"
+    },
+    {
+      "symbol": "300498",
+      "ts_code": "300498.SZ",
+      "name": "温氏股份",
+      "exchange": "SZ",
+      "sector": "agriculture"
+    },
+    {
+      "symbol": "300015",
+      "ts_code": "300015.SZ",
+      "name": "爱尔眼科",
+      "exchange": "SZ",
+      "sector": "medical_services"
+    },
+    {
+      "symbol": "002129",
+      "ts_code": "002129.SZ",
+      "name": "中环股份",
+      "exchange": "SZ",
+      "sector": "new_energy"
+    },
+    {
+      "symbol": "001979",
+      "ts_code": "001979.SZ",
+      "name": "招商蛇口",
+      "exchange": "SZ",
+      "sector": "real_estate"
+    },
+    {
+      "symbol": "002311",
+      "ts_code": "002311.SZ",
+      "name": "海大集团",
+      "exchange": "SZ",
+      "sector": "agriculture"
+    },
+    {
+      "symbol": "300433",
+      "ts_code": "300433.SZ",
+      "name": "蓝思科技",
+      "exchange": "SZ",
+      "sector": "technology"
+    },
+    {
+      "symbol": "601009",
+      "ts_code": "601009.SH",
+      "name": "南京银行",
+      "exchange": "SH",
+      "sector": "banking"
+    },
+    {
+      "symbol": "600606",
+      "ts_code": "600606.SH",
+      "name": "绿地控股",
+      "exchange": "SH",
+      "sector": "real_estate"
+    },
+    {
+      "symbol": "002241",
+      "ts_code": "002241.SZ",
+      "name": "歌尔股份",
+      "exchange": "SZ",
+      "sector": "technology"
+    },
+    {
+      "symbol": "600585",
+      "ts_code": "600585.SH",
+      "name": "海螺水泥",
+      "exchange": "SH",
+      "sector": "materials"
+    },
+    {
+      "symbol": "603919",
+      "ts_code": "603919.SH",
+      "name": "金徽酒",
+      "exchange": "SH",
+      "sector": "consumer_staples"
+    },
+    {
+      "symbol": "002555",
+      "ts_code": "002555.SZ",
+      "name": "三七互娱",
+      "exchange": "SZ",
+      "sector": "gaming"
+    },
+    {
+      "symbol": "600489",
+      "ts_code": "600489.SH",
+      "name": "中金黄金",
+      "exchange": "SH",
+      "sector": "mining"
+    }
+  ]
+}
