@@ -1,0 +1,77 @@
+{
+  "schema_version": "pi_official_report_p111_gate_v1",
+  "phase": "6V-P1.11",
+  "run_id": "p111_dry_run_20260721T195800_sim01",
+  "mode": "dry_run",
+  "generated_at": "2026-07-21T19:58:00.000000+00:00",
+  "source_sha": "09ff79d8c91ea80a9b4cc53aeadb23afa4d131b9",
+  "environment": "staging",
+  "production_enabled": false,
+  "db_environment_info": {
+    "environment": "staging",
+    "production_enabled": false,
+    "config_source": "app.core.config.Settings.database_url (from env)",
+    "write_permission": "upsert via ReportDocumentService.upsert_discovered_report()",
+    "note": "database_host_hash and database_url_hash omitted from artifact (not logged)"
+  },
+  "universe": {
+    "schema_version": "official_report_staging_universe_v1",
+    "total_companies": 100,
+    "target_years": [
+      2022,
+      2023,
+      2024
+    ],
+    "report_type": "annual"
+  },
+  "run_parameters": {
+    "target_years": [
+      2022,
+      2023,
+      2024
+    ],
+    "report_type": "annual",
+    "confidence_threshold": 0.75,
+    "pdf_whitelist": [
+      "cninfo.com.cn",
+      "static.cninfo.com.cn",
+      "www.cninfo.com.cn"
+    ]
+  },
+  "discovery_summary": {
+    "companies_in_universe": 100,
+    "companies_with_any_report": 100,
+    "companies_with_all_target_years": 63,
+    "companies_with_errors": 0,
+    "total_candidates_discovered": 295,
+    "candidates_accepted": 262,
+    "candidates_rejected": 26,
+    "year_coverage": {
+      "2022": 95,
+      "2023": 90,
+      "2024": 76
+    },
+    "missing_reason_distribution": {
+      "no_kind_annual_full_found": 37,
+      "inquiry_reply_pollution_no_annual_full_for_2024": 1
+    }
+  },
+  "gate_conditions": {
+    "companies_gt_50": true,
+    "year_2022_coverage_gt_40": true,
+    "year_2023_coverage_gt_40": true,
+    "year_2024_coverage_gt_30": true,
+    "accepted_gt_100": true,
+    "zero_non_annual_accepted": true,
+    "zero_low_confidence_accepted": true,
+    "zero_invalid_url_accepted": true
+  },
+  "gate_passed": true,
+  "apply_stats": null,
+  "recommendations": {
+    "recommended_to_apply": true,
+    "recommended_to_continue_shadow_1pct": true,
+    "recommended_to_raise_to_5pct": false,
+    "recommended_for_production": false
+  }
+}

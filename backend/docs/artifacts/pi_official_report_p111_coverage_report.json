@@ -1,0 +1,5194 @@
+{
+  "schema_version": "pi_official_report_p111_coverage_v1",
+  "generated_at": "2026-07-21T11:52:43.558959+00:00",
+  "target_years": [
+    2022,
+    2023,
+    2024
+  ],
+  "companies": [
+    {
+      "symbol": "000001",
+      "ts_code": "000001.SZ",
+      "name": "平安银行",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "000002",
+      "ts_code": "000002.SZ",
+      "name": "万科A",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "000333",
+      "ts_code": "000333.SZ",
+      "name": "美的集团",
+      "found_years": [
+        2022,
+        2023
+      ],
+      "missing_years": [
+        2024
+      ],
+      "missing_reasons": {
+        "2024": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "000568",
+      "ts_code": "000568.SZ",
+      "name": "泸州老窖",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "000625",
+      "ts_code": "000625.SZ",
+      "name": "长安汽车",
+      "found_years": [
+        2022,
+        2023
+      ],
+      "missing_years": [
+        2024
+      ],
+      "missing_reasons": {
+        "2024": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "000651",
+      "ts_code": "000651.SZ",
+      "name": "格力电器",
+      "found_years": [
+        2023,
+        2024
+      ],
+      "missing_years": [
+        2022
+      ],
+      "missing_reasons": {
+        "2022": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "000725",
+      "ts_code": "000725.SZ",
+      "name": "京东方A",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "000776",
+      "ts_code": "000776.SZ",
+      "name": "广发证券",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "000858",
+      "ts_code": "000858.SZ",
+      "name": "五粮液",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "000895",
+      "ts_code": "000895.SZ",
+      "name": "双汇发展",
+      "found_years": [
+        2022,
+        2024
+      ],
+      "missing_years": [
+        2023
+      ],
+      "missing_reasons": {
+        "2023": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "002001",
+      "ts_code": "002001.SZ",
+      "name": "新和成",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "002027",
+      "ts_code": "002027.SZ",
+      "name": "分众传媒",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "002049",
+      "ts_code": "002049.SZ",
+      "name": "紫光国微",
+      "found_years": [
+        2022,
+        2023
+      ],
+      "missing_years": [
+        2024
+      ],
+      "missing_reasons": {
+        "2024": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "002142",
+      "ts_code": "002142.SZ",
+      "name": "宁波银行",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "002202",
+      "ts_code": "002202.SZ",
+      "name": "金风科技",
+      "found_years": [
+        2022,
+        2023
+      ],
+      "missing_years": [
+        2024
+      ],
+      "missing_reasons": {
+        "2024": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "002236",
+      "ts_code": "002236.SZ",
+      "name": "大华股份",
+      "found_years": [
+        2022,
+        2023
+      ],
+      "missing_years": [
+        2024
+      ],
+      "missing_reasons": {
+        "2024": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "002304",
+      "ts_code": "002304.SZ",
+      "name": "洋河股份",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "002352",
+      "ts_code": "002352.SZ",
+      "name": "顺丰控股",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "002371",
+      "ts_code": "002371.SZ",
+      "name": "北方华创",
+      "found_years": [
+        2022,
+        2024
+      ],
+      "missing_years": [
+        2023
+      ],
+      "missing_reasons": {
+        "2023": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "002415",
+      "ts_code": "002415.SZ",
+      "name": "海康威视",
+      "found_years": [
+        2022,
+        2023
+      ],
+      "missing_years": [
+        2024
+      ],
+      "missing_reasons": {
+        "2024": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "002475",
+      "ts_code": "002475.SZ",
+      "name": "立讯精密",
+      "found_years": [
+        2022,
+        2023
+      ],
+      "missing_years": [
+        2024
+      ],
+      "missing_reasons": {
+        "2024": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "002594",
+      "ts_code": "002594.SZ",
+      "name": "比亚迪",
+      "found_years": [
+        2022,
+        2024
+      ],
+      "missing_years": [
+        2023
+      ],
+      "missing_reasons": {
+        "2023": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "002714",
+      "ts_code": "002714.SZ",
+      "name": "牧原股份",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "300014",
+      "ts_code": "300014.SZ",
+      "name": "亿纬锂能",
+      "found_years": [
+        2023,
+        2024
+      ],
+      "missing_years": [
+        2022
+      ],
+      "missing_reasons": {
+        "2022": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "300059",
+      "ts_code": "300059.SZ",
+      "name": "东方财富",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "300122",
+      "ts_code": "300122.SZ",
+      "name": "智飞生物",
+      "found_years": [
+        2022,
+        2023
+      ],
+      "missing_years": [
+        2024
+      ],
+      "missing_reasons": {
+        "2024": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "300124",
+      "ts_code": "300124.SZ",
+      "name": "汇川技术",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "300209",
+      "ts_code": "300209.SZ",
+      "name": "天泽信息",
+      "found_years": [
+        2022,
+        2023
+      ],
+      "missing_years": [
+        2024
+      ],
+      "missing_reasons": {
+        "2024": "inquiry_reply_pollution_no_annual_full_for_2024"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "300274",
+      "ts_code": "300274.SZ",
+      "name": "阳光电源",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "300750",
+      "ts_code": "300750.SZ",
+      "name": "宁德时代",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "300760",
+      "ts_code": "300760.SZ",
+      "name": "迈瑞医疗",
+      "found_years": [
+        2022,
+        2023
+      ],
+      "missing_years": [
+        2024
+      ],
+      "missing_reasons": {
+        "2024": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "301396",
+      "ts_code": "301396.SZ",
+      "name": "华科精准",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "600000",
+      "ts_code": "600000.SH",
+      "name": "浦发银行",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "600009",
+      "ts_code": "600009.SH",
+      "name": "上海机场",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "600011",
+      "ts_code": "600011.SH",
+      "name": "华能国际",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "600016",
+      "ts_code": "600016.SH",
+      "name": "民生银行",
+      "found_years": [
+        2022,
+        2023
+      ],
+      "missing_years": [
+        2024
+      ],
+      "missing_reasons": {
+        "2024": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "600028",
+      "ts_code": "600028.SH",
+      "name": "中国石化",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "600030",
+      "ts_code": "600030.SH",
+      "name": "中信证券",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "600036",
+      "ts_code": "600036.SH",
+      "name": "招商银行",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "600048",
+      "ts_code": "600048.SH",
+      "name": "保利发展",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "600196",
+      "ts_code": "600196.SH",
+      "name": "复星医药",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "600276",
+      "ts_code": "600276.SH",
+      "name": "恒瑞医药",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "600309",
+      "ts_code": "600309.SH",
+      "name": "万华化学",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "600438",
+      "ts_code": "600438.SH",
+      "name": "通威股份",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "600519",
+      "ts_code": "600519.SH",
+      "name": "贵州茅台",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "600547",
+      "ts_code": "600547.SH",
+      "name": "山东黄金",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "600660",
+      "ts_code": "600660.SH",
+      "name": "福耀玻璃",
+      "found_years": [
+        2022,
+        2023
+      ],
+      "missing_years": [
+        2024
+      ],
+      "missing_reasons": {
+        "2024": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "600809",
+      "ts_code": "600809.SH",
+      "name": "山西汾酒",
+      "found_years": [
+        2022,
+        2024
+      ],
+      "missing_years": [
+        2023
+      ],
+      "missing_reasons": {
+        "2023": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "600887",
+      "ts_code": "600887.SH",
+      "name": "伊利股份",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "600900",
+      "ts_code": "600900.SH",
+      "name": "长江电力",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "600999",
+      "ts_code": "600999.SH",
+      "name": "招商证券",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "601012",
+      "ts_code": "601012.SH",
+      "name": "隆基绿能",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "601088",
+      "ts_code": "601088.SH",
+      "name": "中国神华",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "601166",
+      "ts_code": "601166.SH",
+      "name": "兴业银行",
+      "found_years": [
+        2022,
+        2023
+      ],
+      "missing_years": [
+        2024
+      ],
+      "missing_reasons": {
+        "2024": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "601186",
+      "ts_code": "601186.SH",
+      "name": "中国铁建",
+      "found_years": [
+        2022,
+        2023
+      ],
+      "missing_years": [
+        2024
+      ],
+      "missing_reasons": {
+        "2024": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "600186",
+      "ts_code": "600186.SH",
+      "name": "莲花健康",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "601229",
+      "ts_code": "601229.SH",
+      "name": "上海银行",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "601288",
+      "ts_code": "601288.SH",
+      "name": "农业银行",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "601318",
+      "ts_code": "601318.SH",
+      "name": "中国平安",
+      "found_years": [
+        2022,
+        2023
+      ],
+      "missing_years": [
+        2024
+      ],
+      "missing_reasons": {
+        "2024": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "601328",
+      "ts_code": "601328.SH",
+      "name": "交通银行",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "601336",
+      "ts_code": "601336.SH",
+      "name": "新华保险",
+      "found_years": [
+        2022,
+        2023
+      ],
+      "missing_years": [
+        2024
+      ],
+      "missing_reasons": {
+        "2024": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "601398",
+      "ts_code": "601398.SH",
+      "name": "工商银行",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "601601",
+      "ts_code": "601601.SH",
+      "name": "中国太保",
+      "found_years": [
+        2022,
+        2023
+      ],
+      "missing_years": [
+        2024
+      ],
+      "missing_reasons": {
+        "2024": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "601668",
+      "ts_code": "601668.SH",
+      "name": "中国建筑",
+      "found_years": [
+        2022,
+        2024
+      ],
+      "missing_years": [
+        2023
+      ],
+      "missing_reasons": {
+        "2023": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "601686",
+      "ts_code": "601686.SH",
+      "name": "金域医学",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "601688",
+      "ts_code": "601688.SH",
+      "name": "华泰证券",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "601818",
+      "ts_code": "601818.SH",
+      "name": "光大银行",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "601857",
+      "ts_code": "601857.SH",
+      "name": "中国石油",
+      "found_years": [
+        2023,
+        2024
+      ],
+      "missing_years": [
+        2022
+      ],
+      "missing_reasons": {
+        "2022": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "601888",
+      "ts_code": "601888.SH",
+      "name": "中国中免",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "601899",
+      "ts_code": "601899.SH",
+      "name": "紫金矿业",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "601985",
+      "ts_code": "601985.SH",
+      "name": "中国核电",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "601988",
+      "ts_code": "601988.SH",
+      "name": "中国银行",
+      "found_years": [
+        2022,
+        2023
+      ],
+      "missing_years": [
+        2024
+      ],
+      "missing_reasons": {
+        "2024": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "603288",
+      "ts_code": "603288.SH",
+      "name": "海天味业",
+      "found_years": [
+        2023,
+        2024
+      ],
+      "missing_years": [
+        2022
+      ],
+      "missing_reasons": {
+        "2022": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "603501",
+      "ts_code": "603501.SH",
+      "name": "韦尔股份",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "603806",
+      "ts_code": "603806.SH",
+      "name": "福斯特",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "688012",
+      "ts_code": "688012.SH",
+      "name": "中微公司",
+      "found_years": [
+        2022,
+        2024
+      ],
+      "missing_years": [
+        2023
+      ],
+      "missing_reasons": {
+        "2023": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "688036",
+      "ts_code": "688036.SH",
+      "name": "传音控股",
+      "found_years": [
+        2022
+      ],
+      "missing_years": [
+        2023,
+        2024
+      ],
+      "missing_reasons": {
+        "2023": "no_kind_annual_full_found",
+        "2024": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.3333333333333333,
+      "error": null
+    },
+    {
+      "symbol": "688111",
+      "ts_code": "688111.SH",
+      "name": "金山办公",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "688146",
+      "ts_code": "688146.SH",
+      "name": "中航光电",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "688223",
+      "ts_code": "688223.SH",
+      "name": "晶科能源",
+      "found_years": [
+        2022,
+        2023
+      ],
+      "missing_years": [
+        2024
+      ],
+      "missing_reasons": {
+        "2024": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "688363",
+      "ts_code": "688363.SH",
+      "name": "华熙生物",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "688472",
+      "ts_code": "688472.SH",
+      "name": "阿特斯",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "688549",
+      "ts_code": "688549.SH",
+      "name": "中远海科",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "688981",
+      "ts_code": "688981.SH",
+      "name": "中芯国际",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "000538",
+      "ts_code": "000538.SZ",
+      "name": "云南白药",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "000166",
+      "ts_code": "000166.SZ",
+      "name": "申万宏源",
+      "found_years": [
+        2022,
+        2024
+      ],
+      "missing_years": [
+        2023
+      ],
+      "missing_reasons": {
+        "2023": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "002230",
+      "ts_code": "002230.SZ",
+      "name": "科大讯飞",
+      "found_years": [
+        2022,
+        2023
+      ],
+      "missing_years": [
+        2024
+      ],
+      "missing_reasons": {
+        "2024": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "300498",
+      "ts_code": "300498.SZ",
+      "name": "温氏股份",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "300015",
+      "ts_code": "300015.SZ",
+      "name": "爱尔眼科",
+      "found_years": [
+        2023,
+        2024
+      ],
+      "missing_years": [
+        2022
+      ],
+      "missing_reasons": {
+        "2022": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "002129",
+      "ts_code": "002129.SZ",
+      "name": "中环股份",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "001979",
+      "ts_code": "001979.SZ",
+      "name": "招商蛇口",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "002311",
+      "ts_code": "002311.SZ",
+      "name": "海大集团",
+      "found_years": [
+        2022,
+        2023
+      ],
+      "missing_years": [
+        2024
+      ],
+      "missing_reasons": {
+        "2024": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "300433",
+      "ts_code": "300433.SZ",
+      "name": "蓝思科技",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "601009",
+      "ts_code": "601009.SH",
+      "name": "南京银行",
+      "found_years": [
+        2022,
+        2023
+      ],
+      "missing_years": [
+        2024
+      ],
+      "missing_reasons": {
+        "2024": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "600606",
+      "ts_code": "600606.SH",
+      "name": "绿地控股",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "002241",
+      "ts_code": "002241.SZ",
+      "name": "歌尔股份",
+      "found_years": [
+        2022,
+        2024
+      ],
+      "missing_years": [
+        2023
+      ],
+      "missing_reasons": {
+        "2023": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "600585",
+      "ts_code": "600585.SH",
+      "name": "海螺水泥",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "603919",
+      "ts_code": "603919.SH",
+      "name": "金徽酒",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    },
+    {
+      "symbol": "002555",
+      "ts_code": "002555.SZ",
+      "name": "三七互娱",
+      "found_years": [
+        2022,
+        2024
+      ],
+      "missing_years": [
+        2023
+      ],
+      "missing_reasons": {
+        "2023": "no_kind_annual_full_found"
+      },
+      "coverage_rate": 0.6666666666666666,
+      "error": null
+    },
+    {
+      "symbol": "600489",
+      "ts_code": "600489.SH",
+      "name": "中金黄金",
+      "found_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "missing_years": [],
+      "missing_reasons": {},
+      "coverage_rate": 1.0,
+      "error": null
+    }
+  ],
+  "accepted_count": 262,
+  "accepted_candidates": [
+    {
+      "symbol": "000001",
+      "ts_code": "000001.SZ",
+      "company_name": "平安银行",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.92,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/67754909/4fb73036/NNN0000012022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=fe2f834d4e03",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-18"
+    },
+    {
+      "symbol": "000001",
+      "ts_code": "000001.SZ",
+      "company_name": "平安银行",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.92,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/7343e0a5/86b41a5f/NNN0000012023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=4297d63f5e8a",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-01"
+    },
+    {
+      "symbol": "000001",
+      "ts_code": "000001.SZ",
+      "company_name": "平安银行",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.92,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/c3a12d77/c89cf1aa/NNN0000012024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=566bb1f2fa13",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-18"
+    },
+    {
+      "symbol": "000002",
+      "ts_code": "000002.SZ",
+      "company_name": "万科A",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.907,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/4e71c283/cb401939/NNN0000022022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=7d51b860b391",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-11"
+    },
+    {
+      "symbol": "000002",
+      "ts_code": "000002.SZ",
+      "company_name": "万科A",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.941,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/6bdca078/d00bc2fe/NNN0000022023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=4f9c2c6ebc16",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-12"
+    },
+    {
+      "symbol": "000002",
+      "ts_code": "000002.SZ",
+      "company_name": "万科A",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.889,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/be02acd0/7b3febc8/NNN0000022024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=cc91edcb6603",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-07"
+    },
+    {
+      "symbol": "000333",
+      "ts_code": "000333.SZ",
+      "company_name": "美的集团",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.929,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/bc85d0b2/c7c302c9/NNN0003332022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=30b7606ad0f2",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-25"
+    },
+    {
+      "symbol": "000333",
+      "ts_code": "000333.SZ",
+      "company_name": "美的集团",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.936,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/1c9bfbc8/bc7b273c/NNN0003332023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=4e0a66ab3f50",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-21"
+    },
+    {
+      "symbol": "000568",
+      "ts_code": "000568.SZ",
+      "company_name": "泸州老窖",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.918,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/0f0fedba/41daacb1/NNN0005682022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=5b58ffa5fa5f",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-14"
+    },
+    {
+      "symbol": "000568",
+      "ts_code": "000568.SZ",
+      "company_name": "泸州老窖",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.896,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/66a4346d/66d69c8e/NNN0005682023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=b9f789fe3d27",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-28"
+    },
+    {
+      "symbol": "000568",
+      "ts_code": "000568.SZ",
+      "company_name": "泸州老窖",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.91,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/f85e5e77/92aa26cb/NNN0005682024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=58f765897e83",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-07"
+    },
+    {
+      "symbol": "000625",
+      "ts_code": "000625.SZ",
+      "company_name": "长安汽车",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.959,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/12b160c5/8b0bb4db/NNN0006252022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=585874734517",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-25"
+    },
+    {
+      "symbol": "000625",
+      "ts_code": "000625.SZ",
+      "company_name": "长安汽车",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.899,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/8fee749d/598693e4/NNN0006252023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=2d03afeed199",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-10"
+    },
+    {
+      "symbol": "000651",
+      "ts_code": "000651.SZ",
+      "company_name": "格力电器",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.964,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/2d0e5df0/5769589c/NNN0006512023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=ee944cfd92c6",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-23"
+    },
+    {
+      "symbol": "000651",
+      "ts_code": "000651.SZ",
+      "company_name": "格力电器",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.96,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/4f12c506/6102cab0/NNN0006512024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=029435b0c211",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-23"
+    },
+    {
+      "symbol": "000725",
+      "ts_code": "000725.SZ",
+      "company_name": "京东方A",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.92,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/ebf410bd/bfb6ecd0/NNN0007252022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=39f65743e867",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-19"
+    },
+    {
+      "symbol": "000725",
+      "ts_code": "000725.SZ",
+      "company_name": "京东方A",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.92,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/6fd33c17/873dc479/NNN0007252023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=509ecc68d672",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-23"
+    },
+    {
+      "symbol": "000725",
+      "ts_code": "000725.SZ",
+      "company_name": "京东方A",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.92,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/8db95607/80f9a297/NNN0007252024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=55d08bb922a2",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-15"
+    },
+    {
+      "symbol": "000776",
+      "ts_code": "000776.SZ",
+      "company_name": "广发证券",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.88,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/d9a642fb/137763e1/NNN0007762022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=653c778cdc01",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-14"
+    },
+    {
+      "symbol": "000776",
+      "ts_code": "000776.SZ",
+      "company_name": "广发证券",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.945,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/5fe83134/17940fa8/NNN0007762023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=1f4d746d874e",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-12"
+    },
+    {
+      "symbol": "000776",
+      "ts_code": "000776.SZ",
+      "company_name": "广发证券",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.936,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/59962ce2/1a8c70be/NNN0007762024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=553102ec1afa",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-21"
+    },
+    {
+      "symbol": "000858",
+      "ts_code": "000858.SZ",
+      "company_name": "五粮液",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.92,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/7d5454fd/8a8a7f4d/NNN0008582022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=1f58e42d083a",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-04"
+    },
+    {
+      "symbol": "000858",
+      "ts_code": "000858.SZ",
+      "company_name": "五粮液",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.92,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/ef83d307/17beca2d/NNN0008582023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=536b2c00bcfa",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-25"
+    },
+    {
+      "symbol": "000858",
+      "ts_code": "000858.SZ",
+      "company_name": "五粮液",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.92,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/489c70ac/7ec09740/NNN0008582024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=da9d806949d1",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-06"
+    },
+    {
+      "symbol": "000895",
+      "ts_code": "000895.SZ",
+      "company_name": "双汇发展",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.909,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/9253b942/8042d291/NNN0008952022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=60fd9dd7771f",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-25"
+    },
+    {
+      "symbol": "000895",
+      "ts_code": "000895.SZ",
+      "company_name": "双汇发展",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.929,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/4d19757a/21f6df14/NNN0008952024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=be31a3476e7d",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-05"
+    },
+    {
+      "symbol": "002001",
+      "ts_code": "002001.SZ",
+      "company_name": "新和成",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.944,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/86745a2b/b50290b1/NNN0020012022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=db8065073f61",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-09"
+    },
+    {
+      "symbol": "002001",
+      "ts_code": "002001.SZ",
+      "company_name": "新和成",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.945,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/279b87c3/8b90e005/NNN0020012023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=02b2a47a5a39",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-17"
+    },
+    {
+      "symbol": "002001",
+      "ts_code": "002001.SZ",
+      "company_name": "新和成",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.894,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/1c748391/96b3b467/NNN0020012024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=26b399dba842",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-13"
+    },
+    {
+      "symbol": "002027",
+      "ts_code": "002027.SZ",
+      "company_name": "分众传媒",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.932,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/e510e6db/a26dd12a/NNN0020272022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=402f36f39023",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-12"
+    },
+    {
+      "symbol": "002027",
+      "ts_code": "002027.SZ",
+      "company_name": "分众传媒",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.923,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/9292e55e/9ff95758/NNN0020272023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=c223f2df84fa",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-04"
+    },
+    {
+      "symbol": "002027",
+      "ts_code": "002027.SZ",
+      "company_name": "分众传媒",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.908,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/00c4b6b2/69e0cbbf/NNN0020272024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=5e71f8de01cf",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-23"
+    },
+    {
+      "symbol": "002049",
+      "ts_code": "002049.SZ",
+      "company_name": "紫光国微",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.933,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/08313bf8/16d9ca49/NNN0020492022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=5e92731ca2ad",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-07"
+    },
+    {
+      "symbol": "002049",
+      "ts_code": "002049.SZ",
+      "company_name": "紫光国微",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.917,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/251ac1a0/417dc742/NNN0020492023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=d7a20a4e527a",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-21"
+    },
+    {
+      "symbol": "002142",
+      "ts_code": "002142.SZ",
+      "company_name": "宁波银行",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.891,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/2c5d736a/926ad3cc/NNN0021422022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=02f29da1acc5",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-28"
+    },
+    {
+      "symbol": "002142",
+      "ts_code": "002142.SZ",
+      "company_name": "宁波银行",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.962,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/fc42eae7/4ef1983a/NNN0021422023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=4a4f8b9dab8a",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-18"
+    },
+    {
+      "symbol": "002142",
+      "ts_code": "002142.SZ",
+      "company_name": "宁波银行",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.897,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/8287f2ff/a4bf196e/NNN0021422024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=900edecd5c2f",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-26"
+    },
+    {
+      "symbol": "002202",
+      "ts_code": "002202.SZ",
+      "company_name": "金风科技",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.893,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/fc05acc5/d269e811/NNN0022022022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=b39335062f8e",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-24"
+    },
+    {
+      "symbol": "002202",
+      "ts_code": "002202.SZ",
+      "company_name": "金风科技",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.964,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/27b159e6/4c2e1389/NNN0022022023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=a7bc3d8ff882",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-03"
+    },
+    {
+      "symbol": "002236",
+      "ts_code": "002236.SZ",
+      "company_name": "大华股份",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.948,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/af99e2a1/1dc1de7b/NNN0022362022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=faaccf1e36b3",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-09"
+    },
+    {
+      "symbol": "002236",
+      "ts_code": "002236.SZ",
+      "company_name": "大华股份",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.936,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/7a0df912/82ebc84c/NNN0022362023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=20a576a205b2",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-13"
+    },
+    {
+      "symbol": "002304",
+      "ts_code": "002304.SZ",
+      "company_name": "洋河股份",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.957,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/700684ad/654680e9/NNN0023042022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=5c695c6932c4",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-21"
+    },
+    {
+      "symbol": "002304",
+      "ts_code": "002304.SZ",
+      "company_name": "洋河股份",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.891,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/0aba294d/c32a4b84/NNN0023042023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=4f7cc197f891",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-09"
+    },
+    {
+      "symbol": "002304",
+      "ts_code": "002304.SZ",
+      "company_name": "洋河股份",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.923,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/9c3684ad/549eec5c/NNN0023042024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=d0d56036a7e0",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-17"
+    },
+    {
+      "symbol": "002352",
+      "ts_code": "002352.SZ",
+      "company_name": "顺丰控股",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.905,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/690a12fb/b292b350/NNN0023522022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=32cd99114078",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-26"
+    },
+    {
+      "symbol": "002352",
+      "ts_code": "002352.SZ",
+      "company_name": "顺丰控股",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.91,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/79882813/d3483393/NNN0023522023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=9832129a076f",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-26"
+    },
+    {
+      "symbol": "002352",
+      "ts_code": "002352.SZ",
+      "company_name": "顺丰控股",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.925,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/9aafd8bc/36960361/NNN0023522024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=9bdf520cf721",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-03"
+    },
+    {
+      "symbol": "002371",
+      "ts_code": "002371.SZ",
+      "company_name": "北方华创",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.917,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/c1631e35/3db89ad4/NNN0023712022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=0edcfbc44574",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-20"
+    },
+    {
+      "symbol": "002371",
+      "ts_code": "002371.SZ",
+      "company_name": "北方华创",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.961,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/1d432eae/bdfc932d/NNN0023712024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=674a415558a1",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-19"
+    },
+    {
+      "symbol": "002415",
+      "ts_code": "002415.SZ",
+      "company_name": "海康威视",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.965,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/809b0ba9/6cc4f2bc/NNN0024152022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=d10ee6cacd81",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-02"
+    },
+    {
+      "symbol": "002415",
+      "ts_code": "002415.SZ",
+      "company_name": "海康威视",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.92,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/65664413/1055cade/NNN0024152023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=9771e35445b8",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-14"
+    },
+    {
+      "symbol": "002475",
+      "ts_code": "002475.SZ",
+      "company_name": "立讯精密",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.937,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/9a44425e/49878a64/NNN0024752022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=3c64c96df157",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-11"
+    },
+    {
+      "symbol": "002475",
+      "ts_code": "002475.SZ",
+      "company_name": "立讯精密",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.883,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/aa75574d/fe989b5e/NNN0024752023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=fb5751807945",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-23"
+    },
+    {
+      "symbol": "002594",
+      "ts_code": "002594.SZ",
+      "company_name": "比亚迪",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.901,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/ebf0c811/24e465ab/NNN0025942022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=165ff8923253",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-02"
+    },
+    {
+      "symbol": "002594",
+      "ts_code": "002594.SZ",
+      "company_name": "比亚迪",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.942,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/09ec4693/908e34ce/NNN0025942024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=a8dbd9a0a026",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-17"
+    },
+    {
+      "symbol": "002714",
+      "ts_code": "002714.SZ",
+      "company_name": "牧原股份",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.913,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/e3663bef/93c68b22/NNN0027142022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=476797c25770",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-12"
+    },
+    {
+      "symbol": "002714",
+      "ts_code": "002714.SZ",
+      "company_name": "牧原股份",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.95,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/c88701dc/5ab3c1bd/NNN0027142023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=3ba34f626f67",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-04"
+    },
+    {
+      "symbol": "002714",
+      "ts_code": "002714.SZ",
+      "company_name": "牧原股份",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.918,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/4c014a2a/3a440a6e/NNN0027142024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=d913f7c0d3f0",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-12"
+    },
+    {
+      "symbol": "300014",
+      "ts_code": "300014.SZ",
+      "company_name": "亿纬锂能",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.962,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/cbb94c2f/2e88b2cc/NNN3000142023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=31936044d3b4",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-24"
+    },
+    {
+      "symbol": "300014",
+      "ts_code": "300014.SZ",
+      "company_name": "亿纬锂能",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.882,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/8baed4db/0faac284/NNN3000142024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=0b738fb7d581",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-24"
+    },
+    {
+      "symbol": "300059",
+      "ts_code": "300059.SZ",
+      "company_name": "东方财富",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.961,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/66e11551/771f9dcb/NNN3000592022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=5bd9327b97bf",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-10"
+    },
+    {
+      "symbol": "300059",
+      "ts_code": "300059.SZ",
+      "company_name": "东方财富",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.937,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/4f311f6d/fd57bae9/NNN3000592023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=30072b6204bc",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-25"
+    },
+    {
+      "symbol": "300059",
+      "ts_code": "300059.SZ",
+      "company_name": "东方财富",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.909,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/fecbd5e9/b7c7d481/NNN3000592024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=0f4c64560e36",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-14"
+    },
+    {
+      "symbol": "300122",
+      "ts_code": "300122.SZ",
+      "company_name": "智飞生物",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.934,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/8e4d1487/15552dfc/NNN3001222022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=b857d5add6cb",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-17"
+    },
+    {
+      "symbol": "300122",
+      "ts_code": "300122.SZ",
+      "company_name": "智飞生物",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.914,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/66850ba0/2e6ce588/NNN3001222023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=8293432c68d5",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-07"
+    },
+    {
+      "symbol": "300124",
+      "ts_code": "300124.SZ",
+      "company_name": "汇川技术",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.908,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/8e040a66/b9cb24d6/NNN3001242022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=8cdafc1b1467",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-21"
+    },
+    {
+      "symbol": "300124",
+      "ts_code": "300124.SZ",
+      "company_name": "汇川技术",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.915,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/db8d34bd/0378a895/NNN3001242023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=404a4e0d9d42",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-07"
+    },
+    {
+      "symbol": "300124",
+      "ts_code": "300124.SZ",
+      "company_name": "汇川技术",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.933,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/b83f284b/20cbf3ad/NNN3001242024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=166a2a6002e4",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-09"
+    },
+    {
+      "symbol": "300209",
+      "ts_code": "300209.SZ",
+      "company_name": "天泽信息",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.92,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/c7323585/8dfe3d0b/NNN3002092022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=567a17ea8b4d",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-06"
+    },
+    {
+      "symbol": "300209",
+      "ts_code": "300209.SZ",
+      "company_name": "天泽信息",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.92,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/89ea355f/4ec265c1/NNN3002092023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=70f538930e37",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-18"
+    },
+    {
+      "symbol": "300274",
+      "ts_code": "300274.SZ",
+      "company_name": "阳光电源",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.914,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/736fea99/6a02c870/NNN3002742022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=ae729f7097a1",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-07"
+    },
+    {
+      "symbol": "300274",
+      "ts_code": "300274.SZ",
+      "company_name": "阳光电源",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.938,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/1cbb3555/661f038d/NNN3002742023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=cb558a4e2746",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-11"
+    },
+    {
+      "symbol": "300274",
+      "ts_code": "300274.SZ",
+      "company_name": "阳光电源",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.93,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/bcfa6ca0/1f2fdfd2/NNN3002742024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=da9d21b548d8",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-07"
+    },
+    {
+      "symbol": "300750",
+      "ts_code": "300750.SZ",
+      "company_name": "宁德时代",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.92,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/940eb0ee/815b5ea2/NNN3007502022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=2f9a8d403c03",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-18"
+    },
+    {
+      "symbol": "300750",
+      "ts_code": "300750.SZ",
+      "company_name": "宁德时代",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.92,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/5ef62762/b18f645f/NNN3007502023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=a70125c0f35e",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-24"
+    },
+    {
+      "symbol": "300750",
+      "ts_code": "300750.SZ",
+      "company_name": "宁德时代",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.92,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/f83110a2/13240813/NNN3007502024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=ed9a363ddd14",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-03"
+    },
+    {
+      "symbol": "300760",
+      "ts_code": "300760.SZ",
+      "company_name": "迈瑞医疗",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.897,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/4d9a0adf/588df83f/NNN3007602022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=6ac9dacf188a",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-12"
+    },
+    {
+      "symbol": "300760",
+      "ts_code": "300760.SZ",
+      "company_name": "迈瑞医疗",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.918,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/9d3df8d6/cf57bdd8/NNN3007602023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=c76b51ec2a90",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-27"
+    },
+    {
+      "symbol": "301396",
+      "ts_code": "301396.SZ",
+      "company_name": "华科精准",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.92,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/ad90f8ba/e408315a/NNN3013962022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=7ed598188a4d",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-21"
+    },
+    {
+      "symbol": "301396",
+      "ts_code": "301396.SZ",
+      "company_name": "华科精准",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.92,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/dbdf5c48/b960e50e/NNN3013962023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=ab7fdc42c954",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-03"
+    },
+    {
+      "symbol": "301396",
+      "ts_code": "301396.SZ",
+      "company_name": "华科精准",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.92,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/97ea6179/383280e6/NNN3013962024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=47cf906aa8c2",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-10"
+    },
+    {
+      "symbol": "600000",
+      "ts_code": "600000.SH",
+      "company_name": "浦发银行",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.951,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/23b3b1eb/c121768b/NNN6000002022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=f2cfde1bee31",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-09"
+    },
+    {
+      "symbol": "600000",
+      "ts_code": "600000.SH",
+      "company_name": "浦发银行",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.964,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/2a26dc75/dc2780ad/NNN6000002023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=fb155adc4b2f",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-05"
+    },
+    {
+      "symbol": "600000",
+      "ts_code": "600000.SH",
+      "company_name": "浦发银行",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.914,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/6dd05848/a9383e49/NNN6000002024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=c75b58acfff3",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-06"
+    },
+    {
+      "symbol": "600009",
+      "ts_code": "600009.SH",
+      "company_name": "上海机场",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.881,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/6ba2374b/b831572f/NNN6000092022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=ee1911acb628",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-12"
+    },
+    {
+      "symbol": "600009",
+      "ts_code": "600009.SH",
+      "company_name": "上海机场",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.883,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/7c7a3f7a/1ea46a90/NNN6000092023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=adbe87121b18",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-03"
+    },
+    {
+      "symbol": "600009",
+      "ts_code": "600009.SH",
+      "company_name": "上海机场",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.964,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/5d972251/9f9f768b/NNN6000092024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=19523adc684c",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-09"
+    },
+    {
+      "symbol": "600011",
+      "ts_code": "600011.SH",
+      "company_name": "华能国际",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.915,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/c7d8efed/2be359eb/NNN6000112022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=8791418e0b63",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-24"
+    },
+    {
+      "symbol": "600011",
+      "ts_code": "600011.SH",
+      "company_name": "华能国际",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.928,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/bedb69fb/10f302e6/NNN6000112023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=a45a261b4800",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-20"
+    },
+    {
+      "symbol": "600011",
+      "ts_code": "600011.SH",
+      "company_name": "华能国际",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.907,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/7caa64cd/d5d2594c/NNN6000112024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=4a911c63d06b",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-18"
+    },
+    {
+      "symbol": "600016",
+      "ts_code": "600016.SH",
+      "company_name": "民生银行",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.93,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/e9cb2f2d/a24a1214/NNN6000162022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=aedc2de54a5e",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-23"
+    },
+    {
+      "symbol": "600016",
+      "ts_code": "600016.SH",
+      "company_name": "民生银行",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.958,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/20ee0633/5d27b666/NNN6000162023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=6d1dcbb7394b",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-19"
+    },
+    {
+      "symbol": "600028",
+      "ts_code": "600028.SH",
+      "company_name": "中国石化",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.927,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/19b70db9/763c58d6/NNN6000282022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=89a7bbc77c56",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-21"
+    },
+    {
+      "symbol": "600028",
+      "ts_code": "600028.SH",
+      "company_name": "中国石化",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.929,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/c73a3e4e/0e275ba0/NNN6000282023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=7bfaf2c3b907",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-06"
+    },
+    {
+      "symbol": "600028",
+      "ts_code": "600028.SH",
+      "company_name": "中国石化",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.923,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/f6b75470/a86b61de/NNN6000282024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=6ced224f95ca",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-01"
+    },
+    {
+      "symbol": "600030",
+      "ts_code": "600030.SH",
+      "company_name": "中信证券",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.919,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/3fd113e5/dd167b97/NNN6000302022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=813e4021d345",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-04"
+    },
+    {
+      "symbol": "600030",
+      "ts_code": "600030.SH",
+      "company_name": "中信证券",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.91,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/deefb43d/c5cb63be/NNN6000302023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=ed08679ec29b",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-28"
+    },
+    {
+      "symbol": "600030",
+      "ts_code": "600030.SH",
+      "company_name": "中信证券",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.917,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/46f1d464/6779135b/NNN6000302024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=ce556d4e41f1",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-08"
+    },
+    {
+      "symbol": "600036",
+      "ts_code": "600036.SH",
+      "company_name": "招商银行",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.918,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/be3021e0/5865382f/NNN6000362022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=f0aa4704895c",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-07"
+    },
+    {
+      "symbol": "600036",
+      "ts_code": "600036.SH",
+      "company_name": "招商银行",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.942,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/16c5e6b9/7ed2837d/NNN6000362023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=3c81e351d6d1",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-25"
+    },
+    {
+      "symbol": "600036",
+      "ts_code": "600036.SH",
+      "company_name": "招商银行",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.942,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/74f427cd/a176b5a4/NNN6000362024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=4cb137b66831",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-06"
+    },
+    {
+      "symbol": "600048",
+      "ts_code": "600048.SH",
+      "company_name": "保利发展",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.94,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/41dc12e2/d4f0e042/NNN6000482022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=44386e3765e7",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-22"
+    },
+    {
+      "symbol": "600048",
+      "ts_code": "600048.SH",
+      "company_name": "保利发展",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.91,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/ea610f55/d2c5c336/NNN6000482023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=e2ebfbb0815d",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-19"
+    },
+    {
+      "symbol": "600048",
+      "ts_code": "600048.SH",
+      "company_name": "保利发展",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.926,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/8ed57e0d/5e233fbe/NNN6000482024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=40fa75511a56",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-08"
+    },
+    {
+      "symbol": "600196",
+      "ts_code": "600196.SH",
+      "company_name": "复星医药",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.923,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/88e52981/55b3d961/NNN6001962022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=7a99d8d1b953",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-13"
+    },
+    {
+      "symbol": "600196",
+      "ts_code": "600196.SH",
+      "company_name": "复星医药",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.895,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/fb3c7869/0bb71909/NNN6001962023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=c525a0e4b190",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-26"
+    },
+    {
+      "symbol": "600196",
+      "ts_code": "600196.SH",
+      "company_name": "复星医药",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.969,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/e4b464b4/e1747b64/NNN6001962024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=30f515cf3301",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-10"
+    },
+    {
+      "symbol": "600276",
+      "ts_code": "600276.SH",
+      "company_name": "恒瑞医药",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.933,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/bf8e7158/aea17ed9/NNN6002762022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=cfd865b215d6",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-26"
+    },
+    {
+      "symbol": "600276",
+      "ts_code": "600276.SH",
+      "company_name": "恒瑞医药",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.907,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/14eadd82/64012717/NNN6002762023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=156eb7a94ef6",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-25"
+    },
+    {
+      "symbol": "600276",
+      "ts_code": "600276.SH",
+      "company_name": "恒瑞医药",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.934,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/06dc210d/345bc1d4/NNN6002762024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=237da34c8b86",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-01"
+    },
+    {
+      "symbol": "600309",
+      "ts_code": "600309.SH",
+      "company_name": "万华化学",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.951,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/07b9cf0b/6028bfc9/NNN6003092022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=7b558c5dbdbb",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-01"
+    },
+    {
+      "symbol": "600309",
+      "ts_code": "600309.SH",
+      "company_name": "万华化学",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.969,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/11fc5aa3/2d8c8ba1/NNN6003092023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=228902f2cb07",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-27"
+    },
+    {
+      "symbol": "600309",
+      "ts_code": "600309.SH",
+      "company_name": "万华化学",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.882,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/bf4f7772/dc5dfd97/NNN6003092024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=70d861be6c17",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-17"
+    },
+    {
+      "symbol": "600438",
+      "ts_code": "600438.SH",
+      "company_name": "通威股份",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.892,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/c670e832/77784dbc/NNN6004382022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=76a99efd3e88",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-17"
+    },
+    {
+      "symbol": "600438",
+      "ts_code": "600438.SH",
+      "company_name": "通威股份",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.947,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/91d39010/2459e1e9/NNN6004382023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=a5a2e850e6ab",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-01"
+    },
+    {
+      "symbol": "600438",
+      "ts_code": "600438.SH",
+      "company_name": "通威股份",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.899,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/e125d16e/8a53da05/NNN6004382024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=898866d8d71d",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-09"
+    },
+    {
+      "symbol": "600519",
+      "ts_code": "600519.SH",
+      "company_name": "贵州茅台",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.92,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/e8a5682a/234e0675/NNN6005192022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=bad2562403de",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-28"
+    },
+    {
+      "symbol": "600519",
+      "ts_code": "600519.SH",
+      "company_name": "贵州茅台",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.92,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/6fb26cf1/24218430/NNN6005192023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=58c14a1a9bf3",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-22"
+    },
+    {
+      "symbol": "600519",
+      "ts_code": "600519.SH",
+      "company_name": "贵州茅台",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.92,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/beed037c/24181973/NNN6005192024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=697a2755248c",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-26"
+    },
+    {
+      "symbol": "600547",
+      "ts_code": "600547.SH",
+      "company_name": "山东黄金",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.895,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/7d7a96e9/7d3d29b9/NNN6005472022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=14dc83359ba2",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-07"
+    },
+    {
+      "symbol": "600547",
+      "ts_code": "600547.SH",
+      "company_name": "山东黄金",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.881,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/20866202/d238e573/NNN6005472023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=ca8f747f773d",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-15"
+    },
+    {
+      "symbol": "600547",
+      "ts_code": "600547.SH",
+      "company_name": "山东黄金",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.952,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/a556d59f/46d9ab1e/NNN6005472024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=73d8237d9d1e",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-22"
+    },
+    {
+      "symbol": "600660",
+      "ts_code": "600660.SH",
+      "company_name": "福耀玻璃",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.91,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/457726a8/7914c768/NNN6006602022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=0552d6269761",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-04"
+    },
+    {
+      "symbol": "600660",
+      "ts_code": "600660.SH",
+      "company_name": "福耀玻璃",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.91,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/0b9d17bc/11b7ff1a/NNN6006602023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=58a684d7dce1",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-27"
+    },
+    {
+      "symbol": "600809",
+      "ts_code": "600809.SH",
+      "company_name": "山西汾酒",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.901,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/608a07e0/2b5c4923/NNN6008092022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=3d1d1cdef7de",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-07"
+    },
+    {
+      "symbol": "600809",
+      "ts_code": "600809.SH",
+      "company_name": "山西汾酒",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.902,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/995d9894/617d5bef/NNN6008092024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=fb9452205831",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-07"
+    },
+    {
+      "symbol": "600887",
+      "ts_code": "600887.SH",
+      "company_name": "伊利股份",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.955,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/52fe1ced/a9bde037/NNN6008872022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=74e355ac7562",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-24"
+    },
+    {
+      "symbol": "600887",
+      "ts_code": "600887.SH",
+      "company_name": "伊利股份",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.945,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/a5eebf4a/06bcd5f3/NNN6008872023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=b05b4e3c31f1",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-11"
+    },
+    {
+      "symbol": "600887",
+      "ts_code": "600887.SH",
+      "company_name": "伊利股份",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.933,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/ce4221a1/668cc233/NNN6008872024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=e658cc504f50",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-24"
+    },
+    {
+      "symbol": "600900",
+      "ts_code": "600900.SH",
+      "company_name": "长江电力",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.96,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/6b8c9631/42aab0d8/NNN6009002022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=48c78ff4fee5",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-18"
+    },
+    {
+      "symbol": "600900",
+      "ts_code": "600900.SH",
+      "company_name": "长江电力",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.964,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/bdf5e4da/953a5189/NNN6009002023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=613f2de3319a",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-19"
+    },
+    {
+      "symbol": "600900",
+      "ts_code": "600900.SH",
+      "company_name": "长江电力",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.909,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/7a39d8c1/14bd026d/NNN6009002024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=402fd257b690",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-15"
+    },
+    {
+      "symbol": "600999",
+      "ts_code": "600999.SH",
+      "company_name": "招商证券",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.966,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/732240cc/35a08afa/NNN6009992022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=56c26fa7cc7f",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-17"
+    },
+    {
+      "symbol": "600999",
+      "ts_code": "600999.SH",
+      "company_name": "招商证券",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.893,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/474f2fa2/a6804d63/NNN6009992023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=cd475b7e496a",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-18"
+    },
+    {
+      "symbol": "600999",
+      "ts_code": "600999.SH",
+      "company_name": "招商证券",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.923,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/9b5e1ddc/5caab4fd/NNN6009992024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=3600c32b6430",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-16"
+    },
+    {
+      "symbol": "601012",
+      "ts_code": "601012.SH",
+      "company_name": "隆基绿能",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.919,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/0764d352/dff50388/NNN6010122022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=cd3df4d1d0c3",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-03"
+    },
+    {
+      "symbol": "601012",
+      "ts_code": "601012.SH",
+      "company_name": "隆基绿能",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.963,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/85fcf6bf/131d5954/NNN6010122023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=e935be2e77fd",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-04"
+    },
+    {
+      "symbol": "601012",
+      "ts_code": "601012.SH",
+      "company_name": "隆基绿能",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.882,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/d064c9e1/c9053646/NNN6010122024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=9815f6cdea28",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-06"
+    },
+    {
+      "symbol": "601088",
+      "ts_code": "601088.SH",
+      "company_name": "中国神华",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.968,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/dca36bde/8ce61395/NNN6010882022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=065e02a9d97f",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-27"
+    },
+    {
+      "symbol": "601088",
+      "ts_code": "601088.SH",
+      "company_name": "中国神华",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.883,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/2ff10ba8/f0f62e19/NNN6010882023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=3284d57e2683",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-28"
+    },
+    {
+      "symbol": "601088",
+      "ts_code": "601088.SH",
+      "company_name": "中国神华",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.956,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/07b0091e/b6f91d56/NNN6010882024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=d28cc9e9320b",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-11"
+    },
+    {
+      "symbol": "601166",
+      "ts_code": "601166.SH",
+      "company_name": "兴业银行",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.909,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/0204486c/53c335c7/NNN6011662022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=96e69b4c4e9c",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-11"
+    },
+    {
+      "symbol": "601166",
+      "ts_code": "601166.SH",
+      "company_name": "兴业银行",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.888,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/5777ccb8/4c5f8607/NNN6011662023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=2c578a23ae68",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-25"
+    },
+    {
+      "symbol": "601186",
+      "ts_code": "601186.SH",
+      "company_name": "中国铁建",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.962,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/e2fd9475/1f80c8de/NNN6011862022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=0583798b2cb0",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-09"
+    },
+    {
+      "symbol": "601186",
+      "ts_code": "601186.SH",
+      "company_name": "中国铁建",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.927,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/28462430/2800a884/NNN6011862023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=beea886e72ff",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-10"
+    },
+    {
+      "symbol": "600186",
+      "ts_code": "600186.SH",
+      "company_name": "莲花健康",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.92,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/3e76bf69/e4c42a22/NNN6001862022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=170c54d93c6a",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-22"
+    },
+    {
+      "symbol": "600186",
+      "ts_code": "600186.SH",
+      "company_name": "莲花健康",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.92,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/d81eff2f/aaea10cb/NNN6001862023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=c7939fc4099b",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-23"
+    },
+    {
+      "symbol": "600186",
+      "ts_code": "600186.SH",
+      "company_name": "莲花健康",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.92,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/230396b4/1dd6bc59/NNN6001862024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=fb1e972cf539",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-03"
+    },
+    {
+      "symbol": "601229",
+      "ts_code": "601229.SH",
+      "company_name": "上海银行",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.888,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/37764030/fe15c7ac/NNN6012292022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=e034dfceb978",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-23"
+    },
+    {
+      "symbol": "601229",
+      "ts_code": "601229.SH",
+      "company_name": "上海银行",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.885,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/f4885495/f0aa1fea/NNN6012292023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=fb05367b6f20",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-22"
+    },
+    {
+      "symbol": "601229",
+      "ts_code": "601229.SH",
+      "company_name": "上海银行",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.889,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/a1bf21ad/308d0a96/NNN6012292024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=f2f010adfaa3",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-13"
+    },
+    {
+      "symbol": "601288",
+      "ts_code": "601288.SH",
+      "company_name": "农业银行",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.91,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/390143e3/1c29dccf/NNN6012882022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=445121f82ad1",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-16"
+    },
+    {
+      "symbol": "601288",
+      "ts_code": "601288.SH",
+      "company_name": "农业银行",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.913,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/b81393a2/f465d94f/NNN6012882023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=7eb5bd695c1a",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-26"
+    },
+    {
+      "symbol": "601288",
+      "ts_code": "601288.SH",
+      "company_name": "农业银行",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.909,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/6ae93068/a2bb851e/NNN6012882024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=cc9238df1d7a",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-01"
+    },
+    {
+      "symbol": "601318",
+      "ts_code": "601318.SH",
+      "company_name": "中国平安",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.938,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/fb76208d/f4d5b715/NNN6013182022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=7017f7a6f6f2",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-06"
+    },
+    {
+      "symbol": "601318",
+      "ts_code": "601318.SH",
+      "company_name": "中国平安",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.935,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/50a75312/8c7c308f/NNN6013182023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=1823deeff47a",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-26"
+    },
+    {
+      "symbol": "601328",
+      "ts_code": "601328.SH",
+      "company_name": "交通银行",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.89,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/8b6839e8/f2584f1c/NNN6013282022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=456cf8d0760d",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-04"
+    },
+    {
+      "symbol": "601328",
+      "ts_code": "601328.SH",
+      "company_name": "交通银行",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.924,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/bc9ead39/bb6dee54/NNN6013282023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=1bdfa3fe5555",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-03"
+    },
+    {
+      "symbol": "601328",
+      "ts_code": "601328.SH",
+      "company_name": "交通银行",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.931,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/162a3caf/a5315740/NNN6013282024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=669e3d6bfae3",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-24"
+    },
+    {
+      "symbol": "601336",
+      "ts_code": "601336.SH",
+      "company_name": "新华保险",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.948,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/bb6cb53f/47ba0ef5/NNN6013362022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=c5ad8da29185",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-15"
+    },
+    {
+      "symbol": "601336",
+      "ts_code": "601336.SH",
+      "company_name": "新华保险",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.884,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/650fe662/d50be5fd/NNN6013362023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=05fa929153d6",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-24"
+    },
+    {
+      "symbol": "601398",
+      "ts_code": "601398.SH",
+      "company_name": "工商银行",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.913,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/109802c3/e9f4b7a5/NNN6013982022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=43605ff64877",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-03"
+    },
+    {
+      "symbol": "601398",
+      "ts_code": "601398.SH",
+      "company_name": "工商银行",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.899,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/272fcf1a/70cb7afc/NNN6013982023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=8737144067cc",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-12"
+    },
+    {
+      "symbol": "601398",
+      "ts_code": "601398.SH",
+      "company_name": "工商银行",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.967,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/6338a6a2/d1a4a80f/NNN6013982024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=53460761fed9",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-10"
+    },
+    {
+      "symbol": "601601",
+      "ts_code": "601601.SH",
+      "company_name": "中国太保",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.926,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/07422d2c/be3f0d40/NNN6016012022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=fb85f0347c20",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-15"
+    },
+    {
+      "symbol": "601601",
+      "ts_code": "601601.SH",
+      "company_name": "中国太保",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.968,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/514ae8d3/e50e053f/NNN6016012023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=e3f69badec3b",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-19"
+    },
+    {
+      "symbol": "601668",
+      "ts_code": "601668.SH",
+      "company_name": "中国建筑",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.954,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/b2d0f38d/b5e1df53/NNN6016682022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=aab86055c42f",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-21"
+    },
+    {
+      "symbol": "601668",
+      "ts_code": "601668.SH",
+      "company_name": "中国建筑",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.941,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/75e972b4/6021c59a/NNN6016682024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=f11313352d3c",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-14"
+    },
+    {
+      "symbol": "601686",
+      "ts_code": "601686.SH",
+      "company_name": "金域医学",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.92,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/093eef8c/d98a440b/NNN6016862022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=13e3d24fde75",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-25"
+    },
+    {
+      "symbol": "601686",
+      "ts_code": "601686.SH",
+      "company_name": "金域医学",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.92,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/45db44c9/faf54716/NNN6016862023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=6614febc35ca",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-27"
+    },
+    {
+      "symbol": "601686",
+      "ts_code": "601686.SH",
+      "company_name": "金域医学",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.92,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/4cc62d1b/2a98f8e2/NNN6016862024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=f24e52c00c6e",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-13"
+    },
+    {
+      "symbol": "601688",
+      "ts_code": "601688.SH",
+      "company_name": "华泰证券",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.905,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/246e2187/48e90a70/NNN6016882022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=9d4375371bf3",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-05"
+    },
+    {
+      "symbol": "601688",
+      "ts_code": "601688.SH",
+      "company_name": "华泰证券",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.931,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/a7a89bbf/8d6c947e/NNN6016882023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=6d7c174b69fb",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-12"
+    },
+    {
+      "symbol": "601688",
+      "ts_code": "601688.SH",
+      "company_name": "华泰证券",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.917,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/dfbe543b/ede255fa/NNN6016882024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=c0a6c8acb86e",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-12"
+    },
+    {
+      "symbol": "601818",
+      "ts_code": "601818.SH",
+      "company_name": "光大银行",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.959,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/f3e96b26/2eba9c03/NNN6018182022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=fc77892b81f6",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-11"
+    },
+    {
+      "symbol": "601818",
+      "ts_code": "601818.SH",
+      "company_name": "光大银行",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.954,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/b51705dd/9f9d36e5/NNN6018182023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=22646b6903cb",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-06"
+    },
+    {
+      "symbol": "601818",
+      "ts_code": "601818.SH",
+      "company_name": "光大银行",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.898,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/ad47d9ed/5cebc409/NNN6018182024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=628e7675f269",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-10"
+    },
+    {
+      "symbol": "601857",
+      "ts_code": "601857.SH",
+      "company_name": "中国石油",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.939,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/3c6b10ef/ac722127/NNN6018572023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=f7d53518f187",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-13"
+    },
+    {
+      "symbol": "601857",
+      "ts_code": "601857.SH",
+      "company_name": "中国石油",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.937,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/ad62b011/6db541a3/NNN6018572024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=d53735a61b20",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-04"
+    },
+    {
+      "symbol": "601888",
+      "ts_code": "601888.SH",
+      "company_name": "中国中免",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.946,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/17274521/3d304f01/NNN6018882022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=06849ed3a878",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-14"
+    },
+    {
+      "symbol": "601888",
+      "ts_code": "601888.SH",
+      "company_name": "中国中免",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.899,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/34a5b11d/3eb70a20/NNN6018882023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=d37185046896",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-22"
+    },
+    {
+      "symbol": "601888",
+      "ts_code": "601888.SH",
+      "company_name": "中国中免",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.909,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/ef9c66cc/0d360db4/NNN6018882024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=679e68205bd0",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-14"
+    },
+    {
+      "symbol": "601899",
+      "ts_code": "601899.SH",
+      "company_name": "紫金矿业",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.963,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/6c4f4e79/0114d72e/NNN6018992022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=50159bde7b40",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-13"
+    },
+    {
+      "symbol": "601899",
+      "ts_code": "601899.SH",
+      "company_name": "紫金矿业",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.892,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/f20c812d/2ac3cbde/NNN6018992023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=fe6a6aacd542",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-04"
+    },
+    {
+      "symbol": "601899",
+      "ts_code": "601899.SH",
+      "company_name": "紫金矿业",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.911,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/7e0cf484/2e413fcb/NNN6018992024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=5bdea0455955",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-18"
+    },
+    {
+      "symbol": "601985",
+      "ts_code": "601985.SH",
+      "company_name": "中国核电",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.913,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/9c55ed39/c12a9c86/NNN6019852022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=1afb2948324c",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-13"
+    },
+    {
+      "symbol": "601985",
+      "ts_code": "601985.SH",
+      "company_name": "中国核电",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.965,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/0c048374/fe8b1124/NNN6019852023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=c9f9672541b9",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-03"
+    },
+    {
+      "symbol": "601985",
+      "ts_code": "601985.SH",
+      "company_name": "中国核电",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.915,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/20403bc0/12e95f94/NNN6019852024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=0e08fc11581d",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-28"
+    },
+    {
+      "symbol": "601988",
+      "ts_code": "601988.SH",
+      "company_name": "中国银行",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.888,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/85f856c5/12cedd07/NNN6019882022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=85b4674c7241",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-12"
+    },
+    {
+      "symbol": "601988",
+      "ts_code": "601988.SH",
+      "company_name": "中国银行",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.93,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/b1f8ab5f/8e7d4a5c/NNN6019882023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=98b655e128a7",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-07"
+    },
+    {
+      "symbol": "603288",
+      "ts_code": "603288.SH",
+      "company_name": "海天味业",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.949,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/e4a23714/d880fa46/NNN6032882023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=3397b79b5821",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-04"
+    },
+    {
+      "symbol": "603288",
+      "ts_code": "603288.SH",
+      "company_name": "海天味业",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.929,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/ec3f9a92/a74fcc39/NNN6032882024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=b15584c49168",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-15"
+    },
+    {
+      "symbol": "603501",
+      "ts_code": "603501.SH",
+      "company_name": "韦尔股份",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.885,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/08203210/10fe0557/NNN6035012022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=e7f9ae52afe5",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-05"
+    },
+    {
+      "symbol": "603501",
+      "ts_code": "603501.SH",
+      "company_name": "韦尔股份",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.888,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/b7ac3691/b6d086cd/NNN6035012023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=9be24bb8eea7",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-28"
+    },
+    {
+      "symbol": "603501",
+      "ts_code": "603501.SH",
+      "company_name": "韦尔股份",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.926,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/e5f229f4/ea233b66/NNN6035012024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=e0a252d594e2",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-02"
+    },
+    {
+      "symbol": "603806",
+      "ts_code": "603806.SH",
+      "company_name": "福斯特",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.919,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/3ac2ae38/274a7c82/NNN6038062022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=7354a1f3c40a",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-13"
+    },
+    {
+      "symbol": "603806",
+      "ts_code": "603806.SH",
+      "company_name": "福斯特",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.892,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/73e87a5f/c50b9e2c/NNN6038062023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=aa57689d5351",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-25"
+    },
+    {
+      "symbol": "603806",
+      "ts_code": "603806.SH",
+      "company_name": "福斯特",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.952,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/3e45fbbf/f3784796/NNN6038062024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=5b012e936004",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-24"
+    },
+    {
+      "symbol": "688012",
+      "ts_code": "688012.SH",
+      "company_name": "中微公司",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.89,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/32355400/79d5bca9/NNN6880122022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=2e2f41046a6f",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-23"
+    },
+    {
+      "symbol": "688012",
+      "ts_code": "688012.SH",
+      "company_name": "中微公司",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.943,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/75007c97/f3b3f6d1/NNN6880122024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=a059ccc3d84c",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-16"
+    },
+    {
+      "symbol": "688036",
+      "ts_code": "688036.SH",
+      "company_name": "传音控股",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.884,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/c9172c7d/cc96727f/NNN6880362022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=9cedbc81050b",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-04"
+    },
+    {
+      "symbol": "688111",
+      "ts_code": "688111.SH",
+      "company_name": "金山办公",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.901,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/b1d70a7b/c35e3936/NNN6881112022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=0e8a32dd9066",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-07"
+    },
+    {
+      "symbol": "688111",
+      "ts_code": "688111.SH",
+      "company_name": "金山办公",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.967,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/00c1cb42/36edcef6/NNN6881112023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=1bd4c2b8253f",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-12"
+    },
+    {
+      "symbol": "688111",
+      "ts_code": "688111.SH",
+      "company_name": "金山办公",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.918,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/aaccaf08/a807ae9e/NNN6881112024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=6eceff40446d",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-21"
+    },
+    {
+      "symbol": "688146",
+      "ts_code": "688146.SH",
+      "company_name": "中航光电",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.92,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/0e99cab6/2a25b9a3/NNN6881462022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=b49c6a294f59",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-16"
+    },
+    {
+      "symbol": "688146",
+      "ts_code": "688146.SH",
+      "company_name": "中航光电",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.92,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/219e4472/3afd4c9d/NNN6881462023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=960639c80373",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-09"
+    },
+    {
+      "symbol": "688146",
+      "ts_code": "688146.SH",
+      "company_name": "中航光电",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.92,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/51348cbd/26cd725c/NNN6881462024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=00f27ab33b67",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-23"
+    },
+    {
+      "symbol": "688223",
+      "ts_code": "688223.SH",
+      "company_name": "晶科能源",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.895,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/40c64281/918069ba/NNN6882232022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=7f704ff31a9f",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-17"
+    },
+    {
+      "symbol": "688223",
+      "ts_code": "688223.SH",
+      "company_name": "晶科能源",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.964,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/e9151701/f3ba84c6/NNN6882232023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=86f619cc1322",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-05"
+    },
+    {
+      "symbol": "688363",
+      "ts_code": "688363.SH",
+      "company_name": "华熙生物",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.957,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/c7591024/55e182e7/NNN6883632022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=9f684edc914a",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-01"
+    },
+    {
+      "symbol": "688363",
+      "ts_code": "688363.SH",
+      "company_name": "华熙生物",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.933,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/6d89b59a/70b85cea/NNN6883632023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=c82af2a78d4e",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-10"
+    },
+    {
+      "symbol": "688363",
+      "ts_code": "688363.SH",
+      "company_name": "华熙生物",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.954,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/fed71c3a/7d0657b0/NNN6883632024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=3d205e7f20ab",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-02"
+    },
+    {
+      "symbol": "688472",
+      "ts_code": "688472.SH",
+      "company_name": "阿特斯",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.96,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/53f58c4a/38ee3318/NNN6884722022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=8910e29accff",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-07"
+    },
+    {
+      "symbol": "688472",
+      "ts_code": "688472.SH",
+      "company_name": "阿特斯",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.925,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/29501d00/d5dfc0f2/NNN6884722023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=d0b808e375ff",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-13"
+    },
+    {
+      "symbol": "688472",
+      "ts_code": "688472.SH",
+      "company_name": "阿特斯",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.969,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/7d6016e4/1d36d1b2/NNN6884722024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=948be8c45c02",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-02"
+    },
+    {
+      "symbol": "688549",
+      "ts_code": "688549.SH",
+      "company_name": "中远海科",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.92,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/c5851313/ccf8aaf0/NNN6885492022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=82d6c47da95a",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-01"
+    },
+    {
+      "symbol": "688549",
+      "ts_code": "688549.SH",
+      "company_name": "中远海科",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.92,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/05ab9916/72d9a119/NNN6885492023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=a36d706cd6eb",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-16"
+    },
+    {
+      "symbol": "688549",
+      "ts_code": "688549.SH",
+      "company_name": "中远海科",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.92,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/a1017fbc/7775c40d/NNN6885492024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=fdd8f64549bc",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-09"
+    },
+    {
+      "symbol": "688981",
+      "ts_code": "688981.SH",
+      "company_name": "中芯国际",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.945,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/bfd07df2/accd13e7/NNN6889812022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=5746a2415c32",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-21"
+    },
+    {
+      "symbol": "688981",
+      "ts_code": "688981.SH",
+      "company_name": "中芯国际",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.897,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/a2f49251/ca9b3dbb/NNN6889812023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=683950f731ad",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-10"
+    },
+    {
+      "symbol": "688981",
+      "ts_code": "688981.SH",
+      "company_name": "中芯国际",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.955,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/7eb7fbf9/52307988/NNN6889812024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=b431c21a388c",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-01"
+    },
+    {
+      "symbol": "000538",
+      "ts_code": "000538.SZ",
+      "company_name": "云南白药",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.909,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/5df11f8c/1ff0ac5b/NNN0005382022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=4150fb27776e",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-23"
+    },
+    {
+      "symbol": "000538",
+      "ts_code": "000538.SZ",
+      "company_name": "云南白药",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.968,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/1c21ae86/0a4ea03b/NNN0005382023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=961dd462065b",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-23"
+    },
+    {
+      "symbol": "000538",
+      "ts_code": "000538.SZ",
+      "company_name": "云南白药",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.903,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/62d82bf1/b61f0405/NNN0005382024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=0c05916e2af5",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-12"
+    },
+    {
+      "symbol": "000166",
+      "ts_code": "000166.SZ",
+      "company_name": "申万宏源",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.953,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/d23b57c7/e8ef5a68/NNN0001662022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=0ae2754dd109",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-16"
+    },
+    {
+      "symbol": "000166",
+      "ts_code": "000166.SZ",
+      "company_name": "申万宏源",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.898,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/04902e74/52616a0a/NNN0001662024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=ef51588fd978",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-10"
+    },
+    {
+      "symbol": "002230",
+      "ts_code": "002230.SZ",
+      "company_name": "科大讯飞",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.959,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/8996a68b/96fae6fd/NNN0022302022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=f126750006ea",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-07"
+    },
+    {
+      "symbol": "002230",
+      "ts_code": "002230.SZ",
+      "company_name": "科大讯飞",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.964,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/2af0e581/a653c2cb/NNN0022302023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=b5bf52f02166",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-23"
+    },
+    {
+      "symbol": "300498",
+      "ts_code": "300498.SZ",
+      "company_name": "温氏股份",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.969,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/eb5a9247/38fda385/NNN3004982022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=1d0ee131dfa0",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-08"
+    },
+    {
+      "symbol": "300498",
+      "ts_code": "300498.SZ",
+      "company_name": "温氏股份",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.966,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/5de75a9f/4d5902ba/NNN3004982023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=8d8b83049a4f",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-12"
+    },
+    {
+      "symbol": "300498",
+      "ts_code": "300498.SZ",
+      "company_name": "温氏股份",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.94,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/3b89da10/a1817f7c/NNN3004982024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=2c2439b5dfff",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-08"
+    },
+    {
+      "symbol": "300015",
+      "ts_code": "300015.SZ",
+      "company_name": "爱尔眼科",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.919,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/97a8fffb/a81c49da/NNN3000152023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=6642064b4627",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-11"
+    },
+    {
+      "symbol": "300015",
+      "ts_code": "300015.SZ",
+      "company_name": "爱尔眼科",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.894,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/696e33a6/ed2493a9/NNN3000152024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=e306d1b3fae4",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-22"
+    },
+    {
+      "symbol": "002129",
+      "ts_code": "002129.SZ",
+      "company_name": "中环股份",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.9,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/dc166bb5/0cb2a83f/NNN0021292022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=8ab37c21b13c",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-19"
+    },
+    {
+      "symbol": "002129",
+      "ts_code": "002129.SZ",
+      "company_name": "中环股份",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.934,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/045607ce/9316284e/NNN0021292023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=42eb144b6d90",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-23"
+    },
+    {
+      "symbol": "002129",
+      "ts_code": "002129.SZ",
+      "company_name": "中环股份",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.958,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/f057295a/68be9815/NNN0021292024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=b9afc8b3bd45",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-06"
+    },
+    {
+      "symbol": "001979",
+      "ts_code": "001979.SZ",
+      "company_name": "招商蛇口",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.883,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/80e77a4a/c1a2de34/NNN0019792022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=2bbdf8f86b80",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-23"
+    },
+    {
+      "symbol": "001979",
+      "ts_code": "001979.SZ",
+      "company_name": "招商蛇口",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.938,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/0bdae519/998a1983/NNN0019792023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=a0034e4fd96b",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-05"
+    },
+    {
+      "symbol": "001979",
+      "ts_code": "001979.SZ",
+      "company_name": "招商蛇口",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.951,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/cafc11bf/f22abf2d/NNN0019792024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=970b6ecd1521",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-25"
+    },
+    {
+      "symbol": "002311",
+      "ts_code": "002311.SZ",
+      "company_name": "海大集团",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.889,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/718067e0/ccc3637d/NNN0023112022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=2312a8e75009",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-10"
+    },
+    {
+      "symbol": "002311",
+      "ts_code": "002311.SZ",
+      "company_name": "海大集团",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.9,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/2c9a41d3/1f4b6d13/NNN0023112023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=0691a71c9822",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-25"
+    },
+    {
+      "symbol": "300433",
+      "ts_code": "300433.SZ",
+      "company_name": "蓝思科技",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.938,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/30d56380/a7dd1e6f/NNN3004332022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=090db42d7a90",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-01"
+    },
+    {
+      "symbol": "300433",
+      "ts_code": "300433.SZ",
+      "company_name": "蓝思科技",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.887,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/398a4fe7/987add2a/NNN3004332023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=42d180377661",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-18"
+    },
+    {
+      "symbol": "300433",
+      "ts_code": "300433.SZ",
+      "company_name": "蓝思科技",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.924,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/ab573734/56d1332d/NNN3004332024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=fe17e55e7228",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-01"
+    },
+    {
+      "symbol": "601009",
+      "ts_code": "601009.SH",
+      "company_name": "南京银行",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.916,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/eed7c2ff/afccf3e5/NNN6010092022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=073fba44403e",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-21"
+    },
+    {
+      "symbol": "601009",
+      "ts_code": "601009.SH",
+      "company_name": "南京银行",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.926,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/e5c32eb6/2605499d/NNN6010092023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=fb7bbea2fa23",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-24"
+    },
+    {
+      "symbol": "600606",
+      "ts_code": "600606.SH",
+      "company_name": "绿地控股",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.906,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/74eab926/463d3009/NNN6006062022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=35273b801ae0",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-12"
+    },
+    {
+      "symbol": "600606",
+      "ts_code": "600606.SH",
+      "company_name": "绿地控股",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.931,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/653215ec/56079837/NNN6006062023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=cd566d205563",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-02"
+    },
+    {
+      "symbol": "600606",
+      "ts_code": "600606.SH",
+      "company_name": "绿地控股",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.939,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/a405a25b/3641ab02/NNN6006062024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=6ab95af83922",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-23"
+    },
+    {
+      "symbol": "002241",
+      "ts_code": "002241.SZ",
+      "company_name": "歌尔股份",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.903,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/ae8987e3/b81c9676/NNN0022412022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=5d399dd11f56",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-21"
+    },
+    {
+      "symbol": "002241",
+      "ts_code": "002241.SZ",
+      "company_name": "歌尔股份",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.887,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/f689a9d0/abe954b7/NNN0022412024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=11a86e37a7ef",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-04-11"
+    },
+    {
+      "symbol": "600585",
+      "ts_code": "600585.SH",
+      "company_name": "海螺水泥",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.964,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/e9656208/30c3f82b/NNN6005852022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=b1e112814509",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-04-21"
+    },
+    {
+      "symbol": "600585",
+      "ts_code": "600585.SH",
+      "company_name": "海螺水泥",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.941,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/13d08a77/87be832d/NNN6005852023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=d25ae4bfa887",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-21"
+    },
+    {
+      "symbol": "600585",
+      "ts_code": "600585.SH",
+      "company_name": "海螺水泥",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.937,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/b7a26185/cf2d0b93/NNN6005852024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=b6bc08c5b1d8",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-24"
+    },
+    {
+      "symbol": "603919",
+      "ts_code": "603919.SH",
+      "company_name": "金徽酒",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.906,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/2599d828/9cb35db5/NNN6039192022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=5741cccd5520",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-16"
+    },
+    {
+      "symbol": "603919",
+      "ts_code": "603919.SH",
+      "company_name": "金徽酒",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.953,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/c3b78322/ec773d34/NNN6039192023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=35c45fee1e04",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-03-06"
+    },
+    {
+      "symbol": "603919",
+      "ts_code": "603919.SH",
+      "company_name": "金徽酒",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.959,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/d9d6d6f8/60b9fac1/NNN6039192024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=0c06e2001176",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-01"
+    },
+    {
+      "symbol": "002555",
+      "ts_code": "002555.SZ",
+      "company_name": "三七互娱",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.913,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/150a39c1/377dc108/NNN0025552022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=47fdc12554e2",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-09"
+    },
+    {
+      "symbol": "002555",
+      "ts_code": "002555.SZ",
+      "company_name": "三七互娱",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.902,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/3fb38ae0/3b2c0f88/NNN0025552024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=989ebbf82c75",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-12"
+    },
+    {
+      "symbol": "600489",
+      "ts_code": "600489.SH",
+      "company_name": "中金黄金",
+      "year": 2022,
+      "report_year": 2022,
+      "title": "2022年度报告",
+      "confidence": 0.899,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/e28a9f6e/41ff3c99/NNN6004892022annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=0e663fec95db",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2023-03-28"
+    },
+    {
+      "symbol": "600489",
+      "ts_code": "600489.SH",
+      "company_name": "中金黄金",
+      "year": 2023,
+      "report_year": 2023,
+      "title": "2023年度报告",
+      "confidence": 0.923,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/d74111ba/e1667fa3/NNN6004892023annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=55d988baaf41",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2024-04-10"
+    },
+    {
+      "symbol": "600489",
+      "ts_code": "600489.SH",
+      "company_name": "中金黄金",
+      "year": 2024,
+      "report_year": 2024,
+      "title": "2024年度报告",
+      "confidence": 0.95,
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/ba401ed2/26a40e5d/NNN6004892024annual.pdf",
+      "source_url": "http://www.cninfo.com.cn/new/disclosure/detail?announcementId=c486c8967276",
+      "classification_kind": "annual_full",
+      "dry_run_status": "would_insert",
+      "disclosure_date": "2025-03-11"
+    }
+  ]
+}
