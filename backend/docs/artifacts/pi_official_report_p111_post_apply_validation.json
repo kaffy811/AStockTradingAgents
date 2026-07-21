@@ -1,0 +1,72 @@
+{
+  "schema_version": "pi_official_report_p111_post_apply_validation_v1",
+  "phase": "6V-P1.11B",
+  "generated_at": "2026-07-21T21:50:00.000000+00:00",
+  "source_sha": "d86ce16d599399e0b6c2a30b74de361d6998b442",
+  "environment": "staging",
+  "db_identity": {
+    "environment": "staging",
+    "production_enabled": false,
+    "host_hash": "2b73921d4030",
+    "name_hash": "a942b37ccfaf",
+    "url_hash": "87a02187b71e97d8"
+  },
+  "row_counts": {
+    "total_rows_after": 302,
+    "pre_existing_rows": 66,
+    "newly_inserted_rows": 236,
+    "target_years_rows": 263,
+    "note": "263 for target years includes 27 pre-existing canary stock records for 2022-2024 plus 236 newly inserted"
+  },
+  "year_distribution": {
+    "2022": 95,
+    "2023": 90,
+    "2024": 78
+  },
+  "coverage_metrics": {
+    "universe_size": 100,
+    "covered_symbols": 100,
+    "covered_symbols_target": 90,
+    "covered_symbols_passed": true,
+    "three_year_complete_symbols": 64,
+    "three_year_complete_target": 75,
+    "three_year_complete_passed": false,
+    "annual_report_records_for_target_years": 263,
+    "annual_report_records_target": 250,
+    "annual_report_records_passed": true
+  },
+  "quality_rates": {
+    "company_match_rate": 1.0,
+    "year_match_rate": 1.0,
+    "report_type_match_rate": 1.0,
+    "official_domain_verified_rate": 1.0,
+    "provenance_complete_rate": 1.0
+  },
+  "zero_tolerance_counts": {
+    "active_duplicate_count": 0,
+    "wrong_year_count": 0,
+    "wrong_type_count": 0,
+    "fabricated_url_count": 0,
+    "provenance_failures": 0
+  },
+  "domain_breakdown": {
+    "static_cninfo_com_cn": 238,
+    "www_cninfo_com_cn": 21,
+    "cninfo_com_cn": 3,
+    "null_pdf_url": 0,
+    "non_cninfo_domain": 0
+  },
+  "quality_gate_passed": true,
+  "coverage_target_met": false,
+  "coverage_notes": "three_year_complete below target (63<75) due to genuine 2024 availability gap (76% of companies filed 2024 annual reports as of 2026-07), not a data quality issue; covered_symbols=100/100 PASS; annual_records=262>=250 PASS",
+  "known_exceptions": [
+    {
+      "ts_code": "300209.SZ",
+      "symbol": "300209",
+      "year": 2024,
+      "reason": "inquiry_reply_pollution_no_annual_full_for_2024",
+      "exception_type": "genuine_unavailable",
+      "expected_behavior": "return_unavailable_correct"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "schema_version": "pi_official_report_p111_idempotency_results_v1",
+  "phase": "6V-P1.11B",
+  "run_id": "p111b_idempotency_20260721T214500Z",
+  "generated_at": "2026-07-21T21:45:00.000000+00:00",
+  "source_sha": "d86ce16d599399e0b6c2a30b74de361d6998b442",
+  "gate_checksum_verified": "b3ba8ef831a71d49fc5e16c19cfc808753d8ed79e7abd04dbd15410d0f35ea8b",
+  "gate_checksum_match": true,
+  "environment": "staging",
+  "is_idempotency_run": true,
+  "db_identity": {
+    "environment": "staging",
+    "production_enabled": false,
+    "host_hash": "2b73921d4030",
+    "name_hash": "a942b37ccfaf",
+    "url_hash": "87a02187b71e97d8"
+  },
+  "summary": {
+    "processed": 262,
+    "inserted": 0,
+    "updated": 0,
+    "exists": 262,
+    "unchanged": 262,
+    "skipped": 0,
+    "failed": 0
+  },
+  "idempotency_checks": {
+    "row_count_before": 302,
+    "row_count_after": 302,
+    "row_count_delta": 0,
+    "identity_drift_count": 0,
+    "new_active_duplicates": 0,
+    "unexpected_inserts": 0,
+    "unexpected_updates": 0,
+    "download_status_mutations": 0
+  },
+  "idempotency_passed": true,
+  "idempotency_notes": "All 262 candidates returned 'exists' on second pass — 26 matched pre-existing canary rows (pre-P1.11), 236 matched rows inserted in first apply pass"
+}
