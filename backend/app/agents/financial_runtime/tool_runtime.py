@@ -308,8 +308,14 @@ class FinancialToolRegistry:
                     continue
                 db_started = time.perf_counter()
                 try:
+                    requested_year = req.parameters.get("report_year")
                     reports = await asyncio.wait_for(
-                        official_report_domain_service.list_official_annual_reports(db, ts_code=ts_code, limit=8),
+                        official_report_domain_service.list_official_annual_reports(
+                            db,
+                            ts_code=ts_code,
+                            limit=8,
+                            requested_year=int(requested_year) if requested_year else None,
+                        ),
                         timeout=query_timeout,
                     )
                 except asyncio.TimeoutError:
