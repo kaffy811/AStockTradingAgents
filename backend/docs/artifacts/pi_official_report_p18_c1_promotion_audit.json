@@ -1,7 +1,7 @@
 {
   "schema_version": "pi_official_report_p18_c1_promotion_audit_v1",
   "phase": "6V-P1.8",
-  "generated_at": "2026-07-20T10:55:09.307192+00:00",
+  "generated_at": "2026-07-20T18:02:30.001146+00:00",
   "promotion_source": "project_owner_manual_decision",
   "from_rollout": 0,
   "to_rollout": 1,
@@ -9,7 +9,7 @@
   "authorization_phase": "c1",
   "event": {
     "event": "promote_to_c1",
-    "at": "2026-07-20T10:55:09.307185+00:00",
+    "at": "2026-07-20T18:02:30.001141+00:00",
     "state": "active_c1",
     "promotion_source": "project_owner_manual_decision",
     "from_rollout": 0,
