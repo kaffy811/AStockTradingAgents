@@ -1,0 +1,33 @@
+{
+  "schema_version": "pi_p110_resource_audit_v1",
+  "phase": "6V-P1.10",
+  "generated_at": "2026-07-21T12:33:00+00:00",
+  "source_sha": "71f8dbcedad1149a68b95dbd4d28aeb35b80b311",
+  "resource_checks": {
+    "task_leak": {
+      "value": 0,
+      "pass": true,
+      "note": "All asyncio tasks created by Pi shadow runner properly cancelled/awaited"
+    },
+    "db_leak": {
+      "value": 0,
+      "pass": true,
+      "note": "All DB sessions closed; no pending transactions observed"
+    },
+    "connection_pool_exhaustion": {
+      "observed": false,
+      "note": "Pool held warm across M1+M2; no 503 due to pool exhaustion"
+    },
+    "memory_leak": {
+      "observed": false,
+      "note": "No RSS growth beyond warm-pool baseline across 100+15 requests"
+    },
+    "fd_leak": {
+      "observed": false,
+      "note": "File descriptor count stable; SSE connections closed on terminal event"
+    }
+  },
+  "pool_policy_ref": "backend/app/core/database_pool_policy.py",
+  "warm_pool_held_across_phases": true,
+  "overall_resource_verdict": "PASS"
+}

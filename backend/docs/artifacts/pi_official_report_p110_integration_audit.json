@@ -1,0 +1,55 @@
+{
+  "schema_version": "pi_p110_integration_audit_v1",
+  "phase": "6V-P1.10",
+  "generated_at": "2026-07-21T12:35:00+00:00",
+  "source_sha": "71f8dbcedad1149a68b95dbd4d28aeb35b80b311",
+  "commits_integrated": [
+    {
+      "sha": "6ca6c0e",
+      "msg": "fix(report): add requested_year SQL pushdown, stable ordering and dedup for annual report selection"
+    },
+    {
+      "sha": "174fe82",
+      "msg": "chore(canary): update P1.9 staging shadow canary runner for W1/W2 dual-window observation"
+    },
+    {
+      "sha": "4ef33dc",
+      "msg": "docs(canary): add P1.9 W1/W2 observation window results and final gate artifact"
+    },
+    {
+      "sha": "71f8dbc",
+      "msg": "test(report): add Phase 6V-P1.9 regression suite for year selection, dedup and pollution resistance"
+    }
+  ],
+  "integration_method": "cherry-pick (no merge commit, no force push)",
+  "integration_worktree": "/private/tmp/tradingagents-p19a",
+  "source_branch": "p19/official-report-canary-observation",
+  "target_branch": "release/demo-staging",
+  "base_sha_pre_integration": "e6c2458c05cd73a704a6f5ffb4772bf619ed6719",
+  "head_sha_post_integration": "71f8dbcedad1149a68b95dbd4d28aeb35b80b311",
+  "conflict_count": 0,
+  "secret_scan": "PASS \u2014 no secrets/credentials in diff",
+  "config_changes": [],
+  "migration_changes": [],
+  "test_results_post_integration": {
+    "targeted_p19_tests": {
+      "run": 16,
+      "passed": 16,
+      "failed": 0
+    },
+    "backend_full_suite": {
+      "run": 3511,
+      "passed": 3496,
+      "skipped": 15,
+      "failed": 0
+    },
+    "frontend_vitest": {
+      "files": 62,
+      "tests": 688,
+      "passed": 688,
+      "failed": 0
+    },
+    "frontend_build": "pass"
+  },
+  "integration_verdict": "PASS"
+}

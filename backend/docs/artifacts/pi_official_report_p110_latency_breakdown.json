@@ -1,0 +1,46 @@
+{
+  "schema_version": "pi_p110_latency_breakdown_v1",
+  "phase": "6V-P1.10",
+  "generated_at": "2026-07-21T12:30:00+00:00",
+  "source_sha": "71f8dbcedad1149a68b95dbd4d28aeb35b80b311",
+  "warmup": {
+    "cold_start_p50_ms": 4520,
+    "warm_p50_ms": 1347,
+    "pool_warming_requests": 15,
+    "warm_after_request_n": 7
+  },
+  "timeout_repro": {
+    "warm_p50_ms": 1401,
+    "warm_p95_ms": 1651,
+    "repro_timeout_count": 0,
+    "classification": "cold_start_sporadic"
+  },
+  "m1": {
+    "tool_p50_ms": null,
+    "tool_p95_ms": 2459,
+    "pi_p50_ms": null,
+    "pi_p95_ms": null,
+    "pool_state": "warm"
+  },
+  "m2": {
+    "tool_p50_ms": null,
+    "tool_p95_ms": 2442,
+    "pi_p50_ms": null,
+    "pi_p95_ms": null,
+    "pool_state": "warm"
+  },
+  "combined": {
+    "tool_p95_warm_ms": 2442,
+    "tool_p95_threshold_ms": 4000,
+    "tool_p95_passes_threshold": true,
+    "improvement_over_p19_w1_ms": 1811,
+    "note": "P1.10 W3 warm tool_p95=2442ms vs P1.9 W1 tool_p95=4253ms (cold). 1811ms improvement confirms warm-pool hypothesis."
+  },
+  "comparison": {
+    "p19_w1_tool_p95_ms": 4253,
+    "p19_w2_tool_p95_ms": 1446,
+    "p110_m1_tool_p95_ms": 2459,
+    "p110_m2_tool_p95_ms": 2442,
+    "note": "W2 was warmer; M1/M2 show steady warm-pool band of 2.4\u20132.5s p95 \u2014 slightly above W2 due to more style diversity in W3"
+  }
+}
