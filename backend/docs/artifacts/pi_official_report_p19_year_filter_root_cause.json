@@ -1,0 +1,183 @@
+{
+  "schema_version": "pi_official_report_p19_year_filter_root_cause_v1",
+  "phase": "6V-P1.9",
+  "generated_at": "2026-07-20T15:58:33.737191+00:00",
+  "root_cause": "NOT a query/ordering bug hiding real reports: the missing (symbol, year) combos have no annual full-text document at all — their report_documents rows are inquiry-letter replies, disclosure reminders and sponsor opinions misfiled with report_type=annual. classify_report_document correctly excludes them (KIND_ANNUAL_FULL guard). 600186 true latest full annual is 2022; 300209/2024 has no full annual. Real defects fixed this phase: repository lacked requested-year SQL pushdown, ordering had no stable id tie-break or disclosure-date key, no official-document dedup, and the pollution-sensitive scan window could truncate full reports for heavily polluted symbols.",
+  "affected_code_paths": [
+    "app/services/official_report_domain_service.py:list_official_annual_reports",
+    "app/agents/financial_runtime/tool_runtime.py:get_official_reports (no requested_year pushdown)",
+    "app/services/report_document_classifier.py (working as intended)"
+  ],
+  "samples": [
+    {
+      "symbol": "600186",
+      "requested_year": null,
+      "requested_type": "annual",
+      "available_rows": 11,
+      "available_candidates": [
+        {
+          "report_year": 2025,
+          "kind": "inquiry_reply",
+          "title_class": "non_full"
+        },
+        {
+          "report_year": 2024,
+          "kind": "inquiry_reply",
+          "title_class": "non_full"
+        },
+        {
+          "report_year": 2023,
+          "kind": "inquiry_reply",
+          "title_class": "non_full"
+        },
+        {
+          "report_year": 2022,
+          "kind": "annual_full",
+          "title_class": "annual_full"
+        },
+        {
+          "report_year": 2021,
+          "kind": "annual_full",
+          "title_class": "annual_full"
+        },
+        {
+          "report_year": 2020,
+          "kind": "inquiry_reply",
+          "title_class": "non_full"
+        },
+        {
+          "report_year": 2019,
+          "kind": "correction",
+          "title_class": "non_full"
+        },
+        {
+          "report_year": 2018,
+          "kind": "annual_full",
+          "title_class": "annual_full"
+        },
+        {
+          "report_year": 2017,
+          "kind": "inquiry_reply",
+          "title_class": "non_full"
+        },
+        {
+          "report_year": 2016,
+          "kind": "inquiry_reply",
+          "title_class": "non_full"
+        },
+        {
+          "report_year": 2015,
+          "kind": "inquiry_reply",
+          "title_class": "non_full"
+        }
+      ],
+      "tool_filtered_years": [
+        2022,
+        2021,
+        2018
+      ],
+      "selected_document": {
+        "report_year": 2022,
+        "title_hash": "-1672132"
+      },
+      "selection_reason": "latest annual_full",
+      "rejection_reason": null
+    },
+    {
+      "symbol": "600186",
+      "requested_year": 2025,
+      "requested_type": "annual",
+      "available_rows": 1,
+      "available_candidates": [
+        {
+          "report_year": 2025,
+          "kind": "inquiry_reply",
+          "title_class": "non_full"
+        }
+      ],
+      "tool_filtered_years": [
+        2022,
+        2021,
+        2018
+      ],
+      "selected_document": null,
+      "selection_reason": null,
+      "rejection_reason": "no ANNUAL_FULL document for requested year — DB rows for that year are inquiry-letter replies / disclosure notices misfiled as report_type=annual"
+    },
+    {
+      "symbol": "300209",
+      "requested_year": 2024,
+      "requested_type": "annual",
+      "available_rows": 1,
+      "available_candidates": [
+        {
+          "report_year": 2024,
+          "kind": "inquiry_reply",
+          "title_class": "non_full"
+        }
+      ],
+      "tool_filtered_years": [
+        2025,
+        2017,
+        2016,
+        2015
+      ],
+      "selected_document": null,
+      "selection_reason": null,
+      "rejection_reason": "no ANNUAL_FULL document for requested year — DB rows for that year are inquiry-letter replies / disclosure notices misfiled as report_type=annual"
+    },
+    {
+      "symbol": "600519",
+      "requested_year": 2024,
+      "requested_type": "annual",
+      "available_rows": 1,
+      "available_candidates": [
+        {
+          "report_year": 2024,
+          "kind": "annual_full",
+          "title_class": "annual_full"
+        }
+      ],
+      "tool_filtered_years": [
+        2025,
+        2024,
+        2023
+      ],
+      "selected_document": {
+        "report_year": 2024,
+        "title_hash": "-5139652"
+      },
+      "selection_reason": "exact year match",
+      "rejection_reason": null
+    },
+    {
+      "symbol": "000858",
+      "requested_year": 2025,
+      "requested_type": "annual",
+      "available_rows": 1,
+      "available_candidates": [
+        {
+          "report_year": 2025,
+          "kind": "annual_full",
+          "title_class": "annual_full"
+        }
+      ],
+      "tool_filtered_years": [
+        2025,
+        2024,
+        2023,
+        2022,
+        2021,
+        2020,
+        2019,
+        2018
+      ],
+      "selected_document": {
+        "report_year": 2025,
+        "title_hash": "-1128642"
+      },
+      "selection_reason": "exact year match",
+      "rejection_reason": null
+    }
+  ]
+}
