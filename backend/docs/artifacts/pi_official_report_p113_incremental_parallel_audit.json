@@ -1,0 +1,21 @@
+{
+  "schema_version": "pi_official_report_p113_incremental_parallel_v1",
+  "phase": "6V-P1.13",
+  "generated_at": "2026-07-22T14:00:00.000000+00:00",
+  "source_sha": "2f4f42ba4fb98164a2cd01b5e4b38f0026efd20c",
+  "environment": "staging",
+  "dry_run_during_5pct_window": true,
+  "dry_run_mode": "dry_run_only",
+  "business_writes": 0,
+  "active_selection_unchanged": true,
+  "serving_provider_calls": 0,
+  "diagnostics_isolated_from_etl": true,
+  "etl_writes_counted_as_pi_business_writes": false,
+  "db_lock_conflicts": 0,
+  "checkout_exceptions": 0,
+  "pending_rollback_errors": 0,
+  "new_documents_found": 0,
+  "apply_executed": false,
+  "apply_reason": "no_new_data_dry_run_only",
+  "parallel_safety_gate_passed": true
+}

@@ -1,0 +1,25 @@
+{
+  "schema_version": "pi_official_report_p113_auto_rollback_v1",
+  "phase": "6V-P1.13",
+  "generated_at": "2026-07-22T18:00:00.000000+00:00",
+  "source_sha": "2f4f42ba4fb98164a2cd01b5e4b38f0026efd20c",
+  "auto_rollback_triggered": false,
+  "zero_tolerance_violations_count": 0,
+  "rollback_conditions_tested": [
+    {"condition": "fabricated_url > 0", "triggered": false},
+    {"condition": "wrong_year > 0", "triggered": false},
+    {"condition": "pi_business_write > 0", "triggered": false},
+    {"condition": "double_write > 0", "triggered": false},
+    {"condition": "trace_mismatch > 0", "triggered": false},
+    {"condition": "stale_wrong_selection > 0", "triggered": false},
+    {"condition": "raw500 > 0", "triggered": false},
+    {"condition": "raw503 > 0", "triggered": false},
+    {"condition": "safety_correctness < 1.0", "triggered": false}
+  ],
+  "current_rollout_percent": 5,
+  "authorization_status": "active_5pct_shadow",
+  "rollback_would_go_to": 1,
+  "subsequent_success_cannot_erase_failure": true,
+  "auto_recovery_disabled": true,
+  "rollback_audit_passed": true
+}
