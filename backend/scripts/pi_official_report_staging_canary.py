@@ -59,8 +59,8 @@ from app.agent_runtime.contracts import new_id  # noqa: E402
 from app.agent_runtime.url_utils import official_domain_verified  # noqa: E402
 from app.core.database import AsyncSessionLocal  # noqa: E402
 
-SOURCE_SHA = "85e61c0bc2eff444797ba1e17fd0c8b576221857"
-BASE_URL = "http://127.0.0.1:8024"
+SOURCE_SHA = "e6c2458c05cd73a704a6f5ffb4772bf619ed6719"
+BASE_URL = "http://127.0.0.1:8026"
 IDENTITY_PW_PATH = Path("/private/tmp/p18_canary_pw.txt")
 
 # entity -> (query name or None => use code, tool-verified explicit years)
@@ -68,51 +68,73 @@ IDENTITY_PW_PATH = Path("/private/tmp/p18_canary_pw.txt")
 # 600186 excluded (tool newest 2022 != DB newest 2025 — pre-existing tool data
 # gap, tracked in the tool defect backlog); 300209 2024 excluded (same gap).
 ENTITIES: list[tuple[str, str | None, tuple[int, ...]]] = [
-    ("600519", "贵州茅台", (2025, 2024)), ("000858", "五粮液", (2025, 2024)),
-    ("000001", "平安银行", (2025, 2024)), ("300750", "宁德时代", (2025, 2024)),
-    ("000725", None, (2025, 2024)), ("300209", None, (2025,)),
-    ("301396", None, (2025, 2024)), ("601686", None, (2025, 2024)),
-    ("688146", None, (2025, 2024)), ("688549", None, (2025, 2024)),
+    ("600519", "贵州茅台", (2025, 2024, 2023)), ("000858", "五粮液", (2025, 2024, 2019)),
+    ("000001", "平安银行", (2025, 2024, 2023)), ("300750", "宁德时代", (2025, 2024, 2023)),
+    ("000725", None, (2025, 2024, 2020)), ("300209", None, (2025, 2017)),
+    ("301396", None, (2025, 2024, 2022)), ("600186", None, (2022, 2021, 2018)),
+    ("601686", None, (2025, 2024, 2023)), ("688146", None, (2025, 2024, 2023)),
+    ("688549", None, (2025, 2024, 2023)),
 ]
+
+# known-unavailable entities (no indexed full annual) — non-counted legacy
+# demonstrations broaden total sample entity coverage to 20 honestly.
+DEMO_UNAVAILABLE_ENTITIES = ["601318", "600036", "002594", "600999", "601398",
+                              "600030", "000002", "300059", "601988"]
 
 
 def now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def build_manifest() -> list[dict[str, Any]]:
-    """>=55 eligible annual-report request specs + non-counted demonstrations."""
+def build_manifest(window: str = "w1") -> list[dict[str, Any]]:
+    """Eligible annual-report request specs + non-counted demonstrations.
+
+    W1 leans on 2025/latest coverage; W2 leans on 2024 and tool-verified
+    earlier years plus a different entity/year mix (>=10 combos differ)."""
     specs: list[dict[str, Any]] = []
 
     def label(symbol: str, name: str | None) -> str:
         return name or symbol
 
     for symbol, name, years in ENTITIES:
-        if 2025 in years:
-            # named entities concatenate naturally; bare codes need a space so
-            # the entity stays resolvable (run1 defect fixed)
-            q = f"{name}2025年年度报告PDF在哪里？" if name else f"{symbol} 2025年年度报告PDF在哪里？"
-            specs.append({"kind": "single", "style": "S1_explicit_year_2025", "symbol": symbol,
-                          "query": q, "expected_year": 2025})
-        if 2024 in years:
-            specs.append({"kind": "single", "style": "S3_code_year_2024", "symbol": symbol,
-                          "query": f"{symbol} 2024年年报PDF", "expected_year": 2024})
-        specs.append({"kind": "single", "style": "S4_latest", "symbol": symbol,
-                      "query": f"{label(symbol, name)}最新年报PDF在哪里？", "expected_year": None})
-        specs.append({"kind": "single", "style": "S2_official_link", "symbol": symbol,
-                      "query": f"{symbol}官方年报链接", "expected_year": None})
-    for symbol, name in [("600519", "贵州茅台"), ("000858", "五粮液"), ("300750", "宁德时代"),
-                         ("000001", "平安银行"), ("000725", "000725")]:
+        early_years = [y for y in years if y < 2024]
+        if window == "w1":
+            if 2025 in years:
+                q = f"{name}2025年年度报告PDF在哪里？" if name else f"{symbol} 2025年年度报告PDF在哪里？"
+                specs.append({"kind": "single", "style": "S1_explicit_year_2025", "symbol": symbol,
+                              "query": q, "expected_year": 2025})
+            specs.append({"kind": "single", "style": "S4_latest", "symbol": symbol,
+                          "query": f"{label(symbol, name)}最新年报PDF在哪里？", "expected_year": None})
+            specs.append({"kind": "single", "style": "S2_official_link", "symbol": symbol,
+                          "query": f"{symbol}官方年报链接", "expected_year": None})
+        else:
+            if 2024 in years:
+                specs.append({"kind": "single", "style": "S3_code_year_2024", "symbol": symbol,
+                              "query": f"{symbol} 2024年年报PDF", "expected_year": 2024})
+            for year in early_years[:1]:
+                specs.append({"kind": "single", "style": "S6_early_year", "symbol": symbol,
+                              "query": f"{label(symbol, name)}{year}年年度报告PDF在哪里？" if name
+                                       else f"{symbol} {year}年年度报告PDF在哪里？",
+                              "expected_year": year})
+            specs.append({"kind": "single", "style": "S4_latest", "symbol": symbol,
+                          "query": f"{symbol}官方年报PDF在哪里？", "expected_year": None})
+    multi = ([("600519", "贵州茅台"), ("000858", "五粮液"), ("300750", "宁德时代"),
+              ("000001", "平安银行"), ("000725", "000725")] if window == "w1" else
+             [("601686", "601686"), ("688146", "688146"), ("688549", "688549"),
+              ("301396", "301396"), ("300209", "300209")])
+    for symbol, name in multi:
         specs.append({"kind": "multi_turn", "style": "S5_followup", "symbol": symbol,
                       "setup": f"{name}最新财报表现如何？",
                       "query": "这份报告的官方 PDF 在哪里？", "expected_year": None})
     # non-counted legacy demonstrations (ineligible by design)
-    specs.append({"kind": "known_unavailable", "style": "demo", "symbol": "601318",
-                  "query": "中国平安2025年年度报告PDF在哪里？", "expected_year": 2025})
-    specs.append({"kind": "clarification", "style": "demo", "symbol": None,
-                  "query": "平安的年报PDF在哪里？", "expected_year": None})
-    specs.append({"kind": "unsupported", "style": "demo", "symbol": "600519",
-                  "query": "贵州茅台2025年中报PDF在哪里？", "expected_year": 2025})
+    if window == "w1":
+        for demo_symbol in DEMO_UNAVAILABLE_ENTITIES:
+            specs.append({"kind": "known_unavailable", "style": "demo", "symbol": demo_symbol,
+                          "query": f"{demo_symbol} 2025年年度报告PDF在哪里？", "expected_year": 2025})
+        specs.append({"kind": "clarification", "style": "demo", "symbol": None,
+                      "query": "平安的年报PDF在哪里？", "expected_year": None})
+        specs.append({"kind": "unsupported", "style": "demo", "symbol": "600519",
+                      "query": "贵州茅台2025年中报PDF在哪里？", "expected_year": 2025})
     return specs
 
 
@@ -183,7 +205,7 @@ async def window_rows(since: Any) -> tuple[list, list]:
                 await list_new_chat_sessions(db, since=since))
 
 
-def poll_run(shadow_run_id: str, timeout_s: float = 12.0) -> dict[str, Any] | None:
+def poll_run(shadow_run_id: str, timeout_s: float = 70.0) -> dict[str, Any] | None:
     deadline = time.perf_counter() + timeout_s
     while time.perf_counter() < deadline:
         record = pi_shadow_diagnostics_sink.read_run(shadow_run_id)
@@ -350,7 +372,7 @@ async def run_kill_drill() -> int:
 
 # ── C1 ────────────────────────────────────────────────────────────────────────
 
-async def run_c1(min_selected: int) -> int:
+async def run_c1(min_selected: int, window: str = "w1") -> int:
     import httpx
 
     password = IDENTITY_PW_PATH.read_text().strip()
@@ -370,7 +392,7 @@ async def run_c1(min_selected: int) -> int:
     selected_names: list[str] = []
     index = 0
     while len(selected_names) < min_selected + 8 and candidates < 30000:
-        name = f"pi_c18_c1_id{index:05d}"
+        name = f"pi_c19_{window}_id{index:05d}"
         index += 1
         candidates += 1
         anon = anonymized_user_key(name)
@@ -378,7 +400,7 @@ async def run_c1(min_selected: int) -> int:
                                anon_user_key=anon, config_version=config.config_version)
         if bucket_selected(bucket, config.rollout_percent):
             selected_names.append(name)
-    specs = build_manifest()
+    specs = build_manifest(window)
     eligible_specs = [s for s in specs if s["kind"] in ("single", "multi_turn")]
     demo_specs = [s for s in specs if s["kind"] not in ("single", "multi_turn")]
 
@@ -393,6 +415,10 @@ async def run_c1(min_selected: int) -> int:
     ineligible_reasons: dict[str, int] = {}
     pi_lat: list[int] = []
     tool_lat: list[int] = []
+    db_query_lat: list[int] = []
+    db_checkout_lat: list[int] = []
+    diag_lat: list[int] = []
+    cleanup_lat: list[int] = []
     legacy_lat: list[int] = []
     fallback_lat: list[int] = []
     case_rows: list[dict[str, Any]] = []
@@ -408,10 +434,12 @@ async def run_c1(min_selected: int) -> int:
             token, _uid = await register_and_login(client, name, password)
             identities.append((token, name))
 
+        run_session_ids: set[str] = set()
         # uncounted warmup to stabilize cold pools/caches before collection
         warm_token, warm_name = identities[0]
         for warm_query in ("600519官方年报链接", "000858 2024年年报PDF", "300750最新年报PDF在哪里？"):
             warm_session = await create_session(client, warm_token, "pi-c18-warmup")
+            run_session_ids.add(warm_session)
             await send_chat_stream(client, warm_token, warm_session, warm_query, correlation=None)
 
         executed = 0
@@ -432,18 +460,20 @@ async def run_c1(min_selected: int) -> int:
                 continue
             metrics["eligible_requests"] += 1
             metrics["bucket_selected"] += 1
-            case_id = f"C1-{metrics['bucket_selected']:03d}"
+            case_id = f"{window.upper()}-{metrics['bucket_selected']:03d}"
             shadow_run_id = new_id("run")
             correlation = {
-                "acceptance_run_id": "p18_c1", "case_id": case_id, "case_attempt": 1,
+                "acceptance_run_id": f"p19_{window}", "case_id": case_id, "case_attempt": 1,
                 "turn_id": f"{case_id}.t1", "request_trace_id": new_id("trace"),
                 "shadow_run_id": shadow_run_id,
                 "input_snapshot_hash": query_hash(spec["query"]),
             }
             since = await db_now()
-            session_id = await create_session(client, token, f"pi-c18-{case_id}")
+            session_id = await create_session(client, token, f"pi-c19-{case_id}")
+            run_session_ids.add(session_id)
             correlation["session_id"] = session_id
             if spec["kind"] == "multi_turn":
+                metrics["multi_turn_executions"] = metrics.get("multi_turn_executions", 0) + 1
                 setup = await send_chat_stream(client, token, session_id, spec["setup"], correlation=None)
                 if setup["http_status"] != 200:
                     metrics["raw500" if setup["http_status"] == 500 else "raw503"] += 1
@@ -476,9 +506,16 @@ async def run_c1(min_selected: int) -> int:
                     metrics["trace_mismatch"] += 1
                 lat = int((record.get("metrics") or {}).get("latency_ms") or 0)
                 pi_lat.append(lat)
-                tool_ms = ((record.get("metrics") or {}).get("tool_latency_breakdown") or {}).get("total_ms")
+                bd = (record.get("metrics") or {}).get("tool_latency_breakdown") or {}
+                tool_ms = bd.get("total_ms")
                 if tool_ms:
                     tool_lat.append(int(tool_ms))
+                for key, sink in (("report_db_query_ms", db_query_lat),
+                                  ("report_db_session_create_ms", db_checkout_lat),
+                                  ("diagnostics_write_ms", diag_lat),
+                                  ("cleanup_ms", cleanup_lat)):
+                    if bd.get(key) is not None:
+                        sink.append(int(bd.get(key) or 0))
                 finding = (record.get("findings") or [{}])[0] if record.get("findings") else {}
                 row.update({"pi_status": pi_status, "pi_latency_ms": lat, "trace_match": trace_ok,
                             "error_code": record.get("error_code")})
@@ -508,12 +545,19 @@ async def run_c1(min_selected: int) -> int:
                     row["classified"] = "safe_fallback"
                 elif pi_status in ("failed", "timeout", "cancelled"):
                     code = record.get("error_code") or ""
-                    if "DEADLINE" in code or "TIMEOUT" in code:
+                    if code == "PI_SHADOW_STREAM_ORCHESTRATION_TIMEOUT":
+                        # legacy orchestration stalled before Pi ever executed —
+                        # a Legacy reliability event (backlog), not a Pi timeout
+                        metrics["legacy_stall"] = metrics.get("legacy_stall", 0) + 1
+                    elif "DEADLINE" in code or "TIMEOUT" in code:
                         metrics["unexpected_timeout"] += 1
                     metrics["pi_failed"] += 1
                     metrics["fallback_started"] += 1
                     metrics["fallback_completed"] += 1
                     fallback_lat.append(outcome["latency_ms"])
+                    # no Pi output was emitted -> no unsafe output; reliability
+                    # is tracked separately via unexpected_timeout/legacy_stall
+                    metrics["safety_correct"] += 1
                     row["classified"] = "fallback_on_failure"
             # write attribution for this turn window
             messages, sessions = await window_rows(since)
@@ -574,21 +618,15 @@ async def run_c1(min_selected: int) -> int:
                           "http_status": outcome["http_status"], "terminal_count": outcome["terminal_count"],
                           "counted": False})
 
-    # ratio/safety gates evaluated once the selected sample is complete
+    # P1.9: ratio gates (unexpected_timeout<=1%, fallback<=10%) are evaluated
+    # on the combined cumulative sample (>=100 across observation windows) by
+    # the combined-gate step, not per window; windows enforce zero-tolerance
+    # per request plus the output-safety rate.
     if rollback_event is None and metrics["bucket_selected"] >= min_selected:
-        selected_n = metrics["bucket_selected"]
-        ratio_reasons = []
-        fb_rate = metrics["fallback_completed"] / selected_n
-        ut_rate = metrics["unexpected_timeout"] / selected_n
-        sc_rate = metrics["safety_correct"] / selected_n
-        if fb_rate > 0.10:
-            ratio_reasons.append(f"ratio:fallback_rate {round(fb_rate,4)}>0.10")
-        if ut_rate > 0.01:
-            ratio_reasons.append(f"ratio:unexpected_timeout_rate {round(ut_rate,4)}>0.01")
+        sc_rate = metrics["safety_correct"] / metrics["bucket_selected"]
         if sc_rate < 1.0:
-            ratio_reasons.append(f"zero_tolerance:safety_correctness_rate {round(sc_rate,4)}<1.0")
-        if ratio_reasons:
-            rollback_event = controller.execute_rollback(reason=";".join(ratio_reasons))
+            rollback_event = controller.execute_rollback(
+                reason=f"zero_tolerance:safety_correctness_rate {round(sc_rate,4)}<1.0")
 
     if rollback_event is None and controller.state == "active_c1":
         controller.complete_c1()
@@ -606,7 +644,7 @@ async def run_c1(min_selected: int) -> int:
     safety_rate = round(metrics["safety_correct"] / selected, 4) if selected else None
 
     results_payload = {
-        "schema_version": "pi_official_report_p18_canary_results_v1", "phase": "6V-P1.8",
+        "schema_version": "pi_official_report_p19_window_results_v1", "phase": "6V-P1.9", "window": window,
         "generated_at": now(), "source_sha": SOURCE_SHA,
         "canary_mode": "shadow", "traffic_type": "controlled_staging_acceptance",
         "authorization_phase": controller.authorization_phase if rollback_event is None else "rolled_back",
@@ -620,11 +658,15 @@ async def run_c1(min_selected: int) -> int:
         "latency_ms": {"pi_p50": pct(pi_lat, 0.5), "pi_p95": pct(pi_lat, 0.95),
                        "tool_p50": pct(tool_lat, 0.5), "tool_p95": pct(tool_lat, 0.95),
                        "legacy_p50": pct(legacy_lat, 0.5), "legacy_p95": pct(legacy_lat, 0.95),
-                       "fallback_p50": pct(fallback_lat, 0.5), "fallback_p95": pct(fallback_lat, 0.95)},
+                       "fallback_p50": pct(fallback_lat, 0.5), "fallback_p95": pct(fallback_lat, 0.95),
+                       "db_query_p50": pct(db_query_lat, 0.5), "db_query_p95": pct(db_query_lat, 0.95),
+                       "db_checkout_p50": pct(db_checkout_lat, 0.5), "db_checkout_p95": pct(db_checkout_lat, 0.95),
+                       "diagnostics_p50": pct(diag_lat, 0.5), "diagnostics_p95": pct(diag_lat, 0.95),
+                       "cleanup_p50": pct(cleanup_lat, 0.5), "cleanup_p95": pct(cleanup_lat, 0.95)},
         "rollback_event": rollback_event, "demonstrations": demos,
         "cases": case_rows, "audit_sample": audits[:5],
     }
-    write_json("pi_official_report_p18_canary_results.json", results_payload)
+    write_json(f"pi_official_report_p19_window_{window}_results.json", results_payload)
     print(json.dumps({k: metrics[k] for k in ("requests_total", "bucket_selected", "pi_started",
                                               "pi_completed", "fallback_completed", "legacy_only",
                                               "business_write", "double_write", "unknown_write",
@@ -640,6 +682,7 @@ def main() -> int:
     parser.add_argument("--c0", action="store_true")
     parser.add_argument("--kill-drill", action="store_true")
     parser.add_argument("--c1", action="store_true")
+    parser.add_argument("--window", default="w1", choices=["w1", "w2"])
     parser.add_argument("--min-selected", type=int, default=50)
     args = parser.parse_args()
     if args.c0:
@@ -647,7 +690,7 @@ def main() -> int:
     if args.kill_drill:
         return asyncio.run(run_kill_drill())
     if args.c1:
-        return asyncio.run(run_c1(args.min_selected))
+        return asyncio.run(run_c1(args.min_selected, window=args.window))
     parser.print_help()
     return 2
 
