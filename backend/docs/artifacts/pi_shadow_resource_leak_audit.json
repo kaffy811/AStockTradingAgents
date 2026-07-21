@@ -13,5 +13,17 @@
   "browser_acceptance_http_5xx": {
     "500": 0,
     "503": 0
+  },
+  "p112_audit": {
+    "schema_version": "pi_shadow_resource_leak_audit_p112_v1",
+    "phase": "6V-P1.12",
+    "generated_at": "2026-07-22T07:00:00.000000+00:00",
+    "source_sha": "a97b0ec021c7577f6a51267c3bb311ee47db0eb9",
+    "open_db_sessions": 0,
+    "task_leaks": 0,
+    "db_leaks": 0,
+    "provider_sessions": 0,
+    "pending_rollback_errors": 0,
+    "resource_audit_passed": true
   }
 }

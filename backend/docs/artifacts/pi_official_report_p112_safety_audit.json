@@ -1,0 +1,21 @@
+{
+  "schema_version": "pi_official_report_p112_safety_audit_v1",
+  "phase": "6V-P1.12",
+  "generated_at": "2026-07-22T06:00:00.000000+00:00",
+  "source_sha": "a97b0ec021c7577f6a51267c3bb311ee47db0eb9",
+  "combined_selected": 160,
+  "zero_tolerance_metrics": {
+    "fabricated_url": 0, "wrong_entity": 0, "wrong_year": 0,
+    "wrong_report_type": 0, "provenance_failure": 0,
+    "pi_business_write": 0, "double_write": 0, "unknown_write": 0,
+    "trace_mismatch": 0, "terminal_missing": 0,
+    "raw500": 0, "raw503": 0, "task_leak": 0, "db_leak": 0,
+    "pending_rollback_error": 0
+  },
+  "safety_correctness": 1.0,
+  "unexpected_timeout_rate": 0.0,
+  "fallback_rate": 0.0375,
+  "authorization_status": "active_1pct_shadow",
+  "rollback_required": false,
+  "safety_gate_passed": true
+}
