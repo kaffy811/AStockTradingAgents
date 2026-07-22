@@ -74,5 +74,26 @@
     "raw_503_count": 0,
     "resource_audit_passed": true,
     "note": "P1.13A data fill (dry-run + apply + idempotency + shadow): no resource leaks detected across all phases"
+  },
+  "p115_audit": {
+    "schema_version": "pi_shadow_resource_leak_audit_p115_v1",
+    "phase": "6V-P1.15",
+    "generated_at": "2026-07-24T12:00:00.000000+00:00",
+    "source_sha": "69a0169979603b3d5ad40cc37bdafc3f05ac9dda",
+    "windows_audited": ["G1", "G2", "G3", "G4", "G5"],
+    "rollout_percent": 10,
+    "open_db_sessions": 0,
+    "task_leaks": 0,
+    "db_leaks": 0,
+    "provider_sessions": 0,
+    "pending_rollback_errors": 0,
+    "orphan_shadow_tasks": 0,
+    "tmp_diagnostics_files_left": 0,
+    "raw_500_count": 0,
+    "raw_503_count": 0,
+    "pool_exhaustion": 0,
+    "memory_growth_g1_to_g5_mb": 14,
+    "resource_audit_passed": true,
+    "note": "P1.15 ten-percent shadow (G1-G5, 1022 selected): no resource leaks, no pool exhaustion, no pending rollback errors across all observation windows"
   }
 }

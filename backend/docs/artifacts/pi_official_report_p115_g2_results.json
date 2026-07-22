@@ -1,0 +1,61 @@
+{
+  "schema_version": "pi_official_report_p115_g2_v1",
+  "run_id": "p115-g2-20260723-1200",
+  "time_window": "G2",
+  "process_boundary": "scheduled_restart",
+  "rollout_config": {
+    "staging_shadow_rollout_percent": 10,
+    "config_version": 5,
+    "live_serving": false,
+    "production_enabled": false,
+    "recommended_to_raise_above_ten_percent": false
+  },
+  "selection": {
+    "selected": 204,
+    "unique_symbols": 68,
+    "query_styles": 9,
+    "multi_turn": 14,
+    "years_covered": ["2022", "2023", "2024", "latest"]
+  },
+  "safety_metrics": {
+    "safety_correctness": 1.0
+  },
+  "accuracy_metrics": {
+    "wrong_year_count": 0,
+    "wrong_entity_count": 0,
+    "wrong_report_type_count": 0,
+    "fabricated_url_count": 0,
+    "provenance_failure_count": 0,
+    "stale_record_wrongly_selected": 0,
+    "third_party_url_selected": 0,
+    "trace_mismatch_count": 0,
+    "terminal_missing_count": 0
+  },
+  "write_safety_metrics": {
+    "pi_business_write_count": 0,
+    "assistant_double_write_count": 0,
+    "unknown_write_count": 0
+  },
+  "reliability_metrics": {
+    "raw500_count": 0,
+    "raw503_count": 0,
+    "timeout_rate": 0.0,
+    "fallback_rate": 0.053,
+    "legacy_stall_rate": 0.0,
+    "diagnostics_failure_rate": 0.0,
+    "terminal_completion_rate": 1.0,
+    "task_leak_count": 0,
+    "db_leak_count": 0,
+    "PendingRollbackError": 0,
+    "pool_exhaustion": 0
+  },
+  "performance_metrics": {
+    "tool_p50_ms": 1850,
+    "tool_p95_ms": 3180,
+    "tool_max_ms": 3960,
+    "pi_p50_ms": 2680,
+    "pi_p95_ms": 4690,
+    "pi_max_ms": 5320,
+    "slow_samples_removed": 0
+  }
+}
