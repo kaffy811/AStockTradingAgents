@@ -58,6 +58,24 @@
     "production_enabled": false,
     "auto_rollback_triggered": false
   },
+  "p114_audit": {
+    "schema_version": "pi_compatible_runtime_gate_p114_v1",
+    "phase": "6V-P1.14",
+    "generated_at": "2026-07-22T23:00:00.000000+00:00",
+    "source_sha": "19130f054ca330f2fa16e8200184af6a8b632ec0",
+    "observation_windows": 3,
+    "combined_selected": 465,
+    "safety_correctness_rate": 1.0,
+    "wrong_year_count": 0,
+    "tool_p95_ms": 3210,
+    "pi_p95_ms": 4720,
+    "ready_for_ten_percent_decision": true,
+    "recommended_to_raise_to_ten_percent": false,
+    "recommended_for_live_serving": false,
+    "recommended_for_production": false,
+    "rollout_percent": 5,
+    "runtime_gate_passed": true
+  },
   "p113a_audit": {
     "phase": "6V-P1.13A",
     "description": "2024 annual report gap fill with 5% shadow regression",

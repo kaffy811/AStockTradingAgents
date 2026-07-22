@@ -38,6 +38,26 @@
     "pending_rollback_errors": 0,
     "resource_audit_passed": true
   },
+  "p114_audit": {
+    "schema_version": "pi_shadow_resource_leak_audit_p114_v1",
+    "phase": "6V-P1.14",
+    "generated_at": "2026-07-22T23:00:00.000000+00:00",
+    "source_sha": "19130f054ca330f2fa16e8200184af6a8b632ec0",
+    "windows_audited": ["T1", "T2", "T3"],
+    "open_db_sessions": 0,
+    "task_leaks": 0,
+    "db_leaks": 0,
+    "provider_sessions": 0,
+    "pending_rollback_errors": 0,
+    "orphan_shadow_tasks": 0,
+    "tmp_diagnostics_files_left": 0,
+    "raw_500_count": 0,
+    "raw_503_count": 0,
+    "pool_exhaustion": 0,
+    "memory_growth_t1_to_t3_mb": 9,
+    "resource_audit_passed": true,
+    "note": "P1.14 sustained 5% shadow (T1+T2+T3, 465 selected): no resource leaks, no pool exhaustion, no pending rollback errors across all observation windows"
+  },
   "p113a_audit": {
     "schema_version": "pi_shadow_resource_leak_audit_p113a_v1",
     "phase": "6V-P1.13A",
