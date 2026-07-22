@@ -1,0 +1,18 @@
+{
+  "schema_version": "pi_official_report_p115_remaining_gap_regression_v1",
+  "phase": "6V-P1.15",
+  "symbols_tested": 19,
+  "all_returned_unavailable": true,
+  "wrong_year_fallback": 0,
+  "summary_returned": 0,
+  "quarterly_returned": 0,
+  "third_party_url": 0,
+  "breakdown": {
+    "provider_not_found": {"count": 8, "correctly_unavailable": 8},
+    "officially_not_disclosed": {"count": 3, "correctly_unavailable": 3},
+    "summary_only": {"count": 3, "correctly_unavailable": 3},
+    "wrong_report_type_only": {"count": 2, "correctly_unavailable": 2},
+    "manual_review_required": {"count": 3, "correctly_unavailable": 3}
+  },
+  "regression_passed": true
+}
