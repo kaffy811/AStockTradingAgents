@@ -1,0 +1,18 @@
+{
+  "schema_version": "pi_official_report_p115_bucket_distribution_v1",
+  "phase": "6V-P1.15",
+  "algorithm": "sha256(environment + agent_id + anonymized_user_key + config_version) % 10000",
+  "threshold": 1000,
+  "sampled_keys": 100000,
+  "selected_count": 9987,
+  "observed_selection_rate_pct": 9.987,
+  "expected_range_pct": [9.6, 10.4],
+  "within_expected_range": true,
+  "deterministic": true,
+  "same_key_same_version_same_result": true,
+  "config_version_rebuckets": true,
+  "uses_python_builtin_hash": false,
+  "full_identity_stored": false,
+  "rollout_boundary_exact": true,
+  "bucket_distribution_passed": true
+}

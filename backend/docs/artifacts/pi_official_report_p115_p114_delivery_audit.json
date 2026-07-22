@@ -1,0 +1,28 @@
+{
+  "schema_version": "pi_official_report_p115_p114_delivery_audit_v1",
+  "phase": "6V-P1.15",
+  "generated_at": "2026-07-22T23:30:00.000000+00:00",
+  "source_sha": "69a0169979603b3d5ad40cc37bdafc3f05ac9dda",
+  "p114_final_gate_verified": true,
+  "p114_resource_audit_verified": true,
+  "p114_secret_scan_verified": true,
+  "p114_resource_leak_audit_verified": true,
+  "p114_compatible_runtime_gate_verified": true,
+  "p114_pdf_agent_gate_verified": true,
+  "backend_full_passed": 606,
+  "backend_full_failed": 0,
+  "backend_full_skipped": 0,
+  "backend_full_exit_code": 0,
+  "secret_scan_clean": true,
+  "resource_audit_passed": true,
+  "formal_default_config": {
+    "AGENT_EXECUTOR_MODE": "legacy",
+    "PI_AGENT_SHADOW_ENABLED": false,
+    "authorized_agents": [],
+    "default_rollout": 0,
+    "production_enabled": false
+  },
+  "head_equals_origin": true,
+  "worktree_clean": true,
+  "delivery_audit_gate_passed": true
+}
