@@ -1,0 +1,22 @@
+{
+  "schema_version": "pi_official_report_p116_browser_regression_v1",
+  "phase": "6V-P1.16",
+  "generated_at": "2026-07-26T14:00:00.000000+00:00",
+  "observation_period": "H1-H6",
+  "cases_tested": 10,
+  "cases": [
+    {"id": 1, "name": "guizhou_moutai_latest", "result": "passed", "user_sees_legacy_only": true, "pi_displayed": false},
+    {"id": 2, "name": "pdf_followup", "result": "passed", "user_sees_legacy_only": true, "pi_displayed": false},
+    {"id": 3, "name": "new_2024_company", "result": "passed", "user_sees_legacy_only": true, "pi_displayed": false},
+    {"id": 4, "name": "remaining_gap_company", "result": "passed", "user_sees_legacy_only": true, "pi_displayed": false},
+    {"id": 5, "name": "pingan_disambiguation", "result": "passed", "user_sees_legacy_only": true, "pi_displayed": false},
+    {"id": 6, "name": "historical_year_2022", "result": "passed", "user_sees_legacy_only": true, "pi_displayed": false},
+    {"id": 7, "name": "future_year_unavailable", "result": "passed", "user_sees_legacy_only": true, "pi_displayed": false},
+    {"id": 8, "name": "semi_annual_unsupported", "result": "passed", "user_sees_legacy_only": true, "pi_displayed": false},
+    {"id": 9, "name": "stale_review_company", "result": "passed", "user_sees_legacy_only": true, "pi_displayed": false},
+    {"id": 10, "name": "refresh_and_persistence", "result": "passed", "user_sees_legacy_only": true, "pi_displayed": false}
+  ],
+  "all_user_sees_legacy_only": true,
+  "no_pi_displayed_to_users": true,
+  "browser_regression_passed": true
+}

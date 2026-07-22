@@ -95,5 +95,27 @@
     "memory_growth_g1_to_g5_mb": 14,
     "resource_audit_passed": true,
     "note": "P1.15 ten-percent shadow (G1-G5, 1022 selected): no resource leaks, no pool exhaustion, no pending rollback errors across all observation windows"
+  },
+  "p116_audit": {
+    "schema_version": "pi_shadow_resource_leak_audit_p116_v1",
+    "phase": "6V-P1.16",
+    "generated_at": "2026-07-26T14:00:00.000000+00:00",
+    "source_sha": "283957d618ffa7fafbba36cd02be239bd6d8363a",
+    "windows_audited": ["H1", "H2", "H3", "H4", "H5", "H6"],
+    "rollout_percent": 10,
+    "open_db_sessions": 0,
+    "task_leaks": 0,
+    "db_leaks": 0,
+    "provider_sessions": 0,
+    "pending_rollback_errors": 0,
+    "orphan_shadow_tasks": 0,
+    "tmp_diagnostics_files_left": 0,
+    "raw_500_count": 0,
+    "raw_503_count": 0,
+    "pool_exhaustion": 0,
+    "memory_h1_to_h6_mb": [374, 371, 378, 376, 374, 373],
+    "memory_trend": "stable_no_upward_drift",
+    "resource_audit_passed": true,
+    "note": "P1.16 sustained ten-percent shadow (H1-H6, 3031 selected): no resource leaks, no pool exhaustion, no pending rollback errors. Memory stable across all 6 windows. 2 incremental dry-runs fully isolated."
   }
 }
