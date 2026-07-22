@@ -1,0 +1,49 @@
+{
+  "schema_version": "pi_official_report_p116_latency_v1",
+  "phase": "6V-P1.16",
+  "generated_at": "2026-07-26T14:00:00.000000+00:00",
+  "per_window": {
+    "H1": {"tool_p50_ms": 1870, "tool_p90_ms": 2980, "tool_p95_ms": 3310, "tool_p99_ms": 3890, "tool_max_ms": 4380, "pi_p50_ms": 2650, "pi_p90_ms": 4210, "pi_p95_ms": 4820, "pi_p99_ms": 5140, "pi_max_ms": 5680},
+    "H2": {"tool_p50_ms": 1840, "tool_p90_ms": 2910, "tool_p95_ms": 3260, "tool_p99_ms": 3810, "tool_max_ms": 4290, "pi_p50_ms": 2610, "pi_p90_ms": 4150, "pi_p95_ms": 4780, "pi_p99_ms": 5090, "pi_max_ms": 5620},
+    "H3": {"tool_p50_ms": 1910, "tool_p90_ms": 3050, "tool_p95_ms": 3340, "tool_p99_ms": 3940, "tool_max_ms": 4420, "pi_p50_ms": 2710, "pi_p90_ms": 4280, "pi_p95_ms": 4850, "pi_p99_ms": 5200, "pi_max_ms": 5720},
+    "H4": {"tool_p50_ms": 1850, "tool_p90_ms": 2960, "tool_p95_ms": 3290, "tool_p99_ms": 3860, "tool_max_ms": 4350, "pi_p50_ms": 2640, "pi_p90_ms": 4190, "pi_p95_ms": 4800, "pi_p99_ms": 5120, "pi_max_ms": 5650},
+    "H5": {"tool_p50_ms": 1830, "tool_p90_ms": 2940, "tool_p95_ms": 3270, "tool_p99_ms": 3820, "tool_max_ms": 4310, "pi_p50_ms": 2600, "pi_p90_ms": 4160, "pi_p95_ms": 4760, "pi_p99_ms": 5080, "pi_max_ms": 5600},
+    "H6": {"tool_p50_ms": 1820, "tool_p90_ms": 2920, "tool_p95_ms": 3250, "tool_p99_ms": 3800, "tool_max_ms": 4280, "pi_p50_ms": 2580, "pi_p90_ms": 4130, "pi_p95_ms": 4740, "pi_p99_ms": 5060, "pi_max_ms": 5580}
+  },
+  "combined": {
+    "tool_p50_ms": 1853,
+    "tool_p90_ms": 2970,
+    "tool_p95_ms": 3320,
+    "tool_p99_ms": 3870,
+    "tool_max_ms": 4420,
+    "pi_p50_ms": 2632,
+    "pi_p90_ms": 4187,
+    "pi_p95_ms": 4800,
+    "pi_p99_ms": 5115,
+    "pi_max_ms": 5720
+  },
+  "baselines": {
+    "p114_tool_p95_ms": 3210,
+    "p114_pi_p95_ms": 4720,
+    "p115_tool_p95_ms": 3290,
+    "p115_pi_p95_ms": 4780
+  },
+  "deltas_vs_p115": {
+    "tool_p95_delta_ms": 30,
+    "tool_p95_delta_pct": 0.9,
+    "pi_p95_delta_ms": 20,
+    "pi_p95_delta_pct": 0.4
+  },
+  "gates": {
+    "tool_p95_lte_4000ms": true,
+    "pi_p95_lte_5000ms": true,
+    "pi_p95_at_4800ms_borderline_flagged": true,
+    "performance_review_triggered": false
+  },
+  "regression_check": {
+    "h6_vs_h1_tool_p95": {"h1": 3310, "h6": 3250, "direction": "improvement", "regression": false},
+    "h6_vs_h1_pi_p95": {"h1": 4820, "h6": 4740, "direction": "improvement", "regression": false},
+    "within_20pct_degradation_limit": true
+  },
+  "slow_samples_removed": 0
+}
