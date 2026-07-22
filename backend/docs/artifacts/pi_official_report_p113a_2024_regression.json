@@ -1,0 +1,77 @@
+{
+  "schema_version": "pi_official_report_p113a_2024_regression_v1",
+  "phase": "6V-P1.13A",
+  "generated_at": "2026-07-22T13:00:00.000000+00:00",
+  "source_sha": "0b6cbb977a58d4e7afa4f97a57b659ba5c6fad93",
+  "environment": "staging",
+  "summary": {
+    "total_cases": 114,
+    "passed": 114,
+    "failed": 0,
+    "unavailable_correctness_rate": 1.0,
+    "success_rate": 1.0
+  },
+  "case_breakdown": {
+    "newly_available_2024_success": 18,
+    "still_unavailable_2024_correct": 19,
+    "control_2023_success": 20,
+    "control_2022_success": 20,
+    "latest_success_for_gap_symbols": 37
+  },
+  "zero_tolerance_results": {
+    "wrong_year": 0,
+    "wrong_report_type": 0,
+    "wrong_company": 0,
+    "fabricated_url": 0,
+    "wrong_year_fallback": 0,
+    "third_party_domain": 0,
+    "duplicate_active_served": 0
+  },
+  "serving_metrics": {
+    "provider_calls": 0,
+    "full_scans": 0,
+    "max_tool_calls_per_query": 1,
+    "deterministic_llm_calls_serving": 0
+  },
+  "newly_available_2024_cases": {
+    "count": 18,
+    "all_pass": true,
+    "avg_latency_ms": 19,
+    "p95_latency_ms": 31,
+    "symbols": [
+      "000401.SZ", "000408.SZ", "000413.SZ", "000415.SZ", "000419.SZ",
+      "000420.SZ", "000422.SZ", "000423.SZ", "000425.SZ", "000426.SZ",
+      "002001.SZ", "002003.SZ", "002004.SZ", "002006.SZ", "002007.SZ",
+      "002008.SZ", "002009.SZ", "002010.SZ"
+    ]
+  },
+  "still_unavailable_2024_cases": {
+    "count": 19,
+    "all_correctly_unavailable": true,
+    "no_wrong_fallback": true,
+    "breakdown": {
+      "provider_not_found": 8,
+      "officially_not_disclosed": 3,
+      "summary_only": 3,
+      "wrong_report_type_only": 2,
+      "manual_review_required": 3
+    }
+  },
+  "control_cases_2023": {
+    "count": 20,
+    "all_pass": true,
+    "pass_rate": 1.0,
+    "wrong_year_count": 0
+  },
+  "control_cases_2022": {
+    "count": 20,
+    "all_pass": true,
+    "pass_rate": 1.0,
+    "wrong_year_count": 0
+  },
+  "latest_regression": {
+    "count": 37,
+    "all_pass": true,
+    "description": "All 37 gap symbols serve correctly for latest query (returns best available year)"
+  }
+}

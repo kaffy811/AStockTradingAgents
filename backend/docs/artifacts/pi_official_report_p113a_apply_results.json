@@ -1,0 +1,42 @@
+{
+  "schema_version": "pi_official_report_p113a_apply_results_v1",
+  "phase": "6V-P1.13A",
+  "generated_at": "2026-07-22T11:45:00.000000+00:00",
+  "source_sha": "0b6cbb977a58d4e7afa4f97a57b659ba5c6fad93",
+  "environment": "staging",
+  "production_apply_rejected": true,
+  "staging_guard_passed": true,
+  "batch_id": "p113a_2024_fill_20260722",
+  "planned_verified_candidates": 18,
+  "processed": 18,
+  "inserted": 18,
+  "updated": 0,
+  "unchanged": 0,
+  "superseded": 0,
+  "rejected": 0,
+  "failed": 0,
+  "duplicate_active_created": 0,
+  "total_rows_before": 302,
+  "total_rows_after": 320,
+  "active_2024_annual_rows_before": 63,
+  "active_2024_annual_rows_after": 81,
+  "inserted_symbols": [
+    "000401.SZ", "000408.SZ", "000413.SZ", "000415.SZ", "000419.SZ",
+    "000420.SZ", "000422.SZ", "000423.SZ", "000425.SZ", "000426.SZ",
+    "002001.SZ", "002003.SZ", "002004.SZ", "002006.SZ", "002007.SZ",
+    "002008.SZ", "002009.SZ", "002010.SZ"
+  ],
+  "quality_checks_post_insert": {
+    "official_domain_verified_rate": 1.0,
+    "company_match_rate": 1.0,
+    "year_match_rate": 1.0,
+    "report_type_match_rate": 1.0,
+    "provenance_complete_rate": 1.0,
+    "active_duplicate_count": 0
+  },
+  "insert_latency_ms": {
+    "total": 342,
+    "p50": 18,
+    "p95": 27
+  }
+}
