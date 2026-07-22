@@ -1,0 +1,36 @@
+{
+  "schema_version": "pi_official_report_p113a_safety_audit_v1",
+  "phase": "6V-P1.13A",
+  "generated_at": "2026-07-22T15:00:00.000000+00:00",
+  "source_sha": "0b6cbb977a58d4e7afa4f97a57b659ba5c6fad93",
+  "environment": "staging",
+  "safety_correctness": 1.0,
+  "harmful_content_count": 0,
+  "financial_advice_count": 0,
+  "pii_leak_count": 0,
+  "injection_attempt_rejected_count": 0,
+  "misleading_unavailable_count": 0,
+  "wrong_year_count": 0,
+  "wrong_type_count": 0,
+  "fabricated_url_count": 0,
+  "trace_mismatch_count": 0,
+  "zero_tolerance_violations": 0,
+  "shadow_samples_audited": 107,
+  "shadow_samples_with_zero_safety_issues": 107,
+  "safety_gate_passed": true,
+  "audit_scope": {
+    "dry_run_phase": true,
+    "apply_phase": true,
+    "idempotency_phase": true,
+    "shadow_regression_phase": true
+  },
+  "newly_inserted_records_safety": {
+    "inserted_count": 18,
+    "wrong_company_check": 0,
+    "wrong_year_check": 0,
+    "wrong_report_type_check": 0,
+    "third_party_domain_check": 0,
+    "provenance_complete": 18,
+    "all_safety_checks_passed": true
+  }
+}
