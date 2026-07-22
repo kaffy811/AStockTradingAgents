@@ -37,5 +37,22 @@
     "provider_sessions": 0,
     "pending_rollback_errors": 0,
     "resource_audit_passed": true
+  },
+  "p113a_audit": {
+    "schema_version": "pi_shadow_resource_leak_audit_p113a_v1",
+    "phase": "6V-P1.13A",
+    "generated_at": "2026-07-22T18:00:00.000000+00:00",
+    "source_sha": "0b6cbb977a58d4e7afa4f97a57b659ba5c6fad93",
+    "open_db_sessions": 0,
+    "task_leaks": 0,
+    "db_leaks": 0,
+    "provider_sessions": 0,
+    "pending_rollback_errors": 0,
+    "orphan_shadow_tasks": 0,
+    "tmp_diagnostics_files_left": 0,
+    "raw_500_count": 0,
+    "raw_503_count": 0,
+    "resource_audit_passed": true,
+    "note": "P1.13A data fill (dry-run + apply + idempotency + shadow): no resource leaks detected across all phases"
   }
 }

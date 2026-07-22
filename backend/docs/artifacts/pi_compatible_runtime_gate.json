@@ -57,5 +57,23 @@
     "rollout_percent": 5,
     "production_enabled": false,
     "auto_rollback_triggered": false
+  },
+  "p113a_audit": {
+    "phase": "6V-P1.13A",
+    "description": "2024 annual report gap fill with 5% shadow regression",
+    "starting_2024_gap": 37,
+    "verified_2024_records_added": 18,
+    "remaining_2024_gap": 19,
+    "three_year_complete_after": 82,
+    "shadow_selected": 107,
+    "shadow_2024_targeted": 54,
+    "safety_correctness": 1.0,
+    "tool_p95_ms": 3140,
+    "pi_business_write_count": 0,
+    "wrong_year_count": 0,
+    "rollout_percent": 5,
+    "production_enabled": false,
+    "live_serving": false,
+    "recommended_to_raise_to_ten_percent": false
   }
 }
