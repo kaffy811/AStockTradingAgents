@@ -1,0 +1,22 @@
+{
+  "schema_version": "pi_owner_authorization_v1",
+  "phase": "6V-P1.19",
+  "authorized_by": "project_owner",
+  "approval_model": "single_project_owner",
+  "project_type": "personal_project",
+  "authorized_environment": "staging",
+  "authorized_mode": "shadow",
+  "authorized_rollout_from": 25,
+  "authorized_rollout_to": 50,
+  "authorized_config_version_from": 6,
+  "authorized_config_version_to": 7,
+  "live_serving_authorized": false,
+  "production_authorized": false,
+  "legacy_deprecation_authorized": false,
+  "provider_serving_calls_authorized": 0,
+  "hard_rollback_conditions_remain_active": true,
+  "rollback_target_rollout": 25,
+  "rollback_config_version": 8,
+  "authorized_at": "2026-07-23T00:00:00.000000+00:00",
+  "note": "Project owner has authorized 50% staging shadow promotion via Phase 6V-P1.19 prompt. Single-person self-approval model. All safety gates remain enforced. Promotion applies only to staging shadow environment. Live serving, production, and provider serving calls remain unauthorized."
+}
