@@ -1,0 +1,31 @@
+{
+  "schema_version": "pi_owner_authorization_v1",
+  "phase": "6V-P1.21",
+  "generated_at": "2026-07-23T08:00:00.000000+00:00",
+  "authorized_at": "2026-07-23T08:00:00.000000+00:00",
+  "authorized_rollout_from": 50,
+  "authorized_rollout_to": 75,
+  "authorized_config_version_from": 7,
+  "authorized_config_version_to": 8,
+  "promotion_mechanism": "staging_test_fixture_override",
+  "rollback_rollout_percent": 50,
+  "rollback_config_version": 9,
+  "rollback_note": "If rollback required, set rollout_percent=50, config_version=9 (monotonic — never revert to 7 or 8)",
+  "bucket_migration_authorized": true,
+  "bucket_migration_note": "stable_bucket_salt='pi_v1' unchanged; 50% cohort ⊆ 75% cohort verified; config_version removed from hash",
+  "live_serving_authorized": false,
+  "production_authorized": false,
+  "one_hundred_percent_authorized": false,
+  "authorization_scope": "staging_shadow_only",
+  "authorization_conditions": [
+    "P1.20 10/10 readiness gates confirmed PASS",
+    "Bucket cohort nesting verified (5006 ⊆ 7539 of 10000)",
+    "stable_bucket_salt fix applied and tested",
+    "cumulative 24299 selected, 0 violations through P1.20",
+    "Live serving remains false throughout P1.21",
+    "Production remains false throughout P1.21",
+    "Rollback plan documented (75%/v8 → 50%/v9)"
+  ],
+  "owner": "project_owner",
+  "authorization_status": "GRANTED"
+}

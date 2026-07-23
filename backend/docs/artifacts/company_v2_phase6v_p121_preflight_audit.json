@@ -1,0 +1,51 @@
+{
+  "schema_version": "pi_preflight_audit_v1",
+  "phase": "6V-P1.21",
+  "generated_at": "2026-07-23T08:00:00.000000+00:00",
+  "p120_final_sha_confirmed": "7cbc4b57d420e6c43f062f8131544c2ef7dae9be",
+  "p120_artifacts_complete": true,
+  "p120_artifacts_found": 20,
+  "p120_commits_verified": ["7cbc4b5", "d560e8a", "e9fa9e4", "ab380b9"],
+  "current_rollout_percent": 50,
+  "current_config_version": 7,
+  "configuration_drift_detected": false,
+  "soak_cleared": true,
+  "bucket_fix_note": "stable_bucket now uses stable_bucket_salt='pi_v1' instead of config_version; 50% cohort ⊆ 75% cohort verified (5006 ⊆ 7539 out of 10000 test identities)",
+  "bucket_fix_sha": "7cbc4b57d420e6c43f062f8131544c2ef7dae9be",
+  "safety_config_confirmed": {
+    "live": false,
+    "production_enabled": false,
+    "recommended_for_live_serving": false,
+    "recommended_for_production": false,
+    "provider_calls_serving": 0,
+    "canary_mode": "shadow"
+  },
+  "formal_defaults_verified": {
+    "production_enabled": false,
+    "PI_AGENT_SHADOW_ENABLED": false,
+    "authorized_agents": [],
+    "default_rollout": 0,
+    "pi_canary_rollout_percent_repo_default": 0.0,
+    "pi_canary_stable_bucket_salt_repo_default": "pi_v1"
+  },
+  "p120_key_metrics": {
+    "total_selected_s1_s8": 6902,
+    "unique_symbols": 100,
+    "query_styles": 14,
+    "multi_turn": 447,
+    "combined_pi_p95_ms": 4742,
+    "tool_p95_ms": 3253,
+    "safety_correctness_rate": 1.0,
+    "zero_tolerance_violations": 0,
+    "pi_over_6s_count": 0,
+    "provider_serving_calls": 0
+  },
+  "cumulative_p18_through_p120": {
+    "total_selected": 24299,
+    "zero_violations": 0
+  },
+  "p121_objective": "75% shadow promotion (config_version 7→8, rollout 50→75) via staging_test_fixture_override; 8 observation windows T1-T8",
+  "promotion_cleared": true,
+  "preflight_passed": true,
+  "note": "P1.20 state confirmed at SHA 7cbc4b57d420e6c43f062f8131544c2ef7dae9be. 20 artifacts intact. Config version 7, rollout 50% — stable. Bucket fix applied: stable_bucket_salt='pi_v1' (not config_version) now used for hashing; cohort nesting verified (50% ⊆ 75%). Cleared for P1.21 75% shadow promotion (T1-T8)."
+}
