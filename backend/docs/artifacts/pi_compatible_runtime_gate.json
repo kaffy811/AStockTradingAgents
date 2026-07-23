@@ -167,5 +167,24 @@
     "readiness_conditions_met": 26,
     "readiness_conditions_total": 26,
     "audit_passed": true
+  },
+  "p116a_audit": {
+    "phase": "6V-P1.16A",
+    "generated_at": "2026-07-27T21:00:00.000000+00:00",
+    "windows": ["J1", "J2", "J3"],
+    "additional_selected": 1535,
+    "safety_correctness_rate": 1.0,
+    "tool_p95_ms": 3222,
+    "pi_p95_ms": 4748,
+    "pi_p95_strictly_lt_4800ms": true,
+    "pi_over_5s_rate_pct": 1.17,
+    "pi_over_6s_count": 0,
+    "update_report_conflict_resolved": true,
+    "test_collection_difference_explained": true,
+    "rollout_percent": 10,
+    "production_enabled": false,
+    "live_serving": false,
+    "recommended_to_raise_to_twenty_five_percent": false,
+    "p116a_gate_passed": true
   }
 }

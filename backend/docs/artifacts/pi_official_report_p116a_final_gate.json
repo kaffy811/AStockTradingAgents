@@ -1,0 +1,68 @@
+{
+  "schema_version": "pi_official_report_p116a_final_gate_v1",
+  "phase": "6V-P1.16A",
+  "generated_at": "2026-07-27T21:00:00.000000+00:00",
+  "source_sha": "c492ffee7b1080f754807ba8fcb80556dff6d46c",
+  "update_report_audit": {
+    "conflict_resolved": true,
+    "history_preserved": true,
+    "p116a_report_number": 92
+  },
+  "test_collection_audit": {
+    "current_collected": 3696,
+    "historical_count": 3787,
+    "difference_explained": true,
+    "targeted_suite_verified": true,
+    "test_collection_gate_passed": true
+  },
+  "observation_summary": {
+    "windows": ["J1", "J2", "J3"],
+    "window_selected": {"J1": 518, "J2": 512, "J3": 505},
+    "total_additional_selected": 1535,
+    "unique_symbols": 100,
+    "query_styles": 12,
+    "multi_turn": 84
+  },
+  "safety_gate": {
+    "safety_correctness": 1.0,
+    "zero_tolerance_count": 0,
+    "safety_gate_passed": true,
+    "auto_rollback_triggered": false
+  },
+  "performance_gate": {
+    "tool_p95_ms": 3222,
+    "pi_p95_ms": 4748,
+    "pi_p95_strictly_lt_4800ms": true,
+    "pi_over_5s_rate_pct": 1.17,
+    "pi_over_6s_count": 0,
+    "timeout_rate_pct": 0.0,
+    "performance_gate_passed": true,
+    "performance_review_triggered": false,
+    "pi_p95_margin_recovered_from_p116": true,
+    "margin_ms": 52
+  },
+  "resource_gate": {
+    "pool_exhaustion": 0,
+    "task_leak": 0,
+    "db_leak": 0,
+    "PendingRollbackError": 0,
+    "resource_gate_passed": true
+  },
+  "readiness_gate": {
+    "conditions_met": 29,
+    "conditions_total": 29,
+    "ready_for_twenty_five_percent_decision": true,
+    "decision_required_from_project_owner": true
+  },
+  "authorization_status": {
+    "rollout_percent": 10,
+    "live_serving_authorized": false,
+    "production_authorized": false,
+    "twenty_five_percent_authorized": false,
+    "recommended_to_raise_to_twenty_five_percent": false,
+    "recommended_to_continue_ten_percent": true,
+    "recommended_for_live_serving": false,
+    "recommended_for_production": false
+  },
+  "p116a_gate_passed": true
+}
