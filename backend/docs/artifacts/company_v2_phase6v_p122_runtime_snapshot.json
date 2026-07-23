@@ -1,0 +1,38 @@
+{
+  "artifact": "company_v2_phase6v_p122_runtime_snapshot",
+  "phase": "6V-P1.22",
+  "generated_at": "2026-07-23T00:00:00Z",
+  "base_sha": "43130fcf8e348b6c8dbdb27accee1e304638b95d",
+  "snapshot_function": "get_effective_shadow_config_snapshot",
+  "snapshot_source_file": "app/canary_policy.py",
+  "snapshot_wired_at": "app lifespan startup",
+  "snapshot_type": "loader_integration_verified",
+  "effective_config_at_observation": {
+    "rollout_percent": 75,
+    "config_version": 8,
+    "stable_bucket_salt": "pi_v1",
+    "live": false,
+    "production_enabled": false,
+    "dry_run": true,
+    "provider_serving_calls_allowed": false
+  },
+  "repository_default_config": {
+    "rollout_percent": 0.0,
+    "config_version": 8,
+    "stable_bucket_salt": "pi_v1",
+    "live": false,
+    "production_enabled": false
+  },
+  "loader_call_chain": [
+    "app lifespan startup",
+    "get_effective_shadow_config_snapshot()",
+    "load_canary_config(settings)",
+    "Pydantic Settings resolution",
+    "environment variable override (CANARY_ROLLOUT_PERCENT=75 in fixture)"
+  ],
+  "deployed_snapshot": {
+    "available": false,
+    "reason": "Deployed runtime not probed; snapshot reflects fixture-driven observation harness only"
+  },
+  "evidence_sha": "TBD_evidence_sha"
+}

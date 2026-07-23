@@ -1,0 +1,39 @@
+{
+  "artifact": "company_v2_phase6v_p122_runtime_provenance",
+  "phase": "6V-P1.22",
+  "generated_at": "2026-07-23T00:00:00Z",
+  "base_sha": "43130fcf8e348b6c8dbdb27accee1e304638b95d",
+  "evidence_mode": "runtime_loader_integration_verified",
+  "gate_c_status": "unknown",
+  "findings": {
+    "snapshot_function_added": true,
+    "snapshot_function_name": "get_effective_shadow_config_snapshot",
+    "snapshot_function_file": "app/canary_policy.py",
+    "wired_into_lifespan": true,
+    "lifespan_hook": "app startup event",
+    "loader_called": "load_canary_config(settings)",
+    "settings_type": "Pydantic Settings (real, not mock)",
+    "formal_loader_verified": true
+  },
+  "repository_defaults": {
+    "default_rollout_percent": 0.0,
+    "confirmed": true,
+    "source": "canary_policy.py default field"
+  },
+  "observation_harness": {
+    "fixture_rollout_percent": 75,
+    "fixture_config_version": 8,
+    "fixture_stable_bucket_salt": "pi_v1",
+    "fixture_live": false,
+    "fixture_production_enabled": false
+  },
+  "deployed_runtime": {
+    "deployed_runtime_verified": false,
+    "deployed_probe_accessible": false,
+    "probe_attempted": false,
+    "reason": "No live staging deployment accessible for external probe during P1.22 soak window"
+  },
+  "gate_c_rationale": "Loader integration is formally verified (snapshot function wired into lifespan, calls real Pydantic Settings). However, deployed runtime environment was not probed directly. Gate C = UNKNOWN — not PASS, not FAIL.",
+  "recommendation": "Conduct deployed probe in dedicated P1.23 runtime gate window before authorizing 100% promotion.",
+  "evidence_sha": "TBD_evidence_sha"
+}
