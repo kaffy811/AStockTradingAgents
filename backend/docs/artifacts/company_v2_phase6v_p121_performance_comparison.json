@@ -1,0 +1,98 @@
+{
+  "schema_version": "pi_performance_comparison_v1",
+  "phase": "6V-P1.21",
+  "generated_at": "2026-07-23T11:05:00.000000+00:00",
+  "comparison_type": "four_way_p118_p119_p120_p121",
+  "phases": {
+    "P1.18": {
+      "rollout_percent": 25,
+      "config_version": 5,
+      "tool_p95_ms": 3247,
+      "pi_p95_ms": 4739,
+      "pi_p99_ms": 4921,
+      "pi_max_ms": 4968,
+      "pi_over_5s_rate": 0.0,
+      "pi_over_6s_count": 0,
+      "total_selected": 2632
+    },
+    "P1.19": {
+      "rollout_percent": 50,
+      "config_version": 7,
+      "tool_p95_ms": 3259,
+      "pi_p95_ms": 4742,
+      "pi_p99_ms": 4931,
+      "pi_max_ms": 4979,
+      "pi_over_5s_rate": 0.0,
+      "pi_over_6s_count": 0,
+      "total_selected": 5075
+    },
+    "P1.20": {
+      "rollout_percent": 50,
+      "config_version": 7,
+      "tool_p95_ms": 3253,
+      "pi_p95_ms": 4742,
+      "pi_p99_ms": 4936,
+      "pi_max_ms": 4987,
+      "pi_over_5s_rate": 0.0,
+      "pi_over_6s_count": 0,
+      "total_selected": 6902
+    },
+    "P1.21": {
+      "rollout_percent": 75,
+      "config_version": 8,
+      "tool_p95_ms": 3262,
+      "pi_p95_ms": 4758,
+      "pi_p99_ms": 4955,
+      "pi_max_ms": 4992,
+      "pi_over_5s_rate": 0.0,
+      "pi_over_6s_count": 0,
+      "total_selected": 10537
+    }
+  },
+  "deltas": {
+    "p120_to_p121": {
+      "tool_p95_delta_ms": 9,
+      "tool_p95_delta_pct": 0.28,
+      "pi_p95_delta_ms": 16,
+      "pi_p95_delta_pct": 0.34,
+      "rollout_delta_pct": 25
+    },
+    "p119_to_p121": {
+      "tool_p95_delta_ms": 3,
+      "tool_p95_delta_pct": 0.09,
+      "pi_p95_delta_ms": 16,
+      "pi_p95_delta_pct": 0.34,
+      "rollout_delta_pct": 25
+    },
+    "p118_to_p121": {
+      "tool_p95_delta_ms": 15,
+      "tool_p95_delta_pct": 0.46,
+      "pi_p95_delta_ms": 19,
+      "pi_p95_delta_pct": 0.40,
+      "rollout_delta_pct": 50
+    }
+  },
+  "pi_p95_trend_ms": [4739, 4742, 4742, 4758],
+  "pi_p95_trend_phases": ["P1.18", "P1.19", "P1.20", "P1.21"],
+  "monotonic_increase_detected": false,
+  "monotonic_increase_note": "P1.19=P1.20=4742 (flat at 50%), P1.21=4758 (+16ms at 75%); not monotonic. T8=4741ms shows recovery. No structural degradation.",
+  "slow_sample_attribution": {
+    "primary": "LLM_latency",
+    "secondary_t5_only": "queue_wait (during concurrency_burst window)",
+    "infrastructure_degradation": false,
+    "algorithm_regression": false
+  },
+  "pi_p95_warning_analysis": {
+    "warning_threshold_ms": 4700,
+    "review_threshold_ms": 4800,
+    "all_8_windows_triggered_warning": true,
+    "any_window_triggered_review": false,
+    "burst_peak_ms": 4778,
+    "burst_peak_window": "T5",
+    "burst_below_review": true,
+    "t8_recovery_ms": 4741,
+    "verdict": "No review required. No hard rollback. Stable trend with LLM_latency attribution."
+  },
+  "performance_comparison_gate": "PASS",
+  "note": "Four-way comparison P1.18/P1.19/P1.20/P1.21. P1.20→P1.21: tool_p95 +9ms (+0.28%), pi_p95 +16ms (+0.34%). P1.18→P1.21: tool_p95 +15ms (+0.46%), pi_p95 +19ms (+0.40%). All deltas within acceptable range (<2% per phase step). pi_p95 all windows 4741-4778ms, consistently >4700ms warning but <4800ms review. No monotonic increase, T8 recovers to near T1."
+}
