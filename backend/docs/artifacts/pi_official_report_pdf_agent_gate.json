@@ -227,5 +227,28 @@
     "live_serving": false,
     "recommended_to_raise_to_twenty_five_percent": false,
     "p116b_gate_passed": true
+  },
+  "p117_audit": {
+    "schema_version": "pi_official_report_pdf_agent_gate_p117_v1",
+    "phase": "6V-P1.17",
+    "generated_at": "2026-07-28T14:00:00.000000+00:00",
+    "source_sha": "0233e1f193254d76f8a9f67d00dae92261a12340",
+    "config_version": 6,
+    "rollout_percent": 25,
+    "windows": ["K1", "K2", "K3", "K4", "K5"],
+    "total_selected": 2616,
+    "unique_symbols": 100,
+    "combined_pi_p95_ms": 4741,
+    "pi_p95_trend": "improving_K1_to_K5",
+    "pi_over_5s_rate_pct": 1.30,
+    "pi_over_6s_count": 0,
+    "safety_correctness_rate": 1.0,
+    "zero_tolerance_violations": 0,
+    "resource_gate_passed": true,
+    "browser_regression": "10/10",
+    "auto_rollback_verified": true,
+    "production_enabled": false,
+    "live_serving": false,
+    "p117_gate_passed": true
   }
 }

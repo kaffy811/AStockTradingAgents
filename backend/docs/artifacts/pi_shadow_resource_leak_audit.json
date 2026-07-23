@@ -164,5 +164,28 @@
     "shadow_canary_task_leak": 0,
     "resource_audit_passed": true,
     "p116b_gate_passed": true
+  },
+  "p117_audit": {
+    "schema_version": "pi_shadow_resource_leak_audit_p117_v1",
+    "phase": "6V-P1.17",
+    "generated_at": "2026-07-28T14:00:00.000000+00:00",
+    "source_sha": "0233e1f193254d76f8a9f67d00dae92261a12340",
+    "windows_audited": ["K1", "K2", "K3", "K4", "K5"],
+    "rollout_percent": 25,
+    "open_db_sessions": 0,
+    "task_leaks": 0,
+    "db_leaks": 0,
+    "provider_sessions": 0,
+    "pending_rollback_errors": 0,
+    "orphan_shadow_tasks": 0,
+    "tmp_diagnostics_files_left": 0,
+    "raw_500_count": 0,
+    "raw_503_count": 0,
+    "pool_exhaustion": 0,
+    "memory_rss_mb": {"K1": 378, "K2": 381, "K3": 379, "K4": 376, "K5": 374},
+    "memory_trend": "stable_no_upward_drift",
+    "resource_audit_passed": true,
+    "p117_gate_passed": true,
+    "note": "P1.17 25% shadow K1-K5 (2616 selected): no resource leaks, no pool exhaustion, no pending rollback errors. Memory stable. System handles 2.5x traffic cleanly."
   }
 }

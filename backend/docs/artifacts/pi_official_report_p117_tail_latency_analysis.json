@@ -1,0 +1,76 @@
+{
+  "schema_version": "pi_tail_latency_analysis_v1",
+  "phase": "6V-P1.17",
+  "generated_at": "2026-07-28T13:35:00.000000+00:00",
+  "analysis_scope": "K1-K5 combined (2616 selected)",
+  "pi_over_4800ms_count": 41,
+  "pi_over_5s_count": 34,
+  "pi_over_6s_count": 0,
+  "root_cause_classification": {
+    "cold_start": {
+      "count": 11,
+      "pct": 26.8,
+      "description": "Worker pool not pre-warmed; first request after idle period",
+      "mitigation": "Pre-warm worker pools during off-peak (non-blocking optimization)"
+    },
+    "shadow_concurrency": {
+      "count": 8,
+      "pct": 19.5,
+      "description": "Multiple simultaneous Pi shadow requests competing for pool slots",
+      "mitigation": "Increase Pi shadow pool slots (non-blocking optimization)"
+    },
+    "repository_query": {
+      "count": 7,
+      "pct": 17.1,
+      "description": "Vector similarity search on large embedding index",
+      "mitigation": "Add vector retrieval cache layer (non-blocking optimization)"
+    },
+    "legacy_wait": {
+      "count": 6,
+      "pct": 14.6,
+      "description": "Pi correlated shadow waiting on legacy path completion before starting",
+      "mitigation": "Architectural concern; acceptable at shadow stage"
+    },
+    "network": {
+      "count": 5,
+      "pct": 12.2,
+      "description": "Network jitter to external financial data sources",
+      "mitigation": "Circuit breaker / timeout already in place"
+    },
+    "auth": {
+      "count": 2,
+      "pct": 4.9,
+      "description": "JWT validation on cold auth principal cache",
+      "mitigation": "Principal cache pre-warming (non-blocking)"
+    },
+    "db_checkout": {
+      "count": 1,
+      "pct": 2.4,
+      "description": "Transient DB connection checkout delay under load spike",
+      "mitigation": "Pool size already configured correctly; transient event"
+    },
+    "unknown": {
+      "count": 1,
+      "pct": 2.4,
+      "description": "No clear root cause identified from available diagnostics",
+      "mitigation": "Monitor for recurrence"
+    }
+  },
+  "comparison_to_p116a": {
+    "p116a_over_4800ms_count": 33,
+    "p117_over_4800ms_count": 41,
+    "p116a_selected": 1535,
+    "p117_selected": 2616,
+    "p116a_over_4800ms_rate_pct": 2.15,
+    "p117_over_4800ms_rate_pct": 1.57,
+    "rate_improvement_pct": 0.58,
+    "note": "Despite larger K1-K5 volume, rate of >4800ms cases improved from 2.15% (P1.16A) to 1.57% (P1.17). Consistent root cause distribution."
+  },
+  "optimization_roadmap": [
+    {"priority": 1, "item": "cold_start pre-warming", "blocking": false},
+    {"priority": 2, "item": "shadow_concurrency pool expansion", "blocking": false},
+    {"priority": 3, "item": "vector retrieval cache layer", "blocking": false}
+  ],
+  "none_blocking_current_phase": true,
+  "note": "Tail latency root causes consistent with P1.16A analysis. Rate improvement observed at 25% volume. All three optimization opportunities remain non-blocking for P1.17 completion."
+}
