@@ -1,0 +1,76 @@
+{
+  "schema_version": "pi_canary_preflight_audit_v1",
+  "phase": "6V-P1.24",
+  "generated_at": "2026-07-24T00:00:00.000000+00:00",
+  "base_sha": "11855396533c4350338fdb44b9ab6db0c7ea5c8a",
+
+  "p123_state_confirmed": "B",
+  "p123_gate_c_confirmed": "UNKNOWN",
+  "p123_promotion_authorized_confirmed": false,
+  "p123_promotion_applied_confirmed": false,
+
+  "p123_evidence_sha": "01ad00014f4e321b890094df6c931b8261c11280",
+  "p123_final_sha": "11855396533c4350338fdb44b9ab6db0c7ea5c8a",
+
+  "intended_staging_rollout_confirmed": 75,
+  "intended_staging_config_version_confirmed": 8,
+  "intended_stable_bucket_salt_confirmed": "pi_v1",
+
+  "repository_default_rollout_confirmed": 0.0,
+  "repository_authorization_status_confirmed": "proposed",
+
+  "live_confirmed": false,
+  "production_enabled_confirmed": false,
+  "provider_serving_calls_confirmed": 0,
+
+  "p121_bucket_fix_present": true,
+  "p121_bucket_fix_note": "stable_bucket uses stable_bucket_salt in hash; config_version is audit-only",
+
+  "p122_snapshot_function_present": true,
+  "p122_snapshot_function": "get_effective_shadow_config_snapshot(settings_obj)",
+  "p124_snapshot_function_upgraded": true,
+  "p124_snapshot_upgrade_note": "v2 adds process_id, deployment_sha, deployment_mode, config_fingerprint, process_started_at",
+
+  "p123_artifacts_intact": true,
+  "p123_artifacts_checked": [
+    "company_v2_phase6v_p123_final_decision.json",
+    "company_v2_phase6v_p123_test_report.json",
+    "company_v2_phase6v_p123_runtime_probe_closure.json",
+    "company_v2_phase6v_p123_deployment_mapping.json"
+  ],
+
+  "p124_docker_assessment": {
+    "docker_command_found": false,
+    "docker_socket_found": false,
+    "docker_desktop_found": false,
+    "orbstack_found": false,
+    "podman_found": false,
+    "colima_found": false,
+    "homebrew_available": true,
+    "docker_desktop_installable_via_brew": true,
+    "docker_installed": false,
+    "containerized_deployment_possible": false,
+    "gate_c_closeable_this_run": false
+  },
+
+  "three_config_regions_confirmed": {
+    "repository_default": {
+      "pi_canary_rollout_percent": 0.0,
+      "pi_canary_authorization_status": "proposed",
+      "pi_canary_config_version": 1
+    },
+    "intended_staging_config": {
+      "pi_canary_rollout_percent": 75.0,
+      "pi_canary_config_version": 8,
+      "pi_canary_stable_bucket_salt": "pi_v1",
+      "pi_canary_authorization_status": "authorized",
+      "note": "Verified via observation harness and P1.22 runtime_loader_integration; not yet via deployed running process"
+    },
+    "deployed_effective_runtime": {
+      "status": "NONE — no deployed process accessible (P1.23); Docker not installed (P1.24)",
+      "can_be_verified": false
+    }
+  },
+
+  "preflight_outcome": "PASS — P1.23 State B correctly confirmed; three config regions distinguished; Docker absent noted as new blocker; proceeding to State B documentation"
+}

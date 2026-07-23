@@ -1,0 +1,21 @@
+{
+  "schema_version": "pi_canary_combined_metrics_v1",
+  "phase": "6V-P1.24",
+  "generated_at": "2026-07-24T00:00:00.000000+00:00",
+  "observation_executed": false,
+  "not_executed_reason": "100% promotion not applied — Gate C = UNKNOWN",
+  "p124_contribution_to_cumulative": {
+    "selections_this_phase": 0,
+    "violations_this_phase": 0
+  },
+  "cumulative_p18_through_p124": {
+    "phases_covered": ["P1.8", "P1.9", "P1.10", "P1.11", "P1.12", "P1.13", "P1.14",
+                       "P1.15", "P1.16", "P1.17", "P1.18", "P1.19", "P1.20", "P1.21",
+                       "P1.22", "P1.23", "P1.24"],
+    "total_selected": 45373,
+    "zero_violations": 0,
+    "violation_rate": 0.0,
+    "soak_health": "excellent",
+    "note": "Cumulative unchanged from P1.23 — no new observation this phase"
+  }
+}

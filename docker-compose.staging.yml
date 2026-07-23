@@ -1,0 +1,89 @@
+# ── TradingAgents — Isolated Containerized Staging Override ───────────────────
+#
+# Phase 6V-P1.24: Pi Canary 100% Shadow Promotion — Staging Deployment
+#
+# Usage (requires docker-compose.yml as base):
+#   docker compose \
+#     -p tradingagents-p124-staging \
+#     -f docker-compose.yml \
+#     -f docker-compose.staging.yml \
+#     --env-file .env.staging.local \
+#     up -d --build
+#
+# Isolation guarantees:
+#   - Compose project: tradingagents-p124-staging (distinct from dev/prod)
+#   - Network:         staging-internal (distinct from internal)
+#   - Host binding:    127.0.0.1:18000 (backend), 127.0.0.1:18080 (frontend)
+#   - NOT exposed to public internet
+#   - Uses staging-only DATABASE_URL and SECRET_KEY from .env.staging.local
+#
+# Purpose:
+#   Provide a real deployed runtime for Gate C verification.
+#   The backend lifespan must call load_canary_config(settings) and confirm
+#   rollout=75, config_version=8, stable_bucket_salt=pi_v1.
+#
+# Do NOT use in production. Do NOT commit .env.staging.local.
+
+services:
+
+  redis:
+    networks:
+      - staging-internal
+    # Override the internal network from the base file
+    ports: []
+
+  migrate:
+    networks:
+      - staging-internal
+    environment:
+      - APP_ENV=staging
+      - REDIS_URL=redis://redis:6379
+    build:
+      args:
+        - DEPLOYMENT_SHA=${DEPLOYMENT_SHA:-unknown}
+        - DEPLOYMENT_MODE=containerized_staging
+
+  backend:
+    networks:
+      - staging-internal
+    ports:
+      # Expose backend directly for probe access — only on localhost
+      - "127.0.0.1:18000:8000"
+    environment:
+      - APP_ENV=staging
+      - DEBUG=false
+      - REDIS_URL=redis://redis:6379
+      # Phase 6V-P1.24: snapshot path for containerized staging probe
+      - PI_CANARY_SNAPSHOT_PATH=/tmp/tradingagents-runtime/pi_canary_snapshot.json
+      - DEPLOYMENT_MODE=containerized_staging
+      - DEPLOYMENT_SHA=${DEPLOYMENT_SHA:-unknown}
+      # Canary staging config — overrides .env defaults
+      # Values sourced from .env.staging.local (not committed)
+      # These must match the P1.24 authorized staging configuration:
+      #   rollout=75 (or 100 after promotion), config_version=8 (or 9), salt=pi_v1
+    build:
+      args:
+        - DEPLOYMENT_SHA=${DEPLOYMENT_SHA:-unknown}
+        - DEPLOYMENT_MODE=containerized_staging
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  frontend:
+    networks:
+      - staging-internal
+    ports:
+      # Separate staging port — avoids collision with dev/prod on port 80
+      - "127.0.0.1:18080:80"
+    build:
+      args:
+        - VITE_API_BASE=/api/v1
+
+networks:
+  staging-internal:
+    driver: bridge
+  internal:
+    driver: bridge

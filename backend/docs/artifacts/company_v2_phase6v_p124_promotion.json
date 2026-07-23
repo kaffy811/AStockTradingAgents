@@ -1,0 +1,35 @@
+{
+  "schema_version": "pi_canary_promotion_v1",
+  "phase": "6V-P1.24",
+  "generated_at": "2026-07-24T00:00:00.000000+00:00",
+
+  "promotion_target": {
+    "rollout_percent_before": 75,
+    "rollout_percent_after": 100,
+    "config_version_before": 8,
+    "config_version_after": 9,
+    "stable_bucket_salt": "pi_v1"
+  },
+
+  "authorization_condition": "Gate C = PASS via containerized deployed staging runtime probe",
+  "authorization_condition_satisfied": false,
+  "authorization_condition_satisfied_reason": "Docker not installed; Gate C = UNKNOWN; containerized runtime probe not performed",
+
+  "promotion_authorized": false,
+  "promotion_attempted": false,
+  "promotion_applied": false,
+
+  "config_change_applied": false,
+  "container_restarted": false,
+  "post_promotion_probe_performed": false,
+
+  "state_b_applies": true,
+
+  "actual_state_after_phase": {
+    "intended_staging_rollout": 75,
+    "intended_config_version": 8,
+    "stable_bucket_salt": "pi_v1",
+    "deployed_runtime_rollout": null,
+    "deployed_runtime_status": "none_running"
+  }
+}

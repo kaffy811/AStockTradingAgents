@@ -120,6 +120,10 @@ class Settings(BaseSettings):
     pi_canary_config_version: int = 1
     pi_canary_stable_bucket_salt: str = "pi_v1"   # stable across config_version changes; ensures monotonic rollout
     pi_canary_approval_reference: str = ""
+    # Phase 6V-P1.24: if set, lifespan writes a sanitized runtime snapshot JSON here.
+    # Used by containerized staging probe to verify deployed effective config.
+    # Must be writable by the application process; defaults to "" (disabled).
+    pi_canary_snapshot_path: str = ""
     pi_canary_auto_rollback_enabled: bool = True
     pi_canary_health_window_minutes: int = 30
     pi_canary_min_sample_size: int = 50

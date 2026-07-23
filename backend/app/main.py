@@ -31,20 +31,32 @@ async def lifespan(app: FastAPI):
     set_event_loop(asyncio.get_running_loop())
     # 初始化 Tushare 客户端（TUSHARE_TOKEN 未配置时仅记录 warning，不阻断启动）
     await init_tushare_client()
-    # Phase 6V-P1.22: log effective shadow config via formal runtime loader for provenance.
+    # Phase 6V-P1.22+: log effective shadow config via formal runtime loader for provenance.
     # Snapshot is sanitized — no secrets, no user data, no auth headers.
     _shadow_snap = get_effective_shadow_config_snapshot(settings)
     import logging as _logging
-    _logging.getLogger("app.canary").info(
+    _log = _logging.getLogger("app.canary")
+    _log.info(
         "pi_canary_runtime_snapshot loaded: rollout=%.1f config_version=%d "
-        "salt_version=%s status=%s fail_closed=%s evidence_mode=%s",
+        "salt_version=%s status=%s fail_closed=%s evidence_mode=%s pid=%d deployment_sha=%s",
         _shadow_snap["rollout_percent"],
         _shadow_snap["config_version"],
         _shadow_snap["stable_bucket_salt_version"],
         _shadow_snap["authorization_status"],
         _shadow_snap["fail_closed"],
         _shadow_snap["evidence_mode"],
+        _shadow_snap["process_id"],
+        _shadow_snap["deployment_sha"],
     )
+    # Phase 6V-P1.24: persist snapshot to a probe-readable path for containerized staging.
+    # Disabled by default (PI_CANARY_SNAPSHOT_PATH=""). Only written in staging containers.
+    _snap_path = getattr(settings, "pi_canary_snapshot_path", "")
+    if _snap_path:
+        import json as _json, os as _os
+        _os.makedirs(_os.path.dirname(_snap_path), exist_ok=True)
+        with open(_snap_path, "w") as _f:
+            _json.dump(_shadow_snap, _f, indent=2)
+        _log.info("pi_canary_runtime_snapshot written to %s", _snap_path)
     yield
     await close_redis()
 

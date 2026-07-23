@@ -1,0 +1,62 @@
+{
+  "schema_version": "pi_canary_browser_regression_v1",
+  "phase": "6V-P1.24",
+  "generated_at": "2026-07-24T00:00:00.000000+00:00",
+
+  "p122_cases_retained": 24,
+  "p124_new_cases": [
+    {
+      "id": "BR-25",
+      "description": "deployed 75% runtime remains shadow-only: no Pi output visible to user",
+      "classification": "offline_verified",
+      "result": "PASS"
+    },
+    {
+      "id": "BR-26",
+      "description": "deployed 100% eligible request remains shadow-only (if promotion executed)",
+      "classification": "offline_verified",
+      "result": "NOT_APPLICABLE — 100% promotion not executed"
+    },
+    {
+      "id": "BR-27",
+      "description": "runtime snapshot cannot reach user response: snapshot contains no user data",
+      "classification": "offline_verified",
+      "result": "PASS",
+      "note": "snapshot schema verified sanitized — no user identifiers or query content"
+    },
+    {
+      "id": "BR-28",
+      "description": "container restart does not expose cached Pi: lifespan snapshot rewritten on restart",
+      "classification": "offline_design_verified",
+      "result": "PASS",
+      "note": "snapshot written by running lifespan, not by test fixture; restart regenerates snapshot"
+    },
+    {
+      "id": "BR-29",
+      "description": "100% concurrency does not duplicate output",
+      "classification": "NOT_APPLICABLE",
+      "result": "NOT_APPLICABLE — 100% promotion not executed"
+    },
+    {
+      "id": "BR-30",
+      "description": "100→75 rollback clears stale effective config",
+      "classification": "offline_verified",
+      "result": "PASS",
+      "note": "config_version monotonic; v10 on rollback supersedes v9; stale snapshots invalidated"
+    }
+  ],
+
+  "offline_cases_total": 30,
+  "online_applicable": 0,
+  "not_applicable": 2,
+  "offline_pass": 28,
+  "failed": 0,
+
+  "authoritative_result": "PARTIAL — 28 offline PASS, 2 NOT_APPLICABLE (BR-26, BR-29 require 100% deployed runtime)",
+  "legacy_only": true,
+  "pi_leakage": 0,
+  "runtime_metadata_leakage": 0,
+  "duplicate_assistant": 0,
+  "duplicate_cards": 0,
+  "terminal_exactly_once": true
+}

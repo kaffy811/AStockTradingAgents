@@ -360,12 +360,36 @@ def get_effective_shadow_config_snapshot(settings_obj: Any = None) -> dict[str, 
             function remains importable without triggering Settings validation
             during unit-test collection.
     """
+    import os as _os
+    import datetime as _datetime
+    import hashlib as _hashlib
+
     if settings_obj is None:
         from app.core.config import settings as _settings  # lazy import
         settings_obj = _settings
     cfg = load_canary_config(settings_obj)
+
+    # Derive deployment SHA — injected at build time via DEPLOYMENT_SHA env var;
+    # falls back to "unknown" when running outside a container build.
+    deployment_sha = _os.environ.get("DEPLOYMENT_SHA", "unknown")
+
+    # Config fingerprint: stable hash of non-secret effective fields only.
+    # Allows probe to verify config identity without exposing secrets.
+    _fp_payload = (
+        f"{cfg.environment}|{cfg.rollout_percent}|{cfg.config_version}"
+        f"|{cfg.stable_bucket_salt}|{cfg.authorization_status}"
+    ).encode()
+    config_fingerprint = _hashlib.sha256(_fp_payload).hexdigest()[:16]
+
+    evidence_mode = (
+        "containerized_deployed_staging_runtime"
+        if _os.environ.get("DEPLOYMENT_MODE") == "containerized_staging"
+        else ("runtime_loader_integration_verified" if not cfg.fail_closed
+              else "config_parse_failed")
+    )
+
     return {
-        "schema_version": "pi_canary_runtime_snapshot_v1",
+        "schema_version": "pi_canary_runtime_snapshot_v2",
         "environment": cfg.environment,
         "canary_mode": "shadow",
         "rollout_percent": cfg.rollout_percent,
@@ -380,8 +404,11 @@ def get_effective_shadow_config_snapshot(settings_obj: Any = None) -> dict[str, 
         "global_kill_switch": cfg.global_kill_switch,
         "runtime_loader": "load_canary_config",
         "config_source": "pydantic_settings.Settings",
-        "evidence_mode": (
-            "runtime_loader_integration_verified" if not cfg.fail_closed
-            else "config_parse_failed"
-        ),
+        "evidence_mode": evidence_mode,
+        # Process identity — populated from running container; "unknown" in unit tests.
+        "process_id": _os.getpid(),
+        "process_started_at": _datetime.datetime.now(_datetime.timezone.utc).isoformat(),
+        "deployment_sha": deployment_sha,
+        "deployment_mode": _os.environ.get("DEPLOYMENT_MODE", "local"),
+        "config_fingerprint": config_fingerprint,
     }
