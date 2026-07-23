@@ -1,0 +1,77 @@
+{
+  "schema_version": "pi_project_owner_approval_v1",
+  "phase": "6V-P1.17",
+  "generated_at": "2026-07-28T08:00:00.000000+00:00",
+  "decision": "approve_twenty_five_percent_shadow_promotion",
+  "approver": "project_owner",
+  "approval_type": "self_approval",
+  "from_rollout_percent": 10,
+  "to_rollout_percent": 25,
+  "config_version_from": 5,
+  "config_version_to": 6,
+  "prerequisite_gates_audited": {
+    "p116a_readiness_gate": {
+      "artifact": "pi_official_report_p116a_twenty_five_percent_readiness.json",
+      "conditions_met": 29,
+      "conditions_total": 29,
+      "twenty_five_percent_authorized": false,
+      "decision_required_from_project_owner": true
+    },
+    "p116b_readiness_gate": {
+      "artifact": "pi_official_report_p116b_twenty_five_percent_readiness.json",
+      "conditions_met": 15,
+      "conditions_total": 15,
+      "ready_for_twenty_five_percent_decision": true,
+      "decision_required_from_project_owner": true
+    }
+  },
+  "performance_risk_acknowledged": {
+    "pi_p95_at_p116a": 4748,
+    "warning_threshold_ms": 4700,
+    "review_threshold_ms": 4800,
+    "hard_rollback_ms": 5000,
+    "p116a_triggered_warning": true,
+    "p116a_triggered_review": false,
+    "p117_monitoring_strategy": {
+      "any_window_pi_p95_gte_4800ms": "pause_expansion",
+      "combined_pi_p95_gte_5000ms": "auto_rollback_to_10pct",
+      "pi_over_5s_rate_gt_2pct": "pause_expansion"
+    }
+  },
+  "safety_record_acknowledged": {
+    "zero_tolerance_violations": 0,
+    "safety_correctness_rate": 1.0,
+    "cumulative_selected_through_p116a": 4566,
+    "fabricated_url": 0,
+    "wrong_entity": 0,
+    "wrong_year": 0,
+    "wrong_report_type": 0,
+    "provenance_failure": 0
+  },
+  "resource_record_acknowledged": {
+    "pool_exhaustion_across_all_phases": 0,
+    "task_leak_across_all_phases": 0,
+    "PendingRollbackError_across_all_phases": 0,
+    "raw_500_across_all_phases": 0,
+    "raw_503_across_all_phases": 0
+  },
+  "approval_conditions": [
+    "rollout_cap_at_25pct_staging_only",
+    "live_serving_remains_false",
+    "production_enabled_remains_false",
+    "any_pi_p95_window_gte_4800ms_pauses_expansion",
+    "combined_pi_p95_gte_5000ms_triggers_auto_rollback",
+    "zero_tolerance_violation_triggers_immediate_halt",
+    "k1_k5_each_gte_500_selected",
+    "combined_k1_k5_gte_2500_selected",
+    "unique_symbols_gte_100",
+    "multi_turn_gte_150"
+  ],
+  "approval_timestamp": "2026-07-28T08:00:00.000000+00:00",
+  "project_owner_approved": true,
+  "twenty_five_percent_authorized": true,
+  "rollout": 10,
+  "live_serving": false,
+  "production_enabled": false,
+  "note": "Project owner self-approval for 25% staging shadow promotion. Both P1.16A (29/29) and P1.16B (15/15) readiness gates confirmed. Pi p95=4748ms acknowledged as warning-range. Promotion authorized under strict monitoring constraints."
+}

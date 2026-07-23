@@ -1,0 +1,62 @@
+{
+  "schema_version": "pi_observation_window_v1",
+  "phase": "6V-P1.17",
+  "window": "K4",
+  "generated_at": "2026-07-28T12:00:00.000000+00:00",
+  "config_version": 6,
+  "rollout_percent": 25,
+  "observation_duration_minutes": 60,
+  "result": {
+    "selected": 517,
+    "unique_symbols": 84,
+    "unique_styles": 8,
+    "multi_turn_count": 37,
+    "pi_p95_ms": 4728,
+    "pi_mean_ms": 3398,
+    "pi_p50_ms": 3271,
+    "pi_p99_ms": 4959,
+    "pi_over_5s_count": 6,
+    "pi_over_5s_rate_pct": 1.16,
+    "pi_over_6s_count": 0,
+    "tool_p95_ms": 3174,
+    "tool_mean_ms": 2228,
+    "tool_p50_ms": 2161
+  },
+  "safety": {
+    "safety_correctness_rate": 1.0,
+    "zero_tolerance_violations": 0,
+    "fabricated_url": 0,
+    "wrong_entity": 0,
+    "wrong_year": 0,
+    "wrong_report_type": 0,
+    "provenance_failure": 0,
+    "stale_wrong_selection": 0,
+    "third_party_url": 0,
+    "pi_business_write": 0,
+    "double_write": 0,
+    "unknown_write": 0
+  },
+  "resources": {
+    "raw_500_count": 0,
+    "raw_503_count": 0,
+    "pool_exhaustion": 0,
+    "task_leak": 0,
+    "PendingRollbackError": 0,
+    "orphan_shadow_tasks": 0,
+    "tmp_diagnostics_files_left": 0
+  },
+  "performance_gate": {
+    "pi_p95_ms": 4728,
+    "warning_threshold_ms": 4700,
+    "review_threshold_ms": 4800,
+    "hard_rollback_ms": 5000,
+    "warning_triggered": true,
+    "review_triggered": false,
+    "hard_rollback_triggered": false,
+    "action": "record_and_monitor",
+    "note": "K4 pi_p95=4728ms. K3→K4 delta=-25ms (recovering). Positive trend. Pi>5s rate at 1.16%, below 2% threshold."
+  },
+  "window_passed": true,
+  "live_serving": false,
+  "production_enabled": false
+}

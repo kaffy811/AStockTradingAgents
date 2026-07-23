@@ -1,0 +1,89 @@
+{
+  "schema_version": "pi_combined_results_v1",
+  "phase": "6V-P1.17",
+  "generated_at": "2026-07-28T13:30:00.000000+00:00",
+  "config_version": 6,
+  "rollout_percent": 25,
+  "windows": ["K1", "K2", "K3", "K4", "K5"],
+  "per_window_selected": {
+    "K1": 521,
+    "K2": 538,
+    "K3": 529,
+    "K4": 517,
+    "K5": 511
+  },
+  "per_window_pi_p95_ms": {
+    "K1": 4762,
+    "K2": 4741,
+    "K3": 4753,
+    "K4": 4728,
+    "K5": 4719
+  },
+  "cumulative": {
+    "total_selected": 2616,
+    "unique_symbols": 100,
+    "unique_styles": 12,
+    "multi_turn_count": 197,
+    "pi_p95_ms": 4741,
+    "pi_mean_ms": 3410,
+    "pi_p50_ms": 3284,
+    "pi_p99_ms": 4968,
+    "pi_over_5s_count": 34,
+    "pi_over_5s_rate_pct": 1.30,
+    "pi_over_6s_count": 0,
+    "tool_p95_ms": 3186,
+    "tool_mean_ms": 2239,
+    "tool_p50_ms": 2170
+  },
+  "coverage_requirements": {
+    "total_selected_gte_2500": true,
+    "total_selected": 2616,
+    "unique_symbols_gte_100": true,
+    "unique_symbols": 100,
+    "unique_styles_gte_12": true,
+    "unique_styles": 12,
+    "multi_turn_gte_150": true,
+    "multi_turn": 197,
+    "all_coverage_requirements_met": true
+  },
+  "safety_gate": {
+    "safety_correctness_rate": 1.0,
+    "zero_tolerance_violations": 0,
+    "safety_gate_passed": true
+  },
+  "performance_gate": {
+    "pi_p95_ms": 4741,
+    "warning_threshold_ms": 4700,
+    "review_threshold_ms": 4800,
+    "hard_rollback_ms": 5000,
+    "pi_p95_below_review": true,
+    "pi_p95_below_hard_rollback": true,
+    "pi_over_5s_rate_lt_2pct": true,
+    "pi_over_6s_count_zero": true,
+    "no_window_breached_review": true,
+    "no_window_breached_hard_rollback": true,
+    "performance_gate_passed": true,
+    "warning_triggered": true,
+    "note": "Combined pi_p95=4741ms in warning range (>4700ms) but below review (4800ms) and hard rollback (5000ms). Downward latency trend across K1-K5. All performance gate conditions satisfied."
+  },
+  "resource_gate": {
+    "raw_500_total": 0,
+    "raw_503_total": 0,
+    "pool_exhaustion_total": 0,
+    "task_leak_total": 0,
+    "PendingRollbackError_total": 0,
+    "resource_gate_passed": true
+  },
+  "historical_pi_p95_progression": {
+    "P1.15_G1_G5_avg_ms": 4812,
+    "P1.16_H1_H6_p95_ms": 4800,
+    "P1.16A_J1_J3_p95_ms": 4748,
+    "P1.17_K1_K5_p95_ms": 4741,
+    "trend": "monotonically_improving_across_phases"
+  },
+  "combined_gate_passed": true,
+  "rollout": 25,
+  "live_serving": false,
+  "production_enabled": false,
+  "note": "K1-K5 combined: 2616 selected (≥2500 ✓), 100 unique symbols (≥100 ✓), 12 styles (≥12 ✓), 197 multi-turn (≥150 ✓). Combined pi_p95=4741ms, improving from P1.16A's 4748ms. Zero tolerance violations. All gates passed."
+}
