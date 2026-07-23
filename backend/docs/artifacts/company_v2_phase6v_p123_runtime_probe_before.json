@@ -1,0 +1,62 @@
+{
+  "schema_version": "pi_canary_runtime_probe_v1",
+  "phase": "6V-P1.23",
+  "phase_title": "Deployed Runtime Probe Closure",
+  "probe_label": "before_promotion_attempt",
+  "generated_at": "2026-07-23T17:00:00.000000+00:00",
+  "base_sha": "779da4cd3f33ff6a1b21b7c36cf182b7b2c4500d",
+
+  "probe_performed": true,
+  "probe_method": "local_process_real_settings_singleton",
+  "probe_function": "get_effective_shadow_config_snapshot()",
+  "probe_executed_at": "2026-07-23T16:56:56.101801+00:00",
+  "probe_process_type": "local_runtime_no_staging_env",
+
+  "raw_probe_result": {
+    "schema_version": "pi_canary_runtime_snapshot_v1",
+    "environment": "staging",
+    "canary_mode": "shadow",
+    "rollout_percent": 0.0,
+    "config_version": 1,
+    "stable_bucket_salt_version": "pi_v1",
+    "authorization_status": "proposed",
+    "live": false,
+    "production_enabled": false,
+    "provider_serving_enabled": false,
+    "fail_closed": false,
+    "parse_error": null,
+    "global_kill_switch": false,
+    "runtime_loader": "load_canary_config",
+    "config_source": "pydantic_settings.Settings",
+    "evidence_mode": "runtime_loader_integration_verified",
+    "probed_at": "2026-07-23T16:56:56.101801+00:00",
+    "probe_method": "local_process_real_settings",
+    "process_type": "local_runtime_no_staging_env"
+  },
+
+  "probe_qualifies_as_deployed_runtime": false,
+  "probe_qualifies_as_deployed_runtime_reason": "Process runs with local environment variables; no PI_CANARY_ROLLOUT_PERCENT override present; returns repository default rollout=0.0/proposed, not staging intended 75/authorized",
+
+  "effective_rollout_percent": 0.0,
+  "effective_config_version": 1,
+  "stable_bucket_salt_version": "pi_v1",
+  "authorization_status": "proposed",
+  "live": false,
+  "production_enabled": false,
+  "provider_serving_enabled": false,
+  "evidence_mode": "runtime_loader_integration_verified",
+
+  "staging_intended_rollout_percent": 75,
+  "staging_intended_config_version": 8,
+  "staging_intended_authorization_status": "authorized",
+  "staging_values_confirmed_by_probe": false,
+
+  "gate_c_contribution": "UNKNOWN — loader verified with real Settings, but process uses repository defaults not staging overrides",
+  "gate_c_status_after_probe": "unknown",
+
+  "probe_interpretation": {
+    "what_was_confirmed": "The runtime_loader (load_canary_config) correctly integrates with pydantic_settings.Settings and returns a valid snapshot. The probe function itself is operational.",
+    "what_was_not_confirmed": "The staging deployment's actual runtime configuration. The probe did not run inside the staging Docker container with the staging .env. Without PI_CANARY_ROLLOUT_PERCENT=75 in the environment, the loader returns repository defaults.",
+    "why_this_does_not_satisfy_section_7": "Section 7 requires the probe to run against the actual deployed staging process (i.e., inside or against the staging Docker container configured with staging environment variables). A local probe with repository defaults does not satisfy this requirement."
+  }
+}

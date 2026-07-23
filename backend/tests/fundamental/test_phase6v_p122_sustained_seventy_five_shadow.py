@@ -767,7 +767,7 @@ class TestTestEvidence:
         return next(s for s in test_report["suites"] if "fundamental" in s["name"])
 
     def _backend(self, test_report):
-        return next(s for s in test_report["suites"] if "full backend" in s["name"])
+        return next(s for s in test_report["suites"] if "backend" in s["name"] and "full" not in s["name"] or "entire" in s["name"])
 
     def _frontend(self, test_report):
         return next(s for s in test_report["suites"] if "frontend" in s["name"])

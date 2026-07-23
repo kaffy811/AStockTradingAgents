@@ -1,0 +1,38 @@
+{
+  "schema_version": "pi_canary_owner_authorization_v1",
+  "phase": "6V-P1.23",
+  "phase_title": "Deployed Runtime Probe Closure",
+  "generated_at": "2026-07-23T17:00:00.000000+00:00",
+  "base_sha": "779da4cd3f33ff6a1b21b7c36cf182b7b2c4500d",
+
+  "authorization_type": "conditional",
+  "authorization_scope": "100_percent_promotion",
+  "authorization_target_rollout": 100,
+  "authorization_target_config_version": 9,
+
+  "condition": {
+    "condition_id": "gate_c_pass",
+    "condition_description": "Gate C must be PASS: deployed staging runtime probe must confirm rollout_percent=75 and authorization_status=authorized in the actual running staging process.",
+    "condition_satisfied": false,
+    "condition_evaluation_time": "2026-07-23T17:00:00.000000+00:00",
+    "condition_evaluation_result": "NOT_SATISFIED",
+    "condition_evaluation_reason": "Gate C = UNKNOWN. The deployed staging runtime probe returned repository defaults (rollout=0.0, authorization_status=proposed) because no PI_CANARY_ROLLOUT_PERCENT override was present in the local environment. No accessible staging service was found to probe against the actual deployed instance."
+  },
+
+  "promotion_authorized": false,
+  "authorization_blocked_by": "gate_c_unknown",
+  "authorization_blocked_reason": "Conditional authorization requires Gate C = PASS. Gate C remains UNKNOWN because no deployed staging runtime probe could be executed against the live staging server. The probe performed used local process with repository default settings, which does not satisfy Section 7 requirements.",
+
+  "live_authorized": false,
+  "production_authorized": false,
+  "provider_serving_authorized": false,
+  "legacy_deprecation_authorized": false,
+
+  "owner_statement": "Owner authorizes promotion to 100% rollout (config_version=9) if and only if Gate C = PASS via a deployed staging runtime probe confirming rollout=75 and authorization_status=authorized. As of P1.23, that condition is NOT satisfied. No promotion is authorized at this time.",
+
+  "authorization_recorded_at": "2026-07-23T17:00:00.000000+00:00",
+  "authorization_valid_until": "gate_c_pass_or_phase_expiry",
+  "authorization_carry_forward": true,
+  "carry_forward_to_phase": "6V-P1.24",
+  "carry_forward_condition": "Condition remains: Gate C = PASS via deployed staging runtime probe."
+}
