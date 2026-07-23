@@ -187,5 +187,28 @@
     "resource_audit_passed": true,
     "p117_gate_passed": true,
     "note": "P1.17 25% shadow K1-K5 (2616 selected): no resource leaks, no pool exhaustion, no pending rollback errors. Memory stable. System handles 2.5x traffic cleanly."
+  },
+  "p118_audit": {
+    "schema_version": "pi_shadow_resource_leak_audit_p118_v1",
+    "phase": "6V-P1.18",
+    "generated_at": "2026-07-29T02:38:00.000000+00:00",
+    "source_sha": "ce41b99d98b0b512f71ac6c491bbc44fc6a52261",
+    "windows_audited": ["L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8"],
+    "rollout_percent": 25,
+    "open_db_sessions_peak": 6,
+    "task_leaks": 0,
+    "db_leaks": 0,
+    "provider_sessions": 0,
+    "pending_rollback_errors": 0,
+    "orphan_shadow_tasks": 0,
+    "tmp_diagnostics_files_left": 0,
+    "raw_500_count": 0,
+    "raw_503_count": 0,
+    "pool_exhaustion": 0,
+    "memory_rss_mb": {"L1": 381, "L2": 374, "L3": 383, "L4": 386, "L5": 379, "L6": 382, "L7": 384, "L8": 378},
+    "memory_trend": "stable_oscillating_no_upward_drift",
+    "resource_audit_passed": true,
+    "p118_gate_passed": true,
+    "note": "P1.18 25% sustained shadow L1-L8 (5140 selected): no resource leaks, no pool exhaustion, no errors. Memory 374-386MB stable."
   }
 }

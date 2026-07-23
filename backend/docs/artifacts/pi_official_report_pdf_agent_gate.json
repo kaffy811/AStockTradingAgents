@@ -250,5 +250,32 @@
     "production_enabled": false,
     "live_serving": false,
     "p117_gate_passed": true
+  },
+  "p118_audit": {
+    "schema_version": "pi_official_report_pdf_agent_gate_p118_v1",
+    "phase": "6V-P1.18",
+    "generated_at": "2026-07-29T02:38:00.000000+00:00",
+    "source_sha": "ce41b99d98b0b512f71ac6c491bbc44fc6a52261",
+    "config_version": 6,
+    "rollout_percent": 25,
+    "windows": ["L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8"],
+    "total_selected": 5140,
+    "unique_symbols": 100,
+    "combined_pi_p95_ms": 4739,
+    "pi_over_5s_rate_pct": 0.02,
+    "pi_over_6s_count": 0,
+    "safety_correctness_rate": 1.0,
+    "zero_tolerance_violations": 0,
+    "backend_collected": 5189,
+    "backend_passed": 5174,
+    "backend_failed": 0,
+    "frontend_tests_passed": 688,
+    "frontend_build_passed": true,
+    "resource_gate_passed": true,
+    "browser_regression": "12/12",
+    "ready_for_fifty_percent_decision": true,
+    "production_enabled": false,
+    "live_serving": false,
+    "p118_gate_passed": true
   }
 }

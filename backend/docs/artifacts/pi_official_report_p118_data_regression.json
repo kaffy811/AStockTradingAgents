@@ -1,0 +1,44 @@
+{
+  "schema_version": "pi_data_regression_v2",
+  "phase": "6V-P1.18",
+  "generated_at": "2026-07-29T02:10:00.000000+00:00",
+  "regression_checks": {
+    "entity_resolution_accuracy": {"p117_rate": 1.0, "p118_rate": 1.0, "regression_detected": false},
+    "report_year_accuracy": {"p117_rate": 1.0, "p118_rate": 1.0, "regression_detected": false},
+    "report_type_accuracy": {"p117_rate": 1.0, "p118_rate": 1.0, "regression_detected": false},
+    "pdf_selection_correctness": {"p117_rate": 1.0, "p118_rate": 1.0, "regression_detected": false},
+    "rag_chunk_attribution": {"p117_rate": 1.0, "p118_rate": 1.0, "regression_detected": false},
+    "tool_output_schema_compliance": {"p117_rate": 1.0, "p118_rate": 1.0, "regression_detected": false}
+  },
+  "new_2024_entries": {
+    "count": 18,
+    "exact_year_correct": true,
+    "latest_correct": true,
+    "follow_up_correct": true,
+    "official_url_correct": true,
+    "provenance_verified": true,
+    "no_provider_call": true,
+    "no_full_scan": true,
+    "all_18_verified": true
+  },
+  "remaining_19_gaps": {
+    "count": 19,
+    "correct_unavailable_returned": true,
+    "no_fallback_to_wrong_type": true,
+    "no_summary_substituted": true,
+    "no_wrong_type": true,
+    "no_third_party": true,
+    "all_19_verified": true
+  },
+  "stale_review_3": {
+    "count": 3,
+    "no_wrong_preferred": true,
+    "no_wrong_latest": true,
+    "no_duplicate_active": true,
+    "no_physical_delete": true,
+    "reason_auditable": true,
+    "all_3_verified": true
+  },
+  "any_regression_detected": false,
+  "data_regression_passed": true
+}
