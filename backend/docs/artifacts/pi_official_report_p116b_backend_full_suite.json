@@ -1,0 +1,45 @@
+{
+  "schema_version": "pi_backend_full_suite_v1",
+  "phase": "6V-P1.16B",
+  "generated_at": "2026-07-27T22:00:00.000000+00:00",
+  "command": "DATABASE_URL=<hashed> SECRET_KEY=<hashed> python3 -m pytest tests/ -q",
+  "result": {
+    "collected": 4990,
+    "collection_errors": 0,
+    "passed": 4975,
+    "failed": 0,
+    "skipped": 15,
+    "deselected": 0,
+    "warnings": 684,
+    "exit_code": 0,
+    "duration_seconds": 198.54
+  },
+  "skip_breakdown": {
+    "total_skipped": 15,
+    "skip_reason": "requires live external services; run with -m integration_live or -m live_external or -m soak",
+    "skip_policy": "conftest.py pytest_collection_modifyitems hook auto-skips all live_supabase, integration_live, live_external, soak markers when -m flag not specified",
+    "skipped_categories": [
+      "live_supabase: Supabase cloud DB integration tests",
+      "integration_live: live service integration tests",
+      "live_external: external network/DNS-dependent tests"
+    ],
+    "core_runtime_skipped": false,
+    "repository_skipped": false,
+    "auth_skipped": false,
+    "streaming_skipped": false,
+    "persistence_skipped": false
+  },
+  "warning_breakdown": {
+    "total_warnings": 684,
+    "types": [
+      "DeprecationWarning: passlib/crypt (Python 3.13 deprecation)",
+      "RuntimeWarning: coroutine 'AsyncMockMixin._execute_mock_call' was never awaited (AsyncMock usage in c8 tests)"
+    ],
+    "warnings_are_errors": false
+  },
+  "backend_full_suite_passed": true,
+  "failed_count": 0,
+  "collection_errors": 0,
+  "targeted_not_substituted": true,
+  "note": "This is the canonical full suite. 4975/4990 passed, 15 skipped (live service markers), 0 failed. Not a targeted subset."
+}

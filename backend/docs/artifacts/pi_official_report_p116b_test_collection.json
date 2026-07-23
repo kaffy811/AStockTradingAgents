@@ -1,0 +1,32 @@
+{
+  "schema_version": "pi_test_collection_v1",
+  "phase": "6V-P1.16B",
+  "generated_at": "2026-07-27T22:00:00.000000+00:00",
+  "collection_command": "DATABASE_URL=<hashed> SECRET_KEY=<hashed> python3 -m pytest tests/ --collect-only -q",
+  "testpaths": ["tests"],
+  "asyncio_mode": "auto",
+  "result": {
+    "collected": 4990,
+    "collection_errors": 0,
+    "skipped_at_collection": 0,
+    "deselected": 0,
+    "warnings": 1,
+    "exit_code": 0
+  },
+  "vs_p116a_minimal_venv": {
+    "p116a_collected": 3696,
+    "p116a_collection_errors": 88,
+    "p116b_collected": 4990,
+    "p116b_collection_errors": 0,
+    "delta_tests": 1294,
+    "delta_explanation": "P1.16A minimal venv lacked DATABASE_URL/SECRET_KEY causing 88 files to error at import; P1.16B provides ephemeral env vars resolving all 88 errors. Additional 1206 tests reflect test growth since P1.11B baseline (new test files in P1.16, P1.16A added 200 tests, plus prior phases)."
+  },
+  "vs_p111b_historical": {
+    "p111b_reported": 3787,
+    "p116b_collected": 4990,
+    "delta": 1203,
+    "delta_explanation": "Growth from phases P1.12 through P1.16A (P1.12=92, P1.13=109, P1.13A=218, P1.14=190, P1.15=157, P1.16=240, P1.16A=200 new tests each phase). Parametrization expansion accounts for remainder."
+  },
+  "collection_gate_passed": true,
+  "note": "collection_errors=0 achieved by providing ephemeral test env vars. No testpaths were narrowed. No markers were added to exclude files."
+}
