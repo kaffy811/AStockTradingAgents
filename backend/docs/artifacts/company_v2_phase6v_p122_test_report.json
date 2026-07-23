@@ -1,0 +1,76 @@
+{
+  "artifact": "company_v2_phase6v_p122_test_report",
+  "phase": "6V-P1.22",
+  "generated_at": "2026-07-23T00:00:00Z",
+  "base_sha": "43130fcf8e348b6c8dbdb27accee1e304638b95d",
+  "suites": [
+    {
+      "name": "P1.22 targeted",
+      "command": "DATABASE_URL='...(test-only-dummy)...' SECRET_KEY='...(test-only-dummy)...' uv run pytest tests/fundamental/test_phase6v_p122_sustained_seventy_five_shadow.py tests/fundamental/test_phase6v_p17_canary_policy.py -q",
+      "scope": "P1.22 sustained 75% shadow gates + P1.17 canary policy (for stable_bucket_salt)",
+      "files": [
+        "backend/tests/fundamental/test_phase6v_p122_sustained_seventy_five_shadow.py",
+        "backend/tests/fundamental/test_phase6v_p17_canary_policy.py"
+      ],
+      "collected": 280,
+      "passed": 280,
+      "failed": 0,
+      "skipped": 0,
+      "duration_seconds": 0.46,
+      "exit_code": 0
+    },
+    {
+      "name": "cross-phase P1.x",
+      "command": "uv run pytest tests/fundamental/test_phase6v_p1*.py -q",
+      "scope": "All Phase 6V tests P1.1 through P1.22",
+      "collected": 3003,
+      "passed": 3003,
+      "failed": 0,
+      "skipped": 0,
+      "duration_seconds": 1.58,
+      "exit_code": 0
+    },
+    {
+      "name": "full fundamental suite",
+      "command": "uv run pytest tests/fundamental/ -q",
+      "path": "backend/tests/fundamental/",
+      "collected": 4556,
+      "passed": 4541,
+      "failed": 0,
+      "skipped": 15,
+      "duration_seconds": 35.96,
+      "exit_code": 0,
+      "skipped_reason": "15 integration tests requiring live external data sources (BaoStock, Tushare) — not available in CI; same 15 as P1.21"
+    },
+    {
+      "name": "entire backend suite",
+      "command": "uv run pytest tests/ -q",
+      "path": "backend/tests/",
+      "collected": 6387,
+      "passed": 6372,
+      "failed": 0,
+      "skipped": 15,
+      "collection_errors": 0,
+      "duration_seconds": 194.06,
+      "exit_code": 0,
+      "note": "Entire backend canonical suite. 6372 pass + 15 skip = 6387 collected. 0 collection errors. 15 skipped = same live-external tests as fundamental suite. This is the canonical full backend suite, distinct from the fundamental subdirectory subset."
+    },
+    {
+      "name": "frontend vitest",
+      "test_files": 62,
+      "passed": 688,
+      "failed": 0,
+      "exit_code": 0,
+      "build": "clean"
+    }
+  ],
+  "secret_scan": {
+    "status": "clean",
+    "real_tokens": 0,
+    "real_jwts": 0,
+    "production_secrets": 0,
+    "test_dummies_in_test_profile_only": true
+  },
+  "overall_verdict": "PASS — 0 failures across all suites; 15 known skips unchanged from P1.21",
+  "evidence_sha": "TBD_evidence_sha"
+}

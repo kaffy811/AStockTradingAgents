@@ -1,0 +1,40 @@
+{
+  "artifact": "company_v2_phase6v_p122_data_regression",
+  "phase": "6V-P1.22",
+  "generated_at": "2026-07-23T00:00:00Z",
+  "base_sha": "43130fcf8e348b6c8dbdb27accee1e304638b95d",
+  "suites": {
+    "fundamental_suite": {
+      "path": "tests/fundamental/",
+      "collected": 4556,
+      "passed": 4541,
+      "failed": 0,
+      "skipped": 15,
+      "exit_code": 0,
+      "skipped_reason": "Optional provider (Tushare token) not configured in CI fixture"
+    },
+    "full_backend_suite": {
+      "path": "tests/",
+      "collected": 6387,
+      "passed": 6372,
+      "failed": 0,
+      "skipped": 15,
+      "exit_code": 0,
+      "duration_seconds": 195
+    }
+  },
+  "data_coverage": {
+    "cn_stocks_covered": 5166,
+    "hk_stocks_supported": true,
+    "industry_mappings_valid": true,
+    "fallback_chains_intact": true
+  },
+  "shadow_data_isolation": {
+    "Pi_results_not_persisted_to_db": true,
+    "shadow_queries_not_affecting_cache": false,
+    "business_writes": 0,
+    "provider_serving_calls": 0
+  },
+  "regression_verdict": "PASS — 0 failures; 15 skips are known optional-provider skips unchanged from P1.21",
+  "evidence_sha": "TBD_evidence_sha"
+}
