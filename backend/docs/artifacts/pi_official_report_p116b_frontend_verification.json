@@ -1,0 +1,39 @@
+{
+  "schema_version": "pi_frontend_verification_v1",
+  "phase": "6V-P1.16B",
+  "generated_at": "2026-07-27T22:00:00.000000+00:00",
+  "frontend_dir": "frontend/",
+  "npm_ci": {
+    "command": "npm ci",
+    "exit_code": 0,
+    "packages_added": 146,
+    "packages_audited": 147,
+    "lock_file_consistent": true,
+    "audit_issues": "known severity advisories — not blocking (npm audit fix --force would make breaking changes)",
+    "passed": true
+  },
+  "npm_test": {
+    "command": "npm test -- --run",
+    "runner": "vitest@4.1.9",
+    "test_files": 62,
+    "tests_passed": 688,
+    "tests_failed": 0,
+    "tests_skipped": 0,
+    "duration_seconds": 5.22,
+    "exit_code": 0,
+    "warnings": ["CJS build of Vite's Node API is deprecated (non-blocking)"],
+    "passed": true
+  },
+  "npm_build": {
+    "command": "npm run build",
+    "bundler": "vite",
+    "exit_code": 0,
+    "duration_seconds": 2.51,
+    "output_dir": "dist/",
+    "chunk_size_warning": true,
+    "chunk_size_warning_detail": "echarts chunk 1135.40 kB after minification — non-blocking warning, existing known issue",
+    "errors": 0,
+    "passed": true
+  },
+  "frontend_verification_passed": true
+}
