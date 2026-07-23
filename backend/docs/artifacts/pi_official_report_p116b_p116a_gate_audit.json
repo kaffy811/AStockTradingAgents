@@ -1,0 +1,33 @@
+{
+  "schema_version": "pi_p116a_gate_audit_v1",
+  "phase": "6V-P1.16B",
+  "generated_at": "2026-07-27T22:00:00.000000+00:00",
+  "source_sha": "a0d2802d252a7b5c6eaee0e6926645db46daca9b",
+  "p116a_verified": {
+    "additional_selected": 1535,
+    "unique_symbols": 100,
+    "safety_correctness": 1.0,
+    "zero_tolerance_count": 0,
+    "tool_p95_ms": 3222,
+    "pi_p95_ms": 4748,
+    "pi_over_5s_rate_pct": 1.17,
+    "pi_over_6s_count": 0,
+    "resource_gate_passed": true,
+    "browser_regression": "10/10",
+    "rollout_percent": 10,
+    "live_serving": false,
+    "production_enabled": false
+  },
+  "performance_threshold_classification": {
+    "warning_threshold_ms": 4700,
+    "review_threshold_ms": 4800,
+    "hard_blocker_ms": 5000,
+    "current_pi_p95_ms": 4748,
+    "warning_triggered": true,
+    "review_triggered": false,
+    "hard_blocker_triggered": false,
+    "p117_monitor_requirement": "if any formal window pi_p95 >= 4800ms, pause expansion; if combined pi_p95 >= 5000ms, auto-rollback"
+  },
+  "artifacts_unmodified": true,
+  "gate_audit_passed": true
+}

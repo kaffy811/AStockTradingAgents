@@ -208,5 +208,24 @@
     "live_serving": false,
     "recommended_to_raise_to_twenty_five_percent": false,
     "p116a_gate_passed": true
+  },
+  "p116b_audit": {
+    "schema_version": "pi_official_report_pdf_agent_gate_p116b_v1",
+    "phase": "6V-P1.16B",
+    "generated_at": "2026-07-27T22:00:00.000000+00:00",
+    "source_sha": "a0d2802d252a7b5c6eaee0e6926645db46daca9b",
+    "backend_collection_errors": 0,
+    "backend_passed": 4975,
+    "backend_failed": 0,
+    "backend_skipped": 15,
+    "frontend_tests_passed": 688,
+    "frontend_build_passed": true,
+    "p116a_pi_p95_ms": 4748,
+    "p116a_safety_correctness": 1.0,
+    "rollout_percent": 10,
+    "production_enabled": false,
+    "live_serving": false,
+    "recommended_to_raise_to_twenty_five_percent": false,
+    "p116b_gate_passed": true
   }
 }

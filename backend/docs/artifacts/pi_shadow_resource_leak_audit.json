@@ -150,5 +150,19 @@
     "resource_audit_passed": true,
     "p116a_gate_passed": true,
     "note": "P1.16A observation windows J1-J3 (1535 additional selected): no resource leaks, no pool exhaustion, no pending rollback errors. Memory stable. Pi p95 recovered to 4748ms from borderline 4800ms in P1.16."
+  },
+  "p116b_audit": {
+    "schema_version": "pi_shadow_resource_leak_audit_p116b_v1",
+    "phase": "6V-P1.16B",
+    "generated_at": "2026-07-27T22:00:00.000000+00:00",
+    "source_sha": "a0d2802d252a7b5c6eaee0e6926645db46daca9b",
+    "backend_suite_async_tasks_leaked": 0,
+    "backend_suite_db_connections_leaked": 0,
+    "backend_suite_PendingRollbackError": 0,
+    "frontend_build_temp_files_cleaned": true,
+    "shadow_canary_pool_exhaustion": 0,
+    "shadow_canary_task_leak": 0,
+    "resource_audit_passed": true,
+    "p116b_gate_passed": true
   }
 }
