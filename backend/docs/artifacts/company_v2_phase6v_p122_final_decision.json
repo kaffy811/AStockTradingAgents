@@ -1,0 +1,62 @@
+{
+  "artifact": "company_v2_phase6v_p122_final_decision",
+  "phase": "6V-P1.22",
+  "generated_at": "2026-07-23T00:00:00Z",
+  "base_sha": "43130fcf8e348b6c8dbdb27accee1e304638b95d",
+  "rollout_percent": 75,
+  "config_version": 8,
+  "stable_bucket_salt": "pi_v1",
+  "live": false,
+  "production_enabled": false,
+  "provider_serving_calls": 0,
+  "soak_summary": {
+    "windows_completed": 10,
+    "windows": ["U1","U2","U3","U4","U5","U6","U7","U8","U9","U10"],
+    "eligible_requests": 14034,
+    "selected_requests": 10526,
+    "selection_rate": 0.7501,
+    "safety_correctness_rate": 1.0,
+    "zero_tolerance_violations": 0,
+    "pi_leakage": 0,
+    "terminal_completion_rate": 1.0,
+    "Pi_p95_range_ms": [4743, 4781],
+    "Pi_gt_4800ms": 0,
+    "Pi_gt_5000ms": 0,
+    "business_writes": 0
+  },
+  "cumulative": {
+    "phases": "P1.8 through P1.22",
+    "total_selected": 45373,
+    "total_violations": 0
+  },
+  "gate_summary": {
+    "A_repository_integrity":    "pass",
+    "B_configuration_integrity": "pass",
+    "C_runtime_provenance":      "unknown",
+    "D_sustained_observation":   "pass",
+    "E_bucket_stability":        "pass",
+    "F_100pct_policy_readiness": "pass",
+    "G_safety":                  "pass",
+    "H_reliability":             "pass",
+    "I_performance":             "pass",
+    "J_resources":               "pass",
+    "K_browser_ui":              "pass",
+    "L_test_evidence":           "pass",
+    "M_rollback_readiness":      "pass"
+  },
+  "gates_pass": 12,
+  "gates_unknown": 1,
+  "gates_fail": 0,
+  "decisions": {
+    "ready_for_one_hundred_percent_shadow_decision": false,
+    "one_hundred_percent_authorized": false,
+    "one_hundred_percent_applied": false,
+    "rollback_required": false,
+    "rollback_applied": false,
+    "continue_seventy_five_percent_shadow": true
+  },
+  "blocking_gate": "C",
+  "blocking_reason": "Gate C = UNKNOWN (deployed runtime probe not accessible). 100% promotion not authorized until Gate C = PASS.",
+  "recommended_action": "Proceed to P1.23: conduct dedicated deployed runtime probe (Gate C), then re-evaluate 100% promotion readiness.",
+  "evidence_sha": "ed304002f8370329314feb507c1e99e04c7e9ce1"
+}
