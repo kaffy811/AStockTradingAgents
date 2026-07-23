@@ -342,3 +342,46 @@ def build_audit_event(
             "anon_user_key": (request.anon_user_key or "")[:16],
         },
     }
+
+
+# ── runtime loader integration (Phase 6V-P1.22) ───────────────────────────────
+
+def get_effective_shadow_config_snapshot(settings_obj: Any = None) -> dict[str, Any]:
+    """Return a sanitized effective-config snapshot via the formal runtime loader.
+
+    Calls ``load_canary_config`` with the real (or injected) settings object so
+    the snapshot is produced by the same code path used in production.  Never
+    exposes secrets, user identities, query text, tokens, or auth headers.
+    Designed to be called at process startup for provenance logging.
+
+    Args:
+        settings_obj: A Settings-compatible object.  If None, the module-level
+            singleton from ``app.core.config`` is imported lazily so this
+            function remains importable without triggering Settings validation
+            during unit-test collection.
+    """
+    if settings_obj is None:
+        from app.core.config import settings as _settings  # lazy import
+        settings_obj = _settings
+    cfg = load_canary_config(settings_obj)
+    return {
+        "schema_version": "pi_canary_runtime_snapshot_v1",
+        "environment": cfg.environment,
+        "canary_mode": "shadow",
+        "rollout_percent": cfg.rollout_percent,
+        "config_version": cfg.config_version,
+        "stable_bucket_salt_version": cfg.stable_bucket_salt,
+        "authorization_status": cfg.authorization_status,
+        "live": False,
+        "production_enabled": cfg.production_enabled,
+        "provider_serving_enabled": False,
+        "fail_closed": cfg.fail_closed,
+        "parse_error": cfg.parse_error,
+        "global_kill_switch": cfg.global_kill_switch,
+        "runtime_loader": "load_canary_config",
+        "config_source": "pydantic_settings.Settings",
+        "evidence_mode": (
+            "runtime_loader_integration_verified" if not cfg.fail_closed
+            else "config_parse_failed"
+        ),
+    }
