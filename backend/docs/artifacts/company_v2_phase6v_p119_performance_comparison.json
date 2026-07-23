@@ -1,0 +1,86 @@
+{
+  "schema_version": "pi_performance_comparison_v1",
+  "phase": "6V-P1.19",
+  "generated_at": "2026-07-23T03:08:00.000000+00:00",
+  "comparison": "25pct_baseline_vs_50pct_result",
+  "tool_latency": {
+    "baseline_25pct": {
+      "p50_ms": 2203,
+      "p90_ms": 3042,
+      "p95_ms": 3247,
+      "p99_ms": 3573,
+      "max_ms": 3841,
+      "source": "P1.18 L1-L8 combined"
+    },
+    "result_50pct": {
+      "p50_ms": 2218,
+      "p90_ms": 3061,
+      "p95_ms": 3259,
+      "p99_ms": 3588,
+      "max_ms": 3847,
+      "source": "P1.19 F1-F6 combined"
+    },
+    "absolute_delta": {
+      "p50_ms": 15,
+      "p90_ms": 19,
+      "p95_ms": 12,
+      "p99_ms": 15,
+      "max_ms": 6
+    },
+    "percentage_delta": {
+      "p95_pct": 0.37,
+      "p99_pct": 0.42
+    },
+    "within_2pct_budget": true
+  },
+  "pi_latency": {
+    "baseline_25pct": {
+      "p50_ms": 3271,
+      "p90_ms": 4416,
+      "p95_ms": 4739,
+      "p97_ms": 4821,
+      "p99_ms": 4940,
+      "max_ms": 5008,
+      "pi_over_5s_count": 1,
+      "pi_over_6s_count": 0,
+      "source": "P1.18 L1-L8 combined"
+    },
+    "result_50pct": {
+      "p50_ms": 3284,
+      "p90_ms": 4428,
+      "p95_ms": 4742,
+      "p97_ms": 4819,
+      "p99_ms": 4938,
+      "max_ms": 4981,
+      "pi_over_5s_count": 0,
+      "pi_over_6s_count": 0,
+      "source": "P1.19 F1-F6 combined"
+    },
+    "absolute_delta": {
+      "p50_ms": 13,
+      "p90_ms": 12,
+      "p95_ms": 3,
+      "p97_ms": -2,
+      "p99_ms": -2,
+      "max_ms": -27
+    },
+    "percentage_delta": {
+      "p95_pct": 0.06
+    },
+    "pi_over_5s_count": 0,
+    "pi_over_6s_count": 0,
+    "warning_threshold_breached": true,
+    "review_threshold_breached": false,
+    "hard_rollback_triggered": false
+  },
+  "historical_pi_p95_progression": {
+    "P1.16_p95_ms": 4800,
+    "P1.16A_p95_ms": 4748,
+    "P1.17_p95_ms": 4741,
+    "P1.18_p95_ms": 4739,
+    "P1.19_p95_ms": 4742,
+    "trend": "stable_with_improving_tendency"
+  },
+  "verdict": "50% latency within +1% of 25% baseline. pi_p95 stable at 4742ms (improving trend). pi_over_5s_count improved from 1 to 0. No hard rollback triggered.",
+  "performance_comparison_passed": true
+}
