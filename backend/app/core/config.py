@@ -118,6 +118,7 @@ class Settings(BaseSettings):
     pi_canary_agent_kill_switch: bool = False
     pi_canary_authorization_expires_at: str = ""
     pi_canary_config_version: int = 1
+    pi_canary_stable_bucket_salt: str = "pi_v1"   # stable across config_version changes; ensures monotonic rollout
     pi_canary_approval_reference: str = ""
     pi_canary_auto_rollback_enabled: bool = True
     pi_canary_health_window_minutes: int = 30

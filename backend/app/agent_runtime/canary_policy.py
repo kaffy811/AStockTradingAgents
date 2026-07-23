@@ -52,6 +52,7 @@ class CanaryConfig:
     agent_kill_switch: bool = False
     authorization_expires_at: str | None = None
     config_version: int = 1
+    stable_bucket_salt: str = "pi_v1"  # stable across config_version; do NOT change between rollout promotions
     approval_reference: str | None = None
     auto_rollback_enabled: bool = True
     health_window_minutes: int = 30
@@ -91,6 +92,7 @@ def load_canary_config(settings_obj: Any) -> CanaryConfig:
             agent_kill_switch=bool(getattr(settings_obj, "pi_canary_agent_kill_switch", False)),
             authorization_expires_at=getattr(settings_obj, "pi_canary_authorization_expires_at", None) or None,
             config_version=int(getattr(settings_obj, "pi_canary_config_version", 1) or 1),
+            stable_bucket_salt=str(getattr(settings_obj, "pi_canary_stable_bucket_salt", "pi_v1") or "pi_v1"),
             approval_reference=getattr(settings_obj, "pi_canary_approval_reference", None) or None,
             auto_rollback_enabled=bool(getattr(settings_obj, "pi_canary_auto_rollback_enabled", True)),
             health_window_minutes=int(getattr(settings_obj, "pi_canary_health_window_minutes", 30) or 30),
@@ -105,9 +107,17 @@ def anonymized_user_key(user_id: str | None) -> str:
     return hashlib.sha256(f"pi_canary_user:{user_id or ''}".encode("utf-8")).hexdigest()[:16]
 
 
-def stable_bucket(*, environment: str, agent_id: str, anon_user_key: str, config_version: int) -> int:
-    """Deterministic bucket in [0, 10000). No builtin hash, time or randomness."""
-    payload = f"{environment}|{agent_id}|{anon_user_key}|v{config_version}"
+def stable_bucket(*, environment: str, agent_id: str, anon_user_key: str,
+                  stable_bucket_salt: str = "pi_v1",
+                  config_version: int | None = None) -> int:
+    """Deterministic bucket in [0, 10000). No builtin hash, time or randomness.
+
+    ``stable_bucket_salt`` must remain constant across rollout promotions to
+    guarantee monotonic cohort nesting (50% ⊆ 75% ⊆ 100%).  ``config_version``
+    is kept as an optional parameter for backward-compatibility only; it is no
+    longer part of the hash and has no effect on bucket assignment.
+    """
+    payload = f"{environment}|{agent_id}|{anon_user_key}|{stable_bucket_salt}"
     digest = hashlib.sha256(payload.encode("utf-8")).digest()
     return int.from_bytes(digest[:8], "big") % _BUCKET_SPACE
 
@@ -189,7 +199,7 @@ def evaluate_canary_decision(
         environment=request.environment,
         agent_id=request.agent_id,
         anon_user_key=request.anon_user_key,
-        config_version=config.config_version,
+        stable_bucket_salt=config.stable_bucket_salt,
     )
     selected = bucket_selected(bucket, min(config.rollout_percent, config.max_rollout_percent))
     if not selected:
