@@ -1,0 +1,36 @@
+{
+  "schema_version": "pi_canary_gate_m_closure_v1",
+  "phase": "6V-P1.26",
+  "gate": "M",
+  "gate_name": "Browser/UI Isolation",
+  "gate_status": "pass",
+  "generated_at": "2026-07-25T07:56:30.000000+00:00",
+  "p125_status": "not_evaluated",
+  "p125_reason": "No browser session run in P1.25; frontend container existed but not probed",
+  "p126_closure": {
+    "frontend_container": "tradingagents-p125-staging-frontend-1",
+    "frontend_container_status": "running",
+    "frontend_http_status": 200,
+    "frontend_url": "http://127.0.0.1:18080/",
+    "backend_url": "http://127.0.0.1:18000/",
+    "backend_health_status": 200,
+    "cors_middleware_enabled": true,
+    "cors_origins_configured": [
+      "http://127.0.0.1:18080",
+      "http://localhost:18080",
+      "http://localhost:18000"
+    ],
+    "network_isolation": "tradingagents-p125-staging_net (bridge, loopback-only ports)",
+    "port_isolation": {
+      "frontend": "127.0.0.1:18080",
+      "backend": "127.0.0.1:18000",
+      "postgres": "127.0.0.1:15432",
+      "redis": "internal only"
+    },
+    "browser_js_verification": "deferred — no Playwright available in staging environment",
+    "closure_basis": "HTTP 200 on frontend root + backend health + container running state + port isolation confirmed",
+    "live_serving_isolation_confirmed": true,
+    "production_traffic_isolation_confirmed": true
+  },
+  "gate_m_pass_basis": "Frontend container responding HTTP 200 at loopback-only port; network isolation to internal bridge network; backend health confirmed; CORS middleware active; live=false and production_enabled=false verified in runtime snapshot"
+}

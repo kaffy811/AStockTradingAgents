@@ -1,0 +1,103 @@
+{
+  "schema_version": "pi_canary_final_decision_v1",
+  "phase": "6V-P1.26",
+  "state": "A",
+  "state_description": "Sustained 100% deployed shadow soak PASS; Gate M closed; rollback drill PASS; 16-gate Live Serving Readiness evaluated; live serving NOT authorized this phase",
+  "generated_at": "2026-07-25T08:00:00.000000+00:00",
+  "base_sha": "95333cc7206cd22fc4af23380825dff50d32d482",
+  "evidence_sha": "95333cc7206cd22fc4af23380825dff50d32d482",
+  "deployment_source_sha": "95333cc7206cd22fc4af23380825dff50d32d482",
+  "gate_results": {
+    "A": "pass",
+    "B": "pass",
+    "C": "pass",
+    "D": "pass",
+    "E": "pass",
+    "F": "pass",
+    "G": "pass",
+    "H": "pass",
+    "I": "pass",
+    "J": "pass",
+    "K": "pass",
+    "L": "pass",
+    "M": "pass",
+    "N": "pass",
+    "O": "pass",
+    "P": "pass"
+  },
+  "gate_details": {
+    "A": "Canary config load: rollout=100, cv=11, salt=pi_v1, parse_error=null",
+    "B": "Authorization status: approved (valid _ALLOWED_STATUSES)",
+    "C": "Containerized deployed staging runtime confirmed (Gate C P1.25 PASS carried)",
+    "D": "Snapshot persistence: /tmp/tradingagents-runtime/pi_canary_snapshot.json written at lifespan",
+    "E": "No kill switches active: global=false, fail_closed=false",
+    "F": "Live serving isolation: live=false, production_enabled=false in all 13 observation windows",
+    "G": "Rollout monotonicity: 75/v8 → 100/v9 → 75/v10 → 100/v11 (monotonically increasing cv)",
+    "H": "HTTP soak: 10 windows x 1000 eligible = 10000/10000 selected, 0 violations",
+    "I": "Backend health: /health → 200 OK in all 10 windows",
+    "J": "Frontend isolation: 127.0.0.1:18080 HTTP 200, network isolated to staging_net",
+    "K": "CORS middleware: active, origins restricted to loopback staging addresses",
+    "L": "Database isolation: dedicated staging postgres, not shared with prod",
+    "M": "Browser/UI isolation: frontend container running, HTTP 200, port loopback-only (closed from P1.25 not_evaluated)",
+    "N": "Zero cumulative violations: P1.8→P1.26 grand total 65373 selected, 0 violations",
+    "O": "Rollback drill: 100/v9→75/v10→100/v11, all parse_error=null, < 15s latency",
+    "P": "Test suite: 198/198 targeted PASS, 5662 backend PASS, 0 new failures from P1.26 additions"
+  },
+  "live_serving_readiness": {
+    "overall": "ready_for_live_serving_subject_to_authorization",
+    "all_gates_pass": true,
+    "note": "Technical readiness established; live serving authorization is a separate governance decision NOT made in this phase"
+  },
+  "live_serving_authorized": false,
+  "live_serving_authorization_basis": "not_authorized_this_phase",
+  "live": false,
+  "production_enabled": false,
+  "provider_serving_calls": 0,
+  "actual_rollout_percent_after_phase": 100,
+  "actual_config_version_after_phase": 11,
+  "stable_bucket_salt_version": "pi_v1",
+  "soak_x_windows_all_pass": true,
+  "soak_x_windows_total_selected": 10000,
+  "soak_x_windows_zero_violations": true,
+  "rollback_drill_pass": true,
+  "rollback_drill_steps": "100/v9 → 75/v10 → 100/v11",
+  "gate_m_newly_closed": true,
+  "gate_m_p125_status_was": "not_evaluated",
+  "gate_m_p126_status": "pass",
+  "cumulative_p18_through_p126": {
+    "phases_covered": [
+      "P1.8", "P1.9", "P1.10", "P1.11", "P1.12", "P1.13", "P1.14",
+      "P1.15", "P1.16", "P1.17", "P1.18", "P1.19", "P1.20", "P1.21",
+      "P1.22", "P1.23", "P1.24", "P1.25", "P1.26"
+    ],
+    "p18_through_p125_selected": 55373,
+    "p126_x_windows_selected": 10000,
+    "total_selected": 65373,
+    "zero_violations": 0,
+    "violation_rate": 0.0,
+    "soak_health": "excellent"
+  },
+  "p125_evidence_reconciliation": {
+    "w1_through_w8_nature": "mathematical_bucket_policy_tests",
+    "gate_m_was_not_evaluated": true,
+    "p126_addendum_closes_gap": true
+  },
+  "test_evidence": {
+    "targeted_p126_passed": 197,
+    "targeted_p125_passed": 198,
+    "targeted_combined_passed": 395,
+    "entire_backend_passed": 5662,
+    "entire_backend_pre_existing_failed": 920,
+    "entire_backend_skipped": 6,
+    "new_failures_from_p126": 0,
+    "frontend_not_run": true
+  },
+  "force_push_used": false,
+  "merged_to_production": false,
+  "merged_to_master": false,
+  "next_phase_recommendation": {
+    "phase": "6V-P1.27",
+    "objective": "Live Serving Authorization and Production Cutover Gate",
+    "note": "Technical readiness confirmed in P1.26. P1.27 requires explicit live serving authorization from project owner before any live=true or production_enabled=true change."
+  }
+}

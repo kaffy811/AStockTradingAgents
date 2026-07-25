@@ -1,0 +1,62 @@
+{
+  "schema_version": "pi_canary_rollback_drill_v1",
+  "phase": "6V-P1.26",
+  "generated_at": "2026-07-25T07:56:00.000000+00:00",
+  "drill_authorized": true,
+  "drill_steps": [
+    {
+      "step": 1,
+      "label": "pre_rollback_baseline",
+      "rollout_percent": 100.0,
+      "config_version": 9,
+      "stable_bucket_salt": "pi_v1",
+      "parse_error": null,
+      "live": false,
+      "production_enabled": false,
+      "config_fingerprint": "6be358e1035b0086",
+      "status": "verified"
+    },
+    {
+      "step": 2,
+      "label": "rollback_applied",
+      "rollout_percent": 75.0,
+      "config_version": 10,
+      "stable_bucket_salt": "pi_v1",
+      "parse_error": null,
+      "live": false,
+      "production_enabled": false,
+      "config_fingerprint": "064ac7d0a8d20e64",
+      "status": "verified",
+      "method": "sed on .env.staging.local + docker compose up -d backend --no-build"
+    },
+    {
+      "step": 3,
+      "label": "restore_to_100",
+      "rollout_percent": 100.0,
+      "config_version": 11,
+      "stable_bucket_salt": "pi_v1",
+      "parse_error": null,
+      "live": false,
+      "production_enabled": false,
+      "config_fingerprint": "515f4ebb18659ace",
+      "status": "verified",
+      "method": "sed on .env.staging.local + docker compose up -d backend --no-build"
+    }
+  ],
+  "drill_summary": {
+    "all_steps_pass": true,
+    "parse_error_at_any_step": false,
+    "live_enabled_at_any_step": false,
+    "production_enabled_at_any_step": false,
+    "rollback_latency_seconds": "< 15 (container restart + lifespan init)",
+    "restore_latency_seconds": "< 15 (container restart + lifespan init)",
+    "config_version_monotonicity": "9 → 10 → 11 (monotonically increasing, no reuse)"
+  },
+  "final_state": {
+    "rollout_percent": 100.0,
+    "config_version": 11,
+    "stable_bucket_salt": "pi_v1",
+    "deployment_sha": "95333cc7206cd22fc4af23380825dff50d32d482",
+    "evidence_mode": "containerized_deployed_staging_runtime"
+  }
+}
