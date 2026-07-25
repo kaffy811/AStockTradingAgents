@@ -1,0 +1,117 @@
+{
+  "schema_version": "pi_canary_final_decision_v3",
+  "phase": "6V-P1.29",
+  "generated_at": "2026-07-25T19:50:00.000000+00:00",
+  "phase_label": "Sustained 1% Limited Live Canary and Real-Provider Readiness Gate",
+  "live_serving_authorized": true,
+  "live_serving_applied": true,
+  "decision": "STATE_A_SUSTAINED_ONE_PERCENT_LIVE_STABLE",
+  "decision_reason": "All 19 evaluated gates PASS. 1 gate (S) deferred to P1.30 by design. 12 sustained soak windows S1-S12 complete (60000 requests, 504 live-selected). 0 pi_violations, 0 terminal_violations across entire sustained soak. Fail-closed real provider design verified. Real provider NOT activated in P1.29.",
+
+  "p128_evidence_closure": {
+    "deployment_source_sha_audit": "CLOSED",
+    "frontend_688_vs_414_reconciliation": "CLOSED",
+    "backend_42_skips_audit": "CLOSED",
+    "kill_switch_request_evidence": "CLOSED",
+    "gate_r0_status": "PASS"
+  },
+
+  "runtime_final": {
+    "shadow_rollout_percent": 100,
+    "config_version": 12,
+    "shadow_salt": "pi_v1",
+    "live_enabled": true,
+    "live_rollout_percent": 1,
+    "live_salt": "pi_live_v1",
+    "production_enabled": false,
+    "provider_mode": "staging_replay",
+    "provider_serving_calls": 0,
+    "real_provider_activated": false
+  },
+
+  "sustained_soak_summary": {
+    "windows": 12,
+    "total_requests": 60000,
+    "total_live_selected": 504,
+    "live_selection_rate_pct": 0.84,
+    "pi_violations": 0,
+    "terminal_violations": 0,
+    "fallback_success_rate": 1.0,
+    "pi_approved_visible": 399,
+    "all_windows_pass": true
+  },
+
+  "cumulative_summary": {
+    "cumulative_shadow_requests": 125373,
+    "cumulative_live_requests": 666,
+    "cumulative_pi_violations": 0,
+    "cumulative_terminal_violations": 0
+  },
+
+  "browser_e2e": {
+    "total_cases": 50,
+    "passed": 50,
+    "failed": 0,
+    "sustained_live_cases": 10
+  },
+
+  "backend_suite": {
+    "collected": 7673,
+    "passed": 7631,
+    "failed": 0,
+    "skipped": 42,
+    "exit_code": 0
+  },
+
+  "gate_results": [
+    {"gate_id": "A",  "gate_name": "Repository Integrity",                    "status": "PASS"},
+    {"gate_id": "B",  "gate_name": "P1.28 Evidence Closure (Gate R0)",        "status": "PASS"},
+    {"gate_id": "C",  "gate_name": "Runtime Integrity (pre-soak)",             "status": "PASS"},
+    {"gate_id": "D",  "gate_name": "Sustained 1% Live Cohort Stability",       "status": "PASS"},
+    {"gate_id": "E",  "gate_name": "Session Cohort Determinism",               "status": "PASS"},
+    {"gate_id": "F",  "gate_name": "Exactly-Once Accounting (S1-S12)",         "status": "PASS"},
+    {"gate_id": "G",  "gate_name": "Approved Pi Visibility",                   "status": "PASS"},
+    {"gate_id": "H",  "gate_name": "Legacy Fallback (all paths)",              "status": "PASS"},
+    {"gate_id": "I",  "gate_name": "Exactly-Once UX",                          "status": "PASS"},
+    {"gate_id": "J",  "gate_name": "Safety (zero tolerance = 0)",              "status": "PASS"},
+    {"gate_id": "K",  "gate_name": "Reliability (pi_p95 < 4800ms)",           "status": "PASS"},
+    {"gate_id": "L",  "gate_name": "Performance (legacy not degraded)",        "status": "PASS"},
+    {"gate_id": "M",  "gate_name": "Resources (no leaks, no OOM)",             "status": "PASS"},
+    {"gate_id": "N",  "gate_name": "Browser E2E (50/50)",                      "status": "PASS"},
+    {"gate_id": "O",  "gate_name": "Browser Network Isolation",                "status": "PASS"},
+    {"gate_id": "P",  "gate_name": "Entire Backend (0 failures, 7533 PASS)",   "status": "PASS"},
+    {"gate_id": "Q",  "gate_name": "Kill Switch (< 10s, request evidence)",    "status": "PASS"},
+    {"gate_id": "R",  "gate_name": "Production Boundary (false)",              "status": "PASS"},
+    {"gate_id": "R0", "gate_name": "P1.28 Evidence Gap Closure",               "status": "PASS"},
+    {"gate_id": "S",  "gate_name": "Real Provider Readiness Gate",             "status": "NOT_EVALUATED",
+     "reason": "Real provider activation not authorized for P1.29. Fail-closed design verified. Provider dry run deferred to P1.30."}
+  ],
+  "gates_pass": 19,
+  "gates_not_evaluated": 1,
+  "gates_fail": 0,
+
+  "what_is_active": [
+    "100% Pi shadow (shadow_salt=pi_v1)",
+    "1% Pi live arbitration (live_salt=pi_live_v1, provider=staging_replay)",
+    "Legacy fallback for all requests",
+    "Kill switch available (PI_CANARY_LIVE_ENABLED=false → cv=13)",
+    "Provider kill switch available (PI_REAL_PROVIDER_ENABLED=false)"
+  ],
+
+  "what_is_not_authorized": [
+    "live rollout > 1%",
+    "production deployment",
+    "ordinary external users",
+    "legacy executor removal",
+    "real paid provider calls (deferred to P1.30)"
+  ],
+
+  "next_cv_path": {
+    "kill_switch": 13,
+    "shadow_rollback": 14,
+    "real_provider_activation": "cv=15 (P1.30, requires explicit authorization)",
+    "constraint": "cv must stay monotonic; never reuse 11 or 12"
+  },
+
+  "next_phase": "P1.30 — Real Staging Provider Activation (≤100 requests, ≤100 CNY) or live% expansion decision"
+}

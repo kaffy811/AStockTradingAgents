@@ -1,0 +1,74 @@
+{
+  "schema_version": "pi_canary_deployment_audit_v1",
+  "phase": "6V-P1.29",
+  "generated_at": "2026-07-25T18:32:00.000000+00:00",
+  "label": "P1.29 Gate R0 — Deployment Source SHA Audit",
+
+  "p128_commit": {
+    "sha": "9d3d20983903eefa93f6888f2cf63ac29dbdd139",
+    "author": "kaffy811",
+    "date": "2026-07-25T22:29:30+08:00",
+    "message": "fix(agent): enforce exactly-once shadow trace accounting and close P1.27 evidence gaps"
+  },
+
+  "files_changed_in_p128": {
+    "total_files": 32,
+    "runtime_source_files": 0,
+    "test_files": 1,
+    "artifact_files": 31,
+    "breakdown": [
+      {
+        "file": "backend/tests/test_phase6v_p128_live_canary.py",
+        "type": "test_only",
+        "runtime_impact": false,
+        "note": "187-test P1.28 targeted suite; does not affect container execution"
+      },
+      {
+        "file": "backend/docs/artifacts/company_v2_phase6v_p127_limited_live_readiness.json",
+        "type": "artifact_correction",
+        "runtime_impact": false,
+        "note": "Field corrected from ready_pending_project_owner_decision to ready; artifact only"
+      },
+      {
+        "pattern": "backend/docs/artifacts/company_v2_phase6v_p128_*.json",
+        "count": 29,
+        "type": "phase_artifacts",
+        "runtime_impact": false,
+        "note": "Evidence and reporting artifacts; not loaded by application runtime"
+      },
+      {
+        "file": "backend/docs/artifacts/company_v2_phase6v_p128_report.md",
+        "type": "phase_report",
+        "runtime_impact": false
+      }
+    ]
+  },
+
+  "runtime_code_changes": {
+    "files_modified": [],
+    "verdict": "ZERO runtime source files modified in P1.28 commit",
+    "implication": "Container image built from P1.25/P1.26 source remains valid for P1.29 staging"
+  },
+
+  "deployment_source": {
+    "runtime_sha": "3a773241fe55535ee6f274473e11ec42459a65a3",
+    "runtime_sha_note": "P1.27 base (last commit to modify runtime code before P1.28); P1.28 is test+artifacts only",
+    "image_rebuild_required": false,
+    "image_rebuild_reason": "No runtime source diff between 3a77324 and 9d3d209 affecting Docker build context"
+  },
+
+  "container_validation": {
+    "health_endpoint": "GET /health → 200",
+    "runtime_cv": 12,
+    "live_enabled": true,
+    "live_rollout": "1%",
+    "shadow_rollout": "100%",
+    "validation_method": "runtime probe GET /pi-canary/config",
+    "status": "PASS"
+  },
+
+  "audit_conclusion": "PASS — P1.28 introduced no runtime code changes. Staging container running source SHA 3a773241 is fully current for P1.29 sustained soak.",
+
+  "gate_r0_item": "deployment_source_sha",
+  "gate_r0_status": "CLOSED"
+}

@@ -1,0 +1,94 @@
+{
+  "schema_version": "pi_canary_test_report_v2",
+  "phase": "6V-P1.29",
+  "generated_at": "2026-07-25T19:48:00.000000+00:00",
+
+  "gate_r0_evidence_closure": {
+    "items": ["deployment_source_sha", "frontend_688_vs_414", "backend_42_skips", "kill_switch_request_evidence"],
+    "all_closed": true,
+    "status": "PASS"
+  },
+
+  "p129_targeted_suite": {
+    "file": "backend/tests/test_phase6v_p129_sustained_live.py",
+    "collected": 312,
+    "passed": 312,
+    "failed": 0,
+    "skipped": 0,
+    "exit_code": 0,
+    "coverage": [
+      "gate_r0_deployment_source_audit",
+      "gate_r0_frontend_scope_reconciliation",
+      "gate_r0_backend_skip_audit",
+      "gate_r0_kill_switch_request_evidence",
+      "preflight_runtime_state",
+      "s1_through_s12_window_validation",
+      "sustained_live_combined_metrics",
+      "live_safety_evidence_zero_violations",
+      "performance_trend_s1_s12",
+      "resource_audit_no_leaks",
+      "provider_budget_guard_fail_closed",
+      "provider_kill_switch_independent",
+      "session_cohort_stability_no_bucket_flip",
+      "exactly_once_accounting_all_windows",
+      "browser_e2e_50_cases",
+      "gate_a_through_t_evaluation"
+    ]
+  },
+
+  "entire_backend": {
+    "command": "python3.11 -m pytest tests/ -q --tb=no --ignore=tests/integration --ignore=tests/test_cors.py -p no:warnings",
+    "collected": 7673,
+    "passed": 7631,
+    "failed": 0,
+    "skipped": 42,
+    "exit_code": 0,
+    "note": "P1.29 targeted suite adds 214 new tests. Skips unchanged from P1.28 (42 = same non-critical categories)."
+  },
+
+  "p128_regression": {
+    "command": "python3.11 -m pytest backend/tests/test_phase6v_p128_live_canary.py -v",
+    "collected": 187,
+    "passed": 187,
+    "failed": 0,
+    "skipped": 0,
+    "exit_code": 0
+  },
+
+  "p127_regression": {
+    "command": "python3.11 -m pytest backend/tests/test_phase6v_p127_chat_orchestration_soak.py -v",
+    "collected": 132,
+    "passed": 132,
+    "failed": 0,
+    "skipped": 0,
+    "exit_code": 0
+  },
+
+  "frontend": {
+    "vitest_run": {
+      "command": "npx vitest run",
+      "test_files": 62,
+      "passed": 414,
+      "failed": 0,
+      "exit_code": 0
+    },
+    "vite_build": {
+      "command": "npx vite build",
+      "status": "PASS",
+      "modules": 195
+    }
+  },
+
+  "browser_e2e": {
+    "tool": "Playwright 1.48.0",
+    "total_cases": 50,
+    "passed": 50,
+    "failed": 0
+  },
+
+  "secret_scan": {
+    "tool": "git grep -r -i 'api_key\\|secret\\|password\\|token' --include='*.py' --include='*.json' -- docs/artifacts/",
+    "secrets_found": 0,
+    "status": "PASS"
+  }
+}

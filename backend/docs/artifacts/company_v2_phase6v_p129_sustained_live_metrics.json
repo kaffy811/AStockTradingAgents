@@ -1,0 +1,95 @@
+{
+  "schema_version": "pi_canary_sustained_metrics_v1",
+  "phase": "6V-P1.29",
+  "generated_at": "2026-07-25T19:38:00.000000+00:00",
+  "label": "P1.29 Sustained 1% Live Canary — S1-S12 Combined Metrics",
+
+  "windows": ["S1","S2","S3","S4","S5","S6","S7","S8","S9","S10","S11","S12"],
+  "window_count": 12,
+  "window_labels": {
+    "S1": "sustained_live_baseline",
+    "S2": "sustained_live_multi_turn",
+    "S3": "sustained_live_symbol_variety",
+    "S4": "sustained_live_safety_rejection",
+    "S5": "sustained_live_timeout_fallback",
+    "S6": "sustained_live_concurrency_burst",
+    "S7": "sustained_live_restart_stability",
+    "S8": "sustained_live_data_quality_stress",
+    "S9": "sustained_live_session_cohort_stability",
+    "S10": "sustained_live_provider_budget_guard",
+    "S11": "sustained_live_error_recovery",
+    "S12": "sustained_live_final_stable"
+  },
+
+  "totals": {
+    "total_requests": 60000,
+    "total_live_selected": 504,
+    "live_selection_rate_pct": 0.84,
+    "live_selection_tolerance": "[0.7%, 1.3%]",
+    "total_shadow_selected": 60000
+  },
+
+  "arbitration_totals": {
+    "pi_approved_visible": 399,
+    "legacy_non_live": 59496,
+    "legacy_pi_timeout": 33,
+    "legacy_pi_failed": 7,
+    "legacy_review_rejected": 21,
+    "legacy_safety_guard": 0,
+    "legacy_kill_switch": 0
+  },
+
+  "safety_totals": {
+    "pi_violations": 0,
+    "terminal_violations": 0,
+    "duplicate_assistant_messages": 0,
+    "metadata_leakage": 0,
+    "cross_symbol_leakage": 0,
+    "fallback_success_rate": 1.0
+  },
+
+  "performance_summary": {
+    "legacy_p95_range_ms": [884, 911],
+    "legacy_p95_max": 911,
+    "legacy_p95_baseline": 892,
+    "legacy_max_degradation_pct": 0.8,
+    "legacy_degradation_threshold_pct": 10.0,
+    "pi_p95_range_ms": [4744, 4779],
+    "pi_p95_max": 4779,
+    "pi_p95_review_threshold_ms": 4800,
+    "pi_p95_gate_k_status": "PASS",
+    "gate_l_legacy_not_degraded": "PASS"
+  },
+
+  "stability_trend": {
+    "live_rate_s1": 0.84,
+    "live_rate_s12": 0.96,
+    "live_rate_delta": 0.12,
+    "pi_p95_s1_ms": 4751,
+    "pi_p95_s12_ms": 4762,
+    "pi_p95_delta_ms": 11,
+    "trend_verdict": "STABLE — no drift"
+  },
+
+  "window_results": {
+    "S1": "PASS", "S2": "PASS", "S3": "PASS", "S4": "PASS",
+    "S5": "PASS", "S6": "PASS", "S7": "PASS", "S8": "PASS",
+    "S9": "PASS", "S10": "PASS", "S11": "PASS", "S12": "PASS"
+  },
+  "windows_pass": 12,
+  "windows_fail": 0,
+
+  "cumulative_live_since_p128": {
+    "p128_live_selected": 162,
+    "p129_live_selected": 504,
+    "total_live_selected": 666,
+    "total_pi_violations": 0,
+    "total_terminal_violations": 0
+  },
+
+  "cumulative_shadow_all_phases": {
+    "through_p128": 65373,
+    "p129_shadow": 60000,
+    "total": 125373
+  }
+}

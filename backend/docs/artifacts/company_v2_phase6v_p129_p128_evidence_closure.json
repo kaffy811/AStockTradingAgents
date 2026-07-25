@@ -1,0 +1,63 @@
+{
+  "schema_version": "pi_canary_evidence_closure_v2",
+  "phase": "6V-P1.29",
+  "generated_at": "2026-07-25T18:38:00.000000+00:00",
+  "label": "P1.29 Gate R0 — P1.28 Evidence Gap Closure",
+
+  "p128_confirmed_sha": "9d3d20983903eefa93f6888f2cf63ac29dbdd139",
+  "p128_runtime_state": {
+    "shadow_rollout": "100%",
+    "shadow_salt": "pi_v1",
+    "live_rollout": "1%",
+    "live_salt": "pi_live_v1",
+    "config_version": 12,
+    "production": false,
+    "provider_mode": "staging_replay"
+  },
+
+  "evidence_gaps_identified": [
+    "deployment_source_sha: Did P1.28 modify runtime code requiring image rebuild?",
+    "frontend_688_vs_414: Why did frontend vitest count differ from prior references?",
+    "backend_42_skips: Are any of the 42 skipped tests release-critical?",
+    "kill_switch_legacy_ks_zero: No legacy_kill_switch outcomes in P1.28 main-staging arbitration log"
+  ],
+
+  "gap_closure_status": [
+    {
+      "gap": "deployment_source_sha",
+      "artifact": "company_v2_phase6v_p129_deployment_source_audit.json",
+      "status": "CLOSED",
+      "finding": "P1.28 commit modified 0 runtime files. Container image valid. No rebuild needed.",
+      "runtime_sha": "3a773241fe55535ee6f274473e11ec42459a65a3"
+    },
+    {
+      "gap": "frontend_688_vs_414",
+      "artifact": "company_v2_phase6v_p129_frontend_scope_reconciliation.json",
+      "status": "CLOSED",
+      "finding": "414 is canonical. 688 was a documentation error in an intermediate phase; never a real vitest run output."
+    },
+    {
+      "gap": "backend_42_skips",
+      "artifact": "company_v2_phase6v_p129_backend_skip_reconciliation.json",
+      "status": "CLOSED",
+      "finding": "42 skips = 15 db_connected_tj1 + 20 soak/integration_live + 7 live_external. 0 release-critical."
+    },
+    {
+      "gap": "kill_switch_legacy_ks_zero",
+      "artifact": "company_v2_phase6v_p129_kill_switch_request_evidence.json",
+      "status": "CLOSED",
+      "finding": "5 confirmed legacy_kill_switch outcomes generated in isolated drill. Disable time 7.9s. Main staging cv=12 unaffected."
+    }
+  ],
+
+  "gate_r0_result": {
+    "gaps_identified": 4,
+    "gaps_closed": 4,
+    "gaps_remaining": 0,
+    "status": "PASS"
+  },
+
+  "authorized_to_proceed": true,
+  "proceed_to": "S1 sustained soak window",
+  "note": "All P1.28 evidence gaps closed. Sustained 1% live canary soak S1-S12 may begin."
+}

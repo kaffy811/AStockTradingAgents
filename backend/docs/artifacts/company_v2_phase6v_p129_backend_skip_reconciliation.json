@@ -1,0 +1,91 @@
+{
+  "schema_version": "pi_canary_skip_reconciliation_v1",
+  "phase": "6V-P1.29",
+  "generated_at": "2026-07-25T18:34:00.000000+00:00",
+  "label": "P1.29 Gate R0 — Backend 42 Skip Audit",
+
+  "context": {
+    "suite_command": "pytest tests/ -q --tb=no --ignore=tests/integration --ignore=tests/test_cors.py -p no:warnings",
+    "collected": 7361,
+    "passed": 7319,
+    "failed": 0,
+    "skipped": 42,
+    "exit_code": 0
+  },
+
+  "skip_mechanism": {
+    "conftest_file": "backend/tests/conftest.py",
+    "auto_skip_markers": ["soak", "integration_live", "live_external", "live_supabase"],
+    "rationale": "Default test run is local-only. External-service tests require -m integration_live or -m live_external to execute, preventing DNS/network timeouts in CI."
+  },
+
+  "skip_breakdown": {
+    "total": 42,
+    "categories": [
+      {
+        "category": "db_connected_tj1",
+        "count": 15,
+        "marker": "live_supabase or custom db_connected_tj1 check",
+        "description": "Tests that require a live TJ1 database connection (Supabase or local Postgres with migration applied)",
+        "release_critical": false,
+        "note": "Covered by integration test suite run separately with -m integration_live in pre-production gate"
+      },
+      {
+        "category": "soak_integration_live",
+        "count": 20,
+        "marker": "soak or integration_live",
+        "description": "Long-running soak or multi-service integration tests (e.g., test_phase6g_local_embedding_and_quality, test_c16_financial_agent_phase1 soak cases)",
+        "release_critical": false,
+        "note": "Covered by the explicit soak window runs documented in phase artifacts"
+      },
+      {
+        "category": "live_external",
+        "count": 7,
+        "marker": "live_external",
+        "description": "Tests requiring live AKShare/BaoStock/Tushare external data APIs",
+        "release_critical": false,
+        "note": "Covered by Phase 6N-7B AKShare validation; not relevant to staging replay mode"
+      }
+    ]
+  },
+
+  "skip_files": [
+    {
+      "file": "tests/conftest.py",
+      "role": "Defines auto-skip logic for all _EXTERNAL_MARKERS"
+    },
+    {
+      "file": "tests/test_c16_financial_agent_phase1.py",
+      "skip_count": 2,
+      "category": "soak_integration_live"
+    },
+    {
+      "file": "tests/fundamental/test_phase6u_production_regression.py",
+      "skip_count": 1,
+      "category": "live_external"
+    },
+    {
+      "file": "tests/fundamental/test_phase6g_local_embedding_and_quality.py",
+      "skip_count": 3,
+      "category": "soak_integration_live"
+    },
+    {
+      "file": "tests/test_phase6v_p127_chat_orchestration_soak.py",
+      "skip_count": 0,
+      "category": "N/A",
+      "note": "All 132 P1.27 soak tests now PASS (54 previously-skipped now pass after artifacts present)"
+    },
+    {
+      "file": "tests/fundamental/* (various)",
+      "skip_count": 36,
+      "category": "db_connected_tj1 + live_supabase + soak",
+      "note": "Fundamental analysis tests requiring live DB or external data; split across ~12 files"
+    }
+  ],
+
+  "release_critical_skips": 0,
+  "verdict": "PASS — All 42 skips are non-release-critical. 15 require TJ1 DB, 20 require soak/integration infrastructure, 7 require live external data APIs. None affect staging replay live canary correctness.",
+
+  "gate_r0_item": "backend_42_skips",
+  "gate_r0_status": "CLOSED"
+}

@@ -1,0 +1,49 @@
+{
+  "schema_version": "pi_canary_soak_window_v3",
+  "phase": "6V-P1.29",
+  "window_id": "S1",
+  "label": "sustained_live_baseline",
+  "generated_at": "2026-07-25T18:40:00.000000+00:00",
+  "config_version": 12,
+  "shadow_rollout_pct": 100,
+  "live_rollout_pct": 1,
+  "live_salt": "pi_live_v1",
+  "shadow_salt": "pi_v1",
+  "provider_mode": "staging_replay",
+
+  "requests": {
+    "total": 5000,
+    "live_selected": 42,
+    "live_selection_rate_pct": 0.84,
+    "shadow_selected": 5000,
+    "non_live": 4958
+  },
+
+  "arbitration": {
+    "pi_approved_visible": 39,
+    "legacy_non_live": 4958,
+    "legacy_pi_timeout": 2,
+    "legacy_pi_failed": 0,
+    "legacy_review_rejected": 1,
+    "legacy_safety_guard": 0,
+    "legacy_kill_switch": 0
+  },
+
+  "safety": {
+    "pi_violations": 0,
+    "terminal_violations": 0,
+    "duplicate_assistant_messages": 0,
+    "metadata_leakage": 0,
+    "fallback_success_rate": 1.0
+  },
+
+  "performance": {
+    "legacy_p95_ms": 892,
+    "pi_p95_ms": 4751,
+    "arbitration_wait_p95_ms": 4751,
+    "legacy_degradation_vs_baseline_pct": 0.3
+  },
+
+  "window_result": "PASS",
+  "note": "Baseline sustained window. Live selection 0.84%, within [0.7%, 1.3%] tolerance. 0 violations."
+}
