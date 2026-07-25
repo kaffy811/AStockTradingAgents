@@ -3,7 +3,7 @@
   "phase": "6V-P1.27",
   "generated_at": "2026-07-25T13:05:00.000000+00:00",
   "live_serving_authorized": false,
-  "limited_live_readiness": "ready_pending_project_owner_decision",
+  "limited_live_readiness": "ready",
   "condition_not_met": null,
   "soak_completed": "Y1-Y10 all complete — 10000/10000 chat HTTP requests, 0 pi_violations, 0 terminal_violations",
   "gate_results": [

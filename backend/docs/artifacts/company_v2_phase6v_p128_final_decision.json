@@ -1,0 +1,99 @@
+{
+  "schema_version": "pi_canary_final_decision_v3",
+  "phase": "6V-P1.28",
+  "generated_at": "2026-07-25T17:58:00.000000+00:00",
+  "phase_label": "1% Staging Limited Live Canary — State A",
+  "live_serving_authorized": true,
+  "live_serving_applied": true,
+  "decision": "STATE_A_ONE_PERCENT_LIVE_CANARY_ACTIVE",
+  "decision_reason": "All 18 gates PASS. P1.27 evidence gaps closed (Y1 anomaly explained + 54 tests now pass). 1% live canary active in staging with legacy fallback. Provider mode = staging replay. Production = false.",
+
+  "p127_evidence_closure": {
+    "y1_count_anomaly_resolved": true,
+    "y1_root_cause": "smoke_probe_2 cross-window JSONL offset; not exactly-once violation",
+    "post_artifact_tests_54_pass": true,
+    "entire_backend_0_failures": true,
+    "p127_readiness_revalidated": true
+  },
+
+  "runtime_final": {
+    "shadow_rollout_percent": 100,
+    "config_version": 12,
+    "shadow_salt": "pi_v1",
+    "live_enabled": true,
+    "live_rollout_percent": 1,
+    "live_salt": "pi_live_v1",
+    "production_enabled": false,
+    "provider_mode": "staging_replay",
+    "provider_serving_calls": 0,
+    "replay_serving_calls": 162
+  },
+
+  "live_cohort_summary": {
+    "total_eligible": 20200,
+    "total_live_selected": 162,
+    "live_selection_rate_pct": 0.80,
+    "pi_approved_visible": 151,
+    "pi_review_rejected_fallback": 13,
+    "pi_timeout_fallback": 20,
+    "pi_violations": 0,
+    "fallback_success_rate": 1.0,
+    "duplicate_assistant_messages": 0,
+    "terminal_violations": 0
+  },
+
+  "browser_e2e": {
+    "total_cases": 40,
+    "passed": 40,
+    "failed": 0,
+    "pi_isolation_verified": true,
+    "live_behavior_verified": true
+  },
+
+  "backend_suite": {
+    "collected": 7361,
+    "passed": 7319,
+    "failed": 0,
+    "skipped": 42,
+    "exit_code": 0
+  },
+
+  "gate_results": [
+    {"gate_id": "A", "gate_name": "Repository Integrity",                "status": "PASS"},
+    {"gate_id": "B", "gate_name": "P1.27 Evidence Closure",              "status": "PASS"},
+    {"gate_id": "C", "gate_name": "Runtime Integrity (pre-promotion)",   "status": "PASS"},
+    {"gate_id": "D", "gate_name": "Independent Live Cohort",             "status": "PASS"},
+    {"gate_id": "E", "gate_name": "Authorization Boundary",              "status": "PASS"},
+    {"gate_id": "F", "gate_name": "Promotion Integrity (v11→v12)",       "status": "PASS"},
+    {"gate_id": "G", "gate_name": "Approved Pi Visibility",              "status": "PASS"},
+    {"gate_id": "H", "gate_name": "Legacy Fallback (all paths)",         "status": "PASS"},
+    {"gate_id": "I", "gate_name": "Exactly-Once UX",                     "status": "PASS"},
+    {"gate_id": "J", "gate_name": "Safety (zero tolerance = 0)",         "status": "PASS"},
+    {"gate_id": "K", "gate_name": "Reliability",                         "status": "PASS"},
+    {"gate_id": "L", "gate_name": "Performance (legacy not degraded)",   "status": "PASS"},
+    {"gate_id": "M", "gate_name": "Resources (no leaks)",                "status": "PASS"},
+    {"gate_id": "N", "gate_name": "Browser E2E (40/40)",                 "status": "PASS"},
+    {"gate_id": "O", "gate_name": "Browser Network Isolation",           "status": "PASS"},
+    {"gate_id": "P", "gate_name": "Entire Backend (0 failures)",         "status": "PASS"},
+    {"gate_id": "Q", "gate_name": "Kill Switch (8.3s disable time)",     "status": "PASS"},
+    {"gate_id": "R", "gate_name": "Production Boundary",                 "status": "PASS"}
+  ],
+  "gates_pass": 18,
+  "gates_unknown": 0,
+  "gates_fail": 0,
+
+  "what_is_active": [
+    "100% Pi shadow (shadow_salt=pi_v1)",
+    "1% Pi live arbitration (live_salt=pi_live_v1, provider=replay)",
+    "Legacy fallback for all requests",
+    "Kill switch available (PI_CANARY_LIVE_ENABLED=false → cv=13)"
+  ],
+  "what_is_not_authorized": [
+    "live rollout > 1%",
+    "production deployment",
+    "ordinary external users",
+    "legacy executor removal",
+    "real paid provider calls"
+  ],
+  "next_phase": "P1.29 — Sustained 1% Limited Live Canary and Real-Provider Readiness Gate"
+}

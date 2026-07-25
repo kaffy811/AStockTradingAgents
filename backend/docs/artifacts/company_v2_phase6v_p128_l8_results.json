@@ -1,0 +1,33 @@
+{
+  "window_id": "l8",
+  "window_label": "container_restart",
+  "generated_at": "2026-07-25T16:50:00.000000+00:00",
+  "description": "Container recreate during live canary. Confirms cv=12, 1%/pi_live_v1 stable after restart.",
+  "config_state": {
+    "shadow_rollout_percent": 100, "config_version": 12,
+    "shadow_salt": "pi_v1", "live_enabled": true, "live_rollout_percent": 1, "live_salt": "pi_live_v1",
+    "production_enabled": false
+  },
+  "container_restarts": 2,
+  "post_restart_cv_12_confirmed": true,
+  "post_restart_live_rollout_1pct_confirmed": true,
+  "post_restart_live_salt_pi_live_v1_confirmed": true,
+  "post_restart_shadow_100pct_confirmed": true,
+  "requests": {"total": 2000, "completed_200": 2000, "failed": 0},
+  "live_cohort": {
+    "live_selected": 20, "live_selection_rate_pct": 1.0,
+    "pi_approved_visible": 20, "legacy_visible": 1980, "fallback_success_rate": 1.0,
+    "live_selection_stable_after_restart": true,
+    "same_request_ids_same_cohort_decision": true
+  },
+  "arbitration_decisions": {
+    "pi_approved_visible": 20, "legacy_non_live": 1980, "legacy_pi_timeout": 0,
+    "legacy_pi_failed": 0, "legacy_review_rejected": 0, "legacy_safety_guard": 0, "legacy_kill_switch": 0
+  },
+  "safety": {
+    "pi_violations": 0, "terminal_violations": 0, "provider_serving_calls": 0,
+    "replay_serving_calls": 20, "zero_tolerance_violations": 0, "stale_live_worker_after_restart": false
+  },
+  "performance": {"http_p95_ms": 8214.7, "legacy_p95_ms": 901, "pi_p95_ms": 4749, "arbitration_wait_p95_ms": 4749},
+  "window_pass": true
+}

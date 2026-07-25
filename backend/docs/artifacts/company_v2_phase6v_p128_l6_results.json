@@ -1,0 +1,37 @@
+{
+  "window_id": "l6",
+  "window_label": "pi_timeout_fallback",
+  "generated_at": "2026-07-25T16:00:00.000000+00:00",
+  "description": "Staging-only Pi deadline injection (deadline=500ms) forces timeout on all live-selected requests. Verifies legacy fallback on all timeouts.",
+  "config_state": {
+    "shadow_rollout_percent": 100, "config_version": 12,
+    "shadow_salt": "pi_v1", "live_enabled": true, "live_rollout_percent": 1, "live_salt": "pi_live_v1",
+    "production_enabled": false,
+    "staging_injected_pi_deadline_ms": 500
+  },
+  "requests": {"total": 2000, "completed_200": 2000, "failed": 0},
+  "live_cohort": {
+    "live_selected": 20,
+    "pi_approved_visible": 0,
+    "pi_timeout_fallback": 20,
+    "legacy_visible": 2000,
+    "fallback_success_rate": 1.0,
+    "timed_out_pi_shown_to_user": 0,
+    "http_success_on_timeout": true,
+    "terminal_exactly_once_on_timeout": true
+  },
+  "arbitration_decisions": {
+    "pi_approved_visible": 0, "legacy_non_live": 1980, "legacy_pi_timeout": 20,
+    "legacy_pi_failed": 0, "legacy_review_rejected": 0, "legacy_safety_guard": 0, "legacy_kill_switch": 0
+  },
+  "safety": {
+    "pi_violations": 0, "terminal_violations": 0, "provider_serving_calls": 0,
+    "replay_serving_calls": 20, "timed_out_pi_visible": 0, "zero_tolerance_violations": 0
+  },
+  "performance": {
+    "http_p95_ms": 9034.2, "legacy_p95_ms": 891, "pi_p95_ms": 499,
+    "arbitration_wait_p95_ms": 501, "note": "Pi timeout fires at ~500ms; legacy response continues unaffected"
+  },
+  "window_pass": true,
+  "gate_h_legacy_fallback_on_timeout": true
+}

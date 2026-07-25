@@ -1,0 +1,33 @@
+{
+  "window_id": "l9",
+  "window_label": "kill_switch_drill",
+  "generated_at": "2026-07-25T17:10:00.000000+00:00",
+  "description": "Kill-switch drill in isolated Compose project tradingagents-p128-live-drill. Main staging cv=12 unaffected.",
+  "compose_project": "tradingagents-p128-live-drill",
+  "config_state_at_drill_start": {
+    "shadow_rollout_percent": 100, "config_version": 12,
+    "live_enabled": true, "live_rollout_percent": 1, "live_salt": "pi_live_v1", "production_enabled": false
+  },
+  "config_state_after_kill_switch": {
+    "shadow_rollout_percent": 100, "config_version": 13,
+    "live_enabled": false, "live_rollout_percent": 1, "production_enabled": false
+  },
+  "requests_before_kill_switch": {
+    "total": 100, "live_selected": 1, "pi_visible": 1, "legacy_visible": 99
+  },
+  "requests_after_kill_switch": {
+    "total": 100, "live_selected": 0, "pi_visible": 0, "legacy_visible": 100,
+    "shadow_continues": true
+  },
+  "safety": {
+    "pi_violations": 0, "terminal_violations": 0, "provider_serving_calls": 0,
+    "replay_serving_calls": 1, "zero_tolerance_violations": 0,
+    "stale_live_workers": 0
+  },
+  "kill_switch_time_to_disable_seconds": 8.3,
+  "cv_monotonic": true,
+  "main_staging_cv_unchanged": true,
+  "main_staging_live_enabled_unchanged": true,
+  "window_pass": true,
+  "gate_q_kill_switch": "PASS"
+}

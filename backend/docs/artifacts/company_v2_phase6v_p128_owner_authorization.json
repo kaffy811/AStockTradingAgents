@@ -1,0 +1,51 @@
+{
+  "schema_version": "pi_canary_owner_authorization_v1",
+  "phase": "6V-P1.28",
+  "generated_at": "2026-07-25T14:00:00.000000+00:00",
+  "project_owner": "kaffy",
+  "authorization_type": "conditional_1pct_staging_live_canary",
+  "authorization_granted": true,
+  "conditions_required_before_live": [
+    "Y1 Pi count anomaly resolved",
+    "per-request Pi execution exactly-once verified",
+    "54 post-artifact validation tests = 54 PASS",
+    "entire backend canonical suite = 0 failures",
+    "current deployed runtime = 100% shadow / v11 / pi_v1",
+    "live remains false before promotion"
+  ],
+  "conditions_status": {
+    "y1_anomaly_resolved": true,
+    "exactly_once_verified": true,
+    "post_artifact_54_pass": true,
+    "entire_backend_0_failures": true,
+    "runtime_100_v11_pi_v1": true,
+    "live_false_before_promotion": true,
+    "all_conditions_satisfied": true
+  },
+  "authorized_scope": {
+    "environment": "staging only",
+    "pi_shadow_rollout": "100% (maintained)",
+    "pi_live_rollout": "0% → 1%",
+    "config_version": "11 → 12",
+    "shadow_bucket_salt": "pi_v1 (unchanged)",
+    "live_bucket_salt": "pi_live_v1 (new, independent)",
+    "legacy_fallback": "enabled for 100% requests",
+    "identities": "synthetic test identities and project owner only",
+    "provider_mode": "staging replay (provider_serving_calls=0)"
+  },
+  "explicitly_not_authorized": [
+    "production deployment",
+    "public staging with ordinary external users",
+    "live rollout > 1%",
+    "legacy executor removal",
+    "Pi as sole executor without fallback",
+    "stable_bucket_salt modification",
+    "repository default live=true",
+    "real paid external provider calls"
+  ],
+  "kill_switch_path": {
+    "normal_1pct": {"live_enabled": true, "live_rollout_percent": 1, "config_version": 12},
+    "kill_switch": {"live_enabled": false, "config_version": 13, "note": "live_rollout_percent=1 retained for audit; effective live=0"},
+    "shadow_rollback_if_needed": {"shadow_rollout": 75, "live": false, "config_version": 14}
+  }
+}

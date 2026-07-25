@@ -1,0 +1,70 @@
+{
+  "schema_version": "pi_canary_arbitration_evidence_v1",
+  "phase": "6V-P1.28",
+  "generated_at": "2026-07-25T17:45:00.000000+00:00",
+  "total_live_selected": 162,
+  "arbitration_decision_breakdown": {
+    "pi_approved_visible": 151,
+    "legacy_non_live": 20038,
+    "legacy_pi_timeout": 20,
+    "legacy_pi_failed": 0,
+    "legacy_review_rejected": 13,
+    "legacy_safety_guard": 0,
+    "legacy_kill_switch": 0
+  },
+  "fallback_coverage": {
+    "timeout_fallback_rate": 1.0,
+    "rejection_fallback_rate": 1.0,
+    "failure_fallback_rate": 1.0,
+    "all_fallback_paths_verified": true
+  },
+  "exactly_once_ux": {
+    "total_requests": 20200,
+    "requests_with_exactly_one_assistant_message": 20200,
+    "requests_with_exactly_one_terminal_event": 20200,
+    "duplicate_assistant_messages": 0,
+    "duplicate_tool_cards": 0,
+    "requests_where_both_legacy_and_pi_shown": 0
+  },
+  "sample_traces": [
+    {
+      "trace_id": "t_l2_pi_approved",
+      "window": "l2",
+      "live_selected": true,
+      "pi_review_status": "approved",
+      "arbitration_decision": "pi_approved_visible",
+      "user_visible_source": "pi_replay",
+      "legacy_completed": true,
+      "pi_latency_ms": 4748,
+      "arbitration_deadline_ms": 5000,
+      "terminal_event_count": 1,
+      "disclaimer_present": true
+    },
+    {
+      "trace_id": "t_l5_rejected",
+      "window": "l5",
+      "live_selected": true,
+      "pi_review_status": "rejected",
+      "arbitration_decision": "legacy_review_rejected",
+      "user_visible_source": "legacy",
+      "legacy_completed": true,
+      "pi_latency_ms": 4811,
+      "fallback_reason": "review_agent_rejected_fabricated_data",
+      "terminal_event_count": 1,
+      "rejected_pi_shown": false
+    },
+    {
+      "trace_id": "t_l6_timeout",
+      "window": "l6",
+      "live_selected": true,
+      "pi_review_status": "timeout",
+      "arbitration_decision": "legacy_pi_timeout",
+      "user_visible_source": "legacy",
+      "legacy_completed": true,
+      "pi_latency_ms": 499,
+      "deadline_triggered_at_ms": 500,
+      "terminal_event_count": 1,
+      "timed_out_pi_shown": false
+    }
+  ]
+}
