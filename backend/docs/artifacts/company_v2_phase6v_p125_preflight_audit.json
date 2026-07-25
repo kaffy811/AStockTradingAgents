@@ -1,0 +1,59 @@
+{
+  "schema_version": "pi_canary_preflight_v1",
+  "phase": "6V-P1.25",
+  "phase_title": "Docker Runtime Enablement, Containerized Gate C Closure & Conditional 100% Staging Shadow Promotion",
+  "generated_at": "2026-07-24T01:00:00.000000+00:00",
+  "base_sha": "d50c56d45bbc909b8655e5bfbc554868f48635fc",
+
+  "gate_a": "pass",
+  "gate_a_notes": "Clean worktree on p125/docker-gate-c-full-shadow; P1.24 artifacts intact; base_sha confirmed",
+
+  "docker_check": "pass",
+  "docker_version": "29.6.2",
+  "compose_version": "v5.3.1",
+  "docker_available": true,
+
+  "p124_state": "B",
+  "p124_gate_c": "unknown",
+  "p124_promotion_applied": false,
+  "p124_base_sha": "11855396533c4350338fdb44b9ab6db0c7ea5c8a",
+  "p124_evidence_sha": "a6fe07c22c4f48d929ff621fbc7914cfe23cbdba",
+
+  "repository_default": {
+    "rollout_percent": 0.0,
+    "config_version": 0,
+    "stable_bucket_salt": "pi_v1",
+    "authorization_status": "proposed",
+    "live": false,
+    "production_enabled": false,
+    "source": "repository_defaults_in_config.py"
+  },
+
+  "intended_staging_config": {
+    "rollout_percent": 75,
+    "config_version": 8,
+    "stable_bucket_salt": "pi_v1",
+    "authorization_status": "authorized",
+    "live": false,
+    "production_enabled": false,
+    "source": ".env.staging.local (not committed)"
+  },
+
+  "deployed_effective_runtime": {
+    "rollout_percent": "TBD — will be confirmed by runtime probe after container start",
+    "config_version": "TBD",
+    "stable_bucket_salt": "TBD",
+    "evidence_mode": "TBD — expected: containerized_deployed_staging_runtime",
+    "source": "TBD — will be read from PI_CANARY_SNAPSHOT_PATH via docker exec"
+  },
+
+  "invariant_checks": {
+    "live_is_false": true,
+    "production_enabled_is_false": true,
+    "provider_serving_calls_is_zero": true,
+    "stable_bucket_salt_unchangeable": true,
+    "repository_defaults_unchanged": true
+  },
+
+  "p125_objective": "Install Docker Desktop → launch containerized staging → Gate C PASS → 100% promotion"
+}

@@ -103,6 +103,12 @@ async def _http_exception_handler(request, exc: StarletteHTTPException):
         payload = exc.detail
     return JSONResponse(payload, status_code=exc.status_code, headers=exc.headers)
 
+# ── Phase 6V-P1.25: lightweight health endpoint for container healthcheck ─────
+@app.get("/health", include_in_schema=False)
+async def health():
+    return {"status": "ok"}
+
+
 app.include_router(router, prefix="/api/v1")
 # Stock Fundamental Service（Phase 1.5）— 路由前缀已在各 router 内部定义
 app.include_router(fundamentals_router)    # /api/v1/stocks/{market}/{symbol}/fundamentals/...
