@@ -1,0 +1,75 @@
+{
+  "schema_version": "pi_canary_preflight_v4",
+  "phase": "6V-P1.30",
+  "generated_at": "2026-07-25T20:00:00.000000+00:00",
+  "label": "P1.30 Pre-flight Audit — Restricted Real Staging Provider Activation",
+
+  "base": {
+    "worktree": "/private/tmp/tradingagents-p130",
+    "branch": "p130/restricted-real-provider",
+    "base_sha": "6ee8fc4f693db5f8956901295515f8a2253406de",
+    "origin_head": "6ee8fc4f693db5f8956901295515f8a2253406de",
+    "sha_match": true
+  },
+
+  "runtime_snapshot": {
+    "shadow_rollout_percent": 100,
+    "shadow_salt": "pi_v1",
+    "live_rollout_percent": 1,
+    "live_salt": "pi_live_v1",
+    "config_version": 12,
+    "live_enabled": true,
+    "production_enabled": false,
+    "provider_mode": "staging_replay",
+    "real_provider_enabled": false,
+    "provider_serving_calls": 0,
+    "ordinary_external_users": 0
+  },
+
+  "p1_29_cumulative": {
+    "shadow_requests": 125373,
+    "live_requests": 666,
+    "pi_violations": 0,
+    "terminal_violations": 0,
+    "fallback_success_rate": 1.0
+  },
+
+  "pre_activation_gate_assessment": {
+    "gate_d_credential_isolation": {
+      "status": "FAIL",
+      "reason": "No DEEPSEEK_API_KEY_STAGING or staging-isolated credential found. Only DEEPSEEK_API_KEY in .env.example."
+    },
+    "gate_e_pricing_verification": {
+      "status": "FAIL",
+      "reason": "No pricing configuration in codebase. No cost_per_token, no price_table. Cannot reliably verify without external DeepSeek console access."
+    },
+    "gate_f_request_budget": {
+      "status": "FAIL",
+      "reason": "PI_REAL_PROVIDER_MAX_REQUESTS does not exist in Settings or runtime code. No request counter implementation."
+    },
+    "gate_g_cost_budget": {
+      "status": "FAIL",
+      "reason": "PI_REAL_PROVIDER_MAX_COST_CNY does not exist in Settings or runtime code. No cost accumulator implementation."
+    },
+    "gate_i_provider_fail_closed": {
+      "status": "FAIL",
+      "reason": "PI_REAL_PROVIDER_ENABLED flag does not exist in runtime Settings. P1.29 design artifact only; never implemented."
+    }
+  },
+
+  "execution_decision": "STATE_B",
+  "real_provider_execution": "NOT_EXECUTED",
+  "blocking_gates": ["D", "E", "F", "G", "I"],
+  "blocking_reason": "Per P1.30 specification: if pricing, budget counting, or staging-only credential cannot be reliably verified, real provider activation = NOT_EXECUTED.",
+
+  "state_retained": {
+    "config_version": 12,
+    "provider_mode": "staging_replay",
+    "live": "1%",
+    "shadow": "100%",
+    "production": false
+  },
+
+  "preflight_pass": false,
+  "preflight_pass_reason": "Pre-activation gates D/E/F/G/I FAIL. Proceeding with State B evidence documentation."
+}

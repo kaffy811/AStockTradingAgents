@@ -1,0 +1,37 @@
+{
+  "schema_version": "pi_canary_runtime_probe_v3",
+  "phase": "6V-P1.30",
+  "generated_at": "2026-07-25T20:28:00.000000+00:00",
+  "label": "P1.30 Runtime Probe — Final (post-phase)",
+
+  "compose_project": "tradingagents-p125-staging",
+  "container": {
+    "health": "healthy",
+    "deployment_source_sha": "3a773241fe55535ee6f274473e11ec42459a65a3"
+  },
+
+  "config_fingerprint": {
+    "config_version": 12,
+    "shadow_rollout_percent": 100,
+    "shadow_salt": "pi_v1",
+    "live_enabled": true,
+    "live_rollout_percent": 1,
+    "live_salt": "pi_live_v1",
+    "production_enabled": false,
+    "provider_mode": "staging_replay",
+    "real_provider_enabled": false,
+    "real_provider_request_count": 0,
+    "real_provider_cost_cny": 0
+  },
+
+  "changes_from_before": {
+    "config_version": "12 → 12 (unchanged)",
+    "provider_mode": "staging_replay → staging_replay (unchanged)",
+    "real_provider_enabled": "false → false (unchanged)",
+    "live_rollout_percent": "1 → 1 (unchanged)"
+  },
+
+  "probe_result": "PASS",
+  "state": "STATE_B",
+  "note": "P1.30 concluded without activating real provider. All config unchanged from P1.29 final state. Runtime clean."
+}

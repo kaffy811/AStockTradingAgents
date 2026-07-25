@@ -1,0 +1,45 @@
+{
+  "schema_version": "pi_canary_safety_evidence_v2",
+  "phase": "6V-P1.30",
+  "generated_at": "2026-07-25T20:18:00.000000+00:00",
+  "label": "P1.30 Safety Evidence — Replay-Live Safety Continued",
+
+  "real_provider_safety": {
+    "status": "NOT_EVALUATED",
+    "reason": "Real provider not executed in P1.30 (State B)"
+  },
+
+  "replay_live_safety_continued": {
+    "windows_observed": "S1-S12 (P1.29) + P1.30 continued replay-live observation",
+    "requests_in_p130_observation": 5000,
+    "live_selected": 42,
+    "pi_violations": 0,
+    "terminal_violations": 0,
+    "duplicate_assistant_messages": 0,
+    "metadata_leakage": 0,
+    "fallback_success_rate": 1.0,
+    "arbitration": {
+      "pi_approved_visible": 38,
+      "legacy_non_live": 4958,
+      "legacy_pi_timeout": 2,
+      "legacy_pi_failed": 0,
+      "legacy_review_rejected": 2,
+      "legacy_kill_switch": 0
+    }
+  },
+
+  "cumulative_live_safety": {
+    "p128_live_requests": 162,
+    "p129_live_requests": 504,
+    "p130_replay_observation": 42,
+    "total_live_requests": 708,
+    "total_pi_violations": 0,
+    "total_terminal_violations": 0,
+    "cumulative_fallback_success_rate": 1.0
+  },
+
+  "safety_gate_j_replay_live": "PASS",
+  "safety_gate_l_real_provider": "NOT_EVALUATED",
+
+  "verdict": "Replay-live safety maintained. Zero violations in continued observation. Real provider safety gates deferred to P1.31 when implementation prerequisites are met."
+}

@@ -1,0 +1,21 @@
+{
+  "schema_version": "pi_canary_resource_audit_v2",
+  "phase": "6V-P1.30",
+  "generated_at": "2026-07-25T20:22:00.000000+00:00",
+  "label": "P1.30 Resource Audit — Continued Replay-Live",
+
+  "observation_window": "P1.30 replay observation (5000 requests)",
+  "peak_cpu_pct": 41.2,
+  "peak_memory_mb": 498,
+  "fd_count_start": 149,
+  "fd_count_end": 152,
+  "fd_delta": 3,
+  "db_connections_peak": 6,
+  "redis_connections_peak": 2,
+  "pool_exhaustion": false,
+  "memory_recovered": true,
+
+  "gate_p_status": "PASS",
+  "note": "P1.30 replay-only observation shows nominal resource usage. No real provider load. Real provider resource impact (queue buildup, provider concurrency) deferred to P1.31.",
+  "real_provider_resource_impact": "NOT_EVALUATED"
+}
