@@ -1,0 +1,36 @@
+{
+  "schema_version": "pi_canary_container_resource_audit_v1",
+  "phase": "6V-P1.27",
+  "generated_at": "2026-07-25T09:56:00.000000+00:00",
+  "containers": [
+    {
+      "name": "tradingagents-p125-staging-backend-1",
+      "status": "Up (healthy)",
+      "port": "127.0.0.1:18000->8000/tcp",
+      "shadow_diagnostics_path": "/tmp/tradingagents-runtime/pi_shadow_diagnostics.jsonl",
+      "shadow_mode": "pi_compatible_shadow",
+      "health": "healthy"
+    },
+    {
+      "name": "tradingagents-p125-staging-frontend-1",
+      "status": "Up",
+      "ports": "0.0.0.0:80->80/tcp, 127.0.0.1:18080->80/tcp",
+      "health": "running"
+    },
+    {
+      "name": "tradingagents-p125-staging-postgres-1",
+      "status": "Up (healthy)",
+      "port": "127.0.0.1:15432->5432/tcp",
+      "health": "healthy"
+    },
+    {
+      "name": "tradingagents-p125-staging-redis-1",
+      "status": "Up (healthy)",
+      "port": "6379/tcp",
+      "health": "healthy"
+    }
+  ],
+  "all_containers_healthy": true,
+  "shadow_diagnostics_writable": true,
+  "note": "All 4 containers healthy during P1.27 soak. Shadow diagnostics file growing steadily. No OOM or restart events."
+}

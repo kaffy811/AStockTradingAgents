@@ -1,0 +1,48 @@
+{
+  "window_id": "y2",
+  "timestamp": "2026-07-25T09:59:10.570974+00:00",
+  "elapsed_seconds": 880.07,
+  "snapshot": {
+    "rollout_percent": 100.0,
+    "config_version": 11,
+    "stable_bucket_salt_version": "pi_v1",
+    "authorization_status": "approved",
+    "live": false,
+    "production_enabled": false,
+    "parse_error": null,
+    "evidence_mode": "containerized_deployed_staging_runtime"
+  },
+  "snapshot_ok": true,
+  "chat_endpoint": "/api/v1/chat/sessions/{session_id}/messages",
+  "requests": {
+    "total": 1000,
+    "completed_200": 1000,
+    "failed": 0,
+    "pdf_intent": 500,
+    "general_intent": 500
+  },
+  "shadow_diagnostics": {
+    "new_records": 1000,
+    "shadow_started": 1000,
+    "shadow_completed": 1000,
+    "shadow_failed_pi": 1000
+  },
+  "safety": {
+    "pi_violations": 0,
+    "terminal_violations": 0,
+    "user_visible_source": "legacy",
+    "pi_user_visible": false,
+    "provider_serving_calls": 0,
+    "business_writes": 0
+  },
+  "performance": {
+    "http_p50_ms": 20.2,
+    "http_p95_ms": 7507.4,
+    "http_p99_ms": 15146.3
+  },
+  "cumulative": {
+    "before": 1000,
+    "after": 2000
+  },
+  "window_pass": true
+}

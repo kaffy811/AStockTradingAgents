@@ -1,0 +1,63 @@
+{
+  "schema_version": "pi_canary_runtime_probe_v1",
+  "phase": "6V-P1.27",
+  "generated_at": "2026-07-25T09:45:00.000000+00:00",
+  "probe_purpose": "Verify live runtime state matches expected 100/v11/pi_v1 post-P1.26 rollback drill (drill ended at cv=11)",
+  "container": "tradingagents-p125-staging-backend-1",
+  "probe_method": "docker exec env | grep -E 'PI_CANARY|AGENT_EXECUTOR|PI_AGENT'",
+  "observed_env": {
+    "PI_CANARY_ENVIRONMENT": "staging",
+    "PI_CANARY_STABLE_BUCKET_SALT": "pi_v1",
+    "PI_CANARY_ROLLOUT_PERCENT": "100",
+    "PI_CANARY_CONFIG_VERSION": "11",
+    "PI_CANARY_AUTHORIZATION_STATUS": "approved",
+    "PI_CANARY_LIVE": "false",
+    "PI_CANARY_GLOBAL_KILL_SWITCH": "false",
+    "PI_CANARY_FAIL_CLOSED": "false",
+    "PI_CANARY_MAX_ROLLOUT_PERCENT": "100",
+    "PI_CANARY_PRODUCTION_ENABLED": "false",
+    "PI_CANARY_SNAPSHOT_PATH": "/tmp/tradingagents-runtime/pi_canary_snapshot.json",
+    "AGENT_EXECUTOR_MODE": "pi_compatible_shadow",
+    "PI_AGENT_SHADOW_ENABLED": "true",
+    "PI_AGENT_ALLOWED_AGENTS": "official_report_pdf_pi_v1",
+    "PI_AGENT_SHADOW_DIAGNOSTICS_PATH": "/tmp/tradingagents-runtime/pi_shadow_diagnostics.jsonl",
+    "PI_AGENT_MAX_TURNS": "3",
+    "PI_AGENT_DEFAULT_DEADLINE_MS": "5000",
+    "PI_AGENT_MAX_PARALLEL_TOOLS": "2",
+    "PI_AGENT_MAX_TOOL_CALLS": "4"
+  },
+  "snapshot_values": {
+    "rollout_percent": 100.0,
+    "config_version": 11,
+    "stable_bucket_salt_version": "pi_v1",
+    "authorization_status": "approved",
+    "live": false,
+    "production_enabled": false,
+    "parse_error": null
+  },
+  "probe_assertions": {
+    "rollout_100": true,
+    "cv_11": true,
+    "salt_pi_v1": true,
+    "live_false": true,
+    "production_false": true,
+    "parse_error_none": true,
+    "shadow_mode_active": true,
+    "shadow_diagnostics_configured": true,
+    "all_assertions_pass": true
+  },
+  "shadow_activation_triad": {
+    "agent_executor_mode": "pi_compatible_shadow",
+    "pi_agent_shadow_enabled": true,
+    "pi_agent_allowed_agents_contains_pi_v1": true,
+    "triad_complete": true,
+    "runner_enabled_expected": true
+  },
+  "health_check": {
+    "endpoint": "GET http://127.0.0.1:18000/health",
+    "status": "ok",
+    "http_status": 200
+  },
+  "probe_result": "PASS",
+  "note": "Runtime state confirmed: rollout=100%, cv=11, salt=pi_v1, live=false. P1.26 rollback drill ended at cv=11 as expected. P1.27 shadow mode (pi_compatible_shadow) is active."
+}

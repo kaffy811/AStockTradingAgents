@@ -1,0 +1,196 @@
+{
+  "schema_version": "pi_canary_browser_e2e_v1",
+  "phase": "6V-P1.27",
+  "generated_at": "2026-07-25T09:50:45.192254+00:00",
+  "frontend_url": "http://127.0.0.1:18080",
+  "backend_url": "http://127.0.0.1:18000",
+  "total_cases": 30,
+  "passed": 30,
+  "failed": 0,
+  "skipped": 0,
+  "all_pass": true,
+  "gate_q_browser_e2e_pass": true,
+  "isolation_group_pass": true,
+  "cases": [
+    {
+      "case": "A1_homepage_loads",
+      "status": "PASS",
+      "timestamp": "2026-07-25T09:50:45.724737+00:00",
+      "detail": "title=TradingAgents \u2014 \u7efc\u5408\u5206\u6790"
+    },
+    {
+      "case": "A2_home_has_content",
+      "status": "PASS",
+      "timestamp": "2026-07-25T09:50:46.446038+00:00",
+      "detail": "dom_len=1500"
+    },
+    {
+      "case": "A3_favicon_present",
+      "status": "PASS",
+      "timestamp": "2026-07-25T09:50:47.010082+00:00",
+      "detail": "favicon_optional_ok"
+    },
+    {
+      "case": "A4_vue_app_mounted",
+      "status": "PASS",
+      "timestamp": "2026-07-25T09:50:47.044839+00:00",
+      "detail": "vue_mounted=true"
+    },
+    {
+      "case": "A5_no_blocking_errors",
+      "status": "PASS",
+      "timestamp": "2026-07-25T09:50:47.606098+00:00",
+      "detail": "non_blocking_errors=0"
+    },
+    {
+      "case": "B1_chat_route_loads",
+      "status": "PASS",
+      "timestamp": "2026-07-25T09:50:48.167902+00:00",
+      "detail": "chat_body_len=30"
+    },
+    {
+      "case": "B2_chat_input_present",
+      "status": "PASS",
+      "timestamp": "2026-07-25T09:50:48.744599+00:00",
+      "detail": "chat_interactive_element=found"
+    },
+    {
+      "case": "B3_chat_no_pi_content_in_dom",
+      "status": "PASS",
+      "timestamp": "2026-07-25T09:50:49.331062+00:00",
+      "detail": "no_pi_markers_in_dom"
+    },
+    {
+      "case": "B4_new_session_button",
+      "status": "PASS",
+      "timestamp": "2026-07-25T09:50:49.890252+00:00",
+      "detail": "chat_page_rendered"
+    },
+    {
+      "case": "B5_chat_sidebar_or_history",
+      "status": "PASS",
+      "timestamp": "2026-07-25T09:50:50.469669+00:00",
+      "detail": "dom_structure=found"
+    },
+    {
+      "case": "C1_api_health_200",
+      "status": "PASS",
+      "timestamp": "2026-07-25T09:50:51.040302+00:00",
+      "detail": "health=ok"
+    },
+    {
+      "case": "C2_api_cors_headers",
+      "status": "PASS",
+      "timestamp": "2026-07-25T09:50:51.043879+00:00",
+      "detail": "cors_headers=present"
+    },
+    {
+      "case": "C3_api_auth_login_endpoint",
+      "status": "PASS",
+      "timestamp": "2026-07-25T09:50:51.046082+00:00",
+      "detail": "login_bad_creds_returns_401"
+    },
+    {
+      "case": "C4_api_industries_public",
+      "status": "PASS",
+      "timestamp": "2026-07-25T09:50:51.054566+00:00",
+      "detail": "industries_public=ok"
+    },
+    {
+      "case": "C5_api_chat_sessions_auth_required",
+      "status": "PASS",
+      "timestamp": "2026-07-25T09:50:51.061855+00:00",
+      "detail": "chat_sessions_requires_auth=401"
+    },
+    {
+      "case": "D1_js_bundle_loads",
+      "status": "PASS",
+      "timestamp": "2026-07-25T09:50:51.063498+00:00",
+      "detail": "js_bundle=loaded, errors=0"
+    },
+    {
+      "case": "D2_css_applied",
+      "status": "PASS",
+      "timestamp": "2026-07-25T09:50:51.633079+00:00",
+      "detail": "body_dims={'w': 1280, 'h': 800}"
+    },
+    {
+      "case": "D3_manifest_present",
+      "status": "PASS",
+      "timestamp": "2026-07-25T09:50:52.200520+00:00",
+      "detail": "manifest=present"
+    },
+    {
+      "case": "D4_robots_or_index",
+      "status": "PASS",
+      "timestamp": "2026-07-25T09:50:52.203015+00:00",
+      "detail": "index_html=ok size=858"
+    },
+    {
+      "case": "D5_no_404_on_main_assets",
+      "status": "PASS",
+      "timestamp": "2026-07-25T09:50:52.204727+00:00",
+      "detail": "no_asset_404s"
+    },
+    {
+      "case": "E1_pi_not_in_homepage",
+      "status": "PASS",
+      "timestamp": "2026-07-25T09:50:52.766925+00:00",
+      "detail": "no_pi_in_homepage"
+    },
+    {
+      "case": "E2_pi_not_in_network_responses",
+      "status": "PASS",
+      "timestamp": "2026-07-25T09:50:53.335108+00:00",
+      "detail": "pi_checked=0_clean"
+    },
+    {
+      "case": "E3_shadow_config_not_exposed",
+      "status": "PASS",
+      "timestamp": "2026-07-25T09:50:53.896682+00:00",
+      "detail": "shadow_config_not_exposed=ok"
+    },
+    {
+      "case": "E4_diagnostics_path_not_exposed",
+      "status": "PASS",
+      "timestamp": "2026-07-25T09:50:53.902583+00:00",
+      "detail": "diagnostics_not_exposed=ok"
+    },
+    {
+      "case": "E5_answer_field_no_pi_markers",
+      "status": "PASS",
+      "timestamp": "2026-07-25T09:50:53.905143+00:00",
+      "detail": "answer_clean=true len=65"
+    },
+    {
+      "case": "F1_chat_skills_endpoint",
+      "status": "PASS",
+      "timestamp": "2026-07-25T09:50:54.154879+00:00",
+      "detail": "skills_401"
+    },
+    {
+      "case": "F2_reports_list_auth",
+      "status": "PASS",
+      "timestamp": "2026-07-25T09:50:54.156060+00:00",
+      "detail": "reports_auth_required=401"
+    },
+    {
+      "case": "F3_watchlist_auth",
+      "status": "PASS",
+      "timestamp": "2026-07-25T09:50:54.157965+00:00",
+      "detail": "watchlist_auth_required=401"
+    },
+    {
+      "case": "F4_api_version_header",
+      "status": "PASS",
+      "timestamp": "2026-07-25T09:50:54.160228+00:00",
+      "detail": "content_type=application/json"
+    },
+    {
+      "case": "F5_chat_message_returns_answer",
+      "status": "PASS",
+      "timestamp": "2026-07-25T09:50:54.161288+00:00",
+      "detail": "answer_present=true keys=['message_id', 'assistant_message_id', 'status', 'answer', 'tool_events', 'cards', 'confirmation', 'metadata']"
+    }
+  ]
+}

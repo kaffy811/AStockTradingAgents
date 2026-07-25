@@ -1,0 +1,43 @@
+{
+  "schema_version": "pi_canary_performance_trend_v1",
+  "phase": "6V-P1.27",
+  "generated_at": "2026-07-25T09:56:00.000000+00:00",
+  "description": "Chat endpoint HTTP latency trend across P1.27 soak windows (Y1-Y10) and smoke probes",
+  "latency_unit": "milliseconds",
+  "smoke_probes": [
+    {
+      "probe_id": "smoke1",
+      "requests": 3,
+      "concurrency": 1,
+      "http_p50_ms": 421,
+      "http_p95_ms": 709,
+      "http_p99_ms": 709
+    },
+    {
+      "probe_id": "smoke2",
+      "requests": 10,
+      "concurrency": 5,
+      "http_p50_ms": 16054,
+      "http_p95_ms": 28141,
+      "http_p99_ms": 28141,
+      "note": "High latency due to LLM queuing at concurrency=5. Serial mode selected for main soak."
+    }
+  ],
+  "soak_windows": "Y1-Y10 pending (serial mode, ~700ms p95 expected per smoke probe)",
+  "target_slo": {
+    "http_p95_ms": 5000,
+    "http_p99_ms": 10000,
+    "success_rate_pct": 95
+  },
+  "baseline_serial_mode": {
+    "concurrency": 1,
+    "expected_p50_ms": 400,
+    "expected_p95_ms": 800,
+    "rationale": "Serial mode bypasses LLM queue contention. Legacy chat orchestrator responds in 400-800ms per request."
+  },
+  "trend_analysis": {
+    "p126_to_p127_delta": "N/A (P1.26 used non-chat endpoints; first real chat latency measurement in P1.27)",
+    "concurrency_sensitivity": "High — p95 increases from 709ms (serial) to 28141ms (concurrent=5) due to backend LLM serialization",
+    "recommendation": "Production soak should use multiple backend replicas behind a load balancer to achieve parallel throughput without LLM queuing"
+  }
+}
