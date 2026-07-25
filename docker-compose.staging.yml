@@ -136,7 +136,9 @@ volumes:
 
 networks:
   staging-internal:
-    name: tradingagents-p125-staging_internal
+    # Use a distinct name that does NOT collide with the auto-generated name of
+    # the base 'internal' network (tradingagents-p125-staging_internal).
+    name: tradingagents-p125-staging_net
     driver: bridge
   internal:
     driver: bridge
