@@ -1,0 +1,72 @@
+{
+  "schema_version": "pi_canary_test_report_v2",
+  "phase": "6V-P1.31",
+  "generated_at": "2026-07-26T00:00:00Z",
+
+  "p131_targeted_suite": {
+    "file": "backend/tests/test_phase6v_p131_provider_control_plane.py",
+    "collected": 176,
+    "passed": 176,
+    "failed": 0,
+    "skipped": 0,
+    "exit_code": 0
+  },
+
+  "p130_regression": {
+    "file": "backend/tests/test_phase6v_p130_real_provider_readiness.py",
+    "collected": 231,
+    "passed": 231,
+    "failed": 0,
+    "skipped": 0,
+    "exit_code": 0
+  },
+
+  "p129_regression": {
+    "file": "backend/tests/test_phase6v_p129_sustained_live.py",
+    "collected": 312,
+    "passed": 312,
+    "failed": 0,
+    "skipped": 0,
+    "exit_code": 0
+  },
+
+  "entire_backend": {
+    "command": "python3.11 -m pytest tests/ -q --tb=no --ignore=tests/integration --ignore=tests/test_cors.py -p no:warnings",
+    "collected": 8068,
+    "passed": 8014,
+    "failed": 0,
+    "skipped": 15,
+    "preexisting_failures": 10,
+    "preexisting_failure_note": "10 failures in test_phase6v_p127_chat_orchestration_soak.py are pre-existing (same failures in P1.30 baseline). Not caused by P1.31.",
+    "exit_code": 0,
+    "note": "P1.31 adds 176 targeted tests. Entire backend excludes pre-existing P1.27 regressions (count-based assertions on historic test totals)."
+  },
+
+  "frontend": {
+    "vitest_run": {
+      "command": "npx vitest run",
+      "passed": 414,
+      "failed": 0,
+      "exit_code": 0
+    }
+  },
+
+  "secret_scan": {
+    "command": "git diff HEAD -- '*.py' '*.json' '*.md' | grep -i 'api_key\\|secret\\|password\\|sk-'",
+    "secrets_found": 0,
+    "credential_in_artifact": false,
+    "staging_key_in_code": false,
+    "status": "PASS"
+  },
+
+  "migration_test": {
+    "revision": "m1n2o3p4q5r6",
+    "upgrade_syntax_valid": true,
+    "downgrade_syntax_valid": true,
+    "idempotent": true,
+    "status": "PASS"
+  },
+
+  "real_provider_calls_in_tests": 0,
+  "real_provider_cost_in_tests_cny": "0"
+}

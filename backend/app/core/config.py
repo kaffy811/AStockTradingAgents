@@ -127,6 +127,59 @@ class Settings(BaseSettings):
     pi_canary_auto_rollback_enabled: bool = True
     pi_canary_health_window_minutes: int = 30
     pi_canary_min_sample_size: int = 50
+    # Phase 6V-P1.31: provider mode (staging_replay | staging_real)
+    # staging_replay = use replay data only (no real provider calls)
+    # staging_real   = use real provider (requires all P1.31 gates PASS + explicit authorization)
+    pi_canary_provider_mode: str = "staging_replay"
+
+    # ── Phase 6V-P1.31: Real Provider Control Plane ────────────────────────────
+    # ALL defaults are fail-closed. NEVER change without explicit project owner authorization.
+
+    # Staging-only DeepSeek API key. MUST be separate from DEEPSEEK_API_KEY (production).
+    # Gate D: real provider MUST use this key only; MUST NOT fall back to deepseek_api_key.
+    deepseek_api_key_staging: str | None = None
+
+    # Master enable flag. Default False (fail-closed).
+    # Gate I: real provider activation requires this = True AND kill_switch = False.
+    pi_real_provider_enabled: bool = False
+
+    # Kill switch. Default True (fail-closed). Set False only with authorization.
+    # Gate I: if True, all real provider calls are blocked regardless of enabled flag.
+    pi_real_provider_kill_switch: bool = True
+
+    # Provider identity
+    pi_real_provider_name: str = "deepseek"
+    pi_real_provider_model: str = "deepseek-v4-flash"
+
+    # Gate F: maximum real provider requests per activation window (hard cap = 100).
+    pi_real_provider_max_requests: int = 100
+
+    # Gate G: maximum real provider cost in CNY per activation window.
+    pi_real_provider_max_cost_cny: float = 100.0
+
+    # Gate H: maximum concurrent real provider calls (cross-worker via Redis lease).
+    pi_real_provider_max_concurrency: int = 2
+
+    # Gate H: rate limit — maximum real provider calls per minute (cross-worker sliding window).
+    pi_real_provider_rate_limit_per_minute: int = 60
+
+    # Gate H: explicit timeout on OpenAI client (seconds). SDK default is 600s — unsafe.
+    pi_real_provider_timeout_seconds: float = 30.0
+
+    # Circuit breaker: consecutive failure threshold before OPEN.
+    pi_real_provider_circuit_breaker_failure_threshold: int = 5
+
+    # Circuit breaker: seconds before attempting HALF_OPEN recovery.
+    pi_real_provider_circuit_breaker_recovery_seconds: float = 60.0
+
+    # Gate E: pricing version identifier. "unverified" = test fixture only.
+    pi_real_provider_pricing_version: str = "unverified"
+
+    # Redis budget namespace (all keys prefixed with this).
+    pi_real_provider_budget_namespace: str = "pi_provider_staging"
+
+    # Audit trail: enable logging to pi_real_provider_audit table.
+    pi_real_provider_audit_enabled: bool = True
     # Set to False in production to skip Base.metadata.create_all at startup.
     # Production deployments should run: uv run alembic upgrade head
     enable_create_all: bool = True
