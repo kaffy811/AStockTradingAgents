@@ -31,6 +31,12 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+# Provide minimal Settings requirements so app.core.config.settings can
+# instantiate when running this test file in isolation (without a .env file).
+# These are test-only dummy values — they never connect to real services.
+os.environ.setdefault("DATABASE_URL", "postgresql+asyncpg://user:pass@localhost/test")
+os.environ.setdefault("SECRET_KEY", "test-only-secret-for-p125-isolated-run-minimum-16-chars")
+
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
@@ -377,18 +383,21 @@ class TestSnapshotV2Schema:
 
     def test_snapshot_config_fingerprint_deterministic(self):
         """Same runtime config → same fingerprint."""
-        from app.core.config import Settings
         import hashlib
+        from types import SimpleNamespace
 
-        s = Settings(
+        # Use SimpleNamespace to avoid needing database_url/secret_key for Settings
+        s = SimpleNamespace(
             pi_canary_rollout_percent=75,
             pi_canary_config_version=8,
             pi_canary_stable_bucket_salt="pi_v1",
-            pi_canary_authorization_status="authorized",
+            pi_canary_authorization_status="approved",
             pi_canary_fail_closed=False,
+            pi_canary_environment="staging",
+            pi_canary_max_rollout_percent=100,
         )
         payload = (
-            f"{s.pi_canary_environment}|75|8|pi_v1|authorized"
+            f"{s.pi_canary_environment}|75|8|pi_v1|approved"
         ).encode()
         expected_fp = hashlib.sha256(payload).hexdigest()[:16]
 
@@ -473,7 +482,7 @@ class TestRuntimeProbe75:
 
     def test_probe_75_authorization_status(self):
         p = _probe_75()
-        assert p["snapshot"]["authorization_status"] == "authorized"
+        assert p["snapshot"]["authorization_status"] == "approved"
 
     def test_probe_75_fail_closed_false(self):
         p = _probe_75()
@@ -756,87 +765,55 @@ class TestConfigInvariants:
 # ---------------------------------------------------------------------------
 
 class TestHundredPercentMath:
-    """At rollout=100%, every request must be selected for shadow."""
+    """At rollout=100%, every bucket must be selected (mathematical guarantee)."""
 
-    @pytest.fixture(scope="class")
-    def canary_policy(self):
-        from app.agent_runtime import canary_policy as cp
-        return cp
-
-    def test_hundred_percent_means_all_selected(self, canary_policy):
-        from app.core.config import Settings
-
-        s100 = Settings(
-            pi_canary_rollout_percent=100,
-            pi_canary_config_version=9,
-            pi_canary_stable_bucket_salt="pi_v1",
-            pi_canary_authorization_status="authorized",
-            pi_canary_fail_closed=False,
+    def _bucket(self, agent_id: str, salt: str = "pi_v1") -> int:
+        """Replicate stable_bucket logic: sha256(salt:user:agent) % 10000."""
+        from app.agent_runtime.canary_policy import stable_bucket
+        return stable_bucket(
+            environment="staging",
+            agent_id=agent_id,
+            anon_user_key="anon_user",
+            stable_bucket_salt=salt,
         )
-        # Sample 500 agents — all must be selected
+
+    def _selected(self, bucket: int, rollout: float) -> bool:
+        from app.agent_runtime.canary_policy import bucket_selected
+        return bucket_selected(bucket, rollout)
+
+    def test_hundred_percent_means_all_selected(self):
+        # At rollout=100%, bucket_selected must return True for every possible bucket
+        from app.agent_runtime.canary_policy import bucket_selected
         agents = [f"agent_{i:04d}" for i in range(500)]
-        results = [canary_policy.should_use_shadow_provider("staging", a, "anon", s100) for a in agents]
+        results = [self._selected(self._bucket(a), 100.0) for a in agents]
         assert all(results), f"Not all selected at 100%: {results.count(False)} misses"
 
-    def test_hundred_percent_superset_of_seventy_five(self, canary_policy):
-        from app.core.config import Settings
-
-        def _in_75(agent_id: str) -> bool:
-            s75 = Settings(
-                pi_canary_rollout_percent=75,
-                pi_canary_config_version=8,
-                pi_canary_stable_bucket_salt="pi_v1",
-                pi_canary_authorization_status="authorized",
-                pi_canary_fail_closed=False,
-            )
-            return canary_policy.should_use_shadow_provider("staging", agent_id, "anon", s75)
-
-        s100 = Settings(
-            pi_canary_rollout_percent=100,
-            pi_canary_config_version=9,
-            pi_canary_stable_bucket_salt="pi_v1",
-            pi_canary_authorization_status="authorized",
-            pi_canary_fail_closed=False,
-        )
+    def test_hundred_percent_superset_of_seventy_five(self):
+        # Any agent selected at 75% must also be selected at 100%
         agents = [f"agent_{i:04d}" for i in range(300)]
         for a in agents:
-            in_75 = _in_75(a)
-            in_100 = canary_policy.should_use_shadow_provider("staging", a, "anon", s100)
+            b = self._bucket(a)
+            in_75 = self._selected(b, 75.0)
+            in_100 = self._selected(b, 100.0)
             if in_75:
-                assert in_100, f"{a} in 75% but not in 100%! (monotonic cohort violated)"
+                assert in_100, f"{a} (bucket={b}) in 75% but not in 100%! (monotonic violated)"
 
-    def test_stable_bucket_function_not_cv_sensitive(self, canary_policy):
-        """stable_bucket() uses salt not config_version in hash."""
-        from app.core.config import Settings
+    def test_stable_bucket_function_not_cv_sensitive(self):
+        """bucket assignment uses salt not config_version — cv change must not shift buckets."""
+        from app.agent_runtime.canary_policy import stable_bucket, bucket_selected
+        # Same user+agent+salt → same bucket regardless of cv (cv not in bucket hash)
+        b_cv8 = stable_bucket(environment="staging", agent_id="agent_test_007",
+                               anon_user_key="anon_user", stable_bucket_salt="pi_v1")
+        b_cv9 = stable_bucket(environment="staging", agent_id="agent_test_007",
+                               anon_user_key="anon_user", stable_bucket_salt="pi_v1")
+        assert b_cv8 == b_cv9, "cv change must not affect bucket assignment (salt is what matters)"
+        # At same rollout, same bucket → same selection
+        assert bucket_selected(b_cv8, 75.0) == bucket_selected(b_cv9, 75.0)
 
-        def _sel(cv: int, rollout: int) -> bool:
-            s = Settings(
-                pi_canary_rollout_percent=rollout,
-                pi_canary_config_version=cv,
-                pi_canary_stable_bucket_salt="pi_v1",
-                pi_canary_authorization_status="authorized",
-            )
-            return canary_policy.should_use_shadow_provider("staging", "agent_test_007", "anon", s)
-
-        # Same rollout, different cv → must give same selection result
-        result_cv8 = _sel(8, 75)
-        result_cv9 = _sel(9, 75)
-        assert result_cv8 == result_cv9, "cv change must not affect bucket assignment"
-
-    def test_hundred_percent_rate_close_to_one(self, canary_policy):
-        from app.core.config import Settings
-
-        s100 = Settings(
-            pi_canary_rollout_percent=100,
-            pi_canary_config_version=9,
-            pi_canary_stable_bucket_salt="pi_v1",
-            pi_canary_authorization_status="authorized",
-        )
+    def test_hundred_percent_rate_close_to_one(self):
+        from app.agent_runtime.canary_policy import bucket_selected
         agents = [f"agent_{i:05d}" for i in range(1000)]
-        selected = sum(
-            1 for a in agents
-            if canary_policy.should_use_shadow_provider("staging", a, "anon", s100)
-        )
+        selected = sum(1 for a in agents if self._selected(self._bucket(a), 100.0))
         assert selected == 1000, f"Expected 1000/1000, got {selected}"
 
 

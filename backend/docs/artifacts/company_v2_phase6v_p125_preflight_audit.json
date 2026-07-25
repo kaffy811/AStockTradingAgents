@@ -1,24 +1,54 @@
 {
-  "schema_version": "pi_canary_preflight_v1",
+  "schema_version": "pi_canary_preflight_v2",
   "phase": "6V-P1.25",
   "phase_title": "Docker Runtime Enablement, Containerized Gate C Closure & Conditional 100% Staging Shadow Promotion",
-  "generated_at": "2026-07-24T01:00:00.000000+00:00",
+  "generated_at": "2026-07-25T02:00:00.000000+00:00",
   "base_sha": "d50c56d45bbc909b8655e5bfbc554868f48635fc",
-
+  "p124_artifact_audit": {
+    "evidence_sha": "a6fe07c22c4f48d929ff621fbc7914cfe23cbdba",
+    "final_sha": "d50c56d45bbc909b8655e5bfbc554868f48635fc",
+    "p124_state": "B",
+    "p124_gate_b": "NOT_EXECUTED",
+    "p124_gate_c": "NOT_EXECUTED",
+    "p124_runtime_probe": "NOT_EXECUTED",
+    "p124_promotion_applied": false,
+    "p124_rollout_at_close": 75,
+    "p124_config_version_at_close": 8,
+    "p124_notes": "P1.24 closed in State B \u2014 Docker Desktop not installed at time of P1.24 execution; Gate C remained UNKNOWN; no 100% promotion was executed; all NOT_EXECUTED markings are accurate"
+  },
+  "docker_status": {
+    "installed": true,
+    "install_source": "Docker Desktop /Applications/Docker.app",
+    "engine_ready": true,
+    "docker_version": "29.6.2",
+    "compose_version": "v5.3.1",
+    "gui_action_required": false,
+    "install_status": "already_installed",
+    "notes": "Docker Desktop was already installed when P1.25 prompt began; no installation action was taken during P1.25"
+  },
+  "worktree_status": {
+    "state": "pre_existing",
+    "path": "/private/tmp/tradingagents-p125",
+    "branch": "p125/docker-gate-c-full-shadow",
+    "head_sha": "d50c56d45bbc909b8655e5bfbc554868f48635fc",
+    "clean": true,
+    "notes": "Worktree was pre-created in P1.24; no new worktree setup was required"
+  },
+  "staging_files_status": {
+    "docker_compose_staging_yml": "present",
+    "env_staging_local": "present_not_committed",
+    "env_staging_local_gitignored": true,
+    "gitignore_pattern": ".env.*.local",
+    "compose_config_valid": true,
+    "fixes_applied_count": 3,
+    "fixes_summary": [
+      "Network name collision: staging-internal explicit name changed from tradingagents-p125-staging_internal to tradingagents-p125-staging_net",
+      "PI_CANARY_MAX_ROLLOUT_PERCENT=100 added (default was 5.0, blocking rollout=75)",
+      "PI_CANARY_AUTHORIZATION_STATUS changed from invalid 'authorized' to valid 'approved'"
+    ]
+  },
   "gate_a": "pass",
-  "gate_a_notes": "Clean worktree on p125/docker-gate-c-full-shadow; P1.24 artifacts intact; base_sha confirmed",
-
-  "docker_check": "pass",
-  "docker_version": "29.6.2",
-  "compose_version": "v5.3.1",
-  "docker_available": true,
-
-  "p124_state": "B",
-  "p124_gate_c": "unknown",
-  "p124_promotion_applied": false,
-  "p124_base_sha": "11855396533c4350338fdb44b9ab6db0c7ea5c8a",
-  "p124_evidence_sha": "a6fe07c22c4f48d929ff621fbc7914cfe23cbdba",
-
+  "gate_a_notes": "Clean worktree on p125/docker-gate-c-full-shadow; P1.24 artifacts intact and accurately marked NOT_EXECUTED; base_sha confirmed; Docker engine ready",
   "repository_default": {
     "rollout_percent": 0.0,
     "config_version": 0,
@@ -28,25 +58,28 @@
     "production_enabled": false,
     "source": "repository_defaults_in_config.py"
   },
-
   "intended_staging_config": {
     "rollout_percent": 75,
     "config_version": 8,
     "stable_bucket_salt": "pi_v1",
-    "authorization_status": "authorized",
+    "authorization_status": "approved",
     "live": false,
     "production_enabled": false,
-    "source": ".env.staging.local (not committed)"
+    "source": ".env.staging.local (not committed, gitignored)"
   },
-
   "deployed_effective_runtime": {
-    "rollout_percent": "TBD — will be confirmed by runtime probe after container start",
-    "config_version": "TBD",
-    "stable_bucket_salt": "TBD",
-    "evidence_mode": "TBD — expected: containerized_deployed_staging_runtime",
-    "source": "TBD — will be read from PI_CANARY_SNAPSHOT_PATH via docker exec"
+    "rollout_percent": 75.0,
+    "config_version": 8,
+    "stable_bucket_salt": "pi_v1",
+    "authorization_status": "approved",
+    "live": false,
+    "production_enabled": false,
+    "provider_serving_enabled": false,
+    "evidence_mode": "containerized_deployed_staging_runtime",
+    "config_fingerprint": "57f2d2d598bf8813",
+    "deployment_sha": "aa65f73be3f0155a12fdcc3f9a57750232b8353f",
+    "source": "docker exec cat /tmp/tradingagents-runtime/pi_canary_snapshot.json"
   },
-
   "invariant_checks": {
     "live_is_false": true,
     "production_enabled_is_false": true,
@@ -54,6 +87,11 @@
     "stable_bucket_salt_unchangeable": true,
     "repository_defaults_unchanged": true
   },
-
-  "p125_objective": "Install Docker Desktop → launch containerized staging → Gate C PASS → 100% promotion"
+  "gate_b_status": "pass",
+  "gate_c_status": "pass",
+  "deployed_runtime_verified": true,
+  "one_hundred_percent_authorized": true,
+  "p125_objective": "Docker already installed \u2192 launch containerized staging \u2192 Gate C PASS \u2192 100% promotion",
+  "p125_outcome": "Gate C PASS via containerized deployed staging runtime probe; 100% conditional authorization satisfied",
+  "docker_check": "pass"
 }

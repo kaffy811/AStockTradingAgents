@@ -1,0 +1,108 @@
+{
+  "schema_version": "pi_canary_staging_config_mapping_v1",
+  "phase": "6V-P1.25",
+  "phase_title": "Docker Runtime Enablement, Containerized Gate C Closure & Conditional 100% Staging Shadow Promotion",
+  "generated_at": "2026-07-25T02:00:00.000000+00:00",
+
+  "intended_config": {
+    "source": ".env.staging.local (gitignored, not committed)",
+    "rollout_percent": 75,
+    "config_version": 8,
+    "stable_bucket_salt": "pi_v1",
+    "authorization_status": "approved",
+    "live": false,
+    "production_enabled": false,
+    "provider_serving_enabled": false,
+    "canary_mode": "shadow",
+    "max_rollout_percent": 100,
+    "notes": "Intended config after 3 fixes applied to .env.staging.local"
+  },
+
+  "effective_runtime": {
+    "source": "docker exec cat /tmp/tradingagents-runtime/pi_canary_snapshot.json",
+    "evidence_mode": "containerized_deployed_staging_runtime",
+    "rollout_percent": 75.0,
+    "config_version": 8,
+    "stable_bucket_salt": "pi_v1",
+    "authorization_status": "approved",
+    "live": false,
+    "production_enabled": false,
+    "provider_serving_enabled": false,
+    "fail_closed": false,
+    "global_kill_switch": false,
+    "canary_mode": "shadow",
+    "parse_error": null,
+    "runtime_loader": "load_canary_config",
+    "config_source": "pydantic_settings.Settings",
+    "config_fingerprint": "57f2d2d598bf8813",
+    "deployment_sha": "aa65f73be3f0155a12fdcc3f9a57750232b8353f",
+    "deployment_mode": "containerized_staging",
+    "process_id": 10,
+    "process_started_at": "2026-07-25T01:51:17.304567+00:00",
+    "snapshot_generated_at": "2026-07-25T01:51:17.304799+00:00"
+  },
+
+  "mapping_fields": [
+    {
+      "field": "rollout_percent",
+      "intended": 75,
+      "effective": 75.0,
+      "consistent": true
+    },
+    {
+      "field": "config_version",
+      "intended": 8,
+      "effective": 8,
+      "consistent": true
+    },
+    {
+      "field": "stable_bucket_salt",
+      "intended": "pi_v1",
+      "effective": "pi_v1",
+      "consistent": true
+    },
+    {
+      "field": "authorization_status",
+      "intended": "approved",
+      "effective": "approved",
+      "consistent": true
+    },
+    {
+      "field": "live",
+      "intended": false,
+      "effective": false,
+      "consistent": true
+    },
+    {
+      "field": "production_enabled",
+      "intended": false,
+      "effective": false,
+      "consistent": true
+    },
+    {
+      "field": "provider_serving_enabled",
+      "intended": false,
+      "effective": false,
+      "consistent": true
+    },
+    {
+      "field": "canary_mode",
+      "intended": "shadow",
+      "effective": "shadow",
+      "consistent": true
+    },
+    {
+      "field": "parse_error",
+      "intended": null,
+      "effective": null,
+      "consistent": true
+    }
+  ],
+
+  "mapping_consistent": true,
+  "all_fields_consistent": true,
+  "evidence_mode": "containerized_deployed_staging_runtime",
+  "config_fingerprint": "57f2d2d598bf8813",
+
+  "notes": "All intended staging config values are reflected exactly in the effective runtime snapshot. The 3 fixes applied to .env.staging.local (max_rollout_percent, authorization_status enum correction, network name) were necessary for the intended values to propagate correctly."
+}

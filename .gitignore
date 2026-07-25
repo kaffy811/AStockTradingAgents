@@ -29,3 +29,6 @@ build/
 # Claude Code temporary worktrees
 .claude/worktrees/
 .claude/scheduled_tasks.lock
+
+# Staging local override (P1.25)
+.env.staging.local

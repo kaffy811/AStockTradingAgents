@@ -1,0 +1,89 @@
+{
+  "schema_version": "pi_canary_conditional_authorization_v1",
+  "phase": "6V-P1.25",
+  "phase_title": "Docker Runtime Enablement, Containerized Gate C Closure & Conditional 100% Staging Shadow Promotion",
+  "generated_at": "2026-07-25T02:00:00.000000+00:00",
+
+  "owner_authorization_recorded": true,
+  "owner_authorization_source": "company_v2_phase6v_p125_owner_authorization.json",
+  "owner_authorization_notes": "Owner authorization was recorded in P1.25 pre-execution phase; conditional on Gate C = PASS",
+
+  "authorization_condition": "Gate C = PASS via containerized deployed staging runtime probe",
+  "condition_satisfied": true,
+  "condition_satisfied_at": "2026-07-25T01:51:17.304799+00:00",
+  "condition_satisfied_evidence": "company_v2_phase6v_p125_runtime_probe_75.json + company_v2_phase6v_p125_gate_c_closure.json",
+  "condition_satisfied_evidence_mode": "containerized_deployed_staging_runtime",
+
+  "one_hundred_percent_authorized": true,
+  "authorization_chain": [
+    "Gate B = PASS (compose validation, all services running, port bindings verified)",
+    "Gate C = PASS (runtime snapshot verified, all 12 conditions PASS)",
+    "Owner conditional authorization condition satisfied",
+    "100% promotion authorized"
+  ],
+
+  "promotion_target": {
+    "description": "Promote staging shadow rollout from 75% to 100%",
+    "rollout_from": 75,
+    "rollout_to": 100,
+    "config_version_from": 8,
+    "config_version_to": 9,
+    "stable_bucket_salt": "pi_v1",
+    "stable_bucket_salt_change": false,
+    "canary_mode": "shadow",
+    "canary_mode_change": false,
+    "promotion_scope": "staging shadow only — no production traffic"
+  },
+
+  "not_authorized": [
+    {
+      "item": "live",
+      "description": "Setting live=true is not authorized; remains false",
+      "authorized": false
+    },
+    {
+      "item": "production_enabled",
+      "description": "Setting production_enabled=true is not authorized; remains false",
+      "authorized": false
+    },
+    {
+      "item": "provider_serving_enabled",
+      "description": "Setting provider_serving_enabled=true is not authorized; remains false",
+      "authorized": false
+    },
+    {
+      "item": "legacy_decommission",
+      "description": "Decommissioning the legacy custom_coordinator engine is not authorized in this phase",
+      "authorized": false
+    },
+    {
+      "item": "repository_default_rollout_change",
+      "description": "Changing repository default rollout_percent (currently 0.0) is not authorized",
+      "authorized": false
+    },
+    {
+      "item": "stable_salt_change",
+      "description": "Changing the stable_bucket_salt from pi_v1 to any other value is not authorized; pi_v1 must remain unchanged across all phases",
+      "authorized": false
+    }
+  ],
+
+  "safety_constraints": {
+    "staging_only": true,
+    "shadow_mode_only": true,
+    "no_real_provider_calls": true,
+    "no_production_traffic": true,
+    "loopback_bindings_only": true,
+    "secrets_not_committed": true,
+    "invariants_maintained": true
+  },
+
+  "next_steps": [
+    "Execute 100% promotion: update .env.staging.local to rollout_percent=100, config_version=9",
+    "Restart backend container to reload env",
+    "Obtain new runtime snapshot via docker exec to verify rollout=100, cv=9",
+    "Record promotion artifact company_v2_phase6v_p125_promotion_100.json",
+    "Run browser acceptance tests at 100% rollout",
+    "Record final phase summary"
+  ]
+}

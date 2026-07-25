@@ -1,0 +1,38 @@
+{
+  "schema_version": "pi_canary_docker_installation_v1",
+  "phase": "6V-P1.25",
+  "phase_title": "Docker Runtime Enablement, Containerized Gate C Closure & Conditional 100% Staging Shadow Promotion",
+  "generated_at": "2026-07-25T02:00:00.000000+00:00",
+
+  "docker_desktop_was_installed": true,
+  "docker_desktop_path": "/Applications/Docker.app",
+  "docker_desktop_notes": "Docker Desktop was present at /Applications/Docker.app before P1.25 prompt began; confirmed as pre-existing installation",
+
+  "docker_engine_was_ready": true,
+  "docker_engine_server_version": "29.6.2",
+  "docker_version": "29.6.2",
+  "docker_cli_path": "/usr/local/bin/docker",
+
+  "compose_version": "v5.3.1",
+  "compose_plugin": true,
+
+  "installation_action_taken": "none_already_installed",
+  "installation_action_notes": "No installation steps were performed during P1.25; Docker Desktop was already installed and the engine was running",
+
+  "gui_action_required": false,
+  "gui_action_notes": "Docker Desktop GUI did not need to be opened; engine was accessible via CLI without any GUI interaction",
+
+  "engine_verified_command": "docker version --format '{{.Server.Version}}'",
+  "engine_verified_exit_code": 0,
+  "engine_verified_output": "29.6.2",
+
+  "compose_verified_command": "docker compose version --short",
+  "compose_verified_exit_code": 0,
+  "compose_verified_output": "v5.3.1",
+
+  "p124_docker_status": "not_installed",
+  "p124_docker_notes": "Docker Desktop was NOT installed during P1.24 execution; this is why Gate C remained UNKNOWN in P1.24 and P1.25 was required",
+
+  "blocker_resolved": true,
+  "blocker_resolution": "Docker Desktop was already installed when P1.25 began — no action required; engine ready for compose up"
+}
