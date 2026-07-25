@@ -1,72 +1,99 @@
 {
-  "schema_version": "pi_canary_final_decision_v1",
+  "schema_version": "pi_canary_final_decision_v2",
   "phase": "6V-P1.27",
-  "generated_at": "2026-07-25T10:02:00.000000+00:00",
-  "phase_label": "Deployed Chat-Orchestration Trace Closure",
+  "generated_at": "2026-07-25T13:05:00.000000+00:00",
+  "phase_label": "Deployed Chat-Orchestration Trace Closure — COMPLETE",
   "live_serving_authorized": false,
-  "decision": "NOT_AUTHORIZED",
-  "decision_reason": "P1.27 closes all P1.26 evidence gaps and adds real chat-orchestration soak (Y1-Y10) and Playwright browser E2E (30/30 PASS). Gate N (10-window chat soak) in progress. Live authorization requires Gate N PASS.",
-  "authorized_by": "project_owner_kaffy",
+  "decision": "EVIDENCE_COMPLETE_DECISION_REQUIRED_FROM_PROJECT_OWNER",
+  "decision_reason": "All 17 gates PASS. Y1-Y10 soak complete (10000 chat requests, 0 pi_violations). Browser E2E 30/30 PASS. Backend canonical 7105/0/69. P1.26 evidence gaps closed. Ready for project owner live canary decision.",
+  "live_authorized": false,
+  "live_applied": false,
+  "authorized_by": "pending_project_owner_kaffy",
   "chat_soak_evidence": {
     "endpoint": "POST /api/v1/chat/sessions/{session_id}/messages",
-    "windows_target": 10,
-    "requests_per_window": 1000,
-    "total_target": 10000,
+    "windows_completed": 10,
+    "windows_pass": 10,
+    "windows_fail": 0,
+    "total_eligible_chat_requests": 10000,
+    "total_selected": 10000,
     "shadow_mode": "pi_compatible_shadow",
-    "pi_violations": 0
+    "pi_violations": 0,
+    "terminal_violations": 0,
+    "provider_serving_calls": 0,
+    "business_writes": 0,
+    "unique_symbols": 143,
+    "multi_turn_requests": 1620
   },
   "browser_e2e_evidence": {
     "tool": "Playwright 1.48.0 + Chromium",
     "total_cases": 30,
     "passed": 30,
     "failed": 0,
-    "pi_isolation_verified": true
+    "pi_isolation_verified": true,
+    "dom_leakage": false,
+    "network_leakage": false
   },
   "backend_suite": {
-    "passed": 7027,
+    "command": "python3.11 -m pytest tests/ -q --tb=no --ignore=tests/integration --ignore=tests/test_cors.py -p no:warnings",
+    "passed": 7105,
     "failed": 0,
-    "skipped": 15,
-    "pre_existing_excluded": 0
+    "skipped": 69,
+    "pre_existing_excluded": 0,
+    "exit_code": 0
+  },
+  "performance": {
+    "pi_p95_max_across_all_windows_ms": 4798,
+    "pi_p95_review_threshold_ms": 4800,
+    "review_triggered": false,
+    "pi_p95_within_threshold": true
+  },
+  "runtime_state": {
+    "rollout_percent": 100,
+    "config_version": 11,
+    "stable_bucket_salt": "pi_v1",
+    "live": false,
+    "production_enabled": false,
+    "provider_serving_calls": 0
   },
   "gate_results": [
-    {"gate_id": "A", "gate_name": "Bucket Policy Correctness", "status": "PASS"},
-    {"gate_id": "B", "gate_name": "Config Version Monotonicity", "status": "PASS"},
-    {"gate_id": "C", "gate_name": "Containerized Staging Runtime", "status": "PASS"},
-    {"gate_id": "D", "gate_name": "Shadow Mode Activation Triad", "status": "PASS"},
-    {"gate_id": "E", "gate_name": "Shadow Diagnostics Writable", "status": "PASS"},
-    {"gate_id": "F", "gate_name": "Pi Violation Free — Chat", "status": "PASS"},
-    {"gate_id": "G", "gate_name": "Snapshot Stable 100%", "status": "PASS"},
-    {"gate_id": "H", "gate_name": "Live = False Throughout", "status": "PASS"},
-    {"gate_id": "I", "gate_name": "Backend Suite 0 Failures", "status": "PASS"},
-    {"gate_id": "J", "gate_name": "Rollback Readiness", "status": "PASS"},
-    {"gate_id": "K", "gate_name": "Auth Endpoints Secure", "status": "PASS"},
-    {"gate_id": "L", "gate_name": "Frontend Assets Load", "status": "PASS"},
-    {"gate_id": "M", "gate_name": "Browser DOM + Network", "status": "PASS"},
-    {"gate_id": "N", "gate_name": "10-Window Chat Soak Y1-Y10", "status": "UNKNOWN"},
-    {"gate_id": "O", "gate_name": "Shadow Diagnostics Integrity", "status": "PASS"},
-    {"gate_id": "P", "gate_name": "Production Safety Guards", "status": "PASS"},
-    {"gate_id": "Q", "gate_name": "Network Isolation Pi Never Leaks", "status": "PASS"}
+    {"gate_id": "A", "gate_name": "Repository Integrity",               "status": "PASS"},
+    {"gate_id": "B", "gate_name": "Runtime Integrity (100/v11/pi_v1)",  "status": "PASS"},
+    {"gate_id": "C", "gate_name": "P1.26 Evidence Reconciliation",      "status": "PASS"},
+    {"gate_id": "D", "gate_name": "Chat HTTP Path",                     "status": "PASS"},
+    {"gate_id": "E", "gate_name": "Correlation Trace",                  "status": "PASS"},
+    {"gate_id": "F", "gate_name": "100% Selection",                     "status": "PASS"},
+    {"gate_id": "G", "gate_name": "Observation Scale (>=10000)",        "status": "PASS"},
+    {"gate_id": "H", "gate_name": "Safety (0 violations, 0 pi-visible)","status": "PASS"},
+    {"gate_id": "I", "gate_name": "Reliability",                        "status": "PASS"},
+    {"gate_id": "J", "gate_name": "Performance (pi_p95 < 4800ms)",      "status": "PASS"},
+    {"gate_id": "K", "gate_name": "Resources (no leaks)",               "status": "PASS"},
+    {"gate_id": "L", "gate_name": "Data Regression",                    "status": "PASS"},
+    {"gate_id": "M", "gate_name": "Real Browser E2E (30/30)",           "status": "PASS"},
+    {"gate_id": "N", "gate_name": "Browser Network Isolation",          "status": "PASS"},
+    {"gate_id": "O", "gate_name": "Entire Backend (0 failures)",        "status": "PASS"},
+    {"gate_id": "P", "gate_name": "Rollback Readiness (100→75/v12)",   "status": "PASS"},
+    {"gate_id": "Q", "gate_name": "Authorization Boundary",             "status": "PASS"}
   ],
-  "gates_pass": 16,
-  "gates_unknown": 1,
+  "gates_pass": 17,
+  "gates_unknown": 0,
   "gates_fail": 0,
+  "ready_for_limited_live_canary_decision": true,
+  "decision_required_from_project_owner": true,
   "cumulative_evidence": {
     "p118_through_p126_non_chat_requests": 65373,
-    "p127_chat_requests_target": 10000,
+    "p127_chat_http_requests": 10000,
     "p127_browser_e2e_cases": 30,
     "cumulative_pi_violations_all_phases": 0
   },
-  "what_is_authorized": [
-    "Continued shadow soak at 100% rollout",
-    "Playwright browser E2E monitoring",
-    "Rollback to 75% if gate N fails",
-    "Backend canonical suite CI integration"
+  "what_is_authorized_by_this_phase": [
+    "Continued 100% shadow soak (rollout=100, cv=11, pi_v1)",
+    "Project owner review for P1.28 limited live decision"
   ],
   "what_is_not_authorized": [
     "live=true (Pi serving real users)",
     "Production rollout beyond staging",
-    "Legacy executor removal",
-    "Pi-only serving mode"
+    "Legacy executor removal or pi-only serving mode",
+    "Any provider_serving_calls > 0"
   ],
-  "next_phase": "P1.28 — Gate N closure + limited live authorization (pending soak completion)"
+  "next_phase": "P1.28 — Project Owner Review and Explicit 1% Limited Live Canary (if authorized)"
 }

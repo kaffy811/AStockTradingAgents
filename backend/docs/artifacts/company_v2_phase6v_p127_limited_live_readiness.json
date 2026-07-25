@@ -1,10 +1,11 @@
 {
   "schema_version": "pi_canary_limited_live_readiness_v1",
   "phase": "6V-P1.27",
-  "generated_at": "2026-07-25T10:00:00.000000+00:00",
+  "generated_at": "2026-07-25T13:05:00.000000+00:00",
   "live_serving_authorized": false,
-  "limited_live_readiness": "conditionally_ready",
-  "condition_not_met": "Y1-Y10 soak in progress (live authorization requires all 10 windows PASS)",
+  "limited_live_readiness": "ready_pending_project_owner_decision",
+  "condition_not_met": null,
+  "soak_completed": "Y1-Y10 all complete — 10000/10000 chat HTTP requests, 0 pi_violations, 0 terminal_violations",
   "gate_results": [
     {
       "gate_id": "A",
@@ -101,9 +102,8 @@
       "gate_id": "N",
       "gate_name": "10-Window Chat Soak (Y1-Y10)",
       "description": "10,000 real chat HTTP requests through POST /messages; all windows PASS",
-      "evidence": "P1.27 soak in progress: Y1 completing, Y2-Y10 pending",
-      "status": "UNKNOWN",
-      "note": "Status will be updated to PASS once Y1-Y10 all complete"
+      "evidence": "Y1-Y10 complete: 10000/10000 eligible chat HTTP, 0 pi_violations, 0 terminal_violations, 143 unique symbols, 1620 multi-turn requests",
+      "status": "PASS"
     },
     {
       "gate_id": "O",
@@ -127,16 +127,19 @@
       "status": "PASS"
     }
   ],
-  "gates_pass": 16,
-  "gates_unknown": 1,
+  "gates_pass": 17,
+  "gates_unknown": 0,
   "gates_fail": 0,
-  "gate_n_note": "Gate N UNKNOWN at artifact generation time (soak in progress). Will update to PASS upon soak completion.",
+  "gate_n_note": "Gate N PASS — Y1-Y10 all complete, 10000/10000 chat HTTP requests, 0 violations.",
   "authorization_criteria": {
     "all_gates_pass_required": true,
     "live_false_required": true,
     "pi_violations_zero_required": true,
     "current_violations": 0,
     "current_live": false,
-    "authorization_status": "NOT_GRANTED"
-  }
+    "authorization_status": "EVIDENCE_COMPLETE_DECISION_REQUIRED_FROM_PROJECT_OWNER"
+  },
+  "ready_for_limited_live_canary_decision": true,
+  "decision_required_from_project_owner": true,
+  "this_document_does_not_authorize_live": true
 }

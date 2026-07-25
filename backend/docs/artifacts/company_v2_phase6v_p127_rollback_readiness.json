@@ -1,0 +1,46 @@
+{
+  "schema_version": "pi_canary_rollback_readiness_v1",
+  "phase": "6V-P1.27",
+  "generated_at": "2026-07-25T09:55:00.000000+00:00",
+  "purpose": "Verify rollback readiness from current 100%/v11 to 75%/v12 via isolated temporary Compose project",
+  "main_staging_project": "tradingagents-p125-staging",
+  "main_staging_unaffected": true,
+  "drill_project": "tradingagents-p127-rollback-drill",
+  "drill_isolation": "Separate Compose project; main staging cv=11 unchanged throughout drill",
+  "starting_state": {
+    "rollout_percent": 100,
+    "config_version": 11,
+    "stable_bucket_salt": "pi_v1",
+    "live": false
+  },
+  "rollback_target": {
+    "rollout_percent": 75,
+    "config_version": 12,
+    "stable_bucket_salt": "pi_v1",
+    "cv_monotonic": true,
+    "cv_increases_by": 1
+  },
+  "drill_result": {
+    "step_1_initiate_rollback": "PASS",
+    "step_2_health_check_at_75pct": "PASS",
+    "step_3_bucket_math_at_75pct": "PASS",
+    "step_4_cv12_confirmed": "PASS",
+    "step_5_main_staging_still_cv11": "PASS",
+    "drill_destroy": "PASS"
+  },
+  "bucket_verification_at_75pct": {
+    "bucket_0_selected": true,
+    "bucket_2499_selected": true,
+    "bucket_4999_selected": true,
+    "bucket_7500_selected": false,
+    "bucket_9999_selected": false,
+    "expected_selection_rate_pct": 75.0
+  },
+  "cv_monotonicity": {
+    "p126_final_cv": 11,
+    "rollback_cv_would_be": 12,
+    "monotonic": true,
+    "no_reuse_of_prior_versions": true
+  },
+  "gate_p_rollback_readiness": "PASS"
+}

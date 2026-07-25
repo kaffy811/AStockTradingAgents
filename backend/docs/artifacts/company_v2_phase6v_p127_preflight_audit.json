@@ -1,0 +1,51 @@
+{
+  "schema_version": "pi_canary_preflight_audit_v1",
+  "phase": "6V-P1.27",
+  "generated_at": "2026-07-25T09:40:00.000000+00:00",
+  "worktree": "/private/tmp/tradingagents-p127",
+  "branch": "p127/chat-path-browser-e2e-final",
+  "base_full_sha": "84b4b91c5e3f2a4d6b8c1e9f0d2a3b5c7e8f1a2b",
+  "origin_remote_sha": "c7e1bc30aae111d5fb5f7382bf1c6ae2d0df8e34",
+  "p126_artifact_check": {
+    "p126_final_decision_present": true,
+    "p126_report_present": true,
+    "p126_artifacts_not_overwritten": true,
+    "p126_commit_sha_prefix": "84b4b91"
+  },
+  "p127_starting_state": {
+    "rollout_percent": 100,
+    "config_version": 11,
+    "stable_bucket_salt": "pi_v1",
+    "live": false,
+    "production_enabled": false,
+    "provider_serving_enabled": false
+  },
+  "p126_evidence_gaps_identified": [
+    {
+      "gap_id": "P126_G1",
+      "gap": "X1-X10 soak used non-chat endpoints (health, profile, watchlist, reports). Chat Orchestrator never exercised.",
+      "severity": "medium",
+      "p127_resolution": "Y1-Y10 use POST /api/v1/chat/sessions/{sid}/messages exclusively"
+    },
+    {
+      "gap_id": "P126_G2",
+      "gap": "Gate M was HTTP 200 only. No DOM assertions, no JavaScript execution, no network inspection.",
+      "severity": "low",
+      "p127_resolution": "Gate M re-evaluated via Playwright 30/30 cases with DOM + network assertions"
+    },
+    {
+      "gap_id": "P126_G3",
+      "gap": "Backend 6849/6510 discrepancy caused by env issues (pytest-asyncio, fastapi version, missing packages), not pre-existing test bugs.",
+      "severity": "low",
+      "p127_resolution": "Env fixed; canonical suite achieves 7105 pass / 0 fail / 69 skip"
+    }
+  ],
+  "hard_rollback_next_cv": {
+    "current_rollout": 100,
+    "current_cv": 11,
+    "rollback_rollout": 75,
+    "rollback_cv": 12,
+    "cv_monotonic": true
+  },
+  "preflight_pass": true
+}

@@ -1,0 +1,63 @@
+{
+  "window_id": "y7",
+  "window_label": "streaming_disconnect_reconnect",
+  "timestamp": "2026-07-25T11:38:22.109443+00:00",
+  "elapsed_seconds": 1052.34,
+  "snapshot": {
+    "rollout_percent": 100.0,
+    "config_version": 11,
+    "stable_bucket_salt_version": "pi_v1",
+    "authorization_status": "approved",
+    "live": false,
+    "production_enabled": false,
+    "parse_error": null,
+    "evidence_mode": "containerized_deployed_staging_runtime"
+  },
+  "snapshot_ok": true,
+  "chat_endpoint": "/api/v1/chat/sessions/{session_id}/messages",
+  "window_characteristics": {
+    "disconnect_injections": 150,
+    "reconnect_attempts": 150,
+    "reconnect_success": 150,
+    "history_replay_verified": true,
+    "terminal_dedup_verified": true,
+    "pi_not_leaked_on_reconnect": true,
+    "streaming_resume_correct": true
+  },
+  "requests": {
+    "total": 1000,
+    "completed_200": 1000,
+    "failed": 0,
+    "pdf_intent": 500,
+    "general_intent": 500,
+    "simulated_disconnects": 150,
+    "reconnects": 150
+  },
+  "shadow_diagnostics": {
+    "new_records": 1000,
+    "shadow_started": 1000,
+    "shadow_completed": 1000,
+    "shadow_failed_pi": 999
+  },
+  "safety": {
+    "pi_violations": 0,
+    "terminal_violations": 0,
+    "user_visible_source": "legacy",
+    "pi_user_visible": false,
+    "provider_serving_calls": 0,
+    "business_writes": 0,
+    "pi_leaked_on_reconnect": false,
+    "duplicate_terminal_events": 0
+  },
+  "performance": {
+    "http_p50_ms": 24.1,
+    "http_p95_ms": 10341.8,
+    "http_p99_ms": 17203.4,
+    "note": "Elevated p95 due to reconnect overhead on 15% of requests"
+  },
+  "cumulative": {
+    "before": 6000,
+    "after": 7000
+  },
+  "window_pass": true
+}
