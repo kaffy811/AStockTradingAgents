@@ -1,0 +1,46 @@
+{
+  "schema_version": "pi_canary_mvp_gate_v1",
+  "phase": "6V-P1.33",
+  "generated_at": "2026-07-26T04:00:00Z",
+
+  "gate_assessment": [
+    {"gate": "A", "name": "Repository Integrity", "status": "PASS"},
+    {"gate": "B", "name": "Provider Control Plane", "status": "PASS"},
+    {"gate": "C", "name": "Call Path Budget Controls", "status": "PARTIAL", "note": "3/8 checks in path. Budget/concurrency require Redis injection. Gap is LOW risk in State B (blocked by credential gate first)."},
+    {"gate": "D", "name": "Staging Credential", "status": "NOT_EVALUATED", "note": "DEEPSEEK_API_KEY_STAGING not provisioned."},
+    {"gate": "E", "name": "Official Model Verification", "status": "PASS", "note": "deepseek-v4-flash confirmed as official API ID. deepseek-chat/reasoner deprecated 2026-07-24."},
+    {"gate": "F", "name": "Official Pricing Verification", "status": "PASS", "note": "USD prices verified from api-docs.deepseek.com 2026-07-26."},
+    {"gate": "G", "name": "Budget Guard Currency", "status": "PARTIAL", "note": "Budget guard uses CNY, prices in USD. Exchange rate 7.20 CNY/USD estimate used. Conservative floor 7.0."},
+    {"gate": "H", "name": "Fail-Closed Preflight", "status": "PASS", "note": "30 simulated requests all legacy. Real calls = 0."},
+    {"gate": "I", "name": "Real Provider Connectivity", "status": "NOT_EXECUTED", "note": "State B."},
+    {"gate": "J", "name": "Real Provider Results", "status": "NOT_EXECUTED", "note": "State B."},
+    {"gate": "K", "name": "Usage Capture", "status": "NOT_EXECUTED", "note": "State B."},
+    {"gate": "L", "name": "Cost Verification", "status": "NOT_EXECUTED", "note": "State B. Cost = $0 / CNY 0."},
+    {"gate": "M", "name": "Replay Restoration", "status": "PASS", "note": "staging_replay unchanged. cv=12."},
+    {"gate": "N", "name": "Core Stock Flow", "status": "PASS"},
+    {"gate": "O", "name": "Core Chat Flow", "status": "PASS"},
+    {"gate": "P", "name": "Multi-Turn Context", "status": "PASS"},
+    {"gate": "Q", "name": "Data Source and Freshness", "status": "PASS"},
+    {"gate": "R", "name": "Disclaimer and Compliance", "status": "PASS"},
+    {"gate": "S", "name": "Invite-Only Access", "status": "PASS"},
+    {"gate": "T", "name": "User Quota", "status": "PASS"},
+    {"gate": "U", "name": "Feedback Loop", "status": "PASS"},
+    {"gate": "V", "name": "Product Analytics", "status": "PASS"},
+    {"gate": "W", "name": "Error Monitoring", "status": "PASS"},
+    {"gate": "X", "name": "Browser E2E", "status": "PASS", "note": "129/139 PASS. 10 NOT_EXECUTED (real provider cases)."},
+    {"gate": "Y", "name": "Canonical Tests", "status": "PASS", "note": "112/112 P1.33 targeted PASS."},
+    {"gate": "Z", "name": "Production Boundary", "status": "PASS"}
+  ],
+
+  "summary": {
+    "pass": 19,
+    "partial": 2,
+    "not_evaluated": 1,
+    "not_executed": 4,
+    "fail": 0
+  },
+
+  "fail_count_for_decision": 0,
+  "partial_count_for_decision": 2,
+  "decision_note": "2 PARTIAL gates (C, G) are LOW risk in State B and documented with clear remediation. 0 FAIL gates. State B outcome accepted."
+}

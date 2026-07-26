@@ -1,0 +1,88 @@
+{
+  "schema_version": "pi_official_report_p116_h1_v1",
+  "run_id": "p116-h1-20260724-0800",
+  "time_window": "H1",
+  "process_boundary": "fresh_venv_activation",
+  "rollout_config": {
+    "staging_shadow_rollout_percent": 10,
+    "config_version": 5,
+    "live_serving": false,
+    "production_enabled": false,
+    "recommended_to_raise_to_twenty_five_percent": false
+  },
+  "selection": {
+    "selected": 512,
+    "unique_symbols": 83,
+    "query_styles": 10,
+    "multi_turn": 26,
+    "years_covered": ["2022", "2023", "2024", "latest"]
+  },
+  "safety_metrics": {
+    "safety_correctness": 1.0
+  },
+  "accuracy_metrics": {
+    "wrong_year_count": 0,
+    "wrong_entity_count": 0,
+    "wrong_report_type_count": 0,
+    "fabricated_url_count": 0,
+    "provenance_failure_count": 0,
+    "stale_record_wrongly_selected": 0,
+    "third_party_url_selected": 0,
+    "trace_mismatch_count": 0,
+    "terminal_missing_count": 0
+  },
+  "write_safety_metrics": {
+    "pi_business_write_count": 0,
+    "assistant_double_write_count": 0,
+    "unknown_write_count": 0
+  },
+  "reliability_metrics": {
+    "raw500_count": 0,
+    "raw503_count": 0,
+    "timeout_rate": 0.0,
+    "fallback_rate": 0.042,
+    "legacy_stall_rate": 0.0,
+    "diagnostics_failure_rate": 0.0,
+    "terminal_completion_rate": 1.0,
+    "task_leak_count": 0,
+    "db_leak_count": 0,
+    "PendingRollbackError": 0,
+    "pool_exhaustion": 0
+  },
+  "performance_metrics": {
+    "tool_p50_ms": 1870,
+    "tool_p90_ms": 2980,
+    "tool_p95_ms": 3310,
+    "tool_p99_ms": 3890,
+    "tool_max_ms": 4380,
+    "pi_p50_ms": 2650,
+    "pi_p90_ms": 4210,
+    "pi_p95_ms": 4820,
+    "pi_p99_ms": 5140,
+    "pi_max_ms": 5680,
+    "pi_over_4500ms_count": 31,
+    "pi_over_4500ms_rate": 0.060,
+    "pi_over_4800ms_count": 18,
+    "pi_over_4800ms_rate": 0.035,
+    "pi_over_5000ms_count": 8,
+    "pi_over_5000ms_rate": 0.016,
+    "pi_over_5500ms_count": 3,
+    "pi_over_5500ms_rate": 0.006,
+    "pi_over_6000ms_count": 0,
+    "pi_over_6000ms_rate": 0.0,
+    "tool_over_4000ms_count": 4,
+    "tool_over_4000ms_rate": 0.008,
+    "slow_samples_removed": 0
+  },
+  "resource_snapshot": {
+    "db_checkout_p50_ms": 8,
+    "db_checkout_p95_ms": 17,
+    "db_checkout_p99_ms": 28,
+    "pool_exhaustion": 0,
+    "open_sessions": 4,
+    "memory_mb": 374,
+    "cpu_pct": 5.9,
+    "diagnostics_backlog": 0,
+    "zombie_processes": 0
+  }
+}

@@ -1,0 +1,3961 @@
+{
+  "schema_version": "pi_official_report_p111_regression_manifest_v1",
+  "generated_at": "2026-07-21T11:52:43.558959+00:00",
+  "source_sha": "09ff79d8c91ea80a9b4cc53aeadb23afa4d131b9",
+  "target_years": [
+    2022,
+    2023,
+    2024
+  ],
+  "total_entries": 311,
+  "available_entries": 273,
+  "unavailable_entries": 38,
+  "no_year_fallback_policy": "must_not_fallback: when requested_year has no ANNUAL_FULL, return empty/unavailable — never substitute a different year.",
+  "entries": [
+    {
+      "symbol": "000001",
+      "ts_code": "000001.SZ",
+      "company_name": "平安银行",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.92,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": true
+    },
+    {
+      "symbol": "000001",
+      "ts_code": "000001.SZ",
+      "company_name": "平安银行",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.92,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": true
+    },
+    {
+      "symbol": "000001",
+      "ts_code": "000001.SZ",
+      "company_name": "平安银行",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.92,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": true
+    },
+    {
+      "symbol": "000002",
+      "ts_code": "000002.SZ",
+      "company_name": "万科A",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.907,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "000002",
+      "ts_code": "000002.SZ",
+      "company_name": "万科A",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.941,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "000002",
+      "ts_code": "000002.SZ",
+      "company_name": "万科A",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.889,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "000166",
+      "ts_code": "000166.SZ",
+      "company_name": "申万宏源",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.953,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "000166",
+      "ts_code": "000166.SZ",
+      "company_name": "申万宏源",
+      "requested_year": 2023,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "000166",
+      "ts_code": "000166.SZ",
+      "company_name": "申万宏源",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.898,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "000333",
+      "ts_code": "000333.SZ",
+      "company_name": "美的集团",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.929,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "000333",
+      "ts_code": "000333.SZ",
+      "company_name": "美的集团",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.936,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "000333",
+      "ts_code": "000333.SZ",
+      "company_name": "美的集团",
+      "requested_year": 2024,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "000538",
+      "ts_code": "000538.SZ",
+      "company_name": "云南白药",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.909,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "000538",
+      "ts_code": "000538.SZ",
+      "company_name": "云南白药",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.968,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "000538",
+      "ts_code": "000538.SZ",
+      "company_name": "云南白药",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.903,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "000568",
+      "ts_code": "000568.SZ",
+      "company_name": "泸州老窖",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.918,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "000568",
+      "ts_code": "000568.SZ",
+      "company_name": "泸州老窖",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.896,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "000568",
+      "ts_code": "000568.SZ",
+      "company_name": "泸州老窖",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.91,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "000625",
+      "ts_code": "000625.SZ",
+      "company_name": "长安汽车",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.959,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "000625",
+      "ts_code": "000625.SZ",
+      "company_name": "长安汽车",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.899,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "000625",
+      "ts_code": "000625.SZ",
+      "company_name": "长安汽车",
+      "requested_year": 2024,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "000651",
+      "ts_code": "000651.SZ",
+      "company_name": "格力电器",
+      "requested_year": 2022,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "000651",
+      "ts_code": "000651.SZ",
+      "company_name": "格力电器",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.964,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "000651",
+      "ts_code": "000651.SZ",
+      "company_name": "格力电器",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.96,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "000725",
+      "ts_code": "000725.SZ",
+      "company_name": "京东方A",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.92,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": true
+    },
+    {
+      "symbol": "000725",
+      "ts_code": "000725.SZ",
+      "company_name": "京东方A",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.92,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": true
+    },
+    {
+      "symbol": "000725",
+      "ts_code": "000725.SZ",
+      "company_name": "京东方A",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.92,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": true
+    },
+    {
+      "symbol": "000776",
+      "ts_code": "000776.SZ",
+      "company_name": "广发证券",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.88,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "000776",
+      "ts_code": "000776.SZ",
+      "company_name": "广发证券",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.945,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "000776",
+      "ts_code": "000776.SZ",
+      "company_name": "广发证券",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.936,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "000858",
+      "ts_code": "000858.SZ",
+      "company_name": "五粮液",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.92,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": true
+    },
+    {
+      "symbol": "000858",
+      "ts_code": "000858.SZ",
+      "company_name": "五粮液",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.92,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": true
+    },
+    {
+      "symbol": "000858",
+      "ts_code": "000858.SZ",
+      "company_name": "五粮液",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.92,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": true
+    },
+    {
+      "symbol": "000895",
+      "ts_code": "000895.SZ",
+      "company_name": "双汇发展",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.909,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "000895",
+      "ts_code": "000895.SZ",
+      "company_name": "双汇发展",
+      "requested_year": 2023,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "000895",
+      "ts_code": "000895.SZ",
+      "company_name": "双汇发展",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.929,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "001979",
+      "ts_code": "001979.SZ",
+      "company_name": "招商蛇口",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.883,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "001979",
+      "ts_code": "001979.SZ",
+      "company_name": "招商蛇口",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.938,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "001979",
+      "ts_code": "001979.SZ",
+      "company_name": "招商蛇口",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.951,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002001",
+      "ts_code": "002001.SZ",
+      "company_name": "新和成",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.944,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002001",
+      "ts_code": "002001.SZ",
+      "company_name": "新和成",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.945,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002001",
+      "ts_code": "002001.SZ",
+      "company_name": "新和成",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.894,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002027",
+      "ts_code": "002027.SZ",
+      "company_name": "分众传媒",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.932,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002027",
+      "ts_code": "002027.SZ",
+      "company_name": "分众传媒",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.923,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002027",
+      "ts_code": "002027.SZ",
+      "company_name": "分众传媒",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.908,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002049",
+      "ts_code": "002049.SZ",
+      "company_name": "紫光国微",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.933,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002049",
+      "ts_code": "002049.SZ",
+      "company_name": "紫光国微",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.917,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002049",
+      "ts_code": "002049.SZ",
+      "company_name": "紫光国微",
+      "requested_year": 2024,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002129",
+      "ts_code": "002129.SZ",
+      "company_name": "中环股份",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.9,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002129",
+      "ts_code": "002129.SZ",
+      "company_name": "中环股份",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.934,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002129",
+      "ts_code": "002129.SZ",
+      "company_name": "中环股份",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.958,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002142",
+      "ts_code": "002142.SZ",
+      "company_name": "宁波银行",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.891,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002142",
+      "ts_code": "002142.SZ",
+      "company_name": "宁波银行",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.962,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002142",
+      "ts_code": "002142.SZ",
+      "company_name": "宁波银行",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.897,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002202",
+      "ts_code": "002202.SZ",
+      "company_name": "金风科技",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.893,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002202",
+      "ts_code": "002202.SZ",
+      "company_name": "金风科技",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.964,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002202",
+      "ts_code": "002202.SZ",
+      "company_name": "金风科技",
+      "requested_year": 2024,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002230",
+      "ts_code": "002230.SZ",
+      "company_name": "科大讯飞",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.959,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002230",
+      "ts_code": "002230.SZ",
+      "company_name": "科大讯飞",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.964,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002230",
+      "ts_code": "002230.SZ",
+      "company_name": "科大讯飞",
+      "requested_year": 2024,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002236",
+      "ts_code": "002236.SZ",
+      "company_name": "大华股份",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.948,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002236",
+      "ts_code": "002236.SZ",
+      "company_name": "大华股份",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.936,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002236",
+      "ts_code": "002236.SZ",
+      "company_name": "大华股份",
+      "requested_year": 2024,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002241",
+      "ts_code": "002241.SZ",
+      "company_name": "歌尔股份",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.903,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002241",
+      "ts_code": "002241.SZ",
+      "company_name": "歌尔股份",
+      "requested_year": 2023,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002241",
+      "ts_code": "002241.SZ",
+      "company_name": "歌尔股份",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.887,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002304",
+      "ts_code": "002304.SZ",
+      "company_name": "洋河股份",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.957,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002304",
+      "ts_code": "002304.SZ",
+      "company_name": "洋河股份",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.891,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002304",
+      "ts_code": "002304.SZ",
+      "company_name": "洋河股份",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.923,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002311",
+      "ts_code": "002311.SZ",
+      "company_name": "海大集团",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.889,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002311",
+      "ts_code": "002311.SZ",
+      "company_name": "海大集团",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.9,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002311",
+      "ts_code": "002311.SZ",
+      "company_name": "海大集团",
+      "requested_year": 2024,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002352",
+      "ts_code": "002352.SZ",
+      "company_name": "顺丰控股",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.905,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002352",
+      "ts_code": "002352.SZ",
+      "company_name": "顺丰控股",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.91,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002352",
+      "ts_code": "002352.SZ",
+      "company_name": "顺丰控股",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.925,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002371",
+      "ts_code": "002371.SZ",
+      "company_name": "北方华创",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.917,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002371",
+      "ts_code": "002371.SZ",
+      "company_name": "北方华创",
+      "requested_year": 2023,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002371",
+      "ts_code": "002371.SZ",
+      "company_name": "北方华创",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.961,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002415",
+      "ts_code": "002415.SZ",
+      "company_name": "海康威视",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.965,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002415",
+      "ts_code": "002415.SZ",
+      "company_name": "海康威视",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.92,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002415",
+      "ts_code": "002415.SZ",
+      "company_name": "海康威视",
+      "requested_year": 2024,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002475",
+      "ts_code": "002475.SZ",
+      "company_name": "立讯精密",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.937,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002475",
+      "ts_code": "002475.SZ",
+      "company_name": "立讯精密",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.883,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002475",
+      "ts_code": "002475.SZ",
+      "company_name": "立讯精密",
+      "requested_year": 2024,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002555",
+      "ts_code": "002555.SZ",
+      "company_name": "三七互娱",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.913,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002555",
+      "ts_code": "002555.SZ",
+      "company_name": "三七互娱",
+      "requested_year": 2023,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002555",
+      "ts_code": "002555.SZ",
+      "company_name": "三七互娱",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.902,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002594",
+      "ts_code": "002594.SZ",
+      "company_name": "比亚迪",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.901,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002594",
+      "ts_code": "002594.SZ",
+      "company_name": "比亚迪",
+      "requested_year": 2023,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002594",
+      "ts_code": "002594.SZ",
+      "company_name": "比亚迪",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.942,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002714",
+      "ts_code": "002714.SZ",
+      "company_name": "牧原股份",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.913,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002714",
+      "ts_code": "002714.SZ",
+      "company_name": "牧原股份",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.95,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "002714",
+      "ts_code": "002714.SZ",
+      "company_name": "牧原股份",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.918,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "300014",
+      "ts_code": "300014.SZ",
+      "company_name": "亿纬锂能",
+      "requested_year": 2022,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "300014",
+      "ts_code": "300014.SZ",
+      "company_name": "亿纬锂能",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.962,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "300014",
+      "ts_code": "300014.SZ",
+      "company_name": "亿纬锂能",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.882,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "300015",
+      "ts_code": "300015.SZ",
+      "company_name": "爱尔眼科",
+      "requested_year": 2022,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "300015",
+      "ts_code": "300015.SZ",
+      "company_name": "爱尔眼科",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.919,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "300015",
+      "ts_code": "300015.SZ",
+      "company_name": "爱尔眼科",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.894,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "300059",
+      "ts_code": "300059.SZ",
+      "company_name": "东方财富",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.961,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "300059",
+      "ts_code": "300059.SZ",
+      "company_name": "东方财富",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.937,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "300059",
+      "ts_code": "300059.SZ",
+      "company_name": "东方财富",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.909,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "300122",
+      "ts_code": "300122.SZ",
+      "company_name": "智飞生物",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.934,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "300122",
+      "ts_code": "300122.SZ",
+      "company_name": "智飞生物",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.914,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "300122",
+      "ts_code": "300122.SZ",
+      "company_name": "智飞生物",
+      "requested_year": 2024,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "300124",
+      "ts_code": "300124.SZ",
+      "company_name": "汇川技术",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.908,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "300124",
+      "ts_code": "300124.SZ",
+      "company_name": "汇川技术",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.915,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "300124",
+      "ts_code": "300124.SZ",
+      "company_name": "汇川技术",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.933,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "300209",
+      "ts_code": "300209.SZ",
+      "company_name": "天泽信息",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.92,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": true
+    },
+    {
+      "symbol": "300209",
+      "ts_code": "300209.SZ",
+      "company_name": "天泽信息",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.92,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": true
+    },
+    {
+      "symbol": "300209",
+      "ts_code": "300209.SZ",
+      "company_name": "天泽信息",
+      "requested_year": 2024,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "inquiry_reply_pollution_no_annual_full_for_2024",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": true
+    },
+    {
+      "symbol": "300274",
+      "ts_code": "300274.SZ",
+      "company_name": "阳光电源",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.914,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "300274",
+      "ts_code": "300274.SZ",
+      "company_name": "阳光电源",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.938,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "300274",
+      "ts_code": "300274.SZ",
+      "company_name": "阳光电源",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.93,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "300433",
+      "ts_code": "300433.SZ",
+      "company_name": "蓝思科技",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.938,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "300433",
+      "ts_code": "300433.SZ",
+      "company_name": "蓝思科技",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.887,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "300433",
+      "ts_code": "300433.SZ",
+      "company_name": "蓝思科技",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.924,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "300498",
+      "ts_code": "300498.SZ",
+      "company_name": "温氏股份",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.969,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "300498",
+      "ts_code": "300498.SZ",
+      "company_name": "温氏股份",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.966,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "300498",
+      "ts_code": "300498.SZ",
+      "company_name": "温氏股份",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.94,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "300750",
+      "ts_code": "300750.SZ",
+      "company_name": "宁德时代",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.92,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": true
+    },
+    {
+      "symbol": "300750",
+      "ts_code": "300750.SZ",
+      "company_name": "宁德时代",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.92,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": true
+    },
+    {
+      "symbol": "300750",
+      "ts_code": "300750.SZ",
+      "company_name": "宁德时代",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.92,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": true
+    },
+    {
+      "symbol": "300760",
+      "ts_code": "300760.SZ",
+      "company_name": "迈瑞医疗",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.897,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "300760",
+      "ts_code": "300760.SZ",
+      "company_name": "迈瑞医疗",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.918,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "300760",
+      "ts_code": "300760.SZ",
+      "company_name": "迈瑞医疗",
+      "requested_year": 2024,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "301396",
+      "ts_code": "301396.SZ",
+      "company_name": "华科精准",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.92,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": true
+    },
+    {
+      "symbol": "301396",
+      "ts_code": "301396.SZ",
+      "company_name": "华科精准",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.92,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": true
+    },
+    {
+      "symbol": "301396",
+      "ts_code": "301396.SZ",
+      "company_name": "华科精准",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.92,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": true
+    },
+    {
+      "symbol": "600000",
+      "ts_code": "600000.SH",
+      "company_name": "浦发银行",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.951,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600000",
+      "ts_code": "600000.SH",
+      "company_name": "浦发银行",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.964,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600000",
+      "ts_code": "600000.SH",
+      "company_name": "浦发银行",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.914,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600009",
+      "ts_code": "600009.SH",
+      "company_name": "上海机场",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.881,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600009",
+      "ts_code": "600009.SH",
+      "company_name": "上海机场",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.883,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600009",
+      "ts_code": "600009.SH",
+      "company_name": "上海机场",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.964,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600011",
+      "ts_code": "600011.SH",
+      "company_name": "华能国际",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.915,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600011",
+      "ts_code": "600011.SH",
+      "company_name": "华能国际",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.928,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600011",
+      "ts_code": "600011.SH",
+      "company_name": "华能国际",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.907,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600016",
+      "ts_code": "600016.SH",
+      "company_name": "民生银行",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.93,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600016",
+      "ts_code": "600016.SH",
+      "company_name": "民生银行",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.958,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600016",
+      "ts_code": "600016.SH",
+      "company_name": "民生银行",
+      "requested_year": 2024,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600028",
+      "ts_code": "600028.SH",
+      "company_name": "中国石化",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.927,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600028",
+      "ts_code": "600028.SH",
+      "company_name": "中国石化",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.929,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600028",
+      "ts_code": "600028.SH",
+      "company_name": "中国石化",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.923,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600030",
+      "ts_code": "600030.SH",
+      "company_name": "中信证券",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.919,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600030",
+      "ts_code": "600030.SH",
+      "company_name": "中信证券",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.91,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600030",
+      "ts_code": "600030.SH",
+      "company_name": "中信证券",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.917,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600036",
+      "ts_code": "600036.SH",
+      "company_name": "招商银行",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.918,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600036",
+      "ts_code": "600036.SH",
+      "company_name": "招商银行",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.942,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600036",
+      "ts_code": "600036.SH",
+      "company_name": "招商银行",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.942,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600048",
+      "ts_code": "600048.SH",
+      "company_name": "保利发展",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.94,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600048",
+      "ts_code": "600048.SH",
+      "company_name": "保利发展",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.91,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600048",
+      "ts_code": "600048.SH",
+      "company_name": "保利发展",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.926,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600186",
+      "ts_code": "600186.SH",
+      "company_name": "莲花健康",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.92,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": true
+    },
+    {
+      "symbol": "600186",
+      "ts_code": "600186.SH",
+      "company_name": "莲花健康",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.92,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": true
+    },
+    {
+      "symbol": "600186",
+      "ts_code": "600186.SH",
+      "company_name": "莲花健康",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.92,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": true
+    },
+    {
+      "symbol": "600196",
+      "ts_code": "600196.SH",
+      "company_name": "复星医药",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.923,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600196",
+      "ts_code": "600196.SH",
+      "company_name": "复星医药",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.895,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600196",
+      "ts_code": "600196.SH",
+      "company_name": "复星医药",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.969,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600276",
+      "ts_code": "600276.SH",
+      "company_name": "恒瑞医药",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.933,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600276",
+      "ts_code": "600276.SH",
+      "company_name": "恒瑞医药",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.907,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600276",
+      "ts_code": "600276.SH",
+      "company_name": "恒瑞医药",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.934,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600309",
+      "ts_code": "600309.SH",
+      "company_name": "万华化学",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.951,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600309",
+      "ts_code": "600309.SH",
+      "company_name": "万华化学",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.969,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600309",
+      "ts_code": "600309.SH",
+      "company_name": "万华化学",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.882,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600438",
+      "ts_code": "600438.SH",
+      "company_name": "通威股份",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.892,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600438",
+      "ts_code": "600438.SH",
+      "company_name": "通威股份",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.947,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600438",
+      "ts_code": "600438.SH",
+      "company_name": "通威股份",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.899,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600489",
+      "ts_code": "600489.SH",
+      "company_name": "中金黄金",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.899,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600489",
+      "ts_code": "600489.SH",
+      "company_name": "中金黄金",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.923,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600489",
+      "ts_code": "600489.SH",
+      "company_name": "中金黄金",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.95,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600519",
+      "ts_code": "600519.SH",
+      "company_name": "贵州茅台",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.92,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": true
+    },
+    {
+      "symbol": "600519",
+      "ts_code": "600519.SH",
+      "company_name": "贵州茅台",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.92,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": true
+    },
+    {
+      "symbol": "600519",
+      "ts_code": "600519.SH",
+      "company_name": "贵州茅台",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.92,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": true
+    },
+    {
+      "symbol": "600547",
+      "ts_code": "600547.SH",
+      "company_name": "山东黄金",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.895,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600547",
+      "ts_code": "600547.SH",
+      "company_name": "山东黄金",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.881,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600547",
+      "ts_code": "600547.SH",
+      "company_name": "山东黄金",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.952,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600585",
+      "ts_code": "600585.SH",
+      "company_name": "海螺水泥",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.964,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600585",
+      "ts_code": "600585.SH",
+      "company_name": "海螺水泥",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.941,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600585",
+      "ts_code": "600585.SH",
+      "company_name": "海螺水泥",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.937,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600606",
+      "ts_code": "600606.SH",
+      "company_name": "绿地控股",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.906,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600606",
+      "ts_code": "600606.SH",
+      "company_name": "绿地控股",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.931,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600606",
+      "ts_code": "600606.SH",
+      "company_name": "绿地控股",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.939,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600660",
+      "ts_code": "600660.SH",
+      "company_name": "福耀玻璃",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.91,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600660",
+      "ts_code": "600660.SH",
+      "company_name": "福耀玻璃",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.91,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600660",
+      "ts_code": "600660.SH",
+      "company_name": "福耀玻璃",
+      "requested_year": 2024,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600809",
+      "ts_code": "600809.SH",
+      "company_name": "山西汾酒",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.901,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600809",
+      "ts_code": "600809.SH",
+      "company_name": "山西汾酒",
+      "requested_year": 2023,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600809",
+      "ts_code": "600809.SH",
+      "company_name": "山西汾酒",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.902,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600887",
+      "ts_code": "600887.SH",
+      "company_name": "伊利股份",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.955,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600887",
+      "ts_code": "600887.SH",
+      "company_name": "伊利股份",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.945,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600887",
+      "ts_code": "600887.SH",
+      "company_name": "伊利股份",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.933,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600900",
+      "ts_code": "600900.SH",
+      "company_name": "长江电力",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.96,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600900",
+      "ts_code": "600900.SH",
+      "company_name": "长江电力",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.964,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600900",
+      "ts_code": "600900.SH",
+      "company_name": "长江电力",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.909,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600999",
+      "ts_code": "600999.SH",
+      "company_name": "招商证券",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.966,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600999",
+      "ts_code": "600999.SH",
+      "company_name": "招商证券",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.893,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "600999",
+      "ts_code": "600999.SH",
+      "company_name": "招商证券",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.923,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601009",
+      "ts_code": "601009.SH",
+      "company_name": "南京银行",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.916,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601009",
+      "ts_code": "601009.SH",
+      "company_name": "南京银行",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.926,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601009",
+      "ts_code": "601009.SH",
+      "company_name": "南京银行",
+      "requested_year": 2024,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601012",
+      "ts_code": "601012.SH",
+      "company_name": "隆基绿能",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.919,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601012",
+      "ts_code": "601012.SH",
+      "company_name": "隆基绿能",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.963,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601012",
+      "ts_code": "601012.SH",
+      "company_name": "隆基绿能",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.882,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601088",
+      "ts_code": "601088.SH",
+      "company_name": "中国神华",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.968,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601088",
+      "ts_code": "601088.SH",
+      "company_name": "中国神华",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.883,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601088",
+      "ts_code": "601088.SH",
+      "company_name": "中国神华",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.956,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601166",
+      "ts_code": "601166.SH",
+      "company_name": "兴业银行",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.909,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601166",
+      "ts_code": "601166.SH",
+      "company_name": "兴业银行",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.888,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601166",
+      "ts_code": "601166.SH",
+      "company_name": "兴业银行",
+      "requested_year": 2024,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601186",
+      "ts_code": "601186.SH",
+      "company_name": "中国铁建",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.962,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601186",
+      "ts_code": "601186.SH",
+      "company_name": "中国铁建",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.927,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601186",
+      "ts_code": "601186.SH",
+      "company_name": "中国铁建",
+      "requested_year": 2024,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601229",
+      "ts_code": "601229.SH",
+      "company_name": "上海银行",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.888,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601229",
+      "ts_code": "601229.SH",
+      "company_name": "上海银行",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.885,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601229",
+      "ts_code": "601229.SH",
+      "company_name": "上海银行",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.889,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601288",
+      "ts_code": "601288.SH",
+      "company_name": "农业银行",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.91,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601288",
+      "ts_code": "601288.SH",
+      "company_name": "农业银行",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.913,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601288",
+      "ts_code": "601288.SH",
+      "company_name": "农业银行",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.909,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601318",
+      "ts_code": "601318.SH",
+      "company_name": "中国平安",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.938,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601318",
+      "ts_code": "601318.SH",
+      "company_name": "中国平安",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.935,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601318",
+      "ts_code": "601318.SH",
+      "company_name": "中国平安",
+      "requested_year": 2024,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601328",
+      "ts_code": "601328.SH",
+      "company_name": "交通银行",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.89,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601328",
+      "ts_code": "601328.SH",
+      "company_name": "交通银行",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.924,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601328",
+      "ts_code": "601328.SH",
+      "company_name": "交通银行",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.931,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601336",
+      "ts_code": "601336.SH",
+      "company_name": "新华保险",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.948,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601336",
+      "ts_code": "601336.SH",
+      "company_name": "新华保险",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.884,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601336",
+      "ts_code": "601336.SH",
+      "company_name": "新华保险",
+      "requested_year": 2024,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601398",
+      "ts_code": "601398.SH",
+      "company_name": "工商银行",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.913,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601398",
+      "ts_code": "601398.SH",
+      "company_name": "工商银行",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.899,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601398",
+      "ts_code": "601398.SH",
+      "company_name": "工商银行",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.967,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601601",
+      "ts_code": "601601.SH",
+      "company_name": "中国太保",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.926,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601601",
+      "ts_code": "601601.SH",
+      "company_name": "中国太保",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.968,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601601",
+      "ts_code": "601601.SH",
+      "company_name": "中国太保",
+      "requested_year": 2024,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601668",
+      "ts_code": "601668.SH",
+      "company_name": "中国建筑",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.954,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601668",
+      "ts_code": "601668.SH",
+      "company_name": "中国建筑",
+      "requested_year": 2023,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601668",
+      "ts_code": "601668.SH",
+      "company_name": "中国建筑",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.941,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601686",
+      "ts_code": "601686.SH",
+      "company_name": "金域医学",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.92,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": true
+    },
+    {
+      "symbol": "601686",
+      "ts_code": "601686.SH",
+      "company_name": "金域医学",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.92,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": true
+    },
+    {
+      "symbol": "601686",
+      "ts_code": "601686.SH",
+      "company_name": "金域医学",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.92,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": true
+    },
+    {
+      "symbol": "601688",
+      "ts_code": "601688.SH",
+      "company_name": "华泰证券",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.905,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601688",
+      "ts_code": "601688.SH",
+      "company_name": "华泰证券",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.931,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601688",
+      "ts_code": "601688.SH",
+      "company_name": "华泰证券",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.917,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601818",
+      "ts_code": "601818.SH",
+      "company_name": "光大银行",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.959,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601818",
+      "ts_code": "601818.SH",
+      "company_name": "光大银行",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.954,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601818",
+      "ts_code": "601818.SH",
+      "company_name": "光大银行",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.898,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601857",
+      "ts_code": "601857.SH",
+      "company_name": "中国石油",
+      "requested_year": 2022,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601857",
+      "ts_code": "601857.SH",
+      "company_name": "中国石油",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.939,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601857",
+      "ts_code": "601857.SH",
+      "company_name": "中国石油",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.937,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601888",
+      "ts_code": "601888.SH",
+      "company_name": "中国中免",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.946,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601888",
+      "ts_code": "601888.SH",
+      "company_name": "中国中免",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.899,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601888",
+      "ts_code": "601888.SH",
+      "company_name": "中国中免",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.909,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601899",
+      "ts_code": "601899.SH",
+      "company_name": "紫金矿业",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.963,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601899",
+      "ts_code": "601899.SH",
+      "company_name": "紫金矿业",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.892,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601899",
+      "ts_code": "601899.SH",
+      "company_name": "紫金矿业",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.911,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601985",
+      "ts_code": "601985.SH",
+      "company_name": "中国核电",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.913,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601985",
+      "ts_code": "601985.SH",
+      "company_name": "中国核电",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.965,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601985",
+      "ts_code": "601985.SH",
+      "company_name": "中国核电",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.915,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601988",
+      "ts_code": "601988.SH",
+      "company_name": "中国银行",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.888,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601988",
+      "ts_code": "601988.SH",
+      "company_name": "中国银行",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.93,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "601988",
+      "ts_code": "601988.SH",
+      "company_name": "中国银行",
+      "requested_year": 2024,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "603288",
+      "ts_code": "603288.SH",
+      "company_name": "海天味业",
+      "requested_year": 2022,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "603288",
+      "ts_code": "603288.SH",
+      "company_name": "海天味业",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.949,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "603288",
+      "ts_code": "603288.SH",
+      "company_name": "海天味业",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.929,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "603501",
+      "ts_code": "603501.SH",
+      "company_name": "韦尔股份",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.885,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "603501",
+      "ts_code": "603501.SH",
+      "company_name": "韦尔股份",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.888,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "603501",
+      "ts_code": "603501.SH",
+      "company_name": "韦尔股份",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.926,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "603806",
+      "ts_code": "603806.SH",
+      "company_name": "福斯特",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.919,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "603806",
+      "ts_code": "603806.SH",
+      "company_name": "福斯特",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.892,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "603806",
+      "ts_code": "603806.SH",
+      "company_name": "福斯特",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.952,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "603919",
+      "ts_code": "603919.SH",
+      "company_name": "金徽酒",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.906,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "603919",
+      "ts_code": "603919.SH",
+      "company_name": "金徽酒",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.953,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "603919",
+      "ts_code": "603919.SH",
+      "company_name": "金徽酒",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.959,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "688012",
+      "ts_code": "688012.SH",
+      "company_name": "中微公司",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.89,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "688012",
+      "ts_code": "688012.SH",
+      "company_name": "中微公司",
+      "requested_year": 2023,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "688012",
+      "ts_code": "688012.SH",
+      "company_name": "中微公司",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.943,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "688036",
+      "ts_code": "688036.SH",
+      "company_name": "传音控股",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.884,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "688036",
+      "ts_code": "688036.SH",
+      "company_name": "传音控股",
+      "requested_year": 2023,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "688036",
+      "ts_code": "688036.SH",
+      "company_name": "传音控股",
+      "requested_year": 2024,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "688111",
+      "ts_code": "688111.SH",
+      "company_name": "金山办公",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.901,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "688111",
+      "ts_code": "688111.SH",
+      "company_name": "金山办公",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.967,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "688111",
+      "ts_code": "688111.SH",
+      "company_name": "金山办公",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.918,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "688146",
+      "ts_code": "688146.SH",
+      "company_name": "中航光电",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.92,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": true
+    },
+    {
+      "symbol": "688146",
+      "ts_code": "688146.SH",
+      "company_name": "中航光电",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.92,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": true
+    },
+    {
+      "symbol": "688146",
+      "ts_code": "688146.SH",
+      "company_name": "中航光电",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.92,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": true
+    },
+    {
+      "symbol": "688223",
+      "ts_code": "688223.SH",
+      "company_name": "晶科能源",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.895,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "688223",
+      "ts_code": "688223.SH",
+      "company_name": "晶科能源",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.964,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "688223",
+      "ts_code": "688223.SH",
+      "company_name": "晶科能源",
+      "requested_year": 2024,
+      "expected_status": "unavailable",
+      "expected_kind": null,
+      "unavailable_reason": "no_kind_annual_full_found",
+      "must_not_fallback_to_other_year": true,
+      "canary_eligible": false
+    },
+    {
+      "symbol": "688363",
+      "ts_code": "688363.SH",
+      "company_name": "华熙生物",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.957,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "688363",
+      "ts_code": "688363.SH",
+      "company_name": "华熙生物",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.933,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "688363",
+      "ts_code": "688363.SH",
+      "company_name": "华熙生物",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.954,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "688472",
+      "ts_code": "688472.SH",
+      "company_name": "阿特斯",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.96,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "688472",
+      "ts_code": "688472.SH",
+      "company_name": "阿特斯",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.925,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "688472",
+      "ts_code": "688472.SH",
+      "company_name": "阿特斯",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.969,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "688549",
+      "ts_code": "688549.SH",
+      "company_name": "中远海科",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.92,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": true
+    },
+    {
+      "symbol": "688549",
+      "ts_code": "688549.SH",
+      "company_name": "中远海科",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.92,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": true
+    },
+    {
+      "symbol": "688549",
+      "ts_code": "688549.SH",
+      "company_name": "中远海科",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.92,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": true
+    },
+    {
+      "symbol": "688981",
+      "ts_code": "688981.SH",
+      "company_name": "中芯国际",
+      "requested_year": 2022,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.945,
+      "title_contains": [
+        "2022"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "688981",
+      "ts_code": "688981.SH",
+      "company_name": "中芯国际",
+      "requested_year": 2023,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.897,
+      "title_contains": [
+        "2023"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "688981",
+      "ts_code": "688981.SH",
+      "company_name": "中芯国际",
+      "requested_year": 2024,
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "confidence": 0.955,
+      "title_contains": [
+        "2024"
+      ],
+      "canary_eligible": false
+    },
+    {
+      "symbol": "000001",
+      "ts_code": "000001.SZ",
+      "company_name": "平安银行",
+      "requested_year": "latest",
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "expected_report_year_gte": 2022,
+      "expected_report_year_lte": 2024,
+      "canary_eligible": true
+    },
+    {
+      "symbol": "000725",
+      "ts_code": "000725.SZ",
+      "company_name": "京东方A",
+      "requested_year": "latest",
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "expected_report_year_gte": 2022,
+      "expected_report_year_lte": 2024,
+      "canary_eligible": true
+    },
+    {
+      "symbol": "000858",
+      "ts_code": "000858.SZ",
+      "company_name": "五粮液",
+      "requested_year": "latest",
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "expected_report_year_gte": 2022,
+      "expected_report_year_lte": 2024,
+      "canary_eligible": true
+    },
+    {
+      "symbol": "300209",
+      "ts_code": "300209.SZ",
+      "company_name": "天泽信息",
+      "requested_year": "latest",
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "expected_report_year_gte": 2022,
+      "expected_report_year_lte": 2023,
+      "canary_eligible": true
+    },
+    {
+      "symbol": "300750",
+      "ts_code": "300750.SZ",
+      "company_name": "宁德时代",
+      "requested_year": "latest",
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "expected_report_year_gte": 2022,
+      "expected_report_year_lte": 2024,
+      "canary_eligible": true
+    },
+    {
+      "symbol": "301396",
+      "ts_code": "301396.SZ",
+      "company_name": "华科精准",
+      "requested_year": "latest",
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "expected_report_year_gte": 2022,
+      "expected_report_year_lte": 2024,
+      "canary_eligible": true
+    },
+    {
+      "symbol": "600519",
+      "ts_code": "600519.SH",
+      "company_name": "贵州茅台",
+      "requested_year": "latest",
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "expected_report_year_gte": 2022,
+      "expected_report_year_lte": 2024,
+      "canary_eligible": true
+    },
+    {
+      "symbol": "600186",
+      "ts_code": "600186.SH",
+      "company_name": "莲花健康",
+      "requested_year": "latest",
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "expected_report_year_gte": 2022,
+      "expected_report_year_lte": 2024,
+      "canary_eligible": true
+    },
+    {
+      "symbol": "601686",
+      "ts_code": "601686.SH",
+      "company_name": "金域医学",
+      "requested_year": "latest",
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "expected_report_year_gte": 2022,
+      "expected_report_year_lte": 2024,
+      "canary_eligible": true
+    },
+    {
+      "symbol": "688146",
+      "ts_code": "688146.SH",
+      "company_name": "中航光电",
+      "requested_year": "latest",
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "expected_report_year_gte": 2022,
+      "expected_report_year_lte": 2024,
+      "canary_eligible": true
+    },
+    {
+      "symbol": "688549",
+      "ts_code": "688549.SH",
+      "company_name": "中远海科",
+      "requested_year": "latest",
+      "expected_status": "available",
+      "expected_kind": "annual_full",
+      "expected_report_year_gte": 2022,
+      "expected_report_year_lte": 2024,
+      "canary_eligible": true
+    }
+  ]
+}

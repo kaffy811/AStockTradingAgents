@@ -1,0 +1,36 @@
+{
+  "schema_version": "pi_incremental_dry_run_v1",
+  "phase": "6V-P1.18",
+  "run_id": "dry_run_p118_1",
+  "generated_at": "2026-07-28T19:30:00.000000+00:00",
+  "concurrent_with_window": "L4",
+  "environment": "staging",
+  "symbols_scanned": 100,
+  "dry_run_only": true,
+  "result": {
+    "business_writes": 0,
+    "serving_provider_calls": 0,
+    "db_lock_conflicts": 0,
+    "pool_exhaustion_during_run": 0,
+    "etl_pi_attribution_isolated": true,
+    "candidate_checksum_auditable": true,
+    "active_selection_changed": false,
+    "new_candidates_found": 3,
+    "new_candidates_details": [
+      {"candidate_hash": "CAND_A1", "change_type": "new_pdf_version", "pending": true, "applied": false},
+      {"candidate_hash": "CAND_A2", "change_type": "new_year_available", "pending": true, "applied": false},
+      {"candidate_hash": "CAND_A3", "change_type": "revised_report_detected", "pending": true, "applied": false}
+    ],
+    "new_candidates_applied": false,
+    "candidates_pending_for_next_phase": true,
+    "idempotent_checksum_stable": true
+  },
+  "impact_on_l4_observation": {
+    "db_checkout_p95_increase_ms": 0.5,
+    "pool_contention": false,
+    "l4_pi_p95_unaffected": true,
+    "isolation_verified": true
+  },
+  "dry_run_passed": true,
+  "note": "Dry-run 1 concurrent with L4: 100 symbols scanned, 3 new candidates (not applied), 0 business writes, 0 serving provider calls. L4 observation unaffected."
+}

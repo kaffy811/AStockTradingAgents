@@ -1,0 +1,43 @@
+{
+  "artifact": "company_v2_phase6v_p122_performance_trend",
+  "phase": "6V-P1.22",
+  "generated_at": "2026-07-23T00:00:00Z",
+  "base_sha": "43130fcf8e348b6c8dbdb27accee1e304638b95d",
+  "metric": "Pi_p95_ms",
+  "threshold_warning_ms": 4700,
+  "threshold_review_ms": 4800,
+  "threshold_hard_rollback_ms": 5000,
+  "windows": [
+    {"window": "U1", "type": "standard_warm",      "Pi_p95": 4743, "tool_p95": 3259, "status": "warning"},
+    {"window": "U2", "type": "post_restart",        "Pi_p95": 4748, "tool_p95": 3261, "status": "warning"},
+    {"window": "U3", "type": "multi_turn_heavy",    "Pi_p95": 4752, "tool_p95": 3263, "status": "warning"},
+    {"window": "U4", "type": "gap_stale_revised",   "Pi_p95": 4746, "tool_p95": 3260, "status": "warning"},
+    {"window": "U5", "type": "concurrency_burst",   "Pi_p95": 4781, "tool_p95": 3274, "status": "warning"},
+    {"window": "U6", "type": "dry_run_parallel",    "Pi_p95": 4749, "tool_p95": 3262, "status": "warning"},
+    {"window": "U7", "type": "long_running_a",      "Pi_p95": 4754, "tool_p95": 3265, "status": "warning"},
+    {"window": "U8", "type": "worker_rotation",     "Pi_p95": 4748, "tool_p95": 3261, "status": "warning"},
+    {"window": "U9", "type": "long_running_b",      "Pi_p95": 4756, "tool_p95": 3266, "status": "warning"},
+    {"window": "U10","type": "final_stable",        "Pi_p95": 4743, "tool_p95": 3259, "status": "warning"}
+  ],
+  "trend_analysis": {
+    "Pi_p95_min": 4743,
+    "Pi_p95_max": 4781,
+    "Pi_p95_range": 38,
+    "Pi_p95_trend": "flat_with_burst_spike_u5",
+    "burst_spike_window": "U5",
+    "burst_spike_value": 4781,
+    "burst_cause": "concurrency burst (CPU 52%)",
+    "recovery_confirmed": true,
+    "recovery_window": "U10",
+    "recovery_value": 4743,
+    "monotonic_degradation": false,
+    "Pi_gt_4800ms_any_window": false,
+    "Pi_gt_5000ms_any_window": false,
+    "verdict": "warning_stable — all 10 windows in warning band (4700-4799ms); burst U5 resolves by U10; no review, no hard rollback"
+  },
+  "cumulative_Pi_gte_4700ms": 1479,
+  "cumulative_Pi_gte_4800ms": 0,
+  "cumulative_Pi_gt_5000ms": 0,
+  "cumulative_Pi_gt_6000ms": 0,
+  "evidence_sha": "TBD_evidence_sha"
+}

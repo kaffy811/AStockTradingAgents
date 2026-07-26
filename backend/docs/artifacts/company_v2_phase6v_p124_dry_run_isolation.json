@@ -1,0 +1,14 @@
+{
+  "schema_version": "pi_canary_dry_run_isolation_v1",
+  "phase": "6V-P1.24",
+  "generated_at": "2026-07-24T00:00:00.000000+00:00",
+  "dry_run_applicable": false,
+  "reason": "100% promotion not executed — Gate C = UNKNOWN. No deployed runtime to dry-run against.",
+  "offline_isolation_invariants_verified": {
+    "live": false,
+    "production_enabled": false,
+    "provider_serving_calls": 0,
+    "legacy_sole_user_path": true,
+    "shadow_concurrency_safe": true
+  }
+}

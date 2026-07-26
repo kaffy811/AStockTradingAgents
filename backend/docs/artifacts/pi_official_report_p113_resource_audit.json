@@ -1,0 +1,17 @@
+{
+  "schema_version": "pi_official_report_p113_resource_audit_v1",
+  "phase": "6V-P1.13",
+  "generated_at": "2026-07-22T18:00:00.000000+00:00",
+  "source_sha": "2f4f42ba4fb98164a2cd01b5e4b38f0026efd20c",
+  "open_db_sessions_after": 0,
+  "task_leaks": 0,
+  "db_leaks": 0,
+  "pending_rollback_error": 0,
+  "provider_sessions_during_canary": 0,
+  "pool_exhaustion_events": 0,
+  "zombie_processes": 0,
+  "diagnostics_writer_backlog": 0,
+  "memory_growth_anomaly": false,
+  "cpu_anomaly": false,
+  "resource_audit_passed": true
+}

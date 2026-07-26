@@ -1,0 +1,26 @@
+{
+  "schema_version": "pi_full30_clarification_denominator_audit_v1",
+  "phase": "6V-P1.6.5",
+  "old_denominator": 30,
+  "old_clarification_correctness_rate": 0.4333,
+  "old_defect": "summarize_shadow_results mapped clarification_correctness_rate to status_match_rate over all 30 cases (shadow_acceptance.py)",
+  "clarification_applicable_samples": 2,
+  "clarification_correct_samples": 1,
+  "clarification_correctness": 0.5,
+  "cases": [
+    {
+      "case_id": "E01",
+      "clarification_correct": true,
+      "reasons": []
+    },
+    {
+      "case_id": "E02",
+      "clarification_correct": false,
+      "reasons": [
+        "status_is_unavailable_not_clarification_required",
+        "no_candidates"
+      ]
+    }
+  ],
+  "historical_metric_preserved": true
+}

@@ -1,0 +1,265 @@
+{
+  "provider": "akshare",
+  "interfaces": "stock_financial_analysis_indicator_em (primary) + stock_financial_analysis_indicator sina (fallback)",
+  "cache_hit": false,
+  "symbols": {
+    "600519.SH": {
+      "em": {
+        "status": "failed",
+        "reason_code": "PROVIDER_EMPTY",
+        "elapsed_ms": 208,
+        "error": "'NoneType' object is not subscriptable"
+      },
+      "sina": {
+        "status": "ok",
+        "elapsed_ms": 898,
+        "rows_count": 5,
+        "columns_count": 86,
+        "latest_period": "2026-03-31",
+        "key_fields_found": [
+          "roe",
+          "roa",
+          "net_margin",
+          "debt_ratio",
+          "current_ratio",
+          "revenue_growth",
+          "net_profit_growth",
+          "asset_turnover",
+          "inventory_turnover",
+          "ocf_to_np"
+        ],
+        "key_fields_missing": [
+          [
+            "gross_margin",
+            "销售毛利率(%)",
+            "PROVIDER_EMPTY"
+          ]
+        ],
+        "samples": {
+          "roe": [
+            "净资产收益率(%)",
+            10.06,
+            0.10060000000000001
+          ],
+          "roa": [
+            "总资产净利润率(%)",
+            9.0272,
+            0.090272
+          ],
+          "net_margin": [
+            "销售净利率(%)",
+            52.2245,
+            0.522245
+          ],
+          "debt_ratio": [
+            "资产负债率(%)",
+            12.1227,
+            0.121227
+          ],
+          "current_ratio": [
+            "流动比率",
+            7.0607,
+            7.0607
+          ],
+          "revenue_growth": [
+            "主营业务收入增长率(%)",
+            6.538,
+            0.06538000000000001
+          ],
+          "net_profit_growth": [
+            "净利润增长率(%)",
+            1.3653,
+            0.013653
+          ],
+          "asset_turnover": [
+            "总资产周转率(次)",
+            0.1729,
+            0.1729
+          ],
+          "inventory_turnover": [
+            "存货周转率(次)",
+            0.0904,
+            0.0904
+          ],
+          "ocf_to_np": [
+            "经营现金净流量与净利润的比率(%)",
+            0.9558,
+            0.9558
+          ]
+        }
+      }
+    },
+    "000725.SZ": {
+      "em": {
+        "status": "failed",
+        "reason_code": "PROVIDER_EMPTY",
+        "elapsed_ms": 171,
+        "error": "'NoneType' object is not subscriptable"
+      },
+      "sina": {
+        "status": "ok",
+        "elapsed_ms": 607,
+        "rows_count": 5,
+        "columns_count": 86,
+        "latest_period": "2026-03-31",
+        "key_fields_found": [
+          "roe",
+          "roa",
+          "net_margin",
+          "debt_ratio",
+          "current_ratio",
+          "revenue_growth",
+          "net_profit_growth",
+          "asset_turnover",
+          "inventory_turnover",
+          "ocf_to_np"
+        ],
+        "key_fields_missing": [
+          [
+            "gross_margin",
+            "销售毛利率(%)",
+            "PROVIDER_EMPTY"
+          ]
+        ],
+        "samples": {
+          "roe": [
+            "净资产收益率(%)",
+            1.25,
+            0.0125
+          ],
+          "roa": [
+            "总资产净利润率(%)",
+            0.3911,
+            0.003911
+          ],
+          "net_margin": [
+            "销售净利率(%)",
+            3.3511,
+            0.033511
+          ],
+          "debt_ratio": [
+            "资产负债率(%)",
+            51.9161,
+            0.519161
+          ],
+          "current_ratio": [
+            "流动比率",
+            1.4253,
+            1.4253
+          ],
+          "revenue_growth": [
+            "主营业务收入增长率(%)",
+            0.7951,
+            0.007951
+          ],
+          "net_profit_growth": [
+            "净利润增长率(%)",
+            -11.7708,
+            -0.117708
+          ],
+          "asset_turnover": [
+            "总资产周转率(次)",
+            0.1167,
+            0.1167
+          ],
+          "inventory_turnover": [
+            "存货周转率(次)",
+            1.6161,
+            1.6161
+          ],
+          "ocf_to_np": [
+            "经营现金净流量与净利润的比率(%)",
+            7.1965,
+            7.1965
+          ]
+        }
+      }
+    },
+    "601686.SH": {
+      "em": {
+        "status": "failed",
+        "reason_code": "PROVIDER_EMPTY",
+        "elapsed_ms": 112,
+        "error": "'NoneType' object is not subscriptable"
+      },
+      "sina": {
+        "status": "ok",
+        "elapsed_ms": 599,
+        "rows_count": 5,
+        "columns_count": 86,
+        "latest_period": "2026-03-31",
+        "key_fields_found": [
+          "roe",
+          "roa",
+          "net_margin",
+          "debt_ratio",
+          "current_ratio",
+          "revenue_growth",
+          "net_profit_growth",
+          "asset_turnover",
+          "inventory_turnover",
+          "ocf_to_np"
+        ],
+        "key_fields_missing": [
+          [
+            "gross_margin",
+            "销售毛利率(%)",
+            "PROVIDER_EMPTY"
+          ]
+        ],
+        "samples": {
+          "roe": [
+            "净资产收益率(%)",
+            1.88,
+            0.018799999999999997
+          ],
+          "roa": [
+            "总资产净利润率(%)",
+            0.6075,
+            0.0060750000000000005
+          ],
+          "net_margin": [
+            "销售净利率(%)",
+            1.3534,
+            0.013534
+          ],
+          "debt_ratio": [
+            "资产负债率(%)",
+            66.5492,
+            0.665492
+          ],
+          "current_ratio": [
+            "流动比率",
+            1.2254,
+            1.2254
+          ],
+          "revenue_growth": [
+            "主营业务收入增长率(%)",
+            -6.6449,
+            -0.066449
+          ],
+          "net_profit_growth": [
+            "净利润增长率(%)",
+            -3.1798,
+            -0.031798
+          ],
+          "asset_turnover": [
+            "总资产周转率(次)",
+            0.4489,
+            0.4489
+          ],
+          "inventory_turnover": [
+            "存货周转率(次)",
+            2.8827,
+            2.8827
+          ],
+          "ocf_to_np": [
+            "经营现金净流量与净利润的比率(%)",
+            -0.0953,
+            -0.0953
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "phase": "phase6tl_trace",
+  "real_execution": true,
+  "source_artifact": "backend/docs/artifacts/company_v2_financial_fusion_phase6tl_acceptance.json",
+  "database_connectivity": {
+    "dns_resolution": "passed",
+    "tcp_connectivity": "passed",
+    "db_authentication": "passed",
+    "database_query": "passed",
+    "rag_tables_readable": "passed"
+  },
+  "rag_601686": {
+    "report_id": 1,
+    "symbol": "601686",
+    "report_year": 2024,
+    "report_type": "annual",
+    "repository_backend": "database",
+    "persistent": true,
+    "active_rag_document_id": 71,
+    "active_generation": 1,
+    "persisted_chunk_count": 296,
+    "rag_status": "indexed"
+  },
+  "job_create_trace": {
+    "p50_ms": 1723.65,
+    "p95_ms": 6923.74,
+    "sql_query_count": [
+      16,
+      2,
+      2,
+      2,
+      2
+    ],
+    "cache_hit": false,
+    "provider_calls": 0,
+    "rag_retrieval_calls": 0,
+    "extractor_calls": 0
+  },
+  "cold_trace": {
+    "p50_ms": 1537.46,
+    "p95_ms": 3658.15,
+    "cache_hit": false,
+    "provider_calls": 0,
+    "rag_retrieval_calls": 0,
+    "extractor_calls": 0,
+    "top3_bottlenecks": [
+      "retrieval_ms",
+      "official_extractor_ms",
+      "unit_normalization_ms"
+    ]
+  },
+  "warm_trace": {
+    "p50_ms": 1443.31,
+    "p95_ms": 1462.91,
+    "cache_hit": true,
+    "provider_calls": 0,
+    "rag_retrieval_calls": 0,
+    "extractor_calls": 0,
+    "speedup_ratio": 1.07
+  },
+  "singleflight": [
+    {
+      "report_id": 1,
+      "requests": 3,
+      "compute_count": 1,
+      "leader_count": 1,
+      "reused_count": 2,
+      "all_results_equal": true
+    },
+    {
+      "report_id": 2,
+      "requests": 3,
+      "compute_count": 1,
+      "leader_count": 1,
+      "reused_count": 2,
+      "all_results_equal": true
+    },
+    {
+      "report_id": 3,
+      "requests": 3,
+      "compute_count": 1,
+      "leader_count": 1,
+      "reused_count": 2,
+      "all_results_equal": true
+    },
+    {
+      "report_id": 4,
+      "requests": 3,
+      "compute_count": 1,
+      "leader_count": 1,
+      "reused_count": 2,
+      "all_results_equal": true
+    },
+    {
+      "report_id": 5,
+      "requests": 3,
+      "compute_count": 1,
+      "leader_count": 1,
+      "reused_count": 2,
+      "all_results_equal": true
+    }
+  ],
+  "cancel": {
+    "success_count": 5,
+    "polluted_success_cache": false
+  },
+  "acceptance_summary": {
+    "symbols_total": 5,
+    "reports_ready": 5,
+    "reports_failed": 0,
+    "confirmed_value_conflict_total": 0,
+    "false_conflict": 0,
+    "cross_symbol_leakage": 0,
+    "cross_report_leakage": 0,
+    "stale_generation_usage": 0,
+    "missing_citation": 0,
+    "incomplete_source_trace": 0,
+    "invalid_page_citation": 0,
+    "unsupported_merge": 0,
+    "timeout_count": 0,
+    "timeout_rate": 0
+  }
+}

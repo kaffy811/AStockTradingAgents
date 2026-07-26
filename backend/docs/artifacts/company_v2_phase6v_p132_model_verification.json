@@ -1,0 +1,50 @@
+{
+  "schema_version": "pi_canary_model_verification_v1",
+  "phase": "6V-P1.32",
+  "generated_at": "2026-07-26T02:00:00Z",
+  "verification_status": "NOT_EXECUTED",
+  "reason": "DEEPSEEK_API_KEY_STAGING not provisioned; no real API calls made in P1.32",
+
+  "model_alias_mapping": {
+    "deepseek-v4-flash": {
+      "internal_alias": "deepseek-v4-flash",
+      "official_api_id": "deepseek-chat",
+      "model_family": "DeepSeek-V3",
+      "notes": "DeepSeek's primary chat model (latest V3 checkpoint). The alias 'deepseek-chat' is the canonical API model ID per DeepSeek documentation.",
+      "supports_usage": true,
+      "supports_streaming": true,
+      "recommended_for_mvp": true
+    },
+    "deepseek-v4-pro": {
+      "internal_alias": "deepseek-v4-pro",
+      "official_api_id": "deepseek-chat",
+      "model_family": "DeepSeek-V3",
+      "notes": "Same model class as flash; differentiated in this project by temperature/prompt strategy. Both map to 'deepseek-chat' in the API.",
+      "supports_usage": true,
+      "supports_streaming": true,
+      "recommended_for_mvp": false
+    },
+    "deepseek-reasoner": {
+      "internal_alias": "deepseek-reasoner",
+      "official_api_id": "deepseek-reasoner",
+      "model_family": "DeepSeek-R1",
+      "notes": "DeepSeek R1 reasoning model. Returns reasoning_content field. Does not support temperature parameter. More expensive than V3.",
+      "supports_usage": true,
+      "supports_streaming": true,
+      "recommended_for_mvp": false
+    }
+  },
+
+  "verification_required_for_p133": [
+    "1. Provision DEEPSEEK_API_KEY_STAGING",
+    "2. Call GET https://api.deepseek.com/models with staging key to confirm available model IDs",
+    "3. Verify 'deepseek-chat' is accessible with staging key",
+    "4. Verify 'deepseek-reasoner' is accessible with staging key",
+    "5. Confirm usage.prompt_tokens and usage.completion_tokens returned correctly",
+    "6. Update config.py DEEPSEEK_DEFAULT_MODEL to 'deepseek-chat' if alias differs",
+    "7. Record model list response SHA in artifact"
+  ],
+
+  "gate_c_status": "NOT_EVALUATED",
+  "gate_c_reason": "Cannot verify model connectivity without DEEPSEEK_API_KEY_STAGING"
+}

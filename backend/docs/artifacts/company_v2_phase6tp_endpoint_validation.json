@@ -1,0 +1,18 @@
+{
+  "phase": "phase6tp_endpoint_validation",
+  "database_project_region": "ap-northeast-2",
+  "current_pooler_host": "aws-1-ap-northeast-2.pooler.supabase.com",
+  "current_pooler_port": 6543,
+  "current_pool_mode": "transaction_pooler",
+  "ssl_mode": "require",
+  "username_format": "postgres.<project_ref>",
+  "ipv4_support": null,
+  "ipv6_support": null,
+  "endpoint_validity": "reachable_with_network_permission_but_same_region_runner_not_provisioned",
+  "evidence": [
+    "DATABASE_URL in backend/.env and .env points at aws-1-ap-northeast-2.pooler.supabase.com:6543",
+    "socket.getaddrinfo failed 30/30 in this shell",
+    "scutil --dns reported no DNS configuration available in this shell context",
+    "live Supabase integration tests passed after enabling network access"
+  ]
+}

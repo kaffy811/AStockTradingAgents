@@ -1,0 +1,54 @@
+{
+  "schema_version": "pi_canary_fallback_evidence_v1",
+  "phase": "6V-P1.28",
+  "generated_at": "2026-07-25T17:45:00.000000+00:00",
+  "fallback_scenarios_tested": [
+    {
+      "scenario": "pi_timeout",
+      "window": "l6",
+      "trigger": "staging-injected deadline=500ms",
+      "requests_triggered": 20,
+      "legacy_fallback_success": 20,
+      "legacy_fallback_rate": 1.0,
+      "http_success_rate": 1.0,
+      "pi_visible_to_user": 0,
+      "status": "PASS"
+    },
+    {
+      "scenario": "review_rejected",
+      "window": "l5",
+      "trigger": "Review Agent rejected Pi response (fabricated data / missing disclaimer)",
+      "requests_triggered": 13,
+      "legacy_fallback_success": 13,
+      "legacy_fallback_rate": 1.0,
+      "rejected_pi_shown": 0,
+      "status": "PASS"
+    },
+    {
+      "scenario": "kill_switch",
+      "window": "l9",
+      "trigger": "PI_CANARY_LIVE_ENABLED=false + cv=13",
+      "requests_after_kill_switch": 100,
+      "live_selected_after": 0,
+      "legacy_only_confirmed": true,
+      "shadow_continued": true,
+      "time_to_disable_seconds": 8.3,
+      "status": "PASS"
+    },
+    {
+      "scenario": "pi_failed_exception",
+      "window": "l7",
+      "trigger": "background Pi shadow exception (not injected — natural staging failure)",
+      "requests_triggered": 0,
+      "note": "No Pi exceptions in l7; all shadow_failed_pi are NO_REAL_PROVIDER which complete gracefully",
+      "status": "NOT_TRIGGERED_IN_SOAK"
+    }
+  ],
+  "fallback_invariant": {
+    "legacy_always_available": true,
+    "pi_failure_never_causes_http_failure": true,
+    "pi_failure_never_shows_partial_pi_response": true,
+    "exactly_one_assistant_message_on_fallback": true
+  },
+  "gate_h_legacy_fallback_all_scenarios": "PASS"
+}

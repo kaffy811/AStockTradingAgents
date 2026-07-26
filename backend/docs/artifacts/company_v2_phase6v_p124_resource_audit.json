@@ -1,0 +1,14 @@
+{
+  "schema_version": "pi_canary_resource_audit_v1",
+  "phase": "6V-P1.24",
+  "generated_at": "2026-07-24T00:00:00.000000+00:00",
+  "resource_audit_executed": false,
+  "reason": "100% observation not executed — Gate C = UNKNOWN",
+  "p122_sustained_75_resource_baseline": {
+    "memory_w1_mb": 390,
+    "memory_w10_mb": 391,
+    "fd_w1": 431,
+    "fd_w10": 430,
+    "structural_degradation": false
+  }
+}

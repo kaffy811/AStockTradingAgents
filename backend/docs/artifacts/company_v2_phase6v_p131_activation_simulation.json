@@ -1,0 +1,37 @@
+{
+  "schema_version": "pi_canary_activation_simulation_v1",
+  "phase": "6V-P1.31",
+  "generated_at": "2026-07-26T00:00:00Z",
+
+  "simulation_type": "FAKE — No real provider calls. All scenarios use FakeDeepSeekClient.",
+
+  "cv13_candidate_simulation": {
+    "description": "What cv=13 staging_real activation would look like (simulated with fake provider)",
+    "config_version": "13 (candidate — NOT applied to main staging)",
+    "provider_mode": "staging_real (candidate — NOT applied to main staging)",
+    "real_provider_enabled": "false (kill_switch=True blocks in P1.31)",
+    "result": "BLOCKED — all gate checks fail in P1.31 defaults"
+  },
+
+  "gate_simulation_results": [
+    {"gate": "I1", "check": "kill_switch", "result": "BLOCKED", "error": "KillSwitchError"},
+    {"gate": "I2", "check": "enabled", "result": "BLOCKED", "error": "KillSwitchError"},
+    {"gate": "D", "check": "credential", "result": "BLOCKED", "error": "CredentialGateError"},
+    {"gate": "F", "check": "request_budget", "result": "WOULD_PASS (budget=0/100)", "error": null},
+    {"gate": "G", "check": "cost_budget", "result": "WOULD_PASS (cost=¥0/100)", "error": null},
+    {"gate": "H1", "check": "rate_limit", "result": "WOULD_PASS (0/60 per min)", "error": null},
+    {"gate": "H2", "check": "concurrency", "result": "WOULD_PASS (0/2 slots)", "error": null},
+    {"gate": "I3", "check": "circuit_breaker", "result": "WOULD_PASS (CLOSED)", "error": null}
+  ],
+
+  "main_staging_state": {
+    "config_version": 12,
+    "provider_mode": "staging_replay",
+    "real_provider_enabled": false,
+    "unchanged": true
+  },
+
+  "real_provider_requests": 0,
+  "real_provider_cost_cny": "0",
+  "conclusion": "P1.31 correctly blocks all real provider activation paths. Controls implemented and verified with fake harness. Authorization required for P1.32."
+}

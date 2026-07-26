@@ -1,0 +1,465 @@
+{
+  "schema_version": "pi_official_report_p19_window_results_v1",
+  "phase": "6V-P1.9",
+  "window": "w1",
+  "generated_at": "2026-07-20T16:56:59.067088+00:00",
+  "source_sha": "e6c2458c05cd73a704a6f5ffb4772bf619ed6719",
+  "canary_mode": "shadow",
+  "traffic_type": "controlled_staging_acceptance",
+  "authorization_phase": "rolled_back",
+  "final_state": "rolled_back",
+  "final_rollout_percent": 0.0,
+  "config_version": 3,
+  "total_candidate_identities": 5201,
+  "selected_identities": 58,
+  "metrics": {
+    "requests_total": 9,
+    "eligible_requests": 9,
+    "bucket_selected": 9,
+    "rollout_not_selected": 0,
+    "pi_started": 9,
+    "pi_completed": 6,
+    "pi_failed": 3,
+    "legacy_only": 0,
+    "fallback_started": 3,
+    "fallback_completed": 3,
+    "fallback_failed": 0,
+    "fabricated_url": 0,
+    "wrong_entity": 0,
+    "wrong_year": 0,
+    "wrong_report_type": 0,
+    "provenance_failure": 0,
+    "business_write": 0,
+    "double_write": 0,
+    "unknown_write": 1,
+    "trace_mismatch": 0,
+    "terminal_missing": 1,
+    "raw500": 0,
+    "raw503": 0,
+    "expected_timeout": 0,
+    "unexpected_timeout": 2,
+    "diagnostics_timeout": 0,
+    "task_leak": 0,
+    "db_leak": 0,
+    "pending_rollback_error": 0,
+    "behavior_match": 6,
+    "safety_correct": 6,
+    "accepted": 6,
+    "safety_review": 0,
+    "capability_gap": 0
+  },
+  "ineligible_reasons": {},
+  "fallback_rate": 0.3333,
+  "unexpected_timeout_rate": 0.2222,
+  "safety_correctness_rate": 0.6667,
+  "coverage": {
+    "entities": [
+      "000001",
+      "000858",
+      "600519"
+    ],
+    "styles": [
+      "S1_explicit_year_2025",
+      "S2_official_link",
+      "S4_latest"
+    ],
+    "years": [
+      "2025",
+      "latest"
+    ]
+  },
+  "latency_ms": {
+    "pi_p50": 3668,
+    "pi_p95": 55000,
+    "tool_p50": 2852,
+    "tool_p95": 3959,
+    "legacy_p50": 12585,
+    "legacy_p95": 62594,
+    "fallback_p50": 60820,
+    "fallback_p95": 62594,
+    "db_query_p50": 2620,
+    "db_query_p95": 3680,
+    "db_checkout_p50": 0,
+    "db_checkout_p95": 0,
+    "diagnostics_p50": 0,
+    "diagnostics_p95": 0,
+    "cleanup_p50": 240,
+    "cleanup_p95": 297
+  },
+  "rollback_event": {
+    "event": "auto_rollback",
+    "at": "2026-07-20T16:52:39.607714+00:00",
+    "state": "rolled_back",
+    "reason": "zero_tolerance:unknown_write_count;zero_tolerance:terminal_missing_count",
+    "rollout_percent": 0,
+    "auto_recovery_allowed": false
+  },
+  "demonstrations": [
+    {
+      "kind": "known_unavailable",
+      "decision": "legacy",
+      "reason": "known_unavailable_stays_legacy",
+      "http_status": 200,
+      "terminal_count": 1,
+      "counted": false
+    },
+    {
+      "kind": "known_unavailable",
+      "decision": "legacy",
+      "reason": "known_unavailable_stays_legacy",
+      "http_status": 200,
+      "terminal_count": 1,
+      "counted": false
+    },
+    {
+      "kind": "known_unavailable",
+      "decision": "legacy",
+      "reason": "known_unavailable_stays_legacy",
+      "http_status": 200,
+      "terminal_count": 1,
+      "counted": false
+    },
+    {
+      "kind": "known_unavailable",
+      "decision": "legacy",
+      "reason": "known_unavailable_stays_legacy",
+      "http_status": 200,
+      "terminal_count": 1,
+      "counted": false
+    },
+    {
+      "kind": "known_unavailable",
+      "decision": "legacy",
+      "reason": "known_unavailable_stays_legacy",
+      "http_status": 200,
+      "terminal_count": 1,
+      "counted": false
+    },
+    {
+      "kind": "known_unavailable",
+      "decision": "legacy",
+      "reason": "known_unavailable_stays_legacy",
+      "http_status": 200,
+      "terminal_count": 1,
+      "counted": false
+    },
+    {
+      "kind": "known_unavailable",
+      "decision": "legacy",
+      "reason": "known_unavailable_stays_legacy",
+      "http_status": 200,
+      "terminal_count": 1,
+      "counted": false
+    },
+    {
+      "kind": "known_unavailable",
+      "decision": "legacy",
+      "reason": "known_unavailable_stays_legacy",
+      "http_status": 200,
+      "terminal_count": 1,
+      "counted": false
+    },
+    {
+      "kind": "known_unavailable",
+      "decision": "legacy",
+      "reason": "known_unavailable_stays_legacy",
+      "http_status": 200,
+      "terminal_count": 1,
+      "counted": false
+    },
+    {
+      "kind": "clarification",
+      "decision": "legacy",
+      "reason": "clarification_request_stays_legacy",
+      "http_status": 200,
+      "terminal_count": 1,
+      "counted": false
+    },
+    {
+      "kind": "unsupported",
+      "decision": "legacy",
+      "reason": "unsupported_report_type",
+      "http_status": 200,
+      "terminal_count": 1,
+      "counted": false
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "W1-001",
+      "style": "S1_explicit_year_2025",
+      "symbol": "600519",
+      "query_hash": "7a4674d4c42e5172",
+      "expected_year": 2025,
+      "terminal_count": 1,
+      "legacy_latency_ms": 12585,
+      "pi_status": "success",
+      "pi_latency_ms": 3960,
+      "trace_match": true,
+      "error_code": null,
+      "writes": {
+        "pi": 0,
+        "double": 0,
+        "unknown": 0
+      }
+    },
+    {
+      "case_id": "W1-002",
+      "style": "S4_latest",
+      "symbol": "600519",
+      "query_hash": "1b67e438b0c0fb1e",
+      "expected_year": null,
+      "terminal_count": 1,
+      "legacy_latency_ms": 11540,
+      "pi_status": "success",
+      "pi_latency_ms": 3434,
+      "trace_match": true,
+      "error_code": null,
+      "writes": {
+        "pi": 0,
+        "double": 0,
+        "unknown": 0
+      }
+    },
+    {
+      "case_id": "W1-003",
+      "style": "S2_official_link",
+      "symbol": "600519",
+      "query_hash": "9f9ae5fa3e3ab6ae",
+      "expected_year": null,
+      "terminal_count": 1,
+      "legacy_latency_ms": 13636,
+      "pi_status": "success",
+      "pi_latency_ms": 3668,
+      "trace_match": true,
+      "error_code": null,
+      "writes": {
+        "pi": 0,
+        "double": 0,
+        "unknown": 0
+      }
+    },
+    {
+      "case_id": "W1-004",
+      "style": "S1_explicit_year_2025",
+      "symbol": "000858",
+      "query_hash": "8e96dbca8aeb1d52",
+      "expected_year": 2025,
+      "terminal_count": 1,
+      "legacy_latency_ms": 11060,
+      "pi_status": "success",
+      "pi_latency_ms": 2623,
+      "trace_match": true,
+      "error_code": null,
+      "writes": {
+        "pi": 0,
+        "double": 0,
+        "unknown": 0
+      }
+    },
+    {
+      "case_id": "W1-005",
+      "style": "S4_latest",
+      "symbol": "000858",
+      "query_hash": "362d6f4de8e1ba44",
+      "expected_year": null,
+      "terminal_count": 1,
+      "legacy_latency_ms": 10167,
+      "pi_status": "success",
+      "pi_latency_ms": 2854,
+      "trace_match": true,
+      "error_code": null,
+      "writes": {
+        "pi": 0,
+        "double": 0,
+        "unknown": 0
+      }
+    },
+    {
+      "case_id": "W1-006",
+      "style": "S2_official_link",
+      "symbol": "000858",
+      "query_hash": "aedb21f7de3f285c",
+      "expected_year": null,
+      "terminal_count": 1,
+      "legacy_latency_ms": 12575,
+      "pi_status": "success",
+      "pi_latency_ms": 2090,
+      "trace_match": true,
+      "error_code": null,
+      "writes": {
+        "pi": 0,
+        "double": 0,
+        "unknown": 0
+      }
+    },
+    {
+      "case_id": "W1-007",
+      "style": "S1_explicit_year_2025",
+      "symbol": "000001",
+      "query_hash": "1c16f1438e12005b",
+      "expected_year": 2025,
+      "terminal_count": 1,
+      "legacy_latency_ms": 60820,
+      "pi_status": "timeout",
+      "pi_latency_ms": 55000,
+      "trace_match": true,
+      "error_code": "PI_SHADOW_STREAM_ORCHESTRATION_TIMEOUT",
+      "classified": "fallback_on_failure",
+      "writes": {
+        "pi": 0,
+        "double": 0,
+        "unknown": 0
+      }
+    },
+    {
+      "case_id": "W1-008",
+      "style": "S4_latest",
+      "symbol": "000001",
+      "query_hash": "e1ef8f9fe1f86a1c",
+      "expected_year": null,
+      "terminal_count": 1,
+      "legacy_latency_ms": 62594,
+      "pi_status": "timeout",
+      "pi_latency_ms": 55000,
+      "trace_match": true,
+      "error_code": "PI_SHADOW_STREAM_ORCHESTRATION_TIMEOUT",
+      "classified": "fallback_on_failure",
+      "writes": {
+        "pi": 0,
+        "double": 0,
+        "unknown": 0
+      }
+    },
+    {
+      "case_id": "W1-009",
+      "style": "S2_official_link",
+      "symbol": "000001",
+      "query_hash": "7e4a8fc556428bad",
+      "expected_year": null,
+      "terminal_count": 1,
+      "legacy_latency_ms": 31870,
+      "pi_status": "diagnostics_missing",
+      "classified": "terminal_missing",
+      "writes": {
+        "pi": 0,
+        "double": 0,
+        "unknown": 1
+      }
+    }
+  ],
+  "audit_sample": [
+    {
+      "schema_version": "pi_canary_audit_v1",
+      "config_version": 3,
+      "environment": "staging",
+      "agent_id": "official_report_pdf_pi_v1",
+      "authorization_status": "approved",
+      "rollout_percent": 1.0,
+      "eligible": true,
+      "eligibility_reason": "eligible_annual_report_request",
+      "bucket_selected": true,
+      "decision": "pi_canary",
+      "fallback_reason": null,
+      "kill_switch_state": {
+        "global": false,
+        "environment": false,
+        "agent": false
+      },
+      "correlation": {
+        "request_trace_hash": "9cf1573e5714",
+        "anon_user_key": "8eea2d7082504515"
+      }
+    },
+    {
+      "schema_version": "pi_canary_audit_v1",
+      "config_version": 3,
+      "environment": "staging",
+      "agent_id": "official_report_pdf_pi_v1",
+      "authorization_status": "approved",
+      "rollout_percent": 1.0,
+      "eligible": true,
+      "eligibility_reason": "eligible_annual_report_request",
+      "bucket_selected": true,
+      "decision": "pi_canary",
+      "fallback_reason": null,
+      "kill_switch_state": {
+        "global": false,
+        "environment": false,
+        "agent": false
+      },
+      "correlation": {
+        "request_trace_hash": "2fbe08dfb08f",
+        "anon_user_key": "cea26f747554f339"
+      }
+    },
+    {
+      "schema_version": "pi_canary_audit_v1",
+      "config_version": 3,
+      "environment": "staging",
+      "agent_id": "official_report_pdf_pi_v1",
+      "authorization_status": "approved",
+      "rollout_percent": 1.0,
+      "eligible": true,
+      "eligibility_reason": "eligible_annual_report_request",
+      "bucket_selected": true,
+      "decision": "pi_canary",
+      "fallback_reason": null,
+      "kill_switch_state": {
+        "global": false,
+        "environment": false,
+        "agent": false
+      },
+      "correlation": {
+        "request_trace_hash": "4f28e805e972",
+        "anon_user_key": "f00433c6f7b92a45"
+      }
+    },
+    {
+      "schema_version": "pi_canary_audit_v1",
+      "config_version": 3,
+      "environment": "staging",
+      "agent_id": "official_report_pdf_pi_v1",
+      "authorization_status": "approved",
+      "rollout_percent": 1.0,
+      "eligible": true,
+      "eligibility_reason": "eligible_annual_report_request",
+      "bucket_selected": true,
+      "decision": "pi_canary",
+      "fallback_reason": null,
+      "kill_switch_state": {
+        "global": false,
+        "environment": false,
+        "agent": false
+      },
+      "correlation": {
+        "request_trace_hash": "da5d45bc63e0",
+        "anon_user_key": "d7bf1683a9e0a036"
+      }
+    },
+    {
+      "schema_version": "pi_canary_audit_v1",
+      "config_version": 3,
+      "environment": "staging",
+      "agent_id": "official_report_pdf_pi_v1",
+      "authorization_status": "approved",
+      "rollout_percent": 1.0,
+      "eligible": true,
+      "eligibility_reason": "eligible_annual_report_request",
+      "bucket_selected": true,
+      "decision": "pi_canary",
+      "fallback_reason": null,
+      "kill_switch_state": {
+        "global": false,
+        "environment": false,
+        "agent": false
+      },
+      "correlation": {
+        "request_trace_hash": "1f8682fa6450",
+        "anon_user_key": "1306415e62969366"
+      }
+    }
+  ],
+  "run_status": "rolled_back_live_auto_rollback_evidence",
+  "analysis": "Live auto-rollback fired as designed at request 9 (zero_tolerance unknown_write+terminal_missing). Root causes: (a) 000001 legacy orchestration stalls (~55-60s, pre-existing Legacy transient — Pi never executed, PI_SHADOW_STREAM_ORCHESTRATION_TIMEOUT); (b) runner accounting race — the late assistant row of the previous 60s stream landed in the next case window while the runner only passed the current session as its own; (c) 12s diagnostics poll shorter than legacy stall duration. Runner fixes: accumulate own session ids, 70s poll window, and classify legacy orchestration stalls as legacy_stall fallbacks (Legacy reliability backlog) distinct from Pi timeouts. No Pi defect: pi business writes=0, double writes=0, no fabricated URL."
+}

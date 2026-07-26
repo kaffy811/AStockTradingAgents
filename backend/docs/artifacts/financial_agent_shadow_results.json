@@ -1,0 +1,1454 @@
+{
+  "schema_version": "financial_agent_shadow.v1",
+  "generated_at": "2026-07-16T20:09:34.550618+00:00",
+  "mode": "hermetic_contract",
+  "sample_count": 23,
+  "market_sample": {
+    "CN": {
+      "requested": 100,
+      "executed": 0,
+      "reason": "live security master sampling not run in hermetic mode"
+    },
+    "HK": {
+      "requested": 30,
+      "executed": 0,
+      "reason": "live security master sampling not run in hermetic mode"
+    },
+    "US": {
+      "requested": 0,
+      "executed": 0,
+      "reason": "current local security master coverage is not asserted by hermetic gate"
+    }
+  },
+  "runs": [
+    {
+      "trace_id": "shadow_contract_001",
+      "intent": "financial_report",
+      "scenario": {
+        "intent": "financial_report",
+        "case": "explicit_cn_name"
+      },
+      "entities": [
+        {
+          "market": "CN",
+          "symbol": "SAMPLE",
+          "entity_type": "equity"
+        }
+      ],
+      "legacy": {
+        "route": "legacy_skill_registry",
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 120,
+        "error_code": null
+      },
+      "layered": {
+        "route": "layered_v1_contract",
+        "plan": {
+          "intent": "financial_report",
+          "tools": [
+            "get_official_reports",
+            "get_structured_report_financials",
+            "query_report_evidence"
+          ]
+        },
+        "tools": [
+          {
+            "capability": "get_official_reports",
+            "status": "success"
+          },
+          {
+            "capability": "get_structured_report_financials",
+            "status": "success"
+          },
+          {
+            "capability": "query_report_evidence",
+            "status": "success"
+          }
+        ],
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 100,
+        "error_code": null
+      },
+      "comparison": {
+        "intent_match": true,
+        "entity_match": true,
+        "period_match": true,
+        "numeric_fact_match": true,
+        "unsupported_fact_count": 0,
+        "missing_fact_count": 0,
+        "latency_delta_ms": -20,
+        "tool_call_count_delta": 2,
+        "decision": "contract_pass_live_required"
+      }
+    },
+    {
+      "trace_id": "shadow_contract_002",
+      "intent": "financial_report",
+      "scenario": {
+        "intent": "financial_report",
+        "case": "explicit_code"
+      },
+      "entities": [
+        {
+          "market": "CN",
+          "symbol": "SAMPLE",
+          "entity_type": "equity"
+        }
+      ],
+      "legacy": {
+        "route": "legacy_skill_registry",
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 120,
+        "error_code": null
+      },
+      "layered": {
+        "route": "layered_v1_contract",
+        "plan": {
+          "intent": "financial_report",
+          "tools": [
+            "get_official_reports",
+            "get_structured_report_financials",
+            "query_report_evidence"
+          ]
+        },
+        "tools": [
+          {
+            "capability": "get_official_reports",
+            "status": "success"
+          },
+          {
+            "capability": "get_structured_report_financials",
+            "status": "success"
+          },
+          {
+            "capability": "query_report_evidence",
+            "status": "success"
+          }
+        ],
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 100,
+        "error_code": null
+      },
+      "comparison": {
+        "intent_match": true,
+        "entity_match": true,
+        "period_match": true,
+        "numeric_fact_match": true,
+        "unsupported_fact_count": 0,
+        "missing_fact_count": 0,
+        "latency_delta_ms": -20,
+        "tool_call_count_delta": 2,
+        "decision": "contract_pass_live_required"
+      }
+    },
+    {
+      "trace_id": "shadow_contract_003",
+      "intent": "financial_report",
+      "scenario": {
+        "intent": "financial_report",
+        "case": "continuous_chinese_name"
+      },
+      "entities": [
+        {
+          "market": "CN",
+          "symbol": "SAMPLE",
+          "entity_type": "equity"
+        }
+      ],
+      "legacy": {
+        "route": "legacy_skill_registry",
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 120,
+        "error_code": null
+      },
+      "layered": {
+        "route": "layered_v1_contract",
+        "plan": {
+          "intent": "financial_report",
+          "tools": [
+            "get_official_reports",
+            "get_structured_report_financials",
+            "query_report_evidence"
+          ]
+        },
+        "tools": [
+          {
+            "capability": "get_official_reports",
+            "status": "success"
+          },
+          {
+            "capability": "get_structured_report_financials",
+            "status": "success"
+          },
+          {
+            "capability": "query_report_evidence",
+            "status": "success"
+          }
+        ],
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 100,
+        "error_code": null
+      },
+      "comparison": {
+        "intent_match": true,
+        "entity_match": true,
+        "period_match": true,
+        "numeric_fact_match": true,
+        "unsupported_fact_count": 0,
+        "missing_fact_count": 0,
+        "latency_delta_ms": -20,
+        "tool_call_count_delta": 2,
+        "decision": "contract_pass_live_required"
+      }
+    },
+    {
+      "trace_id": "shadow_contract_004",
+      "intent": "financial_report",
+      "scenario": {
+        "intent": "financial_report",
+        "case": "report_indexed"
+      },
+      "entities": [
+        {
+          "market": "CN",
+          "symbol": "SAMPLE",
+          "entity_type": "equity"
+        }
+      ],
+      "legacy": {
+        "route": "legacy_skill_registry",
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 120,
+        "error_code": null
+      },
+      "layered": {
+        "route": "layered_v1_contract",
+        "plan": {
+          "intent": "financial_report",
+          "tools": [
+            "get_official_reports",
+            "get_structured_report_financials",
+            "query_report_evidence"
+          ]
+        },
+        "tools": [
+          {
+            "capability": "get_official_reports",
+            "status": "success"
+          },
+          {
+            "capability": "get_structured_report_financials",
+            "status": "success"
+          },
+          {
+            "capability": "query_report_evidence",
+            "status": "success"
+          }
+        ],
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 100,
+        "error_code": null
+      },
+      "comparison": {
+        "intent_match": true,
+        "entity_match": true,
+        "period_match": true,
+        "numeric_fact_match": true,
+        "unsupported_fact_count": 0,
+        "missing_fact_count": 0,
+        "latency_delta_ms": -20,
+        "tool_call_count_delta": 2,
+        "decision": "contract_pass_live_required"
+      }
+    },
+    {
+      "trace_id": "shadow_contract_005",
+      "intent": "financial_report",
+      "scenario": {
+        "intent": "financial_report",
+        "case": "rag_unavailable_cached_snapshot"
+      },
+      "entities": [
+        {
+          "market": "CN",
+          "symbol": "SAMPLE",
+          "entity_type": "equity"
+        }
+      ],
+      "legacy": {
+        "route": "legacy_skill_registry",
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 120,
+        "error_code": null
+      },
+      "layered": {
+        "route": "layered_v1_contract",
+        "plan": {
+          "intent": "financial_report",
+          "tools": [
+            "get_official_reports",
+            "get_structured_report_financials",
+            "query_report_evidence"
+          ]
+        },
+        "tools": [
+          {
+            "capability": "get_official_reports",
+            "status": "partial_success"
+          },
+          {
+            "capability": "get_structured_report_financials",
+            "status": "partial_success"
+          },
+          {
+            "capability": "query_report_evidence",
+            "status": "partial_success"
+          }
+        ],
+        "status": "partial_success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 100,
+        "error_code": null
+      },
+      "comparison": {
+        "intent_match": true,
+        "entity_match": true,
+        "period_match": true,
+        "numeric_fact_match": true,
+        "unsupported_fact_count": 0,
+        "missing_fact_count": 1,
+        "latency_delta_ms": -20,
+        "tool_call_count_delta": 2,
+        "decision": "contract_pass_live_required"
+      }
+    },
+    {
+      "trace_id": "shadow_contract_006",
+      "intent": "financial_comparison",
+      "scenario": {
+        "intent": "financial_comparison",
+        "case": "two_explicit_companies"
+      },
+      "entities": [
+        {
+          "market": "CN",
+          "symbol": "SAMPLE",
+          "entity_type": "equity"
+        },
+        {
+          "market": "CN",
+          "symbol": "SAMPLE2",
+          "entity_type": "equity"
+        }
+      ],
+      "legacy": {
+        "route": "legacy_skill_registry",
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 120,
+        "error_code": null
+      },
+      "layered": {
+        "route": "layered_v1_contract",
+        "plan": {
+          "intent": "financial_comparison",
+          "tools": [
+            "get_official_reports",
+            "get_structured_report_financials",
+            "compare_financials"
+          ]
+        },
+        "tools": [
+          {
+            "capability": "get_official_reports",
+            "status": "success"
+          },
+          {
+            "capability": "get_structured_report_financials",
+            "status": "success"
+          },
+          {
+            "capability": "compare_financials",
+            "status": "success"
+          }
+        ],
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 100,
+        "error_code": null
+      },
+      "comparison": {
+        "intent_match": true,
+        "entity_match": true,
+        "period_match": true,
+        "numeric_fact_match": true,
+        "unsupported_fact_count": 0,
+        "missing_fact_count": 0,
+        "latency_delta_ms": -20,
+        "tool_call_count_delta": 2,
+        "decision": "contract_pass_live_required"
+      }
+    },
+    {
+      "trace_id": "shadow_contract_007",
+      "intent": "financial_comparison",
+      "scenario": {
+        "intent": "financial_comparison",
+        "case": "pronoun_plus_second_entity"
+      },
+      "entities": [
+        {
+          "market": "CN",
+          "symbol": "SAMPLE",
+          "entity_type": "equity"
+        },
+        {
+          "market": "CN",
+          "symbol": "SAMPLE2",
+          "entity_type": "equity"
+        }
+      ],
+      "legacy": {
+        "route": "legacy_skill_registry",
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 120,
+        "error_code": null
+      },
+      "layered": {
+        "route": "layered_v1_contract",
+        "plan": {
+          "intent": "financial_comparison",
+          "tools": [
+            "get_official_reports",
+            "get_structured_report_financials",
+            "compare_financials"
+          ]
+        },
+        "tools": [
+          {
+            "capability": "get_official_reports",
+            "status": "success"
+          },
+          {
+            "capability": "get_structured_report_financials",
+            "status": "success"
+          },
+          {
+            "capability": "compare_financials",
+            "status": "success"
+          }
+        ],
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 100,
+        "error_code": null
+      },
+      "comparison": {
+        "intent_match": true,
+        "entity_match": true,
+        "period_match": true,
+        "numeric_fact_match": true,
+        "unsupported_fact_count": 0,
+        "missing_fact_count": 0,
+        "latency_delta_ms": -20,
+        "tool_call_count_delta": 2,
+        "decision": "contract_pass_live_required"
+      }
+    },
+    {
+      "trace_id": "shadow_contract_008",
+      "intent": "financial_comparison",
+      "scenario": {
+        "intent": "financial_comparison",
+        "case": "three_companies"
+      },
+      "entities": [
+        {
+          "market": "CN",
+          "symbol": "SAMPLE",
+          "entity_type": "equity"
+        },
+        {
+          "market": "CN",
+          "symbol": "SAMPLE2",
+          "entity_type": "equity"
+        }
+      ],
+      "legacy": {
+        "route": "legacy_skill_registry",
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 120,
+        "error_code": null
+      },
+      "layered": {
+        "route": "layered_v1_contract",
+        "plan": {
+          "intent": "financial_comparison",
+          "tools": [
+            "get_official_reports",
+            "get_structured_report_financials",
+            "compare_financials"
+          ]
+        },
+        "tools": [
+          {
+            "capability": "get_official_reports",
+            "status": "success"
+          },
+          {
+            "capability": "get_structured_report_financials",
+            "status": "success"
+          },
+          {
+            "capability": "compare_financials",
+            "status": "success"
+          }
+        ],
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 100,
+        "error_code": null
+      },
+      "comparison": {
+        "intent_match": true,
+        "entity_match": true,
+        "period_match": true,
+        "numeric_fact_match": true,
+        "unsupported_fact_count": 0,
+        "missing_fact_count": 0,
+        "latency_delta_ms": -20,
+        "tool_call_count_delta": 2,
+        "decision": "contract_pass_live_required"
+      }
+    },
+    {
+      "trace_id": "shadow_contract_009",
+      "intent": "financial_comparison",
+      "scenario": {
+        "intent": "financial_comparison",
+        "case": "period_mismatch"
+      },
+      "entities": [
+        {
+          "market": "CN",
+          "symbol": "SAMPLE",
+          "entity_type": "equity"
+        },
+        {
+          "market": "CN",
+          "symbol": "SAMPLE2",
+          "entity_type": "equity"
+        }
+      ],
+      "legacy": {
+        "route": "legacy_skill_registry",
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 120,
+        "error_code": null
+      },
+      "layered": {
+        "route": "layered_v1_contract",
+        "plan": {
+          "intent": "financial_comparison",
+          "tools": [
+            "get_official_reports",
+            "get_structured_report_financials",
+            "compare_financials"
+          ]
+        },
+        "tools": [
+          {
+            "capability": "get_official_reports",
+            "status": "success"
+          },
+          {
+            "capability": "get_structured_report_financials",
+            "status": "success"
+          },
+          {
+            "capability": "compare_financials",
+            "status": "success"
+          }
+        ],
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 100,
+        "error_code": null
+      },
+      "comparison": {
+        "intent_match": true,
+        "entity_match": true,
+        "period_match": true,
+        "numeric_fact_match": true,
+        "unsupported_fact_count": 0,
+        "missing_fact_count": 0,
+        "latency_delta_ms": -20,
+        "tool_call_count_delta": 2,
+        "decision": "contract_pass_live_required"
+      }
+    },
+    {
+      "trace_id": "shadow_contract_010",
+      "intent": "financial_comparison",
+      "scenario": {
+        "intent": "financial_comparison",
+        "case": "one_side_missing_fields"
+      },
+      "entities": [
+        {
+          "market": "CN",
+          "symbol": "SAMPLE",
+          "entity_type": "equity"
+        },
+        {
+          "market": "CN",
+          "symbol": "SAMPLE2",
+          "entity_type": "equity"
+        }
+      ],
+      "legacy": {
+        "route": "legacy_skill_registry",
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 120,
+        "error_code": null
+      },
+      "layered": {
+        "route": "layered_v1_contract",
+        "plan": {
+          "intent": "financial_comparison",
+          "tools": [
+            "get_official_reports",
+            "get_structured_report_financials",
+            "compare_financials"
+          ]
+        },
+        "tools": [
+          {
+            "capability": "get_official_reports",
+            "status": "partial_success"
+          },
+          {
+            "capability": "get_structured_report_financials",
+            "status": "partial_success"
+          },
+          {
+            "capability": "compare_financials",
+            "status": "partial_success"
+          }
+        ],
+        "status": "partial_success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 100,
+        "error_code": null
+      },
+      "comparison": {
+        "intent_match": true,
+        "entity_match": true,
+        "period_match": true,
+        "numeric_fact_match": true,
+        "unsupported_fact_count": 0,
+        "missing_fact_count": 1,
+        "latency_delta_ms": -20,
+        "tool_call_count_delta": 2,
+        "decision": "contract_pass_live_required"
+      }
+    },
+    {
+      "trace_id": "shadow_contract_011",
+      "intent": "official_report_pdf",
+      "scenario": {
+        "intent": "official_report_pdf",
+        "case": "current_report_context"
+      },
+      "entities": [
+        {
+          "market": "CN",
+          "symbol": "SAMPLE",
+          "entity_type": "equity"
+        }
+      ],
+      "legacy": {
+        "route": "legacy_skill_registry",
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 120,
+        "error_code": null
+      },
+      "layered": {
+        "route": "layered_v1_contract",
+        "plan": {
+          "intent": "official_report_pdf",
+          "tools": [
+            "get_official_report_url"
+          ]
+        },
+        "tools": [
+          {
+            "capability": "get_official_report_url",
+            "status": "success"
+          }
+        ],
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 100,
+        "error_code": null
+      },
+      "comparison": {
+        "intent_match": true,
+        "entity_match": true,
+        "period_match": true,
+        "numeric_fact_match": true,
+        "unsupported_fact_count": 0,
+        "missing_fact_count": 0,
+        "latency_delta_ms": -20,
+        "tool_call_count_delta": 0,
+        "decision": "contract_pass_live_required"
+      }
+    },
+    {
+      "trace_id": "shadow_contract_012",
+      "intent": "official_report_pdf",
+      "scenario": {
+        "intent": "official_report_pdf",
+        "case": "explicit_company"
+      },
+      "entities": [
+        {
+          "market": "CN",
+          "symbol": "SAMPLE",
+          "entity_type": "equity"
+        }
+      ],
+      "legacy": {
+        "route": "legacy_skill_registry",
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 120,
+        "error_code": null
+      },
+      "layered": {
+        "route": "layered_v1_contract",
+        "plan": {
+          "intent": "official_report_pdf",
+          "tools": [
+            "get_official_report_url"
+          ]
+        },
+        "tools": [
+          {
+            "capability": "get_official_report_url",
+            "status": "success"
+          }
+        ],
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 100,
+        "error_code": null
+      },
+      "comparison": {
+        "intent_match": true,
+        "entity_match": true,
+        "period_match": true,
+        "numeric_fact_match": true,
+        "unsupported_fact_count": 0,
+        "missing_fact_count": 0,
+        "latency_delta_ms": -20,
+        "tool_call_count_delta": 0,
+        "decision": "contract_pass_live_required"
+      }
+    },
+    {
+      "trace_id": "shadow_contract_013",
+      "intent": "official_report_pdf",
+      "scenario": {
+        "intent": "official_report_pdf",
+        "case": "report_not_found"
+      },
+      "entities": [
+        {
+          "market": "CN",
+          "symbol": "SAMPLE",
+          "entity_type": "equity"
+        }
+      ],
+      "legacy": {
+        "route": "legacy_skill_registry",
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 120,
+        "error_code": null
+      },
+      "layered": {
+        "route": "layered_v1_contract",
+        "plan": {
+          "intent": "official_report_pdf",
+          "tools": [
+            "get_official_report_url"
+          ]
+        },
+        "tools": [
+          {
+            "capability": "get_official_report_url",
+            "status": "unavailable"
+          }
+        ],
+        "status": "unavailable",
+        "answer_present": false,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 100,
+        "error_code": "DATA_UNAVAILABLE"
+      },
+      "comparison": {
+        "intent_match": true,
+        "entity_match": true,
+        "period_match": true,
+        "numeric_fact_match": true,
+        "unsupported_fact_count": 0,
+        "missing_fact_count": 1,
+        "latency_delta_ms": -20,
+        "tool_call_count_delta": 0,
+        "decision": "contract_pass_live_required"
+      }
+    },
+    {
+      "trace_id": "shadow_contract_014",
+      "intent": "official_report_pdf",
+      "scenario": {
+        "intent": "official_report_pdf",
+        "case": "official_url_available"
+      },
+      "entities": [
+        {
+          "market": "CN",
+          "symbol": "SAMPLE",
+          "entity_type": "equity"
+        }
+      ],
+      "legacy": {
+        "route": "legacy_skill_registry",
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 120,
+        "error_code": null
+      },
+      "layered": {
+        "route": "layered_v1_contract",
+        "plan": {
+          "intent": "official_report_pdf",
+          "tools": [
+            "get_official_report_url"
+          ]
+        },
+        "tools": [
+          {
+            "capability": "get_official_report_url",
+            "status": "success"
+          }
+        ],
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 100,
+        "error_code": null
+      },
+      "comparison": {
+        "intent_match": true,
+        "entity_match": true,
+        "period_match": true,
+        "numeric_fact_match": true,
+        "unsupported_fact_count": 0,
+        "missing_fact_count": 0,
+        "latency_delta_ms": -20,
+        "tool_call_count_delta": 0,
+        "decision": "contract_pass_live_required"
+      }
+    },
+    {
+      "trace_id": "shadow_contract_015",
+      "intent": "financial_snapshot",
+      "scenario": {
+        "intent": "financial_snapshot",
+        "case": "company_cache_hit"
+      },
+      "entities": [
+        {
+          "market": "CN",
+          "symbol": "SAMPLE",
+          "entity_type": "equity"
+        }
+      ],
+      "legacy": {
+        "route": "legacy_skill_registry",
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 120,
+        "error_code": null
+      },
+      "layered": {
+        "route": "layered_v1_contract",
+        "plan": {
+          "intent": "financial_snapshot",
+          "tools": [
+            "get_financial_snapshot"
+          ]
+        },
+        "tools": [
+          {
+            "capability": "get_financial_snapshot",
+            "status": "success"
+          }
+        ],
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 100,
+        "error_code": null
+      },
+      "comparison": {
+        "intent_match": true,
+        "entity_match": true,
+        "period_match": true,
+        "numeric_fact_match": true,
+        "unsupported_fact_count": 0,
+        "missing_fact_count": 0,
+        "latency_delta_ms": -20,
+        "tool_call_count_delta": 0,
+        "decision": "contract_pass_live_required"
+      }
+    },
+    {
+      "trace_id": "shadow_contract_016",
+      "intent": "financial_snapshot",
+      "scenario": {
+        "intent": "financial_snapshot",
+        "case": "partial_fields"
+      },
+      "entities": [
+        {
+          "market": "CN",
+          "symbol": "SAMPLE",
+          "entity_type": "equity"
+        }
+      ],
+      "legacy": {
+        "route": "legacy_skill_registry",
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 120,
+        "error_code": null
+      },
+      "layered": {
+        "route": "layered_v1_contract",
+        "plan": {
+          "intent": "financial_snapshot",
+          "tools": [
+            "get_financial_snapshot"
+          ]
+        },
+        "tools": [
+          {
+            "capability": "get_financial_snapshot",
+            "status": "success"
+          }
+        ],
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 100,
+        "error_code": null
+      },
+      "comparison": {
+        "intent_match": true,
+        "entity_match": true,
+        "period_match": true,
+        "numeric_fact_match": true,
+        "unsupported_fact_count": 0,
+        "missing_fact_count": 0,
+        "latency_delta_ms": -20,
+        "tool_call_count_delta": 0,
+        "decision": "contract_pass_live_required"
+      }
+    },
+    {
+      "trace_id": "shadow_contract_017",
+      "intent": "financial_snapshot",
+      "scenario": {
+        "intent": "financial_snapshot",
+        "case": "industry_not_applicable"
+      },
+      "entities": [
+        {
+          "market": "CN",
+          "symbol": "SAMPLE",
+          "entity_type": "equity"
+        }
+      ],
+      "legacy": {
+        "route": "legacy_skill_registry",
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 120,
+        "error_code": null
+      },
+      "layered": {
+        "route": "layered_v1_contract",
+        "plan": {
+          "intent": "financial_snapshot",
+          "tools": [
+            "get_financial_snapshot"
+          ]
+        },
+        "tools": [
+          {
+            "capability": "get_financial_snapshot",
+            "status": "success"
+          }
+        ],
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 100,
+        "error_code": null
+      },
+      "comparison": {
+        "intent_match": true,
+        "entity_match": true,
+        "period_match": true,
+        "numeric_fact_match": true,
+        "unsupported_fact_count": 0,
+        "missing_fact_count": 0,
+        "latency_delta_ms": -20,
+        "tool_call_count_delta": 0,
+        "decision": "contract_pass_live_required"
+      }
+    },
+    {
+      "trace_id": "shadow_contract_018",
+      "intent": "financial_snapshot",
+      "scenario": {
+        "intent": "financial_snapshot",
+        "case": "provider_unavailable"
+      },
+      "entities": [
+        {
+          "market": "CN",
+          "symbol": "SAMPLE",
+          "entity_type": "equity"
+        }
+      ],
+      "legacy": {
+        "route": "legacy_skill_registry",
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 120,
+        "error_code": null
+      },
+      "layered": {
+        "route": "layered_v1_contract",
+        "plan": {
+          "intent": "financial_snapshot",
+          "tools": [
+            "get_financial_snapshot"
+          ]
+        },
+        "tools": [
+          {
+            "capability": "get_financial_snapshot",
+            "status": "partial_success"
+          }
+        ],
+        "status": "partial_success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 100,
+        "error_code": null
+      },
+      "comparison": {
+        "intent_match": true,
+        "entity_match": true,
+        "period_match": true,
+        "numeric_fact_match": true,
+        "unsupported_fact_count": 0,
+        "missing_fact_count": 1,
+        "latency_delta_ms": -20,
+        "tool_call_count_delta": 0,
+        "decision": "contract_pass_live_required"
+      }
+    },
+    {
+      "trace_id": "shadow_contract_019",
+      "intent": "quote_query",
+      "scenario": {
+        "intent": "quote_query",
+        "case": "cn_quote"
+      },
+      "entities": [
+        {
+          "market": "CN",
+          "symbol": "SAMPLE",
+          "entity_type": "equity"
+        }
+      ],
+      "legacy": {
+        "route": "legacy_skill_registry",
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 120,
+        "error_code": null
+      },
+      "layered": {
+        "route": "layered_v1_contract",
+        "plan": {
+          "intent": "quote_query",
+          "tools": [
+            "get_quote_snapshot"
+          ]
+        },
+        "tools": [
+          {
+            "capability": "get_quote_snapshot",
+            "status": "success"
+          }
+        ],
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 100,
+        "error_code": null
+      },
+      "comparison": {
+        "intent_match": true,
+        "entity_match": true,
+        "period_match": true,
+        "numeric_fact_match": true,
+        "unsupported_fact_count": 0,
+        "missing_fact_count": 0,
+        "latency_delta_ms": -20,
+        "tool_call_count_delta": 0,
+        "decision": "contract_pass_live_required"
+      }
+    },
+    {
+      "trace_id": "shadow_contract_020",
+      "intent": "quote_query",
+      "scenario": {
+        "intent": "quote_query",
+        "case": "hk_quote"
+      },
+      "entities": [
+        {
+          "market": "HK",
+          "symbol": "00001",
+          "entity_type": "equity"
+        }
+      ],
+      "legacy": {
+        "route": "legacy_skill_registry",
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 120,
+        "error_code": null
+      },
+      "layered": {
+        "route": "layered_v1_contract",
+        "plan": {
+          "intent": "quote_query",
+          "tools": [
+            "get_quote_snapshot"
+          ]
+        },
+        "tools": [
+          {
+            "capability": "get_quote_snapshot",
+            "status": "success"
+          }
+        ],
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 100,
+        "error_code": null
+      },
+      "comparison": {
+        "intent_match": true,
+        "entity_match": true,
+        "period_match": true,
+        "numeric_fact_match": true,
+        "unsupported_fact_count": 0,
+        "missing_fact_count": 0,
+        "latency_delta_ms": -20,
+        "tool_call_count_delta": 0,
+        "decision": "contract_pass_live_required"
+      }
+    },
+    {
+      "trace_id": "shadow_contract_021",
+      "intent": "quote_query",
+      "scenario": {
+        "intent": "quote_query",
+        "case": "us_no_data_architecture"
+      },
+      "entities": [
+        {
+          "market": "US",
+          "symbol": "SAMPLE",
+          "entity_type": "equity"
+        }
+      ],
+      "legacy": {
+        "route": "legacy_skill_registry",
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 120,
+        "error_code": null
+      },
+      "layered": {
+        "route": "layered_v1_contract",
+        "plan": {
+          "intent": "quote_query",
+          "tools": [
+            "get_quote_snapshot"
+          ]
+        },
+        "tools": [
+          {
+            "capability": "get_quote_snapshot",
+            "status": "success"
+          }
+        ],
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 100,
+        "error_code": null
+      },
+      "comparison": {
+        "intent_match": true,
+        "entity_match": true,
+        "period_match": true,
+        "numeric_fact_match": true,
+        "unsupported_fact_count": 0,
+        "missing_fact_count": 0,
+        "latency_delta_ms": -20,
+        "tool_call_count_delta": 0,
+        "decision": "contract_pass_live_required"
+      }
+    },
+    {
+      "trace_id": "shadow_contract_022",
+      "intent": "quote_query",
+      "scenario": {
+        "intent": "quote_query",
+        "case": "stale_quote"
+      },
+      "entities": [
+        {
+          "market": "CN",
+          "symbol": "SAMPLE",
+          "entity_type": "equity"
+        }
+      ],
+      "legacy": {
+        "route": "legacy_skill_registry",
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 120,
+        "error_code": null
+      },
+      "layered": {
+        "route": "layered_v1_contract",
+        "plan": {
+          "intent": "quote_query",
+          "tools": [
+            "get_quote_snapshot"
+          ]
+        },
+        "tools": [
+          {
+            "capability": "get_quote_snapshot",
+            "status": "success"
+          }
+        ],
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 100,
+        "error_code": null
+      },
+      "comparison": {
+        "intent_match": true,
+        "entity_match": true,
+        "period_match": true,
+        "numeric_fact_match": true,
+        "unsupported_fact_count": 0,
+        "missing_fact_count": 0,
+        "latency_delta_ms": -20,
+        "tool_call_count_delta": 0,
+        "decision": "contract_pass_live_required"
+      }
+    },
+    {
+      "trace_id": "shadow_contract_023",
+      "intent": "quote_query",
+      "scenario": {
+        "intent": "quote_query",
+        "case": "market_closed"
+      },
+      "entities": [
+        {
+          "market": "CN",
+          "symbol": "SAMPLE",
+          "entity_type": "equity"
+        }
+      ],
+      "legacy": {
+        "route": "legacy_skill_registry",
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 120,
+        "error_code": null
+      },
+      "layered": {
+        "route": "layered_v1_contract",
+        "plan": {
+          "intent": "quote_query",
+          "tools": [
+            "get_quote_snapshot"
+          ]
+        },
+        "tools": [
+          {
+            "capability": "get_quote_snapshot",
+            "status": "success"
+          }
+        ],
+        "status": "success",
+        "answer_present": true,
+        "metrics": [],
+        "evidence_ids": [],
+        "latency_ms": 100,
+        "error_code": null
+      },
+      "comparison": {
+        "intent_match": true,
+        "entity_match": true,
+        "period_match": true,
+        "numeric_fact_match": true,
+        "unsupported_fact_count": 0,
+        "missing_fact_count": 0,
+        "latency_delta_ms": -20,
+        "tool_call_count_delta": 0,
+        "decision": "contract_pass_live_required"
+      }
+    }
+  ],
+  "metrics": {
+    "elapsed_ms": 0,
+    "intent_match_rate": 1.0,
+    "entity_match_rate": 1.0,
+    "unsupported_numeric_fact_count": 0,
+    "unsupported_causal_claim_count": 0,
+    "stale_as_realtime_count": 0,
+    "annual_quarter_mismatch_count": 0,
+    "null_filled_as_zero_count": 0,
+    "context_corruption_count": 0,
+    "message_double_write_count": 0,
+    "db_session_across_llm_count": 0,
+    "private_daemon_loop_in_layered_path": 0,
+    "latency_p50_ms": 100.0,
+    "latency_p95_ms": 100.0
+  }
+}

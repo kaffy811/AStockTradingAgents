@@ -1,0 +1,49 @@
+{
+  "schema_version": "pi_canary_migration_v1",
+  "phase": "6V-P1.31",
+  "generated_at": "2026-07-26T00:00:00Z",
+
+  "migration": {
+    "revision": "m1n2o3p4q5r6",
+    "down_revision": "l0m1n2o3p4q5",
+    "file": "backend/alembic/versions/2026_07_26_0001-m1n2o3p4q5r6_pi_real_provider_audit.py",
+    "table": "pi_real_provider_audit",
+    "has_upgrade": true,
+    "has_downgrade": true,
+    "idempotent": true
+  },
+
+  "table_schema": {
+    "columns": [
+      "id (BigInteger PK autoincrement)",
+      "call_id (String 64 unique)",
+      "phase (String 32)",
+      "outcome (String 32)",
+      "model_id (String 64)",
+      "input_tokens (Integer)",
+      "output_tokens (Integer)",
+      "cached_input_tokens (Integer)",
+      "reasoning_tokens (Integer)",
+      "usage_complete (Boolean)",
+      "estimated_cost_cny (String 32)",
+      "duration_ms (Integer)",
+      "error_type (String 128)",
+      "trigger (String 64)",
+      "config_version (Integer)",
+      "request_hash (String 16 — SHA256 prefix only)",
+      "response_hash (String 16 — SHA256 prefix only)",
+      "epoch (Float)",
+      "created_at (DateTime with timezone)"
+    ],
+    "indexes": [
+      "ix_pi_real_provider_audit_phase",
+      "ix_pi_real_provider_audit_outcome",
+      "ix_pi_real_provider_audit_created_at"
+    ],
+    "no_raw_content_fields": true,
+    "no_api_key_fields": true
+  },
+
+  "p131_records_inserted": 0,
+  "gate": "Audit table ready for P1.32+ real provider activation"
+}

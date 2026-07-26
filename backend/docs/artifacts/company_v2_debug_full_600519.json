@@ -1,0 +1,2534 @@
+{
+  "request_id": "1848d707-5492-43f9-8542-5194b610ec4d",
+  "market": "CN",
+  "symbol": "600519",
+  "ts_code": "600519.SH",
+  "data_mode": "free",
+  "partial": true,
+  "summary": {
+    "providers_attempted": 14,
+    "providers_success": 5,
+    "providers_timeout": 9,
+    "providers_failed": 0,
+    "modules_renderable": 2,
+    "modules_unavailable": 9
+  },
+  "modules": {
+    "quote_overview": {
+      "request_id": "1848d707-5492-43f9-8542-5194b610ec4d",
+      "market": "CN",
+      "symbol": "600519",
+      "ts_code": "600519.SH",
+      "module_key": "quote_overview",
+      "data_mode": "free",
+      "stage": "final",
+      "ok": true,
+      "partial": true,
+      "stale": false,
+      "source_chain": [
+        {
+          "provider": "akshare",
+          "endpoint": "stock_zh_a_spot_em",
+          "attempted": true,
+          "success": true,
+          "status": "success",
+          "started_at": "2026-07-08T15:00:33.302062+00:00",
+          "ended_at": "2026-07-08T15:00:39.466714+00:00",
+          "elapsed_ms": 6164,
+          "latency_ms": 6164,
+          "rows_count": 2,
+          "columns": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "non_null_fields": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "missing_fields": [],
+          "error_code": null,
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": "tuple",
+          "raw_shape": [
+            2,
+            8
+          ],
+          "detached_timeout": false
+        },
+        {
+          "provider": "baostock",
+          "endpoint": "query_history_k_data_plus",
+          "attempted": true,
+          "success": true,
+          "status": "success",
+          "started_at": "2026-07-08T15:00:39.469284+00:00",
+          "ended_at": "2026-07-08T15:00:50.935774+00:00",
+          "elapsed_ms": 11467,
+          "latency_ms": 11467,
+          "rows_count": 1,
+          "columns": [
+            "change_pct",
+            "close",
+            "pb",
+            "pcf_ttm",
+            "pe_ttm",
+            "ps_ttm",
+            "source",
+            "trade_date",
+            "ts_code",
+            "turnover_rate"
+          ],
+          "non_null_fields": [
+            "change_pct",
+            "close",
+            "pb",
+            "pcf_ttm",
+            "pe_ttm",
+            "ps_ttm",
+            "source",
+            "trade_date",
+            "ts_code",
+            "turnover_rate"
+          ],
+          "missing_fields": [],
+          "error_code": null,
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": "dict",
+          "raw_shape": [
+            1,
+            10
+          ],
+          "detached_timeout": false
+        }
+      ],
+      "raw": {
+        "baostock": [
+          {
+            "endpoint": "query_history_k_data_plus",
+            "raw_type": "dict",
+            "raw_shape": [
+              1,
+              10
+            ],
+            "columns": [
+              "change_pct",
+              "close",
+              "pb",
+              "pcf_ttm",
+              "pe_ttm",
+              "ps_ttm",
+              "source",
+              "trade_date",
+              "ts_code",
+              "turnover_rate"
+            ],
+            "rows_count": 1,
+            "status": "success",
+            "started_at": "2026-07-08T15:00:39.469284+00:00",
+            "ended_at": "2026-07-08T15:00:50.935774+00:00",
+            "elapsed_ms": 11467,
+            "detached_timeout": false,
+            "raw_sample": [
+              {
+                "ts_code": "600519.SH",
+                "trade_date": "2026-07-08",
+                "close": 1199.3,
+                "change_pct": 0.8832,
+                "turnover_rate": 0.2062,
+                "pe_ttm": 18.12514,
+                "pb": 5.534352,
+                "ps_ttm": 8.551662,
+                "pcf_ttm": 1055.924548,
+                "source": "baostock_kline_fallback"
+              }
+            ],
+            "error_code": null,
+            "error_message": null,
+            "raw_full": [
+              {
+                "ts_code": "600519.SH",
+                "trade_date": "2026-07-08",
+                "close": 1199.3,
+                "change_pct": 0.8832,
+                "turnover_rate": 0.2062,
+                "pe_ttm": 18.12514,
+                "pb": 5.534352,
+                "ps_ttm": 8.551662,
+                "pcf_ttm": 1055.924548,
+                "source": "baostock_kline_fallback"
+              }
+            ]
+          }
+        ],
+        "akshare": [
+          {
+            "endpoint": "stock_zh_a_spot_em",
+            "raw_type": "tuple",
+            "raw_shape": [
+              2,
+              8
+            ],
+            "columns": [
+              "elapsed_ms",
+              "errors",
+              "interface",
+              "provider",
+              "reason_code",
+              "source",
+              "source_fields",
+              "status"
+            ],
+            "rows_count": 2,
+            "status": "success",
+            "started_at": "2026-07-08T15:00:33.302062+00:00",
+            "ended_at": "2026-07-08T15:00:39.466714+00:00",
+            "elapsed_ms": 6164,
+            "detached_timeout": false,
+            "raw_sample": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "stock_zh_a_spot_em",
+                "source": "akshare_spot_em",
+                "status": "failed",
+                "elapsed_ms": 6164,
+                "reason_code": "NETWORK_UNAVAILABLE",
+                "source_fields": {},
+                "errors": [
+                  {
+                    "error": "('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+                  }
+                ]
+              }
+            ],
+            "error_code": null,
+            "error_message": null,
+            "raw_full": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "stock_zh_a_spot_em",
+                "source": "akshare_spot_em",
+                "status": "failed",
+                "elapsed_ms": 6164,
+                "reason_code": "NETWORK_UNAVAILABLE",
+                "source_fields": {},
+                "errors": [
+                  {
+                    "error": "('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "tencent": [],
+        "sina": [],
+        "eastmoney": [],
+        "pdf_metrics": []
+      },
+      "normalized": {
+        "rows": [
+          {
+            "latest_price_source": "baostock_kline_fallback",
+            "recent_close": 1199.3,
+            "recent_close_source": "provider",
+            "latest_price": 1199.3,
+            "pct_chg": 0.8832,
+            "pct_chg_source": "provider",
+            "turnover": 0.2062,
+            "turnover_source": "provider",
+            "pe_ttm": 18.12514,
+            "pe_ttm_source": "provider",
+            "pb": 5.534352,
+            "pb_source": "provider",
+            "ps_ttm": 8.551662,
+            "ps_ttm_source": "provider",
+            "pcf_ncf_ttm": 1055.924548,
+            "pcf_ncf_ttm_source": "provider"
+          }
+        ],
+        "metrics": {
+          "latest_price_source": "baostock_kline_fallback",
+          "recent_close": 1199.3,
+          "recent_close_source": "provider",
+          "latest_price": 1199.3,
+          "pct_chg": 0.8832,
+          "pct_chg_source": "provider",
+          "turnover": 0.2062,
+          "turnover_source": "provider",
+          "pe_ttm": 18.12514,
+          "pe_ttm_source": "provider",
+          "pb": 5.534352,
+          "pb_source": "provider",
+          "ps_ttm": 8.551662,
+          "ps_ttm_source": "provider",
+          "pcf_ncf_ttm": 1055.924548,
+          "pcf_ncf_ttm_source": "provider"
+        },
+        "fields": {
+          "latest_price": {
+            "value": 1199.3,
+            "source": "baostock_kline_fallback"
+          },
+          "recent_close": {
+            "value": 1199.3,
+            "source": "provider"
+          },
+          "pct_chg": {
+            "value": 0.8832,
+            "source": "provider"
+          },
+          "turnover": {
+            "value": 0.2062,
+            "source": "provider"
+          },
+          "pe_ttm": {
+            "value": 18.12514,
+            "source": "provider"
+          },
+          "pb": {
+            "value": 5.534352,
+            "source": "provider"
+          },
+          "ps_ttm": {
+            "value": 8.551662,
+            "source": "provider"
+          },
+          "pcf_ncf_ttm": {
+            "value": 1055.924548,
+            "source": "provider"
+          }
+        }
+      },
+      "completion": {
+        "filled_fields": {
+          "latest_price": {
+            "value": 1199.3,
+            "source": "baostock_kline_fallback"
+          },
+          "recent_close": {
+            "value": 1199.3,
+            "source": "provider"
+          },
+          "pct_chg": {
+            "value": 0.8832,
+            "source": "provider"
+          },
+          "turnover": {
+            "value": 0.2062,
+            "source": "provider"
+          },
+          "pe_ttm": {
+            "value": 18.12514,
+            "source": "provider"
+          },
+          "pb": {
+            "value": 5.534352,
+            "source": "provider"
+          },
+          "ps_ttm": {
+            "value": 8.551662,
+            "source": "provider"
+          },
+          "pcf_ncf_ttm": {
+            "value": 1055.924548,
+            "source": "provider"
+          }
+        },
+        "still_missing_fields": {
+          "open": "FIELD_MISSING",
+          "high": "FIELD_MISSING",
+          "low": "FIELD_MISSING",
+          "volume": "FIELD_MISSING",
+          "amount": "FIELD_MISSING",
+          "market_cap": "SHARE_CAPITAL_MISSING",
+          "float_market_cap": "SHARE_CAPITAL_MISSING"
+        },
+        "computed_fields": {},
+        "fallback_chain": {
+          "latest_price": "baostock_kline_fallback",
+          "recent_close": "provider",
+          "pct_chg": "provider",
+          "turnover": "provider",
+          "pe_ttm": "provider",
+          "pb": "provider",
+          "ps_ttm": "provider",
+          "pcf_ncf_ttm": "provider"
+        }
+      },
+      "render": {
+        "renderable": true,
+        "chart_renderable": false,
+        "table_renderable": true,
+        "has_displayable_data": true,
+        "visible_fields": [
+          "latest_price",
+          "recent_close",
+          "pct_chg",
+          "turnover",
+          "pe_ttm",
+          "pb",
+          "ps_ttm",
+          "pcf_ncf_ttm"
+        ],
+        "hidden_fields": [
+          "open",
+          "high",
+          "low",
+          "volume",
+          "amount",
+          "market_cap",
+          "float_market_cap"
+        ],
+        "reason": null
+      },
+      "errors": [],
+      "warnings": [],
+      "diagnosis": {
+        "module_key": "quote_overview",
+        "primary_issue": "OK",
+        "evidence": [],
+        "recommended_fix": []
+      },
+      "debug": {
+        "enabled": true,
+        "raw_truncated": false,
+        "max_raw_chars": 20000
+      }
+    },
+    "valuation": {
+      "request_id": "1848d707-5492-43f9-8542-5194b610ec4d",
+      "market": "CN",
+      "symbol": "600519",
+      "ts_code": "600519.SH",
+      "module_key": "valuation",
+      "data_mode": "free",
+      "stage": "final",
+      "ok": true,
+      "partial": true,
+      "stale": false,
+      "source_chain": [
+        {
+          "provider": "akshare",
+          "endpoint": "stock_zh_a_spot_em",
+          "attempted": true,
+          "success": true,
+          "status": "success",
+          "started_at": "2026-07-08T15:00:50.936781+00:00",
+          "ended_at": "2026-07-08T15:00:56.820488+00:00",
+          "elapsed_ms": 5884,
+          "latency_ms": 5884,
+          "rows_count": 2,
+          "columns": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "non_null_fields": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "missing_fields": [],
+          "error_code": null,
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": "tuple",
+          "raw_shape": [
+            2,
+            8
+          ],
+          "detached_timeout": false
+        },
+        {
+          "provider": "baostock",
+          "endpoint": "query_history_k_data_plus",
+          "attempted": true,
+          "success": true,
+          "status": "success",
+          "started_at": "2026-07-08T15:00:56.820632+00:00",
+          "ended_at": "2026-07-08T15:00:58.195393+00:00",
+          "elapsed_ms": 1374,
+          "latency_ms": 1374,
+          "rows_count": 1,
+          "columns": [
+            "change_pct",
+            "close",
+            "pb",
+            "pcf_ttm",
+            "pe_ttm",
+            "ps_ttm",
+            "source",
+            "trade_date",
+            "ts_code",
+            "turnover_rate"
+          ],
+          "non_null_fields": [
+            "change_pct",
+            "close",
+            "pb",
+            "pcf_ttm",
+            "pe_ttm",
+            "ps_ttm",
+            "source",
+            "trade_date",
+            "ts_code",
+            "turnover_rate"
+          ],
+          "missing_fields": [],
+          "error_code": null,
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": "dict",
+          "raw_shape": [
+            1,
+            10
+          ],
+          "detached_timeout": false
+        }
+      ],
+      "raw": {
+        "baostock": [
+          {
+            "endpoint": "query_history_k_data_plus",
+            "raw_type": "dict",
+            "raw_shape": [
+              1,
+              10
+            ],
+            "columns": [
+              "change_pct",
+              "close",
+              "pb",
+              "pcf_ttm",
+              "pe_ttm",
+              "ps_ttm",
+              "source",
+              "trade_date",
+              "ts_code",
+              "turnover_rate"
+            ],
+            "rows_count": 1,
+            "status": "success",
+            "started_at": "2026-07-08T15:00:56.820632+00:00",
+            "ended_at": "2026-07-08T15:00:58.195393+00:00",
+            "elapsed_ms": 1374,
+            "detached_timeout": false,
+            "raw_sample": [
+              {
+                "ts_code": "600519.SH",
+                "trade_date": "2026-07-08",
+                "close": 1199.3,
+                "change_pct": 0.8832,
+                "turnover_rate": 0.2062,
+                "pe_ttm": 18.12514,
+                "pb": 5.534352,
+                "ps_ttm": 8.551662,
+                "pcf_ttm": 1055.924548,
+                "source": "baostock_kline_fallback"
+              }
+            ],
+            "error_code": null,
+            "error_message": null,
+            "raw_full": [
+              {
+                "ts_code": "600519.SH",
+                "trade_date": "2026-07-08",
+                "close": 1199.3,
+                "change_pct": 0.8832,
+                "turnover_rate": 0.2062,
+                "pe_ttm": 18.12514,
+                "pb": 5.534352,
+                "ps_ttm": 8.551662,
+                "pcf_ttm": 1055.924548,
+                "source": "baostock_kline_fallback"
+              }
+            ]
+          }
+        ],
+        "akshare": [
+          {
+            "endpoint": "stock_zh_a_spot_em",
+            "raw_type": "tuple",
+            "raw_shape": [
+              2,
+              8
+            ],
+            "columns": [
+              "elapsed_ms",
+              "errors",
+              "interface",
+              "provider",
+              "reason_code",
+              "source",
+              "source_fields",
+              "status"
+            ],
+            "rows_count": 2,
+            "status": "success",
+            "started_at": "2026-07-08T15:00:50.936781+00:00",
+            "ended_at": "2026-07-08T15:00:56.820488+00:00",
+            "elapsed_ms": 5884,
+            "detached_timeout": false,
+            "raw_sample": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "stock_zh_a_spot_em",
+                "source": "akshare_spot_em",
+                "status": "failed",
+                "elapsed_ms": 5884,
+                "reason_code": "NETWORK_UNAVAILABLE",
+                "source_fields": {},
+                "errors": [
+                  {
+                    "error": "('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+                  }
+                ]
+              }
+            ],
+            "error_code": null,
+            "error_message": null,
+            "raw_full": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "stock_zh_a_spot_em",
+                "source": "akshare_spot_em",
+                "status": "failed",
+                "elapsed_ms": 5884,
+                "reason_code": "NETWORK_UNAVAILABLE",
+                "source_fields": {},
+                "errors": [
+                  {
+                    "error": "('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "tencent": [],
+        "sina": [],
+        "eastmoney": [],
+        "pdf_metrics": []
+      },
+      "normalized": {
+        "rows": [
+          {
+            "latest_price_source": "baostock_kline_fallback",
+            "recent_close": 1199.3,
+            "recent_close_source": "provider",
+            "latest_price": 1199.3,
+            "pct_chg": 0.8832,
+            "pct_chg_source": "provider",
+            "turnover": 0.2062,
+            "turnover_source": "provider",
+            "pe_ttm": 18.12514,
+            "pe_ttm_source": "provider",
+            "pb": 5.534352,
+            "pb_source": "provider",
+            "ps_ttm": 8.551662,
+            "ps_ttm_source": "provider",
+            "pcf_ncf_ttm": 1055.924548,
+            "pcf_ncf_ttm_source": "provider"
+          }
+        ],
+        "metrics": {
+          "latest_price_source": "baostock_kline_fallback",
+          "recent_close": 1199.3,
+          "recent_close_source": "provider",
+          "latest_price": 1199.3,
+          "pct_chg": 0.8832,
+          "pct_chg_source": "provider",
+          "turnover": 0.2062,
+          "turnover_source": "provider",
+          "pe_ttm": 18.12514,
+          "pe_ttm_source": "provider",
+          "pb": 5.534352,
+          "pb_source": "provider",
+          "ps_ttm": 8.551662,
+          "ps_ttm_source": "provider",
+          "pcf_ncf_ttm": 1055.924548,
+          "pcf_ncf_ttm_source": "provider"
+        },
+        "fields": {
+          "pe_ttm": {
+            "value": 18.12514,
+            "source": "provider"
+          },
+          "pb": {
+            "value": 5.534352,
+            "source": "provider"
+          },
+          "ps_ttm": {
+            "value": 8.551662,
+            "source": "provider"
+          },
+          "pcf_ncf_ttm": {
+            "value": 1055.924548,
+            "source": "provider"
+          }
+        }
+      },
+      "completion": {
+        "filled_fields": {
+          "pe_ttm": {
+            "value": 18.12514,
+            "source": "provider"
+          },
+          "pb": {
+            "value": 5.534352,
+            "source": "provider"
+          },
+          "ps_ttm": {
+            "value": 8.551662,
+            "source": "provider"
+          },
+          "pcf_ncf_ttm": {
+            "value": 1055.924548,
+            "source": "provider"
+          }
+        },
+        "still_missing_fields": {
+          "market_cap": "SHARE_CAPITAL_MISSING",
+          "float_market_cap": "SHARE_CAPITAL_MISSING"
+        },
+        "computed_fields": {},
+        "fallback_chain": {
+          "pe_ttm": "provider",
+          "pb": "provider",
+          "ps_ttm": "provider",
+          "pcf_ncf_ttm": "provider"
+        }
+      },
+      "render": {
+        "renderable": true,
+        "chart_renderable": false,
+        "table_renderable": true,
+        "has_displayable_data": true,
+        "visible_fields": [
+          "pe_ttm",
+          "pb",
+          "ps_ttm",
+          "pcf_ncf_ttm"
+        ],
+        "hidden_fields": [
+          "market_cap",
+          "float_market_cap"
+        ],
+        "reason": null
+      },
+      "errors": [],
+      "warnings": [],
+      "diagnosis": {
+        "module_key": "valuation",
+        "primary_issue": "OK",
+        "evidence": [],
+        "recommended_fix": []
+      },
+      "debug": {
+        "enabled": true,
+        "raw_truncated": false,
+        "max_raw_chars": 20000
+      }
+    },
+    "profitability": {
+      "request_id": "1848d707-5492-43f9-8542-5194b610ec4d",
+      "market": "CN",
+      "symbol": "600519",
+      "ts_code": "600519.SH",
+      "module_key": "profitability",
+      "data_mode": "free",
+      "stage": "final",
+      "ok": false,
+      "partial": true,
+      "stale": false,
+      "source_chain": [
+        {
+          "provider": "baostock",
+          "endpoint": "get_all_financial_indicators",
+          "attempted": true,
+          "success": true,
+          "status": "success",
+          "started_at": "2026-07-08T15:00:58.196088+00:00",
+          "ended_at": "2026-07-08T15:01:15.744859+00:00",
+          "elapsed_ms": 17549,
+          "latency_ms": 17549,
+          "rows_count": 1,
+          "columns": [
+            "balance",
+            "cash_flow",
+            "dupont",
+            "growth",
+            "operation",
+            "profit"
+          ],
+          "non_null_fields": [
+            "balance",
+            "cash_flow",
+            "dupont",
+            "growth",
+            "operation",
+            "profit"
+          ],
+          "missing_fields": [],
+          "error_code": null,
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": "dict",
+          "raw_shape": [
+            1,
+            6
+          ],
+          "detached_timeout": false
+        },
+        {
+          "provider": "module",
+          "endpoint": "profitability",
+          "attempted": true,
+          "success": false,
+          "status": "timeout",
+          "started_at": null,
+          "ended_at": null,
+          "elapsed_ms": null,
+          "latency_ms": 0,
+          "rows_count": 0,
+          "columns": [],
+          "non_null_fields": [],
+          "missing_fields": [],
+          "error_code": "PROVIDER_TIMEOUT",
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": null,
+          "raw_shape": null,
+          "detached_timeout": false
+        }
+      ],
+      "raw": {
+        "baostock": [
+          {
+            "endpoint": "get_all_financial_indicators",
+            "raw_type": "dict",
+            "raw_shape": [
+              1,
+              6
+            ],
+            "columns": [
+              "balance",
+              "cash_flow",
+              "dupont",
+              "growth",
+              "operation",
+              "profit"
+            ],
+            "rows_count": 1,
+            "status": "success",
+            "started_at": "2026-07-08T15:00:58.196088+00:00",
+            "ended_at": "2026-07-08T15:01:15.744859+00:00",
+            "elapsed_ms": 17549,
+            "detached_timeout": false,
+            "raw_sample": [
+              {
+                "profit": [
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2026-04-25",
+                    "stat_date": "2026-03-31",
+                    "roe_avg": 0.105687,
+                    "net_margin": 0.522245,
+                    "gross_margin": 0.897592,
+                    "net_profit": 28153831489.89,
+                    "eps_ttm": 66.052123,
+                    "mb_revenue": null,
+                    "total_share": 1252270215.0,
+                    "liqa_share": 1252270215.0
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2026-04-17",
+                    "stat_date": "2025-12-31",
+                    "roe_avg": 0.34462,
+                    "net_margin": 0.505279,
+                    "gross_margin": 0.911796,
+                    "net_profit": 85310324833.67,
+                    "eps_ttm": 65.736665,
+                    "mb_revenue": 172054171890.91,
+                    "total_share": 1252270215.0,
+                    "liqa_share": 1252270215.0
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-10-30",
+                    "stat_date": "2025-09-30",
+                    "roe_avg": 0.263688,
+                    "net_margin": 0.520801,
+                    "gross_margin": 0.912934,
+                    "net_profit": 66898804746.17,
+                    "eps_ttm": 71.891306,
+                    "mb_revenue": 128397857400.0,
+                    "total_share": 1252270215.0,
+                    "liqa_share": 1252270215.0
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-08-13",
+                    "stat_date": "2025-06-30",
+                    "roe_avg": 0.192486,
+                    "net_margin": 0.525641,
+                    "gross_margin": 0.912993,
+                    "net_profit": 46986681449.24,
+                    "eps_ttm": 71.593421,
+                    "mb_revenue": 89352478256.56,
+                    "total_share": 1256197800.0,
+                    "liqa_share": 1256197800.0
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-04-30",
+                    "stat_date": "2025-03-31",
+                    "roe_avg": 0.109255,
+                    "net_margin": 0.548895,
+                    "gross_margin": 0.919736,
+                    "net_profit": 27774636011.61,
+                    "eps_ttm": 70.856961,
+                    "mb_revenue": null,
+                    "total_share": 1256197800.0,
+                    "liqa_share": 1256197800.0
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-04-03",
+                    "stat_date": "2024-12-31",
+                    "roe_avg": 0.384283,
+                    "net_margin": 0.522734,
+                    "gross_margin": 0.919312,
+                    "net_profit": 89334728025.9,
+                    "eps_ttm": 68.642173,
+                    "mb_revenue": 170611838052.02,
+                    "total_share": 1256197800.0,
+                    "liqa_share": 1256197800.0
+                  }
+                ],
+                "growth": [
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2026-04-25",
+                    "stat_date": "2026-03-31",
+                    "yoy_equity": 0.048523,
+                    "yoy_asset": 0.024171,
+                    "yoy_ni": 0.013653,
+                    "yoy_eps": 0.017774,
+                    "yoy_pni": 0.014714
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2026-04-17",
+                    "stat_date": "2025-12-31",
+                    "yoy_equity": 0.04947,
+                    "yoy_asset": 0.016358,
+                    "yoy_ni": -0.045049,
+                    "yoy_eps": -0.043415,
+                    "yoy_pni": -0.045323
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-10-30",
+                    "stat_date": "2025-09-30",
+                    "yoy_equity": 0.081446,
+                    "yoy_asset": 0.062654,
+                    "yoy_ni": 0.061356,
+                    "yoy_eps": 0.06423,
+                    "yoy_pni": 0.062458
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-08-13",
+                    "stat_date": "2025-06-30",
+                    "yoy_equity": 0.091826,
+                    "yoy_asset": 0.046741,
+                    "yoy_ni": 0.088236,
+                    "yoy_eps": 0.090087,
+                    "yoy_pni": 0.088915
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-04-30",
+                    "stat_date": "2025-03-31",
+                    "yoy_equity": 0.077695,
+                    "yoy_asset": 0.094017,
+                    "yoy_ni": 0.116239,
+                    "yoy_eps": 0.115866,
+                    "yoy_pni": 0.115611
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-04-03",
+                    "stat_date": "2024-12-31",
+                    "yoy_equity": 0.080853,
+                    "yoy_asset": 0.096241,
+                    "yoy_ni": 0.152387,
+                    "yoy_eps": 0.153807,
+                    "yoy_pni": 0.1538
+                  }
+                ],
+                "balance": [
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2026-04-25",
+                    "stat_date": "2026-03-31",
+                    "current_ratio": 7.060729,
+                    "quick_ratio": 5.482485,
+                    "cash_ratio": 1.26865,
+                    "yoy_liability": -0.122128,
+                    "liability_to_asset": 0.121227,
+                    "asset_to_equity": 1.137951
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2026-04-17",
+                    "stat_date": "2025-12-31",
+                    "current_ratio": 5.090027,
+                    "quick_ratio": 3.851832,
+                    "cash_ratio": 1.041929,
+                    "yoy_liability": -0.123964,
+                    "liability_to_asset": 0.164154,
+                    "asset_to_equity": 1.196392
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-10-30",
+                    "stat_date": "2025-09-30",
+                    "current_ratio": 6.619319,
+                    "quick_ratio": 5.178297,
+                    "cash_ratio": 1.335102,
+                    "yoy_liability": -0.001264,
+                    "liability_to_asset": 0.001281,
+                    "asset_to_equity": 1.146904
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-08-13",
+                    "stat_date": "2025-06-30",
+                    "current_ratio": 5.72974,
+                    "quick_ratio": 4.446638,
+                    "cash_ratio": 1.205449,
+                    "yoy_liability": -0.157151,
+                    "liability_to_asset": 0.001475,
+                    "asset_to_equity": 1.173087
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-04-30",
+                    "stat_date": "2025-03-31",
+                    "current_ratio": 6.074895,
+                    "quick_ratio": 4.82579,
+                    "cash_ratio": 1.189857,
+                    "yoy_liability": 0.194404,
+                    "liability_to_asset": 0.001414,
+                    "asset_to_equity": 1.164728
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-04-03",
+                    "stat_date": "2024-12-31",
+                    "current_ratio": 4.454079,
+                    "quick_ratio": 3.492523,
+                    "cash_ratio": 1.053584,
+                    "yoy_liability": 0.16088,
+                    "liability_to_asset": 0.001904,
+                    "asset_to_equity": 1.23525
+                  }
+                ],
+                "operation": [
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2026-04-25",
+                    "stat_date": "2026-03-31",
+                    "nr_turn_ratio": 3084.614768,
+                    "nr_turn_days": 0.029177,
+                    "inv_turn_ratio": 0.090415,
+                    "inv_turn_days": 995.575221,
+                    "ca_turn_ratio": 0.208773,
+                    "asset_turn_ratio": 0.175399
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2026-04-17",
+                    "stat_date": "2025-12-31",
+                    "nr_turn_ratio": 168.333841,
+                    "nr_turn_days": 2.138607,
+                    "inv_turn_ratio": 0.257272,
+                    "inv_turn_days": 1399.144967,
+                    "ca_turn_ratio": 0.682422,
+                    "asset_turn_ratio": 0.570869
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-10-30",
+                    "stat_date": "2025-09-30",
+                    "nr_turn_ratio": 35.492078,
+                    "nr_turn_days": 7.607331,
+                    "inv_turn_ratio": 0.202972,
+                    "inv_turn_days": 1330.049261,
+                    "ca_turn_ratio": 0.515051,
+                    "asset_turn_ratio": 0.433684
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-08-13",
+                    "stat_date": "2025-06-30",
+                    "nr_turn_ratio": 36.80752,
+                    "nr_turn_days": 4.890305,
+                    "inv_turn_ratio": 0.142295,
+                    "inv_turn_days": 1264.93324,
+                    "ca_turn_ratio": 0.366423,
+                    "asset_turn_ratio": 0.308164
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-04-30",
+                    "stat_date": "2025-03-31",
+                    "nr_turn_ratio": 24.409291,
+                    "nr_turn_days": 3.687121,
+                    "inv_turn_ratio": 0.074425,
+                    "inv_turn_days": 1209.677419,
+                    "ca_turn_ratio": 0.198534,
+                    "asset_turn_ratio": 0.168305
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-04-03",
+                    "stat_date": "2024-12-31",
+                    "nr_turn_ratio": 164.508886,
+                    "nr_turn_days": 2.188332,
+                    "inv_turn_ratio": 0.273659,
+                    "inv_turn_days": 1315.308732,
+                    "ca_turn_ratio": 0.730318,
+                    "asset_turn_ratio": 0.609274
+                  }
+                ],
+                "cash_flow": [
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2026-04-25",
+                    "stat_date": "2026-03-31",
+                    "ca_to_asset": 0.848729,
+                    "nca_to_asset": 0.151271,
+                    "tangible_to_asset": 0.801239,
+                    "cfo_to_or": 0.49917,
+                    "cfo_to_np": 0.955816,
+                    "cfo_to_gr": 0.491928,
+                    "ebit_to_interest": null
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2026-04-17",
+                    "stat_date": "2025-12-31",
+                    "ca_to_asset": 0.831105,
+                    "nca_to_asset": 0.168895,
+                    "tangible_to_asset": 0.754019,
+                    "cfo_to_or": 0.364386,
+                    "cfo_to_np": 0.721158,
+                    "cfo_to_gr": 0.357575,
+                    "ebit_to_interest": null
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-10-30",
+                    "stat_date": "2025-09-30",
+                    "ca_to_asset": 0.841992,
+                    "nca_to_asset": 0.158008,
+                    "tangible_to_asset": 0.795127,
+                    "cfo_to_or": 0.297359,
+                    "cfo_to_np": 0.570964,
+                    "cfo_to_gr": 0.291793,
+                    "ebit_to_interest": null
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-08-13",
+                    "stat_date": "2025-06-30",
+                    "ca_to_asset": 0.839938,
+                    "nca_to_asset": 0.160062,
+                    "tangible_to_asset": 0.766417,
+                    "cfo_to_or": 0.146763,
+                    "cfo_to_np": 0.279208,
+                    "cfo_to_gr": 0.144017,
+                    "ebit_to_interest": null
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-04-30",
+                    "stat_date": "2025-03-31",
+                    "ca_to_asset": 0.85318,
+                    "nca_to_asset": 0.14682,
+                    "tangible_to_asset": 0.781655,
+                    "cfo_to_or": 0.174091,
+                    "cfo_to_np": 0.317167,
+                    "cfo_to_gr": 0.17124,
+                    "ebit_to_interest": null
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-04-03",
+                    "stat_date": "2024-12-31",
+                    "ca_to_asset": 0.842051,
+                    "nca_to_asset": 0.157949,
+                    "tangible_to_asset": 0.730855,
+                    "cfo_to_or": 0.541042,
+                    "cfo_to_np": 1.035025,
+                    "cfo_to_gr": 0.530961,
+                    "ebit_to_interest": null
+                  }
+                ],
+                "dupont": [
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2026-04-25",
+                    "stat_date": "2026-03-31",
+                    "dupont_roe": 0.105687,
+                    "dupont_npi": 0.967631,
+                    "dupont_nitogr": 0.514668,
+                    "dupont_tax": 0.749904,
+                    "dupont_int": 1.003166,
+                    "dupont_at": 0.175399,
+                    "dupont_am": 1.209923
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2026-04-17",
+                    "stat_date": "2025-12-31",
+                    "dupont_roe": 0.34462,
+                    "dupont_npi": 0.964948,
+                    "dupont_nitogr": 0.495834,
+                    "dupont_tax": 0.743411,
+                    "dupont_int": 1.007146,
+                    "dupont_at": 0.570869,
+                    "dupont_am": 1.261721
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-10-30",
+                    "stat_date": "2025-09-30",
+                    "dupont_roe": 0.263688,
+                    "dupont_npi": 0.966037,
+                    "dupont_nitogr": 0.511053,
+                    "dupont_tax": 0.74828,
+                    "dupont_int": 1.00719,
+                    "dupont_at": 0.433684,
+                    "dupont_am": 1.231563
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-08-13",
+                    "stat_date": "2025-06-30",
+                    "dupont_roe": 0.192486,
+                    "dupont_npi": 0.966294,
+                    "dupont_nitogr": 0.515806,
+                    "dupont_tax": 0.748458,
+                    "dupont_int": 1.007854,
+                    "dupont_at": 0.308164,
+                    "dupont_am": 1.253204
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-04-30",
+                    "stat_date": "2025-03-31",
+                    "dupont_roe": 0.109255,
+                    "dupont_npi": 0.966618,
+                    "dupont_nitogr": 0.539906,
+                    "dupont_tax": 0.750028,
+                    "dupont_int": 1.007734,
+                    "dupont_at": 0.168305,
+                    "dupont_am": 1.243862
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-04-03",
+                    "stat_date": "2024-12-31",
+                    "dupont_roe": 0.384283,
+                    "dupont_npi": 0.965225,
+                    "dupont_nitogr": 0.512993,
+                    "dupont_tax": 0.746705,
+                    "dupont_int": 1.012376,
+                    "dupont_at": 0.609274,
+                    "dupont_am": 1.273789
+                  }
+                ]
+              }
+            ],
+            "error_code": null,
+            "error_message": null,
+            "raw_full": [
+              {
+                "profit": [
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2026-04-25",
+                    "stat_date": "2026-03-31",
+                    "roe_avg": 0.105687,
+                    "net_margin": 0.522245,
+                    "gross_margin": 0.897592,
+                    "net_profit": 28153831489.89,
+                    "eps_ttm": 66.052123,
+                    "mb_revenue": null,
+                    "total_share": 1252270215.0,
+                    "liqa_share": 1252270215.0
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2026-04-17",
+                    "stat_date": "2025-12-31",
+                    "roe_avg": 0.34462,
+                    "net_margin": 0.505279,
+                    "gross_margin": 0.911796,
+                    "net_profit": 85310324833.67,
+                    "eps_ttm": 65.736665,
+                    "mb_revenue": 172054171890.91,
+                    "total_share": 1252270215.0,
+                    "liqa_share": 1252270215.0
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-10-30",
+                    "stat_date": "2025-09-30",
+                    "roe_avg": 0.263688,
+                    "net_margin": 0.520801,
+                    "gross_margin": 0.912934,
+                    "net_profit": 66898804746.17,
+                    "eps_ttm": 71.891306,
+                    "mb_revenue": 128397857400.0,
+                    "total_share": 1252270215.0,
+                    "liqa_share": 1252270215.0
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-08-13",
+                    "stat_date": "2025-06-30",
+                    "roe_avg": 0.192486,
+                    "net_margin": 0.525641,
+                    "gross_margin": 0.912993,
+                    "net_profit": 46986681449.24,
+                    "eps_ttm": 71.593421,
+                    "mb_revenue": 89352478256.56,
+                    "total_share": 1256197800.0,
+                    "liqa_share": 1256197800.0
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-04-30",
+                    "stat_date": "2025-03-31",
+                    "roe_avg": 0.109255,
+                    "net_margin": 0.548895,
+                    "gross_margin": 0.919736,
+                    "net_profit": 27774636011.61,
+                    "eps_ttm": 70.856961,
+                    "mb_revenue": null,
+                    "total_share": 1256197800.0,
+                    "liqa_share": 1256197800.0
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-04-03",
+                    "stat_date": "2024-12-31",
+                    "roe_avg": 0.384283,
+                    "net_margin": 0.522734,
+                    "gross_margin": 0.919312,
+                    "net_profit": 89334728025.9,
+                    "eps_ttm": 68.642173,
+                    "mb_revenue": 170611838052.02,
+                    "total_share": 1256197800.0,
+                    "liqa_share": 1256197800.0
+                  }
+                ],
+                "growth": [
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2026-04-25",
+                    "stat_date": "2026-03-31",
+                    "yoy_equity": 0.048523,
+                    "yoy_asset": 0.024171,
+                    "yoy_ni": 0.013653,
+                    "yoy_eps": 0.017774,
+                    "yoy_pni": 0.014714
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2026-04-17",
+                    "stat_date": "2025-12-31",
+                    "yoy_equity": 0.04947,
+                    "yoy_asset": 0.016358,
+                    "yoy_ni": -0.045049,
+                    "yoy_eps": -0.043415,
+                    "yoy_pni": -0.045323
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-10-30",
+                    "stat_date": "2025-09-30",
+                    "yoy_equity": 0.081446,
+                    "yoy_asset": 0.062654,
+                    "yoy_ni": 0.061356,
+                    "yoy_eps": 0.06423,
+                    "yoy_pni": 0.062458
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-08-13",
+                    "stat_date": "2025-06-30",
+                    "yoy_equity": 0.091826,
+                    "yoy_asset": 0.046741,
+                    "yoy_ni": 0.088236,
+                    "yoy_eps": 0.090087,
+                    "yoy_pni": 0.088915
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-04-30",
+                    "stat_date": "2025-03-31",
+                    "yoy_equity": 0.077695,
+                    "yoy_asset": 0.094017,
+                    "yoy_ni": 0.116239,
+                    "yoy_eps": 0.115866,
+                    "yoy_pni": 0.115611
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-04-03",
+                    "stat_date": "2024-12-31",
+                    "yoy_equity": 0.080853,
+                    "yoy_asset": 0.096241,
+                    "yoy_ni": 0.152387,
+                    "yoy_eps": 0.153807,
+                    "yoy_pni": 0.1538
+                  }
+                ],
+                "balance": [
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2026-04-25",
+                    "stat_date": "2026-03-31",
+                    "current_ratio": 7.060729,
+                    "quick_ratio": 5.482485,
+                    "cash_ratio": 1.26865,
+                    "yoy_liability": -0.122128,
+                    "liability_to_asset": 0.121227,
+                    "asset_to_equity": 1.137951
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2026-04-17",
+                    "stat_date": "2025-12-31",
+                    "current_ratio": 5.090027,
+                    "quick_ratio": 3.851832,
+                    "cash_ratio": 1.041929,
+                    "yoy_liability": -0.123964,
+                    "liability_to_asset": 0.164154,
+                    "asset_to_equity": 1.196392
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-10-30",
+                    "stat_date": "2025-09-30",
+                    "current_ratio": 6.619319,
+                    "quick_ratio": 5.178297,
+                    "cash_ratio": 1.335102,
+                    "yoy_liability": -0.001264,
+                    "liability_to_asset": 0.001281,
+                    "asset_to_equity": 1.146904
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-08-13",
+                    "stat_date": "2025-06-30",
+                    "current_ratio": 5.72974,
+                    "quick_ratio": 4.446638,
+                    "cash_ratio": 1.205449,
+                    "yoy_liability": -0.157151,
+                    "liability_to_asset": 0.001475,
+                    "asset_to_equity": 1.173087
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-04-30",
+                    "stat_date": "2025-03-31",
+                    "current_ratio": 6.074895,
+                    "quick_ratio": 4.82579,
+                    "cash_ratio": 1.189857,
+                    "yoy_liability": 0.194404,
+                    "liability_to_asset": 0.001414,
+                    "asset_to_equity": 1.164728
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-04-03",
+                    "stat_date": "2024-12-31",
+                    "current_ratio": 4.454079,
+                    "quick_ratio": 3.492523,
+                    "cash_ratio": 1.053584,
+                    "yoy_liability": 0.16088,
+                    "liability_to_asset": 0.001904,
+                    "asset_to_equity": 1.23525
+                  }
+                ],
+                "operation": [
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2026-04-25",
+                    "stat_date": "2026-03-31",
+                    "nr_turn_ratio": 3084.614768,
+                    "nr_turn_days": 0.029177,
+                    "inv_turn_ratio": 0.090415,
+                    "inv_turn_days": 995.575221,
+                    "ca_turn_ratio": 0.208773,
+                    "asset_turn_ratio": 0.175399
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2026-04-17",
+                    "stat_date": "2025-12-31",
+                    "nr_turn_ratio": 168.333841,
+                    "nr_turn_days": 2.138607,
+                    "inv_turn_ratio": 0.257272,
+                    "inv_turn_days": 1399.144967,
+                    "ca_turn_ratio": 0.682422,
+                    "asset_turn_ratio": 0.570869
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-10-30",
+                    "stat_date": "2025-09-30",
+                    "nr_turn_ratio": 35.492078,
+                    "nr_turn_days": 7.607331,
+                    "inv_turn_ratio": 0.202972,
+                    "inv_turn_days": 1330.049261,
+                    "ca_turn_ratio": 0.515051,
+                    "asset_turn_ratio": 0.433684
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-08-13",
+                    "stat_date": "2025-06-30",
+                    "nr_turn_ratio": 36.80752,
+                    "nr_turn_days": 4.890305,
+                    "inv_turn_ratio": 0.142295,
+                    "inv_turn_days": 1264.93324,
+                    "ca_turn_ratio": 0.366423,
+                    "asset_turn_ratio": 0.308164
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-04-30",
+                    "stat_date": "2025-03-31",
+                    "nr_turn_ratio": 24.409291,
+                    "nr_turn_days": 3.687121,
+                    "inv_turn_ratio": 0.074425,
+                    "inv_turn_days": 1209.677419,
+                    "ca_turn_ratio": 0.198534,
+                    "asset_turn_ratio": 0.168305
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-04-03",
+                    "stat_date": "2024-12-31",
+                    "nr_turn_ratio": 164.508886,
+                    "nr_turn_days": 2.188332,
+                    "inv_turn_ratio": 0.273659,
+                    "inv_turn_days": 1315.308732,
+                    "ca_turn_ratio": 0.730318,
+                    "asset_turn_ratio": 0.609274
+                  }
+                ],
+                "cash_flow": [
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2026-04-25",
+                    "stat_date": "2026-03-31",
+                    "ca_to_asset": 0.848729,
+                    "nca_to_asset": 0.151271,
+                    "tangible_to_asset": 0.801239,
+                    "cfo_to_or": 0.49917,
+                    "cfo_to_np": 0.955816,
+                    "cfo_to_gr": 0.491928,
+                    "ebit_to_interest": null
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2026-04-17",
+                    "stat_date": "2025-12-31",
+                    "ca_to_asset": 0.831105,
+                    "nca_to_asset": 0.168895,
+                    "tangible_to_asset": 0.754019,
+                    "cfo_to_or": 0.364386,
+                    "cfo_to_np": 0.721158,
+                    "cfo_to_gr": 0.357575,
+                    "ebit_to_interest": null
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-10-30",
+                    "stat_date": "2025-09-30",
+                    "ca_to_asset": 0.841992,
+                    "nca_to_asset": 0.158008,
+                    "tangible_to_asset": 0.795127,
+                    "cfo_to_or": 0.297359,
+                    "cfo_to_np": 0.570964,
+                    "cfo_to_gr": 0.291793,
+                    "ebit_to_interest": null
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-08-13",
+                    "stat_date": "2025-06-30",
+                    "ca_to_asset": 0.839938,
+                    "nca_to_asset": 0.160062,
+                    "tangible_to_asset": 0.766417,
+                    "cfo_to_or": 0.146763,
+                    "cfo_to_np": 0.279208,
+                    "cfo_to_gr": 0.144017,
+                    "ebit_to_interest": null
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-04-30",
+                    "stat_date": "2025-03-31",
+                    "ca_to_asset": 0.85318,
+                    "nca_to_asset": 0.14682,
+                    "tangible_to_asset": 0.781655,
+                    "cfo_to_or": 0.174091,
+                    "cfo_to_np": 0.317167,
+                    "cfo_to_gr": 0.17124,
+                    "ebit_to_interest": null
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-04-03",
+                    "stat_date": "2024-12-31",
+                    "ca_to_asset": 0.842051,
+                    "nca_to_asset": 0.157949,
+                    "tangible_to_asset": 0.730855,
+                    "cfo_to_or": 0.541042,
+                    "cfo_to_np": 1.035025,
+                    "cfo_to_gr": 0.530961,
+                    "ebit_to_interest": null
+                  }
+                ],
+                "dupont": [
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2026-04-25",
+                    "stat_date": "2026-03-31",
+                    "dupont_roe": 0.105687,
+                    "dupont_npi": 0.967631,
+                    "dupont_nitogr": 0.514668,
+                    "dupont_tax": 0.749904,
+                    "dupont_int": 1.003166,
+                    "dupont_at": 0.175399,
+                    "dupont_am": 1.209923
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2026-04-17",
+                    "stat_date": "2025-12-31",
+                    "dupont_roe": 0.34462,
+                    "dupont_npi": 0.964948,
+                    "dupont_nitogr": 0.495834,
+                    "dupont_tax": 0.743411,
+                    "dupont_int": 1.007146,
+                    "dupont_at": 0.570869,
+                    "dupont_am": 1.261721
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-10-30",
+                    "stat_date": "2025-09-30",
+                    "dupont_roe": 0.263688,
+                    "dupont_npi": 0.966037,
+                    "dupont_nitogr": 0.511053,
+                    "dupont_tax": 0.74828,
+                    "dupont_int": 1.00719,
+                    "dupont_at": 0.433684,
+                    "dupont_am": 1.231563
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-08-13",
+                    "stat_date": "2025-06-30",
+                    "dupont_roe": 0.192486,
+                    "dupont_npi": 0.966294,
+                    "dupont_nitogr": 0.515806,
+                    "dupont_tax": 0.748458,
+                    "dupont_int": 1.007854,
+                    "dupont_at": 0.308164,
+                    "dupont_am": 1.253204
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-04-30",
+                    "stat_date": "2025-03-31",
+                    "dupont_roe": 0.109255,
+                    "dupont_npi": 0.966618,
+                    "dupont_nitogr": 0.539906,
+                    "dupont_tax": 0.750028,
+                    "dupont_int": 1.007734,
+                    "dupont_at": 0.168305,
+                    "dupont_am": 1.243862
+                  },
+                  {
+                    "ts_code": "600519.SH",
+                    "pub_date": "2025-04-03",
+                    "stat_date": "2024-12-31",
+                    "dupont_roe": 0.384283,
+                    "dupont_npi": 0.965225,
+                    "dupont_nitogr": 0.512993,
+                    "dupont_tax": 0.746705,
+                    "dupont_int": 1.012376,
+                    "dupont_at": 0.609274,
+                    "dupont_am": 1.273789
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "akshare": [],
+        "tencent": [],
+        "sina": [],
+        "eastmoney": [],
+        "pdf_metrics": []
+      },
+      "normalized": {
+        "rows": [],
+        "metrics": {},
+        "fields": {}
+      },
+      "completion": {
+        "filled_fields": {},
+        "still_missing_fields": {
+          "roe": "FIELD_MISSING",
+          "gross_margin": "FIELD_MISSING",
+          "net_margin": "FIELD_MISSING",
+          "roa": "FIELD_MISSING",
+          "roic": "FIELD_MISSING"
+        },
+        "computed_fields": {},
+        "fallback_chain": {}
+      },
+      "render": {
+        "renderable": false,
+        "chart_renderable": false,
+        "table_renderable": false,
+        "has_displayable_data": false,
+        "visible_fields": [],
+        "hidden_fields": [
+          "roe",
+          "gross_margin",
+          "net_margin",
+          "roa",
+          "roic"
+        ],
+        "reason": "ALL_NULL_ROWS"
+      },
+      "errors": [
+        {
+          "layer": "provider",
+          "error_code": "PROVIDER_TIMEOUT",
+          "message": "Module debug exceeded 20.0s",
+          "provider": null,
+          "endpoint": null,
+          "field": null
+        },
+        {
+          "layer": "render",
+          "error_code": "ALL_NULL_ROWS",
+          "message": "No displayable core fields after completion",
+          "provider": null,
+          "endpoint": null,
+          "field": null
+        }
+      ],
+      "warnings": [],
+      "diagnosis": {
+        "module_key": "profitability",
+        "primary_issue": "MAPPING_ERROR",
+        "evidence": [
+          "raw rows_count=1, normalized rows_count=0"
+        ],
+        "recommended_fix": [
+          "inspect raw_sample columns and update field mapping"
+        ]
+      },
+      "debug": {
+        "enabled": true,
+        "raw_truncated": false,
+        "max_raw_chars": 20000
+      }
+    },
+    "growth": {
+      "request_id": "1848d707-5492-43f9-8542-5194b610ec4d",
+      "market": "CN",
+      "symbol": "600519",
+      "ts_code": "600519.SH",
+      "module_key": "growth",
+      "data_mode": "free",
+      "stage": "final",
+      "ok": false,
+      "partial": true,
+      "stale": false,
+      "source_chain": [
+        {
+          "provider": "module",
+          "endpoint": "growth",
+          "attempted": true,
+          "success": false,
+          "status": "timeout",
+          "started_at": null,
+          "ended_at": null,
+          "elapsed_ms": null,
+          "latency_ms": 0,
+          "rows_count": 0,
+          "columns": [],
+          "non_null_fields": [],
+          "missing_fields": [],
+          "error_code": "PROVIDER_TIMEOUT",
+          "error_message": "debug/full exceeded 45s while waiting for growth",
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": null,
+          "raw_shape": null,
+          "detached_timeout": false
+        }
+      ],
+      "raw": {
+        "baostock": [],
+        "akshare": [],
+        "tencent": [],
+        "sina": [],
+        "eastmoney": [],
+        "pdf_metrics": []
+      },
+      "normalized": {
+        "rows": [],
+        "metrics": {},
+        "fields": {}
+      },
+      "completion": {
+        "filled_fields": {},
+        "still_missing_fields": {},
+        "computed_fields": {},
+        "fallback_chain": {}
+      },
+      "render": {
+        "renderable": false,
+        "chart_renderable": false,
+        "table_renderable": false,
+        "has_displayable_data": false,
+        "visible_fields": [],
+        "hidden_fields": [],
+        "reason": "PROVIDER_TIMEOUT"
+      },
+      "errors": [
+        {
+          "layer": "provider",
+          "error_code": "PROVIDER_TIMEOUT",
+          "message": "debug/full exceeded 45s while waiting for growth",
+          "provider": null,
+          "endpoint": null,
+          "field": null
+        }
+      ],
+      "warnings": [],
+      "diagnosis": {
+        "module_key": "growth",
+        "primary_issue": "PROVIDER_TIMEOUT",
+        "evidence": [
+          "all provider attempts timed out"
+        ],
+        "recommended_fix": [
+          "lower provider concurrency or increase provider-specific timeout"
+        ]
+      },
+      "debug": {
+        "enabled": true,
+        "raw_truncated": false,
+        "max_raw_chars": 20000
+      }
+    },
+    "cashflow_quality": {
+      "request_id": "1848d707-5492-43f9-8542-5194b610ec4d",
+      "market": "CN",
+      "symbol": "600519",
+      "ts_code": "600519.SH",
+      "module_key": "cashflow_quality",
+      "data_mode": "free",
+      "stage": "final",
+      "ok": false,
+      "partial": true,
+      "stale": false,
+      "source_chain": [
+        {
+          "provider": "module",
+          "endpoint": "cashflow_quality",
+          "attempted": true,
+          "success": false,
+          "status": "timeout",
+          "started_at": null,
+          "ended_at": null,
+          "elapsed_ms": null,
+          "latency_ms": 0,
+          "rows_count": 0,
+          "columns": [],
+          "non_null_fields": [],
+          "missing_fields": [],
+          "error_code": "PROVIDER_TIMEOUT",
+          "error_message": "debug/full exceeded 45s before cashflow_quality started",
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": null,
+          "raw_shape": null,
+          "detached_timeout": false
+        }
+      ],
+      "raw": {
+        "baostock": [],
+        "akshare": [],
+        "tencent": [],
+        "sina": [],
+        "eastmoney": [],
+        "pdf_metrics": []
+      },
+      "normalized": {
+        "rows": [],
+        "metrics": {},
+        "fields": {}
+      },
+      "completion": {
+        "filled_fields": {},
+        "still_missing_fields": {},
+        "computed_fields": {},
+        "fallback_chain": {}
+      },
+      "render": {
+        "renderable": false,
+        "chart_renderable": false,
+        "table_renderable": false,
+        "has_displayable_data": false,
+        "visible_fields": [],
+        "hidden_fields": [],
+        "reason": "PROVIDER_TIMEOUT"
+      },
+      "errors": [
+        {
+          "layer": "provider",
+          "error_code": "PROVIDER_TIMEOUT",
+          "message": "debug/full exceeded 45s before cashflow_quality started",
+          "provider": null,
+          "endpoint": null,
+          "field": null
+        }
+      ],
+      "warnings": [],
+      "diagnosis": {
+        "module_key": "cashflow_quality",
+        "primary_issue": "PROVIDER_TIMEOUT",
+        "evidence": [
+          "all provider attempts timed out"
+        ],
+        "recommended_fix": [
+          "lower provider concurrency or increase provider-specific timeout"
+        ]
+      },
+      "debug": {
+        "enabled": true,
+        "raw_truncated": false,
+        "max_raw_chars": 20000
+      }
+    },
+    "solvency": {
+      "request_id": "1848d707-5492-43f9-8542-5194b610ec4d",
+      "market": "CN",
+      "symbol": "600519",
+      "ts_code": "600519.SH",
+      "module_key": "solvency",
+      "data_mode": "free",
+      "stage": "final",
+      "ok": false,
+      "partial": true,
+      "stale": false,
+      "source_chain": [
+        {
+          "provider": "module",
+          "endpoint": "solvency",
+          "attempted": true,
+          "success": false,
+          "status": "timeout",
+          "started_at": null,
+          "ended_at": null,
+          "elapsed_ms": null,
+          "latency_ms": 0,
+          "rows_count": 0,
+          "columns": [],
+          "non_null_fields": [],
+          "missing_fields": [],
+          "error_code": "PROVIDER_TIMEOUT",
+          "error_message": "debug/full exceeded 45s before solvency started",
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": null,
+          "raw_shape": null,
+          "detached_timeout": false
+        }
+      ],
+      "raw": {
+        "baostock": [],
+        "akshare": [],
+        "tencent": [],
+        "sina": [],
+        "eastmoney": [],
+        "pdf_metrics": []
+      },
+      "normalized": {
+        "rows": [],
+        "metrics": {},
+        "fields": {}
+      },
+      "completion": {
+        "filled_fields": {},
+        "still_missing_fields": {},
+        "computed_fields": {},
+        "fallback_chain": {}
+      },
+      "render": {
+        "renderable": false,
+        "chart_renderable": false,
+        "table_renderable": false,
+        "has_displayable_data": false,
+        "visible_fields": [],
+        "hidden_fields": [],
+        "reason": "PROVIDER_TIMEOUT"
+      },
+      "errors": [
+        {
+          "layer": "provider",
+          "error_code": "PROVIDER_TIMEOUT",
+          "message": "debug/full exceeded 45s before solvency started",
+          "provider": null,
+          "endpoint": null,
+          "field": null
+        }
+      ],
+      "warnings": [],
+      "diagnosis": {
+        "module_key": "solvency",
+        "primary_issue": "PROVIDER_TIMEOUT",
+        "evidence": [
+          "all provider attempts timed out"
+        ],
+        "recommended_fix": [
+          "lower provider concurrency or increase provider-specific timeout"
+        ]
+      },
+      "debug": {
+        "enabled": true,
+        "raw_truncated": false,
+        "max_raw_chars": 20000
+      }
+    },
+    "operation_capability": {
+      "request_id": "1848d707-5492-43f9-8542-5194b610ec4d",
+      "market": "CN",
+      "symbol": "600519",
+      "ts_code": "600519.SH",
+      "module_key": "operation_capability",
+      "data_mode": "free",
+      "stage": "final",
+      "ok": false,
+      "partial": true,
+      "stale": false,
+      "source_chain": [
+        {
+          "provider": "module",
+          "endpoint": "operation_capability",
+          "attempted": true,
+          "success": false,
+          "status": "timeout",
+          "started_at": null,
+          "ended_at": null,
+          "elapsed_ms": null,
+          "latency_ms": 0,
+          "rows_count": 0,
+          "columns": [],
+          "non_null_fields": [],
+          "missing_fields": [],
+          "error_code": "PROVIDER_TIMEOUT",
+          "error_message": "debug/full exceeded 45s before operation_capability started",
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": null,
+          "raw_shape": null,
+          "detached_timeout": false
+        }
+      ],
+      "raw": {
+        "baostock": [],
+        "akshare": [],
+        "tencent": [],
+        "sina": [],
+        "eastmoney": [],
+        "pdf_metrics": []
+      },
+      "normalized": {
+        "rows": [],
+        "metrics": {},
+        "fields": {}
+      },
+      "completion": {
+        "filled_fields": {},
+        "still_missing_fields": {},
+        "computed_fields": {},
+        "fallback_chain": {}
+      },
+      "render": {
+        "renderable": false,
+        "chart_renderable": false,
+        "table_renderable": false,
+        "has_displayable_data": false,
+        "visible_fields": [],
+        "hidden_fields": [],
+        "reason": "PROVIDER_TIMEOUT"
+      },
+      "errors": [
+        {
+          "layer": "provider",
+          "error_code": "PROVIDER_TIMEOUT",
+          "message": "debug/full exceeded 45s before operation_capability started",
+          "provider": null,
+          "endpoint": null,
+          "field": null
+        }
+      ],
+      "warnings": [],
+      "diagnosis": {
+        "module_key": "operation_capability",
+        "primary_issue": "PROVIDER_TIMEOUT",
+        "evidence": [
+          "all provider attempts timed out"
+        ],
+        "recommended_fix": [
+          "lower provider concurrency or increase provider-specific timeout"
+        ]
+      },
+      "debug": {
+        "enabled": true,
+        "raw_truncated": false,
+        "max_raw_chars": 20000
+      }
+    },
+    "dupont": {
+      "request_id": "1848d707-5492-43f9-8542-5194b610ec4d",
+      "market": "CN",
+      "symbol": "600519",
+      "ts_code": "600519.SH",
+      "module_key": "dupont",
+      "data_mode": "free",
+      "stage": "final",
+      "ok": false,
+      "partial": true,
+      "stale": false,
+      "source_chain": [
+        {
+          "provider": "module",
+          "endpoint": "dupont",
+          "attempted": true,
+          "success": false,
+          "status": "timeout",
+          "started_at": null,
+          "ended_at": null,
+          "elapsed_ms": null,
+          "latency_ms": 0,
+          "rows_count": 0,
+          "columns": [],
+          "non_null_fields": [],
+          "missing_fields": [],
+          "error_code": "PROVIDER_TIMEOUT",
+          "error_message": "debug/full exceeded 45s before dupont started",
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": null,
+          "raw_shape": null,
+          "detached_timeout": false
+        }
+      ],
+      "raw": {
+        "baostock": [],
+        "akshare": [],
+        "tencent": [],
+        "sina": [],
+        "eastmoney": [],
+        "pdf_metrics": []
+      },
+      "normalized": {
+        "rows": [],
+        "metrics": {},
+        "fields": {}
+      },
+      "completion": {
+        "filled_fields": {},
+        "still_missing_fields": {},
+        "computed_fields": {},
+        "fallback_chain": {}
+      },
+      "render": {
+        "renderable": false,
+        "chart_renderable": false,
+        "table_renderable": false,
+        "has_displayable_data": false,
+        "visible_fields": [],
+        "hidden_fields": [],
+        "reason": "PROVIDER_TIMEOUT"
+      },
+      "errors": [
+        {
+          "layer": "provider",
+          "error_code": "PROVIDER_TIMEOUT",
+          "message": "debug/full exceeded 45s before dupont started",
+          "provider": null,
+          "endpoint": null,
+          "field": null
+        }
+      ],
+      "warnings": [],
+      "diagnosis": {
+        "module_key": "dupont",
+        "primary_issue": "PROVIDER_TIMEOUT",
+        "evidence": [
+          "all provider attempts timed out"
+        ],
+        "recommended_fix": [
+          "lower provider concurrency or increase provider-specific timeout"
+        ]
+      },
+      "debug": {
+        "enabled": true,
+        "raw_truncated": false,
+        "max_raw_chars": 20000
+      }
+    },
+    "report_documents": {
+      "request_id": "1848d707-5492-43f9-8542-5194b610ec4d",
+      "market": "CN",
+      "symbol": "600519",
+      "ts_code": "600519.SH",
+      "module_key": "report_documents",
+      "data_mode": "free",
+      "stage": "final",
+      "ok": false,
+      "partial": true,
+      "stale": false,
+      "source_chain": [
+        {
+          "provider": "module",
+          "endpoint": "report_documents",
+          "attempted": true,
+          "success": false,
+          "status": "timeout",
+          "started_at": null,
+          "ended_at": null,
+          "elapsed_ms": null,
+          "latency_ms": 0,
+          "rows_count": 0,
+          "columns": [],
+          "non_null_fields": [],
+          "missing_fields": [],
+          "error_code": "PROVIDER_TIMEOUT",
+          "error_message": "debug/full exceeded 45s before report_documents started",
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": null,
+          "raw_shape": null,
+          "detached_timeout": false
+        }
+      ],
+      "raw": {
+        "baostock": [],
+        "akshare": [],
+        "tencent": [],
+        "sina": [],
+        "eastmoney": [],
+        "pdf_metrics": []
+      },
+      "normalized": {
+        "rows": [],
+        "metrics": {},
+        "fields": {}
+      },
+      "completion": {
+        "filled_fields": {},
+        "still_missing_fields": {},
+        "computed_fields": {},
+        "fallback_chain": {}
+      },
+      "render": {
+        "renderable": false,
+        "chart_renderable": false,
+        "table_renderable": false,
+        "has_displayable_data": false,
+        "visible_fields": [],
+        "hidden_fields": [],
+        "reason": "PROVIDER_TIMEOUT"
+      },
+      "errors": [
+        {
+          "layer": "provider",
+          "error_code": "PROVIDER_TIMEOUT",
+          "message": "debug/full exceeded 45s before report_documents started",
+          "provider": null,
+          "endpoint": null,
+          "field": null
+        }
+      ],
+      "warnings": [],
+      "diagnosis": {
+        "module_key": "report_documents",
+        "primary_issue": "PROVIDER_TIMEOUT",
+        "evidence": [
+          "all provider attempts timed out"
+        ],
+        "recommended_fix": [
+          "lower provider concurrency or increase provider-specific timeout"
+        ]
+      },
+      "debug": {
+        "enabled": true,
+        "raw_truncated": false,
+        "max_raw_chars": 20000
+      }
+    },
+    "report_rag": {
+      "request_id": "1848d707-5492-43f9-8542-5194b610ec4d",
+      "market": "CN",
+      "symbol": "600519",
+      "ts_code": "600519.SH",
+      "module_key": "report_rag",
+      "data_mode": "free",
+      "stage": "final",
+      "ok": false,
+      "partial": true,
+      "stale": false,
+      "source_chain": [
+        {
+          "provider": "module",
+          "endpoint": "report_rag",
+          "attempted": true,
+          "success": false,
+          "status": "timeout",
+          "started_at": null,
+          "ended_at": null,
+          "elapsed_ms": null,
+          "latency_ms": 0,
+          "rows_count": 0,
+          "columns": [],
+          "non_null_fields": [],
+          "missing_fields": [],
+          "error_code": "PROVIDER_TIMEOUT",
+          "error_message": "debug/full exceeded 45s before report_rag started",
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": null,
+          "raw_shape": null,
+          "detached_timeout": false
+        }
+      ],
+      "raw": {
+        "baostock": [],
+        "akshare": [],
+        "tencent": [],
+        "sina": [],
+        "eastmoney": [],
+        "pdf_metrics": []
+      },
+      "normalized": {
+        "rows": [],
+        "metrics": {},
+        "fields": {}
+      },
+      "completion": {
+        "filled_fields": {},
+        "still_missing_fields": {},
+        "computed_fields": {},
+        "fallback_chain": {}
+      },
+      "render": {
+        "renderable": false,
+        "chart_renderable": false,
+        "table_renderable": false,
+        "has_displayable_data": false,
+        "visible_fields": [],
+        "hidden_fields": [],
+        "reason": "PROVIDER_TIMEOUT"
+      },
+      "errors": [
+        {
+          "layer": "provider",
+          "error_code": "PROVIDER_TIMEOUT",
+          "message": "debug/full exceeded 45s before report_rag started",
+          "provider": null,
+          "endpoint": null,
+          "field": null
+        }
+      ],
+      "warnings": [],
+      "diagnosis": {
+        "module_key": "report_rag",
+        "primary_issue": "PROVIDER_TIMEOUT",
+        "evidence": [
+          "all provider attempts timed out"
+        ],
+        "recommended_fix": [
+          "lower provider concurrency or increase provider-specific timeout"
+        ]
+      },
+      "debug": {
+        "enabled": true,
+        "raw_truncated": false,
+        "max_raw_chars": 20000
+      }
+    },
+    "ai_analysis_status": {
+      "request_id": "1848d707-5492-43f9-8542-5194b610ec4d",
+      "market": "CN",
+      "symbol": "600519",
+      "ts_code": "600519.SH",
+      "module_key": "ai_analysis_status",
+      "data_mode": "free",
+      "stage": "final",
+      "ok": false,
+      "partial": true,
+      "stale": false,
+      "source_chain": [
+        {
+          "provider": "module",
+          "endpoint": "ai_analysis_status",
+          "attempted": true,
+          "success": false,
+          "status": "timeout",
+          "started_at": null,
+          "ended_at": null,
+          "elapsed_ms": null,
+          "latency_ms": 0,
+          "rows_count": 0,
+          "columns": [],
+          "non_null_fields": [],
+          "missing_fields": [],
+          "error_code": "PROVIDER_TIMEOUT",
+          "error_message": "debug/full exceeded 45s before ai_analysis_status started",
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": null,
+          "raw_shape": null,
+          "detached_timeout": false
+        }
+      ],
+      "raw": {
+        "baostock": [],
+        "akshare": [],
+        "tencent": [],
+        "sina": [],
+        "eastmoney": [],
+        "pdf_metrics": []
+      },
+      "normalized": {
+        "rows": [],
+        "metrics": {},
+        "fields": {}
+      },
+      "completion": {
+        "filled_fields": {},
+        "still_missing_fields": {},
+        "computed_fields": {},
+        "fallback_chain": {}
+      },
+      "render": {
+        "renderable": false,
+        "chart_renderable": false,
+        "table_renderable": false,
+        "has_displayable_data": false,
+        "visible_fields": [],
+        "hidden_fields": [],
+        "reason": "PROVIDER_TIMEOUT"
+      },
+      "errors": [
+        {
+          "layer": "provider",
+          "error_code": "PROVIDER_TIMEOUT",
+          "message": "debug/full exceeded 45s before ai_analysis_status started",
+          "provider": null,
+          "endpoint": null,
+          "field": null
+        }
+      ],
+      "warnings": [],
+      "diagnosis": {
+        "module_key": "ai_analysis_status",
+        "primary_issue": "PROVIDER_TIMEOUT",
+        "evidence": [
+          "all provider attempts timed out"
+        ],
+        "recommended_fix": [
+          "lower provider concurrency or increase provider-specific timeout"
+        ]
+      },
+      "debug": {
+        "enabled": true,
+        "raw_truncated": false,
+        "max_raw_chars": 20000
+      }
+    }
+  }
+}

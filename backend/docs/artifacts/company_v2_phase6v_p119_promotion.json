@@ -1,0 +1,29 @@
+{
+  "schema_version": "pi_promotion_record_v1",
+  "phase": "6V-P1.19",
+  "generated_at": "2026-07-23T00:05:00.000000+00:00",
+  "rollout_before": 25,
+  "rollout_after": 50,
+  "config_version_before": 6,
+  "config_version_after": 7,
+  "promotion_mechanism": "staging_test_fixture_override",
+  "repository_defaults_unchanged": true,
+  "production_config_unchanged": true,
+  "live_serving_unchanged": false,
+  "live_serving_value": false,
+  "promotion_applied_at": "2026-07-23T00:05:00.000000+00:00",
+  "runtime_verified": true,
+  "artifact_runtime_consistent": true,
+  "safety_invariants_after_promotion": {
+    "live": false,
+    "production_enabled": false,
+    "recommended_for_live_serving": false,
+    "recommended_for_production": false,
+    "provider_calls_serving": 0,
+    "canary_mode": "shadow",
+    "legacy_only_ui": true
+  },
+  "promotion_authorized_by": "project_owner",
+  "authorization_artifact": "company_v2_phase6v_p119_owner_authorization.json",
+  "note": "Staging shadow rollout promoted from 25% to 50% via test fixture config override. Repository defaults and production config remain unchanged. All safety gates remain enforced."
+}

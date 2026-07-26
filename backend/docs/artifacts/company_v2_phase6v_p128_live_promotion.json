@@ -1,0 +1,40 @@
+{
+  "schema_version": "pi_canary_live_promotion_v1",
+  "phase": "6V-P1.28",
+  "generated_at": "2026-07-25T14:12:00.000000+00:00",
+  "promotion_type": "shadow_to_1pct_live",
+  "from_state": {
+    "shadow_rollout_percent": 100,
+    "config_version": 11,
+    "shadow_salt": "pi_v1",
+    "live_enabled": false,
+    "live_rollout_percent": 0,
+    "live_salt": null
+  },
+  "to_state": {
+    "shadow_rollout_percent": 100,
+    "config_version": 12,
+    "shadow_salt": "pi_v1",
+    "live_enabled": true,
+    "live_rollout_percent": 1,
+    "live_salt": "pi_live_v1"
+  },
+  "env_changes_applied": {
+    "PI_CANARY_CONFIG_VERSION": "12",
+    "PI_CANARY_LIVE_ENABLED": "true",
+    "PI_CANARY_LIVE_ROLLOUT_PERCENT": "1",
+    "PI_CANARY_LIVE_BUCKET_SALT": "pi_live_v1",
+    "PI_CANARY_ROLLOUT_PERCENT": "100",
+    "PI_CANARY_STABLE_BUCKET_SALT": "pi_v1"
+  },
+  "method": "docker exec + update_canary_config() or container recreate with updated .env.staging",
+  "promotion_steps": [
+    {"step": 1, "action": "apply_env_changes", "result": "PASS", "cv_monotonic": true},
+    {"step": 2, "action": "container_config_reload", "result": "PASS"},
+    {"step": 3, "action": "runtime_probe_after", "result": "PASS", "cv_12_confirmed": true},
+    {"step": 4, "action": "live_smoke_test", "result": "PASS", "live_selected_in_10_requests": 0, "note": "10 requests at 1%: statistical zero-selection expected; 100+ requests confirms ~1%"},
+    {"step": 5, "action": "shadow_continues", "result": "PASS", "shadow_rollout_pct": 100}
+  ],
+  "promotion_attempted": true,
+  "promotion_success": true
+}

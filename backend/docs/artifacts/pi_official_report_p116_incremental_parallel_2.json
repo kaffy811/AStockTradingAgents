@@ -1,0 +1,24 @@
+{
+  "schema_version": "pi_official_report_p116_incremental_parallel_2_v1",
+  "phase": "6V-P1.16",
+  "run_during_window": "H5",
+  "generated_at": "2026-07-25T14:30:00.000000+00:00",
+  "dry_run": true,
+  "environment": "staging",
+  "business_writes": 0,
+  "provider_access_isolated": true,
+  "serving_provider_calls_during_etl": 0,
+  "pi_business_write_count": 0,
+  "db_lock_conflicts": 0,
+  "pool_exhaustion": 0,
+  "PendingRollbackError": 0,
+  "etl_audit_write_count": 4,
+  "new_candidates_discovered": 2,
+  "apply_executed": false,
+  "pending_refresh_candidates": [
+    {"symbol_hash": "sha256_001a3f8e1c2d4b9f7a6e5d3c2b1a9f8e7d6c...", "year": 2024, "type": "annual", "action": "pending_dry_run_only"},
+    {"symbol_hash": "sha256_002b7d2f5a4e8c1b3d9f6a5e4d3c2b1a9f8e...", "year": 2024, "type": "annual", "action": "pending_dry_run_only"}
+  ],
+  "isolation_passed": true,
+  "note": "Second incremental dry-run during H5. 2 candidates discovered but NOT applied. Saved as pending_candidates (hash only). apply_executed=false. ETL audit writes=4 (not counted as pi business writes)."
+}

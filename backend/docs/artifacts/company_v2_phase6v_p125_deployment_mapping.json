@@ -1,0 +1,52 @@
+{
+  "schema_version": "pi_canary_deployment_mapping_v1",
+  "phase": "6V-P1.25",
+  "generated_at": "2026-07-24T01:00:00.000000+00:00",
+  "base_sha": "d50c56d45bbc909b8655e5bfbc554868f48635fc",
+
+  "docker_installed": true,
+  "docker_version": "29.6.2",
+  "docker_engine_arch": "aarch64",
+  "docker_engine_os": "linux",
+  "docker_ram_gb": 7.749,
+  "compose_version": "v5.3.1",
+  "compose_plugin_path": "/Users/kaffy/.docker/cli-plugins/docker-compose",
+  "docker_app_path": "/Applications/Docker.app",
+  "docker_bin_path": "/Applications/Docker.app/Contents/Resources/bin/docker",
+  "docker_socket": "/var/run/docker.sock",
+  "docker_socket_accessible": true,
+
+  "gate_c_closeable_this_run": true,
+  "install_method": "DMG downloaded via chunked range requests through proxy (109 × 5MB); hdiutil attach; cp -R to /Applications",
+  "install_docker_desktop_version": "4.83.0",
+
+  "compose_project": "tradingagents-p125-staging",
+  "compose_files": ["docker-compose.yml", "docker-compose.staging.yml"],
+  "env_file": ".env.staging.local",
+  "services": {
+    "postgres": {
+      "image": "postgres:16-alpine",
+      "port_binding": "127.0.0.1:15432:5432",
+      "volume": "tradingagents-p125-staging_postgres_data"
+    },
+    "redis": {
+      "image": "redis:7-alpine",
+      "port_binding": "none (internal only)"
+    },
+    "migrate": {
+      "image": "built from ./backend/Dockerfile",
+      "command": "uv run alembic upgrade head"
+    },
+    "backend": {
+      "image": "built from ./backend/Dockerfile",
+      "port_binding": "127.0.0.1:18000:8000",
+      "healthcheck": "python3 urllib.request /health"
+    },
+    "frontend": {
+      "image": "built from ./frontend/Dockerfile",
+      "port_binding": "127.0.0.1:18080:80"
+    }
+  },
+  "network": "tradingagents-p125-staging_internal",
+  "isolation_level": "full — separate compose project, network, postgres volume, host port bindings on 127.0.0.1 only"
+}

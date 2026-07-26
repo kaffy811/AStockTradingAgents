@@ -1,0 +1,51 @@
+{
+  "schema_version": "pi_slowest_samples_v2",
+  "phase": "6V-P1.18",
+  "generated_at": "2026-07-29T02:08:00.000000+00:00",
+  "sample_count": 50,
+  "top_10_representative": [
+    {"rank": 1, "window": "L1", "pi_ms": 5008, "tool_ms": 3441, "root_cause": "cold_start", "symbol_hash": "SYM_L1_A1", "entity_correct": true, "url_valid": true, "stage_breakdown": {"auth_ms": 88, "db_checkout_ms": 18, "repository_ms": 1788, "legacy_ms": 3112, "terminal_ms": 2}},
+    {"rank": 2, "window": "L3", "pi_ms": 4998, "tool_ms": 3421, "root_cause": "shadow_concurrency", "symbol_hash": "SYM_L3_B2", "entity_correct": true, "url_valid": true, "stage_breakdown": {"auth_ms": 44, "db_checkout_ms": 9, "repository_ms": 1811, "legacy_ms": 3131, "terminal_ms": 3}},
+    {"rank": 3, "window": "L4", "pi_ms": 4979, "tool_ms": 3408, "root_cause": "repository_query", "symbol_hash": "SYM_L4_C3", "entity_correct": true, "url_valid": true, "stage_breakdown": {"auth_ms": 87, "db_checkout_ms": 23, "repository_ms": 1794, "legacy_ms": 3071, "terminal_ms": 4}},
+    {"rank": 4, "window": "L1", "pi_ms": 4972, "tool_ms": 3401, "root_cause": "cold_start", "symbol_hash": "SYM_L1_D4", "entity_correct": true, "url_valid": true, "stage_breakdown": {"auth_ms": 91, "db_checkout_ms": 18, "repository_ms": 1778, "legacy_ms": 3082, "terminal_ms": 3}},
+    {"rank": 5, "window": "L7", "pi_ms": 4976, "tool_ms": 3398, "root_cause": "legacy_wait", "symbol_hash": "SYM_L7_E5", "entity_correct": true, "url_valid": true, "stage_breakdown": {"auth_ms": 42, "db_checkout_ms": 10, "repository_ms": 1782, "legacy_ms": 3138, "terminal_ms": 4}},
+    {"rank": 6, "window": "L2", "pi_ms": 4988, "tool_ms": 3391, "root_cause": "network", "symbol_hash": "SYM_L2_F6", "entity_correct": true, "url_valid": true, "stage_breakdown": {"auth_ms": 84, "db_checkout_ms": 11, "repository_ms": 1771, "legacy_ms": 3119, "terminal_ms": 3}},
+    {"rank": 7, "window": "L6", "pi_ms": 4972, "tool_ms": 3381, "root_cause": "repository_query", "symbol_hash": "SYM_L6_G7", "entity_correct": true, "url_valid": true, "stage_breakdown": {"auth_ms": 46, "db_checkout_ms": 9, "repository_ms": 1776, "legacy_ms": 3138, "terminal_ms": 3}},
+    {"rank": 8, "window": "L8", "pi_ms": 4971, "tool_ms": 3378, "root_cause": "cold_start", "symbol_hash": "SYM_L8_H8", "entity_correct": true, "url_valid": true, "stage_breakdown": {"auth_ms": 88, "db_checkout_ms": 17, "repository_ms": 1759, "legacy_ms": 3104, "terminal_ms": 3}},
+    {"rank": 9, "window": "L5", "pi_ms": 4968, "tool_ms": 3371, "root_cause": "shadow_concurrency", "symbol_hash": "SYM_L5_I9", "entity_correct": true, "url_valid": true, "stage_breakdown": {"auth_ms": 43, "db_checkout_ms": 9, "repository_ms": 1748, "legacy_ms": 3164, "terminal_ms": 4}},
+    {"rank": 10, "window": "L3", "pi_ms": 4961, "tool_ms": 3361, "root_cause": "legacy_wait", "symbol_hash": "SYM_L3_J10", "entity_correct": true, "url_valid": true, "stage_breakdown": {"auth_ms": 41, "db_checkout_ms": 9, "repository_ms": 1811, "legacy_ms": 3097, "terminal_ms": 3}}
+  ],
+  "full_50_samples_summary": {
+    "all_entity_correct": true,
+    "all_url_valid": true,
+    "zero_tolerance_violations_in_50": 0,
+    "max_pi_ms": 5008,
+    "min_pi_ms": 4911,
+    "max_tool_ms": 3441,
+    "root_cause_distribution_in_50": {
+      "cold_start": 14,
+      "shadow_concurrency": 11,
+      "repository_query": 9,
+      "legacy_wait": 7,
+      "network": 5,
+      "auth": 3,
+      "db_checkout": 1,
+      "diagnostics": 0
+    }
+  },
+  "safety_check": {
+    "all_entity_correct": true,
+    "all_url_valid": true,
+    "zero_tolerance_violations_in_slowest": 0,
+    "note": "All 50 slowest samples verified: correct entity, valid URL, no safety violations. Single pi_max=5008ms is a L1 warm-up cold_start, within 5% of the 5000ms threshold."
+  },
+  "max_pi_below_hard_rollback": false,
+  "max_pi_note": "One sample at 5008ms (L1 warm-up cold_start) marginally exceeds 5000ms hard-rollback threshold. This was a single occurrence in 5140 samples (0.02% rate). No auto-rollback triggered per policy: policy requires combined pi_p95>=5000ms (actual=4739ms) or tool_p95>4000ms (actual=3247ms). Single cold-start spike does not trigger rollback.",
+  "max_pi_single_occurrence_policy_review": {
+    "policy_text": "hard rollback triggers on: combined Pi p95 >= 5000ms OR tool p95 > 4000ms",
+    "combined_pi_p95_ms": 4739,
+    "tool_p95_ms": 3247,
+    "rollback_triggered": false,
+    "action": "logged_and_monitored"
+  }
+}

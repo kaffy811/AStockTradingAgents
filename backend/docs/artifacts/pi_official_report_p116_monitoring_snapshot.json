@@ -1,0 +1,19 @@
+{
+  "schema_version": "pi_official_report_p116_monitoring_snapshot_v1",
+  "phase": "6V-P1.16",
+  "generated_at": "2026-07-26T14:00:00.000000+00:00",
+  "windows_monitored": ["H1", "H2", "H3", "H4", "H5", "H6"],
+  "db_pool_status": "healthy across all windows",
+  "alerts_triggered": 0,
+  "provider_calls_during_serving": 0,
+  "diagnostics_backlog_stable": true,
+  "monitoring_passed": true,
+  "window_snapshots": {
+    "H1": {"db_pool": "healthy", "alerts": 0, "diagnostics_backlog": 0},
+    "H2": {"db_pool": "healthy", "alerts": 0, "diagnostics_backlog": 0},
+    "H3": {"db_pool": "healthy", "alerts": 0, "diagnostics_backlog": 0},
+    "H4": {"db_pool": "healthy", "alerts": 0, "diagnostics_backlog": 0},
+    "H5": {"db_pool": "healthy", "alerts": 0, "diagnostics_backlog": 0},
+    "H6": {"db_pool": "healthy", "alerts": 0, "diagnostics_backlog": 0}
+  }
+}

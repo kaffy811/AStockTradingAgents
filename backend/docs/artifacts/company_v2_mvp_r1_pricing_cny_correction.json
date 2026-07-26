@@ -1,0 +1,39 @@
+{
+  "schema_version": "pi_canary_pricing_cny_v1",
+  "phase": "MVP-R1",
+  "generated_at": "2026-07-26T06:00:00Z",
+
+  "correction_type": "P0 bug fix + CNY source correction",
+
+  "bug_fixed": {
+    "description": "PricingRegistry._load() read entry.get('pricing', {}) but JSON had 'pricing_usd' key only",
+    "impact": "All CNY cost estimates returned Decimal('0') — budget guard never consumed cost budget",
+    "fix": "Added 'pricing' key to each model in deepseek_prices.json with official CNY prices"
+  },
+
+  "official_cny_prices": {
+    "deepseek-v4-flash": {
+      "input_cache_miss_cny_per_1m": "1",
+      "input_cache_hit_cny_per_1m": "0.02",
+      "output_cny_per_1m": "2",
+      "reasoning_cny_per_1m": "2",
+      "verified": true,
+      "currency": "CNY",
+      "fx_rate_required": false
+    },
+    "deepseek-v4-pro": {
+      "input_cache_miss_cny_per_1m": "3",
+      "input_cache_hit_cny_per_1m": "0.025",
+      "output_cny_per_1m": "6",
+      "reasoning_cny_per_1m": "6",
+      "verified": true,
+      "currency": "CNY",
+      "fx_rate_required": false
+    }
+  },
+
+  "budget_guard_currency": "CNY",
+  "budget_guard_max_cny": 20.0,
+  "cost_settlement_method": "per-request: input_cost + cached_input_cost + output_cost = settled_cost (Decimal)",
+  "usage_missing_policy": "use conservative upper-bound estimate, block further calls"
+}

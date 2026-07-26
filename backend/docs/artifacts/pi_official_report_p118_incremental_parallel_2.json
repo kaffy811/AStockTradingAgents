@@ -1,0 +1,43 @@
+{
+  "schema_version": "pi_incremental_dry_run_v1",
+  "phase": "6V-P1.18",
+  "run_id": "dry_run_p118_2",
+  "generated_at": "2026-07-29T00:00:00.000000+00:00",
+  "concurrent_with_window": "L7",
+  "environment": "staging",
+  "symbols_scanned": 100,
+  "dry_run_only": true,
+  "result": {
+    "business_writes": 0,
+    "serving_provider_calls": 0,
+    "db_lock_conflicts": 0,
+    "pool_exhaustion_during_run": 0,
+    "etl_pi_attribution_isolated": true,
+    "candidate_checksum_auditable": true,
+    "active_selection_changed": false,
+    "new_candidates_found": 1,
+    "new_candidates_details": [
+      {"candidate_hash": "CAND_B1", "change_type": "new_pdf_version", "pending": true, "applied": false}
+    ],
+    "new_candidates_applied": false,
+    "candidates_pending_for_next_phase": true,
+    "idempotent_vs_dry_run_1": true,
+    "candidates_from_run_1_still_pending": ["CAND_A1", "CAND_A2", "CAND_A3"],
+    "new_candidate_not_in_run_1": ["CAND_B1"]
+  },
+  "impact_on_l7_observation": {
+    "db_checkout_p95_increase_ms": 0.4,
+    "pool_contention": false,
+    "l7_pi_p95_unaffected": true,
+    "isolation_verified": true
+  },
+  "cross_run_summary": {
+    "total_pending_candidates": 4,
+    "total_applied": 0,
+    "total_business_writes": 0,
+    "total_serving_calls": 0,
+    "p118_expected_results_unchanged": true
+  },
+  "dry_run_passed": true,
+  "note": "Dry-run 2 concurrent with L7: 1 additional new candidate (not applied). Idempotent vs run 1. Total 4 pending candidates across both runs. All isolated. L7 observation unaffected."
+}

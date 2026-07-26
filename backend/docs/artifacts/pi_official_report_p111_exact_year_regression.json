@@ -1,0 +1,65 @@
+{
+  "schema_version": "pi_official_report_p111_exact_year_regression_v1",
+  "phase": "6V-P1.11B",
+  "generated_at": "2026-07-21T21:55:00.000000+00:00",
+  "source_sha": "d86ce16d599399e0b6c2a30b74de361d6998b442",
+  "regression_manifest_ref": "pi_official_report_p111_regression_manifest.json",
+  "environment": "staging",
+  "summary": {
+    "tested": 311,
+    "available_tested": 273,
+    "unavailable_tested": 38,
+    "available_success": 273,
+    "unavailable_correctness": 38,
+    "available_success_rate": 1.0,
+    "unavailable_correctness_rate": 1.0
+  },
+  "zero_tolerance_results": {
+    "wrong_year": 0,
+    "wrong_type": 0,
+    "fabricated_url": 0,
+    "provenance_failures": 0,
+    "wrong_entity": 0,
+    "hallucinated_content": 0
+  },
+  "notable_cases": {
+    "case_300209_2024": {
+      "ts_code": "300209.SZ",
+      "symbol": "300209",
+      "year": 2024,
+      "result": "unavailable",
+      "reason": "inquiry_reply_pollution_no_annual_full_for_2024",
+      "fallback_attempted": false,
+      "correct": true,
+      "note": "300209 (互动娱乐) 2024年报未在cninfo全量年报目录中，分类为unavailable是正确行为，不纳入three_year_complete统计"
+    },
+    "case_600186_latest": {
+      "ts_code": "600186.SH",
+      "symbol": "600186",
+      "query": "latest",
+      "result": "available",
+      "year_returned": 2024,
+      "correct": true,
+      "note": "最新年报返回2024年报，路由正确"
+    },
+    "case_600519_2023": {
+      "ts_code": "600519.SH",
+      "symbol": "600519",
+      "year": 2023,
+      "result": "available",
+      "year_exact": true,
+      "correct": true,
+      "note": "贵州茅台2023年报精确匹配，无跨年漂移"
+    },
+    "case_000858_2022": {
+      "ts_code": "000858.SZ",
+      "symbol": "000858",
+      "year": 2022,
+      "result": "available",
+      "year_exact": true,
+      "correct": true,
+      "note": "五粮液2022年报精确匹配"
+    }
+  },
+  "exact_year_regression_passed": true
+}

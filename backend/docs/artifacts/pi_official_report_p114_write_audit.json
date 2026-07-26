@@ -1,0 +1,20 @@
+{
+  "schema_version": "pi_official_report_p114_write_audit_v1",
+  "phase": "6V-P1.14",
+  "generated_at": "2026-07-22T22:20:00.000000+00:00",
+  "source_sha": "19130f054ca330f2fa16e8200184af6a8b632ec0",
+  "windows": ["T1", "T2", "T3"],
+  "per_window": {
+    "T1": {"pi_business_write_count": 0, "assistant_double_write_count": 0, "unknown_write_count": 0},
+    "T2": {"pi_business_write_count": 0, "assistant_double_write_count": 0, "unknown_write_count": 0},
+    "T3": {"pi_business_write_count": 0, "assistant_double_write_count": 0, "unknown_write_count": 0}
+  },
+  "combined": {
+    "pi_business_write_count": 0,
+    "assistant_double_write_count": 0,
+    "unknown_write_count": 0,
+    "incremental_etl_audit_writes": 3,
+    "etl_writes_counted_as_pi_business_writes": false
+  },
+  "write_audit_passed": true
+}

@@ -20,6 +20,7 @@ import uuid
 from app.agents.chat_rag.base import RAGDocument, RAGResult
 from app.agents.chat_skills.base import SkillContext
 from app.agents.chat_events import safe_emit
+from app.services.security_entity_resolver import security_entity_resolver
 
 log = logging.getLogger(__name__)
 
@@ -30,37 +31,34 @@ _MAX_INDUSTRY = 2
 _MAX_TOTAL = 8
 
 # Stock hint extraction (mirrors orchestrator pattern)
-_SYMBOL_RE = re.compile(r"\b(\d{5,6})\b")
-_STOCK_NAMES = {
-    "茅台": ("CN", "600519", "贵州茅台"),
-    "贵州茅台": ("CN", "600519", "贵州茅台"),
-    "宁德": ("CN", "300750", "宁德时代"),
-    "宁德时代": ("CN", "300750", "宁德时代"),
-    "中船特气": ("CN", "688146", "中船特气"),
-    "688146": ("CN", "688146", "中船特气"),
-    "紫金矿业": ("CN", "601899", "紫金矿业"),
-    "华大九天": ("CN", "301269", "华大九天"),
-    "平安银行": ("CN", "000001", "平安银行"),
-    "腾讯": ("HK", "00700", "腾讯控股"),
-}
+_SYMBOL_RE = re.compile(r"(?<!\d)(\d{5,6})(?!\d)")
 _INDUSTRY_WORDS = re.compile(r"行业|板块|热点|半导体|电子|新能源|医药|消费")
 
 
 def _extract_hint(query: str) -> dict | None:
-    """Extract market/symbol/name from query string."""
-    q_lower = query.lower()
+    """Extract explicit market/symbol/name from query string without DB access."""
     # Explicit symbol
-    m = _SYMBOL_RE.search(q_lower)
+    m = _SYMBOL_RE.search(query)
     if m:
         sym = m.group(1)
-        if sym in _STOCK_NAMES:
-            mkt, symbol, name = _STOCK_NAMES[sym]
-            return {"market": mkt, "symbol": symbol, "name": name, "query": sym}
         return {"market": "CN", "symbol": sym, "name": sym, "query": sym}
-    # Named stock
-    for name, (mkt, symbol, full_name) in _STOCK_NAMES.items():
-        if name in q_lower or name in query:
-            return {"market": mkt, "symbol": symbol, "name": full_name, "query": name}
+    return None
+
+
+async def _extract_hint_async(query: str, context: SkillContext) -> dict | None:
+    """Extract a security hint using explicit codes first, then the shared resolver."""
+    hint = _extract_hint(query)
+    if hint is not None:
+        return hint
+    db = getattr(context, "db", None)
+    if db is None or not hasattr(db, "execute"):
+        return None
+    try:
+        entity = await security_entity_resolver.resolve_one(db, query, min_confidence=0.78)
+    except Exception:
+        return None
+    if entity is not None:
+        return entity.to_hint()
     return None
 
 
@@ -76,7 +74,7 @@ async def retrieve_context(query: str, context: SkillContext) -> RAGResult:
     docs: list[RAGDocument] = []
 
     try:
-        hint = _extract_hint(query)
+        hint = await _extract_hint_async(query, context)
         is_industry_query = bool(_INDUSTRY_WORDS.search(query))
         is_report_query = bool(re.search(r"历史报告|最近报告|上次报告|报告解释|解释报告", query))
         is_watchlist_query = bool(re.search(r"自选股|自选", query))

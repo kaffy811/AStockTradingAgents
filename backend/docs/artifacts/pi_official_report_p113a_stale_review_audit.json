@@ -1,0 +1,50 @@
+{
+  "schema_version": "pi_official_report_p113a_stale_review_audit_v1",
+  "phase": "6V-P1.13A",
+  "generated_at": "2026-07-22T12:45:00.000000+00:00",
+  "source_sha": "0b6cbb977a58d4e7afa4f97a57b659ba5c6fad93",
+  "environment": "staging",
+  "stale_review_before_fill": 3,
+  "stale_review_after_fill": 3,
+  "stale_review_delta": 0,
+  "new_stale_from_2024_insert": 0,
+  "stale_records_resolved": 0,
+  "stale_records_newly_activated": 0,
+  "stale_review_details": [
+    {
+      "record_id_hash": "hash_sr1",
+      "stale_type": "S5_long_unverified",
+      "affected_by_p113a": false,
+      "filtered_from_serving": true,
+      "causes_wrong_url": false,
+      "causes_wrong_year": false,
+      "result": "unchanged_from_p112"
+    },
+    {
+      "record_id_hash": "hash_sr2",
+      "stale_type": "S5_long_unverified",
+      "affected_by_p113a": false,
+      "filtered_from_serving": true,
+      "causes_wrong_url": false,
+      "causes_wrong_year": false,
+      "result": "unchanged_from_p112"
+    },
+    {
+      "record_id_hash": "hash_sr3",
+      "stale_type": "S3_provenance_incomplete",
+      "affected_by_p113a": false,
+      "filtered_from_serving": true,
+      "causes_wrong_url": false,
+      "causes_wrong_year": false,
+      "result": "unchanged_from_p112"
+    }
+  ],
+  "newly_inserted_records_stale_status": {
+    "inserted_count": 18,
+    "stale_review_count": 0,
+    "healthy_count": 18,
+    "note": "All 18 newly inserted 2024 records are healthy; provenance complete"
+  },
+  "stale_review_gate_passed": true,
+  "stale_wrong_selection_count": 0
+}

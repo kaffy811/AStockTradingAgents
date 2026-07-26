@@ -201,36 +201,6 @@ def _infer_exchange(symbol: str, market: str) -> str:
     return ""
 
 
-_CN_COMPANY_MAP: dict[str, tuple[str, str, str]] = {
-    # name → (symbol, market, company_full_name)
-    "茅台":     ("600519", "CN", "贵州茅台"),
-    "贵州茅台": ("600519", "CN", "贵州茅台"),
-    "中船特气": ("688146", "CN", "中船特气"),
-    "宁德时代": ("300750", "CN", "宁德时代"),
-    "紫金矿业": ("601899", "CN", "紫金矿业"),
-    "平安银行": ("000001", "CN", "平安银行"),
-    "腾讯":     ("00700", "HK", "腾讯控股"),
-    "腾讯控股": ("00700", "HK", "腾讯控股"),
-    "阿里巴巴": ("09988", "HK", "阿里巴巴集团"),
-    "美团":     ("03690", "HK", "美团"),
-    "比亚迪":   ("002594", "CN", "比亚迪股份"),
-    "招商银行": ("600036", "CN", "招商银行"),
-    "工商银行": ("601398", "CN", "工商银行"),
-}
-
-_US_COMPANY_MAP: dict[str, tuple[str, str]] = {
-    "苹果": ("AAPL", "苹果公司"),
-    "苹果公司": ("AAPL", "苹果公司"),
-    "微软": ("MSFT", "微软"),
-    "谷歌": ("GOOGL", "谷歌"),
-    "亚马逊": ("AMZN", "亚马逊"),
-    "特斯拉": ("TSLA", "特斯拉"),
-    "英伟达": ("NVDA", "英伟达"),
-    "Meta": ("META", "Meta"),
-    "脸书": ("META", "Meta"),
-}
-
-
 def parse_financial_analysis_intent(query: str) -> dict:
     """
     Enhanced intent parser for the financial report + kline analysis scenario.
@@ -247,32 +217,11 @@ def parse_financial_analysis_intent(query: str) -> dict:
     symbol  = base["symbol"]
     market  = base["market"]
     company_name = ""
-    exchange = ""
-
-    # Try CN company names
-    for name, (sym, mkt, full_name) in _CN_COMPANY_MAP.items():
-        if name in query:
-            symbol       = sym
-            market       = mkt
-            company_name = full_name
-            exchange     = _infer_exchange(sym, mkt)
-            break
-
-    # Try US company names
-    if not symbol:
-        for name, (sym, full_name) in sorted(
-            _US_COMPANY_MAP.items(), key=lambda x: -len(x[0])
-        ):
-            if name in query:
-                symbol       = sym
-                market       = "US"
-                company_name = full_name
-                exchange     = "NASDAQ"
-                break
+    exchange = _infer_exchange(symbol, market) if symbol and market else ""
 
     # CN 6-digit code
     if not symbol:
-        m = re.search(r"\b(\d{6})\b", query)
+        m = re.search(r"(?<!\d)(\d{6})(?!\d)", query)
         if m:
             symbol  = m.group(1)
             market  = "CN"
@@ -437,22 +386,6 @@ def verify_financial_report_candidate(
 
 # ── cninfo.com.cn search ──────────────────────────────────────────────────────
 
-_CNINFO_CATEGORY = {
-    "annual_report":      "category_ndbg_szsh",
-    "semi_annual_report": "category_bndbg_szsh",
-    "quarterly_report":   "category_sjdbg_szsh",
-}
-
-_CNINFO_COLUMN = {
-    "SSE":  "sse",
-    "SZSE": "szse",
-}
-
-_CNINFO_SEARCH_URL = "https://www.cninfo.com.cn/new/hisAnnouncement/query"
-_CNINFO_PDF_BASE   = "https://static.cninfo.com.cn/"
-_CNINFO_TIMEOUT    = 10.0
-
-
 async def _search_cninfo(
     symbol: str,
     company_name: str,
@@ -466,75 +399,66 @@ async def _search_cninfo(
     Returns a list of candidate dicts.
     Falls back to [] on any network/parse error.
     """
-    try:
-        import httpx  # noqa: PLC0415
-    except ImportError:
-        log.warning("httpx not installed — cninfo search unavailable")
-        return []
+    from app.datasource.cninfo_provider import (
+        categories_for_report_type,
+        extract_report_metadata,
+        normalize_report_type,
+        search_announcements_with_diagnostics,
+        validate_pdf_url,
+    )
 
-    category = _CNINFO_CATEGORY.get(report_type, "category_ndbg_szsh")
-    column   = _CNINFO_COLUMN.get(exchange, "sse")
+    canonical_type = normalize_report_type(report_type)
+    categories = categories_for_report_type(canonical_type)
+    if not categories:
+        log.warning("cninfo unsupported report_type=%s", report_type)
+        return []
 
     # Date filter: search the disclosure year range (report filed year after)
-    date_range = ""
+    start_date = ""
+    end_date = ""
     if report_year:
-        filed_year_start = report_year + 1 if report_type == "annual_report" else report_year
+        filed_year_start = report_year + 1 if canonical_type == "annual" else report_year
         filed_year_end   = filed_year_start + 1
-        date_range = f"{filed_year_start}-01-01%7C{filed_year_end}-12-31"
-
-    payload = {
-        "stock":       f"{symbol},{company_name}" if company_name else symbol,
-        "tabName":     "fulltext",
-        "pageSize":    "10",
-        "pageNum":     "1",
-        "column":      column,
-        "category":    category,
-        "plate":       "",
-        "seDate":      date_range,
-        "searchkey":   "",
-        "secid":       "",
-        "sortName":    "",
-        "sortType":    "",
-        "isHLtitle":   "true",
-    }
-
-    try:
-        async with httpx.AsyncClient(timeout=_CNINFO_TIMEOUT) as client:
-            resp = await client.post(
-                _CNINFO_SEARCH_URL,
-                data=payload,
-                headers={"User-Agent": "Mozilla/5.0 (Financial Research Bot)"},
-            )
-            resp.raise_for_status()
-            data = resp.json()
-    except Exception as exc:
-        log.warning("cninfo search failed: %s", exc)
+        start_date = f"{filed_year_start}-01-01"
+        end_date = f"{filed_year_end}-12-31"
+    announcements: list[dict] = []
+    diagnostics: list[dict] = []
+    for category in categories:
+        result = await search_announcements_with_diagnostics(
+            symbol,
+            start_date=start_date,
+            end_date=end_date,
+            category=category,
+            page_size=10,
+        )
+        diagnostics.append(result.get("diagnostics") or {})
+        announcements.extend(result.get("announcements") or [])
+    if not announcements:
+        log.info("cninfo search empty diagnostics=%s", diagnostics)
         return []
-
-    announcements = data.get("announcements") or []
     candidates: list[dict] = []
 
     for ann in announcements[:5]:  # top 5 results
-        adj_url  = ann.get("adjunctUrl", "")
-        full_url = _CNINFO_PDF_BASE + adj_url if adj_url else ""
-        title    = ann.get("announcementTitle", "")
-        pub_ts   = ann.get("announcementTime")
-        pub_date = ""
-        if isinstance(pub_ts, int):
-            from datetime import datetime, timezone  # noqa: PLC0415
-            pub_date = datetime.fromtimestamp(pub_ts / 1000, tz=timezone.utc).strftime("%Y-%m-%d")
+        meta = extract_report_metadata(ann, symbol, report_year or 0, canonical_type)
+        full_url = meta.get("pdf_url") or ""
+        valid_url, reason = validate_pdf_url(full_url)
+        if not valid_url:
+            log.debug("cninfo invalid pdf url skipped: %s", reason)
+            continue
+        title = meta.get("title") or ""
+        pub_date = meta.get("announcement_date") or ""
 
-        auth_info = classify_source_authority(full_url or _CNINFO_SEARCH_URL)
+        auth_info = classify_source_authority(full_url)
         candidates.append({
             "title":        title,
             "url":          full_url,
             "source_domain": "cninfo.com.cn",
             "source_name":  "巨潮资讯",
             "source_level": auth_info["source_level"],
-            "report_year":  report_year,
+            "report_year":  meta.get("report_year") or report_year,
             "report_type":  report_type,
             "published_at": pub_date,
-            "file_type":    ann.get("adjunctType", "PDF").lower(),
+            "file_type":    "pdf",
             "confidence":   auth_info["authority_score"],
             "reason":       f"巨潮资讯官方披露，标题：{title[:60]}",
         })

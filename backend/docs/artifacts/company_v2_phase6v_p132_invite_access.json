@@ -1,0 +1,35 @@
+{
+  "schema_version": "mvp_invite_v1",
+  "phase": "6V-P1.32",
+  "generated_at": "2026-07-26T02:00:00Z",
+
+  "implementation_status": "IMPLEMENTED",
+
+  "table": "mvp_invite",
+  "migration": "n2o3p4q5r6s7",
+
+  "endpoints": [
+    {"method": "POST", "path": "/mvp/invites/check", "auth": "public", "purpose": "Check code validity without consuming"},
+    {"method": "POST", "path": "/mvp/invites/redeem", "auth": "public", "purpose": "Redeem code, increment use_count"},
+    {"method": "POST", "path": "/mvp/invites", "auth": "admin", "purpose": "Create invite codes"}
+  ],
+
+  "capabilities": {
+    "invite_only_gate": true,
+    "per_invite_max_uses": true,
+    "invite_expiry": true,
+    "immediate_user_disable": "Manual via admin endpoint or DB update",
+    "daily_question_limit": "Via MvpAnalyticsEvent + application-layer quota check (P1.33)",
+    "new_registration_close": "Via admin: stop creating invite codes",
+    "ai_live_close": "Via PI_CANARY_LIVE_ENABLED=false (existing kill switch)",
+    "company_page_available_without_chat": "Yes — existing behavior"
+  },
+
+  "invite_code_security": {
+    "generation": "secrets.token_urlsafe(36)[:48] — cryptographically random",
+    "length": 48,
+    "uniqueness": "DB unique constraint on invite_code column",
+    "expiry_supported": true,
+    "multi_use_supported": true
+  }
+}

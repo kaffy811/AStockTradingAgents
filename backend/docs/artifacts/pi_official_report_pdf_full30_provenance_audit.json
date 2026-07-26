@@ -1,0 +1,14 @@
+{
+  "schema_version": "pi_official_report_pdf_full30_provenance_audit_v2",
+  "phase": "6V-P1.6.6",
+  "generated_at": "2026-07-19T13:36:47.675717+00:00",
+  "status_specific_provenance_completeness": 1.0,
+  "source_url_match_rate": 1.0,
+  "pdf_url_match_rate": 0.8667,
+  "fabricated_url_count": 0,
+  "third_party_url_count": 0,
+  "unsupported_url_count": 0,
+  "cases_missing_complete_provenance": [],
+  "url_origin": "tool_provenance_for_success_cases",
+  "official_domain_verified_required": true
+}

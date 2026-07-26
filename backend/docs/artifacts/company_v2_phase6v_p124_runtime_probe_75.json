@@ -1,0 +1,42 @@
+{
+  "schema_version": "pi_canary_runtime_probe_v1",
+  "phase": "6V-P1.24",
+  "probe_target": "75% containerized staging runtime",
+  "generated_at": "2026-07-24T00:00:00.000000+00:00",
+
+  "probe_attempted": false,
+  "probe_performed": false,
+  "probe_reason_skipped": "Docker not installed; no containerized backend process running. Probe would require: docker compose up → wait for healthcheck → docker compose exec -T backend cat /tmp/tradingagents-runtime/pi_canary_snapshot.json",
+
+  "would_verify": {
+    "environment": "staging",
+    "canary_mode": "shadow",
+    "rollout_percent": 75,
+    "config_version": 8,
+    "stable_bucket_salt": "pi_v1",
+    "authorization_status": "authorized",
+    "live": false,
+    "production_enabled": false,
+    "provider_serving_enabled": false,
+    "deployment_sha": "<P1.24_evidence_sha>",
+    "process_id": "<running_container_PID>",
+    "deployment_mode": "containerized_deployed_staging_runtime"
+  },
+
+  "real_probe_result": null,
+  "real_container_running": false,
+  "lifespan_executed": false,
+  "settings_singleton_verified": false,
+  "runtime_loader_verified": false,
+  "deployment_sha_verified": false,
+  "pid_verified": false,
+
+  "gate_c_contribution": "NONE — probe not performed",
+
+  "prerequisite_for_probe": {
+    "docker_installed": false,
+    "install_command": "brew install --cask docker-desktop",
+    "requires_user_action": true,
+    "requires_system_restart": "possibly"
+  }
+}

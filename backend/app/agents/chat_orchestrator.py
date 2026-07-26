@@ -17,6 +17,7 @@ All answers carry _DISCLAIMER.
 """
 from __future__ import annotations
 
+import asyncio
 import logging
 import re
 import uuid
@@ -25,6 +26,7 @@ from typing import Callable
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.agents.chat_confirmation import make_confirmation
 from app.agents.chat_tools.action_tools import (
     ActionResult,
@@ -57,6 +59,8 @@ from app.agents.chat_planner.rule_based_planner import RuleBasedPlanner
 from app.agents.chat_planner.executor import PlannerExecutor
 from app.agents.intent_decision_agent import classify_intent
 from app.agents.central_planning_agent import CentralPlanningAgent as _CentralPlanningAgent
+from app.services.security_entity_resolver import security_entity_resolver
+from app.services.official_report_entity_hints import unambiguous_official_report_entity_hint
 import app.agents.chat_memory as _mem
 
 _central_planner = _CentralPlanningAgent()
@@ -64,7 +68,17 @@ _central_planner = _CentralPlanningAgent()
 log = logging.getLogger(__name__)
 
 _DISCLAIMER = "\n\n_仅供研究参考，不构成投资建议。_"
-
+_EMPTY_FINAL_ANSWER_TEXT = "报告数据已获取，但本次回答生成失败，请重新尝试。"
+_CHAT_ENTITY_PIPELINE_VERSION = "d6_4"
+_OFFICIAL_REPORT_PDF_SHADOW_PATTERN = re.compile(
+    r"pdf|PDF|官方.{0,6}(链接|原文|PDF|pdf)|年报|年度报告|中报|半年报|季报|一季报|三季报|这份报告|那份报告|报告原文|报告.*在哪",
+    re.IGNORECASE,
+)
+_LATEST_REPORT_SETUP_PATTERN = re.compile(
+    r"(最新|最近|当前|这份|那份).{0,8}(财报|报告|定期报告).{0,12}(表现|情况|如何|怎么样|解读|分析)"
+    r"|(.{0,8}(财报|报告|定期报告).{0,8}(表现|情况|如何|怎么样))",
+    re.IGNORECASE,
+)
 # ── Build registry ─────────────────────────────────────────────────────────────
 
 def _build_registry() -> ToolRegistry:
@@ -185,6 +199,48 @@ def _match_trading_request(msg: str) -> bool:
     return bool(_TRADING_PATTERN.search(msg))
 
 
+def _match_official_report_pdf_shadow_candidate(msg: str) -> bool:
+    return bool(_OFFICIAL_REPORT_PDF_SHADOW_PATTERN.search(msg or ""))
+
+
+def _match_latest_report_setup_candidate(msg: str) -> bool:
+    return bool(_LATEST_REPORT_SETUP_PATTERN.search(msg or ""))
+
+
+def _unambiguous_report_entity_hint(message: str) -> dict:
+    return unambiguous_official_report_entity_hint(message)
+
+
+def _entity_payload_from_hint(hint: dict, *, source: str) -> dict:
+    return {
+        "entity_type": "equity",
+        "market": hint.get("market") or "CN",
+        "symbol": hint.get("symbol") or "",
+        "short_name": hint.get("name") or hint.get("symbol") or "",
+        "name": hint.get("name") or hint.get("symbol") or "",
+        "source": source,
+    }
+
+
+def _report_type_from_query(query: str) -> str:
+    text = query or ""
+    if re.search(r"一季报|第一季度|q1", text, re.IGNORECASE):
+        return "q1"
+    if re.search(r"三季报|第三季度|q3", text, re.IGNORECASE):
+        return "q3"
+    if re.search(r"中报|半年报|半年度", text, re.IGNORECASE):
+        return "semi"
+    return "annual"
+
+
+def _ts_code_for_hint(hint: dict) -> str:
+    symbol = str(hint.get("symbol") or "")
+    market = str(hint.get("market") or "CN").upper()
+    if market == "CN" and symbol:
+        return f"{symbol}.SH" if symbol.startswith(("6", "9")) else f"{symbol}.SZ"
+    return symbol
+
+
 def _match_report(msg: str) -> bool:
     return bool(re.search(r"生成.{0,10}报告|综合报告|分析报告|帮我分析", msg))
 
@@ -255,36 +311,463 @@ def _extract_stock_hint(msg: str) -> dict:
     Best-effort extraction of {market, symbol, name_query} from user message.
     C32.2.3: expanded A-share name mapping.
     """
-    # Explicit code / name patterns (order: more specific first)
-    if re.search(r"688146|中船特气", msg):
-        return {"market": "CN", "symbol": "688146", "name": "中船特气", "query": "688146"}
-    if re.search(r"600519|贵州茅台|茅台", msg):
-        return {"market": "CN", "symbol": "600519", "name": "贵州茅台", "query": "600519"}
-    if re.search(r"000858|五粮液", msg):
-        return {"market": "CN", "symbol": "000858", "name": "五粮液", "query": "000858"}
-    if re.search(r"300750|宁德时代", msg):
-        return {"market": "CN", "symbol": "300750", "name": "宁德时代", "query": "300750"}
-    if re.search(r"601899|紫金矿业", msg):
-        return {"market": "CN", "symbol": "601899", "name": "紫金矿业", "query": "601899"}
-    if re.search(r"301269|华大九天", msg):
-        return {"market": "CN", "symbol": "301269", "name": "华大九天", "query": "301269"}
-    if re.search(r"002594|比亚迪", msg):
-        return {"market": "CN", "symbol": "002594", "name": "比亚迪", "query": "002594"}
-    if re.search(r"601012|隆基绿能", msg):
-        return {"market": "CN", "symbol": "601012", "name": "隆基绿能", "query": "601012"}
-    if re.search(r"002475|立讯精密", msg):
-        return {"market": "CN", "symbol": "002475", "name": "立讯精密", "query": "002475"}
-    if re.search(r"688981|中芯国际|SMIC", msg, re.IGNORECASE):
-        return {"market": "CN", "symbol": "688981", "name": "中芯国际", "query": "688981"}
+    ts_code = re.search(r"(?<!\d)(\d{6})\.(SH|SZ|BJ)(?![A-Z0-9])", msg, re.IGNORECASE)
+    if ts_code:
+        symbol = ts_code.group(1)
+        return {"market": "CN", "symbol": symbol, "name": symbol, "query": ts_code.group(0)}
     # Generic CN code: 6-digit number
-    m = re.search(r"\b(\d{6})\b", msg)
+    m = re.search(r"(?<!\d)(\d{6})(?!\d)", msg)
     if m:
         return {"market": "CN", "symbol": m.group(1), "name": m.group(1), "query": m.group(1)}
     # HK code: 5-digit or 4-digit
-    m = re.search(r"\b0?(\d{4,5})\b", msg)
+    m = re.search(r"(?<!\d)0?(\d{4,5})(?!\d)", msg)
     if m:
         return {"market": "HK", "symbol": m.group(1).zfill(5), "name": m.group(1), "query": m.group(1)}
+    m = re.search(r"\b([A-Z]{1,5}(?:[.-][A-Z])?)\b", msg)
+    if m:
+        return {"market": "US", "symbol": m.group(1).upper(), "name": m.group(1).upper(), "query": m.group(1)}
     return {}
+
+
+def _memory_entity_hints(memory_context: object | None) -> list[dict]:
+    entities: list[dict] = []
+    for entity in getattr(memory_context, "active_entities", []) or []:
+        if getattr(entity, "type", "") != "stock" or not getattr(entity, "code", ""):
+            continue
+        entities.append({
+            "entity_type": "equity",
+            "market": getattr(entity, "market", "") or "CN",
+            "symbol": getattr(entity, "code", ""),
+            "short_name": getattr(entity, "name", "") or getattr(entity, "code", ""),
+            "name": getattr(entity, "name", "") or getattr(entity, "code", ""),
+            "source": "conversation_context",
+        })
+    return entities
+
+
+async def _resolve_current_query_entities(
+    db: AsyncSession,
+    *,
+    raw_query: str,
+    effective_query: str,
+    memory_context: object | None,
+) -> dict:
+    """Resolve explicit entities from the current user query before skill routing."""
+    context_entities = _memory_entity_hints(memory_context)
+    debug: dict = {
+        "chat_entity_pipeline_version": _CHAT_ENTITY_PIPELINE_VERSION,
+        "raw_query": raw_query,
+        "effective_query": effective_query,
+        "resolver_called": False,
+        "resolver_result_count": 0,
+        "resolved_entities": [],
+        "primary_entity": None,
+        "context_source": "none",
+        "failure_reason": "",
+    }
+    try:
+        debug["resolver_called"] = True
+        resolved = await security_entity_resolver.resolve(
+            db,
+            raw_query,
+            context_entities=context_entities,
+            min_confidence=0.72,
+        )
+        entities = [entity.to_dict() for entity in (resolved.get("entities") or [])]
+        context_source = "raw_query_explicit"
+        if not entities and effective_query and effective_query != raw_query:
+            resolved = await security_entity_resolver.resolve(
+                db,
+                effective_query,
+                context_entities=context_entities,
+                min_confidence=0.72,
+            )
+            entities = [entity.to_dict() for entity in (resolved.get("entities") or [])]
+            context_source = "effective_query"
+        primary = entities[0] if entities else None
+        debug.update({
+            "resolver_result_count": len(entities),
+            "resolved_entities": entities,
+            "primary_entity": primary,
+            "context_source": context_source if primary else "none",
+            "ambiguity": bool(resolved.get("ambiguity")),
+            "resolver_candidates": resolved.get("candidates", [])[:8],
+            "record_count_by_market": resolved.get("record_count_by_market", {}),
+            "index_version": resolved.get("index_version"),
+            "failure_reason": "" if primary else "ENTITY_NOT_RESOLVED",
+        })
+        return debug
+    except Exception as exc:
+        debug.update({
+            "failure_reason": f"RESOLVER_ERROR:{type(exc).__name__}",
+            "resolver_error": str(exc)[:160],
+        })
+        return debug
+
+
+async def _recent_unambiguous_report_entity_hint(
+    db: AsyncSession,
+    *,
+    session_id: uuid.UUID | None,
+    current_query: str,
+) -> dict:
+    if session_id is None:
+        return {}
+    try:
+        from app.core.database import AsyncSessionLocal  # noqa: PLC0415
+        from sqlalchemy import desc, select  # noqa: PLC0415
+        from app.models.chat import ChatMessage  # noqa: PLC0415
+
+        stmt = (
+            select(ChatMessage.content)
+            .where(ChatMessage.session_id == session_id, ChatMessage.role == "user")
+            .order_by(desc(ChatMessage.created_at))
+            .limit(6)
+        )
+        async with AsyncSessionLocal() as recent_db:
+            result = await asyncio.wait_for(recent_db.execute(stmt), timeout=10.0)
+            rows = result.scalars().all()
+            await asyncio.wait_for(recent_db.rollback(), timeout=3.0)
+        current = (current_query or "").strip()
+        for content in rows:
+            text = str(content or "").strip()
+            if text == current:
+                continue
+            hint = _unambiguous_report_entity_hint(text)
+            if hint:
+                return {**hint, "source": "recent_session_user_message"}
+    except Exception as exc:  # noqa: BLE001
+        log.warning(
+            "official_report_pdf recent entity hint unavailable session=%s error_class=%s",
+            session_id,
+            type(exc).__name__,
+        )
+    return {}
+
+
+def _entity_hint_from_payload_or_memory(entity_payload: dict, memory_context: object | None, raw_query: str) -> dict:
+    primary = entity_payload.get("primary_entity") if isinstance(entity_payload, dict) else None
+    if isinstance(primary, dict) and primary.get("symbol"):
+        return {
+            "market": primary.get("market") or "CN",
+            "symbol": primary.get("symbol"),
+            "name": primary.get("short_name") or primary.get("name") or primary.get("symbol"),
+            "source": "resolver_primary_entity",
+        }
+    for entity in getattr(memory_context, "active_entities", []) or []:
+        if getattr(entity, "type", "") == "stock" and getattr(entity, "code", ""):
+            return {
+                "market": getattr(entity, "market", "") or "CN",
+                "symbol": getattr(entity, "code", ""),
+                "name": getattr(entity, "name", "") or getattr(entity, "code", ""),
+                "source": "memory_context",
+            }
+    return _unambiguous_report_entity_hint(raw_query)
+
+
+async def _handle_official_report_pdf_direct(
+    msg: str,
+    db: AsyncSession,
+    user_id: uuid.UUID,
+    *,
+    entity_hint: dict,
+    session_id: uuid.UUID | None,
+) -> OrchestratorResult:
+    report_type = _report_type_from_query(msg)
+    if report_type != "annual":
+        return OrchestratorResult(
+            answer="当前官方报告 PDF 工具仅支持年度报告；未返回其他期间链接。" + _DISCLAIMER,
+            metadata={
+                "status": "unavailable",
+                "error_code": "REPORT_TYPE_UNSUPPORTED",
+                "skill_name": "official_report_pdf_direct",
+                "skill_data": {
+                    "status": "unavailable",
+                    "error_code": "REPORT_TYPE_UNSUPPORTED",
+                    "report_context": {
+                        "symbol": entity_hint.get("symbol"),
+                        "market": entity_hint.get("market") or "CN",
+                        "report_type": report_type,
+                    },
+                },
+            },
+        )
+    try:
+        from app.core.database import AsyncSessionLocal  # noqa: PLC0415
+        from app.services.official_report_domain_service import official_report_domain_service  # noqa: PLC0415
+
+        async with AsyncSessionLocal() as report_db:
+            reports = await asyncio.wait_for(
+                official_report_domain_service.list_official_annual_reports(
+                    report_db,
+                    ts_code=_ts_code_for_hint(entity_hint),
+                    limit=1,
+                ),
+                timeout=10.0,
+            )
+            await asyncio.wait_for(report_db.rollback(), timeout=3.0)
+    except Exception as exc:  # noqa: BLE001
+        log.warning(
+            "official_report_pdf direct lookup failed session=%s error_class=%s",
+            session_id,
+            type(exc).__name__,
+        )
+        return OrchestratorResult(
+            answer="暂未能读取官方报告索引，请稍后重试。" + _DISCLAIMER,
+            metadata={"status": "failed", "error_code": "OFFICIAL_REPORT_LOOKUP_FAILED"},
+        )
+    if not reports:
+        return OrchestratorResult(
+            answer="暂未找到该公司的官方年度报告 PDF。" + _DISCLAIMER,
+            metadata={"status": "unavailable", "error_code": "OFFICIAL_REPORT_NOT_FOUND"},
+        )
+    report = reports[0]
+    pdf_url = report.get("pdf_url") or ""
+    title = report.get("title") or "官方年度报告"
+    year = report.get("report_year")
+    answer = (
+        f"{entity_hint.get('name') or entity_hint.get('symbol')}的{year or ''}年度报告官方 PDF：{pdf_url}\n\n"
+        f"来源：{title}"
+        + _DISCLAIMER
+    )
+    report_context = {
+        "report_id": report.get("report_id"),
+        "symbol": entity_hint.get("symbol"),
+        "market": entity_hint.get("market") or "CN",
+        "stock_name": entity_hint.get("name") or entity_hint.get("symbol"),
+        "report_year": year,
+        "report_type": "annual",
+        "pdf_url": pdf_url,
+        "source_url": report.get("source_url"),
+    }
+    return OrchestratorResult(
+        answer=answer,
+        tool_events=[_tool_event("get_official_reports", "已读取官方年度报告索引", "success")],
+        metadata={
+            "status": "completed",
+            "skill_name": "official_report_pdf_direct",
+            "tools_used": ["get_official_reports"],
+            "skill_data": {
+                "status": "completed",
+                "report_context": report_context,
+            },
+        },
+    )
+
+
+async def _handle_latest_report_setup_direct(
+    msg: str,
+    db: AsyncSession,
+    user_id: uuid.UUID,
+    *,
+    entity_hint: dict,
+    session_id: uuid.UUID | None,
+) -> OrchestratorResult:
+    try:
+        from app.core.database import AsyncSessionLocal  # noqa: PLC0415
+        from app.agent.report_context import resolve_report_selection  # noqa: PLC0415
+
+        async with AsyncSessionLocal() as report_db:
+            selection = await asyncio.wait_for(
+                resolve_report_selection(
+                    db=report_db,
+                    market=entity_hint.get("market") or "CN",
+                    symbol=entity_hint["symbol"],
+                    stock_name=entity_hint.get("name") or None,
+                    question=msg,
+                    report_id=None,
+                ),
+                timeout=10.0,
+            )
+            await asyncio.wait_for(report_db.rollback(), timeout=3.0)
+    except Exception as exc:  # noqa: BLE001
+        log.warning(
+            "latest_report_setup direct lookup failed session=%s error_class=%s",
+            session_id,
+            type(exc).__name__,
+        )
+        return OrchestratorResult(
+            answer="暂未能读取最新正式报告索引，请稍后重试。" + _DISCLAIMER,
+            metadata={"status": "failed", "error_code": "LATEST_REPORT_SETUP_LOOKUP_FAILED"},
+        )
+
+    if not selection.ok:
+        return OrchestratorResult(
+            answer="暂未找到该公司的最新正式报告上下文。" + _DISCLAIMER,
+            metadata={"status": "unavailable", "error_code": selection.error or selection.selection_reason or "LATEST_REPORT_NOT_FOUND"},
+        )
+
+    report_context = selection.metadata()
+    report_label = report_context.get("title") or "最新正式财报"
+    year_label = f"{report_context.get('report_year')}年" if report_context.get("report_year") else ""
+    answer = (
+        f"已定位到{entity_hint.get('name') or entity_hint['symbol']}的{year_label}{report_label}。"
+        "这轮先基于已索引的正式报告建立上下文；如果需要原文，请继续问这份报告的官方 PDF。"
+        + _DISCLAIMER
+    )
+    return OrchestratorResult(
+        answer=answer,
+        tool_events=[_tool_event("resolve_report_selection", "已定位最新正式报告", "success")],
+        metadata={
+            "status": "partial_success",
+            "skill_name": "latest_report_setup_direct",
+            "tools_used": ["resolve_report_selection"],
+            "skill_data": {
+                "status": "partial_success",
+                "report_context": report_context,
+            },
+            "report_context": report_context,
+        },
+    )
+
+
+async def _record_pi_shadow_skipped(
+    *,
+    content: str,
+    session_id: uuid.UUID | None,
+    user_id: uuid.UUID,
+    entity_payload: dict,
+    shadow_result_callback: Callable | None = None,
+) -> None:
+    try:
+        from app.agent_runtime.contracts import new_id  # noqa: PLC0415
+        from app.agent_runtime.shadow_correlation import current_correlation  # noqa: PLC0415
+        from app.agent_runtime.shadow_diagnostics import pi_shadow_diagnostics_sink  # noqa: PLC0415
+
+        correlation = current_correlation()
+        skipped_result = {
+            "schema_version": "pi_financial_runtime_v1",
+            "trace_id": correlation.get("request_trace_id") or new_id("trace"),
+            "run_id": correlation.get("shadow_run_id") or new_id("run"),
+            "status": "skipped",
+            "reason": "intent_not_official_report_pdf",
+            "agent_id": "official_report_pdf_pi_v1",
+            "turn_count": 0,
+            "tool_call_count": 0,
+            "events": [],
+            "findings": [],
+            "evidence_ids": [],
+            "error": {"code": "PI_SHADOW_SKIPPED"},
+            "metrics": {"latency_ms": 0, "model_calls": 0, "tool_calls": 0, "input_tokens": 0, "output_tokens": 0},
+            "shadow_input": {
+                "conversation_id": str(session_id) if session_id else "",
+                "message_snapshot": [],
+                "financial_context_snapshot": {},
+                "resolved_entity_snapshot": entity_payload,
+            },
+        }
+        pi_shadow_diagnostics_sink.record(
+            raw_query=content,
+            conversation_id=str(session_id) if session_id else "",
+            user_id=str(user_id),
+            result=skipped_result,
+            correlation=correlation,
+        )
+        if shadow_result_callback is not None:
+            maybe_awaitable = shadow_result_callback(skipped_result)
+            if hasattr(maybe_awaitable, "__await__"):
+                await maybe_awaitable
+    except Exception as exc:  # noqa: BLE001
+        log.debug("pi-compatible skipped diagnostics failed: %s", exc)
+
+
+def _schedule_pi_official_report_shadow(
+    *,
+    content: str,
+    effective_content: str,
+    session_id: uuid.UUID | None,
+    user_id: uuid.UUID,
+    entity_payload: dict,
+    output_language: str,
+    shadow_result_callback: Callable | None = None,
+) -> None:
+    try:
+        from app.agent_runtime.contracts import new_id  # noqa: PLC0415
+        from app.agent_runtime.shadow_correlation import current_correlation  # noqa: PLC0415
+        from app.agent_runtime.shadow_runner import pi_compatible_shadow_runner  # noqa: PLC0415
+
+        if not pi_compatible_shadow_runner.enabled():
+            raise RuntimeError("pi-compatible shadow is not enabled or agent is not allowed")
+
+        correlation = current_correlation()
+        shadow_trace_id = correlation.get("request_trace_id") or new_id("trace")
+        shadow_run_id = correlation.get("shadow_run_id") or new_id("run")
+
+        async def _pi_shadow_run() -> None:
+            result: dict | None = None
+            try:
+                result = await pi_compatible_shadow_runner.run_official_report_pdf_shadow_with_new_session(
+                    raw_query=content,
+                    normalized_query=effective_content,
+                    user_id=str(user_id),
+                    conversation_id=str(session_id) if session_id else "",
+                    page_context={},
+                    memory_context=None,
+                    resolved_entity_snapshot=entity_payload,
+                    output_language=output_language,
+                    correlation=correlation,
+                )
+                log.debug("pi-compatible shadow result: %s", result.get("status"))
+            except asyncio.CancelledError:
+                result = {
+                    "trace_id": shadow_trace_id,
+                    "run_id": shadow_run_id,
+                    "status": "cancelled",
+                    "agent_id": "official_report_pdf_pi_v1",
+                    "metrics": {"latency_ms": 0, "model_calls": 0, "tool_calls": 0},
+                    "error": {"code": "PI_SHADOW_CANCELLED"},
+                    "events": [],
+                    "findings": [],
+                    "evidence_ids": [],
+                    "shadow_input": {"conversation_id": str(session_id) if session_id else ""},
+                }
+                raise
+            except Exception as exc:  # noqa: BLE001
+                result = {
+                    "trace_id": shadow_trace_id,
+                    "run_id": shadow_run_id,
+                    "status": "failed",
+                    "agent_id": "official_report_pdf_pi_v1",
+                    "metrics": {"latency_ms": 0, "model_calls": 0, "tool_calls": 0},
+                    "error": {"code": f"PI_SHADOW_{type(exc).__name__.upper()}"},
+                    "events": [],
+                    "findings": [],
+                    "evidence_ids": [],
+                    "shadow_input": {"conversation_id": str(session_id) if session_id else ""},
+                }
+                log.debug("pi-compatible shadow task failed: %s", exc)
+            finally:
+                if result is not None:
+                    try:
+                        from app.agent_runtime.shadow_diagnostics import pi_shadow_diagnostics_sink  # noqa: PLC0415
+
+                        pi_shadow_diagnostics_sink.record(
+                            raw_query=content,
+                            conversation_id=str(session_id) if session_id else "",
+                            user_id=str(user_id),
+                            result=result,
+                            correlation=correlation,
+                        )
+                    except Exception as exc:  # noqa: BLE001
+                        log.debug("pi-compatible shadow diagnostics failed: %s", exc)
+            if shadow_result_callback is not None:
+                maybe_awaitable = shadow_result_callback(result)
+                if hasattr(maybe_awaitable, "__await__"):
+                    await maybe_awaitable
+
+        task = asyncio.create_task(_pi_shadow_run())
+
+        def _consume_pi_shadow_error(done_task: asyncio.Task) -> None:
+            try:
+                done_task.exception()
+            except asyncio.CancelledError:
+                log.debug("pi-compatible shadow task cancelled")
+            except Exception as exc:  # noqa: BLE001
+                log.debug("pi-compatible shadow task failed: %s", exc)
+
+        task.add_done_callback(_consume_pi_shadow_error)
+    except Exception as exc:  # noqa: BLE001
+        log.debug("pi-compatible shadow scheduling failed: %s", exc)
 
 
 # ── Intent handlers (async, use real tools) ────────────────────────────────────
@@ -608,14 +1091,14 @@ def _extract_compare_candidates(msg: str, memory_context=None) -> list[str]:
     Returns up to 4 candidates (names or 5-6-digit codes).
 
     C32.2.2/C32.2.3: handles:
-    - "那它和五粮液相比呢？" after coreference → "那贵州茅台（CN/600519）和五粮液相比呢？"
+    - A follow-up comparison after coreference has injected the prior entity
     - "请对比五粮液和贵州茅台的股票" (with "的股票" suffix noise)
     - Numeric code extraction
 
     C32.3.1: When text has stock pronouns AND memory has active_entities, inject
     the entity as a candidate even if coreference resolution didn't fire.
     """
-    # Step 1: extract codes from coreference-injected parentheticals: "（CN/600519）"
+    # Step 1: extract codes from coreference-injected parentheticals.
     paren_codes = re.findall(r'[（(](?:CN|HK)[:/](\d{4,6})[）)]', msg)
     # Also extract bare 5-6-digit codes
     bare_codes = re.findall(r'\b(\d{5,6})\b', msg)
@@ -629,7 +1112,7 @@ def _extract_compare_candidates(msg: str, memory_context=None) -> list[str]:
         r"|的\s*股票|的\s*研究",
         " ", msg, flags=re.IGNORECASE,
     )
-    # Remove coreference parentheticals like "（CN/600519）" — name already kept before them
+    # Remove coreference parentheticals; the name is already kept before them.
     cleaned = re.sub(r'[（(](?:CN|HK)[:/]\d{4,6}[）)]', ' ', cleaned)
 
     # Step 3: split on all separators including "和"/"与" (treated as delimiters)
@@ -699,7 +1182,7 @@ async def _handle_compare(msg: str, db: AsyncSession, user_id: uuid.UUID, **kw) 
             answer=(
                 f"我尝试识别了以下关键词：{'、'.join(candidates[:4])}，"
                 "但未能找到足够的股票信息。"
-                "请提供完整名称或6位股票代码，例如：「对比 600519 和 300750」。"
+                "请提供完整名称或标准股票代码后再比较。"
                 + _DISCLAIMER
             ),
             tool_events=events,
@@ -887,6 +1370,7 @@ async def process_message(
     output_language: str = "zh-CN",
     session_id: uuid.UUID | None = None,
     event_callback: Callable | None = None,
+    shadow_result_callback: Callable | None = None,
 ) -> OrchestratorResult:
     """
     Route user message to appropriate intent handler with real tool calls.
@@ -931,11 +1415,340 @@ async def process_message(
         "importance": "high",
     })
 
+    # Fast deterministic official-report setup/PDF paths must not wait on
+    # memory/entity resolver DB work; A01 follow-up can recover entity from
+    # persisted recent user messages using an independent short transaction.
+    _early_entity_hint = _unambiguous_report_entity_hint(content)
+    if not _early_entity_hint and _match_official_report_pdf_shadow_candidate(content):
+        _early_entity_hint = await _recent_unambiguous_report_entity_hint(
+            db,
+            session_id=session_id,
+            current_query=content,
+        )
+    if db is not None and _early_entity_hint and _match_latest_report_setup_candidate(content):
+        _early_entity_payload = {
+            "chat_entity_pipeline_version": _CHAT_ENTITY_PIPELINE_VERSION,
+            "raw_query": content,
+            "effective_query": content,
+            "resolver_called": False,
+            "resolver_result_count": 1,
+            "resolved_entities": [_entity_payload_from_hint(_early_entity_hint, source=_early_entity_hint.get("source") or "early_unambiguous_hint")],
+            "primary_entity": _entity_payload_from_hint(_early_entity_hint, source=_early_entity_hint.get("source") or "early_unambiguous_hint"),
+            "context_source": _early_entity_hint.get("source") or "early_unambiguous_hint",
+            "failure_reason": "",
+        }
+        if (getattr(settings, "agent_executor_mode", "legacy") or "legacy").strip().lower() == "pi_compatible_shadow":
+            await _record_pi_shadow_skipped(
+                content=content,
+                session_id=session_id,
+                user_id=user_id,
+                entity_payload=_early_entity_payload,
+                shadow_result_callback=shadow_result_callback,
+            )
+        await _emit("intent_detected", {"intent": "latest_report_setup_direct", "handler": "_handle_latest_report_setup_direct"})
+        return await _handle_latest_report_setup_direct(
+            content,
+            db,
+            user_id,
+            entity_hint=_early_entity_hint,
+            session_id=session_id,
+        )
+    if db is not None and _early_entity_hint and _match_official_report_pdf_shadow_candidate(content):
+        _early_entity = _entity_payload_from_hint(_early_entity_hint, source=_early_entity_hint.get("source") or "early_recent_session_hint")
+        _early_entity_payload = {
+            "chat_entity_pipeline_version": _CHAT_ENTITY_PIPELINE_VERSION,
+            "raw_query": content,
+            "effective_query": content,
+            "resolver_called": False,
+            "resolver_result_count": 1,
+            "resolved_entities": [_early_entity],
+            "primary_entity": _early_entity,
+            "context_source": _early_entity["source"],
+            "failure_reason": "",
+        }
+        if (getattr(settings, "agent_executor_mode", "legacy") or "legacy").strip().lower() == "pi_compatible_shadow":
+            _schedule_pi_official_report_shadow(
+                content=content,
+                effective_content=content,
+                session_id=session_id,
+                user_id=user_id,
+                entity_payload=_early_entity_payload,
+                output_language=output_language,
+                shadow_result_callback=shadow_result_callback,
+            )
+        await _emit("intent_detected", {"intent": "official_report_pdf_direct", "handler": "_handle_official_report_pdf_direct"})
+        return await _handle_official_report_pdf_direct(
+            content,
+            db,
+            user_id,
+            entity_hint=_early_entity_hint,
+            session_id=session_id,
+        )
+
     # C32.1: Build memory context (fire-and-forget on failure; returns empty ctx on error)
-    from app.services.conversation_memory_service import build_memory_context  # noqa: PLC0415
-    _memory_ctx = await build_memory_context(db, session_id, user_id, content)
+    from app.services.conversation_memory_service import MemoryContext, build_memory_context  # noqa: PLC0415
+    try:
+        _memory_ctx = await asyncio.wait_for(
+            build_memory_context(db, session_id, user_id, content),
+            timeout=4.0,
+        )
+    except Exception as exc:  # noqa: BLE001
+        log.warning(
+            "process_message: memory context unavailable session=%s error_class=%s",
+            session_id,
+            type(exc).__name__,
+        )
+        try:
+            await asyncio.wait_for(db.rollback(), timeout=3.0)
+        except Exception as rollback_exc:  # noqa: BLE001
+            log.warning(
+                "process_message: memory context rollback unavailable session=%s error_class=%s",
+                session_id,
+                type(rollback_exc).__name__,
+            )
+            pass
+        _memory_ctx = MemoryContext(resolved_query=content)
     # Use the coreference-resolved query for routing when available
     _effective_content = _memory_ctx.resolved_query or content
+    try:
+        _entity_payload = await asyncio.wait_for(
+            _resolve_current_query_entities(
+                db,
+                raw_query=content,
+                effective_query=_effective_content,
+                memory_context=_memory_ctx,
+            ),
+            timeout=6.0,
+        )
+    except Exception as exc:  # noqa: BLE001
+        log.warning(
+            "process_message: entity resolver unavailable session=%s error_class=%s",
+            session_id,
+            type(exc).__name__,
+        )
+        try:
+            await asyncio.wait_for(db.rollback(), timeout=3.0)
+        except Exception as rollback_exc:  # noqa: BLE001
+            log.warning(
+                "process_message: entity resolver rollback unavailable session=%s error_class=%s",
+                session_id,
+                type(rollback_exc).__name__,
+            )
+            pass
+        _entity_payload = {
+            "chat_entity_pipeline_version": _CHAT_ENTITY_PIPELINE_VERSION,
+            "raw_query": content,
+            "effective_query": _effective_content,
+            "resolver_called": True,
+            "resolver_result_count": 0,
+            "resolved_entities": [],
+            "primary_entity": None,
+            "context_source": "none",
+            "failure_reason": f"RESOLVER_TIMEOUT_OR_ERROR:{type(exc).__name__}",
+        }
+    _is_official_report_shadow_query = (
+        _match_official_report_pdf_shadow_candidate(_effective_content)
+        or _match_official_report_pdf_shadow_candidate(content)
+    )
+    _official_report_entity_hint = _entity_hint_from_payload_or_memory(_entity_payload, _memory_ctx, content)
+    if _is_official_report_shadow_query and not _official_report_entity_hint:
+        _official_report_entity_hint = await _recent_unambiguous_report_entity_hint(
+            db,
+            session_id=session_id,
+            current_query=content,
+        )
+        if _official_report_entity_hint:
+            entity = _entity_payload_from_hint(
+                _official_report_entity_hint,
+                source=_official_report_entity_hint.get("source") or "recent_session_user_message",
+            )
+            _entity_payload.update({
+                "resolver_result_count": 1,
+                "resolved_entities": [entity],
+                "primary_entity": entity,
+                "context_source": entity["source"],
+                "failure_reason": "",
+            })
+
+    if (getattr(settings, "agent_executor_mode", "legacy") or "legacy").strip().lower() == "pi_compatible_shadow":
+        try:
+            from app.agent_runtime.shadow_runner import pi_compatible_shadow_runner  # noqa: PLC0415
+            from app.agent_runtime.contracts import new_id  # noqa: PLC0415
+            from app.agent_runtime.shadow_correlation import current_correlation  # noqa: PLC0415
+
+            if not pi_compatible_shadow_runner.enabled():
+                raise RuntimeError("pi-compatible shadow is not enabled or agent is not allowed")
+
+            _shadow_correlation = current_correlation()
+            _shadow_trace_id = _shadow_correlation.get("request_trace_id") or new_id("trace")
+            _shadow_run_id = _shadow_correlation.get("shadow_run_id") or new_id("run")
+            if not _is_official_report_shadow_query:
+                skipped_result = {
+                    "schema_version": "pi_financial_runtime_v1",
+                    "trace_id": _shadow_trace_id,
+                    "run_id": _shadow_run_id,
+                    "status": "skipped",
+                    "reason": "intent_not_official_report_pdf",
+                    "agent_id": "official_report_pdf_pi_v1",
+                    "turn_count": 0,
+                    "tool_call_count": 0,
+                    "events": [],
+                    "findings": [],
+                    "evidence_ids": [],
+                    "error": {"code": "PI_SHADOW_SKIPPED"},
+                    "metrics": {"latency_ms": 0, "model_calls": 0, "tool_calls": 0, "input_tokens": 0, "output_tokens": 0},
+                    "shadow_input": {
+                        "conversation_id": str(session_id) if session_id else "",
+                        "message_snapshot": [],
+                        "financial_context_snapshot": {},
+                        "resolved_entity_snapshot": _entity_payload,
+                    },
+                }
+                try:
+                    from app.agent_runtime.shadow_diagnostics import pi_shadow_diagnostics_sink  # noqa: PLC0415
+
+                    pi_shadow_diagnostics_sink.record(
+                        raw_query=content,
+                        conversation_id=str(session_id) if session_id else "",
+                        user_id=str(user_id),
+                        result=skipped_result,
+                        correlation=_shadow_correlation,
+                    )
+                except Exception as exc:  # noqa: BLE001
+                    log.debug("pi-compatible skipped diagnostics failed: %s", exc)
+                if shadow_result_callback is not None:
+                    maybe_awaitable = shadow_result_callback(skipped_result)
+                    if hasattr(maybe_awaitable, "__await__"):
+                        await maybe_awaitable
+            else:
+
+                async def _pi_shadow_run() -> None:
+                    result: dict | None = None
+                    try:
+                        result = await pi_compatible_shadow_runner.run_official_report_pdf_shadow_with_new_session(
+                            raw_query=content,
+                            normalized_query=_effective_content,
+                            user_id=str(user_id),
+                            conversation_id=str(session_id) if session_id else "",
+                            page_context={},
+                            memory_context=_memory_ctx,
+                            resolved_entity_snapshot=_entity_payload,
+                            output_language=output_language,
+                            correlation=_shadow_correlation,
+                        )
+                        log.debug("pi-compatible shadow result: %s", result.get("status"))
+                    except asyncio.CancelledError:
+                        result = {
+                            "trace_id": _shadow_trace_id,
+                            "run_id": _shadow_run_id,
+                            "status": "cancelled",
+                            "agent_id": "official_report_pdf_pi_v1",
+                            "metrics": {"latency_ms": 0, "model_calls": 0, "tool_calls": 0},
+                            "error": {"code": "PI_SHADOW_CANCELLED"},
+                            "events": [],
+                            "findings": [],
+                            "evidence_ids": [],
+                            "shadow_input": {"conversation_id": str(session_id) if session_id else ""},
+                        }
+                        raise
+                    except Exception as exc:  # noqa: BLE001
+                        result = {
+                            "trace_id": _shadow_trace_id,
+                            "run_id": _shadow_run_id,
+                            "status": "failed",
+                            "agent_id": "official_report_pdf_pi_v1",
+                            "metrics": {"latency_ms": 0, "model_calls": 0, "tool_calls": 0},
+                            "error": {"code": f"PI_SHADOW_{type(exc).__name__.upper()}"},
+                            "events": [],
+                            "findings": [],
+                            "evidence_ids": [],
+                            "shadow_input": {"conversation_id": str(session_id) if session_id else ""},
+                        }
+                        log.debug("pi-compatible shadow task failed: %s", exc)
+                    finally:
+                        from app.agent_runtime.shadow_diagnostics import pi_shadow_diagnostics_sink  # noqa: PLC0415
+
+                        if result is not None:
+                            try:
+                                pi_shadow_diagnostics_sink.record(
+                                    raw_query=content,
+                                    conversation_id=str(session_id) if session_id else "",
+                                    user_id=str(user_id),
+                                    result=result,
+                                    correlation=_shadow_correlation,
+                                )
+                            except Exception as exc:  # noqa: BLE001
+                                log.debug("pi-compatible shadow diagnostics failed: %s", exc)
+                    if shadow_result_callback is not None:
+                        maybe_awaitable = shadow_result_callback(result)
+                        if hasattr(maybe_awaitable, "__await__"):
+                            await maybe_awaitable
+
+                task = asyncio.create_task(_pi_shadow_run())
+
+                def _consume_pi_shadow_error(done_task: asyncio.Task) -> None:
+                    try:
+                        done_task.exception()
+                    except asyncio.CancelledError:
+                        log.debug("pi-compatible shadow task cancelled")
+                    except Exception as exc:  # noqa: BLE001
+                        log.debug("pi-compatible shadow task failed: %s", exc)
+
+                task.add_done_callback(_consume_pi_shadow_error)
+        except Exception as exc:  # noqa: BLE001
+            log.debug("pi-compatible shadow scheduling failed: %s", exc)
+
+    if db is not None and _match_latest_report_setup_candidate(_effective_content) and _official_report_entity_hint:
+        await _emit("intent_detected", {"intent": "latest_report_setup_direct", "handler": "_handle_latest_report_setup_direct"})
+        return await _handle_latest_report_setup_direct(
+            _effective_content,
+            db,
+            user_id,
+            entity_hint=_official_report_entity_hint,
+            session_id=session_id,
+        )
+
+    runtime_mode = (settings.chat_runtime_mode or "legacy").strip().lower()
+    if runtime_mode in {"layered_v1", "shadow"}:
+        try:
+            from app.agents.financial_runtime.runtime import financial_agent_runtime  # noqa: PLC0415
+
+            if runtime_mode == "shadow":
+                async def _shadow_run() -> None:
+                    result = await financial_agent_runtime.shadow_with_new_session(
+                        raw_query=content,
+                        user_id=str(user_id),
+                        conversation_id=str(session_id) if session_id else "",
+                        page_context={},
+                        memory_context=_memory_ctx,
+                    )
+                    log.debug("layered runtime shadow result: %s", result.get("status"))
+
+                asyncio.create_task(_shadow_run())
+            else:
+                layered = await financial_agent_runtime.run(
+                    raw_query=content,
+                    db=db,
+                    user_id=str(user_id),
+                    conversation_id=str(session_id) if session_id else "",
+                    page_context={},
+                    memory_context=_memory_ctx,
+                    event_callback=event_callback,
+                )
+                if layered.status in {"success", "partial_success", "clarification_required", "failed"}:
+                    return OrchestratorResult(
+                        answer=layered.answer,
+                        tool_events=layered.tool_events,
+                        cards=layered.cards,
+                        metadata={
+                            **(layered.metadata or {}),
+                            "status": layered.status,
+                            "error_code": layered.error_code,
+                            "runtime": "layered_v1",
+                        },
+                    )
+        except Exception as exc:  # noqa: BLE001
+            log.warning("layered runtime failed; falling back to legacy: %s", exc)
 
     # 1.5. C30.2.3: IntentDecisionAgent — classify intent, emit telemetry, drive routing.
     _intent_decision = classify_intent(_effective_content, memory_context=_memory_ctx)
@@ -1048,6 +1861,18 @@ async def process_message(
         )
         # Fall through to existing Planner / SkillRegistry path
 
+    if _is_official_report_shadow_query and _official_report_entity_hint:
+        await _emit("intent_detected", {"intent": "official_report_pdf_direct", "handler": "_handle_official_report_pdf_direct"})
+        result = await _handle_official_report_pdf_direct(
+            _effective_content,
+            db,
+            user_id,
+            entity_hint=_official_report_entity_hint,
+            session_id=session_id,
+        )
+        await _write_memory_from_result(db, session_id, user_id, msg, result, output_language)
+        return result
+
     # 3. Controlled Planner — compound multi-step research tasks (C7)
     if _planner.is_compound(msg):
         plan = _planner.plan(msg)
@@ -1059,6 +1884,13 @@ async def process_message(
                 session_id=str(session_id) if session_id else "",
                 output_language=output_language,
                 tool_registry=_registry,
+                metadata={
+                    "raw_query": content,
+                    "effective_query": _effective_content,
+                    "context_update_mode": "transactional",
+                    "intent": _intent_decision.intent,
+                    **_entity_payload,
+                },
                 event_callback=event_callback,
                 memory_context=_memory_ctx,  # C32.1.1
             )
@@ -1090,6 +1922,13 @@ async def process_message(
         session_id=str(session_id) if session_id else "",
         output_language=output_language,
         tool_registry=_registry,
+        metadata={
+            "raw_query": content,
+            "effective_query": _effective_content,
+            "context_update_mode": "transactional",
+            "intent": _intent_decision.intent,
+            **_entity_payload,
+        },
         event_callback=event_callback,
         memory_context=_memory_ctx,  # C32.1.1
     )
@@ -1097,6 +1936,7 @@ async def process_message(
     # C32.1.2: use resolved query so skills receive de-pronominalized content
     skill_result = await _skill_registry.run(_effective_content, context)
     if skill_result is not None:
+        skill_data = getattr(skill_result, "data", None) or {}
         await _emit("skill_completed", {"skill_name": skill_result.skill_name})
 
         # C31.3 — Emit agent_observation, deep_reasoning, risk_review, synthesis
@@ -1109,7 +1949,7 @@ async def process_message(
         await _emit("thinking_event", _central_plan.get_phase_event("synthesis"))
 
         result = OrchestratorResult(
-            answer=skill_result.answer,
+            answer=(skill_result.answer or "").strip() or _EMPTY_FINAL_ANSWER_TEXT,
             tool_events=skill_result.tool_events,
             cards=skill_result.cards,
             metadata={
@@ -1117,10 +1957,27 @@ async def process_message(
                 "source":            "skill_registry",
                 "tools_used":        [e["name"] for e in skill_result.tool_events],
                 "safety_flags":      skill_result.safety_flags,
+                "skill_data":        skill_data,
                 # C9: spec metadata injected by SkillRegistry
                 **skill_result.metadata,
             },
         )
+        if not (skill_result.answer or "").strip():
+            result.metadata["status"] = "failed"
+            result.metadata["error_code"] = "EMPTY_FINAL_ANSWER"
+        elif skill_data.get("status"):
+            result.metadata["status"] = skill_data.get("status")
+            if skill_data.get("error_code"):
+                result.metadata["error_code"] = skill_data.get("error_code")
+        # P1.6.8: hoist structured clarification so sync/SSE payloads and
+        # message persistence carry it without digging into skill_data.
+        if isinstance(skill_data.get("clarification"), dict):
+            from app.services.entity_clarification import compact_clarification_for_metadata  # noqa: PLC0415
+
+            compact_clar = compact_clarification_for_metadata(skill_data.get("clarification"))
+            if compact_clar is not None:
+                result.metadata["response_kind"] = "clarification"
+                result.metadata["clarification"] = compact_clar
         # C8: write memory (fire-and-forget)
         await _write_memory_from_result(db, session_id, user_id, msg, result, output_language)
         return result
@@ -1163,15 +2020,40 @@ async def _write_memory_from_result(
         return
     try:
         meta = result.metadata or {}
+        skill_data = meta.get("skill_data") or {}
+        skill_status = str(skill_data.get("status") or meta.get("status") or "").lower()
+        context_commit_allowed = skill_status in {"completed", "partial_success"} or not skill_status
+        pending_confirmation = result.confirmation.get("id") if result.confirmation else _mem._UNSET
+        memory_symbols: list[dict] = []
+        last_report_id: str | None = None
 
         # 1. Recent symbols — extracted from user message
-        hint = _extract_stock_hint(msg)
+        hint = _extract_stock_hint(msg) if context_commit_allowed else None
         if hint and hint.get("symbol"):
-            await _mem.update_symbols(db, session_id, user_id, hint)
-
-        # 2. Output language
-        if output_language:
-            await _mem.update_output_language(db, session_id, user_id, output_language)
+            memory_symbols.append(hint)
+        report_context = skill_data.get("report_context") if isinstance(skill_data, dict) else None
+        if context_commit_allowed and isinstance(report_context, dict):
+            report_symbol = str(report_context.get("symbol") or "").strip()
+            report_market = str(report_context.get("market") or "CN").strip() or "CN"
+            if report_symbol:
+                memory_symbols.append({
+                    "market": report_market,
+                    "symbol": report_symbol,
+                    "name": report_context.get("stock_name") or report_symbol,
+                })
+            if report_context.get("report_id"):
+                last_report_id = str(report_context.get("report_id"))
+        comparison_input = skill_data.get("comparison_input") if isinstance(skill_data, dict) else None
+        if context_commit_allowed and isinstance(comparison_input, dict):
+            for entity in comparison_input.get("entities") or []:
+                symbol = str(entity.get("symbol") or "").strip()
+                if not symbol:
+                    continue
+                memory_symbols.append({
+                    "market": str(entity.get("market") or "CN").strip() or "CN",
+                    "symbol": symbol,
+                    "name": entity.get("name") or entity.get("short_name") or symbol,
+                })
 
         # 3. Intent — from metadata
         intent = (
@@ -1179,10 +2061,9 @@ async def _write_memory_from_result(
             or meta.get("skill_name")
             or ("action" if result.confirmation else None)
         )
-        if intent:
-            await _mem.update_intents(db, session_id, user_id, intent)
 
         # 4. Task state — Planner metadata
+        task_state = None
         if meta.get("planner_used"):
             task_state = {
                 "planner_used":      True,
@@ -1194,20 +2075,25 @@ async def _write_memory_from_result(
                     s for s in meta.get("steps", []) if s.get("status") == "failed"
                 ],
             }
-            await _mem.update_task_state(db, session_id, user_id, task_state)
         elif meta.get("skill_name"):
             task_state = {
                 "planner_used": False,
                 "skill_name":   meta.get("skill_name"),
                 "tools_used":   meta.get("tools_used", []),
             }
-            await _mem.update_task_state(db, session_id, user_id, task_state)
 
-        # 5. Pending confirmation
-        if result.confirmation:
-            await _mem.update_pending_confirmation(
-                db, session_id, user_id,
-                result.confirmation.get("id"),
+        # 5. Single per-turn context commit.
+        if context_commit_allowed or result.confirmation:
+            await _mem.apply_memory_updates(
+                db,
+                session_id,
+                user_id,
+                symbols=memory_symbols,
+                intent=intent if context_commit_allowed else None,
+                output_language=output_language if context_commit_allowed else None,
+                last_report_id=last_report_id,
+                task_state=task_state if context_commit_allowed else None,
+                pending_confirmation_id=pending_confirmation,
             )
 
         # C32.1: update extended memory (active_entities, trigger summarization)

@@ -1,0 +1,31 @@
+{
+  "schema_version": "pi_promotion_v1",
+  "phase": "6V-P1.21",
+  "generated_at": "2026-07-23T08:05:00.000000+00:00",
+  "promotion_type": "shadow_rollout_increase",
+  "promotion_mechanism": "staging_test_fixture_override",
+  "rollout_before": 50,
+  "rollout_after": 75,
+  "config_version_before": 7,
+  "config_version_after": 8,
+  "promotion_authorized": true,
+  "promotion_attempted": true,
+  "promotion_applied": true,
+  "bucket_migration_note": "stable_bucket_salt='pi_v1' unchanged; 50% cohort ⊆ 75% cohort verified (5006 ⊆ 7539 of 10000 test identities); config_version removed from hash (now audit-only)",
+  "repository_defaults_unchanged": true,
+  "repository_defaults": {
+    "pi_canary_rollout_percent_default": 0.0,
+    "pi_canary_stable_bucket_salt_default": "pi_v1",
+    "production_enabled_default": false
+  },
+  "staging_fixture_changes": {
+    "pi_canary_rollout_percent": 75,
+    "pi_canary_config_version": 8
+  },
+  "effective_immediately": true,
+  "live_serving": false,
+  "production_enabled": false,
+  "provider_serving_calls_at_promotion": 0,
+  "promotion_verified": true,
+  "promotion_status": "APPLIED"
+}

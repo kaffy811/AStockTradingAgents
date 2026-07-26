@@ -1,0 +1,12 @@
+{
+  "phase": "phase6tq_runner_environment",
+  "status": "passed",
+  "cloud_provider": "Alibaba Cloud",
+  "region": "ap-northeast-2",
+  "os": "Ubuntu 24.04.2 LTS",
+  "architecture": "x86_64",
+  "python": "3.12",
+  "database_region": "ap-northeast-2",
+  "http_target": "localhost",
+  "public_api_exposure": false
+}

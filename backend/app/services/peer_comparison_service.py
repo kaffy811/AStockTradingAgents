@@ -2,15 +2,13 @@
 PeerComparisonService — 同行基本面对比数据服务（Phase 1）。
 
 设计原则：
-  - Phase 1 使用手动 PEER_MAP，不做自动行业识别。
+  - 默认不维护特定股票同行白名单。
   - 不调用 LLM，不写 PeerComparisonAgent。
   - 直接复用 FundamentalDataService.get_fundamentals()，不走 HTTP。
   - 单只 peer 失败不阻塞整体响应；失败项记录在 data_quality.missing_peers。
   - comparison_fields 带动态可用性标记，防止 Agent 误用空字段做对比。
 
-Phase 2 升级路线（预留，不实现）：
-  - Phase 3 接入 company.industry 后，可在 _resolve_peers() 中加自动行业识别。
-  - PEER_MAP 作为 override，优先级高于自动识别。
+Peer 发现由 DynamicPeerDiscoveryService 基于行业分类和行业热门数据完成。
 """
 
 from __future__ import annotations
@@ -37,34 +35,6 @@ _CANDIDATE_FIELDS: list[str] = [
     "financial_health.debt_ratio",
     "financial_health.operating_cashflow",
 ]
-
-# ── 手动同行映射表（Phase 1）────────────────────────────────────────────────────
-#
-# 格式: (market, symbol) → [(market, symbol), ...]
-# 升级路线: Phase 3 行业字段就绪后，可改为自动识别 + PEER_MAP 作为 override。
-
-PEER_MAP: dict[tuple[str, str], list[tuple[str, str]]] = {
-    # 贵州茅台 — 白酒板块龙头对比
-    ("CN", "600519"): [
-        ("CN", "000858"),  # 五粮液
-        ("CN", "000568"),  # 泸州老窖
-        ("CN", "600809"),  # 山西汾酒
-        ("CN", "002304"),  # 洋河股份
-    ],
-
-    # 腾讯控股 Phase 1 peers（HK symbol 统一 5 位补零格式）:
-    # 互联网平台/科技龙头粗略对比口径。
-    # 阿里、美团、网易、百度与腾讯业务形态并不完全一致，
-    # 因此后续 PeerComparisonAgent 必须提示「同行口径较粗，仅供参考」，
-    # 不应做过强的横向估值或经营结论。
-    ("HK", "00700"): [
-        ("HK", "09988"),  # 阿里巴巴-W
-        ("HK", "03690"),  # 美团-W
-        ("HK", "09999"),  # 网易-S
-        ("HK", "09888"),  # 百度集团-SW
-    ],
-}
-
 
 def _normalize_symbol(market: str, symbol: str) -> str:
     """归一化股票代码。HK 统一为 5 位补零格式（700 → 00700）。"""
@@ -209,7 +179,7 @@ def _build_message(
 
 class PeerComparisonService:
     """
-    同行基本面对比服务（Phase 1：手动 PEER_MAP）。
+    同行基本面对比服务。
 
     使用方式（router 层）：
         specs   = peer_comparison_service.get_peer_specs(market, symbol)
@@ -229,12 +199,9 @@ class PeerComparisonService:
     def get_peer_specs(self, market: str, symbol: str) -> list[tuple[str, str]]:
         """
         返回该股票的同行 (market, symbol) 列表。
-        未在 PEER_MAP 中配置时返回空列表（不报错）。
-        HK symbol 查询前归一化为 5 位补零格式（700 / 00700 均可命中）。
+        同步旧接口没有 DB/行业上下文，因此返回空列表；异步动态接口使用行业数据发现同行。
         """
-        mkt = market.upper()
-        sym = _normalize_symbol(mkt, symbol)
-        return list(PEER_MAP.get((mkt, sym), []))
+        return []
 
     def get_peer_fundamentals(self, market: str, symbol: str) -> dict:
         """
@@ -340,7 +307,7 @@ class PeerComparisonService:
             "peers":   peer_entries,
             "comparison_fields": cf,
             "data_quality": {
-                "peer_source":          "manual_map",
+                "peer_source":          "dynamic_or_none",
                 "latest_report_dates":  latest_report_dates,
                 "missing_peers":        missing_peers,
                 "missing_fields":       missing_fields_map,
@@ -359,11 +326,10 @@ class PeerComparisonService:
         Async 版同行对比全流程，使用 DynamicPeerDiscoveryService。
 
         优先级（由 DynamicPeerDiscoveryService 内部处理）：
-          1. PEER_MAP 手动 override（任何市场）
-          2. CN 动态行业 Hot Top5
-          3. 非 CN 且无 PEER_MAP → peers=[]
-          4. CN 但无行业映射 → peers=[]
-          5. CN 有行业但无热门股快照 → peers=[]
+          1. CN 动态行业 Hot Top5
+          2. 非 CN → peers=[]
+          3. CN 但无行业映射 → peers=[]
+          4. CN 有行业但无热门股快照 → peers=[]
 
         返回结构与 assemble_response() 相同，data_quality 中额外包含：
           industry_code, industry_name, hot_stock_date, hot_score_version, fallback_reason

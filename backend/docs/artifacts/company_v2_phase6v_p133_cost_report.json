@@ -1,0 +1,16 @@
+{
+  "schema_version": "pi_canary_cost_report_v2",
+  "phase": "6V-P1.33",
+  "generated_at": "2026-07-26T04:00:00Z",
+  "gate": "L",
+
+  "state": "B",
+  "real_provider_cost_usd": 0.0,
+  "real_provider_cost_cny": 0.0,
+  "real_provider_requests": 0,
+  "budget_consumed_percent": 0.0,
+  "budget_limit_cny": 100.0,
+
+  "gate_l_result": "NOT_EXECUTED",
+  "note": "State B — no real provider calls. Cost = $0 / ¥0."
+}

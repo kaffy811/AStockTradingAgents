@@ -87,6 +87,10 @@ _SYSTEM_PROMPT = """你是 TradingAgents 金融研究助理，专注于 A 股和
 10. 【新闻名单处理】若新闻标题提到"X只股即将分红（名单）"，但工具未返回名单正文，
     不得推断"某股票在列"等具体股票是否入围的结论。
     正确做法："另有新闻提到多只股票即将分红，但工具未提供完整名单，无法确认具体包含哪些股票。"
+11. 【fallback 降级】如果本次是技术失败后的 fallback，只能基于输入 evidence 和 data_quality 作答。
+    没有 evidence 时不得写具体数字、公司事实、新闻事实或完整股票分析。
+12. 【证据追溯】所有数字、日期、涨跌幅、财务指标、新闻事实必须来自工具调用结果或参考资料。
+    禁止输出 chain of thought、工具参数、本地路径、provider secret、未提供 URL 或页码。
 
 回答结构（必须遵守）：
 ### 研究摘要
@@ -146,6 +150,33 @@ def _filter_banned_phrases(text: str) -> str:
     return text
 
 
+def _has_evidence(tool_results: list[dict], rag_documents: list[dict]) -> bool:
+    return any(t.get("status") == "success" or t.get("detail") or t.get("summary") for t in tool_results) or bool(rag_documents)
+
+
+def _no_evidence_fallback(output_language: str = "zh-CN") -> str:
+    if output_language.startswith("zh"):
+        return (
+            "### 研究摘要\n\n"
+            "当前回答是技术失败后的有限信息摘要；本次没有可靠工具结果或审核资料，因此不能给出具体股票事实、价格、涨跌幅、财务数字或新闻判断。\n\n"
+            "### 关键依据\n\n"
+            "- 无可靠 evidence 可引用。\n\n"
+            "### 风险与不确定性\n\n"
+            "- 不能把工具失败解读为公司没有相关数据。\n"
+            "- 不能使用模型记忆补齐个股事实。\n\n"
+            "### 后续观察\n\n"
+            "- 请稍后重试，或补充明确股票代码、市场和所需维度。\n\n"
+            "### 资料来源与可信度\n\n"
+            "- 证据不足，可信度低；本回答不构成完整工具分析。"
+            + _DISCLAIMER
+        )
+    return (
+        "### Research Summary\n\n"
+        "This is a limited fallback summary after a technical failure. No reliable evidence was provided, so no specific company facts or numbers can be stated."
+        + _DISCLAIMER
+    )
+
+
 async def generate_answer(
     user_message: str,
     tool_results: list[dict],
@@ -154,6 +185,8 @@ async def generate_answer(
     stock_context: dict | None = None,
     timeout_seconds: float = 30.0,
     memory_context: object | None = None,  # MemoryContext | None — C32.1.1
+    data_quality: dict | None = None,
+    fallback_mode: bool = False,
 ) -> str:
     """
     Generate a DeepSeek-backed financial research answer.
@@ -169,8 +202,12 @@ async def generate_answer(
     """
     from app.llm.factory import get_llm_client
 
+    if fallback_mode and not _has_evidence(tool_results, rag_documents):
+        return _no_evidence_fallback(output_language)
+
     tool_summary = _build_tool_summary(tool_results)
     rag_summary  = _build_rag_summary(rag_documents)
+    dq_summary = data_quality or {}
 
     stock_ctx = ""
     if stock_context:
@@ -191,8 +228,10 @@ async def generate_answer(
         f"用户问题：{user_message}{stock_ctx}\n\n"
         f"工具调用结果：\n{tool_summary}\n\n"
         f"参考资料摘要：\n{rag_summary}\n\n"
+        f"data_quality：{dq_summary}\n\n"
         f"{lang_instruction}"
         "请基于以上数据生成研究报告，严格遵守系统提示中的回答结构和安全规则。"
+        "如果证据不足，必须明确降级，不得补充未提供事实。"
     )
 
     # C32.1.1: inject conversation history when memory context is available

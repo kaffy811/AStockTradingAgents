@@ -1,0 +1,2 @@
+ts_code,trade_date,overall_completeness,overall_without_rag,quote_completeness,valuation_completeness,valuation_p0_completeness,valuation_p1_completeness,financial_statement_completeness,financial_indicator_completeness,financial_completeness,rag_completeness,rag_status,missing_field_count
+600519.SH,2026-07-08,0.8837,0.9744,1.0,0.9,1.0,0.8571,1.0,1.0,1.0,0.0,empty,1

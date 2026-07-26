@@ -1,0 +1,1499 @@
+[
+  {
+    "ts_code": "600519.SH",
+    "trade_date": "2026-07-07",
+    "generated_at": "2026-07-07T16:31:00.093036",
+    "overall_completeness": 0.475,
+    "overall_without_rag": 0.4167,
+    "rag_status": "empty",
+    "quote_completeness": 0.8,
+    "valuation_completeness": 0.5714,
+    "financial_completeness": 0.1864,
+    "rag_completeness": 1.0,
+    "categories": {
+      "quote": {
+        "category": "quote",
+        "total_fields": 5,
+        "ok_fields": 4,
+        "completeness": 0.8,
+        "fields": [
+          {
+            "field_name": "latest_price",
+            "value": 1188.8,
+            "status": "ok",
+            "source": "etl_daily_basic",
+            "reason_code": null
+          },
+          {
+            "field_name": "change_pct",
+            "value": -0.015005,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          },
+          {
+            "field_name": "volume",
+            "value": 2736500.0,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          },
+          {
+            "field_name": "amount",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "trade_date",
+            "value": "2026-07-07",
+            "status": "ok",
+            "source": "etl_daily_basic",
+            "reason_code": null
+          }
+        ]
+      },
+      "valuation": {
+        "category": "valuation",
+        "total_fields": 7,
+        "ok_fields": 4,
+        "completeness": 0.5714,
+        "fields": [
+          {
+            "field_name": "pe_ttm",
+            "value": 17.966452,
+            "status": "ok",
+            "source": "etl_daily_basic",
+            "reason_code": null
+          },
+          {
+            "field_name": "pb",
+            "value": 5.485898,
+            "status": "ok",
+            "source": "etl_daily_basic",
+            "reason_code": null
+          },
+          {
+            "field_name": "market_cap",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "total_share",
+            "value": 1252270215.0,
+            "status": "ok",
+            "source": "etl_daily_basic",
+            "reason_code": null
+          },
+          {
+            "field_name": "float_share",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "turnover_rate",
+            "value": 0.2189,
+            "status": "ok",
+            "source": "etl_daily_basic",
+            "reason_code": null
+          },
+          {
+            "field_name": "dividend_yield",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          }
+        ]
+      },
+      "income": {
+        "category": "income",
+        "total_fields": 5,
+        "ok_fields": 1,
+        "completeness": 0.2,
+        "fields": [
+          {
+            "field_name": "revenue",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "gross_profit",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "operating_profit",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "net_profit",
+            "value": 28153831489.89,
+            "status": "ok",
+            "source": "baostock_profit",
+            "reason_code": null
+          },
+          {
+            "field_name": "net_profit_parent",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          }
+        ]
+      },
+      "balance": {
+        "category": "balance",
+        "total_fields": 5,
+        "ok_fields": 0,
+        "completeness": 0.0,
+        "fields": [
+          {
+            "field_name": "total_assets",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "total_liabilities",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "total_equity",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "current_assets",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "current_liabilities",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          }
+        ]
+      },
+      "cashflow": {
+        "category": "cashflow",
+        "total_fields": 3,
+        "ok_fields": 0,
+        "completeness": 0.0,
+        "fields": [
+          {
+            "field_name": "operating_cashflow",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "investing_cashflow",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "financing_cashflow",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          }
+        ]
+      },
+      "indicators": {
+        "category": "indicators",
+        "total_fields": 11,
+        "ok_fields": 6,
+        "completeness": 0.5455,
+        "fields": [
+          {
+            "field_name": "roe",
+            "value": 0.105687,
+            "status": "ok",
+            "source": "baostock_profit",
+            "reason_code": null
+          },
+          {
+            "field_name": "roa",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "gross_margin",
+            "value": 0.897592,
+            "status": "ok",
+            "source": "baostock_profit",
+            "reason_code": null
+          },
+          {
+            "field_name": "net_margin",
+            "value": 0.522245,
+            "status": "ok",
+            "source": "baostock_profit",
+            "reason_code": null
+          },
+          {
+            "field_name": "revenue_growth",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "net_profit_growth",
+            "value": 0.013653,
+            "status": "ok",
+            "source": "baostock_growth",
+            "reason_code": null
+          },
+          {
+            "field_name": "debt_ratio",
+            "value": 0.121227,
+            "status": "ok",
+            "source": "baostock_balance",
+            "reason_code": null
+          },
+          {
+            "field_name": "current_ratio",
+            "value": 7.060729,
+            "status": "ok",
+            "source": "baostock_balance",
+            "reason_code": null
+          },
+          {
+            "field_name": "asset_turnover",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "ocf_to_np",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "dupont_equity_multiplier",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          }
+        ]
+      },
+      "rag": {
+        "category": "rag",
+        "total_fields": 4,
+        "ok_fields": 4,
+        "completeness": 1.0,
+        "fields": [
+          {
+            "field_name": "documents_count",
+            "value": 0,
+            "status": "ok",
+            "source": "report_documents",
+            "reason_code": null
+          },
+          {
+            "field_name": "chunks_count",
+            "value": 0,
+            "status": "ok",
+            "source": "report_chunks",
+            "reason_code": null
+          },
+          {
+            "field_name": "embedding_count",
+            "value": 0,
+            "status": "ok",
+            "source": "report_chunks",
+            "reason_code": null
+          },
+          {
+            "field_name": "rag_status",
+            "value": "empty",
+            "status": "ok",
+            "source": "report_chunks",
+            "reason_code": null
+          }
+        ]
+      }
+    },
+    "missing_fields": [
+      {
+        "field_name": "amount",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "market_cap",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "float_share",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "dividend_yield",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "revenue",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "gross_profit",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "operating_profit",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "net_profit_parent",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "total_assets",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "total_liabilities",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "total_equity",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "current_assets",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "current_liabilities",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "operating_cashflow",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "investing_cashflow",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "financing_cashflow",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "roa",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "revenue_growth",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "asset_turnover",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "ocf_to_np",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "dupont_equity_multiplier",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      }
+    ]
+  },
+  {
+    "ts_code": "000725.SZ",
+    "trade_date": "2026-07-07",
+    "generated_at": "2026-07-07T16:31:23.060696",
+    "overall_completeness": 0.475,
+    "overall_without_rag": 0.4167,
+    "rag_status": "empty",
+    "quote_completeness": 0.8,
+    "valuation_completeness": 0.5714,
+    "financial_completeness": 0.1864,
+    "rag_completeness": 1.0,
+    "categories": {
+      "quote": {
+        "category": "quote",
+        "total_fields": 5,
+        "ok_fields": 4,
+        "completeness": 0.8,
+        "fields": [
+          {
+            "field_name": "latest_price",
+            "value": 7.58,
+            "status": "ok",
+            "source": "etl_daily_basic",
+            "reason_code": null
+          },
+          {
+            "field_name": "change_pct",
+            "value": -0.023195999999999998,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          },
+          {
+            "field_name": "volume",
+            "value": 2818697744.0,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          },
+          {
+            "field_name": "amount",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "trade_date",
+            "value": "2026-07-07",
+            "status": "ok",
+            "source": "etl_daily_basic",
+            "reason_code": null
+          }
+        ]
+      },
+      "valuation": {
+        "category": "valuation",
+        "total_fields": 7,
+        "ok_fields": 4,
+        "completeness": 0.5714,
+        "fields": [
+          {
+            "field_name": "pe_ttm",
+            "value": 47.191119,
+            "status": "ok",
+            "source": "etl_daily_basic",
+            "reason_code": null
+          },
+          {
+            "field_name": "pb",
+            "value": 2.063206,
+            "status": "ok",
+            "source": "etl_daily_basic",
+            "reason_code": null
+          },
+          {
+            "field_name": "market_cap",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "total_share",
+            "value": 37044328064.0,
+            "status": "ok",
+            "source": "etl_daily_basic",
+            "reason_code": null
+          },
+          {
+            "field_name": "float_share",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "turnover_rate",
+            "value": 7.9698,
+            "status": "ok",
+            "source": "etl_daily_basic",
+            "reason_code": null
+          },
+          {
+            "field_name": "dividend_yield",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          }
+        ]
+      },
+      "income": {
+        "category": "income",
+        "total_fields": 5,
+        "ok_fields": 1,
+        "completeness": 0.2,
+        "fields": [
+          {
+            "field_name": "revenue",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "gross_profit",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "operating_profit",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "net_profit",
+            "value": 1709087317.0,
+            "status": "ok",
+            "source": "baostock_profit",
+            "reason_code": null
+          },
+          {
+            "field_name": "net_profit_parent",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          }
+        ]
+      },
+      "balance": {
+        "category": "balance",
+        "total_fields": 5,
+        "ok_fields": 0,
+        "completeness": 0.0,
+        "fields": [
+          {
+            "field_name": "total_assets",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "total_liabilities",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "total_equity",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "current_assets",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "current_liabilities",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          }
+        ]
+      },
+      "cashflow": {
+        "category": "cashflow",
+        "total_fields": 3,
+        "ok_fields": 0,
+        "completeness": 0.0,
+        "fields": [
+          {
+            "field_name": "operating_cashflow",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "investing_cashflow",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "financing_cashflow",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          }
+        ]
+      },
+      "indicators": {
+        "category": "indicators",
+        "total_fields": 11,
+        "ok_fields": 6,
+        "completeness": 0.5455,
+        "fields": [
+          {
+            "field_name": "roe",
+            "value": 0.012619,
+            "status": "ok",
+            "source": "baostock_profit",
+            "reason_code": null
+          },
+          {
+            "field_name": "roa",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "gross_margin",
+            "value": 0.155957,
+            "status": "ok",
+            "source": "baostock_profit",
+            "reason_code": null
+          },
+          {
+            "field_name": "net_margin",
+            "value": 0.033511,
+            "status": "ok",
+            "source": "baostock_profit",
+            "reason_code": null
+          },
+          {
+            "field_name": "revenue_growth",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "net_profit_growth",
+            "value": -0.117708,
+            "status": "ok",
+            "source": "baostock_growth",
+            "reason_code": null
+          },
+          {
+            "field_name": "debt_ratio",
+            "value": 0.519161,
+            "status": "ok",
+            "source": "baostock_balance",
+            "reason_code": null
+          },
+          {
+            "field_name": "current_ratio",
+            "value": 1.425343,
+            "status": "ok",
+            "source": "baostock_balance",
+            "reason_code": null
+          },
+          {
+            "field_name": "asset_turnover",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "ocf_to_np",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "dupont_equity_multiplier",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          }
+        ]
+      },
+      "rag": {
+        "category": "rag",
+        "total_fields": 4,
+        "ok_fields": 4,
+        "completeness": 1.0,
+        "fields": [
+          {
+            "field_name": "documents_count",
+            "value": 0,
+            "status": "ok",
+            "source": "report_documents",
+            "reason_code": null
+          },
+          {
+            "field_name": "chunks_count",
+            "value": 0,
+            "status": "ok",
+            "source": "report_chunks",
+            "reason_code": null
+          },
+          {
+            "field_name": "embedding_count",
+            "value": 0,
+            "status": "ok",
+            "source": "report_chunks",
+            "reason_code": null
+          },
+          {
+            "field_name": "rag_status",
+            "value": "empty",
+            "status": "ok",
+            "source": "report_chunks",
+            "reason_code": null
+          }
+        ]
+      }
+    },
+    "missing_fields": [
+      {
+        "field_name": "amount",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "market_cap",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "float_share",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "dividend_yield",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "revenue",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "gross_profit",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "operating_profit",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "net_profit_parent",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "total_assets",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "total_liabilities",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "total_equity",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "current_assets",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "current_liabilities",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "operating_cashflow",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "investing_cashflow",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "financing_cashflow",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "roa",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "revenue_growth",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "asset_turnover",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "ocf_to_np",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "dupont_equity_multiplier",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      }
+    ]
+  },
+  {
+    "ts_code": "601686.SH",
+    "trade_date": "2026-07-07",
+    "generated_at": "2026-07-07T16:31:46.808497",
+    "overall_completeness": 0.475,
+    "overall_without_rag": 0.4167,
+    "rag_status": "empty",
+    "quote_completeness": 0.8,
+    "valuation_completeness": 0.5714,
+    "financial_completeness": 0.1864,
+    "rag_completeness": 1.0,
+    "categories": {
+      "quote": {
+        "category": "quote",
+        "total_fields": 5,
+        "ok_fields": 4,
+        "completeness": 0.8,
+        "fields": [
+          {
+            "field_name": "latest_price",
+            "value": 4.99,
+            "status": "ok",
+            "source": "etl_daily_basic",
+            "reason_code": null
+          },
+          {
+            "field_name": "change_pct",
+            "value": -0.009921,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          },
+          {
+            "field_name": "volume",
+            "value": 3842600.0,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          },
+          {
+            "field_name": "amount",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "trade_date",
+            "value": "2026-07-07",
+            "status": "ok",
+            "source": "etl_daily_basic",
+            "reason_code": null
+          }
+        ]
+      },
+      "valuation": {
+        "category": "valuation",
+        "total_fields": 7,
+        "ok_fields": 4,
+        "completeness": 0.5714,
+        "fields": [
+          {
+            "field_name": "pe_ttm",
+            "value": 10.915282,
+            "status": "ok",
+            "source": "etl_daily_basic",
+            "reason_code": null
+          },
+          {
+            "field_name": "pb",
+            "value": 1.105193,
+            "status": "ok",
+            "source": "etl_daily_basic",
+            "reason_code": null
+          },
+          {
+            "field_name": "market_cap",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "total_share",
+            "value": 1471547040.0,
+            "status": "ok",
+            "source": "etl_daily_basic",
+            "reason_code": null
+          },
+          {
+            "field_name": "float_share",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "turnover_rate",
+            "value": 0.2597,
+            "status": "ok",
+            "source": "etl_daily_basic",
+            "reason_code": null
+          },
+          {
+            "field_name": "dividend_yield",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          }
+        ]
+      },
+      "income": {
+        "category": "income",
+        "total_fields": 5,
+        "ok_fields": 1,
+        "completeness": 0.2,
+        "fields": [
+          {
+            "field_name": "revenue",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "gross_profit",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "operating_profit",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "net_profit",
+            "value": 144062444.38,
+            "status": "ok",
+            "source": "baostock_profit",
+            "reason_code": null
+          },
+          {
+            "field_name": "net_profit_parent",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          }
+        ]
+      },
+      "balance": {
+        "category": "balance",
+        "total_fields": 5,
+        "ok_fields": 0,
+        "completeness": 0.0,
+        "fields": [
+          {
+            "field_name": "total_assets",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "total_liabilities",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "total_equity",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "current_assets",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "current_liabilities",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          }
+        ]
+      },
+      "cashflow": {
+        "category": "cashflow",
+        "total_fields": 3,
+        "ok_fields": 0,
+        "completeness": 0.0,
+        "fields": [
+          {
+            "field_name": "operating_cashflow",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "investing_cashflow",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "financing_cashflow",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          }
+        ]
+      },
+      "indicators": {
+        "category": "indicators",
+        "total_fields": 11,
+        "ok_fields": 6,
+        "completeness": 0.5455,
+        "fields": [
+          {
+            "field_name": "roe",
+            "value": 0.018961,
+            "status": "ok",
+            "source": "baostock_profit",
+            "reason_code": null
+          },
+          {
+            "field_name": "roa",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "gross_margin",
+            "value": 0.029144,
+            "status": "ok",
+            "source": "baostock_profit",
+            "reason_code": null
+          },
+          {
+            "field_name": "net_margin",
+            "value": 0.013534,
+            "status": "ok",
+            "source": "baostock_profit",
+            "reason_code": null
+          },
+          {
+            "field_name": "revenue_growth",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "net_profit_growth",
+            "value": -0.031798,
+            "status": "ok",
+            "source": "baostock_growth",
+            "reason_code": null
+          },
+          {
+            "field_name": "debt_ratio",
+            "value": 0.665492,
+            "status": "ok",
+            "source": "baostock_balance",
+            "reason_code": null
+          },
+          {
+            "field_name": "current_ratio",
+            "value": 1.225379,
+            "status": "ok",
+            "source": "baostock_balance",
+            "reason_code": null
+          },
+          {
+            "field_name": "asset_turnover",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "ocf_to_np",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "dupont_equity_multiplier",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          }
+        ]
+      },
+      "rag": {
+        "category": "rag",
+        "total_fields": 4,
+        "ok_fields": 4,
+        "completeness": 1.0,
+        "fields": [
+          {
+            "field_name": "documents_count",
+            "value": 0,
+            "status": "ok",
+            "source": "report_documents",
+            "reason_code": null
+          },
+          {
+            "field_name": "chunks_count",
+            "value": 0,
+            "status": "ok",
+            "source": "report_chunks",
+            "reason_code": null
+          },
+          {
+            "field_name": "embedding_count",
+            "value": 0,
+            "status": "ok",
+            "source": "report_chunks",
+            "reason_code": null
+          },
+          {
+            "field_name": "rag_status",
+            "value": "empty",
+            "status": "ok",
+            "source": "report_chunks",
+            "reason_code": null
+          }
+        ]
+      }
+    },
+    "missing_fields": [
+      {
+        "field_name": "amount",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "market_cap",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "float_share",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "dividend_yield",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "revenue",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "gross_profit",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "operating_profit",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "net_profit_parent",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "total_assets",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "total_liabilities",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "total_equity",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "current_assets",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "current_liabilities",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "operating_cashflow",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "investing_cashflow",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "financing_cashflow",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "roa",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "revenue_growth",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "asset_turnover",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "ocf_to_np",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "dupont_equity_multiplier",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      }
+    ]
+  }
+]

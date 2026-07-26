@@ -125,13 +125,17 @@ class TestAPIEnvelope:
 
     @patch("app.core.config.settings")
     def test_ae2_err_envelope_errors_list(self, mock_settings):
-        """AE-2: 失败 envelope → errors 包含 reason，且是 list（不为 null）。"""
+        """AE-2: 失败 envelope → errors 包含 reason，且是 list（不为 null）。
+        data 已改为 stub dict (rows+reasons) 以避免前端 503 崩溃（Phase 4E-1）。"""
         mock_settings.enable_akshare = False
         env = err_envelope("Tushare 超时")
         resp = build_api_response(env, "CN", "600519", "600519.SH", "valuation", "估值分位")
         assert resp["errors"] == ["Tushare 超时"]
         assert isinstance(resp["errors"], list)
-        assert resp["data"] is None
+        # data is now a stub dict (not None) to allow frontend graceful rendering
+        assert resp["data"] is not None
+        assert "rows" in resp["data"]
+        assert resp["partial"] is True
 
     @patch("app.core.config.settings")
     def test_ae3_partial_errors_in_list(self, mock_settings):
@@ -452,8 +456,10 @@ class TestCompatRouter:
 
     @patch("app.routers.fundamentals_compat.get_aggregator")
     @patch("app.core.config.settings")
-    def test_cr6_module_503_on_failure(self, mock_settings, mock_get_agg):
-        """CR-6: 模块 fetch 失败 → HTTP 503（ok=False）。"""
+    def test_cr6_module_200_with_partial_on_failure(self, mock_settings, mock_get_agg):
+        """CR-6: 模块 fetch 失败 → HTTP 200 + partial=true + errors（Phase 4E-1 503 降噪）。
+        模块级错误通过 partial=true 和 errors[] 传达，HTTP 状态始终 200，
+        避免前端因单模块失败而崩溃或控制台出现大量未处理异常。"""
         mock_settings.enable_akshare = False
         from app.aggregator.envelope import err_envelope
         mock_agg = MagicMock()
@@ -462,10 +468,13 @@ class TestCompatRouter:
 
         client = TestClient(_make_test_app())
         resp = client.get("/api/v1/stock/600519/modules/valuation")
-        assert resp.status_code == 503
+        assert resp.status_code == 200   # always 200; errors in body
         data = resp.json()
         assert isinstance(data["errors"], list)
         assert len(data["errors"]) > 0
+        assert data["partial"] is True   # frontend reads this to show empty state
+        # data is a stub dict (not null), so frontend never crashes
+        assert data["data"] is not None
 
 
 # ═══════════════════════════════════════════════════════════════════════════

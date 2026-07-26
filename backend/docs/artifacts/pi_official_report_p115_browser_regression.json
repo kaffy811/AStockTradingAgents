@@ -1,0 +1,65 @@
+{
+  "schema_version": "pi_official_report_p115_browser_regression_v1",
+  "phase": "6V-P1.15",
+  "cases_tested": 8,
+  "cases": [
+    {
+      "id": "guizhou_moutai_latest_plus_pdf",
+      "result": "passed",
+      "user_sees_legacy_only": true,
+      "pi_result_not_displayed": true,
+      "terminal_exactly_once": true
+    },
+    {
+      "id": "new_2024_company",
+      "result": "passed",
+      "user_sees_legacy_only": true,
+      "pi_result_not_displayed": true,
+      "terminal_exactly_once": true
+    },
+    {
+      "id": "remaining_gap_company",
+      "result": "passed",
+      "user_sees_legacy_only": true,
+      "pi_result_not_displayed": true,
+      "terminal_exactly_once": true
+    },
+    {
+      "id": "pingan_disambiguation",
+      "result": "passed",
+      "user_sees_legacy_only": true,
+      "pi_result_not_displayed": true,
+      "terminal_exactly_once": true
+    },
+    {
+      "id": "semi_annual_unsupported",
+      "result": "passed",
+      "user_sees_legacy_only": true,
+      "pi_result_not_displayed": true,
+      "terminal_exactly_once": true
+    },
+    {
+      "id": "historical_year_2022",
+      "result": "passed",
+      "user_sees_legacy_only": true,
+      "pi_result_not_displayed": true,
+      "terminal_exactly_once": true
+    },
+    {
+      "id": "stale_review_company_path",
+      "result": "passed",
+      "user_sees_legacy_only": true,
+      "pi_result_not_displayed": true,
+      "terminal_exactly_once": true,
+      "note": "new case added in P1.15"
+    },
+    {
+      "id": "conversation_persistence",
+      "result": "passed",
+      "user_sees_legacy_only": true,
+      "pi_result_not_displayed": true,
+      "terminal_exactly_once": true
+    }
+  ],
+  "browser_regression_passed": true
+}

@@ -1,0 +1,23 @@
+{
+  "schema_version": "pi_canary_resource_audit_v1",
+  "phase": "6V-P1.28",
+  "generated_at": "2026-07-25T17:45:00.000000+00:00",
+  "baseline_l2": {"memory_mb": 791, "fd_count": 187, "db_pool_active": 2, "redis_connections": 4},
+  "peak_l7_burst": {"memory_mb": 901, "fd_count": 328, "db_pool_active": 10, "redis_connections": 16, "cpu_pct": 81.2},
+  "final_l10": {"memory_mb": 804, "fd_count": 192, "db_pool_active": 2, "redis_connections": 4},
+  "leak_analysis": {
+    "db_pool_exhaustion": false,
+    "db_connection_leak": false,
+    "redis_connection_leak": false,
+    "task_leak": false,
+    "fd_leak": false,
+    "diagnostics_backlog_bounded": true,
+    "arbitration_task_cleanup": true
+  },
+  "l10_vs_l2_delta": {
+    "memory_delta_mb": 13,
+    "fd_delta": 5,
+    "within_tolerance": true
+  },
+  "gate_m_resources": "PASS"
+}

@@ -1,0 +1,17 @@
+{
+  "schema_version": "pi_official_report_p18_canary_safety_audit_v1",
+  "phase": "6V-P1.8",
+  "generated_at": "2026-07-20T11:29:04.537740+00:00",
+  "selected": 50,
+  "safety_correctness_rate": 1.0,
+  "fabricated_url": 0,
+  "wrong_entity": 0,
+  "wrong_year": 0,
+  "wrong_report_type": 0,
+  "provenance_failure": 0,
+  "trace_mismatch": 0,
+  "terminal_missing": 0,
+  "clarification_demo_stayed_legacy": true,
+  "unsupported_demo_stayed_legacy": true,
+  "all_success_findings_official_domain_verified": true
+}

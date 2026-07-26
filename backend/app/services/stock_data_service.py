@@ -254,15 +254,67 @@ class StockDataService:
                 http_status=200,
             )
 
+        # Last resort: derive quote from the most recent kline bar in cache
+        kline_proxy = self._kline_proxy_quote(market, symbol)
+        if kline_proxy is not None:
+            log.warning(
+                "所有实时 quote 源均失败且无 stale 缓存 [%s/%s]，使用 K 线最近收盘价代理。",
+                market, symbol,
+            )
+            return QuoteResult(
+                data={
+                    **kline_proxy,
+                    "is_realtime":  False,
+                    "reason_code":  "REALTIME_QUOTE_UNAVAILABLE",
+                },
+                provider="kline_proxy",
+                cached=True,
+                stale=True,
+                fallback_chain=fallback_chain + [{"source": "kline_proxy", "status": "ok"}],
+                message="非实时行情，来自最近K线收盘价（实时源暂不可用）",
+                http_status=200,
+            )
+
         detail = "\n".join(f"  - {e}" for e in errors)
         log.error("所有 quote 源均失败且无任何缓存 [%s/%s]", market, symbol)
         return QuoteResult(
-            data={},
+            data={
+                "reason_code": "PROVIDER_REMOTE_CLOSED" if any("Remote end closed" in e for e in errors)
+                               else "NETWORK_UNAVAILABLE",
+            },
             provider="none",
             fallback_chain=fallback_chain + [{"source": "stale_cache", "status": "no data"}],
             message=f"所有实时行情源均不可用，且无历史缓存数据。\n{detail}",
             http_status=503,
         )
+
+    # ── kline proxy: last-resort quote from most recent bar ──────────────────
+
+    def _kline_proxy_quote(self, market: str, symbol: str) -> dict | None:
+        """
+        Try to build a minimal quote dict from the most recent kline bar in cache.
+        Returns a dict with close/volume/date fields, or None if no kline cache exists.
+        """
+        # Try common kline cache keys (daily, qfq, various limits)
+        for period in ("daily",):
+            for adjust in ("qfq", "none"):
+                for limit in (90, 30, 10):
+                    payload, found = cache.get_kline_stale(market, symbol, period, adjust, limit)
+                    if found and payload:
+                        bars = payload.get("bars") or []
+                        if bars:
+                            bar = bars[-1]   # most recent bar
+                            return {
+                                "current":    bar.get("close"),
+                                "close":      bar.get("close"),
+                                "open":       bar.get("open"),
+                                "high":       bar.get("high"),
+                                "low":        bar.get("low"),
+                                "volume":     bar.get("volume"),
+                                "trade_date": bar.get("date") or bar.get("trade_date"),
+                                "source":     "kline_proxy",
+                            }
+        return None
 
     # =========================================================================
     # Kline

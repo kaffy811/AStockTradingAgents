@@ -1,0 +1,41 @@
+{
+  "phase": "phase6tn_create_trace",
+  "samples_total": 50,
+  "cold_connection_create": {
+    "ok": true,
+    "job_id": "11b7003a-fb54-4978-9877-16fdef69a740",
+    "status": "queued",
+    "trace": {
+      "request_normalization_ms": 0.01,
+      "allowlist_check_ms": 0.11,
+      "session_acquire_ms": 0.06,
+      "pool_checkout_ms": 0.06,
+      "report_ownership_query_ms": 815.69,
+      "active_job_dedup_query_ms": 0.0,
+      "insert_ms": 477.99,
+      "commit_ms": 282.39,
+      "post_commit_refresh_ms": 0.0,
+      "worker_schedule_ms": 0.0,
+      "response_model_ms": 0.0,
+      "response_serialize_ms": 0.05,
+      "service_call_ms": 11533.69,
+      "total_ms": 12349.89,
+      "sql_query_count": 19,
+      "db_round_trip_count": 20,
+      "transaction_count": 1,
+      "connection_reused": false,
+      "response_payload_bytes": 151,
+      "provider_calls": 0,
+      "rag_retrieval_calls": 0,
+      "extractor_calls": 0
+    },
+    "result_hash": "1a9e63c295dfaad5faa62760c0ab573523dfecc1769ad36d2a1aa1b539038a17"
+  },
+  "steady_state": {
+    "p50_ms": 1367.75,
+    "p95_ms": 2097.94,
+    "max_ms": 2386.9,
+    "sample_count": 50
+  },
+  "result_hashes_equal": true
+}

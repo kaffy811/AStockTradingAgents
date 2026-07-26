@@ -1,0 +1,47 @@
+{
+  "schema_version": "pi_canary_preflight_v2",
+  "phase": "MVP-R1.1",
+  "generated_at": "2026-07-26T08:00:00Z",
+  "base_sha": "d6e927bea89292d8e7f6b3e6e509a7bce6598147",
+  "base_branch": "release/demo-staging",
+  "worktree": "/private/tmp/tradingagents-mvp-r11",
+
+  "mvp_r1_base_validation": {
+    "gates_pass": 14,
+    "gates_fail": 0,
+    "rp1": "PASS",
+    "rp6": "PASS",
+    "tests_pass": 114,
+    "real_provider_calls": 0,
+    "config_version": 12
+  },
+
+  "gaps_to_close": [
+    "L5/L6: quota settings and enforcement not yet implemented",
+    "L2: wave management config not yet added",
+    "L3: mvp_public_registration_enabled not yet a setting",
+    "L13: kill-switch drill not yet executed",
+    "L16: product messaging accuracy not yet verified in artifacts"
+  ],
+
+  "credential_status": {
+    "DEEPSEEK_API_KEY_STAGING": "NOT_SET",
+    "state": "B",
+    "real_provider_authorized": false
+  },
+
+  "runtime_snapshot": {
+    "config_version": 12,
+    "provider_mode": "staging_replay",
+    "real_provider_enabled": false,
+    "real_provider_kill_switch": true,
+    "shadow_rollout_percent": 100,
+    "live_rollout_percent": 1,
+    "production_enabled": false
+  },
+
+  "invited_users_before_phase": 0,
+  "wave": 0,
+
+  "proceed_with_mvp_r11": true
+}

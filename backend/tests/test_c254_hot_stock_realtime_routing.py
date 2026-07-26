@@ -46,7 +46,7 @@ class TestParseFinancialAnalysisIntentRealtimePropagation:
     def test_regular_query_still_works(self):
         """Regression: non-realtime query should still parse correctly."""
         from app.agents.official_report_search import parse_financial_analysis_intent
-        intent = parse_financial_analysis_intent("茅台最新股价是多少？")
+        intent = parse_financial_analysis_intent("600519 最新股价是多少？")
         assert intent.get("symbol") == "600519"
         assert intent.get("market") == "CN"
 
@@ -59,7 +59,7 @@ class TestParseFinancialAnalysisIntentRealtimePropagation:
     def test_non_realtime_query_has_need_realtime_false(self):
         """Standard stock queries should not trigger realtime."""
         from app.agents.official_report_search import parse_financial_analysis_intent
-        intent = parse_financial_analysis_intent("介绍一下茅台的商业模式")
+        intent = parse_financial_analysis_intent("介绍一下 600519 的商业模式")
         assert intent.get("need_realtime") is False
 
 

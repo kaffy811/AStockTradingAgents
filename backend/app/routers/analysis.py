@@ -321,7 +321,7 @@ async def _run_peer_comparison(
     summary="同行基本面对比分析",
     description=(
         "生成 Markdown 同行基本面对比报告。\n\n"
-        "- 同行来源优先级：PEER_MAP 手动配置 > CN 行业 Hot Score 热门股\n"
+        "- 同行来源：CN 行业 Hot Score 热门股；无可靠行业数据时返回空同行\n"
         "- peers 未配置且无动态同行 → 报告说明原因，不编造\n"
         "- dynamic_hot peers → 报告明确说明 Hot Score 口径限制\n"
         "- 可比字段为空 → 报告说明缺少可比字段，不强行对比\n"
@@ -408,7 +408,7 @@ class ComprehensiveAnalysisResponse(BaseModel):
         "并行调用 TechnicalAnalystAgent、FundamentalAnalystAgent、"
         "PeerComparisonAnalystAgent（Phase 1E：动态同行）、NewsAnalystAgent，"
         "最终由 LLM 生成综合分析 Markdown 报告。\n\n"
-        "- 同行来源优先级：PEER_MAP 手动配置 > CN 行业 Hot Score 热门股\n"
+        "- 同行来源：CN 行业 Hot Score 热门股；无可靠行业数据时返回空同行\n"
         "- 任一子模块失败 → sections 中写入错误说明，综合报告注明该维度暂缺\n"
         "- 子报告传入综合 LLM 前截断至各 4000 字符，sections 返回完整原文\n"
         "- LLM 未配置 → HTTP 503\n"

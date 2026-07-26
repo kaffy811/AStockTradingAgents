@@ -1,0 +1,48 @@
+{
+  "schema_version": "pi_official_report_p111_pre_apply_snapshot_v1",
+  "snapshot_id": "p111b_snapshot_20260721T210000Z",
+  "captured_at": "2026-07-21T21:00:00.000000+00:00",
+  "source_sha": "d86ce16d599399e0b6c2a30b74de361d6998b442",
+  "dry_run_gate_checksum": "b3ba8ef831a71d49fc5e16c19cfc808753d8ed79e7abd04dbd15410d0f35ea8b",
+  "universe_checksum": "6170ef68ee3703c3d61b969f56d375e54a6a35baf4b4775c2067b32b55b90835",
+  "db_identity": {
+    "environment": "staging",
+    "production_enabled": false,
+    "host_hash": "2b73921d4030",
+    "name_hash": "a942b37ccfaf",
+    "url_hash": "87a02187b71e97d8"
+  },
+  "target_table": "report_documents",
+  "pre_apply_total_rows": 66,
+  "pre_apply_target_years_rows": 27,
+  "pre_apply_year_distribution": {
+    "2022": 5,
+    "2023": 11,
+    "2024": 11
+  },
+  "pre_apply_distinct_ts_codes": 11,
+  "pre_apply_download_status_distribution": {
+    "discovered": 51,
+    "pending": 10,
+    "downloaded": 4,
+    "verified": 1
+  },
+  "pre_apply_type_distribution": {
+    "annual": 66
+  },
+  "pre_apply_source_distribution": {
+    "cninfo": 66
+  },
+  "planned_candidates": 262,
+  "expected_new_inserts": 236,
+  "expected_exists": 26,
+  "rollback_plan": {
+    "method": "DELETE FROM report_documents WHERE id IN (<inserted_ids>)",
+    "inserted_ids_tracked_in": "pi_official_report_p111_apply_results.json",
+    "rollback_scope": "only_this_run_inserted_ids",
+    "pre_apply_row_count": 66,
+    "constraint": "must_not_delete_pre_existing_66_rows"
+  },
+  "ingestion_run_id_policy": "no_ingestion_run_id_column_in_schema_track_by_inserted_ids",
+  "ready_for_apply": true
+}

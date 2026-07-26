@@ -58,6 +58,70 @@ class BaseFundamentalTool(ABC):
         """
         raise NotImplementedError(f"{self.__class__.__name__} 未实现 AkShare fallback")
 
+    async def fetch_baostock(self, market: str, symbol: str) -> dict[str, Any]:
+        """
+        BaoStock 免费数据获取（可选实现，Phase 6A）。
+
+        默认抛出 NotImplementedError，子类如需 BaoStock fallback 则覆盖此方法。
+        """
+        raise NotImplementedError(f"{self.__class__.__name__} 未实现 BaoStock fetch")
+
+    @staticmethod
+    def _is_network_error(exc: Exception) -> bool:
+        """判断异常是否为网络/超时类错误（Phase 6N-8A error_code 分类用）。"""
+        msg = repr(exc).lower()
+        return any(k in msg for k in (
+            "timeout", "timed out", "connection", "proxy", "remote",
+            "unreachable", "refused", "network", "dns",
+        ))
+
+    async def _fetch_free_mode(self, market: str, symbol: str) -> DataEnvelope:
+        """
+        DATA_MODE=free 路径：跳过 Tushare，依次尝试 BaoStock → AkShare。
+
+        Phase 6N-8A: 失败信封携带稳定 error_code —
+          - 任一 provider 因网络/超时失败 → DATA_SOURCE_UNAVAILABLE
+          - provider 可达但无数据 / 未实现     → DATA_SOURCE_EMPTY
+        auth 错误绝不会走到这里（401 在路由依赖层直接抛出）。
+        """
+        from app.core.config import settings
+        from app.core.error_codes import DATA_SOURCE_EMPTY, DATA_SOURCE_UNAVAILABLE
+
+        network_failed = False
+
+        # 优先 BaoStock
+        if settings.enable_baostock:
+            try:
+                data = await self.fetch_baostock(market, symbol)
+                log.info("BaoStock fetch 成功 [%s/%s/%s]", self.module_key, market, symbol)
+                return ok_envelope(data)
+            except NotImplementedError:
+                pass  # 子类未实现，静默跳过
+            except Exception as e:
+                network_failed = network_failed or self._is_network_error(e)
+                log.warning("BaoStock 失败 [%s/%s/%s]: %s", self.module_key, market, symbol, e)
+
+        # 降级 AkShare
+        if settings.enable_akshare:
+            try:
+                data = await self.fetch_akshare(market, symbol)
+                log.info("AkShare fallback 成功 [%s/%s/%s]", self.module_key, market, symbol)
+                return ok_envelope(data, stale=True)
+            except NotImplementedError:
+                pass
+            except Exception as e:
+                network_failed = network_failed or self._is_network_error(e)
+                log.warning("AkShare 失败 [%s/%s/%s]: %s", self.module_key, market, symbol, e)
+
+        # Deprecated legacy Company Tab message.
+        # CompanyV2 must use DebugEnvelope error_code/source_chain instead of
+        # this generic BaoStock/AkShare attribution.
+        return err_envelope(
+            "DATA_MODE=free：BaoStock 和 AkShare 均未返回数据，"
+            "请检查 ENABLE_BAOSTOCK / ENABLE_AKSHARE 配置。",
+            error_code=DATA_SOURCE_UNAVAILABLE if network_failed else DATA_SOURCE_EMPTY,
+        )
+
     async def fetch_with_fallback(
         self,
         market: str,
@@ -65,19 +129,27 @@ class BaseFundamentalTool(ABC):
     ) -> DataEnvelope:
         """
         尝试 Tushare，失败时降级到 AkShare（如果 ENABLE_AKSHARE=true）。
+        Phase 6A：DATA_MODE=free 时跳过 Tushare，走 BaoStock → AkShare 链。
         返回 DataEnvelope。
 
-        流程：
+        流程（standard 模式）：
           1. 调用 fetch()（Tushare）
           2. 成功 → 返回 ok_envelope(data)
           3. 失败 → 检查 ENABLE_AKSHARE
              a. 未开启 → 返回 err_envelope(reason)
              b. 已开启 → 调用 fetch_akshare()
-                i.  成功 → 返回 ok_envelope(data, stale=True)（标记为 stale 表示数据来源降级）
+                i.  成功 → 返回 ok_envelope(data, stale=True)
                 ii. 失败 → 返回 err_envelope(combined_reason)
+
+        流程（free 模式）：
+          BaoStock（if ENABLE_BAOSTOCK）→ AkShare（if ENABLE_AKSHARE）→ err_envelope
         """
         from app.core.config import settings
         from app.datasource.tushare_client import TushareError
+
+        # Phase 6A: free mode 完全跳过 Tushare
+        if settings.data_mode == "free":
+            return await self._fetch_free_mode(market, symbol)
 
         # 尝试 Tushare
         try:
@@ -119,8 +191,15 @@ class BaseFundamentalTool(ABC):
                     "AkShare fallback 也失败 [%s/%s/%s]: %s",
                     self.module_key, market, symbol, fallback_err,
                 )
+                from app.core.error_codes import DATA_SOURCE_EMPTY, DATA_SOURCE_UNAVAILABLE
                 return err_envelope(
-                    f"Tushare 失败（{primary_reason}）；AkShare 也失败（{fallback_err}）"
+                    f"Tushare 失败（{primary_reason}）；AkShare 也失败（{fallback_err}）",
+                    error_code=(
+                        DATA_SOURCE_UNAVAILABLE
+                        if self._is_network_error(fallback_err)
+                        else DATA_SOURCE_EMPTY
+                    ),
                 )
 
-        return err_envelope(primary_reason)
+        from app.core.error_codes import DATA_SOURCE_EMPTY
+        return err_envelope(primary_reason, error_code=DATA_SOURCE_EMPTY)

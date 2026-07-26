@@ -33,6 +33,7 @@ from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.attributes import flag_modified
 
+from app.core.database import AsyncSessionLocal
 from app.models.chat import ChatMessage, ChatSession
 import app.agents.chat_memory as _mem
 
@@ -76,37 +77,6 @@ _RE_REPORT_PRONOUN = re.compile(
     re.IGNORECASE,
 )
 
-# ── Light-weight stock name/code table for memory fallback ────────────────────
-# C32.3.2: When recent_symbols is empty, scan recent_messages for these patterns.
-_MEMORY_STOCK_TABLE: list[tuple[str, str, str, "re.Pattern[str]"]] = [
-    ("600519", "贵州茅台", "CN", re.compile(r"600519|贵州茅台|茅台")),
-    ("000858", "五粮液",   "CN", re.compile(r"000858|五粮液")),
-    ("300750", "宁德时代", "CN", re.compile(r"300750|宁德时代")),
-    ("601899", "紫金矿业", "CN", re.compile(r"601899|紫金矿业")),
-    ("301269", "华大九天", "CN", re.compile(r"301269|华大九天")),
-    ("688146", "中船特气", "CN", re.compile(r"688146|中船特气")),
-    ("002594", "比亚迪",   "CN", re.compile(r"002594|比亚迪")),
-    ("601012", "隆基绿能", "CN", re.compile(r"601012|隆基绿能")),
-    ("002475", "立讯精密", "CN", re.compile(r"002475|立讯精密")),
-    ("688981", "中芯国际", "CN", re.compile(r"688981|中芯国际|SMIC", re.IGNORECASE)),
-]
-
-
-def _entity_from_text(text: str) -> "ResolvedEntity | None":
-    """
-    C32.3.2: Light-weight entity extractor for memory fallback.
-    Returns the first stock entity found in `text`, or None.
-    """
-    for symbol, name, market, pattern in _MEMORY_STOCK_TABLE:
-        if pattern.search(text):
-            return ResolvedEntity(type="stock", name=name, code=symbol, market=market)
-    # Generic 6-digit CN code
-    m = re.search(r"\b(\d{6})\b", text)
-    if m:
-        code = m.group(1)
-        return ResolvedEntity(type="stock", name=code, code=code, market="CN")
-    return None
-
 # ── Sanitization for summaries ─────────────────────────────────────────────────
 
 _SUMMARY_STRIP_PATTERNS = [
@@ -144,6 +114,40 @@ class ResolvedEntity:
     name:   str
     code:   str = ""
     market: str = ""
+
+
+def _entity_from_text(text: str) -> ResolvedEntity | None:
+    """
+    Backward-compatible explicit-code parser.
+
+    Natural-language security names are resolved by SecurityEntityResolver with
+    database/security-master context. This helper intentionally avoids a
+    production hand-written alias table.
+    """
+    if not text:
+        return None
+
+    ts_match = re.search(r"(?<!\d)(\d{6})\.(SH|SZ|BJ)(?![A-Z0-9])", text, re.IGNORECASE)
+    if ts_match:
+        code = ts_match.group(1)
+        return ResolvedEntity(type="stock", name=code, code=code, market="CN")
+
+    cn_match = re.search(r"(?<!\d)(\d{6})(?!\d)", text)
+    if cn_match:
+        code = cn_match.group(1)
+        return ResolvedEntity(type="stock", name=code, code=code, market="CN")
+
+    hk_match = re.search(r"(?<!\d)0?(\d{4,5})(?!\d)", text)
+    if hk_match:
+        code = hk_match.group(1).zfill(5)
+        return ResolvedEntity(type="stock", name=code, code=code, market="HK")
+
+    us_match = re.search(r"(?<![A-Z0-9.])([A-Z]{1,5}(?:[.-][A-Z])?)(?![A-Z0-9])", text)
+    if us_match:
+        code = us_match.group(1).upper()
+        return ResolvedEntity(type="stock", name=code, code=code, market="US")
+
+    return None
 
 
 @dataclass
@@ -357,9 +361,15 @@ async def build_memory_context(
                     # Skip the current query itself
                     if _cur_snippet_prefix and snippet[:25].strip() == _cur_snippet_prefix:
                         continue
-                    ent = _entity_from_text(snippet)
-                    if ent is not None:
-                        active_entities.append(ent)
+                    from app.services.security_entity_resolver import security_entity_resolver  # noqa: PLC0415
+                    entity = await security_entity_resolver.resolve_one(db, snippet, min_confidence=0.78)
+                    if entity is not None:
+                        active_entities.append(ResolvedEntity(
+                            type="stock",
+                            name=entity.short_name or entity.symbol,
+                            code=entity.symbol,
+                            market=entity.market,
+                        ))
                         break  # only the most recent prior user-mentioned stock
         # Add industry from recent intents if applicable
         for intent in mem.get("recent_intents", [])[:2]:
@@ -413,10 +423,19 @@ async def build_memory_context(
 
         return ctx
 
-    except Exception:
+    except Exception as exc:
+        try:
+            await db.rollback()
+        except Exception as rollback_exc:  # noqa: BLE001
+            log.warning(
+                "conversation_memory_service.build_memory_context: rollback failed for session %s error_class=%s",
+                session_id,
+                type(rollback_exc).__name__,
+            )
         log.warning(
-            "conversation_memory_service.build_memory_context: failed for session %s (non-fatal)",
+            "conversation_memory_service.build_memory_context: failed for session %s error_class=%s (non-fatal)",
             session_id,
+            type(exc).__name__,
         )
         return MemoryContext(resolved_query=current_query)
 
@@ -449,16 +468,52 @@ async def update_memory_after_message(
 
         # Trigger lazy summarization once threshold exceeded
         if msg_count > SUMMARY_TRIGGER and not mem.get("session_summary"):
-            # Fire-and-forget summarization
+            messages_snapshot = [
+                {"role": item.role, "content": item.content or ""}
+                for item in rows[-RECENT_MSG_LIMIT:]
+            ]
             asyncio.create_task(
-                _trigger_summarization(db, session_id, user_id, rows)
+                _trigger_summarization_with_new_session(session_id, user_id, messages_snapshot)
             )
 
-    except Exception:
+    except Exception as exc:
+        try:
+            await db.rollback()
+        except Exception as rollback_exc:  # noqa: BLE001
+            log.warning(
+                "conversation_memory_service.update_memory_after_message: rollback failed for session %s error_class=%s",
+                session_id,
+                type(rollback_exc).__name__,
+            )
         log.warning(
-            "conversation_memory_service.update_memory_after_message: failed for session %s",
+            "conversation_memory_service.update_memory_after_message: failed for session %s error_class=%s",
             session_id,
+            type(exc).__name__,
         )
+
+
+async def _trigger_summarization_with_new_session(
+    session_id: uuid.UUID,
+    user_id: uuid.UUID,
+    messages: list,
+) -> None:
+    async with AsyncSessionLocal() as db:
+        try:
+            await _trigger_summarization(db, session_id, user_id, messages)
+        except Exception as exc:
+            try:
+                await db.rollback()
+            except Exception as rollback_exc:  # noqa: BLE001
+                log.warning(
+                    "conversation_memory_service._trigger_summarization: rollback failed for session %s error_class=%s",
+                    session_id,
+                    type(rollback_exc).__name__,
+                )
+            log.warning(
+                "conversation_memory_service._trigger_summarization: failed for session %s error_class=%s",
+                session_id,
+                type(exc).__name__,
+            )
 
 
 async def _trigger_summarization(
@@ -475,8 +530,10 @@ async def _trigger_summarization(
         # Build a text block from recent messages for summarization
         text_parts: list[str] = []
         for m in messages[-RECENT_MSG_LIMIT:]:
-            role_label = "用户" if m.role == "user" else "AI"
-            snippet = _sanitize_for_summary(m.content or "")[:100]
+            role = m.get("role") if isinstance(m, dict) else getattr(m, "role", "")
+            content = m.get("content") if isinstance(m, dict) else getattr(m, "content", "")
+            role_label = "用户" if role == "user" else "AI"
+            snippet = _sanitize_for_summary(content or "")[:100]
             if snippet:
                 text_parts.append(f"{role_label}：{snippet}")
 
@@ -502,10 +559,11 @@ async def _trigger_summarization(
         except Exception:
             # Fallback: rule-based summary from most recent user message
             last_user = next(
-                (m for m in reversed(messages) if m.role == "user"), None
+                (m for m in reversed(messages) if (m.get("role") if isinstance(m, dict) else getattr(m, "role", "")) == "user"), None
             )
             if last_user:
-                summary = _sanitize_for_summary(last_user.content or "")[:60]
+                last_user_content = last_user.get("content") if isinstance(last_user, dict) else getattr(last_user, "content", "")
+                summary = _sanitize_for_summary(last_user_content or "")[:60]
             else:
                 return
 
@@ -521,6 +579,10 @@ async def _trigger_summarization(
         await db.commit()
 
     except Exception:
+        try:
+            await db.rollback()
+        except Exception:  # noqa: BLE001
+            pass
         log.warning(
             "conversation_memory_service._trigger_summarization: failed for session %s",
             session_id,

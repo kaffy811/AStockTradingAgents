@@ -1,0 +1,22 @@
+{
+  "schema_version": "pi_canary_observation_window_v1",
+  "phase": "6V-P1.25",
+  "window": "w7_long_running",
+  "generated_at": "2026-07-25T02:00:00.000000+00:00",
+  "executed": true,
+  "rollout_percent": 100,
+  "config_version": 9,
+  "stable_bucket_salt": "pi_v1",
+  "endpoint": "http://127.0.0.1:18000",
+  "evidence_method": "canary_selection_math_in_real_container",
+  "total_requests": 1400,
+  "selections": 1400,
+  "not_selected": 0,
+  "selection_rate": 1.0,
+  "violations": 0,
+  "provider_serving_calls": 0,
+  "live": false,
+  "production_enabled": false,
+  "health_check_pass": true,
+  "result": "PASS"
+}

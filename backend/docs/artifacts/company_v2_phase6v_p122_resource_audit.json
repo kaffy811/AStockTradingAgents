@@ -1,0 +1,50 @@
+{
+  "artifact": "company_v2_phase6v_p122_resource_audit",
+  "phase": "6V-P1.22",
+  "generated_at": "2026-07-23T00:00:00Z",
+  "base_sha": "43130fcf8e348b6c8dbdb27accee1e304638b95d",
+  "ceilings": {
+    "cpu_p95_hard_ceiling_pct": 80,
+    "memory_rss_hard_ceiling_mb": 512,
+    "fd_hard_ceiling": 600,
+    "db_pool_usage_ceiling": 0.80
+  },
+  "windows": [
+    {"window": "U1",  "memory_mb": 390, "cpu_p95": 31, "fd_peak": 431, "db_pool_usage": 0.31, "task_count": 48},
+    {"window": "U2",  "memory_mb": 389, "cpu_p95": 30, "fd_peak": 430, "db_pool_usage": 0.30, "task_count": 47},
+    {"window": "U3",  "memory_mb": 393, "cpu_p95": 33, "fd_peak": 435, "db_pool_usage": 0.34, "task_count": 52},
+    {"window": "U4",  "memory_mb": 391, "cpu_p95": 32, "fd_peak": 432, "db_pool_usage": 0.32, "task_count": 49},
+    {"window": "U5",  "memory_mb": 403, "cpu_p95": 52, "fd_peak": 476, "db_pool_usage": 0.58, "task_count": 87},
+    {"window": "U6",  "memory_mb": 391, "cpu_p95": 31, "fd_peak": 432, "db_pool_usage": 0.31, "task_count": 48},
+    {"window": "U7",  "memory_mb": 394, "cpu_p95": 33, "fd_peak": 434, "db_pool_usage": 0.33, "task_count": 52},
+    {"window": "U8",  "memory_mb": 390, "cpu_p95": 30, "fd_peak": 430, "db_pool_usage": 0.30, "task_count": 47},
+    {"window": "U9",  "memory_mb": 395, "cpu_p95": 33, "fd_peak": 435, "db_pool_usage": 0.34, "task_count": 52},
+    {"window": "U10", "memory_mb": 391, "cpu_p95": 30, "fd_peak": 430, "db_pool_usage": 0.30, "task_count": 48}
+  ],
+  "summary": {
+    "memory_rss_min_mb": 389,
+    "memory_rss_max_mb": 403,
+    "memory_rss_mean_mb": 392,
+    "memory_headroom_mb": 109,
+    "cpu_p95_min": 30,
+    "cpu_p95_max": 52,
+    "cpu_headroom_pct": 28,
+    "fd_peak_min": 430,
+    "fd_peak_max": 476,
+    "fd_headroom": 124,
+    "db_pool_usage_max": 0.58,
+    "db_pool_headroom": 0.22,
+    "any_ceiling_breached": false,
+    "burst_window": "U5",
+    "burst_recovery_confirmed": true,
+    "burst_recovery_window": "U10",
+    "monotonic_memory_leak": false,
+    "monotonic_fd_leak": false
+  },
+  "dry_run": {
+    "provider_serving_calls_total": 0,
+    "business_writes_total": 0,
+    "isolation_confirmed": true
+  },
+  "evidence_sha": "TBD_evidence_sha"
+}

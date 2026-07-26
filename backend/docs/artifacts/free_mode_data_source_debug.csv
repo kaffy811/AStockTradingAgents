@@ -1,0 +1,55 @@
+ts_code,probe,status,latency_ms,rows_count,renderable,error,score
+600519.SH,baostock_login,failed,152,,,error_code=10002007,0.0
+600519.SH,baostock_profit,empty,2,0,False,,0.0
+600519.SH,baostock_growth,empty,2,0,False,,0.0
+600519.SH,baostock_balance,empty,2,0,False,,0.0
+600519.SH,baostock_operation,empty,1,0,False,,0.0
+600519.SH,baostock_cash_flow,empty,1,0,False,,0.0
+600519.SH,baostock_dupont,empty,1,0,False,,0.0
+600519.SH,akshare_financial_abstract,failed,158,0,,"RuntimeError: stock_financial_abstract_ths 获取失败 [600519]: HTTPSConnectionPool(host='basic.10jqka.com.cn', port=443): Max retries exceeded with url: /new/600519/finance.html (Caused by NameResolutionError(""HTTPSConnection(host='basic.10jqka.com.cn', port=443): Failed to resolve 'basic.10jqka.com.cn' ([Errno 8] nodename nor servname provided, or not known)""))",0.0
+600519.SH,akshare_cash_flow,failed,114,0,,"RuntimeError: stock_financial_cash_ths 获取失败 [600519]: HTTPSConnectionPool(host='basic.10jqka.com.cn', port=443): Max retries exceeded with url: /api/stock/finance/600519_cash.json (Caused by NameResolutionError(""HTTPSConnection(host='basic.10jqka.com.cn', port=443): Failed to resolve 'basic.10jqka.com.cn' ([Errno 8] nodename nor servname provided, or not known)""))",0.0
+600519.SH,akshare_real_time_quote,failed,4949,,,"ConnectionError: HTTPSConnectionPool(host='82.push2.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/clist/get?pn=1&pz=100&po=1&np=1&ut=bd1d9ddb04089700cf9c27f6f7426281&fltt=2&invt=2&fid=f12&fs=m%3A0+t%3A6%2Cm%3A0+t%3A80%2Cm%3A1+t%3A2%2Cm%3A1+t%3A23%2Cm%3A0+t%3A81+s%3A2048&fields=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6%2Cf7%2Cf8%2Cf9%2Cf10%2Cf12%2Cf13%2Cf14%2Cf15%2Cf16%2Cf17%2Cf18%2Cf20%2Cf21%2Cf23%2Cf24%2Cf25%2Cf22%2Cf11%2Cf62%2Cf128%2Cf136%2Cf115%2Cf152 (Caused by NameResolutionError(""HTTPSConnection(host='82.push2.eastmoney.com', port=443): Failed to resolve '82.push2.eastmoney.com' ([Errno 8] nodename nor servname provided, or not known)""))",0.0
+600519.SH,dns_static.cninfo.com.cn,failed,0,,,"DNS failed: [Errno 8] nodename nor servname provided, or not known",0.0
+600519.SH,dns_www.sse.com.cn,failed,0,,,"DNS failed: [Errno 8] nodename nor servname provided, or not known",0.0
+600519.SH,dns_disclosure.szse.cn,failed,0,,,"DNS failed: [Errno 8] nodename nor servname provided, or not known",0.0
+600519.SH,pdf_discovery_2025,empty,9228,,,,0.0
+600519.SH,pdf_discovery_2024,empty,9199,,,,0.0
+600519.SH,pdf_discovery_2023,empty,9199,,,,0.0
+600519.SH,db_report_documents,failed,111,0,,"gaierror: [Errno 8] nodename nor servname provided, or not known",0.0
+600519.SH,db_report_chunks,failed,1,0,,"gaierror: [Errno 8] nodename nor servname provided, or not known",0.0
+000725.SZ,baostock_login,failed,0,,,error_code=10002007,0.0
+000725.SZ,baostock_profit,empty,2,0,False,,0.0
+000725.SZ,baostock_growth,empty,1,0,False,,0.0
+000725.SZ,baostock_balance,empty,2,0,False,,0.0
+000725.SZ,baostock_operation,empty,1,0,False,,0.0
+000725.SZ,baostock_cash_flow,empty,2,0,False,,0.0
+000725.SZ,baostock_dupont,empty,2,0,False,,0.0
+000725.SZ,akshare_financial_abstract,failed,1,0,,"RuntimeError: stock_financial_abstract_ths 获取失败 [000725]: HTTPSConnectionPool(host='basic.10jqka.com.cn', port=443): Max retries exceeded with url: /new/000725/finance.html (Caused by NameResolutionError(""HTTPSConnection(host='basic.10jqka.com.cn', port=443): Failed to resolve 'basic.10jqka.com.cn' ([Errno 8] nodename nor servname provided, or not known)""))",0.0
+000725.SZ,akshare_cash_flow,failed,1,0,,"RuntimeError: stock_financial_cash_ths 获取失败 [000725]: HTTPSConnectionPool(host='basic.10jqka.com.cn', port=443): Max retries exceeded with url: /api/stock/finance/000725_cash.json (Caused by NameResolutionError(""HTTPSConnection(host='basic.10jqka.com.cn', port=443): Failed to resolve 'basic.10jqka.com.cn' ([Errno 8] nodename nor servname provided, or not known)""))",0.0
+000725.SZ,akshare_real_time_quote,failed,5318,,,"ConnectionError: HTTPSConnectionPool(host='82.push2.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/clist/get?pn=1&pz=100&po=1&np=1&ut=bd1d9ddb04089700cf9c27f6f7426281&fltt=2&invt=2&fid=f12&fs=m%3A0+t%3A6%2Cm%3A0+t%3A80%2Cm%3A1+t%3A2%2Cm%3A1+t%3A23%2Cm%3A0+t%3A81+s%3A2048&fields=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6%2Cf7%2Cf8%2Cf9%2Cf10%2Cf12%2Cf13%2Cf14%2Cf15%2Cf16%2Cf17%2Cf18%2Cf20%2Cf21%2Cf23%2Cf24%2Cf25%2Cf22%2Cf11%2Cf62%2Cf128%2Cf136%2Cf115%2Cf152 (Caused by NameResolutionError(""HTTPSConnection(host='82.push2.eastmoney.com', port=443): Failed to resolve '82.push2.eastmoney.com' ([Errno 8] nodename nor servname provided, or not known)""))",0.0
+000725.SZ,dns_static.cninfo.com.cn,failed,0,,,"DNS failed: [Errno 8] nodename nor servname provided, or not known",0.0
+000725.SZ,dns_www.sse.com.cn,failed,0,,,"DNS failed: [Errno 8] nodename nor servname provided, or not known",0.0
+000725.SZ,dns_disclosure.szse.cn,failed,0,,,"DNS failed: [Errno 8] nodename nor servname provided, or not known",0.0
+000725.SZ,pdf_discovery_2025,empty,9200,,,,0.0
+000725.SZ,pdf_discovery_2024,empty,9202,,,,0.0
+000725.SZ,pdf_discovery_2023,empty,9193,,,,0.0
+000725.SZ,db_report_documents,failed,2,0,,"gaierror: [Errno 8] nodename nor servname provided, or not known",0.0
+000725.SZ,db_report_chunks,failed,1,0,,"gaierror: [Errno 8] nodename nor servname provided, or not known",0.0
+601686.SH,baostock_login,failed,1,,,error_code=10002007,0.0
+601686.SH,baostock_profit,empty,12,0,False,,0.0
+601686.SH,baostock_growth,empty,12,0,False,,0.0
+601686.SH,baostock_balance,empty,12,0,False,,0.0
+601686.SH,baostock_operation,empty,12,0,False,,0.0
+601686.SH,baostock_cash_flow,empty,12,0,False,,0.0
+601686.SH,baostock_dupont,empty,12,0,False,,0.0
+601686.SH,akshare_financial_abstract,failed,1,0,,"RuntimeError: stock_financial_abstract_ths 获取失败 [601686]: HTTPSConnectionPool(host='basic.10jqka.com.cn', port=443): Max retries exceeded with url: /new/601686/finance.html (Caused by NameResolutionError(""HTTPSConnection(host='basic.10jqka.com.cn', port=443): Failed to resolve 'basic.10jqka.com.cn' ([Errno 8] nodename nor servname provided, or not known)""))",0.0
+601686.SH,akshare_cash_flow,failed,1,0,,"RuntimeError: stock_financial_cash_ths 获取失败 [601686]: HTTPSConnectionPool(host='basic.10jqka.com.cn', port=443): Max retries exceeded with url: /api/stock/finance/601686_cash.json (Caused by NameResolutionError(""HTTPSConnection(host='basic.10jqka.com.cn', port=443): Failed to resolve 'basic.10jqka.com.cn' ([Errno 8] nodename nor servname provided, or not known)""))",0.0
+601686.SH,akshare_real_time_quote,failed,5464,,,"ConnectionError: HTTPSConnectionPool(host='82.push2.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/clist/get?pn=1&pz=100&po=1&np=1&ut=bd1d9ddb04089700cf9c27f6f7426281&fltt=2&invt=2&fid=f12&fs=m%3A0+t%3A6%2Cm%3A0+t%3A80%2Cm%3A1+t%3A2%2Cm%3A1+t%3A23%2Cm%3A0+t%3A81+s%3A2048&fields=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6%2Cf7%2Cf8%2Cf9%2Cf10%2Cf12%2Cf13%2Cf14%2Cf15%2Cf16%2Cf17%2Cf18%2Cf20%2Cf21%2Cf23%2Cf24%2Cf25%2Cf22%2Cf11%2Cf62%2Cf128%2Cf136%2Cf115%2Cf152 (Caused by NameResolutionError(""HTTPSConnection(host='82.push2.eastmoney.com', port=443): Failed to resolve '82.push2.eastmoney.com' ([Errno 8] nodename nor servname provided, or not known)""))",0.0
+601686.SH,dns_static.cninfo.com.cn,failed,0,,,"DNS failed: [Errno 8] nodename nor servname provided, or not known",0.0
+601686.SH,dns_www.sse.com.cn,failed,0,,,"DNS failed: [Errno 8] nodename nor servname provided, or not known",0.0
+601686.SH,dns_disclosure.szse.cn,failed,0,,,"DNS failed: [Errno 8] nodename nor servname provided, or not known",0.0
+601686.SH,pdf_discovery_2025,empty,9199,,,,0.0
+601686.SH,pdf_discovery_2024,empty,9205,,,,0.0
+601686.SH,pdf_discovery_2023,empty,9196,,,,0.0
+601686.SH,db_report_documents,failed,19,0,,"gaierror: [Errno 8] nodename nor servname provided, or not known",0.0
+601686.SH,db_report_chunks,failed,1,0,,"gaierror: [Errno 8] nodename nor servname provided, or not known",0.0

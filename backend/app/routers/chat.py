@@ -19,18 +19,21 @@ user_id 严格从 JWT 读取，不接受请求体传入。
 
 from __future__ import annotations
 
+import asyncio
+import logging
 import uuid
 from datetime import datetime, timezone
 
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from fastapi.responses import StreamingResponse
+from sqlalchemy.exc import DBAPIError, OperationalError, SQLAlchemyError, TimeoutError as SQLAlchemyTimeoutError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.agents.chat_confirmation import is_expired
 from app.agents.chat_orchestrator import get_skills_list, process_confirm, process_message
 import app.agents.chat_memory as _mem
-from app.core.database import get_db
+from app.core.database import AsyncSessionLocal, get_db
 from app.dependencies import get_current_user
 from app.models.chat import (
     ChatConfirmRequest,
@@ -45,6 +48,8 @@ from app.models.chat import (
 )
 from app.models.user import User
 from app.services import chat_service
+
+log = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
@@ -161,9 +166,19 @@ async def get_chat_session(
 async def send_chat_message(
     session_id: uuid.UUID,
     body: ChatMessageSendRequest,
+    request: Request = None,
     user: User         = Depends(get_current_user),
     db:   AsyncSession = Depends(get_db),
 ) -> ChatMessageSendResponse:
+    # Acceptance-only shadow correlation (no-op unless shadow executor mode).
+    from app.agent_runtime.shadow_correlation import (  # noqa: PLC0415
+        SHADOW_CORRELATION_HEADER,
+        set_correlation_from_header,
+    )
+
+    set_correlation_from_header(
+        request.headers.get(SHADOW_CORRELATION_HEADER) if request is not None else None
+    )
     # Verify session belongs to user
     session = await chat_service.get_session(db, session_id, user.id)
     if session is None:
@@ -197,6 +212,14 @@ async def send_chat_message(
     await chat_service.update_session_last_message(db, session_id)
     await db.commit()
 
+    public_meta = {
+        key: value
+        for key, value in {
+            "response_kind": (result.metadata or {}).get("response_kind"),
+            "clarification": (result.metadata or {}).get("clarification"),
+        }.items()
+        if value
+    }
     return ChatMessageSendResponse(
         message_id=user_msg.id,
         assistant_message_id=asst_msg.id,
@@ -205,6 +228,7 @@ async def send_chat_message(
         tool_events=result.tool_events,
         cards=result.cards,
         confirmation=result.confirmation,
+        metadata=public_meta or None,
     )
 
 
@@ -219,7 +243,6 @@ async def send_chat_message_stream(
     body: ChatMessageSendRequest,
     request: Request,
     user: User         = Depends(get_current_user),
-    db:   AsyncSession = Depends(get_db),
 ) -> StreamingResponse:
     """
     SSE streaming version of send_chat_message.
@@ -242,9 +265,47 @@ async def send_chat_message_stream(
       - tool_completed carries tool_name / status / summary only.
     """
     from app.agents.chat_streaming import stream_chat_message
+    from app.agent_runtime.shadow_correlation import (  # noqa: PLC0415
+        SHADOW_CORRELATION_HEADER,
+        set_correlation_from_header,
+    )
 
-    # Verify session belongs to user
-    session = await chat_service.get_session(db, session_id, user.id)
+    # Acceptance-only shadow correlation (no-op unless shadow executor mode).
+    set_correlation_from_header(request.headers.get(SHADOW_CORRELATION_HEADER))
+
+    # Verify session belongs to user in a short transaction.  Do not keep a
+    # request-scoped AsyncSession alive for the StreamingResponse lifetime.
+    try:
+        async with AsyncSessionLocal() as verify_db:
+            session = await asyncio.wait_for(
+                chat_service.get_session(verify_db, session_id, user.id),
+                timeout=10.0,
+            )
+            await asyncio.wait_for(verify_db.rollback(), timeout=3.0)
+    except (
+        asyncio.TimeoutError,
+        TimeoutError,
+        SQLAlchemyTimeoutError,
+        OperationalError,
+        DBAPIError,
+        SQLAlchemyError,
+        OSError,
+    ) as exc:
+        log.warning(
+            "chat_stream_session_verification_failed session=%s error_class=%s connection_invalidated=%s raised_at=app.routers.chat:send_chat_message_stream",
+            session_id,
+            type(exc).__name__,
+            bool(getattr(exc, "connection_invalidated", False)),
+        )
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail={
+                "status": "failed",
+                "error_code": "CHAT_SESSION_VERIFICATION_DATABASE_UNAVAILABLE",
+                "message": "会话验证服务暂时不可用，请稍后重试。",
+                "retryable": True,
+            },
+        ) from None
     if session is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -259,7 +320,6 @@ async def send_chat_message_stream(
             user_id=user.id,
             content=body.content,
             output_language=output_language,
-            db=db,
         ):
             # Stop if client disconnected
             if await request.is_disconnected():

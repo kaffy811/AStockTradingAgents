@@ -1,0 +1,22 @@
+{
+  "schema_version": "pi_official_report_p112_p111b_audit_v1",
+  "phase": "6V-P1.12",
+  "generated_at": "2026-07-21T23:00:00.000000+00:00",
+  "source_sha": "a97b0ec021c7577f6a51267c3bb311ee47db0eb9",
+  "p111b_artifacts_verified": 7,
+  "staging_apply_completed": true,
+  "total_rows_verified": 302,
+  "newly_inserted_verified": 236,
+  "covered_symbols_verified": 100,
+  "quality_gate_passed": true,
+  "idempotency_passed": true,
+  "exact_year_regression_cases": 311,
+  "shadow_selected": 60,
+  "shadow_safety_correctness": 1.0,
+  "wrong_year_count": 0,
+  "fabricated_url_count": 0,
+  "recommended_to_raise_to_five_percent": false,
+  "production_enabled": false,
+  "blocker_detected": false,
+  "p112_authorized_to_proceed": true
+}

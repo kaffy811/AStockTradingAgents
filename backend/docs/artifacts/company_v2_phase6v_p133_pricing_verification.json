@@ -1,0 +1,54 @@
+{
+  "schema_version": "pi_canary_pricing_verification_v2",
+  "phase": "6V-P1.33",
+  "generated_at": "2026-07-26T04:00:00Z",
+  "gate": "F",
+
+  "verification_source": "https://api-docs.deepseek.com/quick_start/pricing",
+  "retrieval_date": "2026-07-26",
+  "currency": "USD",
+  "price_unit": "per_1m_tokens",
+
+  "verified_prices": {
+    "deepseek-v4-flash": {
+      "input_cache_miss_per_1m_usd": "0.14",
+      "input_cache_hit_per_1m_usd": "0.0028",
+      "output_per_1m_usd": "0.28",
+      "verified": true
+    },
+    "deepseek-v4-pro": {
+      "input_cache_miss_per_1m_usd": "0.435",
+      "input_cache_hit_per_1m_usd": "0.003625",
+      "output_per_1m_usd": "0.87",
+      "verified": true
+    }
+  },
+
+  "budget_guard_currency_assessment": {
+    "budget_guard_uses": "CNY",
+    "config_setting": "pi_real_provider_max_cost_cny",
+    "config_default_cny": 100.0,
+    "verified_prices_currency": "USD",
+    "currency_mismatch": true,
+    "exchange_rate_estimate_cny_per_usd": "7.20",
+    "exchange_rate_floor_for_guard": "7.0",
+    "cny_estimate_deepseek_v4_flash_output_per_1m": "2.016",
+    "risk": "Exchange rate fluctuation. Budget guard uses conservative floor (7.0 CNY/USD) for safety.",
+    "action_required_before_real_provider": "Validate exchange rate at time of activation. Consider USD-denominated budget guard for real provider."
+  },
+
+  "100_request_cost_estimate": {
+    "model": "deepseek-v4-flash",
+    "assumed_tokens_per_request": "2000 input (cache miss) + 500 output",
+    "input_cost_usd": "0.000028",
+    "output_cost_usd": "0.00014",
+    "total_per_request_usd": "0.000168",
+    "total_100_requests_usd": "0.0168",
+    "total_100_requests_cny_estimate": "0.121",
+    "within_cny_100_budget": true
+  },
+
+  "gate_f_result": "PASS",
+  "gate_g_result": "PARTIAL",
+  "gate_g_note": "Prices verified in USD. Budget guard uses CNY with conservative exchange rate estimate. Full validation requires real exchange rate at activation time."
+}

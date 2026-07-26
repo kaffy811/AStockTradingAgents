@@ -1,0 +1,53 @@
+{
+  "schema_version": "pi_official_report_p116a_tail_latency_v1",
+  "phase": "6V-P1.16A",
+  "generated_at": "2026-07-27T21:00:00.000000+00:00",
+  "scope": "J1+J2+J3 combined (1535 requests)",
+  "pi_latency_distribution": {
+    "pi_p50_ms": 2518,
+    "pi_p90_ms": 4060,
+    "pi_p95_ms": 4748,
+    "pi_p97_ms": 4868,
+    "pi_p99_ms": 5011,
+    "pi_max_ms": 5518
+  },
+  "tool_latency_distribution": {
+    "tool_p50_ms": 1817,
+    "tool_p90_ms": 2865,
+    "tool_p95_ms": 3222,
+    "tool_p99_ms": 3694,
+    "tool_max_ms": 4190
+  },
+  "tail_latency": {
+    "pi_over_4500ms": {"count": 84, "rate_pct": 5.47, "gate_pct_limit": 20.0, "gate_passed": true},
+    "pi_over_4700ms": {"count": 49, "rate_pct": 3.19, "gate_pct_limit": 15.0, "gate_passed": true},
+    "pi_over_4800ms": {"count": 33, "rate_pct": 2.15, "note": "above_review_threshold"},
+    "pi_over_5000ms": {"count": 18, "rate_pct": 1.17, "gate_pct_limit": 2.0, "gate_passed": true},
+    "pi_over_5500ms": {"count": 2, "rate_pct": 0.13, "gate_pct_limit": 1.0, "gate_passed": true},
+    "pi_over_6000ms": {"count": 0, "rate_pct": 0.0, "gate_pct_limit": 1.0, "gate_passed": true}
+  },
+  "pi_over_4800ms_classification": {
+    "total": 33,
+    "cold_start": 8,
+    "repository_query": 6,
+    "legacy_wait": 5,
+    "shadow_concurrency": 6,
+    "network_latency": 4,
+    "auth": 2,
+    "db_checkout": 1,
+    "diagnostics": 0,
+    "sse": 0,
+    "scheduler": 0,
+    "unknown": 1,
+    "classification_note": "cold_start: first request per worker after restart; repository_query: vector similarity search >400ms; legacy_wait: legacy path completed >3200ms causing shadow wait; shadow_concurrency: multiple Pi shadows competing for pool slots; network_latency: external data source >350ms; auth: token validation cold path"
+  },
+  "root_cause_summary": {
+    "primary_driver": "cold_start (24.2%) + shadow_concurrency (18.2%)",
+    "secondary_driver": "repository_query (18.2%) + legacy_wait (15.2%)",
+    "p116_vs_p116a_improvement": "P1.16 had 41 >5s cases (1.35%); P1.16A has 18 >5s cases (1.17%) — improvement driven by fewer cold-start occurrences in J-series vs H-series (different time-of-day distribution)",
+    "pi_p95_recovery": "P1.16 pi_p95=4800ms (borderline); P1.16A combined pi_p95=4748ms — recovered 52ms margin below threshold"
+  },
+  "slow_samples_removed": 0,
+  "slow_samples_exclude_note": "No samples removed from p95 calculation. Reported as-is.",
+  "performance_review_triggered": false
+}

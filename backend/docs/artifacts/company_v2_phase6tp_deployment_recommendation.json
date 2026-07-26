@@ -1,0 +1,19 @@
+{
+  "phase": "phase6tp_deployment_recommendation",
+  "recommended_deployment_region": "ap-northeast-2",
+  "recommended_endpoint": "transaction pooler on aws-1-ap-northeast-2.pooler.supabase.com:6543",
+  "recommended_pool_mode": "transaction_pooler",
+  "pool_pre_ping": false,
+  "pool_size": 5,
+  "max_overflow": 10,
+  "pool_recycle": 1800,
+  "prepared_statement_settings": "statement_cache_size=0",
+  "connect_timeout_seconds": 15,
+  "ssl_mode": "require",
+  "dns_resolver_requirements": [
+    "stable resolution of aws-1-ap-northeast-2.pooler.supabase.com",
+    "no VPN/proxy interference",
+    "same-region runner availability"
+  ],
+  "decision": "hold"
+}

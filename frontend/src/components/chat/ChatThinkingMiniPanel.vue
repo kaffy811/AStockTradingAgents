@@ -220,9 +220,22 @@ const filteredThinkingEvents = computed(() => {
     if (ev.phase === 'intent_decision') return false
     // Skip internal-only phases with no content
     if (!ev.content) return false
+    const text = `${ev.title ?? ''} ${ev.content ?? ''} ${ev.agent ?? ''}`
+    if (/ReportChatCopilotAgent|MultiCompanyFinancialComparisonAgent|report_explanation_skill|report_comparison_skill/.test(text)) return false
     return true
-  })
+  }).map(ev => ({
+    ...ev,
+    agent: '',
+    content: sanitizeTraceContent(ev.content),
+  }))
 })
+
+function sanitizeTraceContent(text) {
+  return String(text ?? '')
+    .replace(/ReportChatCopilotAgent|MultiCompanyFinancialComparisonAgent/g, '财报分析流程')
+    .replace(/report_explanation_skill|report_comparison_skill/g, '财报分析流程')
+    .replace(/Agent 调度/g, '执行过程')
+}
 
 /** True when we have backend-supplied thinking events */
 const hasThinkingEvents = computed(() => filteredThinkingEvents.value.length > 0)
@@ -274,7 +287,7 @@ const visibleSteps = computed(() => {
       phase:   ev.phase,
       title:   PHASE_LABELS[ev.phase] || ev.title || ev.phase,
       content: ev.content,
-      agent:   ev.agent || '',
+      agent:   '',
       status:  ev.status || 'completed',
     }))
   }

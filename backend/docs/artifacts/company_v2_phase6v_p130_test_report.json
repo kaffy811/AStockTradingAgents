@@ -1,0 +1,77 @@
+{
+  "schema_version": "pi_canary_test_report_v2",
+  "phase": "6V-P1.30",
+  "generated_at": "2026-07-25T20:30:00.000000+00:00",
+
+  "p130_targeted_suite": {
+    "file": "backend/tests/test_phase6v_p130_real_provider_readiness.py",
+    "collected": 231,
+    "passed": 231,
+    "failed": 0,
+    "skipped": 0,
+    "exit_code": 0
+  },
+
+  "p129_regression": {
+    "command": "python3.11 -m pytest backend/tests/test_phase6v_p129_sustained_live.py -q",
+    "collected": 312,
+    "passed": 312,
+    "failed": 0,
+    "skipped": 0,
+    "exit_code": 0
+  },
+
+  "p128_regression": {
+    "command": "python3.11 -m pytest backend/tests/test_phase6v_p128_live_canary.py -q",
+    "collected": 187,
+    "passed": 187,
+    "failed": 0,
+    "skipped": 0,
+    "exit_code": 0
+  },
+
+  "entire_backend": {
+    "command": "python3.11 -m pytest tests/ -q --tb=no --ignore=tests/integration --ignore=tests/test_cors.py -p no:warnings",
+    "collected": 7904,
+    "passed": 7862,
+    "failed": 0,
+    "skipped": 42,
+    "exit_code": 0,
+    "note": "P1.30 adds 231 tests to P1.29 total of 7673 collected."
+  },
+
+  "frontend": {
+    "vitest_run": {
+      "command": "npx vitest run",
+      "test_files": 62,
+      "passed": 414,
+      "failed": 0,
+      "exit_code": 0
+    },
+    "vite_build": {
+      "command": "npx vite build",
+      "status": "PASS",
+      "modules": 195
+    }
+  },
+
+  "browser_e2e": {
+    "tool": "Playwright 1.48.0",
+    "total_cases": 50,
+    "passed": 50,
+    "failed": 0,
+    "real_provider_cases": "NOT_EXECUTED"
+  },
+
+  "secret_scan": {
+    "command": "git diff HEAD -- '*.py' '*.json' '*.md' | grep -i 'api_key\\|secret\\|password\\|sk-'",
+    "secrets_found": 0,
+    "credential_in_artifact": false,
+    "status": "PASS"
+  },
+
+  "provider_budget_unit_tests": {
+    "status": "NOT_EXECUTED",
+    "reason": "Budget guard not implemented; tests would test non-existent code"
+  }
+}

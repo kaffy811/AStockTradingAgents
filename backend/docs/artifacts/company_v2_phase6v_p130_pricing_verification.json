@@ -1,0 +1,46 @@
+{
+  "schema_version": "pi_canary_pricing_verification_v1",
+  "phase": "6V-P1.30",
+  "generated_at": "2026-07-25T20:10:00.000000+00:00",
+  "label": "P1.30 Provider Pricing Verification — Gate E",
+
+  "provider": "DeepSeek",
+  "models_to_price": ["deepseek-v4-flash", "deepseek-v4-pro"],
+  "currency": "CNY",
+
+  "pricing_source_check": {
+    "codebase_pricing_table": null,
+    "codebase_cost_per_token_config": null,
+    "env_example_pricing": null,
+    "internal_price_yaml": null,
+    "provider_usage_response_available": false,
+    "provider_console_accessible": false,
+    "pricing_api_endpoint_available": false
+  },
+
+  "pricing_found": false,
+  "pricing_from_memory_or_assumption": false,
+  "note": "Per P1.30 specification: pricing must NOT be filled from memory. No pricing configuration exists in the codebase. DeepSeek API responses return usage.prompt_tokens and usage.completion_tokens, but DeepSeekClient does not capture these fields. Cannot compute cost_cny without (a) verified token prices and (b) captured usage data.",
+
+  "required_for_activation": {
+    "input_price_per_1k_tokens_cny": "UNKNOWN — must obtain from DeepSeek official pricing page or API",
+    "output_price_per_1k_tokens_cny": "UNKNOWN",
+    "cache_price_per_1k_tokens_cny": "UNKNOWN",
+    "model": "deepseek-v4-flash",
+    "price_version_or_date": "UNKNOWN"
+  },
+
+  "p1_31_remediation": {
+    "action_required": [
+      "Add verified_pricing.json to backend/app/llm/pricing/ with source URL and retrieval date",
+      "Add deepseek_v4_flash_input_price_per_1k_cny and output price to Settings",
+      "Implement usage capture in DeepSeekClient.chat() and async variants",
+      "Implement CostEstimator using captured tokens × price",
+      "Add /pi-canary/provider-cost runtime probe for real-time cost visibility"
+    ]
+  },
+
+  "gate_e_status": "FAIL",
+  "gate_e_reason": "No reliable pricing source available. Pricing cannot be verified from codebase, provider console, or API. Cannot guarantee cost cap without verified per-token prices.",
+  "real_provider_blocked": true
+}

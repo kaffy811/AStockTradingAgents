@@ -1,0 +1,2736 @@
+{
+  "schema_version": "financial_agent_live_shadow.v1",
+  "generated_at": "2026-07-16T20:47:41.341341+00:00",
+  "mode": "live_shadow_required_not_executed",
+  "execution_status": "blocked",
+  "block_reason": "LIVE_SHADOW_NOT_EXECUTED",
+  "requested_sample_count": 56,
+  "executed_sample_count": 0,
+  "intent_sample_counts": {
+    "financial_comparison": 11,
+    "financial_report": 12,
+    "financial_snapshot": 11,
+    "official_report_pdf": 11,
+    "quote_query": 11
+  },
+  "market_sampling": {
+    "CN": {
+      "requested": 100,
+      "executed": 0,
+      "reason": "live StockMaster sampling not executed"
+    },
+    "HK": {
+      "requested": 30,
+      "executed": 0,
+      "reason": "live StockMaster sampling not executed"
+    },
+    "US": {
+      "requested": 0,
+      "executed": 0,
+      "reason": "current requested coverage is 0 and must not be overstated"
+    }
+  },
+  "cases": [
+    {
+      "trace_id": "live_shadow_blocked_001",
+      "intent": "financial_report",
+      "entities": [],
+      "conversation_case": "A1_report_explicit_name",
+      "query_fingerprint": "case_001",
+      "coverage": [
+        "explicit_cn_name",
+        "continuous_chinese_entity",
+        "report_indexed"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_002",
+      "intent": "financial_comparison",
+      "entities": [],
+      "conversation_case": "A2_comparison_pronoun_second_entity",
+      "query_fingerprint": "case_002",
+      "coverage": [
+        "pronoun_followup",
+        "two_company_comparison"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_003",
+      "intent": "official_report_pdf",
+      "entities": [],
+      "conversation_case": "A3_pdf_context",
+      "query_fingerprint": "case_003",
+      "coverage": [
+        "current_report_context",
+        "official_url_available"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_004",
+      "intent": "quote_query",
+      "entities": [],
+      "conversation_case": "B1_quote_explicit_name",
+      "query_fingerprint": "case_004",
+      "coverage": [
+        "explicit_cn_name",
+        "quote_snapshot"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_005",
+      "intent": "financial_snapshot",
+      "entities": [],
+      "conversation_case": "B2_snapshot_pronoun",
+      "query_fingerprint": "case_005",
+      "coverage": [
+        "pronoun_followup",
+        "company_cache_hit"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_006",
+      "intent": "financial_report",
+      "entities": [],
+      "conversation_case": "C1_ambiguous_pingan",
+      "query_fingerprint": "case_006",
+      "coverage": [
+        "ambiguous_entity",
+        "clarification_required"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_007",
+      "intent": "official_report_pdf",
+      "entities": [],
+      "conversation_case": "official_report_pdf_01_explicit_company",
+      "query_fingerprint": "case_007",
+      "coverage": [
+        "explicit_company"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_008",
+      "intent": "official_report_pdf",
+      "entities": [],
+      "conversation_case": "official_report_pdf_02_report_not_found",
+      "query_fingerprint": "case_008",
+      "coverage": [
+        "report_not_found"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_009",
+      "intent": "official_report_pdf",
+      "entities": [],
+      "conversation_case": "official_report_pdf_03_official_url_available",
+      "query_fingerprint": "case_009",
+      "coverage": [
+        "official_url_available"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_010",
+      "intent": "official_report_pdf",
+      "entities": [],
+      "conversation_case": "official_report_pdf_04_current_report_context",
+      "query_fingerprint": "case_010",
+      "coverage": [
+        "current_report_context"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_011",
+      "intent": "official_report_pdf",
+      "entities": [],
+      "conversation_case": "official_report_pdf_05_stale_cache",
+      "query_fingerprint": "case_011",
+      "coverage": [
+        "stale_cache"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_012",
+      "intent": "official_report_pdf",
+      "entities": [],
+      "conversation_case": "official_report_pdf_06_auth_db_503",
+      "query_fingerprint": "case_012",
+      "coverage": [
+        "auth_db_503"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_013",
+      "intent": "official_report_pdf",
+      "entities": [],
+      "conversation_case": "official_report_pdf_07_rag_unavailable",
+      "query_fingerprint": "case_013",
+      "coverage": [
+        "rag_unavailable"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_014",
+      "intent": "official_report_pdf",
+      "entities": [],
+      "conversation_case": "official_report_pdf_08_page_context",
+      "query_fingerprint": "case_014",
+      "coverage": [
+        "page_context"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_015",
+      "intent": "official_report_pdf",
+      "entities": [],
+      "conversation_case": "official_report_pdf_09_code_query",
+      "query_fingerprint": "case_015",
+      "coverage": [
+        "code_query"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_016",
+      "intent": "official_report_pdf",
+      "entities": [],
+      "conversation_case": "official_report_pdf_10_continuous_chinese_entity",
+      "query_fingerprint": "case_016",
+      "coverage": [
+        "continuous_chinese_entity"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_017",
+      "intent": "quote_query",
+      "entities": [],
+      "conversation_case": "quote_query_01_cn_quote",
+      "query_fingerprint": "case_017",
+      "coverage": [
+        "cn_quote"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_018",
+      "intent": "quote_query",
+      "entities": [],
+      "conversation_case": "quote_query_02_hk_quote",
+      "query_fingerprint": "case_018",
+      "coverage": [
+        "hk_quote"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_019",
+      "intent": "quote_query",
+      "entities": [],
+      "conversation_case": "quote_query_03_us_no_current_coverage",
+      "query_fingerprint": "case_019",
+      "coverage": [
+        "us_no_current_coverage"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_020",
+      "intent": "quote_query",
+      "entities": [],
+      "conversation_case": "quote_query_04_stale_quote",
+      "query_fingerprint": "case_020",
+      "coverage": [
+        "stale_quote"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_021",
+      "intent": "quote_query",
+      "entities": [],
+      "conversation_case": "quote_query_05_market_closed",
+      "query_fingerprint": "case_021",
+      "coverage": [
+        "market_closed"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_022",
+      "intent": "quote_query",
+      "entities": [],
+      "conversation_case": "quote_query_06_code_query",
+      "query_fingerprint": "case_022",
+      "coverage": [
+        "code_query"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_023",
+      "intent": "quote_query",
+      "entities": [],
+      "conversation_case": "quote_query_07_page_context",
+      "query_fingerprint": "case_023",
+      "coverage": [
+        "page_context"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_024",
+      "intent": "quote_query",
+      "entities": [],
+      "conversation_case": "quote_query_08_auth_db_503",
+      "query_fingerprint": "case_024",
+      "coverage": [
+        "auth_db_503"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_025",
+      "intent": "quote_query",
+      "entities": [],
+      "conversation_case": "quote_query_09_partial_data",
+      "query_fingerprint": "case_025",
+      "coverage": [
+        "partial_data"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_026",
+      "intent": "quote_query",
+      "entities": [],
+      "conversation_case": "quote_query_10_continuous_chinese_entity",
+      "query_fingerprint": "case_026",
+      "coverage": [
+        "continuous_chinese_entity"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_027",
+      "intent": "financial_snapshot",
+      "entities": [],
+      "conversation_case": "financial_snapshot_01_company_cache_hit",
+      "query_fingerprint": "case_027",
+      "coverage": [
+        "company_cache_hit"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_028",
+      "intent": "financial_snapshot",
+      "entities": [],
+      "conversation_case": "financial_snapshot_02_partial_fields",
+      "query_fingerprint": "case_028",
+      "coverage": [
+        "partial_fields"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_029",
+      "intent": "financial_snapshot",
+      "entities": [],
+      "conversation_case": "financial_snapshot_03_industry_not_applicable",
+      "query_fingerprint": "case_029",
+      "coverage": [
+        "industry_not_applicable"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_030",
+      "intent": "financial_snapshot",
+      "entities": [],
+      "conversation_case": "financial_snapshot_04_provider_unavailable",
+      "query_fingerprint": "case_030",
+      "coverage": [
+        "provider_unavailable"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_031",
+      "intent": "financial_snapshot",
+      "entities": [],
+      "conversation_case": "financial_snapshot_05_stale_cache",
+      "query_fingerprint": "case_031",
+      "coverage": [
+        "stale_cache"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_032",
+      "intent": "financial_snapshot",
+      "entities": [],
+      "conversation_case": "financial_snapshot_06_different_industry",
+      "query_fingerprint": "case_032",
+      "coverage": [
+        "different_industry"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_033",
+      "intent": "financial_snapshot",
+      "entities": [],
+      "conversation_case": "financial_snapshot_07_page_context",
+      "query_fingerprint": "case_033",
+      "coverage": [
+        "page_context"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_034",
+      "intent": "financial_snapshot",
+      "entities": [],
+      "conversation_case": "financial_snapshot_08_code_query",
+      "query_fingerprint": "case_034",
+      "coverage": [
+        "code_query"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_035",
+      "intent": "financial_snapshot",
+      "entities": [],
+      "conversation_case": "financial_snapshot_09_auth_db_503",
+      "query_fingerprint": "case_035",
+      "coverage": [
+        "auth_db_503"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_036",
+      "intent": "financial_snapshot",
+      "entities": [],
+      "conversation_case": "financial_snapshot_10_rag_unavailable",
+      "query_fingerprint": "case_036",
+      "coverage": [
+        "rag_unavailable"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_037",
+      "intent": "financial_report",
+      "entities": [],
+      "conversation_case": "financial_report_01_explicit_cn_name",
+      "query_fingerprint": "case_037",
+      "coverage": [
+        "explicit_cn_name"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_038",
+      "intent": "financial_report",
+      "entities": [],
+      "conversation_case": "financial_report_02_explicit_code",
+      "query_fingerprint": "case_038",
+      "coverage": [
+        "explicit_code"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_039",
+      "intent": "financial_report",
+      "entities": [],
+      "conversation_case": "financial_report_03_continuous_chinese_entity",
+      "query_fingerprint": "case_039",
+      "coverage": [
+        "continuous_chinese_entity"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_040",
+      "intent": "financial_report",
+      "entities": [],
+      "conversation_case": "financial_report_04_report_indexed",
+      "query_fingerprint": "case_040",
+      "coverage": [
+        "report_indexed"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_041",
+      "intent": "financial_report",
+      "entities": [],
+      "conversation_case": "financial_report_05_rag_unavailable_cached_snapshot",
+      "query_fingerprint": "case_041",
+      "coverage": [
+        "rag_unavailable_cached_snapshot"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_042",
+      "intent": "financial_report",
+      "entities": [],
+      "conversation_case": "financial_report_06_report_year_mismatch",
+      "query_fingerprint": "case_042",
+      "coverage": [
+        "report_year_mismatch"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_043",
+      "intent": "financial_report",
+      "entities": [],
+      "conversation_case": "financial_report_07_page_context",
+      "query_fingerprint": "case_043",
+      "coverage": [
+        "page_context"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_044",
+      "intent": "financial_report",
+      "entities": [],
+      "conversation_case": "financial_report_08_auth_db_503",
+      "query_fingerprint": "case_044",
+      "coverage": [
+        "auth_db_503"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_045",
+      "intent": "financial_report",
+      "entities": [],
+      "conversation_case": "financial_report_09_partial_data",
+      "query_fingerprint": "case_045",
+      "coverage": [
+        "partial_data"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_046",
+      "intent": "financial_report",
+      "entities": [],
+      "conversation_case": "financial_report_10_different_industry",
+      "query_fingerprint": "case_046",
+      "coverage": [
+        "different_industry"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_047",
+      "intent": "financial_comparison",
+      "entities": [],
+      "conversation_case": "financial_comparison_01_two_explicit_companies",
+      "query_fingerprint": "case_047",
+      "coverage": [
+        "two_explicit_companies"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_048",
+      "intent": "financial_comparison",
+      "entities": [],
+      "conversation_case": "financial_comparison_02_pronoun_plus_second_entity",
+      "query_fingerprint": "case_048",
+      "coverage": [
+        "pronoun_plus_second_entity"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_049",
+      "intent": "financial_comparison",
+      "entities": [],
+      "conversation_case": "financial_comparison_03_three_company_comparison",
+      "query_fingerprint": "case_049",
+      "coverage": [
+        "three_company_comparison"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_050",
+      "intent": "financial_comparison",
+      "entities": [],
+      "conversation_case": "financial_comparison_04_period_mismatch",
+      "query_fingerprint": "case_050",
+      "coverage": [
+        "period_mismatch"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_051",
+      "intent": "financial_comparison",
+      "entities": [],
+      "conversation_case": "financial_comparison_05_one_side_missing_fields",
+      "query_fingerprint": "case_051",
+      "coverage": [
+        "one_side_missing_fields"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_052",
+      "intent": "financial_comparison",
+      "entities": [],
+      "conversation_case": "financial_comparison_06_different_industry",
+      "query_fingerprint": "case_052",
+      "coverage": [
+        "different_industry"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_053",
+      "intent": "financial_comparison",
+      "entities": [],
+      "conversation_case": "financial_comparison_07_page_context",
+      "query_fingerprint": "case_053",
+      "coverage": [
+        "page_context"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_054",
+      "intent": "financial_comparison",
+      "entities": [],
+      "conversation_case": "financial_comparison_08_auth_db_503",
+      "query_fingerprint": "case_054",
+      "coverage": [
+        "auth_db_503"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_055",
+      "intent": "financial_comparison",
+      "entities": [],
+      "conversation_case": "financial_comparison_09_rag_unavailable_cached_snapshot",
+      "query_fingerprint": "case_055",
+      "coverage": [
+        "rag_unavailable_cached_snapshot"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    },
+    {
+      "trace_id": "live_shadow_blocked_056",
+      "intent": "financial_comparison",
+      "entities": [],
+      "conversation_case": "financial_comparison_10_stale_cache",
+      "query_fingerprint": "case_056",
+      "coverage": [
+        "stale_cache"
+      ],
+      "legacy": {
+        "status": "not_run",
+        "route": null,
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "layered": {
+        "status": "not_run",
+        "route": null,
+        "plan": {},
+        "answer_present": false,
+        "numeric_facts": [],
+        "periods": [],
+        "evidence_ids": [],
+        "latency_ms": null,
+        "db_queries": null,
+        "tool_calls": [],
+        "llm_calls": null,
+        "error_code": "LIVE_SHADOW_NOT_EXECUTED"
+      },
+      "comparison": {
+        "intent_match": null,
+        "entity_match": null,
+        "period_match": null,
+        "numeric_fact_match_rate": null,
+        "unsupported_numeric_fact_count": null,
+        "unsupported_causal_claim_count": null,
+        "missing_fact_count": null,
+        "latency_delta_ms": null,
+        "decision": "blocked_live_not_executed"
+      }
+    }
+  ],
+  "metrics": {
+    "executed_sample_count": 0,
+    "intent_match_rate": null,
+    "entity_match_rate": null,
+    "numeric_fact_match_rate": null,
+    "unsupported_numeric_fact_count": null,
+    "unsupported_causal_claim_count": null,
+    "stale_as_realtime_count": null,
+    "annual_quarter_mismatch_count": null,
+    "null_filled_as_zero_count": null,
+    "cross_company_evidence_contamination_count": null,
+    "context_corruption_count": null,
+    "message_double_write_count": null,
+    "db_session_across_llm_count": null,
+    "private_daemon_loop_in_layered_path": null,
+    "cold_latency_p50_ms": null,
+    "cold_latency_p95_ms": null,
+    "warm_latency_p50_ms": null,
+    "warm_latency_p95_ms": null,
+    "db_query_delta_p50": null,
+    "tool_call_delta_p50": null,
+    "llm_call_delta_p50": null
+  },
+  "db_reliability": {
+    "auth_cache_hit_verified": false,
+    "db_timeout_503_verified": false,
+    "pool_checked_out_returned_to_baseline": false,
+    "cancelled_connection_rollback_storm": "not_run",
+    "session_across_llm": "not_run"
+  },
+  "browser_acceptance": {
+    "status": "not_run",
+    "normal_user_saw_legacy_only": null,
+    "trace_concise": null,
+    "sources_collapsed": null,
+    "disclaimer_once": null,
+    "input_preserved_after_503": null,
+    "shadow_hidden": null
+  },
+  "live_external_suite": {
+    "integration_live_or_live_external": {
+      "status": "failed",
+      "passed": 0,
+      "skipped": 0,
+      "failed": 15,
+      "reason": "DNS_RESOLUTION_FAILED_FOR_SUPABASE_POOLER"
+    },
+    "soak": {
+      "status": "no_tests_collected",
+      "passed": 0,
+      "skipped": 0,
+      "failed": 0,
+      "reason": "NO_TESTS_MATCHED_SOAK_MARKER"
+    }
+  },
+  "side_effects": {
+    "message_writes": 0,
+    "context_writes": 0,
+    "watchlist_writes": 0,
+    "report_writes": 0,
+    "job_writes": 0
+  }
+}

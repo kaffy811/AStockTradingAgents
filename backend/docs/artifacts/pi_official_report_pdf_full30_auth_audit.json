@@ -1,0 +1,25 @@
+{
+  "schema_version": "pi_official_report_pdf_full30_auth_audit_v1",
+  "phase": "6V-P1.6.4",
+  "generated_at": "2026-07-19T06:55:51.671506+00:00",
+  "acceptance_identity_type": "dedicated acceptance account",
+  "user_id_recorded": "hash_only",
+  "token_recorded": false,
+  "cache_policy": {
+    "ttl_seconds": 60,
+    "stores_token": false,
+    "stores_orm_user_object": false,
+    "singleflight_enabled": true
+  },
+  "cold_lookup_count": "at_least_1_preflight",
+  "cache_hit_observed": true,
+  "cache_hit_p95_ms": 0,
+  "auth_401_count": 0,
+  "auth_403_count": 0,
+  "auth_503_count": 0,
+  "auth_database_timeout_count": 0,
+  "auth_database_unavailable_count": 0,
+  "limitations": [
+    "Full30 runner artifact does not emit per-request auth latency counters; preflight/cache audit artifacts were used for this summary."
+  ]
+}

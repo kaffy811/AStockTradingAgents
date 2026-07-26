@@ -1,0 +1,42 @@
+{
+  "schema_version": "pi_canary_runtime_probe_v3",
+  "phase": "6V-P1.30",
+  "generated_at": "2026-07-25T20:04:00.000000+00:00",
+  "label": "P1.30 Runtime Probe — Before (pre-activation)",
+
+  "compose_project": "tradingagents-p125-staging",
+  "container": {
+    "health": "healthy",
+    "container_id_prefix": "tradingagents-p125-staging-backend-1",
+    "image_id_prefix": "sha256:3f7a",
+    "deployment_source_sha": "3a773241fe55535ee6f274473e11ec42459a65a3",
+    "process_uptime_hours": 71.2,
+    "startup_time_seconds": 3.1
+  },
+
+  "config_fingerprint": {
+    "config_version": 12,
+    "shadow_rollout_percent": 100,
+    "shadow_salt": "pi_v1",
+    "live_enabled": true,
+    "live_rollout_percent": 1,
+    "live_salt": "pi_live_v1",
+    "production_enabled": false,
+    "provider_mode": "staging_replay",
+    "real_provider_enabled": false,
+    "real_provider_max_requests": null,
+    "real_provider_max_cost_cny": null,
+    "real_provider_request_count": null,
+    "real_provider_cost_accumulated": null
+  },
+
+  "version_check": {
+    "expected_cv": 12,
+    "actual_cv": 12,
+    "match": true,
+    "drift": false
+  },
+
+  "probe_result": "PASS",
+  "note": "Runtime at cv=12, staging_replay, live=1%, production=false. Consistent with P1.29 final state. No version drift."
+}

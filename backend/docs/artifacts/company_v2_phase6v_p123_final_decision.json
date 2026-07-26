@@ -1,0 +1,68 @@
+{
+  "schema_version": "pi_canary_final_decision_v1",
+  "phase": "6V-P1.23",
+  "phase_title": "Deployed Runtime Probe Closure",
+  "state": "B",
+  "state_description": "Gate C = UNKNOWN, runtime probe not closeable, 100% promotion NOT executed",
+  "generated_at": "2026-07-23T17:00:00.000000+00:00",
+  "base_sha": "779da4cd3f33ff6a1b21b7c36cf182b7b2c4500d",
+  "evidence_sha": "01ad00014f4e321b890094df6c931b8261c11280",
+
+  "conditional_owner_authorization_recorded": true,
+  "authorization_condition": "Gate C = PASS via deployed staging runtime probe",
+  "authorization_condition_satisfied": false,
+  "authorization_condition_satisfied_reason": "Gate C remains UNKNOWN. Local runtime probe returned repository defaults (rollout=0.0, proposed); no PI_CANARY_ROLLOUT_PERCENT override present. Staging service not accessible from probe environment.",
+
+  "gate_c_status": "unknown",
+  "deployed_runtime_verified": false,
+
+  "promotion_authorized": false,
+  "promotion_attempted": false,
+  "promotion_applied": false,
+
+  "actual_rollout_percent_after_phase": 75,
+  "actual_config_version_after_phase": 8,
+  "stable_bucket_salt_version": "pi_v1",
+
+  "continue_one_hundred_percent_shadow": false,
+  "continue_seventy_five_percent_shadow": true,
+
+  "rollback_required": false,
+  "rollback_applied": false,
+  "rollback_reason": "No promotion was applied; current state (75%, cv=8) is unchanged from P1.22. No rollback necessary.",
+
+  "live": false,
+  "production_enabled": false,
+  "provider_serving_calls": 0,
+  "recommended_for_live_serving": false,
+  "recommended_for_production": false,
+  "legacy_deprecation_authorized": false,
+
+  "gate_results": {
+    "A": "pass",
+    "B": "pass",
+    "C": "unknown",
+    "D_through_N": "not_evaluated_promotion_not_executed"
+  },
+
+  "blocking_reason": "Gate C = UNKNOWN: no deployed staging runtime probe accessible. Conditional authorization condition not satisfied.",
+
+  "cumulative_p18_through_p123": {
+    "phases_covered": ["P1.8", "P1.9", "P1.10", "P1.11", "P1.12", "P1.13", "P1.14", "P1.15", "P1.16", "P1.17", "P1.18", "P1.19", "P1.20", "P1.21", "P1.22", "P1.23"],
+    "total_selected": 45373,
+    "zero_violations": 0,
+    "violation_rate": 0.0,
+    "soak_health": "excellent"
+  },
+
+  "next_phase_recommendation": {
+    "phase": "6V-P1.24",
+    "objective": "Close Gate C via deployed staging runtime probe",
+    "required_action": "Gain VPS/server access to run staging deployment with PI_CANARY_ROLLOUT_PERCENT=75, then re-probe against live staging process",
+    "promotion_target_on_gate_c_pass": {
+      "rollout_percent": 100,
+      "config_version": 9,
+      "stable_bucket_salt": "pi_v1"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "schema_version": "pi_canary_replay_restoration_v1",
+  "phase": "6V-P1.30",
+  "generated_at": "2026-07-25T20:26:00.000000+00:00",
+  "label": "P1.30 Replay Restoration — State B",
+
+  "status": "NOT_REQUIRED",
+  "reason": "Real provider was never activated. Config version remained at 12 throughout P1.30. provider_mode=staging_replay was never changed. No restoration action needed.",
+
+  "final_state": {
+    "config_version": 12,
+    "provider_mode": "staging_replay",
+    "real_provider_enabled": false,
+    "shadow_rollout_percent": 100,
+    "live_rollout_percent": 1,
+    "production_enabled": false
+  },
+
+  "version_path_executed": "cv=12 (no change)",
+  "version_path_planned_for_p131": "cv=12 → cv=13 (real provider ON) → cv=14 (replay restored)",
+
+  "gate_t_status": "PASS",
+  "note": "Gate T (Replay Restoration) passes trivially in State B — staging remained in replay mode throughout."
+}

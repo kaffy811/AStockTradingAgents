@@ -1,0 +1,54 @@
+{
+  "schema_version": "1.0",
+  "generated_for": "phase_6u_e1_3_4",
+  "registry_source": "backend/app/services/provider_field_registry.py",
+  "key_rule": "provider + endpoint + field",
+  "notes": [
+    "Provider fields are verified only by deterministic provider endpoint contracts or persisted financial_metric_v1 metadata.",
+    "Same field names from different endpoints or providers must not share unit rules unless explicitly registered.",
+    "Value-size heuristics are not allowed to upgrade verification status."
+  ],
+  "core_coverage": {
+    "baostock.query_profit_data": [
+      "mb_revenue",
+      "net_profit",
+      "roe_avg",
+      "gross_margin",
+      "net_margin",
+      "eps_ttm",
+      "total_share",
+      "liqa_share"
+    ],
+    "baostock.query_growth_data": [
+      "yoy_ni",
+      "yoy_pni",
+      "yoy_eps",
+      "yoy_equity",
+      "yoy_asset"
+    ],
+    "baostock.query_balance_data": [
+      "current_ratio",
+      "quick_ratio",
+      "cash_ratio",
+      "liability_to_asset",
+      "asset_to_equity"
+    ],
+    "baostock.query_cash_flow_data": [
+      "cfo_to_np",
+      "cfo_to_gr",
+      "cfo_to_or"
+    ],
+    "baostock.query_operation_data": [
+      "asset_turn_ratio",
+      "inv_turn_ratio",
+      "nr_turn_ratio"
+    ],
+    "baostock.query_dupont_data": [
+      "dupont_roe",
+      "dupont_npi",
+      "dupont_nitogr",
+      "dupont_at",
+      "dupont_am"
+    ]
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "schema_version": "pi_official_report_p115_capacity_comparison_v1",
+  "phase": "6V-P1.15",
+  "comparison": "5pct_vs_10pct",
+  "at_5pct": {
+    "tool_p95_ms": 3210,
+    "pi_p95_ms": 4720,
+    "db_checkout_p95_ms": 13,
+    "memory_mb_avg": 347,
+    "cpu_pct_avg": 4.2,
+    "diagnostics_volume_per_100req": 340
+  },
+  "at_10pct": {
+    "tool_p95_ms": 3290,
+    "pi_p95_ms": 4780,
+    "db_checkout_p95_ms": 16,
+    "memory_mb_avg": 378,
+    "cpu_pct_avg": 5.8,
+    "diagnostics_volume_per_100req": 690
+  },
+  "deltas": {
+    "tool_p95_delta_pct": 2.5,
+    "pi_p95_delta_pct": 1.3,
+    "db_checkout_delta_pct": 23.1,
+    "memory_delta_mb": 31,
+    "cpu_delta_pct": 1.6,
+    "diagnostics_volume_delta_pct": 103
+  },
+  "pool_exhaustion_at_10pct": 0,
+  "capacity_gate_passed": true,
+  "note": "10% doubles diagnostics volume vs 5% (expected). DB checkout p95 increased +3ms at 10% — within acceptable range. No pool exhaustion."
+}

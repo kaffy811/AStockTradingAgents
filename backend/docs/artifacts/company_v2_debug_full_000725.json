@@ -1,0 +1,2159 @@
+{
+  "request_id": "db104943-d8a6-4690-905b-27c6e6301486",
+  "market": "CN",
+  "symbol": "000725",
+  "ts_code": "000725.SZ",
+  "data_mode": "free",
+  "partial": true,
+  "summary": {
+    "providers_attempted": 15,
+    "providers_success": 7,
+    "providers_timeout": 8,
+    "providers_failed": 0,
+    "modules_renderable": 3,
+    "modules_unavailable": 8
+  },
+  "modules": {
+    "quote_overview": {
+      "request_id": "db104943-d8a6-4690-905b-27c6e6301486",
+      "market": "CN",
+      "symbol": "000725",
+      "ts_code": "000725.SZ",
+      "module_key": "quote_overview",
+      "data_mode": "free",
+      "stage": "final",
+      "ok": true,
+      "partial": true,
+      "stale": false,
+      "source_chain": [
+        {
+          "provider": "akshare",
+          "endpoint": "stock_zh_a_spot_em",
+          "attempted": true,
+          "success": true,
+          "status": "success",
+          "started_at": "2026-07-08T15:01:27.554240+00:00",
+          "ended_at": "2026-07-08T15:01:32.447968+00:00",
+          "elapsed_ms": 4893,
+          "latency_ms": 4893,
+          "rows_count": 2,
+          "columns": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "non_null_fields": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "missing_fields": [],
+          "error_code": null,
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": "tuple",
+          "raw_shape": [
+            2,
+            8
+          ],
+          "detached_timeout": false
+        },
+        {
+          "provider": "baostock",
+          "endpoint": "query_history_k_data_plus",
+          "attempted": true,
+          "success": true,
+          "status": "success",
+          "started_at": "2026-07-08T15:01:32.448060+00:00",
+          "ended_at": "2026-07-08T15:01:33.345601+00:00",
+          "elapsed_ms": 897,
+          "latency_ms": 897,
+          "rows_count": 1,
+          "columns": [
+            "change_pct",
+            "close",
+            "pb",
+            "pcf_ttm",
+            "pe_ttm",
+            "ps_ttm",
+            "source",
+            "trade_date",
+            "ts_code",
+            "turnover_rate"
+          ],
+          "non_null_fields": [
+            "change_pct",
+            "close",
+            "pb",
+            "pcf_ttm",
+            "pe_ttm",
+            "ps_ttm",
+            "source",
+            "trade_date",
+            "ts_code",
+            "turnover_rate"
+          ],
+          "missing_fields": [],
+          "error_code": null,
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": "dict",
+          "raw_shape": [
+            1,
+            10
+          ],
+          "detached_timeout": false
+        }
+      ],
+      "raw": {
+        "baostock": [
+          {
+            "endpoint": "query_history_k_data_plus",
+            "raw_type": "dict",
+            "raw_shape": [
+              1,
+              10
+            ],
+            "columns": [
+              "change_pct",
+              "close",
+              "pb",
+              "pcf_ttm",
+              "pe_ttm",
+              "ps_ttm",
+              "source",
+              "trade_date",
+              "ts_code",
+              "turnover_rate"
+            ],
+            "rows_count": 1,
+            "status": "success",
+            "started_at": "2026-07-08T15:01:32.448060+00:00",
+            "ended_at": "2026-07-08T15:01:33.345601+00:00",
+            "elapsed_ms": 897,
+            "detached_timeout": false,
+            "raw_sample": [
+              {
+                "ts_code": "000725.SZ",
+                "trade_date": "2026-07-08",
+                "close": 7.63,
+                "change_pct": 0.6596,
+                "turnover_rate": 9.3937,
+                "pe_ttm": 47.502407,
+                "pb": 2.076816,
+                "ps_ttm": 1.378822,
+                "pcf_ttm": 77.069342,
+                "source": "baostock_kline_fallback"
+              }
+            ],
+            "error_code": null,
+            "error_message": null,
+            "raw_full": [
+              {
+                "ts_code": "000725.SZ",
+                "trade_date": "2026-07-08",
+                "close": 7.63,
+                "change_pct": 0.6596,
+                "turnover_rate": 9.3937,
+                "pe_ttm": 47.502407,
+                "pb": 2.076816,
+                "ps_ttm": 1.378822,
+                "pcf_ttm": 77.069342,
+                "source": "baostock_kline_fallback"
+              }
+            ]
+          }
+        ],
+        "akshare": [
+          {
+            "endpoint": "stock_zh_a_spot_em",
+            "raw_type": "tuple",
+            "raw_shape": [
+              2,
+              8
+            ],
+            "columns": [
+              "elapsed_ms",
+              "errors",
+              "interface",
+              "provider",
+              "reason_code",
+              "source",
+              "source_fields",
+              "status"
+            ],
+            "rows_count": 2,
+            "status": "success",
+            "started_at": "2026-07-08T15:01:27.554240+00:00",
+            "ended_at": "2026-07-08T15:01:32.447968+00:00",
+            "elapsed_ms": 4893,
+            "detached_timeout": false,
+            "raw_sample": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "stock_zh_a_spot_em",
+                "source": "akshare_spot_em",
+                "status": "failed",
+                "elapsed_ms": 4893,
+                "reason_code": "NETWORK_UNAVAILABLE",
+                "source_fields": {},
+                "errors": [
+                  {
+                    "error": "('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+                  }
+                ]
+              }
+            ],
+            "error_code": null,
+            "error_message": null,
+            "raw_full": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "stock_zh_a_spot_em",
+                "source": "akshare_spot_em",
+                "status": "failed",
+                "elapsed_ms": 4893,
+                "reason_code": "NETWORK_UNAVAILABLE",
+                "source_fields": {},
+                "errors": [
+                  {
+                    "error": "('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "tencent": [],
+        "sina": [],
+        "eastmoney": [],
+        "pdf_metrics": []
+      },
+      "normalized": {
+        "rows": [
+          {
+            "latest_price_source": "baostock_kline_fallback",
+            "recent_close": 7.63,
+            "recent_close_source": "provider",
+            "latest_price": 7.63,
+            "pct_chg": 0.6596,
+            "pct_chg_source": "provider",
+            "turnover": 9.3937,
+            "turnover_source": "provider",
+            "pe_ttm": 47.502407,
+            "pe_ttm_source": "provider",
+            "pb": 2.076816,
+            "pb_source": "provider",
+            "ps_ttm": 1.378822,
+            "ps_ttm_source": "provider",
+            "pcf_ncf_ttm": 77.069342,
+            "pcf_ncf_ttm_source": "provider"
+          }
+        ],
+        "metrics": {
+          "latest_price_source": "baostock_kline_fallback",
+          "recent_close": 7.63,
+          "recent_close_source": "provider",
+          "latest_price": 7.63,
+          "pct_chg": 0.6596,
+          "pct_chg_source": "provider",
+          "turnover": 9.3937,
+          "turnover_source": "provider",
+          "pe_ttm": 47.502407,
+          "pe_ttm_source": "provider",
+          "pb": 2.076816,
+          "pb_source": "provider",
+          "ps_ttm": 1.378822,
+          "ps_ttm_source": "provider",
+          "pcf_ncf_ttm": 77.069342,
+          "pcf_ncf_ttm_source": "provider"
+        },
+        "fields": {
+          "latest_price": {
+            "value": 7.63,
+            "source": "baostock_kline_fallback"
+          },
+          "recent_close": {
+            "value": 7.63,
+            "source": "provider"
+          },
+          "pct_chg": {
+            "value": 0.6596,
+            "source": "provider"
+          },
+          "turnover": {
+            "value": 9.3937,
+            "source": "provider"
+          },
+          "pe_ttm": {
+            "value": 47.502407,
+            "source": "provider"
+          },
+          "pb": {
+            "value": 2.076816,
+            "source": "provider"
+          },
+          "ps_ttm": {
+            "value": 1.378822,
+            "source": "provider"
+          },
+          "pcf_ncf_ttm": {
+            "value": 77.069342,
+            "source": "provider"
+          }
+        }
+      },
+      "completion": {
+        "filled_fields": {
+          "latest_price": {
+            "value": 7.63,
+            "source": "baostock_kline_fallback"
+          },
+          "recent_close": {
+            "value": 7.63,
+            "source": "provider"
+          },
+          "pct_chg": {
+            "value": 0.6596,
+            "source": "provider"
+          },
+          "turnover": {
+            "value": 9.3937,
+            "source": "provider"
+          },
+          "pe_ttm": {
+            "value": 47.502407,
+            "source": "provider"
+          },
+          "pb": {
+            "value": 2.076816,
+            "source": "provider"
+          },
+          "ps_ttm": {
+            "value": 1.378822,
+            "source": "provider"
+          },
+          "pcf_ncf_ttm": {
+            "value": 77.069342,
+            "source": "provider"
+          }
+        },
+        "still_missing_fields": {
+          "open": "FIELD_MISSING",
+          "high": "FIELD_MISSING",
+          "low": "FIELD_MISSING",
+          "volume": "FIELD_MISSING",
+          "amount": "FIELD_MISSING",
+          "market_cap": "SHARE_CAPITAL_MISSING",
+          "float_market_cap": "SHARE_CAPITAL_MISSING"
+        },
+        "computed_fields": {},
+        "fallback_chain": {
+          "latest_price": "baostock_kline_fallback",
+          "recent_close": "provider",
+          "pct_chg": "provider",
+          "turnover": "provider",
+          "pe_ttm": "provider",
+          "pb": "provider",
+          "ps_ttm": "provider",
+          "pcf_ncf_ttm": "provider"
+        }
+      },
+      "render": {
+        "renderable": true,
+        "chart_renderable": false,
+        "table_renderable": true,
+        "has_displayable_data": true,
+        "visible_fields": [
+          "latest_price",
+          "recent_close",
+          "pct_chg",
+          "turnover",
+          "pe_ttm",
+          "pb",
+          "ps_ttm",
+          "pcf_ncf_ttm"
+        ],
+        "hidden_fields": [
+          "open",
+          "high",
+          "low",
+          "volume",
+          "amount",
+          "market_cap",
+          "float_market_cap"
+        ],
+        "reason": null
+      },
+      "errors": [],
+      "warnings": [],
+      "diagnosis": {
+        "module_key": "quote_overview",
+        "primary_issue": "OK",
+        "evidence": [],
+        "recommended_fix": []
+      },
+      "debug": {
+        "enabled": true,
+        "raw_truncated": false,
+        "max_raw_chars": 20000
+      }
+    },
+    "valuation": {
+      "request_id": "db104943-d8a6-4690-905b-27c6e6301486",
+      "market": "CN",
+      "symbol": "000725",
+      "ts_code": "000725.SZ",
+      "module_key": "valuation",
+      "data_mode": "free",
+      "stage": "final",
+      "ok": true,
+      "partial": true,
+      "stale": false,
+      "source_chain": [
+        {
+          "provider": "akshare",
+          "endpoint": "stock_zh_a_spot_em",
+          "attempted": true,
+          "success": true,
+          "status": "success",
+          "started_at": "2026-07-08T15:01:33.346400+00:00",
+          "ended_at": "2026-07-08T15:01:38.668524+00:00",
+          "elapsed_ms": 5322,
+          "latency_ms": 5322,
+          "rows_count": 2,
+          "columns": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "non_null_fields": [
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "provider",
+            "reason_code",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "missing_fields": [],
+          "error_code": null,
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": "tuple",
+          "raw_shape": [
+            2,
+            8
+          ],
+          "detached_timeout": false
+        },
+        {
+          "provider": "baostock",
+          "endpoint": "query_history_k_data_plus",
+          "attempted": true,
+          "success": true,
+          "status": "success",
+          "started_at": "2026-07-08T15:01:38.668689+00:00",
+          "ended_at": "2026-07-08T15:01:38.871477+00:00",
+          "elapsed_ms": 202,
+          "latency_ms": 202,
+          "rows_count": 1,
+          "columns": [
+            "change_pct",
+            "close",
+            "pb",
+            "pcf_ttm",
+            "pe_ttm",
+            "ps_ttm",
+            "source",
+            "trade_date",
+            "ts_code",
+            "turnover_rate"
+          ],
+          "non_null_fields": [
+            "change_pct",
+            "close",
+            "pb",
+            "pcf_ttm",
+            "pe_ttm",
+            "ps_ttm",
+            "source",
+            "trade_date",
+            "ts_code",
+            "turnover_rate"
+          ],
+          "missing_fields": [],
+          "error_code": null,
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": "dict",
+          "raw_shape": [
+            1,
+            10
+          ],
+          "detached_timeout": false
+        }
+      ],
+      "raw": {
+        "baostock": [
+          {
+            "endpoint": "query_history_k_data_plus",
+            "raw_type": "dict",
+            "raw_shape": [
+              1,
+              10
+            ],
+            "columns": [
+              "change_pct",
+              "close",
+              "pb",
+              "pcf_ttm",
+              "pe_ttm",
+              "ps_ttm",
+              "source",
+              "trade_date",
+              "ts_code",
+              "turnover_rate"
+            ],
+            "rows_count": 1,
+            "status": "success",
+            "started_at": "2026-07-08T15:01:38.668689+00:00",
+            "ended_at": "2026-07-08T15:01:38.871477+00:00",
+            "elapsed_ms": 202,
+            "detached_timeout": false,
+            "raw_sample": [
+              {
+                "ts_code": "000725.SZ",
+                "trade_date": "2026-07-08",
+                "close": 7.63,
+                "change_pct": 0.6596,
+                "turnover_rate": 9.3937,
+                "pe_ttm": 47.502407,
+                "pb": 2.076816,
+                "ps_ttm": 1.378822,
+                "pcf_ttm": 77.069342,
+                "source": "baostock_kline_fallback"
+              }
+            ],
+            "error_code": null,
+            "error_message": null,
+            "raw_full": [
+              {
+                "ts_code": "000725.SZ",
+                "trade_date": "2026-07-08",
+                "close": 7.63,
+                "change_pct": 0.6596,
+                "turnover_rate": 9.3937,
+                "pe_ttm": 47.502407,
+                "pb": 2.076816,
+                "ps_ttm": 1.378822,
+                "pcf_ttm": 77.069342,
+                "source": "baostock_kline_fallback"
+              }
+            ]
+          }
+        ],
+        "akshare": [
+          {
+            "endpoint": "stock_zh_a_spot_em",
+            "raw_type": "tuple",
+            "raw_shape": [
+              2,
+              8
+            ],
+            "columns": [
+              "elapsed_ms",
+              "errors",
+              "interface",
+              "provider",
+              "reason_code",
+              "source",
+              "source_fields",
+              "status"
+            ],
+            "rows_count": 2,
+            "status": "success",
+            "started_at": "2026-07-08T15:01:33.346400+00:00",
+            "ended_at": "2026-07-08T15:01:38.668524+00:00",
+            "elapsed_ms": 5322,
+            "detached_timeout": false,
+            "raw_sample": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "stock_zh_a_spot_em",
+                "source": "akshare_spot_em",
+                "status": "failed",
+                "elapsed_ms": 5321,
+                "reason_code": "NETWORK_UNAVAILABLE",
+                "source_fields": {},
+                "errors": [
+                  {
+                    "error": "('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+                  }
+                ]
+              }
+            ],
+            "error_code": null,
+            "error_message": null,
+            "raw_full": [
+              {},
+              {
+                "provider": "akshare",
+                "interface": "stock_zh_a_spot_em",
+                "source": "akshare_spot_em",
+                "status": "failed",
+                "elapsed_ms": 5321,
+                "reason_code": "NETWORK_UNAVAILABLE",
+                "source_fields": {},
+                "errors": [
+                  {
+                    "error": "('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "tencent": [],
+        "sina": [],
+        "eastmoney": [],
+        "pdf_metrics": []
+      },
+      "normalized": {
+        "rows": [
+          {
+            "latest_price_source": "baostock_kline_fallback",
+            "recent_close": 7.63,
+            "recent_close_source": "provider",
+            "latest_price": 7.63,
+            "pct_chg": 0.6596,
+            "pct_chg_source": "provider",
+            "turnover": 9.3937,
+            "turnover_source": "provider",
+            "pe_ttm": 47.502407,
+            "pe_ttm_source": "provider",
+            "pb": 2.076816,
+            "pb_source": "provider",
+            "ps_ttm": 1.378822,
+            "ps_ttm_source": "provider",
+            "pcf_ncf_ttm": 77.069342,
+            "pcf_ncf_ttm_source": "provider"
+          }
+        ],
+        "metrics": {
+          "latest_price_source": "baostock_kline_fallback",
+          "recent_close": 7.63,
+          "recent_close_source": "provider",
+          "latest_price": 7.63,
+          "pct_chg": 0.6596,
+          "pct_chg_source": "provider",
+          "turnover": 9.3937,
+          "turnover_source": "provider",
+          "pe_ttm": 47.502407,
+          "pe_ttm_source": "provider",
+          "pb": 2.076816,
+          "pb_source": "provider",
+          "ps_ttm": 1.378822,
+          "ps_ttm_source": "provider",
+          "pcf_ncf_ttm": 77.069342,
+          "pcf_ncf_ttm_source": "provider"
+        },
+        "fields": {
+          "pe_ttm": {
+            "value": 47.502407,
+            "source": "provider"
+          },
+          "pb": {
+            "value": 2.076816,
+            "source": "provider"
+          },
+          "ps_ttm": {
+            "value": 1.378822,
+            "source": "provider"
+          },
+          "pcf_ncf_ttm": {
+            "value": 77.069342,
+            "source": "provider"
+          }
+        }
+      },
+      "completion": {
+        "filled_fields": {
+          "pe_ttm": {
+            "value": 47.502407,
+            "source": "provider"
+          },
+          "pb": {
+            "value": 2.076816,
+            "source": "provider"
+          },
+          "ps_ttm": {
+            "value": 1.378822,
+            "source": "provider"
+          },
+          "pcf_ncf_ttm": {
+            "value": 77.069342,
+            "source": "provider"
+          }
+        },
+        "still_missing_fields": {
+          "market_cap": "SHARE_CAPITAL_MISSING",
+          "float_market_cap": "SHARE_CAPITAL_MISSING"
+        },
+        "computed_fields": {},
+        "fallback_chain": {
+          "pe_ttm": "provider",
+          "pb": "provider",
+          "ps_ttm": "provider",
+          "pcf_ncf_ttm": "provider"
+        }
+      },
+      "render": {
+        "renderable": true,
+        "chart_renderable": false,
+        "table_renderable": true,
+        "has_displayable_data": true,
+        "visible_fields": [
+          "pe_ttm",
+          "pb",
+          "ps_ttm",
+          "pcf_ncf_ttm"
+        ],
+        "hidden_fields": [
+          "market_cap",
+          "float_market_cap"
+        ],
+        "reason": null
+      },
+      "errors": [],
+      "warnings": [],
+      "diagnosis": {
+        "module_key": "valuation",
+        "primary_issue": "OK",
+        "evidence": [],
+        "recommended_fix": []
+      },
+      "debug": {
+        "enabled": true,
+        "raw_truncated": false,
+        "max_raw_chars": 20000
+      }
+    },
+    "profitability": {
+      "request_id": "db104943-d8a6-4690-905b-27c6e6301486",
+      "market": "CN",
+      "symbol": "000725",
+      "ts_code": "000725.SZ",
+      "module_key": "profitability",
+      "data_mode": "free",
+      "stage": "final",
+      "ok": false,
+      "partial": true,
+      "stale": false,
+      "source_chain": [
+        {
+          "provider": "module",
+          "endpoint": "profitability",
+          "attempted": true,
+          "success": false,
+          "status": "timeout",
+          "started_at": null,
+          "ended_at": null,
+          "elapsed_ms": null,
+          "latency_ms": 0,
+          "rows_count": 0,
+          "columns": [],
+          "non_null_fields": [],
+          "missing_fields": [],
+          "error_code": "PROVIDER_TIMEOUT",
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": null,
+          "raw_shape": null,
+          "detached_timeout": false
+        }
+      ],
+      "raw": {
+        "baostock": [],
+        "akshare": [],
+        "tencent": [],
+        "sina": [],
+        "eastmoney": [],
+        "pdf_metrics": []
+      },
+      "normalized": {
+        "rows": [],
+        "metrics": {},
+        "fields": {}
+      },
+      "completion": {
+        "filled_fields": {},
+        "still_missing_fields": {
+          "roe": "FIELD_MISSING",
+          "gross_margin": "FIELD_MISSING",
+          "net_margin": "FIELD_MISSING",
+          "roa": "FIELD_MISSING",
+          "roic": "FIELD_MISSING"
+        },
+        "computed_fields": {},
+        "fallback_chain": {}
+      },
+      "render": {
+        "renderable": false,
+        "chart_renderable": false,
+        "table_renderable": false,
+        "has_displayable_data": false,
+        "visible_fields": [],
+        "hidden_fields": [
+          "roe",
+          "gross_margin",
+          "net_margin",
+          "roa",
+          "roic"
+        ],
+        "reason": "ALL_NULL_ROWS"
+      },
+      "errors": [
+        {
+          "layer": "provider",
+          "error_code": "PROVIDER_TIMEOUT",
+          "message": "Module debug exceeded 20.0s",
+          "provider": null,
+          "endpoint": null,
+          "field": null
+        },
+        {
+          "layer": "render",
+          "error_code": "ALL_NULL_ROWS",
+          "message": "No displayable core fields after completion",
+          "provider": null,
+          "endpoint": null,
+          "field": null
+        }
+      ],
+      "warnings": [],
+      "diagnosis": {
+        "module_key": "profitability",
+        "primary_issue": "PROVIDER_TIMEOUT",
+        "evidence": [
+          "all provider attempts timed out"
+        ],
+        "recommended_fix": [
+          "lower provider concurrency or increase provider-specific timeout"
+        ]
+      },
+      "debug": {
+        "enabled": true,
+        "raw_truncated": false,
+        "max_raw_chars": 20000
+      }
+    },
+    "growth": {
+      "request_id": "db104943-d8a6-4690-905b-27c6e6301486",
+      "market": "CN",
+      "symbol": "000725",
+      "ts_code": "000725.SZ",
+      "module_key": "growth",
+      "data_mode": "free",
+      "stage": "final",
+      "ok": true,
+      "partial": true,
+      "stale": false,
+      "source_chain": [
+        {
+          "provider": "baostock",
+          "endpoint": "get_all_financial_indicators",
+          "attempted": true,
+          "success": true,
+          "status": "success",
+          "started_at": "2026-07-08T15:01:58.874131+00:00",
+          "ended_at": "2026-07-08T15:01:59.421950+00:00",
+          "elapsed_ms": 547,
+          "latency_ms": 547,
+          "rows_count": 1,
+          "columns": [
+            "balance",
+            "cash_flow",
+            "dupont",
+            "growth",
+            "operation",
+            "profit"
+          ],
+          "non_null_fields": [
+            "balance",
+            "cash_flow",
+            "dupont",
+            "growth",
+            "operation",
+            "profit"
+          ],
+          "missing_fields": [],
+          "error_code": null,
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": "dict",
+          "raw_shape": [
+            1,
+            6
+          ],
+          "detached_timeout": false
+        },
+        {
+          "provider": "akshare",
+          "endpoint": "statements",
+          "attempted": true,
+          "success": true,
+          "status": "success",
+          "started_at": "2026-07-08T15:01:59.422128+00:00",
+          "ended_at": "2026-07-08T15:02:07.101063+00:00",
+          "elapsed_ms": 7678,
+          "latency_ms": 7678,
+          "rows_count": 2,
+          "columns": [
+            "current_assets",
+            "current_liabilities",
+            "elapsed_ms",
+            "errors",
+            "financing_cashflow",
+            "gross_profit",
+            "interface",
+            "investing_cashflow",
+            "latest_period",
+            "net_profit",
+            "net_profit_parent",
+            "operating_cashflow",
+            "operating_cost",
+            "operating_income",
+            "operating_profit",
+            "parent_equity",
+            "provider",
+            "reason_code",
+            "revenue",
+            "source",
+            "source_fields",
+            "status",
+            "total_assets",
+            "total_equity",
+            "total_liabilities"
+          ],
+          "non_null_fields": [
+            "current_assets",
+            "current_liabilities",
+            "elapsed_ms",
+            "errors",
+            "financing_cashflow",
+            "gross_profit",
+            "interface",
+            "investing_cashflow",
+            "latest_period",
+            "net_profit",
+            "net_profit_parent",
+            "operating_cashflow",
+            "operating_cost",
+            "operating_income",
+            "operating_profit",
+            "parent_equity",
+            "provider",
+            "revenue",
+            "source",
+            "source_fields",
+            "status",
+            "total_assets",
+            "total_equity",
+            "total_liabilities"
+          ],
+          "missing_fields": [],
+          "error_code": null,
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": "tuple",
+          "raw_shape": [
+            2,
+            25
+          ],
+          "detached_timeout": false
+        },
+        {
+          "provider": "akshare",
+          "endpoint": "financial_indicator",
+          "attempted": true,
+          "success": true,
+          "status": "success",
+          "started_at": "2026-07-08T15:02:07.101114+00:00",
+          "ended_at": "2026-07-08T15:02:08.470024+00:00",
+          "elapsed_ms": 1368,
+          "latency_ms": 1368,
+          "rows_count": 2,
+          "columns": [
+            "asset_turnover",
+            "current_ratio",
+            "debt_ratio",
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "inventory_turnover",
+            "latest_period",
+            "net_margin",
+            "net_profit_growth",
+            "ocf_to_np",
+            "provider",
+            "reason_code",
+            "revenue_growth",
+            "roa",
+            "roe",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "non_null_fields": [
+            "asset_turnover",
+            "current_ratio",
+            "debt_ratio",
+            "elapsed_ms",
+            "errors",
+            "interface",
+            "inventory_turnover",
+            "latest_period",
+            "net_margin",
+            "net_profit_growth",
+            "ocf_to_np",
+            "provider",
+            "revenue_growth",
+            "roa",
+            "roe",
+            "source",
+            "source_fields",
+            "status"
+          ],
+          "missing_fields": [],
+          "error_code": null,
+          "error_message": null,
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": "tuple",
+          "raw_shape": [
+            2,
+            19
+          ],
+          "detached_timeout": false
+        }
+      ],
+      "raw": {
+        "baostock": [
+          {
+            "endpoint": "get_all_financial_indicators",
+            "raw_type": "dict",
+            "raw_shape": [
+              1,
+              6
+            ],
+            "columns": [
+              "balance",
+              "cash_flow",
+              "dupont",
+              "growth",
+              "operation",
+              "profit"
+            ],
+            "rows_count": 1,
+            "status": "success",
+            "started_at": "2026-07-08T15:01:58.874131+00:00",
+            "ended_at": "2026-07-08T15:01:59.421950+00:00",
+            "elapsed_ms": 547,
+            "detached_timeout": false,
+            "raw_sample": [
+              {
+                "profit": [],
+                "growth": [],
+                "balance": [],
+                "operation": [],
+                "cash_flow": [],
+                "dupont": []
+              }
+            ],
+            "error_code": null,
+            "error_message": null,
+            "raw_full": [
+              {
+                "profit": [],
+                "growth": [],
+                "balance": [],
+                "operation": [],
+                "cash_flow": [],
+                "dupont": []
+              }
+            ]
+          }
+        ],
+        "akshare": [
+          {
+            "endpoint": "statements",
+            "raw_type": "tuple",
+            "raw_shape": [
+              2,
+              25
+            ],
+            "columns": [
+              "current_assets",
+              "current_liabilities",
+              "elapsed_ms",
+              "errors",
+              "financing_cashflow",
+              "gross_profit",
+              "interface",
+              "investing_cashflow",
+              "latest_period",
+              "net_profit",
+              "net_profit_parent",
+              "operating_cashflow",
+              "operating_cost",
+              "operating_income",
+              "operating_profit",
+              "parent_equity",
+              "provider",
+              "reason_code",
+              "revenue",
+              "source",
+              "source_fields",
+              "status",
+              "total_assets",
+              "total_equity",
+              "total_liabilities"
+            ],
+            "rows_count": 2,
+            "status": "success",
+            "started_at": "2026-07-08T15:01:59.422128+00:00",
+            "ended_at": "2026-07-08T15:02:07.101063+00:00",
+            "elapsed_ms": 7678,
+            "detached_timeout": false,
+            "raw_sample": [
+              {
+                "revenue": 51001263370.0,
+                "operating_income": 51001263370.0,
+                "operating_cost": 43047248265.0,
+                "operating_profit": 2461624733.0,
+                "net_profit": 1709087317.0,
+                "net_profit_parent": 1707220076.0,
+                "total_assets": 437705366743.0,
+                "total_liabilities": 227239362857.0,
+                "total_equity": 210466003886.0,
+                "parent_equity": 136096934128.0,
+                "current_assets": 143260640838.0,
+                "current_liabilities": 100509574988.0,
+                "operating_cashflow": 12299498803.0,
+                "investing_cashflow": -10295938322.0,
+                "financing_cashflow": 2454020615.0,
+                "gross_profit": 7954015105.0
+              },
+              {
+                "provider": "akshare",
+                "interface": "profit:em+balance:em+cashflow:em",
+                "source": "akshare_em_report",
+                "status": "ok",
+                "elapsed_ms": 7678,
+                "latest_period": "2026-03-31",
+                "reason_code": null,
+                "source_fields": {
+                  "revenue": "TOTAL_OPERATE_INCOME",
+                  "operating_income": "OPERATE_INCOME",
+                  "operating_cost": "OPERATE_COST",
+                  "operating_profit": "OPERATE_PROFIT",
+                  "net_profit": "NETPROFIT",
+                  "net_profit_parent": "PARENT_NETPROFIT",
+                  "total_assets": "TOTAL_ASSETS",
+                  "total_liabilities": "TOTAL_LIABILITIES",
+                  "total_equity": "TOTAL_EQUITY",
+                  "parent_equity": "TOTAL_PARENT_EQUITY",
+                  "current_assets": "TOTAL_CURRENT_ASSETS",
+                  "current_liabilities": "TOTAL_CURRENT_LIAB",
+                  "operating_cashflow": "NETCASH_OPERATE",
+                  "investing_cashflow": "NETCASH_INVEST",
+                  "financing_cashflow": "NETCASH_FINANCE",
+                  "gross_profit": "computed:operating_income-operating_cost"
+                },
+                "errors": []
+              }
+            ],
+            "error_code": null,
+            "error_message": null,
+            "raw_full": [
+              {
+                "revenue": 51001263370.0,
+                "operating_income": 51001263370.0,
+                "operating_cost": 43047248265.0,
+                "operating_profit": 2461624733.0,
+                "net_profit": 1709087317.0,
+                "net_profit_parent": 1707220076.0,
+                "total_assets": 437705366743.0,
+                "total_liabilities": 227239362857.0,
+                "total_equity": 210466003886.0,
+                "parent_equity": 136096934128.0,
+                "current_assets": 143260640838.0,
+                "current_liabilities": 100509574988.0,
+                "operating_cashflow": 12299498803.0,
+                "investing_cashflow": -10295938322.0,
+                "financing_cashflow": 2454020615.0,
+                "gross_profit": 7954015105.0
+              },
+              {
+                "provider": "akshare",
+                "interface": "profit:em+balance:em+cashflow:em",
+                "source": "akshare_em_report",
+                "status": "ok",
+                "elapsed_ms": 7678,
+                "latest_period": "2026-03-31",
+                "reason_code": null,
+                "source_fields": {
+                  "revenue": "TOTAL_OPERATE_INCOME",
+                  "operating_income": "OPERATE_INCOME",
+                  "operating_cost": "OPERATE_COST",
+                  "operating_profit": "OPERATE_PROFIT",
+                  "net_profit": "NETPROFIT",
+                  "net_profit_parent": "PARENT_NETPROFIT",
+                  "total_assets": "TOTAL_ASSETS",
+                  "total_liabilities": "TOTAL_LIABILITIES",
+                  "total_equity": "TOTAL_EQUITY",
+                  "parent_equity": "TOTAL_PARENT_EQUITY",
+                  "current_assets": "TOTAL_CURRENT_ASSETS",
+                  "current_liabilities": "TOTAL_CURRENT_LIAB",
+                  "operating_cashflow": "NETCASH_OPERATE",
+                  "investing_cashflow": "NETCASH_INVEST",
+                  "financing_cashflow": "NETCASH_FINANCE",
+                  "gross_profit": "computed:operating_income-operating_cost"
+                },
+                "errors": []
+              }
+            ]
+          },
+          {
+            "endpoint": "financial_indicator",
+            "raw_type": "tuple",
+            "raw_shape": [
+              2,
+              19
+            ],
+            "columns": [
+              "asset_turnover",
+              "current_ratio",
+              "debt_ratio",
+              "elapsed_ms",
+              "errors",
+              "interface",
+              "inventory_turnover",
+              "latest_period",
+              "net_margin",
+              "net_profit_growth",
+              "ocf_to_np",
+              "provider",
+              "reason_code",
+              "revenue_growth",
+              "roa",
+              "roe",
+              "source",
+              "source_fields",
+              "status"
+            ],
+            "rows_count": 2,
+            "status": "success",
+            "started_at": "2026-07-08T15:02:07.101114+00:00",
+            "ended_at": "2026-07-08T15:02:08.470024+00:00",
+            "elapsed_ms": 1368,
+            "detached_timeout": false,
+            "raw_sample": [
+              {
+                "roe": 0.0125,
+                "roa": 0.003911,
+                "net_margin": 0.033511,
+                "debt_ratio": 0.519161,
+                "current_ratio": 1.4253,
+                "revenue_growth": 0.007951,
+                "net_profit_growth": -0.117708,
+                "asset_turnover": 0.1167,
+                "inventory_turnover": 1.6161,
+                "ocf_to_np": 7.1965
+              },
+              {
+                "provider": "akshare",
+                "interface": "stock_financial_analysis_indicator",
+                "source": "akshare_sina_indicator",
+                "status": "ok",
+                "reason_code": null,
+                "elapsed_ms": 1368,
+                "latest_period": "2026-03-31",
+                "source_fields": {
+                  "roe": "净资产收益率(%)",
+                  "roa": "总资产净利润率(%)",
+                  "net_margin": "销售净利率(%)",
+                  "debt_ratio": "资产负债率(%)",
+                  "current_ratio": "流动比率",
+                  "revenue_growth": "主营业务收入增长率(%)",
+                  "net_profit_growth": "净利润增长率(%)",
+                  "asset_turnover": "总资产周转率(次)",
+                  "inventory_turnover": "存货周转率(次)",
+                  "ocf_to_np": "经营现金净流量与净利润的比率(%)"
+                },
+                "errors": [
+                  {
+                    "source": "em",
+                    "reason_code": "PROVIDER_EMPTY",
+                    "error": "'NoneType' object is not subscriptable"
+                  },
+                  {
+                    "field": "gross_margin",
+                    "source_field": "销售毛利率(%)",
+                    "reason_code": "PROVIDER_EMPTY"
+                  }
+                ]
+              }
+            ],
+            "error_code": null,
+            "error_message": null,
+            "raw_full": [
+              {
+                "roe": 0.0125,
+                "roa": 0.003911,
+                "net_margin": 0.033511,
+                "debt_ratio": 0.519161,
+                "current_ratio": 1.4253,
+                "revenue_growth": 0.007951,
+                "net_profit_growth": -0.117708,
+                "asset_turnover": 0.1167,
+                "inventory_turnover": 1.6161,
+                "ocf_to_np": 7.1965
+              },
+              {
+                "provider": "akshare",
+                "interface": "stock_financial_analysis_indicator",
+                "source": "akshare_sina_indicator",
+                "status": "ok",
+                "reason_code": null,
+                "elapsed_ms": 1368,
+                "latest_period": "2026-03-31",
+                "source_fields": {
+                  "roe": "净资产收益率(%)",
+                  "roa": "总资产净利润率(%)",
+                  "net_margin": "销售净利率(%)",
+                  "debt_ratio": "资产负债率(%)",
+                  "current_ratio": "流动比率",
+                  "revenue_growth": "主营业务收入增长率(%)",
+                  "net_profit_growth": "净利润增长率(%)",
+                  "asset_turnover": "总资产周转率(次)",
+                  "inventory_turnover": "存货周转率(次)",
+                  "ocf_to_np": "经营现金净流量与净利润的比率(%)"
+                },
+                "errors": [
+                  {
+                    "source": "em",
+                    "reason_code": "PROVIDER_EMPTY",
+                    "error": "'NoneType' object is not subscriptable"
+                  },
+                  {
+                    "field": "gross_margin",
+                    "source_field": "销售毛利率(%)",
+                    "reason_code": "PROVIDER_EMPTY"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "tencent": [],
+        "sina": [],
+        "eastmoney": [],
+        "pdf_metrics": []
+      },
+      "normalized": {
+        "rows": [
+          {
+            "revenue": 51001263370.0,
+            "revenue_source": "provider",
+            "net_profit_parent": 1707220076.0,
+            "net_profit_parent_source": "provider",
+            "operating_cashflow": 12299498803.0,
+            "operating_cashflow_source": "provider",
+            "current_ratio": 1.4253432158588286,
+            "current_ratio_source": "provider",
+            "debt_ratio": 0.519160558957515,
+            "debt_ratio_source": "provider",
+            "ocf_to_revenue": 0.24116066917343895,
+            "ocf_to_revenue_source": "provider",
+            "cashflow_revenue_ratio": 0.24116066917343895,
+            "cashflow_revenue_ratio_source": "provider",
+            "roe": 0.0125,
+            "roe_source": "provider",
+            "net_margin": 0.033511,
+            "net_margin_source": "provider",
+            "roa": 0.003911,
+            "roa_source": "provider",
+            "ocf_to_np": 7.1965,
+            "ocf_to_np_source": "provider",
+            "asset_turnover": 0.1167,
+            "asset_turnover_source": "provider",
+            "inventory_turnover": 1.6161,
+            "inventory_turnover_source": "provider"
+          }
+        ],
+        "metrics": {
+          "revenue": 51001263370.0,
+          "revenue_source": "provider",
+          "net_profit_parent": 1707220076.0,
+          "net_profit_parent_source": "provider",
+          "operating_cashflow": 12299498803.0,
+          "operating_cashflow_source": "provider",
+          "current_ratio": 1.4253432158588286,
+          "current_ratio_source": "provider",
+          "debt_ratio": 0.519160558957515,
+          "debt_ratio_source": "provider",
+          "ocf_to_revenue": 0.24116066917343895,
+          "ocf_to_revenue_source": "provider",
+          "cashflow_revenue_ratio": 0.24116066917343895,
+          "cashflow_revenue_ratio_source": "provider",
+          "roe": 0.0125,
+          "roe_source": "provider",
+          "net_margin": 0.033511,
+          "net_margin_source": "provider",
+          "roa": 0.003911,
+          "roa_source": "provider",
+          "ocf_to_np": 7.1965,
+          "ocf_to_np_source": "provider",
+          "asset_turnover": 0.1167,
+          "asset_turnover_source": "provider",
+          "inventory_turnover": 1.6161,
+          "inventory_turnover_source": "provider"
+        },
+        "fields": {
+          "revenue": {
+            "value": 51001263370.0,
+            "source": "provider"
+          },
+          "net_profit_parent": {
+            "value": 1707220076.0,
+            "source": "provider"
+          }
+        }
+      },
+      "completion": {
+        "filled_fields": {
+          "revenue": {
+            "value": 51001263370.0,
+            "source": "provider"
+          },
+          "net_profit_parent": {
+            "value": 1707220076.0,
+            "source": "provider"
+          }
+        },
+        "still_missing_fields": {
+          "revenue_yoy": "FIELD_MISSING",
+          "net_profit_yoy": "FIELD_MISSING",
+          "eps_basic": "FIELD_MISSING"
+        },
+        "computed_fields": {},
+        "fallback_chain": {
+          "revenue": "provider",
+          "net_profit_parent": "provider"
+        }
+      },
+      "render": {
+        "renderable": true,
+        "chart_renderable": false,
+        "table_renderable": true,
+        "has_displayable_data": true,
+        "visible_fields": [
+          "revenue",
+          "net_profit_parent"
+        ],
+        "hidden_fields": [
+          "revenue_yoy",
+          "net_profit_yoy",
+          "eps_basic"
+        ],
+        "reason": null
+      },
+      "errors": [],
+      "warnings": [],
+      "diagnosis": {
+        "module_key": "growth",
+        "primary_issue": "OK",
+        "evidence": [],
+        "recommended_fix": []
+      },
+      "debug": {
+        "enabled": true,
+        "raw_truncated": false,
+        "max_raw_chars": 20000
+      }
+    },
+    "cashflow_quality": {
+      "request_id": "db104943-d8a6-4690-905b-27c6e6301486",
+      "market": "CN",
+      "symbol": "000725",
+      "ts_code": "000725.SZ",
+      "module_key": "cashflow_quality",
+      "data_mode": "free",
+      "stage": "final",
+      "ok": false,
+      "partial": true,
+      "stale": false,
+      "source_chain": [
+        {
+          "provider": "module",
+          "endpoint": "cashflow_quality",
+          "attempted": true,
+          "success": false,
+          "status": "timeout",
+          "started_at": null,
+          "ended_at": null,
+          "elapsed_ms": null,
+          "latency_ms": 0,
+          "rows_count": 0,
+          "columns": [],
+          "non_null_fields": [],
+          "missing_fields": [],
+          "error_code": "PROVIDER_TIMEOUT",
+          "error_message": "debug/full exceeded 45s while waiting for cashflow_quality",
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": null,
+          "raw_shape": null,
+          "detached_timeout": false
+        }
+      ],
+      "raw": {
+        "baostock": [],
+        "akshare": [],
+        "tencent": [],
+        "sina": [],
+        "eastmoney": [],
+        "pdf_metrics": []
+      },
+      "normalized": {
+        "rows": [],
+        "metrics": {},
+        "fields": {}
+      },
+      "completion": {
+        "filled_fields": {},
+        "still_missing_fields": {},
+        "computed_fields": {},
+        "fallback_chain": {}
+      },
+      "render": {
+        "renderable": false,
+        "chart_renderable": false,
+        "table_renderable": false,
+        "has_displayable_data": false,
+        "visible_fields": [],
+        "hidden_fields": [],
+        "reason": "PROVIDER_TIMEOUT"
+      },
+      "errors": [
+        {
+          "layer": "provider",
+          "error_code": "PROVIDER_TIMEOUT",
+          "message": "debug/full exceeded 45s while waiting for cashflow_quality",
+          "provider": null,
+          "endpoint": null,
+          "field": null
+        }
+      ],
+      "warnings": [],
+      "diagnosis": {
+        "module_key": "cashflow_quality",
+        "primary_issue": "PROVIDER_TIMEOUT",
+        "evidence": [
+          "all provider attempts timed out"
+        ],
+        "recommended_fix": [
+          "lower provider concurrency or increase provider-specific timeout"
+        ]
+      },
+      "debug": {
+        "enabled": true,
+        "raw_truncated": false,
+        "max_raw_chars": 20000
+      }
+    },
+    "solvency": {
+      "request_id": "db104943-d8a6-4690-905b-27c6e6301486",
+      "market": "CN",
+      "symbol": "000725",
+      "ts_code": "000725.SZ",
+      "module_key": "solvency",
+      "data_mode": "free",
+      "stage": "final",
+      "ok": false,
+      "partial": true,
+      "stale": false,
+      "source_chain": [
+        {
+          "provider": "module",
+          "endpoint": "solvency",
+          "attempted": true,
+          "success": false,
+          "status": "timeout",
+          "started_at": null,
+          "ended_at": null,
+          "elapsed_ms": null,
+          "latency_ms": 0,
+          "rows_count": 0,
+          "columns": [],
+          "non_null_fields": [],
+          "missing_fields": [],
+          "error_code": "PROVIDER_TIMEOUT",
+          "error_message": "debug/full exceeded 45s before solvency started",
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": null,
+          "raw_shape": null,
+          "detached_timeout": false
+        }
+      ],
+      "raw": {
+        "baostock": [],
+        "akshare": [],
+        "tencent": [],
+        "sina": [],
+        "eastmoney": [],
+        "pdf_metrics": []
+      },
+      "normalized": {
+        "rows": [],
+        "metrics": {},
+        "fields": {}
+      },
+      "completion": {
+        "filled_fields": {},
+        "still_missing_fields": {},
+        "computed_fields": {},
+        "fallback_chain": {}
+      },
+      "render": {
+        "renderable": false,
+        "chart_renderable": false,
+        "table_renderable": false,
+        "has_displayable_data": false,
+        "visible_fields": [],
+        "hidden_fields": [],
+        "reason": "PROVIDER_TIMEOUT"
+      },
+      "errors": [
+        {
+          "layer": "provider",
+          "error_code": "PROVIDER_TIMEOUT",
+          "message": "debug/full exceeded 45s before solvency started",
+          "provider": null,
+          "endpoint": null,
+          "field": null
+        }
+      ],
+      "warnings": [],
+      "diagnosis": {
+        "module_key": "solvency",
+        "primary_issue": "PROVIDER_TIMEOUT",
+        "evidence": [
+          "all provider attempts timed out"
+        ],
+        "recommended_fix": [
+          "lower provider concurrency or increase provider-specific timeout"
+        ]
+      },
+      "debug": {
+        "enabled": true,
+        "raw_truncated": false,
+        "max_raw_chars": 20000
+      }
+    },
+    "operation_capability": {
+      "request_id": "db104943-d8a6-4690-905b-27c6e6301486",
+      "market": "CN",
+      "symbol": "000725",
+      "ts_code": "000725.SZ",
+      "module_key": "operation_capability",
+      "data_mode": "free",
+      "stage": "final",
+      "ok": false,
+      "partial": true,
+      "stale": false,
+      "source_chain": [
+        {
+          "provider": "module",
+          "endpoint": "operation_capability",
+          "attempted": true,
+          "success": false,
+          "status": "timeout",
+          "started_at": null,
+          "ended_at": null,
+          "elapsed_ms": null,
+          "latency_ms": 0,
+          "rows_count": 0,
+          "columns": [],
+          "non_null_fields": [],
+          "missing_fields": [],
+          "error_code": "PROVIDER_TIMEOUT",
+          "error_message": "debug/full exceeded 45s before operation_capability started",
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": null,
+          "raw_shape": null,
+          "detached_timeout": false
+        }
+      ],
+      "raw": {
+        "baostock": [],
+        "akshare": [],
+        "tencent": [],
+        "sina": [],
+        "eastmoney": [],
+        "pdf_metrics": []
+      },
+      "normalized": {
+        "rows": [],
+        "metrics": {},
+        "fields": {}
+      },
+      "completion": {
+        "filled_fields": {},
+        "still_missing_fields": {},
+        "computed_fields": {},
+        "fallback_chain": {}
+      },
+      "render": {
+        "renderable": false,
+        "chart_renderable": false,
+        "table_renderable": false,
+        "has_displayable_data": false,
+        "visible_fields": [],
+        "hidden_fields": [],
+        "reason": "PROVIDER_TIMEOUT"
+      },
+      "errors": [
+        {
+          "layer": "provider",
+          "error_code": "PROVIDER_TIMEOUT",
+          "message": "debug/full exceeded 45s before operation_capability started",
+          "provider": null,
+          "endpoint": null,
+          "field": null
+        }
+      ],
+      "warnings": [],
+      "diagnosis": {
+        "module_key": "operation_capability",
+        "primary_issue": "PROVIDER_TIMEOUT",
+        "evidence": [
+          "all provider attempts timed out"
+        ],
+        "recommended_fix": [
+          "lower provider concurrency or increase provider-specific timeout"
+        ]
+      },
+      "debug": {
+        "enabled": true,
+        "raw_truncated": false,
+        "max_raw_chars": 20000
+      }
+    },
+    "dupont": {
+      "request_id": "db104943-d8a6-4690-905b-27c6e6301486",
+      "market": "CN",
+      "symbol": "000725",
+      "ts_code": "000725.SZ",
+      "module_key": "dupont",
+      "data_mode": "free",
+      "stage": "final",
+      "ok": false,
+      "partial": true,
+      "stale": false,
+      "source_chain": [
+        {
+          "provider": "module",
+          "endpoint": "dupont",
+          "attempted": true,
+          "success": false,
+          "status": "timeout",
+          "started_at": null,
+          "ended_at": null,
+          "elapsed_ms": null,
+          "latency_ms": 0,
+          "rows_count": 0,
+          "columns": [],
+          "non_null_fields": [],
+          "missing_fields": [],
+          "error_code": "PROVIDER_TIMEOUT",
+          "error_message": "debug/full exceeded 45s before dupont started",
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": null,
+          "raw_shape": null,
+          "detached_timeout": false
+        }
+      ],
+      "raw": {
+        "baostock": [],
+        "akshare": [],
+        "tencent": [],
+        "sina": [],
+        "eastmoney": [],
+        "pdf_metrics": []
+      },
+      "normalized": {
+        "rows": [],
+        "metrics": {},
+        "fields": {}
+      },
+      "completion": {
+        "filled_fields": {},
+        "still_missing_fields": {},
+        "computed_fields": {},
+        "fallback_chain": {}
+      },
+      "render": {
+        "renderable": false,
+        "chart_renderable": false,
+        "table_renderable": false,
+        "has_displayable_data": false,
+        "visible_fields": [],
+        "hidden_fields": [],
+        "reason": "PROVIDER_TIMEOUT"
+      },
+      "errors": [
+        {
+          "layer": "provider",
+          "error_code": "PROVIDER_TIMEOUT",
+          "message": "debug/full exceeded 45s before dupont started",
+          "provider": null,
+          "endpoint": null,
+          "field": null
+        }
+      ],
+      "warnings": [],
+      "diagnosis": {
+        "module_key": "dupont",
+        "primary_issue": "PROVIDER_TIMEOUT",
+        "evidence": [
+          "all provider attempts timed out"
+        ],
+        "recommended_fix": [
+          "lower provider concurrency or increase provider-specific timeout"
+        ]
+      },
+      "debug": {
+        "enabled": true,
+        "raw_truncated": false,
+        "max_raw_chars": 20000
+      }
+    },
+    "report_documents": {
+      "request_id": "db104943-d8a6-4690-905b-27c6e6301486",
+      "market": "CN",
+      "symbol": "000725",
+      "ts_code": "000725.SZ",
+      "module_key": "report_documents",
+      "data_mode": "free",
+      "stage": "final",
+      "ok": false,
+      "partial": true,
+      "stale": false,
+      "source_chain": [
+        {
+          "provider": "module",
+          "endpoint": "report_documents",
+          "attempted": true,
+          "success": false,
+          "status": "timeout",
+          "started_at": null,
+          "ended_at": null,
+          "elapsed_ms": null,
+          "latency_ms": 0,
+          "rows_count": 0,
+          "columns": [],
+          "non_null_fields": [],
+          "missing_fields": [],
+          "error_code": "PROVIDER_TIMEOUT",
+          "error_message": "debug/full exceeded 45s before report_documents started",
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": null,
+          "raw_shape": null,
+          "detached_timeout": false
+        }
+      ],
+      "raw": {
+        "baostock": [],
+        "akshare": [],
+        "tencent": [],
+        "sina": [],
+        "eastmoney": [],
+        "pdf_metrics": []
+      },
+      "normalized": {
+        "rows": [],
+        "metrics": {},
+        "fields": {}
+      },
+      "completion": {
+        "filled_fields": {},
+        "still_missing_fields": {},
+        "computed_fields": {},
+        "fallback_chain": {}
+      },
+      "render": {
+        "renderable": false,
+        "chart_renderable": false,
+        "table_renderable": false,
+        "has_displayable_data": false,
+        "visible_fields": [],
+        "hidden_fields": [],
+        "reason": "PROVIDER_TIMEOUT"
+      },
+      "errors": [
+        {
+          "layer": "provider",
+          "error_code": "PROVIDER_TIMEOUT",
+          "message": "debug/full exceeded 45s before report_documents started",
+          "provider": null,
+          "endpoint": null,
+          "field": null
+        }
+      ],
+      "warnings": [],
+      "diagnosis": {
+        "module_key": "report_documents",
+        "primary_issue": "PROVIDER_TIMEOUT",
+        "evidence": [
+          "all provider attempts timed out"
+        ],
+        "recommended_fix": [
+          "lower provider concurrency or increase provider-specific timeout"
+        ]
+      },
+      "debug": {
+        "enabled": true,
+        "raw_truncated": false,
+        "max_raw_chars": 20000
+      }
+    },
+    "report_rag": {
+      "request_id": "db104943-d8a6-4690-905b-27c6e6301486",
+      "market": "CN",
+      "symbol": "000725",
+      "ts_code": "000725.SZ",
+      "module_key": "report_rag",
+      "data_mode": "free",
+      "stage": "final",
+      "ok": false,
+      "partial": true,
+      "stale": false,
+      "source_chain": [
+        {
+          "provider": "module",
+          "endpoint": "report_rag",
+          "attempted": true,
+          "success": false,
+          "status": "timeout",
+          "started_at": null,
+          "ended_at": null,
+          "elapsed_ms": null,
+          "latency_ms": 0,
+          "rows_count": 0,
+          "columns": [],
+          "non_null_fields": [],
+          "missing_fields": [],
+          "error_code": "PROVIDER_TIMEOUT",
+          "error_message": "debug/full exceeded 45s before report_rag started",
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": null,
+          "raw_shape": null,
+          "detached_timeout": false
+        }
+      ],
+      "raw": {
+        "baostock": [],
+        "akshare": [],
+        "tencent": [],
+        "sina": [],
+        "eastmoney": [],
+        "pdf_metrics": []
+      },
+      "normalized": {
+        "rows": [],
+        "metrics": {},
+        "fields": {}
+      },
+      "completion": {
+        "filled_fields": {},
+        "still_missing_fields": {},
+        "computed_fields": {},
+        "fallback_chain": {}
+      },
+      "render": {
+        "renderable": false,
+        "chart_renderable": false,
+        "table_renderable": false,
+        "has_displayable_data": false,
+        "visible_fields": [],
+        "hidden_fields": [],
+        "reason": "PROVIDER_TIMEOUT"
+      },
+      "errors": [
+        {
+          "layer": "provider",
+          "error_code": "PROVIDER_TIMEOUT",
+          "message": "debug/full exceeded 45s before report_rag started",
+          "provider": null,
+          "endpoint": null,
+          "field": null
+        }
+      ],
+      "warnings": [],
+      "diagnosis": {
+        "module_key": "report_rag",
+        "primary_issue": "PROVIDER_TIMEOUT",
+        "evidence": [
+          "all provider attempts timed out"
+        ],
+        "recommended_fix": [
+          "lower provider concurrency or increase provider-specific timeout"
+        ]
+      },
+      "debug": {
+        "enabled": true,
+        "raw_truncated": false,
+        "max_raw_chars": 20000
+      }
+    },
+    "ai_analysis_status": {
+      "request_id": "db104943-d8a6-4690-905b-27c6e6301486",
+      "market": "CN",
+      "symbol": "000725",
+      "ts_code": "000725.SZ",
+      "module_key": "ai_analysis_status",
+      "data_mode": "free",
+      "stage": "final",
+      "ok": false,
+      "partial": true,
+      "stale": false,
+      "source_chain": [
+        {
+          "provider": "module",
+          "endpoint": "ai_analysis_status",
+          "attempted": true,
+          "success": false,
+          "status": "timeout",
+          "started_at": null,
+          "ended_at": null,
+          "elapsed_ms": null,
+          "latency_ms": 0,
+          "rows_count": 0,
+          "columns": [],
+          "non_null_fields": [],
+          "missing_fields": [],
+          "error_code": "PROVIDER_TIMEOUT",
+          "error_message": "debug/full exceeded 45s before ai_analysis_status started",
+          "cache_hit": false,
+          "cache_stale": false,
+          "cache_status": null,
+          "raw_type": null,
+          "raw_shape": null,
+          "detached_timeout": false
+        }
+      ],
+      "raw": {
+        "baostock": [],
+        "akshare": [],
+        "tencent": [],
+        "sina": [],
+        "eastmoney": [],
+        "pdf_metrics": []
+      },
+      "normalized": {
+        "rows": [],
+        "metrics": {},
+        "fields": {}
+      },
+      "completion": {
+        "filled_fields": {},
+        "still_missing_fields": {},
+        "computed_fields": {},
+        "fallback_chain": {}
+      },
+      "render": {
+        "renderable": false,
+        "chart_renderable": false,
+        "table_renderable": false,
+        "has_displayable_data": false,
+        "visible_fields": [],
+        "hidden_fields": [],
+        "reason": "PROVIDER_TIMEOUT"
+      },
+      "errors": [
+        {
+          "layer": "provider",
+          "error_code": "PROVIDER_TIMEOUT",
+          "message": "debug/full exceeded 45s before ai_analysis_status started",
+          "provider": null,
+          "endpoint": null,
+          "field": null
+        }
+      ],
+      "warnings": [],
+      "diagnosis": {
+        "module_key": "ai_analysis_status",
+        "primary_issue": "PROVIDER_TIMEOUT",
+        "evidence": [
+          "all provider attempts timed out"
+        ],
+        "recommended_fix": [
+          "lower provider concurrency or increase provider-specific timeout"
+        ]
+      },
+      "debug": {
+        "enabled": true,
+        "raw_truncated": false,
+        "max_raw_chars": 20000
+      }
+    }
+  }
+}

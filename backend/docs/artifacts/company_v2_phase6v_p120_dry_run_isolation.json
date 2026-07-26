@@ -1,0 +1,36 @@
+{
+  "schema_version": "pi_dry_run_isolation_v1",
+  "phase": "6V-P1.20",
+  "generated_at": "2026-07-23T06:35:00.000000+00:00",
+  "rollout_percent": 50,
+  "config_version": 7,
+  "window": "S6",
+  "window_type": "dry_run_parallel",
+  "dry_run_results": {
+    "business_writes": 0,
+    "serving_calls": 0,
+    "provider_serving_calls": 0,
+    "pending_candidates_generated": 3,
+    "pending_candidates_applied": 0,
+    "etl_attribution_isolated": true,
+    "pi_attribution_isolated": true,
+    "dry_run_success_counted_as_pi_success": false,
+    "write_protection_enforced": true,
+    "serving_guard_enforced": true
+  },
+  "isolation_verification": {
+    "pi_results_not_in_serving_path": true,
+    "pi_results_not_written_to_production_state": true,
+    "dry_run_candidates_scoped_to_staging_only": true,
+    "dry_run_ops_not_reflected_in_legacy_response": true,
+    "attribution_not_mixed_between_etl_and_pi": true
+  },
+  "stale_candidate_detail": {
+    "candidates_identified": 3,
+    "candidate_applied_count": 0,
+    "reason": "All 3 candidates are stale review candidates only; pending in staging fixture; not applied in this phase",
+    "all_preferred_with_auditable_reason": true
+  },
+  "dry_run_isolation_gate": "PASS",
+  "note": "S6 dry_run_parallel window confirmed zero business writes, zero serving calls, zero provider serving calls. 3 stale_review candidates generated but not applied. ETL and Pi attribution fully isolated. Dry-run success not counted as Pi success."
+}

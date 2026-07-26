@@ -3,16 +3,14 @@ DynamicPeerDiscoveryService
 ============================
 动态同行发现服务。返回给定股票的同行列表，优先级：
 
-  1. PEER_MAP 手动 override（任何市场均可）
-  2. CN 动态行业 Hot Top5（从 industry_hot_stock_snapshot 读取）
-  3. 非 CN 且无 PEER_MAP → 空列表
-  4. CN 但无行业映射 → 空列表
-  5. CN 有行业但无 hot snapshot → 空列表
+  1. CN 动态行业 Hot Top5（从 industry_hot_stock_snapshot 读取）
+  2. 非 CN → 空列表
+  3. CN 但无行业映射 → 空列表
+  4. CN 有行业但无 hot snapshot → 空列表
 
 注意：
 - 动态 Hot Top5 代表市场关注度，不等于严格业务可比同行，
   调用方需自行在分析提示中说明此限制。
-- PEER_MAP 不会被修改；从 peer_comparison_service 直接导入。
 - 不使用 LLM 做任何判断。
 """
 
@@ -25,14 +23,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.services.industry_classification_service import industry_classification_service
 from app.services.industry_hot_stock_service import industry_hot_stock_service
-from app.services.peer_comparison_service import PEER_MAP
-
 log = logging.getLogger(__name__)
 
 # 固定 message 文本
-_MSG_MANUAL = (
-    "Peers are selected from manual PEER_MAP override."
-)
 _MSG_DYNAMIC_HOT = (
     "Peers are selected from same SW level-1 industry hot stocks; "
     "this reflects market attention, not strict business comparability or investment value."
@@ -71,37 +64,7 @@ class DynamicPeerDiscoveryService:
         market = market.upper()
         symbol = symbol.strip()
 
-        # ── Step 1: PEER_MAP override ─────────────────────────────────────────
-        peer_tuples: list[tuple[str, str]] | None = PEER_MAP.get((market, symbol))
-
-        if peer_tuples is not None:
-            peers = [
-                {
-                    "market":       pm,
-                    "symbol":       ps,
-                    "name":         None,       # PEER_MAP 不存名称；调用方可自行补充
-                    "peer_source":  "manual_map",
-                    "rank":         idx + 1,
-                    "hot_score":    None,
-                    "score_factors": None,
-                }
-                for idx, (pm, ps) in enumerate(peer_tuples[:limit])
-            ]
-            return {
-                "market":  market,
-                "symbol":  symbol,
-                "industry": None,               # override 不依赖行业
-                "peers":   peers,
-                "data_quality": {
-                    "peer_source":       "manual_map",
-                    "hot_stock_date":    None,
-                    "hot_score_version": None,
-                    "fallback_reason":   None,
-                    "message":           _MSG_MANUAL,
-                },
-            }
-
-        # ── Step 2: 非 CN 市场无 PEER_MAP ─────────────────────────────────────
+        # ── Step 1: 非 CN 市场暂无行业热门同行发现 ─────────────────────────────
         if market != "CN":
             return self._empty_result(
                 market, symbol,
@@ -111,7 +74,7 @@ class DynamicPeerDiscoveryService:
                 message=_MSG_CN_ONLY,
             )
 
-        # ── Step 3: 查行业映射 ────────────────────────────────────────────────
+        # ── Step 2: 查行业映射 ────────────────────────────────────────────────
         try:
             industry_row = await industry_classification_service.get_stock_industry(
                 db, market, symbol
@@ -137,7 +100,7 @@ class DynamicPeerDiscoveryService:
             "last_synced_at": None,
         }
 
-        # ── Step 4: 查行业热门股 ──────────────────────────────────────────────
+        # ── Step 3: 查行业热门股 ──────────────────────────────────────────────
         try:
             hot_result = await industry_hot_stock_service.get_latest_hot_stocks(
                 db, market, industry_row["industry_code"], limit=limit + 1
@@ -160,7 +123,7 @@ class DynamicPeerDiscoveryService:
                 message=_MSG_NO_SNAPSHOT,
             )
 
-        # ── Step 5: 排除自身，截取 limit ─────────────────────────────────────
+        # ── Step 4: 排除自身，截取 limit ─────────────────────────────────────
         peers = []
         for item in hot_items:
             if item["symbol"] == symbol:

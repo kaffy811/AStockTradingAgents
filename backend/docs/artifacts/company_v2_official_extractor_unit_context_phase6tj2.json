@@ -1,0 +1,83 @@
+{
+  "phase": "Phase 6T-J2 official extractor unit context",
+  "generated_at": "2026-07-12T08:10:16.195600+00:00",
+  "source_audit_artifact": "/Users/kaffy/Documents/TradingAgents/backend/docs/artifacts/company_v2_financial_fusion_stage2_audit_phase6tj.json",
+  "real_execution": true,
+  "mock": false,
+  "repository_backend": "database",
+  "persistent": true,
+  "report_ids": [
+    2,
+    3,
+    4,
+    5
+  ],
+  "official_extractor_version": "official-extractor-unit-context-v2",
+  "unit_normalization_version": "official-extractor-unit-context-v2",
+  "cache_invalidation": {
+    "parse_version_includes_official_extractor_version": true,
+    "stale_pre_fix_cache_reused": false,
+    "refresh": true
+  },
+  "unit_detection_supported": [
+    "元",
+    "千元",
+    "万元",
+    "百万元",
+    "亿元"
+  ],
+  "unit_precedence": [
+    "inline",
+    "table_level",
+    "table_scope",
+    "page_scope",
+    "unknown"
+  ],
+  "scope_rules": {
+    "cross_table_inheritance": false,
+    "cross_page_blind_inheritance": false,
+    "same_page_different_table_isolated": true
+  },
+  "classification_protection": {
+    "official_unit_unknown_forbids_value_conflict": true,
+    "numeric_comparison_after_unit_normalization_only": true
+  },
+  "key_regressions": {
+    "300750_net_profit": {
+      "classification": "verified",
+      "structured_value": 76786309000,
+      "structured_unit": "CNY",
+      "raw_official_value": 76786309.0,
+      "raw_unit": "千元",
+      "unit_scale": 1000.0,
+      "unit_source": "table_level",
+      "normalized_official_value": 76786309000.0,
+      "normalized_unit": "CNY",
+      "evidence_page": 200,
+      "table_scope_id": "p200#u738",
+      "table_title": "合并利润表",
+      "value_conflict": false
+    },
+    "600519_revenue": {
+      "classification": "definition_mismatch",
+      "structured_definition": "main_business_revenue",
+      "official_definition": "营业收入",
+      "raw_official_value": 168838102514.79,
+      "raw_unit": "元",
+      "unit_scale": 1.0,
+      "unit_source": "table_level",
+      "value_conflict": false
+    }
+  },
+  "review_queue_resolution": {
+    "previous_symbol": "300750",
+    "previous_field": "net_profit",
+    "original_classification": "value_conflict",
+    "corrected_classification": "verified",
+    "resolution": "resolved_false_positive",
+    "resolution_reason": "table_level_unit_context_restored",
+    "extractor_version": "official-extractor-unit-context-v2",
+    "resolved_at": "2026-07-12T08:10:16.195600+00:00",
+    "active_queue_contains_item": false
+  }
+}

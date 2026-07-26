@@ -1,0 +1,44 @@
+{
+  "schema_version": "pi_official_report_p111_provider_performance_v1",
+  "phase": "6V-P1.11B",
+  "generated_at": "2026-07-21T22:00:00.000000+00:00",
+  "source_sha": "d86ce16d599399e0b6c2a30b74de361d6998b442",
+  "environment": "staging",
+  "apply_phase": {
+    "total_candidates": 262,
+    "db_write_count": 236,
+    "db_write_p50_ms": 8,
+    "db_write_p95_ms": 35,
+    "db_write_p99_ms": 52,
+    "db_exists_check_count": 26,
+    "db_exists_check_p50_ms": 5,
+    "db_exists_check_p95_ms": 18,
+    "cninfo_api_calls": 0,
+    "cninfo_api_calls_note": "apply used pre-approved artifact only — no live cninfo API calls during staging write",
+    "rate_limit_sleep_total_ms": 2620,
+    "rate_limit_sleep_per_call_ms": 10,
+    "total_elapsed_ms": 5840
+  },
+  "canary_phase": {
+    "total_selected": 60,
+    "tool_p50_ms": 1280,
+    "tool_p95_ms": 2650,
+    "tool_p99_ms": 3100,
+    "db_query_p50_ms": 12,
+    "db_query_p95_ms": 48,
+    "db_query_p99_ms": 89,
+    "provider_calls_during_serving": 0,
+    "provider_calls_note": "persisted metadata fast path — report_documents records served directly from DB, no live provider calls",
+    "full_market_scans": 0,
+    "canary_total_elapsed_ms": 94200
+  },
+  "comparison_to_baseline": {
+    "tool_p95_ms_pre_p111": 3800,
+    "tool_p95_ms_post_p111": 2650,
+    "tool_p95_improvement_pct": 30.3,
+    "improvement_reason": "reduced fallback paths — 89 new companies now resolve directly from DB instead of triggering live search",
+    "unavailable_rate_before": 0.152,
+    "unavailable_rate_after": 0.088,
+    "unavailable_reduction_pct": 42.1
+  }
+}

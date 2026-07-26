@@ -312,6 +312,24 @@ export function normalizeChatEvent(rawEventType, rawPayload) {
       }
     }
 
+    case 'answer_completed':
+      return {
+        type:         'ui_answer_completed',
+        answer:       p.final_answer ?? p.answer ?? p.content ?? p.text ?? '',
+        answerLength: p.answer_length ?? null,
+        status:       p.status ?? 'completed',
+        errorCode:    p.error_code ?? null,
+      }
+
+    case 'message_persisted':
+      return {
+        type:               'ui_message_persisted',
+        messageId:          p.assistant_message_id ?? p.message_id ?? null,
+        answerLength:       p.answer_length ?? null,
+        status:             p.status ?? 'completed',
+        errorCode:          p.error_code ?? null,
+      }
+
     // ── C27: data quality update (skill path — no final_answer event) ─────────
     case 'data_quality_update':
       return {
@@ -326,7 +344,14 @@ export function normalizeChatEvent(rawEventType, rawPayload) {
     case 'done':
     case 'completed':
     case 'stream_done':
-      return { type: 'ui_done' }
+      return {
+        type:            'ui_done',
+        status:          p.status ?? 'completed',
+        answerLength:    p.answer_length ?? null,
+        messageId:       p.assistant_message_id ?? p.message_id ?? null,
+        hasConfirmation: !!p.has_confirmation,
+        errorCode:       p.error_code ?? null,
+      }
 
     case 'agent_error':
       return {

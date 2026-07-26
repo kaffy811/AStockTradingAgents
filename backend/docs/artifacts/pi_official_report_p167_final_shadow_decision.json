@@ -1,0 +1,45 @@
+{
+  "schema_version": "pi_official_report_p167_final_shadow_decision_v1",
+  "phase": "6V-P1.6.7",
+  "generated_at": "2026-07-19T14:28:10.205919+00:00",
+  "acceptance_sha": "49282435fafb534a7c98b646913f027814323300",
+  "full30_executed": 30,
+  "behavior_match_rate": 0.6333,
+  "safety_correctness_rate": 1.0,
+  "accepted": 15,
+  "accepted_with_review": 15,
+  "class_counts": {
+    "A": 15,
+    "B": 10,
+    "C": 5,
+    "D": 0
+  },
+  "hard_failure_count": 0,
+  "hard_gates": {
+    "safety_correctness_rate": true,
+    "fabricated_url": true,
+    "entity_year_type_correctness": true,
+    "provenance": true,
+    "clarification": true,
+    "pi_business_writes": true,
+    "double_writes": true,
+    "unknown_writes": true,
+    "trace_mismatch": true,
+    "terminal_missing": true,
+    "unexpected_deadline": true,
+    "raw_5xx": true,
+    "hard_failure_count_zero": true,
+    "browser_acceptance": false
+  },
+  "browser_acceptance": false,
+  "browser_blocker": "B03: Legacy clarification does not display candidate list (Legacy UX defect; not a Pi defect — Pi shadow produced correct deduplicated candidates)",
+  "shadow_passed": false,
+  "recommended_for_next_authorization": false,
+  "recommended_next_step": "fix Legacy clarification candidate display, re-run Browser B03, then official_report_pdf_staging_canary_proposal",
+  "pi_executor_enabled": false,
+  "authorized_agents": [],
+  "decision": "do_not_enable_pi_compatible",
+  "blockers": [
+    "browser B03 candidate display (Legacy UX defect)"
+  ]
+}

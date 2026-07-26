@@ -1,0 +1,92 @@
+{
+  "report_id": 1,
+  "report_year": 2024,
+  "report_type": "annual",
+  "human_review_queue": [
+    {
+      "field": "total_share",
+      "reason": "年报未直接提供2024-12-31总股本，需人工确认期末总股本。"
+    },
+    {
+      "field": "revenue",
+      "reason": "结构化值为主营业务收入50,227,475,991.67，而年报披露营业收入为54,822,111,649.52，两者不一致。",
+      "confidence": 1.0,
+      "official_value": 54822111649.52,
+      "structured_value": 50227475991.67,
+      "evidence_page": 6,
+      "evidence_excerpt": "营业收入 54,822,111,649.52"
+    },
+    {
+      "field": "net_profit_parent",
+      "reason": "结构化值为净利润（含少数股东）482,101,037.78，而归母净利润应为424,777,342.95。",
+      "confidence": 1.0,
+      "official_value": 424777342.95,
+      "structured_value": 482101037.78,
+      "evidence_page": 6,
+      "evidence_excerpt": "归属于上市公司股东的净利润 424,777,342.95"
+    },
+    {
+      "field": "operating_cashflow",
+      "reason": "结构化未找到该字段，但年报明确披露。",
+      "confidence": 1.0,
+      "official_value": 1393832602.16,
+      "structured_value": null,
+      "evidence_page": 14,
+      "evidence_excerpt": "经营活动产生的现金流量净额 1,393,832,602.16"
+    },
+    {
+      "field": "total_assets",
+      "reason": "结构化未找到该字段，但年报明确披露。",
+      "confidence": 1.0,
+      "official_value": 26001740331.42,
+      "structured_value": null,
+      "evidence_page": 107,
+      "evidence_excerpt": "资产总计 26,001,740,331.42"
+    },
+    {
+      "field": "equity_parent",
+      "reason": "结构化未找到该字段，但年报明确披露。",
+      "confidence": 1.0,
+      "official_value": 6760918501.91,
+      "structured_value": null,
+      "evidence_page": 6,
+      "evidence_excerpt": "归属于上市公司股东的净资产 6,760,918,501.91"
+    },
+    {
+      "field": "eps_basic",
+      "reason": "结构化未找到该字段，但年报明确披露。",
+      "confidence": 1.0,
+      "official_value": 0.3,
+      "structured_value": null,
+      "evidence_page": 6,
+      "evidence_excerpt": "基本每股收益（元／股） 0.30"
+    },
+    {
+      "field": "roe_weighted",
+      "reason": "结构化值为6.3051%（0.063051），年报披露为6.54%，差异约3.59%。",
+      "confidence": 1.0,
+      "official_value": 0.0654,
+      "structured_value": 0.063051,
+      "evidence_page": 6,
+      "evidence_excerpt": "加权平均净资产收益率（%）6.54"
+    },
+    {
+      "field": "total_share",
+      "reason": "年报未直接提供2024-12-31总股本，证据中仅有2024-12-12的总股本1,432,296,037股，无法确认期末准确数值，需人工核实。",
+      "confidence": 0.3,
+      "official_value": null,
+      "structured_value": 1432942234.0,
+      "evidence_page": null,
+      "evidence_excerpt": ""
+    },
+    {
+      "field": "float_share",
+      "reason": "未在年报摘要中找到流通股数相关证据，无法校核。",
+      "confidence": 0.0,
+      "official_value": null,
+      "structured_value": 1432942234.0,
+      "evidence_page": null,
+      "evidence_excerpt": ""
+    }
+  ]
+}

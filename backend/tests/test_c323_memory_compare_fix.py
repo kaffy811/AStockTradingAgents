@@ -21,7 +21,6 @@ from app.services.conversation_memory_service import (
     MemoryContext,
     ResolvedEntity,
     _entity_from_text,
-    _MEMORY_STOCK_TABLE,
     resolve_coreferences,
     build_llm_messages_with_memory,
 )
@@ -118,22 +117,28 @@ def test_t6_three_stock_compare():
 # T7–T10: build_memory_context entity fallback from recent_messages
 # ═════════════════════════════════════════════════════════════════════════════
 
-def test_t7_entity_from_text_finds_maotai():
-    """T7: _entity_from_text('贵州茅台最新财报表现如何？') → 贵州茅台 CN/600519."""
-    ent = _entity_from_text("贵州茅台最新财报表现如何？")
+def test_t7_entity_from_text_finds_explicit_cn_code():
+    """T7: _entity_from_text keeps backward-compatible explicit CN code parsing."""
+    ent = _entity_from_text("600519最新财报表现如何？")
     assert ent is not None
     assert ent.code == "600519"
-    assert ent.name == "贵州茅台"
+    assert ent.name == "600519"
     assert ent.market == "CN"
     assert ent.type == "stock"
 
 
-def test_t8_entity_from_text_finds_wuliangye():
-    """T8: _entity_from_text snippet with 五粮液 → 五粮液 CN/000858."""
+def test_t8_entity_from_text_does_not_name_resolve_without_security_master():
+    """T8: production name matching is handled by SecurityEntityResolver, not a local table."""
     ent = _entity_from_text("五粮液最近走势怎么样？")
+    assert ent is None
+
+
+def test_t8b_entity_from_text_finds_ts_code():
+    """T8b: explicit ts_code remains parseable without DB access."""
+    ent = _entity_from_text("请看600519.SH")
     assert ent is not None
-    assert ent.code == "000858"
-    assert ent.name == "五粮液"
+    assert ent.code == "600519"
+    assert ent.market == "CN"
 
 
 def test_t9_entity_from_text_generic_6digit_code():
@@ -149,12 +154,11 @@ def test_t10_entity_from_text_no_match_returns_none():
     assert ent is None
 
 
-def test_t10b_memory_stock_table_has_required_stocks():
-    """T10b: _MEMORY_STOCK_TABLE covers the 10 required A-share stocks."""
-    codes = {row[0] for row in _MEMORY_STOCK_TABLE}
-    required = {"600519", "000858", "300750", "601899", "301269",
-                "688146", "002594", "601012", "002475", "688981"}
-    assert required.issubset(codes), f"Missing codes: {required - codes}"
+def test_t10b_memory_service_has_no_required_stock_table():
+    """T10b: memory fallback must not depend on a production hand-written stock table."""
+    import app.services.conversation_memory_service as svc
+
+    assert not hasattr(svc, "_MEMORY_STOCK_TABLE")
 
 
 # ═════════════════════════════════════════════════════════════════════════════
@@ -324,12 +328,12 @@ from app.services.conversation_memory_service import _sanitize_for_summary
 def _build_recent_messages_two_rounds() -> list[dict]:
     """
     Simulate the recent_messages list AFTER Round 2 user message is committed.
-    Round 1 user: "贵州茅台最新财报表现如何？"
+    Round 1 user: "600519最新财报表现如何？"
     Round 1 assistant: "贵州茅台2024年营收1459亿..."
     Round 2 user: "那它和五粮液相比呢？"  ← current query (committed by Phase 1)
     """
     return [
-        {"role": "user",      "snippet": "贵州茅台最新财报表现如何？"},
+        {"role": "user",      "snippet": "600519最新财报表现如何？"},
         {"role": "assistant", "snippet": "贵州茅台2024年营收1459亿，净利润748亿..."},
         {"role": "user",      "snippet": "那它和五粮液相比呢？"},   # ← current query
     ]
@@ -341,12 +345,12 @@ def test_t26_fallback_skips_current_query_finds_prior_stock():
     the current query itself and find the stock from the PREVIOUS user message.
 
     Bug: fallback iterated newest-first and hit "那它和五粮液相比呢？" first,
-    extracting 五粮液. Then coreference replaced "它"→"五粮液", producing
-    "五粮液 vs 五粮液" → only 1 unique candidate → "需要至少2只股票" error.
+    extracting 000858. Then coreference replaced "它"→"000858", producing
+    "000858 vs 000858" → only 1 unique candidate → "需要至少2只股票" error.
 
     Fix: skip the snippet that matches current_query prefix.
     """
-    current_query = "那它和五粮液相比呢？"
+    current_query = "那它和000858相比呢？"
     _cur_prefix = _sanitize_for_summary(current_query)[:25].strip()
 
     recent_messages = _build_recent_messages_two_rounds()
@@ -364,19 +368,19 @@ def test_t26_fallback_skips_current_query_finds_prior_stock():
 
     assert found_entity is not None, "Should find an entity from the PRIOR round"
     assert found_entity.code == "600519", \
-        f"Should find 贵州茅台 (600519) from Round 1, got {found_entity}"
-    assert found_entity.name == "贵州茅台"
+        f"Should find prior explicit code 600519 from Round 1, got {found_entity}"
+    assert found_entity.name == "600519"
 
 
 def test_t27_fallback_does_not_extract_from_current_query():
     """
-    T27: _entity_from_text on Round-2 query "那它和五粮液相比呢？"
-    WOULD extract 五粮液 — this proves the current-query MUST be skipped.
+    T27: _entity_from_text on Round-2 query "那它和000858相比呢？"
+    WOULD extract 000858 — this proves the current-query MUST be skipped.
     """
     from app.services.conversation_memory_service import _entity_from_text
-    ent = _entity_from_text("那它和五粮液相比呢？")
+    ent = _entity_from_text("那它和000858相比呢？")
     # This is a valid extraction — the bug is that it shouldn't be used as context
-    assert ent is not None, "五粮液 is in the query and _entity_from_text finds it"
+    assert ent is not None, "000858 is in the query and _entity_from_text finds it"
     assert ent.code == "000858"
     # The test proves WHY we must skip the current query in the fallback loop
 

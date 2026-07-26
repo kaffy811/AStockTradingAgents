@@ -1,0 +1,29 @@
+{
+  "schema_version": "pi_canary_feedback_v1",
+  "phase": "MVP-R1.1",
+  "generated_at": "2026-07-26T08:00:00Z",
+
+  "feedback_endpoint": "POST /chat/feedback",
+  "feedback_model": "chat_feedback",
+  "categories_supported": [
+    "helpful", "not_helpful", "data_inaccurate",
+    "irrelevant", "hard_to_understand", "display_issue", "other"
+  ],
+  "max_comment_length": 1000,
+  "pii_protection": "comment sanitized, no full conversation stored",
+  "success_confirmation": "displayed immediately after submit",
+  "duplicate_prevention": true,
+  "pii_fields_stripped": ["email", "password", "token", "api_key", "secret", "phone"],
+
+  "ui_feedback_labels": {
+    "helpful": "有帮助",
+    "not_helpful": "无帮助",
+    "data_inaccurate": "数据不准确",
+    "irrelevant": "回答不相关",
+    "hard_to_understand": "内容难理解",
+    "display_issue": "加载或显示异常",
+    "other": "其他"
+  },
+
+  "gate_l10_result": "PASS"
+}

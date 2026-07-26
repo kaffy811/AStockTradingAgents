@@ -1,0 +1,11 @@
+{
+  "phase": "phase6tq_cross_region_comparison",
+  "local_cross_region": {
+    "select_1_p50_ms": 525.73,
+    "insert_commit_p50_ms": 811.43,
+    "steady_state_create_p50_ms": 1367.75,
+    "steady_state_create_p95_ms": 2097.94
+  },
+  "same_region": null,
+  "status": "incomplete"
+}

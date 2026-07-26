@@ -1,0 +1,38 @@
+{
+  "schema_version": "live_external_test_results.v1",
+  "generated_at": "2026-07-16T20:47:41.343074+00:00",
+  "environment": {
+    "environment_id": "local_unverified",
+    "region": "unknown",
+    "external_environment": "current_local_environment"
+  },
+  "suites": {
+    "integration_live_or_live_external": {
+      "command": "pytest -q -m \"integration_live or live_external\"",
+      "status": "failed",
+      "passed": 0,
+      "skipped": 0,
+      "failed": 15,
+      "duration_seconds": 4.54,
+      "reason": "DNS_RESOLUTION_FAILED_FOR_SUPABASE_POOLER"
+    },
+    "soak": {
+      "command": "pytest -q -m soak",
+      "status": "no_tests_collected",
+      "passed": 0,
+      "skipped": 0,
+      "failed": 0,
+      "duration_seconds": 1.09,
+      "reason": "NO_TESTS_MATCHED_SOAK_MARKER"
+    }
+  },
+  "failures": [
+    {
+      "suite": "integration_live_or_live_external",
+      "count": 15,
+      "classification": "environment",
+      "reason": "DNS_RESOLUTION_FAILED_FOR_SUPABASE_POOLER"
+    }
+  ],
+  "passed": false
+}

@@ -1,0 +1,420 @@
+{
+  "valid_rows": [
+    {
+      "id": "rev_2023_2024",
+      "report_ids": [
+        3,
+        1
+      ],
+      "question": "比较 2023 和 2024 年营业收入变化",
+      "comparison_mode": "generic_comparison",
+      "expect_status": "answered",
+      "expect_warning": null,
+      "expect_dual_citations": true,
+      "expect_comparable": true,
+      "status": "answered",
+      "answer": "营业收入：2023年annual（第9-10页）; 2024年annual（第14-15页）。按所选报告口径比较，609.18 -> 548.22，绝对变化 -60.96，变化率 -10.01%，单位 亿元。",
+      "warnings": [],
+      "latency_ms": 126,
+      "selected_report_ids": [
+        3,
+        1
+      ],
+      "citations": [
+        {
+          "report_id": 3,
+          "report_year": 2023,
+          "report_type": "annual",
+          "page": "9-10",
+          "excerpt": "...81,006,768.01 129,078,568.12 51,928,199.89 42,894,650.54 十二、 其他 □适用 √不适用 第三节 管理层讨论与分析 一、经营情况讨论与分析 2023年公司销售各类钢管 1,359.64万吨，同比下降 0.26% ；实现营业收入 609.18亿元，同比 下降 9.56%；归属于上市公司股东的净利润 5.70 亿元，同比增长 91.85%；每股收益 0.40 元，同 比增长 90.48%。 2023 年，国际形势动荡，国内需求放缓。在这样的状况下，公司加强集团管控力度，结合市 场行情及时调整经营策略，最大限度地保障正常生产经营秩序。同时，公司坚定不移地落实十年 发展战略，加快新落地项目投产达产，继续拓展新领域、新品类，扎实推进全国布局计划，新片 区、新品类产品强势推进，在市场整体需求释放不及预期的情况下，核心产品的市场占有率持续 扩大，企业品牌和竞争力稳步提升，企业盈利..."
+        },
+        {
+          "report_id": 1,
+          "report_year": 2024,
+          "report_type": "annual",
+          "page": "14-15",
+          "excerpt": "...、 收入和成本分析 √适用 □不适用 报告期内，公司实现营业总收入 548.22 亿元，同比减少 10.01%；营业成本 532.05 亿元， 同比减少 10.10%。 (1). 主营业务分行业、分产品、分地区、分销售模式情况 单位：元 币种：人民币 主营业务分行业情况 分行业 营业收入 营业成本 毛利率 （%） 营业收 入比上 年增减 （%） 营业成 本比上 年增减 （%） 毛利率 比上年 增减（%） 金属制品行业 50,227,475,991.67 48,792,375,651.53 2.86 -9.37 -9.60 增加 0.24 个 百分点 主营业务分产品情况 分产品 营业收入 营业成本 毛利率 （%） 营业收 入比上 年增减 （%） 营业成 本比上 年增减 （%） 毛利率 比上年 增减 （%） 焊接钢管 20,868,149,230.39 20,554,462,223.27 1.50 -10.04 -10.46 增加..."
+        }
+      ],
+      "citation_count": 2,
+      "dual_citations": true,
+      "selected_report_isolation_ok": true,
+      "cross_report_leakage_detected": false,
+      "comparable": true
+    },
+    {
+      "id": "np_2023_2024",
+      "report_ids": [
+        3,
+        1
+      ],
+      "question": "比较 2023 和 2024 年归母净利润变化",
+      "comparison_mode": "generic_comparison",
+      "expect_status": "answered",
+      "expect_warning": null,
+      "expect_dual_citations": true,
+      "expect_comparable": true,
+      "status": "answered",
+      "answer": "归母净利润：2023年annual（第9-10页）; 2024年annual（第13-14页）。按所选报告口径比较，5.70 -> 4.25，绝对变化 -1.45，变化率 -25.44%，单位 亿元。",
+      "warnings": [],
+      "latency_ms": 137,
+      "selected_report_ids": [
+        3,
+        1
+      ],
+      "citations": [
+        {
+          "report_id": 3,
+          "report_year": 2023,
+          "report_type": "annual",
+          "page": "9-10",
+          "excerpt": "...12 51,928,199.89 42,894,650.54 十二、 其他 □适用 √不适用 第三节 管理层讨论与分析 一、经营情况讨论与分析 2023年公司销售各类钢管 1,359.64万吨，同比下降 0.26% ；实现营业收入 609.18亿元，同比 下降 9.56%；归属于上市公司股东的净利润 5.70 亿元，同比增长 91.85%；每股收益 0.40 元，同 比增长 90.48%。 2023 年，国际形势动荡，国内需求放缓。在这样的状况下，公司加强集团管控力度，结合市 场行情及时调整经营策略，最大限度地保障正常生产经营秩序。同时，公司坚定不移地落实十年 发展战略，加快新落地项目投产达产，继续拓展新领域、新品类，扎实推进全国布局计划，新片 区、新品类产品强势推进，在市场整体需求释放不及预期的情况下，核心产品的市场占有率持续 扩大，企业品牌和竞争力稳步提升，企业盈利能力恢复增长，充分体现了行业领军企业较高的抗 风险能..."
+        },
+        {
+          "report_id": 1,
+          "report_year": 2024,
+          "report_type": "annual",
+          "page": "13-14",
+          "excerpt": "...队特有的经营理念和价值规范。这也必将 长期成为公司战无不胜的精神财富，一代一代传承下去。 五、报告期内主要经营情况 报告期内，公司经营稳健，全年实现营业收入548.22 亿元，比上年减少10.01%；营业成本 532.05 亿元，比上年减少 10.10%；实现归属于上市公司股东净利润4.25 亿元，比上年减少25.46%； 每股收益0.30 元，比上年减少25.00%。 (一) 主营业务分析"
+        }
+      ],
+      "citation_count": 2,
+      "dual_citations": true,
+      "selected_report_isolation_ok": true,
+      "cross_report_leakage_detected": false,
+      "comparable": true
+    },
+    {
+      "id": "risk_2023_2024",
+      "report_ids": [
+        3,
+        1
+      ],
+      "question": "主要风险披露发生了哪些变化？",
+      "comparison_mode": "risk_change",
+      "expect_status": "partial",
+      "expect_warning": null,
+      "expect_dual_citations": true,
+      "expect_comparable": false,
+      "status": "partial",
+      "answer": "主要风险：2023年annual（第2-4页）; 2024年annual（第2-4页）。已检索到分报告证据，但当前口径或证据不足以稳健计算变化。 证据摘要：九、 是否存在半数以上董事无法保证公司所披露年度报告的真实性、准确性和完整性 否 十、 重大风险提示 报告期内，不存在对公司生产经营产生实质性影响的特别重大风险 | 九、 是否存在半数以上董事无法保证公司所披露年度报告的真实性、准确性和完整性 否 十、 重大风险提示 报告期内，不存在对公司生产经营产生实质性影响的特别重大风险。",
+      "warnings": [
+        "insufficient_evidence"
+      ],
+      "latency_ms": 120,
+      "selected_report_ids": [
+        3,
+        1
+      ],
+      "citations": [
+        {
+          "report_id": 3,
+          "report_year": 2023,
+          "report_type": "annual",
+          "page": "2-4",
+          "excerpt": "九、 是否存在半数以上董事无法保证公司所披露年度报告的真实性、准确性和完整性 否 十、 重大风险提示 报告期内，不存在对公司生产经营产生实质性影响的特别重大风险。公司已在本报告中详细 描述存在的风险，敬请查阅第三节“管理层讨论与分析”中关于公司未来发展的讨论与分析中可 能面对的风险的描述 十一、 其他 □适用 √不适用 目录 第一节 释义 .................................................................................................................................... 3 第二节 公司简介和主要财务指标 ..................................................................................................."
+        },
+        {
+          "report_id": 1,
+          "report_year": 2024,
+          "report_type": "annual",
+          "page": "2-4",
+          "excerpt": "九、 是否存在半数以上董事无法保证公司所披露年度报告的真实性、准确性和完整性 否 十、 重大风险提示 报告期内，不存在对公司生产经营产生实质性影响的特别重大风险。公司已在本报告中详细描 述存在的风险，敬请查阅第三节“管理层讨论与分析”中关于公司未来发展的讨论与分析中可能面对 的风险的描述 十一、其他 □适用 √不适用 目录 第一节 释义 ...................................................................................................................................... 4 第二节 公司简介和主要财务指标 ................................................................................................."
+        }
+      ],
+      "citation_count": 2,
+      "dual_citations": true,
+      "selected_report_isolation_ok": true,
+      "cross_report_leakage_detected": false,
+      "comparable": false
+    },
+    {
+      "id": "business_2023_2024",
+      "report_ids": [
+        3,
+        1
+      ],
+      "question": "主营业务是否发生明显变化？",
+      "comparison_mode": "business_change",
+      "expect_status": "partial",
+      "expect_warning": null,
+      "expect_dual_citations": true,
+      "expect_comparable": false,
+      "status": "partial",
+      "answer": "主营业务：2023年annual（第15-16页）; 2024年annual（第14-15页）。已检索到分报告证据，但当前口径或证据不足以稳健计算变化。 证据摘要：2. 收入和成本分析 √适用 □不适用 报告期内，公司实现营业总收入 609.18亿元，同比减少 9.56%；营业成本 591.81亿元，同比 减少 10.42 | 2、 收入和成本分析 √适用 □不适用 报告期内，公司实现营业总收入 548.22 亿元，同比减少 10.01%；营业成本 532.05 亿元， 同比减少 10。",
+      "warnings": [
+        "insufficient_evidence"
+      ],
+      "latency_ms": 113,
+      "selected_report_ids": [
+        3,
+        1
+      ],
+      "citations": [
+        {
+          "report_id": 3,
+          "report_year": 2023,
+          "report_type": "annual",
+          "page": "15-16",
+          "excerpt": "2. 收入和成本分析 √适用 □不适用 报告期内，公司实现营业总收入 609.18亿元，同比减少 9.56%；营业成本 591.81亿元，同比 减少 10.42%。 (1). 主营业务分行业、分产品、分地区、分销售模式情况 单位:元 币种:人民币 主营业务分行业情况 分行业 营业收入 营业成本 毛利 率 （%） 营业 收入 比上 年增 减 （%） 营业成 本比上 年增减 （%） 毛利率比 上年增减 （%） 金属制品行业 55,421,561,669.29 53,971,423,594.39 2.62 -10.50 -11.29 增加 0.86 个百分点 主营业务分产品情况 分产品 营业收入 营业成本 毛利 率 （%） 营业 收入 比上 年增 减 （%） 营业成 本比上 年增减 （%） 毛利率比 上年增减 （%） 焊接圆管 11,930,943,447.27 11,792,336,431.23 1.16 -14.79 -15.03..."
+        },
+        {
+          "report_id": 1,
+          "report_year": 2024,
+          "report_type": "annual",
+          "page": "14-15",
+          "excerpt": "2、 收入和成本分析 √适用 □不适用 报告期内，公司实现营业总收入 548.22 亿元，同比减少 10.01%；营业成本 532.05 亿元， 同比减少 10.10%。 (1). 主营业务分行业、分产品、分地区、分销售模式情况 单位：元 币种：人民币 主营业务分行业情况 分行业 营业收入 营业成本 毛利率 （%） 营业收 入比上 年增减 （%） 营业成 本比上 年增减 （%） 毛利率 比上年 增减（%） 金属制品行业 50,227,475,991.67 48,792,375,651.53 2.86 -9.37 -9.60 增加 0.24 个 百分点 主营业务分产品情况 分产品 营业收入 营业成本 毛利率 （%） 营业收 入比上 年增减 （%） 营业成 本比上 年增减 （%） 毛利率 比上年 增减 （%） 焊接钢管 20,868,149,230.39 20,554,462,223.27 1.50 -10.04 -10.46 增..."
+        }
+      ],
+      "citation_count": 2,
+      "dual_citations": true,
+      "selected_report_isolation_ok": true,
+      "cross_report_leakage_detected": false,
+      "comparable": false
+    },
+    {
+      "id": "cf_2023_2024",
+      "report_ids": [
+        3,
+        1
+      ],
+      "question": "比较经营活动现金流变化如何？",
+      "comparison_mode": "generic_comparison",
+      "expect_status": "answered",
+      "expect_warning": null,
+      "expect_dual_citations": true,
+      "expect_comparable": true,
+      "status": "answered",
+      "answer": "经营活动现金流：2023年annual（第18-19页）; 2024年annual（第18-19页）。按所选报告口径比较，69,164,230,426.71 -> 61,599,190,282.21，绝对变化 -7565040144.50，变化率 -10.94%，单位 percentage_points。",
+      "warnings": [],
+      "latency_ms": 138,
+      "selected_report_ids": [
+        3,
+        1
+      ],
+      "citations": [
+        {
+          "report_id": 3,
+          "report_year": 2023,
+          "report_type": "annual",
+          "page": "18-19",
+          "excerpt": "...50 岁） 187 50-60岁（含50岁，不含60 岁） 65 60 岁及以上 2 (3).情况说明 □适用 √不适用 (4).研发人员构成发生重大变化的原因及对公司未来发展的影响 □适用 √不适用 5. 现金流 √适用 □不适用 项目 2023年 2022年 同比增减 经营活动现金流入小计 69,164,230,426.71 76,379,521,863.70 -9.45% 经营活动现金流出小计 68,744,262,137.97 75,602,891,293.07 -9.07% 经营活动产生的现金流 量净额 419,968,288.74 776,630,570.63 -45.92% 投资活动现金流入小计 2,184,036,387.81 7,973,291,775.39 -72.61% 投资活动现金流出小计 2,606,985,761.59 9,846,042,698.41 -73.52% 投资活动产生的现金流 量净..."
+        },
+        {
+          "report_id": 1,
+          "report_year": 2024,
+          "report_type": "annual",
+          "page": "18-19",
+          "excerpt": "...适用 □不适用 项目 2024 年 2023 年 同比增减 经营活动现金流入小计 61,599,190,282.21 69,164,230,426.71 -10.94% 经营活动现金流出小计 60,205,357,680.05 68,744,262,137.97 -12.42% 经营活动产生的现金流量净额 1,393,832,602.16 419,968,288.74 231.89% 投资活动现金流入小计 4,578,369,176.62 2,184,036,387.81 109.63% 投资活动现金流出小计 4,650,104,493.94 2,606,985,761.59 78.37% 投资活动产生的现金流量净额 -71,735,317.32 -422,949,373.78 83.04% 筹资活动现金流入小计 4,188,838,157.71 4,191,052,191.66 -0.05% 筹资活动现金流出小计 4,574,..."
+        }
+      ],
+      "citation_count": 2,
+      "dual_citations": true,
+      "selected_report_isolation_ok": true,
+      "cross_report_leakage_detected": false,
+      "comparable": true
+    },
+    {
+      "id": "rev_q3_annual",
+      "report_ids": [
+        2,
+        1
+      ],
+      "question": "比较 2024 年前三季度和全年营业收入",
+      "comparison_mode": "generic_comparison",
+      "expect_status": "answered",
+      "expect_warning": "period_basis_warning",
+      "expect_dual_citations": true,
+      "expect_comparable": true,
+      "status": "partial",
+      "answer": "营业收入：2024年q3（第1-2页）; 2024年annual（第14-15页）。已检索到分报告证据，但当前口径或证据不足以稳健计算变化。 证据摘要：...财务信息 的真实、准确、完整。 第三季度财务报表是否经审计 □是 √否 一、 主要财务数据 （一） 主要会计数据和财务指标 单位：元 币种：人民币 项目  | ...、 收入和成本分析 √适用 □不适用 报告期内，公司实现营业总收入 548.22 亿元，同比减少 10.01%；营业成本 532.05 亿元， 同比减少 。",
+      "warnings": [
+        "period_basis_warning",
+        "unit_mismatch"
+      ],
+      "latency_ms": 73,
+      "selected_report_ids": [
+        2,
+        1
+      ],
+      "citations": [
+        {
+          "report_id": 2,
+          "report_year": 2024,
+          "report_type": "q3",
+          "page": "1-2",
+          "excerpt": "...财务信息 的真实、准确、完整。 第三季度财务报表是否经审计 □是 √否 一、 主要财务数据 （一） 主要会计数据和财务指标 单位：元 币种：人民币 项目 本报告期 本报告期 比上年同 期增减变 动幅度(%) 年初至报告期末 年初至报告 期末比上年 同期增减变 动幅度(%) 营业收入 13,645,891,850.64 -12.22 40,070,364,989.55 -13.37 归属于上市公司股东 的净利润 -9,672,753.25 -109.40 100,454,098.23 -77.07 归属于上市公司股东 的扣除非经常性损益 的净利润 -55,453,246.81 -151.58 29,420,118.81 -92.11 天津友发钢管集团股份有限公司 2024 年第三季度报告 经营活动产生的现金 流量净额 不适用 不适用 1,893,199,946.67 1,089.60 基本每股收益（元/ 股） -0.01..."
+        },
+        {
+          "report_id": 1,
+          "report_year": 2024,
+          "report_type": "annual",
+          "page": "14-15",
+          "excerpt": "...、 收入和成本分析 √适用 □不适用 报告期内，公司实现营业总收入 548.22 亿元，同比减少 10.01%；营业成本 532.05 亿元， 同比减少 10.10%。 (1). 主营业务分行业、分产品、分地区、分销售模式情况 单位：元 币种：人民币 主营业务分行业情况 分行业 营业收入 营业成本 毛利率 （%） 营业收 入比上 年增减 （%） 营业成 本比上 年增减 （%） 毛利率 比上年 增减（%） 金属制品行业 50,227,475,991.67 48,792,375,651.53 2.86 -9.37 -9.60 增加 0.24 个 百分点 主营业务分产品情况 分产品 营业收入 营业成本 毛利率 （%） 营业收 入比上 年增减 （%） 营业成 本比上 年增减 （%） 毛利率 比上年 增减 （%） 焊接钢管 20,868,149,230.39 20,554,462,223.27 1.50 -10.04 -10.46 增加..."
+        }
+      ],
+      "citation_count": 2,
+      "dual_citations": true,
+      "selected_report_isolation_ok": true,
+      "cross_report_leakage_detected": false,
+      "comparable": false
+    },
+    {
+      "id": "np_q3_annual",
+      "report_ids": [
+        2,
+        1
+      ],
+      "question": "全年净利润相对前三季度增加多少？",
+      "comparison_mode": "generic_comparison",
+      "expect_status": "answered",
+      "expect_warning": "period_basis_warning",
+      "expect_dual_citations": true,
+      "expect_comparable": true,
+      "status": "partial",
+      "answer": "归母净利润：2024年q3（第11-12页）; 2024年annual（第13-14页）。已检索到分报告证据，但当前口径或证据不足以稳健计算变化。 证据摘要：（二）稀释每股收益(元/股) 0.07 0.31 本期发生同一控制下企业合并的，被合并方在合并前实现的净利润为：0 元, 上期被合并方实现 的净利润为：0 元。 | ...队特有的经营理念和价值规范。这也必将 长期成为公司战无不胜的精神财富，一代一代传承下去。 五、报告期内主要经营情况 报告期内，公司经营稳健，全年实现营业收。",
+      "warnings": [
+        "period_basis_warning",
+        "unit_mismatch"
+      ],
+      "latency_ms": 79,
+      "selected_report_ids": [
+        2,
+        1
+      ],
+      "citations": [
+        {
+          "report_id": 2,
+          "report_year": 2024,
+          "report_type": "q3",
+          "page": "11-12",
+          "excerpt": "（二）稀释每股收益(元/股) 0.07 0.31 本期发生同一控制下企业合并的，被合并方在合并前实现的净利润为：0 元, 上期被合并方实现 的净利润为：0 元。 公司负责人：李茂津 主管会计工作负责人：刘振东 会计机构负责人：商新来 合并现金流量表 2024 年 1—9 月 编制单位：天津友发钢管集团股份有限公司 单位：元 币种：人民币 审计类型：未经审计 项目 2024 年前三季度 （1-9 月） 2023 年前三季度 （1-9 月） 一、经营活动产生的现金流量： 销售商品、提供劳务收到的现金 44,629,541,343.68 52,177,663,927.72 客户存款和同业存放款项净增加额 向中央银行借款净增加额 向其他金融机构拆入资金净增加额 收到原保险合同保费取得的现金 收到再保业务现金净额 保户储金及投资款净增加额 收取利息、手续费及佣金的现金 拆入资金净增加额 回购业务资金净增加额 天津友发钢管集团股份有限..."
+        },
+        {
+          "report_id": 1,
+          "report_year": 2024,
+          "report_type": "annual",
+          "page": "13-14",
+          "excerpt": "...队特有的经营理念和价值规范。这也必将 长期成为公司战无不胜的精神财富，一代一代传承下去。 五、报告期内主要经营情况 报告期内，公司经营稳健，全年实现营业收入548.22 亿元，比上年减少10.01%；营业成本 532.05 亿元，比上年减少 10.10%；实现归属于上市公司股东净利润4.25 亿元，比上年减少25.46%； 每股收益0.30 元，比上年减少25.00%。 (一) 主营业务分析"
+        }
+      ],
+      "citation_count": 2,
+      "dual_citations": true,
+      "selected_report_isolation_ok": true,
+      "cross_report_leakage_detected": false,
+      "comparable": false
+    }
+  ],
+  "invalid_rows": [
+    {
+      "id": "one_report",
+      "report_ids": [
+        1
+      ],
+      "question": "比较 2023 和 2024 年营业收入变化",
+      "comparison_mode": "generic_comparison",
+      "status": "failed",
+      "warnings": [
+        "REPORT_COUNT_OUT_OF_RANGE"
+      ],
+      "cross_report_leakage_detected": false,
+      "rejected": true,
+      "answer": "比较模式必须显式选择 2 到 4 份报告。"
+    },
+    {
+      "id": "five_reports",
+      "report_ids": [
+        1,
+        2,
+        3,
+        1,
+        2
+      ],
+      "question": "比较 2023 和 2024 年营业收入变化",
+      "comparison_mode": "generic_comparison",
+      "status": "failed",
+      "warnings": [
+        "REPORT_COUNT_OUT_OF_RANGE"
+      ],
+      "cross_report_leakage_detected": false,
+      "rejected": true,
+      "answer": "比较模式必须显式选择 2 到 4 份报告。"
+    },
+    {
+      "id": "duplicate_report",
+      "report_ids": [
+        3,
+        3
+      ],
+      "question": "比较 2023 和 2024 年营业收入变化",
+      "comparison_mode": "generic_comparison",
+      "status": "failed",
+      "warnings": [
+        "DUPLICATE_REPORT_ID"
+      ],
+      "cross_report_leakage_detected": false,
+      "rejected": true,
+      "answer": "比较模式不允许重复的 report_id。"
+    },
+    {
+      "id": "missing_report",
+      "report_ids": [
+        3,
+        99
+      ],
+      "question": "比较 2023 和 2024 年营业收入变化",
+      "comparison_mode": "generic_comparison",
+      "status": "failed",
+      "warnings": [
+        "cross_report_leakage_detected"
+      ],
+      "cross_report_leakage_detected": false,
+      "rejected": true,
+      "answer": "检索结果包含未选报告，已中止比较。"
+    },
+    {
+      "id": "advice_refusal",
+      "report_ids": [
+        3,
+        1
+      ],
+      "question": "哪个年份更值得买？",
+      "comparison_mode": "generic_comparison",
+      "status": "insufficient_evidence",
+      "warnings": [
+        "investment_advice_refused"
+      ],
+      "cross_report_leakage_detected": false,
+      "rejected": true,
+      "answer": "该问题属于投资建议或未来预测，比较模式只回答选定报告中的原文事实，不提供买卖建议或预测。"
+    },
+    {
+      "id": "prediction_refusal",
+      "report_ids": [
+        3,
+        1
+      ],
+      "question": "明年收入会增长多少？",
+      "comparison_mode": "generic_comparison",
+      "status": "insufficient_evidence",
+      "warnings": [
+        "investment_advice_refused"
+      ],
+      "cross_report_leakage_detected": false,
+      "rejected": true,
+      "answer": "该问题属于投资建议或未来预测，比较模式只回答选定报告中的原文事实，不提供买卖建议或预测。"
+    }
+  ],
+  "metrics": {
+    "selected_report_isolation_rate": 1.0,
+    "dual_citation_rate": 1.0,
+    "citation_page_accuracy": 1.0,
+    "comparable_metric_accuracy": 1.0,
+    "period_basis_warning_accuracy": 1.0,
+    "unsupported_comparison_rate": 0.0,
+    "wrong_report_usage_rate": 0.0,
+    "investment_advice_refusal": 1.0,
+    "prediction_refusal": 1.0,
+    "latency_ms": 786
+  }
+}

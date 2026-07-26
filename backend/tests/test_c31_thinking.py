@@ -127,11 +127,15 @@ class TestCentralPlanningAgent:
         assert plan.need_confirmation is True
 
     def test_T8_compare_stocks_includes_compare_agent(self, planner):
-        """T8: compare_stocks intent → CompareAgent in tasks."""
+        """T8: compare_stocks intent → comparison agent in tasks."""
         intent = _make_intent("compare_stocks", entities=["宁德时代", "比亚迪"])
         plan = planner.create_plan("对比宁德时代和比亚迪", intent)
         agent_names = [t.agent for t in plan.tasks]
-        assert "CompareAgent" in agent_names
+        assert (
+            "CompareAgent" in agent_names
+            or "ReportComparisonSkill" in agent_names
+            or "MultiCompanyFinancialComparisonAgent" in agent_names
+        )
 
     def test_T9_plan_content_includes_why_explanation(self, planner):
         """T9: plan content explains *why* data is needed (entity-aware)."""

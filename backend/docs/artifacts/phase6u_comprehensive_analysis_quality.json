@@ -1,0 +1,56 @@
+{
+  "phase": "phase6u_p4_comprehensive_analysis_quality",
+  "generated_at": "2026-07-14",
+  "scope": [
+    "backend/app/agents/comprehensive_analysis_coordinator.py",
+    "backend/tests/fixtures/phase6u_production_regression_cases.json",
+    "backend/tests/fundamental/test_phase6u_production_regression.py"
+  ],
+  "schema_compatibility": {
+    "report": "preserved",
+    "sections": "preserved_raw_subreports",
+    "metadata": "preserved_with_additive_partial_and_synthesis_validation",
+    "schema_regression_count": 0
+  },
+  "quality_metrics": {
+    "fixture_total": 30,
+    "route_accuracy": 1.0,
+    "entity_inheritance_accuracy": 1.0,
+    "unsupported_number_count": 0,
+    "post_validation_blocked_unsupported_number_count": 1,
+    "duplicate_section_count": 0,
+    "missing_limitation_count": 0,
+    "safety_violation_count": 0,
+    "schema_regression_count": 0
+  },
+  "controls": {
+    "closed_evidence_set": true,
+    "structured_section_summaries_before_llm": true,
+    "numeric_whitelist_validation": true,
+    "symbol_name_market_validation": true,
+    "forbidden_content_validation": true,
+    "source_scope_validation": true,
+    "limitation_retention_validation": true,
+    "duplicate_paragraph_validation": true,
+    "all_missing_data_skips_synthesis_llm": true,
+    "partial_metadata_enabled": true
+  },
+  "targeted_tests": {
+    "command": "cd backend && .venv/bin/python -m pytest -q tests/fundamental -k \"comprehensive or production_regression or phase6u\"",
+    "result": "49 passed, 1282 deselected, 1 warning",
+    "status": "passed"
+  },
+  "hermetic_tests": {
+    "command": "cd backend && .venv/bin/python -m pytest -q -m \"not live_supabase\"",
+    "result": "3139 passed, 15 deselected, 206 warnings",
+    "status": "passed"
+  },
+  "external_calls": {
+    "real_provider": false,
+    "real_rag": false,
+    "real_fusion": false,
+    "stage3": false,
+    "canary": false,
+    "deployment": false
+  }
+}

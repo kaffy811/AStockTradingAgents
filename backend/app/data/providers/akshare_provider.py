@@ -56,6 +56,17 @@ def _direct_connect():
     _original_getproxies = urllib.request.getproxies
     urllib.request.getproxies = lambda: {}
 
+    # -- Layer 1b: patch requests.utils bindings ------------------------------
+    # requests.utils imports getproxies/proxy_bypass BY NAME at import time,
+    # so patching urllib.request alone does not reach sessions with
+    # trust_env=True (e.g. akshare's internally created Sessions).  On macOS
+    # the fallback then reads the system proxy (Clash) via _scproxy.
+    import requests.utils as _req_utils
+    _original_req_getproxies   = _req_utils.getproxies
+    _original_req_proxy_bypass = _req_utils.proxy_bypass
+    _req_utils.getproxies   = lambda: {}
+    _req_utils.proxy_bypass = lambda host: True
+
     # -- Layer 2: env-var cleanup -------------------------------------------
     _saved_env: dict[str, str] = {}
     for var in _PROXY_ENV_VARS:
@@ -73,6 +84,9 @@ def _direct_connect():
     finally:
         # Restore urllib patch
         urllib.request.getproxies = _original_getproxies
+        # Restore requests.utils patches
+        _req_utils.getproxies   = _original_req_getproxies
+        _req_utils.proxy_bypass = _original_req_proxy_bypass
         # Restore env vars
         for var, val in _saved_env.items():
             os.environ[var] = val

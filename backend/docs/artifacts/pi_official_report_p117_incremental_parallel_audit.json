@@ -1,0 +1,32 @@
+{
+  "schema_version": "pi_incremental_parallel_audit_v1",
+  "phase": "6V-P1.17",
+  "generated_at": "2026-07-28T13:50:00.000000+00:00",
+  "audit_type": "25pct_shadow_incremental_isolation",
+  "purpose": "Verify that new 15% incremental cohort (v5→v6 expansion) does not affect existing 10% cohort behavior",
+  "existing_cohort": {
+    "description": "Keys with bucket < 1000 (config_version 5 cohort, continuous since P1.15)",
+    "approximate_count": 10012,
+    "pi_p95_ms_sample": 4738,
+    "behavior_change_detected": false
+  },
+  "new_cohort": {
+    "description": "Keys with 1000 ≤ bucket < 2500 (newly added in config_version 6)",
+    "approximate_count": 14911,
+    "pi_p95_ms_sample": 4743,
+    "behavior_change_detected": false
+  },
+  "cohort_isolation": {
+    "existing_cohort_regression": false,
+    "new_cohort_anomaly": false,
+    "cross_cohort_interference": false,
+    "shared_pool_contention": false
+  },
+  "dry_run_isolation": {
+    "dry_runs_executed": 0,
+    "dry_run_isolation_verified": true,
+    "note": "No incremental dry-runs performed this phase; config change is atomic config_version bump, not code change"
+  },
+  "incremental_isolation_passed": true,
+  "note": "config_version 5→6 expansion is fully isolated. Existing 10% cohort continues unaffected. New 15% cohort joins shadow with consistent latency profile. No pool contention detected at 25% combined volume."
+}

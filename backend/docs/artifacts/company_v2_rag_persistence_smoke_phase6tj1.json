@@ -1,0 +1,212 @@
+{
+  "ok": true,
+  "repository_backend": "database",
+  "persistent": true,
+  "results": [
+    {
+      "report_id": 2,
+      "repository_backend": "database",
+      "persistent": true,
+      "rag_document_id": 1,
+      "symbol": "600519",
+      "generation": 1,
+      "persisted_chunk_count": 211,
+      "expected_chunk_count": 211,
+      "chunk_count_match": true,
+      "retrieved_after_restart": true,
+      "symbol_isolation": true,
+      "retrievals": [
+        {
+          "query": "营业收入",
+          "evidence_found": true,
+          "retrieved": 6,
+          "top_page": 6,
+          "citation_valid": true,
+          "report_isolation": true,
+          "cross_report_leakage_detected": false
+        },
+        {
+          "query": "净利润",
+          "evidence_found": true,
+          "retrieved": 6,
+          "top_page": 143,
+          "citation_valid": true,
+          "report_isolation": true,
+          "cross_report_leakage_detected": false
+        },
+        {
+          "query": "经营活动产生的现金流量净额",
+          "evidence_found": true,
+          "retrieved": 6,
+          "top_page": 6,
+          "citation_valid": true,
+          "report_isolation": true,
+          "cross_report_leakage_detected": false
+        },
+        {
+          "query": "资产总计",
+          "evidence_found": true,
+          "retrieved": 6,
+          "top_page": 57,
+          "citation_valid": true,
+          "report_isolation": true,
+          "cross_report_leakage_detected": false
+        }
+      ]
+    },
+    {
+      "report_id": 3,
+      "repository_backend": "database",
+      "persistent": true,
+      "rag_document_id": 2,
+      "symbol": "300750",
+      "generation": 1,
+      "persisted_chunk_count": 299,
+      "expected_chunk_count": 299,
+      "chunk_count_match": true,
+      "retrieved_after_restart": true,
+      "symbol_isolation": true,
+      "retrievals": [
+        {
+          "query": "营业收入",
+          "evidence_found": true,
+          "retrieved": 6,
+          "top_page": 11,
+          "citation_valid": true,
+          "report_isolation": true,
+          "cross_report_leakage_detected": false
+        },
+        {
+          "query": "净利润",
+          "evidence_found": true,
+          "retrieved": 6,
+          "top_page": 232,
+          "citation_valid": true,
+          "report_isolation": true,
+          "cross_report_leakage_detected": false
+        },
+        {
+          "query": "经营活动产生的现金流量净额",
+          "evidence_found": true,
+          "retrieved": 6,
+          "top_page": 11,
+          "citation_valid": true,
+          "report_isolation": true,
+          "cross_report_leakage_detected": false
+        },
+        {
+          "query": "资产总计",
+          "evidence_found": true,
+          "retrieved": 6,
+          "top_page": 113,
+          "citation_valid": true,
+          "report_isolation": true,
+          "cross_report_leakage_detected": false
+        }
+      ]
+    },
+    {
+      "report_id": 4,
+      "repository_backend": "database",
+      "persistent": true,
+      "rag_document_id": 3,
+      "symbol": "000725",
+      "generation": 1,
+      "persisted_chunk_count": 311,
+      "expected_chunk_count": 311,
+      "chunk_count_match": true,
+      "retrieved_after_restart": true,
+      "symbol_isolation": true,
+      "retrievals": [
+        {
+          "query": "营业收入",
+          "evidence_found": true,
+          "retrieved": 6,
+          "top_page": 13,
+          "citation_valid": true,
+          "report_isolation": true,
+          "cross_report_leakage_detected": false
+        },
+        {
+          "query": "净利润",
+          "evidence_found": true,
+          "retrieved": 6,
+          "top_page": 12,
+          "citation_valid": true,
+          "report_isolation": true,
+          "cross_report_leakage_detected": false
+        },
+        {
+          "query": "经营活动产生的现金流量净额",
+          "evidence_found": true,
+          "retrieved": 6,
+          "top_page": 25,
+          "citation_valid": true,
+          "report_isolation": true,
+          "cross_report_leakage_detected": false
+        },
+        {
+          "query": "资产总计",
+          "evidence_found": true,
+          "retrieved": 6,
+          "top_page": 97,
+          "citation_valid": true,
+          "report_isolation": true,
+          "cross_report_leakage_detected": false
+        }
+      ]
+    },
+    {
+      "report_id": 5,
+      "repository_backend": "database",
+      "persistent": true,
+      "rag_document_id": 4,
+      "symbol": "000001",
+      "generation": 1,
+      "persisted_chunk_count": 396,
+      "expected_chunk_count": 396,
+      "chunk_count_match": true,
+      "retrieved_after_restart": true,
+      "symbol_isolation": true,
+      "retrievals": [
+        {
+          "query": "营业收入",
+          "evidence_found": true,
+          "retrieved": 6,
+          "top_page": 17,
+          "citation_valid": true,
+          "report_isolation": true,
+          "cross_report_leakage_detected": false
+        },
+        {
+          "query": "净利润",
+          "evidence_found": true,
+          "retrieved": 6,
+          "top_page": 18,
+          "citation_valid": true,
+          "report_isolation": true,
+          "cross_report_leakage_detected": false
+        },
+        {
+          "query": "经营活动产生的现金流量净额",
+          "evidence_found": true,
+          "retrieved": 6,
+          "top_page": 19,
+          "citation_valid": true,
+          "report_isolation": true,
+          "cross_report_leakage_detected": false
+        },
+        {
+          "query": "吸收存款",
+          "evidence_found": true,
+          "retrieved": 6,
+          "top_page": 29,
+          "citation_valid": true,
+          "report_isolation": true,
+          "cross_report_leakage_detected": false
+        }
+      ]
+    }
+  ],
+  "total_persisted_chunks": 1217
+}

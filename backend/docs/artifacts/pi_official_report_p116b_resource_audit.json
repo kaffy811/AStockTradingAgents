@@ -1,0 +1,23 @@
+{
+  "schema_version": "pi_resource_audit_v1",
+  "phase": "6V-P1.16B",
+  "generated_at": "2026-07-27T22:00:00.000000+00:00",
+  "scope": "backend full suite run + frontend build",
+  "backend_suite_resource": {
+    "duration_seconds": 198.54,
+    "peak_workers": 1,
+    "async_tasks_leaked": 0,
+    "db_connections_leaked": 0,
+    "redis_connections_leaked": 0,
+    "PendingRollbackError": 0,
+    "zombie_processes": 0
+  },
+  "shadow_canary_resource": {
+    "continued_from": "p116a",
+    "pool_exhaustion": 0,
+    "task_leak": 0,
+    "db_leak": 0,
+    "diagnostics_backlog_stable": true
+  },
+  "resource_gate_passed": true
+}

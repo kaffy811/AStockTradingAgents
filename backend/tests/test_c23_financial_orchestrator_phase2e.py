@@ -51,14 +51,14 @@ class TestComplexQueryRouting:
 
     def test_complex_query_is_detected(self):
         """
-        茅台2026财报 + 一个月行情 → need_report=True, need_kline=True → complex.
+        CN code 2026 财报 + 一个月行情 → need_report=True, need_kline=True → complex.
         """
         from app.agents.orchestrator.schemas import (
             build_task_intent, is_complex_financial_query,
         )
         from app.agents.official_report_search import parse_financial_analysis_intent
 
-        query  = "请帮我根据茅台2026财报分析茅台的2026年经营状况，并结合其一个月的股票数据进行分析"
+        query  = "请帮我根据600519 2026财报分析其2026年经营状况，并结合其一个月的股票数据进行分析"
         intent = parse_financial_analysis_intent(query)
         task   = build_task_intent(intent, query)
 
@@ -76,10 +76,10 @@ class TestComplexQueryRouting:
         assert is_complex_financial_query({"need_report": True, "need_rag": True})
         assert is_complex_financial_query({"need_kline": True, "need_news": True})
 
-    def test_symbol_extracted_for_moutai(self):
+    def test_symbol_extracted_for_cn_code(self):
         from app.agents.official_report_search import parse_financial_analysis_intent
 
-        query  = "请帮我根据茅台2026财报分析茅台的2026年经营状况，并结合其一个月的股票数据进行分析"
+        query  = "请帮我根据600519 2026财报分析其2026年经营状况，并结合其一个月的股票数据进行分析"
         intent = parse_financial_analysis_intent(query)
         assert intent.get("symbol") == "600519", f"Expected 600519, got {intent}"
         assert intent.get("market") == "CN",     f"Expected CN, got {intent}"

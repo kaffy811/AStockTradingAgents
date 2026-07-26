@@ -1,0 +1,26 @@
+{
+  "schema_version": "pi_official_report_p113a_resource_audit_v1",
+  "phase": "6V-P1.13A",
+  "generated_at": "2026-07-22T15:00:00.000000+00:00",
+  "source_sha": "0b6cbb977a58d4e7afa4f97a57b659ba5c6fad93",
+  "environment": "staging",
+  "task_leak": 0,
+  "db_leak": 0,
+  "PendingRollbackError": 0,
+  "open_db_sessions_after_dry_run": 0,
+  "open_db_sessions_after_apply": 0,
+  "open_db_sessions_after_idempotency": 0,
+  "open_db_sessions_after_shadow": 0,
+  "orphan_shadow_tasks": 0,
+  "tmp_diagnostics_files_left": 0,
+  "provider_sessions_left_open": 0,
+  "raw_500_count": 0,
+  "raw_503_count": 0,
+  "resource_audit_passed": true,
+  "phase_breakdown": {
+    "dry_run": {"task_leak": 0, "db_leak": 0, "PendingRollbackError": 0},
+    "apply": {"task_leak": 0, "db_leak": 0, "PendingRollbackError": 0},
+    "idempotency": {"task_leak": 0, "db_leak": 0, "PendingRollbackError": 0},
+    "shadow_regression": {"task_leak": 0, "db_leak": 0, "PendingRollbackError": 0}
+  }
+}

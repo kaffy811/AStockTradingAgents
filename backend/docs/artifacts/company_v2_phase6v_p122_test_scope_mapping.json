@@ -1,0 +1,81 @@
+{
+  "artifact": "company_v2_phase6v_p122_test_scope_mapping",
+  "phase": "6V-P1.22",
+  "generated_at": "2026-07-23T00:00:00Z",
+  "base_sha": "43130fcf8e348b6c8dbdb27accee1e304638b95d",
+  "test_files": {
+    "p122_targeted": {
+      "file": "tests/test_phase6v_p122_sustained_seventy_five_shadow.py",
+      "collected": 247,
+      "passed": 247,
+      "failed": 0,
+      "skipped": 0,
+      "exit_code": 0,
+      "scope": [
+        "U1-U10 window simulation",
+        "bucket selection rate verification (75%)",
+        "safety correctness rate = 1.0",
+        "zero tolerance violation checks",
+        "pi_p95 range gate (< 4800ms)",
+        "pi_leakage = 0",
+        "terminal_completion_rate = 1.0",
+        "resource ceiling checks (CPU < 80%, memory < 512MB)",
+        "dry-run isolation (business_writes = 0)",
+        "restart stability (U2)",
+        "multi-turn coverage (U3)",
+        "concurrency burst (U5)",
+        "worker rotation stability (U8)",
+        "long-running monotonic drift (U7, U9)",
+        "final stable recovery to U1 baseline (U10)",
+        "bucket identity replay (P1.21 cohort == P1.22 cohort)"
+      ]
+    },
+    "cross_phase": {
+      "pattern": "tests/test_phase6v_p1*.py",
+      "collected": 3003,
+      "passed": 3003,
+      "failed": 0,
+      "skipped": 0,
+      "exit_code": 0,
+      "phases_covered": [
+        "P1.8", "P1.9", "P1.10", "P1.11", "P1.12", "P1.13",
+        "P1.14", "P1.15", "P1.16", "P1.17", "P1.18", "P1.19",
+        "P1.20", "P1.21", "P1.22"
+      ]
+    },
+    "fundamental_suite": {
+      "path": "tests/fundamental/",
+      "collected": 4556,
+      "passed": 4541,
+      "failed": 0,
+      "skipped": 15,
+      "exit_code": 0,
+      "skipped_reason": "Optional provider not configured in CI fixture"
+    },
+    "full_backend_suite": {
+      "path": "tests/",
+      "collected": 6387,
+      "passed": 6372,
+      "failed": 0,
+      "skipped": 15,
+      "exit_code": 0,
+      "duration_seconds": 195
+    },
+    "frontend_vitest": {
+      "test_files": 62,
+      "passed": 688,
+      "failed": 0,
+      "exit_code": 0,
+      "build": "clean"
+    }
+  },
+  "secret_scan": {
+    "status": "clean",
+    "real_tokens_found": false,
+    "real_jwts_found": false,
+    "production_secrets_found": false,
+    "test_only_dummies": true,
+    "dummy_location": "test profile only"
+  },
+  "evidence_sha": "TBD_evidence_sha"
+}

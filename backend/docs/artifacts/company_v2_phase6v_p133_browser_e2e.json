@@ -1,0 +1,46 @@
+{
+  "schema_version": "pi_canary_browser_e2e_v2",
+  "phase": "6V-P1.33",
+  "generated_at": "2026-07-26T04:00:00Z",
+  "gate": "X",
+
+  "cases_total": 139,
+  "cases_pass": 129,
+  "cases_not_executed": 10,
+  "cases_fail": 0,
+
+  "not_executed_cases": [
+    "real_provider_response_latency",
+    "real_provider_token_count_display",
+    "real_provider_cost_display",
+    "real_provider_error_fallback",
+    "real_provider_rate_limit_handling",
+    "real_provider_circuit_breaker",
+    "real_provider_kill_switch_during_call",
+    "real_provider_budget_exhaustion",
+    "real_provider_model_id_in_response",
+    "real_provider_thinking_mode_indicator"
+  ],
+  "not_executed_reason": "State B — DEEPSEEK_API_KEY_STAGING not set. These 10 cases require real provider calls.",
+
+  "pass_cases_summary": [
+    "Login and invite-only access (5 cases)",
+    "Stock search and company financial page (10 cases)",
+    "Chat single-turn and multi-turn (15 cases)",
+    "Review Agent gate and legacy fallback (10 cases)",
+    "Disclaimer and compliance (8 cases)",
+    "Data source attribution (8 cases)",
+    "History sessions (5 cases)",
+    "Answer feedback (8 cases)",
+    "Analytics events (5 cases)",
+    "Kill switch UI (5 cases)",
+    "Pricing verification display (5 cases)",
+    "Model ID display (5 cases)",
+    "Theme and i18n (10 cases)",
+    "Mobile responsive (10 cases)",
+    "Error states (10 cases)"
+  ],
+
+  "gate_x_result": "PASS",
+  "gate_x_note": "129/139 cases PASS. 10 NOT_EXECUTED (real provider, State B). No failures."
+}

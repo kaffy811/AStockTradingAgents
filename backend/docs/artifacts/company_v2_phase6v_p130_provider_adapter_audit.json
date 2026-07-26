@@ -1,0 +1,76 @@
+{
+  "schema_version": "pi_canary_provider_adapter_audit_v1",
+  "phase": "6V-P1.30",
+  "generated_at": "2026-07-25T20:06:00.000000+00:00",
+  "label": "P1.30 Provider Adapter Audit",
+
+  "provider": "DeepSeek",
+  "sdk": "openai (OpenAI-compatible REST client)",
+  "sdk_version": "openai>=1.0",
+  "adapter_file": "backend/app/llm/deepseek_client.py",
+  "factory_file": "backend/app/llm/factory.py",
+  "factory_function": "get_llm_client()",
+
+  "api_endpoint": "https://api.deepseek.com",
+  "auth_method": "Bearer token via DEEPSEEK_API_KEY",
+  "auth_env_var": "DEEPSEEK_API_KEY",
+  "auth_env_staging_var": null,
+  "staging_key_exists": false,
+
+  "models": {
+    "default": "deepseek-v4-flash",
+    "pro": "deepseek-v4-pro",
+    "reasoner": "deepseek-reasoner"
+  },
+
+  "timeout": {
+    "configured": false,
+    "note": "No explicit timeout set on openai.OpenAI client in DeepSeekClient.__init__. Relies on SDK default (600s). This is a gap for real provider safety."
+  },
+
+  "retry_policy": {
+    "configured": false,
+    "note": "No explicit retry policy. SDK default behavior applies."
+  },
+
+  "rate_limit_handling": {
+    "configured": false,
+    "note": "No rate limit handler in DeepSeekClient. AuthenticationError and APIError caught in chat(); no RateLimitError specific handling."
+  },
+
+  "cost_accounting": {
+    "implemented": false,
+    "note": "DeepSeekClient.chat() does not capture usage.prompt_tokens or usage.completion_tokens from the response. Cost tracking requires adding usage capture to the client."
+  },
+
+  "token_usage_captured": false,
+
+  "pipeline_integration": {
+    "entry_point": "get_llm_client() → DeepSeekClient",
+    "analysis_agent": "backend/app/agents/financial_agent.py",
+    "review_agent": "referenced in Phase 6I artifacts",
+    "live_arbitration": "backend/app/agent_runtime/canary_policy.py",
+    "fallback": "legacy_fallback always available per canary_policy.py"
+  },
+
+  "pipeline_safety": {
+    "real_calls_through_analysis_agent": true,
+    "review_agent_required": true,
+    "live_arbitration_gate": true,
+    "provider_failure_falls_back_to_legacy": true,
+    "second_parallel_provider_path_exists": false
+  },
+
+  "gaps_for_real_provider_activation": [
+    "No timeout configured on OpenAI client (should be ≤30s for live arbitration)",
+    "No rate limit error handling (should trigger legacy_pi_failed fallback)",
+    "No token usage capture (required for cost accounting)",
+    "No staging-isolated credential",
+    "No budget guard interceptor in call path"
+  ],
+
+  "adapter_audit_conclusion": "Adapter is correctly wired through Analysis Agent → Review Agent → live arbitration pipeline. Safety fallbacks structurally present. However, 5 gaps must be closed before real provider can be safely activated.",
+
+  "gate_a_adapter_integrity": "PASS",
+  "note": "Adapter audit complete. Architecture is safe; implementation gaps prevent real activation."
+}

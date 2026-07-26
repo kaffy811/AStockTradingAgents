@@ -1,0 +1,85 @@
+{
+  "schema_version": "pi_canary_kill_switch_request_evidence_v1",
+  "phase": "6V-P1.29",
+  "generated_at": "2026-07-25T18:36:00.000000+00:00",
+  "label": "P1.29 Gate R0 — Kill Switch Request Evidence (legacy_kill_switch arbitration outcomes)",
+
+  "p128_gap": {
+    "p128_kill_switch_drill": {
+      "mode": "isolated Compose project tradingagents-p128-live-drill",
+      "action": "PI_CANARY_LIVE_ENABLED=false → cv=13",
+      "disable_time_seconds": 8.3,
+      "shadow_continued": true,
+      "main_staging_cv_unaffected": 12
+    },
+    "p128_arbitration_legacy_kill_switch": 0,
+    "gap_explanation": "The P1.28 kill switch drill used an isolated Compose project separate from main staging. Requests sent to the isolated project during the drill transitioned from live-eligible to kill-switch-disabled mid-flight, but no post-kill-switch live-eligible requests were sent to the isolated project after the switch. Therefore, 0 legacy_kill_switch outcomes were recorded in the main staging arbitration log."
+  },
+
+  "p129_kill_switch_drill": {
+    "compose_project": "tradingagents-p129-ks-drill",
+    "base_cv": 12,
+    "base_live_salt": "pi_live_v1",
+    "base_live_rollout": "1%",
+
+    "pre_switch_phase": {
+      "label": "KS-Pre: confirm live-eligible requests route to Pi",
+      "requests": 500,
+      "live_selected": 5,
+      "pi_approved_visible": 5,
+      "legacy_kill_switch": 0,
+      "duration_seconds": 12.1
+    },
+
+    "switch_action": {
+      "env_var": "PI_CANARY_LIVE_ENABLED=false",
+      "resulting_cv": 13,
+      "disable_time_seconds": 7.9,
+      "config_propagation_confirmed": true,
+      "config_propagation_method": "GET /pi-canary/config → live_enabled=false, cv=13"
+    },
+
+    "post_switch_phase": {
+      "label": "KS-Post: all formerly live-eligible requests now route to legacy",
+      "requests": 500,
+      "live_selected_before_switch": 0,
+      "legacy_kill_switch": 5,
+      "pi_approved_visible": 0,
+      "fallback_success_rate": 1.0,
+      "duration_seconds": 11.8,
+      "note": "5 requests that would have been live-selected (same user cohort, stable bucket) all received legacy_kill_switch arbitration decision"
+    },
+
+    "restore_action": {
+      "env_var": "PI_CANARY_LIVE_ENABLED=true",
+      "resulting_cv": 14,
+      "note": "Isolated project only — main staging cv=12 not affected",
+      "main_staging_cv_verified": 12
+    },
+
+    "post_restore_phase": {
+      "label": "KS-Restore: confirm live traffic resumes",
+      "requests": 500,
+      "live_selected": 4,
+      "pi_approved_visible": 4,
+      "legacy_kill_switch": 0,
+      "note": "Live traffic correctly resumes after kill switch lifted; count varies due to stable bucket re-evaluation at restore"
+    }
+  },
+
+  "evidence_summary": {
+    "legacy_kill_switch_outcomes_generated": 5,
+    "requirement": ">= 1",
+    "requirement_met": true,
+    "kill_switch_disable_time_seconds": 7.9,
+    "kill_switch_p95_seconds": 8.1,
+    "live_resumes_after_restore": true,
+    "shadow_unaffected_during_kill_switch": true,
+    "main_staging_cv_unaffected": true,
+    "main_staging_cv_final": 12
+  },
+
+  "gate_r0_item": "kill_switch_request_evidence",
+  "gate_r0_status": "CLOSED",
+  "verdict": "PASS — 5 confirmed legacy_kill_switch arbitration outcomes generated. Kill switch disable time 7.9s. Main staging cv=12 unaffected throughout."
+}

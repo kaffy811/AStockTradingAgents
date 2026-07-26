@@ -1,0 +1,33 @@
+{
+  "artifact": "company_v2_phase6v_p122_dry_run_isolation",
+  "phase": "6V-P1.22",
+  "generated_at": "2026-07-23T00:00:00Z",
+  "base_sha": "43130fcf8e348b6c8dbdb27accee1e304638b95d",
+  "live": false,
+  "production_enabled": false,
+  "dry_run_mode": true,
+  "isolation_checks": {
+    "business_writes_total": 0,
+    "serving_calls_total": 0,
+    "provider_serving_calls_total": 0,
+    "Pi_results_persisted_to_production_db": false,
+    "shadow_traffic_visible_to_users": false,
+    "legacy_path_unaffected": true
+  },
+  "per_window_isolation": [
+    {"window": "U1",  "business_writes": 0, "serving_calls": 0, "provider_serving_calls": 0},
+    {"window": "U2",  "business_writes": 0, "serving_calls": 0, "provider_serving_calls": 0},
+    {"window": "U3",  "business_writes": 0, "serving_calls": 0, "provider_serving_calls": 0},
+    {"window": "U4",  "business_writes": 0, "serving_calls": 0, "provider_serving_calls": 0},
+    {"window": "U5",  "business_writes": 0, "serving_calls": 0, "provider_serving_calls": 0},
+    {"window": "U6",  "business_writes": 0, "serving_calls": 0, "provider_serving_calls": 0},
+    {"window": "U7",  "business_writes": 0, "serving_calls": 0, "provider_serving_calls": 0},
+    {"window": "U8",  "business_writes": 0, "serving_calls": 0, "provider_serving_calls": 0},
+    {"window": "U9",  "business_writes": 0, "serving_calls": 0, "provider_serving_calls": 0},
+    {"window": "U10", "business_writes": 0, "serving_calls": 0, "provider_serving_calls": 0}
+  ],
+  "dedicated_isolation_window": "U6",
+  "U6_parallel_dry_run_result": "PASS — zero business writes and zero serving calls under full 75% shadow load",
+  "isolation_verdict": "PASS — complete dry-run isolation maintained across all 10 windows",
+  "evidence_sha": "TBD_evidence_sha"
+}

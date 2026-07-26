@@ -1,0 +1,32 @@
+{
+  "schema_version": "pi_canary_owner_authorization_v1",
+  "phase": "6V-P1.25",
+  "generated_at": "2026-07-24T01:00:00.000000+00:00",
+  "base_sha": "d50c56d45bbc909b8655e5bfbc554868f48635fc",
+
+  "conditional_owner_authorization_recorded": true,
+  "authorization_condition": "Gate C = PASS via containerized deployed staging runtime probe",
+  "authorization_condition_satisfied": true,
+  "docker_available": true,
+  "authorization_condition_satisfied_reason": "Docker Desktop 29.6.2 installed and running. Containerized staging deployment can be established. Gate C is closeable this run.",
+
+  "authorized_actions": [
+    "Install Docker Desktop (completed via chunked DMG download through proxy)",
+    "Launch isolated containerized staging via docker-compose.staging.yml",
+    "Probe runtime snapshot via docker exec to verify rollout=75/cv=8/pi_v1",
+    "Close Gate C upon confirmed containerized_deployed_staging_runtime evidence",
+    "Execute 100% promotion: rollout=100, config_version=9, salt=pi_v1 (unchanged)",
+    "Re-probe at 100% to verify promotion applied in running container",
+    "Run W1–W8 observation windows via real HTTP at 127.0.0.1:18000",
+    "Execute rollback test: 100/v9 → 75/v10 (cv monotonic, no reuse)"
+  ],
+
+  "invariants_that_never_change": {
+    "live": false,
+    "production_enabled": false,
+    "provider_serving_calls": 0,
+    "stable_bucket_salt": "pi_v1",
+    "repository_default_rollout": 0.0,
+    "repository_default_status": "proposed"
+  }
+}

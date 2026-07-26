@@ -1,0 +1,15 @@
+{
+  "schema_version": "pi_canary_data_regression_v1",
+  "phase": "6V-P1.24",
+  "generated_at": "2026-07-24T00:00:00.000000+00:00",
+  "regression_applicable": false,
+  "reason": "100% observation not executed — Gate C = UNKNOWN",
+  "p124_safety_invariants_verified_offline": {
+    "live": false,
+    "production_enabled": false,
+    "provider_serving_calls": 0,
+    "stable_bucket_salt_unchanged": true,
+    "repository_defaults_unchanged": true,
+    "legacy_sole_user_visible_path": true
+  }
+}

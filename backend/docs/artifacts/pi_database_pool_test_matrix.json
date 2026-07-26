@@ -1,0 +1,101 @@
+{
+  "schema_version": "pi_database_pool_test_matrix_v1",
+  "phase": "6V-P1.6.3",
+  "generated_at": "2026-07-19T05:29:55.495068+00:00",
+  "root_cause": "The old test asserted the global async_engine was PostgreSQL AsyncAdaptedQueuePool even when DATABASE_URL was sqlite+aiosqlite during backend full.",
+  "failed_test": "tests/fundamental/test_phase6tm_connection_pool_reuse.py::test_postgres_engines_use_reusable_async_pool",
+  "old_actual_pool_class_under_sqlite": "NullPool",
+  "old_expected_pool_class": "AsyncAdaptedQueuePool",
+  "matrix": [
+    {
+      "case_id": "sqlite_memory",
+      "dialect": "sqlite",
+      "configured_strategy": "small_queue_pool",
+      "connection_mode": "transaction_pooler",
+      "actual_pool_class": "NullPool",
+      "expected_pool_class": "NullPool",
+      "passed": true,
+      "pool_pre_ping": true,
+      "connect_args_fingerprint": [],
+      "database_url_shape": "sqlite_aiosqlite_memory_or_file"
+    },
+    {
+      "case_id": "sqlite_file",
+      "dialect": "sqlite",
+      "configured_strategy": "small_queue_pool",
+      "connection_mode": "transaction_pooler",
+      "actual_pool_class": "NullPool",
+      "expected_pool_class": "NullPool",
+      "passed": true,
+      "pool_pre_ping": true,
+      "connect_args_fingerprint": [],
+      "database_url_shape": "sqlite_aiosqlite_memory_or_file"
+    },
+    {
+      "case_id": "postgres_default",
+      "dialect": "postgresql",
+      "configured_strategy": "small_queue_pool",
+      "connection_mode": "transaction_pooler",
+      "actual_pool_class": "AsyncAdaptedQueuePool",
+      "expected_pool_class": "AsyncAdaptedQueuePool",
+      "passed": true,
+      "pool_pre_ping": true,
+      "connect_args_fingerprint": [
+        "command_timeout",
+        "statement_cache_size"
+      ],
+      "database_url_shape": "postgresql_asyncpg_redacted"
+    },
+    {
+      "case_id": "postgres_queue_pool",
+      "dialect": "postgresql",
+      "configured_strategy": "queue_pool",
+      "connection_mode": "transaction_pooler",
+      "actual_pool_class": "AsyncAdaptedQueuePool",
+      "expected_pool_class": "AsyncAdaptedQueuePool",
+      "passed": true,
+      "pool_pre_ping": true,
+      "connect_args_fingerprint": [
+        "command_timeout",
+        "statement_cache_size"
+      ],
+      "database_url_shape": "postgresql_asyncpg_redacted"
+    },
+    {
+      "case_id": "postgres_null_pool_transaction_pooler",
+      "dialect": "postgresql",
+      "configured_strategy": "null_pool",
+      "connection_mode": "transaction_pooler",
+      "actual_pool_class": "NullPool",
+      "expected_pool_class": "NullPool",
+      "passed": true,
+      "pool_pre_ping": true,
+      "connect_args_fingerprint": [
+        "command_timeout",
+        "statement_cache_size"
+      ],
+      "database_url_shape": "postgresql_asyncpg_redacted"
+    },
+    {
+      "case_id": "postgres_session_pooler",
+      "dialect": "postgresql",
+      "configured_strategy": "small_queue_pool",
+      "connection_mode": "session_pooler",
+      "actual_pool_class": "AsyncAdaptedQueuePool",
+      "expected_pool_class": "AsyncAdaptedQueuePool",
+      "passed": true,
+      "pool_pre_ping": true,
+      "connect_args_fingerprint": [
+        "command_timeout",
+        "statement_cache_size"
+      ],
+      "database_url_shape": "postgresql_asyncpg_redacted"
+    }
+  ],
+  "invalid_strategy_rejected": true,
+  "pool_tests": {
+    "sqlite_run_1": "13 passed",
+    "sqlite_run_2": "13 passed",
+    "postgres_style_url_run": "13 passed"
+  }
+}

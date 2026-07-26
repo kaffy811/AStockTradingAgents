@@ -1,0 +1,33 @@
+{
+  "schema_version": "pi_canary_fake_provider_v1",
+  "phase": "6V-P1.31",
+  "generated_at": "2026-07-26T00:00:00Z",
+
+  "harness": {
+    "file": "backend/app/llm/provider_control/fake_provider.py",
+    "class": "FakeDeepSeekClient",
+    "real_network_calls": 0,
+    "real_provider_calls": 0,
+    "real_provider_cost_cny": "0"
+  },
+
+  "scenarios_tested": [
+    {"name": "success_with_usage", "result": "CONTENT_RETURNED", "usage_complete": true, "real_calls": 0},
+    {"name": "success_without_usage", "result": "CONTENT_RETURNED", "usage_complete": false, "real_calls": 0},
+    {"name": "timeout", "result": "RAISES_RuntimeError", "real_calls": 0},
+    {"name": "rate_limited", "result": "RAISES_RuntimeError", "real_calls": 0},
+    {"name": "credential_invalid", "result": "RAISES_RuntimeError", "real_calls": 0},
+    {"name": "malformed_response", "result": "RAISES_RuntimeError", "real_calls": 0},
+    {"name": "budget_exhausted_request", "result": "RAISES_BudgetExhaustedError", "budget_type": "request", "real_calls": 0},
+    {"name": "budget_exhausted_cost", "result": "RAISES_BudgetExhaustedError", "budget_type": "cost", "real_calls": 0},
+    {"name": "concurrency_limit", "result": "RAISES_ConcurrencyLimitError", "real_calls": 0},
+    {"name": "circuit_open", "result": "RAISES_CircuitOpenError", "real_calls": 0},
+    {"name": "kill_switch", "result": "RAISES_KillSwitchError", "real_calls": 0},
+    {"name": "credential_missing", "result": "RAISES_CredentialGateError", "real_calls": 0}
+  ],
+
+  "total_scenarios": 12,
+  "all_real_calls_zero": true,
+  "network_isolation_confirmed": true,
+  "gate_r_kill_switch_simulation": "KillSwitchError raised on kill_switch scenario — PASS"
+}

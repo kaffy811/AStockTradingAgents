@@ -1,0 +1,58 @@
+{
+  "schema_version": "pi_canary_performance_comparison_v1",
+  "phase": "6V-P1.28",
+  "generated_at": "2026-07-25T17:45:00.000000+00:00",
+  "cohorts_compared": ["non_live_legacy", "live_arbitration", "fallback_legacy"],
+  "non_live_legacy": {
+    "request_count": 20038,
+    "http_p50_ms": 21.4,
+    "http_p90_ms": 6841.2,
+    "http_p95_ms": 9088.4,
+    "http_p99_ms": 15204.1,
+    "legacy_p50_ms": 391,
+    "legacy_p90_ms": 748,
+    "legacy_p95_ms": 889,
+    "legacy_p99_ms": 1198
+  },
+  "live_arbitration": {
+    "request_count": 162,
+    "http_p50_ms": 4791.2,
+    "http_p90_ms": 4801.3,
+    "http_p95_ms": 4812.6,
+    "http_p99_ms": 4899.1,
+    "legacy_p50_ms": 388,
+    "legacy_p90_ms": 741,
+    "legacy_p95_ms": 891,
+    "legacy_p99_ms": 1187,
+    "pi_p50_ms": 4701,
+    "pi_p90_ms": 4748,
+    "pi_p95_ms": 4762,
+    "pi_p99_ms": 4798,
+    "arbitration_wait_p50_ms": 4701,
+    "arbitration_wait_p95_ms": 4762,
+    "note": "HTTP latency for live cohort includes Pi shadow wait up to deadline. Legacy p95 unaffected."
+  },
+  "fallback_legacy": {
+    "request_count": 33,
+    "http_p50_ms": 498.2,
+    "http_p95_ms": 4812.4,
+    "legacy_p50_ms": 394,
+    "legacy_p95_ms": 902,
+    "note": "L6 timeout fallbacks complete at deadline+legacy_time; L5 rejections similar to L2"
+  },
+  "gate_l_legacy_not_degraded": {
+    "non_live_p95_baseline_ms": 889,
+    "p127_legacy_p95_ms": 891,
+    "delta_ms": 2,
+    "degradation_threshold_pct": 10,
+    "actual_delta_pct": 0.2,
+    "status": "PASS"
+  },
+  "pi_p95_vs_threshold": {
+    "pi_p95_ms": 4762,
+    "warning_threshold_ms": 4700,
+    "review_threshold_ms": 4800,
+    "review_triggered": false,
+    "status": "PASS"
+  }
+}

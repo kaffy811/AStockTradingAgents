@@ -31,18 +31,103 @@ module_id 别名映射：
 
 from __future__ import annotations
 
+import asyncio
 import logging
+import time
 from typing import Any
 
-from fastapi import APIRouter, HTTPException, Path
+from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from fastapi.responses import JSONResponse
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.aggregator.envelope import build_api_response
 from app.aggregator.fundamentals_aggregator import get_aggregator
+from app.core.database import get_db
 from app.datasource.tushare_client import _to_ts_code
 from app.tools.fundamental import MODULE_CATALOG, MODULE_NAME_MAP, TOOL_REGISTRY
 
 log = logging.getLogger(__name__)
+
+
+# ── Phase 6N-8B helpers for diagnostics endpoint ─────────────────────────────
+
+def _get_cache_status() -> str:
+    """Return current Redis circuit-breaker status: 'ok' or 'unavailable'."""
+    try:
+        from app.services.cache_service import cache_status
+        return cache_status()
+    except Exception:
+        return "unknown"
+
+
+def _get_provider_status(module_results: list[dict]) -> str:
+    """Infer overall provider status from module probe results."""
+    ok_count = sum(1 for m in module_results if m.get("status") == "ok")
+    fail_count = sum(1 for m in module_results if m.get("status") == "failed")
+    if ok_count == 0 and fail_count > 0:
+        return "unavailable"
+    if fail_count > 0:
+        return "partial"
+    return "ok"
+
+
+# Per-module fallback chains (what sources are tried in order)
+_MODULE_FALLBACK_CHAINS: dict[str, list[str]] = {
+    "quote_snapshot": ["cache", "eastmoney", "sina", "akshare_spot", "baostock_kline"],
+    "growth":         ["free_fundamental_cache", "baostock_financial", "akshare_income_statement", "pdf_metrics"],
+    "profitability":  ["free_fundamental_cache", "baostock_financial", "akshare_indicators", "pdf_metrics"],
+    "cashflow_quality": ["free_fundamental_cache", "baostock_financial", "akshare_cashflow", "pdf_metrics"],
+    "solvency":       ["free_fundamental_cache", "baostock_financial", "akshare_indicators", "akshare_balance_sheet"],
+    "operation_capability": ["free_fundamental_cache", "baostock_financial", "akshare_indicators"],
+    "dupont":         ["free_fundamental_cache", "baostock_financial", "akshare_indicators"],
+    "valuation":      ["baostock_kline", "akshare_quote"],
+    "asset_structure": ["free_fundamental_cache", "baostock_financial", "akshare_balance_sheet"],
+    "major_holders":  ["free_fundamental_cache", "akshare_holders"],
+    "equity_structure": ["free_fundamental_cache", "akshare_equity"],
+    "main_business":  ["akshare_main_business"],
+    "industry_rank":  ["db_etl_snapshot"],
+    "dividend_history": ["akshare_dividend"],
+    "financial_summary": ["baostock_financial", "akshare_indicators"],
+}
+
+_MODULE_CORE_FIELDS: dict[str, list[str]] = {
+    "growth":           ["revenue_yoy", "net_profit_yoy", "revenue_abs", "net_profit_parent"],
+    "profitability":    ["roe", "gross_margin", "net_margin"],
+    "cashflow_quality": ["ocf_to_np", "operating_cashflow"],
+    "solvency":         ["current_ratio", "quick_ratio", "debt_ratio"],
+    "operation_capability": ["asset_turnover", "inventory_turnover"],
+    "dupont":           ["roe", "net_margin", "asset_turnover"],
+    "valuation":        ["pe_ttm", "pb", "ps_ttm"],
+}
+
+
+def _build_fill_chains(module_results: list[dict], market: str) -> list[dict]:
+    """
+    Build per-module fill chain diagnostic entries (Phase 6N-8B).
+    """
+    out = []
+    for m in module_results:
+        key = m.get("module_key", "")
+        status = m.get("status", "failed")
+        chain = _MODULE_FALLBACK_CHAINS.get(key, [])
+        core = _MODULE_CORE_FIELDS.get(key, [])
+        non_null = m.get("non_null_fields", [])
+        filled = [f for f in core if f in non_null]
+        missing = [f for f in core if f not in non_null]
+        renderable_before = status in ("ok",) and m.get("rows_count", 0) > 0
+        renderable_after = renderable_before or bool(filled)
+        out.append({
+            "module_key":           key,
+            "renderable_before_fill": renderable_before,
+            "fallback_chain":       chain,
+            "filled_fields":        filled,
+            "still_missing_fields": missing,
+            "renderable_after_fill": renderable_after,
+            "hidden_reason":        None if renderable_after else "ALL_NULL_ROWS",
+            "provider_success":     m.get("provider_success"),
+            "inferred":             m.get("inferred", False),
+        })
+    return out
 
 compat_router = APIRouter(
     prefix="/api/v1",
@@ -197,6 +282,311 @@ async def get_stock_overview(
     return _disclaimer_response(response)
 
 
+# ── 端点 D：Free Mode 模块诊断 ──────────────────────────────────────────────
+
+# 诊断探针的 module key 列表（不含 report_documents，由 DB 单独处理）
+_DIAG_MODULE_KEYS: list[str] = [
+    "quote_snapshot",
+    "valuation",
+    "financial_summary",
+    "growth",
+    "profitability",
+    "expense_analysis",
+    "cashflow_quality",
+    "asset_structure",
+    "solvency",
+    "capital_occupation",
+    "operation_capability",
+    "dupont",
+    "main_business",
+    "dividend_history",
+    "industry_rank",
+    "major_holders",
+    "equity_structure",
+]
+
+# BaoStock-backed modules: these require 5–75s per call due to the global asyncio Lock.
+# In free mode, we infer availability from config rather than live-probing each one.
+_BAOSTOCK_MODULE_KEYS: frozenset[str] = frozenset([
+    "growth",
+    "profitability",
+    "cashflow_quality",
+    "solvency",
+    "operation_capability",
+    "dupont",
+])
+
+# 所有 section IDs（按页面顺序，用于 unavailable_sections 排序）
+_ALL_SECTION_IDS: list[str] = [
+    "overview",
+    "highlight-risk",
+    "ai-analysis",
+    "report-documents",
+    "valuation",
+    "dividend",
+    "main-business",
+    "industry",
+    "growth",
+    "profitability",
+    "earnings-quality",
+    "asset-structure",
+    "solvency",
+    "capital",
+    "operations",
+    "dupont",
+    "shareholders",
+]
+
+
+def _count_rows(data: dict) -> int:
+    """从 module data dict 中推断行数。支持 rows/series/periods/records/rankings 等字段。"""
+    if not isinstance(data, dict):
+        return 0
+    for field in ("rows", "series", "periods", "records", "rankings",
+                  "top10_float_holders", "holder_num_series"):
+        val = data.get(field)
+        if isinstance(val, list) and val:
+            return len(val)
+    # 计算顶层非 None 的数值字段
+    count = 0
+    for v in data.values():
+        if v is not None and isinstance(v, (int, float)):
+            count += 1
+    return count
+
+
+@compat_router.get(
+    "/stock/{code}/fundamentals/diagnostics",
+    summary="Free Mode 模块数据诊断（不调用付费 Tushare）",
+)
+async def get_module_diagnostics(
+    code: str = Path(..., description="股票代码"),
+    db: AsyncSession = Depends(get_db),
+) -> JSONResponse:
+    """
+    诊断当前 Free Mode 下每个模块的数据可用性。
+    - 不调用 Tushare（DATA_MODE=free 已自动跳过）
+    - 每个模块 5 秒 timeout
+    - 并发执行所有模块
+    - 不抛 500，所有错误以 failed 状态返回
+    - 不泄露 secret/local_path
+    """
+    from app.services.free_mode_visibility_service import (
+        compute_section_visibility,
+        get_unavailable_sections,
+    )
+
+    market, symbol = _parse_code(code)
+    ts_code = _to_ts_code(market, symbol)
+    aggregator = get_aggregator()
+
+    async def _probe_module(module_key: str) -> dict:
+        t0 = time.time()
+        try:
+            envelope = await asyncio.wait_for(
+                aggregator.fetch_module(market, symbol, module_key),
+                timeout=5.0,
+            )
+            latency_ms = round((time.time() - t0) * 1000)
+            ok = getattr(envelope, "ok", envelope.get("ok", False)) if hasattr(envelope, "get") else False
+            partial = getattr(envelope, "partial", envelope.get("partial", False)) if hasattr(envelope, "get") else False
+            data = getattr(envelope, "data", envelope.get("data", {})) if hasattr(envelope, "get") else {}
+            if data is None:
+                data = {}
+            rows_count = _count_rows(data) if isinstance(data, dict) else 0
+
+            non_null_fields = [k for k, v in data.items() if v is not None][:10] if isinstance(data, dict) else []
+
+            if not ok:
+                status = "failed"
+            elif partial:
+                status = "partial"
+            elif rows_count > 0:
+                status = "ok"
+            else:
+                status = "empty"
+
+            provider_success = data.get("source") if isinstance(data, dict) else None
+
+            return {
+                "module_key":       module_key,
+                "status":           status,
+                "rows_count":       rows_count,
+                "non_null_fields":  non_null_fields,
+                "latency_ms":       latency_ms,
+                "provider_success": provider_success,
+            }
+        except asyncio.TimeoutError:
+            return {
+                "module_key":       module_key,
+                "status":           "failed",
+                "rows_count":       0,
+                "non_null_fields":  [],
+                "latency_ms":       5000,
+                "provider_success": None,
+                "error":            "timeout",
+            }
+        except Exception as exc:
+            return {
+                "module_key":       module_key,
+                "status":           "failed",
+                "rows_count":       0,
+                "non_null_fields":  [],
+                "latency_ms":       round((time.time() - t0) * 1000),
+                "provider_success": None,
+                "error":            type(exc).__name__,
+            }
+
+    # Free mode + CN: BaoStock 模块用配置推断，跳过 5–75s 的实时探针
+    # （BaoStock 全局 asyncio.Lock 导致并发探针全部超时）
+    from app.core.config import settings as _settings
+    _data_mode = getattr(_settings, "data_mode", "free")
+    _enable_baostock = getattr(_settings, "enable_baostock", True)
+    _use_bs_inference = (_data_mode == "free" and market == "CN" and _enable_baostock)
+
+    def _inferred_baostock(module_key: str) -> dict:
+        """Config-based diagnostic placeholder; never reports data success."""
+        try:
+            from app.datasource.baostock_client import baostock_import_status
+            available, import_error = baostock_import_status()
+        except Exception as exc:
+            available, import_error = False, f"{type(exc).__name__}: {exc}"
+        if not available:
+            return {
+                "module_key":       module_key,
+                "status":           "failed",
+                "rows_count":       0,
+                "non_null_fields":  [],
+                "latency_ms":       0,
+                "provider_success": None,
+                "inferred":         False,
+                "reason_code":      "PROVIDER_UNAVAILABLE",
+                "error":            import_error or "baostock import unavailable",
+            }
+        return {
+            "module_key":       module_key,
+            "status":           "empty",
+            "rows_count":       0,
+            "non_null_fields":  [],
+            "latency_ms":       0,
+            "provider_success": None,
+            "inferred":         True,
+            "reason_code":      "PROBE_SKIPPED_BAOSTOCK_SERIALIZED",
+        }
+
+    # 并发探针非 BaoStock 模块；BaoStock 模块在 free+CN 下直接推断
+    probe_keys = [mk for mk in _DIAG_MODULE_KEYS if not (_use_bs_inference and mk in _BAOSTOCK_MODULE_KEYS)]
+    tasks = [_probe_module(mk) for mk in probe_keys]
+    probed_results: list[dict] = list(await asyncio.gather(*tasks))
+
+    module_results: list[dict] = []
+    probed_iter = iter(probed_results)
+    for mk in _DIAG_MODULE_KEYS:
+        if _use_bs_inference and mk in _BAOSTOCK_MODULE_KEYS:
+            module_results.append(_inferred_baostock(mk))
+        else:
+            module_results.append(next(probed_iter))
+
+    # 单独探针 report_documents + RAG 状态（DB 查询）
+    rd_count    = 0
+    rc_count    = 0   # report_chunks
+    cv2_chunk_count = 0
+    emb_count   = 0   # chunks with non-null embedding
+    rd_status   = "failed"
+    rag_status  = "unknown"
+    t0 = time.time()
+    try:
+        from sqlalchemy import text
+
+        rd_count = (await db.execute(
+            text("SELECT COUNT(*) FROM report_documents WHERE ts_code = :ts_code"),
+            {"ts_code": ts_code},
+        )).scalar() or 0
+
+        rc_count = (await db.execute(
+            text("SELECT COUNT(*) FROM report_chunks WHERE ts_code = :ts_code"),
+            {"ts_code": ts_code},
+        )).scalar() or 0
+
+        cv2_chunk_count = (await db.execute(
+            text("""
+                SELECT COUNT(*)
+                FROM company_v2_report_rag_chunks c
+                JOIN company_v2_report_rag_documents d ON d.id = c.rag_document_id
+                WHERE d.symbol = :symbol
+                  AND d.active_index = 1
+                  AND d.deleted_at IS NULL
+                  AND d.status IN ('indexed', 'partial')
+            """),
+            {"symbol": symbol},
+        )).scalar() or 0
+
+        emb_count = (await db.execute(
+            text("SELECT COUNT(*) FROM report_chunks WHERE ts_code = :ts_code AND embedding IS NOT NULL"),
+            {"ts_code": ts_code},
+        )).scalar() or 0
+
+        rd_status  = "ok" if rd_count > 0 else "empty"
+        # RAG ready = has chunks with embeddings
+        if cv2_chunk_count > 0:
+            rag_status = "ready"
+        elif rc_count > 0 and emb_count > 0:
+            rag_status = "ready"
+        elif rd_count > 0:
+            rag_status = "not_indexed"   # docs exist but no chunks/embeddings yet
+        else:
+            rag_status = "empty"
+    except Exception as _exc:
+        rd_status  = "failed"
+        rag_status = "unknown"
+        rd_count = rc_count = emb_count = 0
+
+    module_results.append({
+        "module_key":       "report_documents",
+        "status":           rd_status,
+        "rows_count":       rd_count,
+        "non_null_fields":  [],
+        "latency_ms":       round((time.time() - t0) * 1000),
+        "provider_success": "db" if rd_status != "failed" else None,
+        "rag": {
+            "status":          rag_status,
+            "documents_count": rd_count,
+            "chunks_count":    rc_count,
+            "embedding_count": emb_count,
+            "company_v2_chunks_count": cv2_chunk_count,
+        },
+    })
+
+    # 计算可见性
+    visibility = compute_section_visibility(module_results)
+    unavailable = get_unavailable_sections(visibility, _ALL_SECTION_IDS)
+
+    # 汇总统计
+    summary = {"ok": 0, "partial": 0, "empty": 0, "failed": 0}
+    for m in module_results:
+        s = m.get("status", "failed")
+        if s in summary:
+            summary[s] += 1
+
+    return _disclaimer_response({
+        "market":               market,
+        "symbol":               symbol,
+        "ts_code":              ts_code,
+        "data_mode":            _data_mode,
+        "modules":              module_results,
+        "visibility":           visibility,
+        "unavailable_sections": unavailable,
+        "summary":              summary,
+        "rag_status":           rag_status,   # top-level convenience field
+        # Phase 6N-8B: cache + fill chain diagnostics
+        "cache_status":         _get_cache_status(),
+        "auth_status":          "ok",  # if this endpoint is reachable, auth passed
+        "provider_status":      _get_provider_status(module_results),
+        "pdf_status":           rd_status,
+        "module_fill_chains":   _build_fill_chains(module_results, market),
+    })
+
+
 # ── 端点 C：单模块（code 格式）───────────────────────────────────────────────
 
 @compat_router.get(
@@ -207,6 +597,9 @@ async def get_stock_overview(
 async def get_stock_module_compat(
     code: str = Path(..., description="股票代码，支持多种格式"),
     module_id: str = Path(..., description="模块 key 或别名（cashflow → cashflow_quality）"),
+    mode: str = Query("summary", description="AI 分析模式：summary / full（仅 ai_analysis 模块使用）"),
+    force_refresh: bool = Query(False, description="强制刷新，绕过 AI 分析缓存（仅 ai_analysis 模块使用）"),
+    db: AsyncSession = Depends(get_db),
 ) -> JSONResponse:
     """
     单模块按需加载的短路径版本。
@@ -223,6 +616,19 @@ async def get_stock_module_compat(
     module_key = _resolve_module_id(module_id)
     ts_code = _to_ts_code(market, symbol)
 
+    # Special case: ai_analysis uses the AI Orchestrator
+    if module_key == "ai_analysis":
+        from app.agent.fundamental_ai_orchestrator import get_ai_orchestrator
+        orchestrator = get_ai_orchestrator()
+        # Orchestrator returns a fully-formed API response dict (not a DataEnvelope)
+        response = await orchestrator.run(market, symbol, mode=mode, force_refresh=force_refresh, db=db)
+        return _disclaimer_response(response)
+
+    # Special case: report_documents has a dedicated handler in fundamentals.py
+    if module_key == "report_documents":
+        from app.routers.fundamentals import get_report_documents
+        return await get_report_documents(market=market, symbol=symbol, db=db)
+
     aggregator = get_aggregator()
     envelope = await aggregator.fetch_module(
         market=market,
@@ -236,5 +642,6 @@ async def get_stock_module_compat(
         module_key=module_key, module_name=_module_name(module_key),
         module_meta=module_meta,
     )
-    status = 200 if envelope["ok"] else 503
-    return _disclaimer_response(response, status_code=status)
+    # Always return HTTP 200; errors are communicated via partial=true / errors[]
+    # so the frontend can render a graceful empty state for each module independently.
+    return _disclaimer_response(response, status_code=200)

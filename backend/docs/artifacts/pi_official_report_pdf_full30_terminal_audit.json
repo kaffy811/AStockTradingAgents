@@ -1,0 +1,14 @@
+{
+  "schema_version": "pi_official_report_pdf_full30_terminal_audit_v2",
+  "phase": "6V-P1.6.6",
+  "generated_at": "2026-07-19T13:36:47.675717+00:00",
+  "diagnostics_records": 37,
+  "case_shadow_terminal_missing_count": 0,
+  "trace_mismatch_count": 0,
+  "stale_terminal_ignored_count": 0,
+  "diagnostics_timeout_count": 0,
+  "agent_deadline_exceeded_count": 0,
+  "all_case_traces_have_terminal": true,
+  "match_method": "exact shadow_run_id per-run diagnostics file",
+  "note": "37 records = 3 smoke cases (incl. 1 setup) + 30 full30 cases + 3 multi-turn setups; every counted case matched its pre-generated shadow_run_id exactly once."
+}

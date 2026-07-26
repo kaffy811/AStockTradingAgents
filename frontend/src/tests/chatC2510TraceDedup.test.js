@@ -132,6 +132,31 @@ describe('agent_started ordering', () => {
     ].filter(s => s.status === 'failed' || s.summary === '中断')
     expect(failedSteps).toHaveLength(0)
   })
+
+  it('T6b: same agent dispatch thinking event is shown once with updated stages', () => {
+    const msg = makeMsg()
+
+    applyChatUiEvent(msg, normalizeChatEvent('thinking_event', {
+      phase: 'agent_dispatch',
+      title: 'Agent 调度',
+      agent: 'ReportChatCopilotAgent',
+      content: '定位已索引正式财报',
+      status: 'running',
+    }))
+    applyChatUiEvent(msg, normalizeChatEvent('thinking_event', {
+      phase: 'agent_dispatch',
+      title: 'Agent 调度',
+      agent: 'ReportChatCopilotAgent',
+      content: '定位已索引正式财报 / 检索财报证据 / 生成分析',
+      status: 'running',
+    }))
+
+    const items = msg.thinkingEvents.filter(e =>
+      e.phase === 'agent_dispatch' && e.agent === 'ReportChatCopilotAgent'
+    )
+    expect(items).toHaveLength(1)
+    expect(items[0].content).toContain('生成分析')
+  })
 })
 
 // ── T7: Chinese tool display names ────────────────────────────────────────────

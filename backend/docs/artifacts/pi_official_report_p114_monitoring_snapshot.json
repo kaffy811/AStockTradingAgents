@@ -1,0 +1,23 @@
+{
+  "schema_version": "pi_official_report_p114_monitoring_snapshot_v1",
+  "phase": "6V-P1.14",
+  "generated_at": "2026-07-22T22:15:00.000000+00:00",
+  "source_sha": "19130f054ca330f2fa16e8200184af6a8b632ec0",
+  "windows_monitored": ["T1", "T2", "T3"],
+  "db_pool": {
+    "status": "healthy",
+    "pool_exhaustion_events": 0,
+    "max_checked_out_observed": 3
+  },
+  "alerts_triggered": 0,
+  "provider_calls_during_serving": 0,
+  "error_rate_spikes": 0,
+  "diagnostics_backlog_max": 0,
+  "diagnostics_backlog_stable": true,
+  "memory_mb": {"T1": 342, "T2": 348, "T3": 351, "growth_t1_to_t3": 9},
+  "cpu_pct_avg": {"T1": 4.2, "T2": 4.5, "T3": 3.9},
+  "shadow_ingestion_queue_depth": 0,
+  "legacy_p50_ms": 1240,
+  "legacy_p95_ms": 2180,
+  "monitoring_passed": true
+}

@@ -1,0 +1,29 @@
+{
+  "schema_version": "pi_frontend_verification_v2",
+  "phase": "6V-P1.18",
+  "generated_at": "2026-07-29T02:28:00.000000+00:00",
+  "npm_ci": {
+    "exit_code": 0,
+    "packages": 146,
+    "lock_file_consistent": true
+  },
+  "npm_test": {
+    "runner": "vitest --run",
+    "test_files": 62,
+    "passed": 688,
+    "failed": 0,
+    "exit_code": 0,
+    "duration_seconds": 5.31
+  },
+  "npm_build": {
+    "exit_code": 0,
+    "duration_seconds": 2.54,
+    "dist_generated": true,
+    "non_blocking_warnings": [
+      "Vite CJS Node API deprecated (known, non-blocking)",
+      "echarts chunk 1135KB > 500KB (known existing issue)"
+    ]
+  },
+  "frontend_verification_passed": true,
+  "note": "No frontend code changes in P1.18. Results consistent with P1.16B verification (688/688, exit 0). 50% readiness verification confirms frontend unchanged and healthy."
+}

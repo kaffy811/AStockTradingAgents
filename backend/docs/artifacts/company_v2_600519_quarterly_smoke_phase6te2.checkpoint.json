@@ -1,0 +1,173 @@
+{
+  "mode": "deep",
+  "symbols": [
+    {
+      "symbol": "600519",
+      "stage": "artifact_write",
+      "stage_elapsed_ms": 0,
+      "performance_progress": {
+        "provider_calls_completed": 120,
+        "provider_calls_planned": 120,
+        "years_completed": [],
+        "current_year": 2021,
+        "current_quarter": 1,
+        "modules_completed": [
+          "profitability",
+          "growth",
+          "solvency",
+          "operation_capability",
+          "cashflow_quality",
+          "dupont"
+        ],
+        "cache_hits": 0,
+        "last_successful_operation": "financial_stage_artifact_write"
+      },
+      "provider_call_accounting": {
+        "planned_calls": 120,
+        "actual_calls": 120,
+        "calls_by_endpoint": {
+          "profit": 20,
+          "growth": 20,
+          "balance": 20,
+          "operation": 20,
+          "cash_flow": 20,
+          "dupont": 20
+        },
+        "duplicate_calls_avoided": 600
+      },
+      "deep_chart_gate_status": "passed",
+      "deep_chart_gate_reason": "",
+      "chart_contract_regression": false,
+      "deep_history_gate_status": "passed",
+      "deep_history_gate_reason": "",
+      "company_profile_ok": true,
+      "stock_basic_ok": true,
+      "list_date": "2001-08-27",
+      "history_modules_ok": 6,
+      "annual_rows_by_module": {
+        "profitability": 3,
+        "growth": 3,
+        "solvency": 3,
+        "operation_capability": 3,
+        "cashflow_quality": 3,
+        "dupont": 3
+      },
+      "quarterly_rows_by_module": {
+        "profitability": 15,
+        "growth": 14,
+        "solvency": 14,
+        "operation_capability": 14,
+        "cashflow_quality": 13,
+        "dupont": 13
+      },
+      "quarterly_range": "2021-03-31—2025-12-31",
+      "history_completeness": {
+        "profitability": {
+          "status": "pass",
+          "rows_count": 15,
+          "completeness_pct": 75,
+          "missing_periods_count": 5,
+          "duplicate_period_count": 0,
+          "invalid_period_count": 0,
+          "future_periods": [],
+          "pre_listing_periods": [],
+          "latest_matches_history": true,
+          "period_order_valid": true,
+          "start_period": "2021-03-31",
+          "end_period": "2025-12-31"
+        },
+        "growth": {
+          "status": "pass",
+          "rows_count": 14,
+          "completeness_pct": 70,
+          "missing_periods_count": 6,
+          "duplicate_period_count": 0,
+          "invalid_period_count": 0,
+          "future_periods": [],
+          "pre_listing_periods": [],
+          "latest_matches_history": true,
+          "period_order_valid": true,
+          "start_period": "2021-03-31",
+          "end_period": "2025-12-31"
+        },
+        "solvency": {
+          "status": "pass",
+          "rows_count": 14,
+          "completeness_pct": 70,
+          "missing_periods_count": 6,
+          "duplicate_period_count": 0,
+          "invalid_period_count": 0,
+          "future_periods": [],
+          "pre_listing_periods": [],
+          "latest_matches_history": true,
+          "period_order_valid": true,
+          "start_period": "2021-03-31",
+          "end_period": "2025-12-31"
+        },
+        "operation_capability": {
+          "status": "pass",
+          "rows_count": 14,
+          "completeness_pct": 70,
+          "missing_periods_count": 6,
+          "duplicate_period_count": 0,
+          "invalid_period_count": 0,
+          "future_periods": [],
+          "pre_listing_periods": [],
+          "latest_matches_history": true,
+          "period_order_valid": true,
+          "start_period": "2021-03-31",
+          "end_period": "2025-12-31"
+        },
+        "cashflow_quality": {
+          "status": "pass",
+          "rows_count": 13,
+          "completeness_pct": 65,
+          "missing_periods_count": 7,
+          "duplicate_period_count": 0,
+          "invalid_period_count": 0,
+          "future_periods": [],
+          "pre_listing_periods": [],
+          "latest_matches_history": true,
+          "period_order_valid": true,
+          "start_period": "2021-03-31",
+          "end_period": "2025-12-31"
+        },
+        "dupont": {
+          "status": "pass",
+          "rows_count": 13,
+          "completeness_pct": 65,
+          "missing_periods_count": 7,
+          "duplicate_period_count": 0,
+          "invalid_period_count": 0,
+          "future_periods": [],
+          "pre_listing_periods": [],
+          "latest_matches_history": true,
+          "period_order_valid": true,
+          "start_period": "2021-03-31",
+          "end_period": "2025-12-31"
+        }
+      },
+      "history_truncated": true,
+      "history_range_label": "当前数据源覆盖 2021—2025 年",
+      "chart_contract_valid": true,
+      "invalid_chart_contracts": [],
+      "cninfo_reports_count": null,
+      "cninfo_status": "skipped",
+      "provider_calls": 120,
+      "login_batches": 3,
+      "years_from_cache": 0,
+      "years_fetched": 5,
+      "cache_hit": false,
+      "elapsed_ms": 20318,
+      "warm_latency_ms": null,
+      "response_size_bytes": 42650,
+      "page_profile_size_bytes": null,
+      "debug_profile_size_bytes": null,
+      "baostock_aggregate_calls": 1,
+      "timeout": false,
+      "blocking_issues": [],
+      "warnings": [],
+      "final_status": "passed"
+    }
+  ]
+}

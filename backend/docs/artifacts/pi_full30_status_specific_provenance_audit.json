@@ -1,0 +1,286 @@
+{
+  "schema_version": "pi_full30_status_specific_provenance_audit_v1",
+  "phase": "6V-P1.6.5",
+  "old_provenance_completeness_rate": 0.7,
+  "recomputed_status_specific_provenance_completeness": 0.8667,
+  "cases": [
+    {
+      "case_id": "A01",
+      "normalized_pi_status": "success",
+      "old_provenance_complete": true,
+      "recomputed_provenance_complete": true,
+      "offline_artifact_limitation": false,
+      "missing_fields": [],
+      "note": null
+    },
+    {
+      "case_id": "A02",
+      "normalized_pi_status": "success",
+      "old_provenance_complete": true,
+      "recomputed_provenance_complete": true,
+      "offline_artifact_limitation": false,
+      "missing_fields": [],
+      "note": null
+    },
+    {
+      "case_id": "A03",
+      "normalized_pi_status": "success",
+      "old_provenance_complete": true,
+      "recomputed_provenance_complete": true,
+      "offline_artifact_limitation": false,
+      "missing_fields": [],
+      "note": null
+    },
+    {
+      "case_id": "B01",
+      "normalized_pi_status": "success",
+      "old_provenance_complete": true,
+      "recomputed_provenance_complete": true,
+      "offline_artifact_limitation": false,
+      "missing_fields": [],
+      "note": null
+    },
+    {
+      "case_id": "B02",
+      "normalized_pi_status": "success",
+      "old_provenance_complete": true,
+      "recomputed_provenance_complete": true,
+      "offline_artifact_limitation": false,
+      "missing_fields": [],
+      "note": null
+    },
+    {
+      "case_id": "B03",
+      "normalized_pi_status": "success",
+      "old_provenance_complete": true,
+      "recomputed_provenance_complete": true,
+      "offline_artifact_limitation": false,
+      "missing_fields": [],
+      "note": null
+    },
+    {
+      "case_id": "B04",
+      "normalized_pi_status": "clarification_required",
+      "old_provenance_complete": true,
+      "recomputed_provenance_complete": false,
+      "offline_artifact_limitation": true,
+      "missing_fields": [
+        "clarification_options"
+      ],
+      "note": "P1.6.4 compact artifact did not retain clarification candidates; cannot be judged offline — candidate provenance is verified at runtime in the P1.6.5 blocker subset"
+    },
+    {
+      "case_id": "B05",
+      "normalized_pi_status": "clarification_required",
+      "old_provenance_complete": true,
+      "recomputed_provenance_complete": false,
+      "offline_artifact_limitation": true,
+      "missing_fields": [
+        "clarification_options"
+      ],
+      "note": "P1.6.4 compact artifact did not retain clarification candidates; cannot be judged offline — candidate provenance is verified at runtime in the P1.6.5 blocker subset"
+    },
+    {
+      "case_id": "B06",
+      "normalized_pi_status": "clarification_required",
+      "old_provenance_complete": true,
+      "recomputed_provenance_complete": false,
+      "offline_artifact_limitation": true,
+      "missing_fields": [
+        "clarification_options"
+      ],
+      "note": "P1.6.4 compact artifact did not retain clarification candidates; cannot be judged offline — candidate provenance is verified at runtime in the P1.6.5 blocker subset"
+    },
+    {
+      "case_id": "B07",
+      "normalized_pi_status": "unavailable",
+      "old_provenance_complete": true,
+      "recomputed_provenance_complete": true,
+      "offline_artifact_limitation": false,
+      "missing_fields": [],
+      "note": null
+    },
+    {
+      "case_id": "C01",
+      "normalized_pi_status": "success",
+      "old_provenance_complete": true,
+      "recomputed_provenance_complete": true,
+      "offline_artifact_limitation": false,
+      "missing_fields": [],
+      "note": null
+    },
+    {
+      "case_id": "C02",
+      "normalized_pi_status": "success",
+      "old_provenance_complete": true,
+      "recomputed_provenance_complete": true,
+      "offline_artifact_limitation": false,
+      "missing_fields": [],
+      "note": null
+    },
+    {
+      "case_id": "C03",
+      "normalized_pi_status": "success",
+      "old_provenance_complete": true,
+      "recomputed_provenance_complete": true,
+      "offline_artifact_limitation": false,
+      "missing_fields": [],
+      "note": null
+    },
+    {
+      "case_id": "C04",
+      "normalized_pi_status": "skipped",
+      "old_provenance_complete": false,
+      "recomputed_provenance_complete": true,
+      "offline_artifact_limitation": false,
+      "missing_fields": [],
+      "note": "old analyzer required evidence_ids regardless of status; skipped/timeout cases were judged by the success schema"
+    },
+    {
+      "case_id": "C05",
+      "normalized_pi_status": "skipped",
+      "old_provenance_complete": false,
+      "recomputed_provenance_complete": true,
+      "offline_artifact_limitation": false,
+      "missing_fields": [],
+      "note": "old analyzer required evidence_ids regardless of status; skipped/timeout cases were judged by the success schema"
+    },
+    {
+      "case_id": "C06",
+      "normalized_pi_status": "unavailable",
+      "old_provenance_complete": true,
+      "recomputed_provenance_complete": true,
+      "offline_artifact_limitation": false,
+      "missing_fields": [],
+      "note": null
+    },
+    {
+      "case_id": "D01",
+      "normalized_pi_status": "skipped",
+      "old_provenance_complete": false,
+      "recomputed_provenance_complete": true,
+      "offline_artifact_limitation": false,
+      "missing_fields": [],
+      "note": "old analyzer required evidence_ids regardless of status; skipped/timeout cases were judged by the success schema"
+    },
+    {
+      "case_id": "D02",
+      "normalized_pi_status": "skipped",
+      "old_provenance_complete": false,
+      "recomputed_provenance_complete": true,
+      "offline_artifact_limitation": false,
+      "missing_fields": [],
+      "note": "old analyzer required evidence_ids regardless of status; skipped/timeout cases were judged by the success schema"
+    },
+    {
+      "case_id": "D03",
+      "normalized_pi_status": "skipped",
+      "old_provenance_complete": false,
+      "recomputed_provenance_complete": true,
+      "offline_artifact_limitation": false,
+      "missing_fields": [],
+      "note": "old analyzer required evidence_ids regardless of status; skipped/timeout cases were judged by the success schema"
+    },
+    {
+      "case_id": "D04",
+      "normalized_pi_status": "unsupported",
+      "old_provenance_complete": true,
+      "recomputed_provenance_complete": true,
+      "offline_artifact_limitation": false,
+      "missing_fields": [],
+      "note": null
+    },
+    {
+      "case_id": "D05",
+      "normalized_pi_status": "skipped",
+      "old_provenance_complete": false,
+      "recomputed_provenance_complete": true,
+      "offline_artifact_limitation": false,
+      "missing_fields": [],
+      "note": "old analyzer required evidence_ids regardless of status; skipped/timeout cases were judged by the success schema"
+    },
+    {
+      "case_id": "E01",
+      "normalized_pi_status": "clarification_required",
+      "old_provenance_complete": true,
+      "recomputed_provenance_complete": false,
+      "offline_artifact_limitation": true,
+      "missing_fields": [
+        "clarification_options"
+      ],
+      "note": "P1.6.4 compact artifact did not retain clarification candidates; cannot be judged offline — candidate provenance is verified at runtime in the P1.6.5 blocker subset"
+    },
+    {
+      "case_id": "E02",
+      "normalized_pi_status": "unavailable",
+      "old_provenance_complete": true,
+      "recomputed_provenance_complete": true,
+      "offline_artifact_limitation": false,
+      "missing_fields": [],
+      "note": null
+    },
+    {
+      "case_id": "F01",
+      "normalized_pi_status": "unavailable",
+      "old_provenance_complete": true,
+      "recomputed_provenance_complete": true,
+      "offline_artifact_limitation": false,
+      "missing_fields": [],
+      "note": null
+    },
+    {
+      "case_id": "F02",
+      "normalized_pi_status": "unavailable",
+      "old_provenance_complete": true,
+      "recomputed_provenance_complete": true,
+      "offline_artifact_limitation": false,
+      "missing_fields": [],
+      "note": null
+    },
+    {
+      "case_id": "F03",
+      "normalized_pi_status": "unavailable",
+      "old_provenance_complete": true,
+      "recomputed_provenance_complete": true,
+      "offline_artifact_limitation": false,
+      "missing_fields": [],
+      "note": null
+    },
+    {
+      "case_id": "F04",
+      "normalized_pi_status": "timeout",
+      "old_provenance_complete": false,
+      "recomputed_provenance_complete": true,
+      "offline_artifact_limitation": false,
+      "missing_fields": [],
+      "note": "old analyzer required evidence_ids regardless of status; skipped/timeout cases were judged by the success schema"
+    },
+    {
+      "case_id": "F05",
+      "normalized_pi_status": "skipped",
+      "old_provenance_complete": false,
+      "recomputed_provenance_complete": true,
+      "offline_artifact_limitation": false,
+      "missing_fields": [],
+      "note": "old analyzer required evidence_ids regardless of status; skipped/timeout cases were judged by the success schema"
+    },
+    {
+      "case_id": "F06",
+      "normalized_pi_status": "unavailable",
+      "old_provenance_complete": true,
+      "recomputed_provenance_complete": true,
+      "offline_artifact_limitation": false,
+      "missing_fields": [],
+      "note": null
+    },
+    {
+      "case_id": "F07",
+      "normalized_pi_status": "skipped",
+      "old_provenance_complete": false,
+      "recomputed_provenance_complete": true,
+      "offline_artifact_limitation": false,
+      "missing_fields": [],
+      "note": "old analyzer required evidence_ids regardless of status; skipped/timeout cases were judged by the success schema"
+    }
+  ]
+}

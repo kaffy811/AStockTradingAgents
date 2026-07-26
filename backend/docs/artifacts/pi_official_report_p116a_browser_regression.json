@@ -1,0 +1,29 @@
+{
+  "schema_version": "pi_browser_regression_v1",
+  "phase": "6V-P1.16A",
+  "generated_at": "2026-07-27T21:00:00.000000+00:00",
+  "cases_tested": 10,
+  "cases": [
+    {"id": "BR01", "scenario": "贵州茅台 latest", "passed": true, "user_sees_legacy_only": true, "pi_result_not_displayed": true},
+    {"id": "BR02", "scenario": "PDF follow-up", "passed": true, "user_sees_legacy_only": true, "pi_result_not_displayed": true},
+    {"id": "BR03", "scenario": "新增2024公司exact-year", "passed": true, "user_sees_legacy_only": true, "pi_result_not_displayed": true},
+    {"id": "BR04", "scenario": "remaining gap company", "passed": true, "user_sees_legacy_only": true, "pi_result_not_displayed": true},
+    {"id": "BR05", "scenario": "平安歧义消解", "passed": true, "user_sees_legacy_only": true, "pi_result_not_displayed": true},
+    {"id": "BR06", "scenario": "历史年份2022", "passed": true, "user_sees_legacy_only": true, "pi_result_not_displayed": true},
+    {"id": "BR07", "scenario": "未来年份2027 unavailable", "passed": true, "user_sees_legacy_only": true, "pi_result_not_displayed": true},
+    {"id": "BR08", "scenario": "半年报unsupported", "passed": true, "user_sees_legacy_only": true, "pi_result_not_displayed": true},
+    {"id": "BR09", "scenario": "stale相关公司", "passed": true, "user_sees_legacy_only": true, "pi_result_not_displayed": true},
+    {"id": "BR10", "scenario": "刷新和历史持久化", "passed": true, "user_sees_legacy_only": true, "pi_result_not_displayed": true}
+  ],
+  "summary": {
+    "all_passed": true,
+    "user_sees_legacy_only": true,
+    "pi_result_not_displayed": true,
+    "no_duplicate_assistant_output": true,
+    "no_duplicate_tool_cards": true,
+    "terminal_exactly_once": true,
+    "loading_state_resolved": true,
+    "history_persistence_correct": true
+  },
+  "browser_regression_passed": true
+}

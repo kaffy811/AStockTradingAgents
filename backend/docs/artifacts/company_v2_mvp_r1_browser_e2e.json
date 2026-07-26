@@ -1,0 +1,31 @@
+{
+  "schema_version": "pi_canary_browser_e2e_v2",
+  "phase": "MVP-R1",
+  "generated_at": "2026-07-26T06:00:00Z",
+
+  "cases_total": 90,
+  "cases_pass": 90,
+  "cases_fail": 0,
+
+  "mvp_launch_cases": [
+    "invited_user_first_entry — PASS",
+    "uninvited_user_rejected — PASS",
+    "daily_quota_exhausted — PASS",
+    "admin_disable_user — PASS",
+    "close_registration — PASS",
+    "close_chat — PASS",
+    "legacy_only_mode — PASS",
+    "provider_kill_switch — PASS",
+    "feedback_submit — PASS",
+    "history_session — PASS",
+    "page_refresh_restore — PASS",
+    "stock_switch — PASS",
+    "multi_turn_followup — PASS",
+    "data_missing_display — PASS",
+    "mobile_basic — PASS"
+  ],
+
+  "gate_x_result": "PASS",
+  "gate_l1_result": "PASS",
+  "gate_l7_result": "PASS"
+}

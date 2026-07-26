@@ -11,7 +11,7 @@
     <div v-else class="coc-grid">
       <!-- Price / change -->
       <div class="coc-card primary">
-        <div class="coc-label">最新价</div>
+        <div class="coc-label">{{ priceLabel }}</div>
         <div :class="['coc-price', priceClass]">{{ price }}</div>
         <div :class="['coc-change', priceClass]">{{ change }}</div>
       </div>
@@ -97,7 +97,21 @@ function fmtMv(v) {
   return n >= 100000000 ? (n / 100000000).toFixed(2) : (n / 10000).toFixed(2)
 }
 
+const isBaostockKlineFallback = computed(() =>
+  snapData.value.source === 'baostock_kline_fallback'
+)
+
+const priceLabel = computed(() =>
+  isBaostockKlineFallback.value ? '最近收盘价' : '最新价'
+)
+
 const sourceNote = computed(() => {
+  if (isBaostockKlineFallback.value) {
+    // Phase 6N-7B: kline fallback 现可携带 PE(TTM)/PB；市值仍不可用
+    return snapData.value.pe_ttm != null || snapData.value.pb != null
+      ? '行情与估值来自 BaoStock K线（日频），总市值暂不可用'
+      : '价格来自 BaoStock K线，PE/PB/市值暂不可用'
+  }
   const s = props.snapshot?.stale || props.financial?.stale
   return s ? '数据来自缓存' : ''
 })

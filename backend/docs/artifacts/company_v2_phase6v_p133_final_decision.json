@@ -1,0 +1,96 @@
+{
+  "schema_version": "pi_canary_final_decision_v3",
+  "phase": "6V-P1.33",
+  "generated_at": "2026-07-26T04:30:00Z",
+  "phase_label": "Final MVP Gate — State B (Real Provider NOT_EXECUTED)",
+
+  "decision": "MVP_GATE_STATE_B_COMPLETE",
+  "decision_reason": "All State-A gates PASS. Official model IDs verified (deepseek-v4-flash). Official pricing verified (USD, api-docs.deepseek.com, 2026-07-26). deepseek_prices.json updated to pricing_mode=official. Provider call path audited (3/8 checks in path — gap documented, LOW risk in State B). Fail-closed preflight PASS (30 simulated requests, 0 real calls). Real provider NOT_EXECUTED: DEEPSEEK_API_KEY_STAGING not provisioned (State B). 112/112 P1.33 targeted PASS. 19 gates PASS, 2 PARTIAL, 1 NOT_EVALUATED, 4 NOT_EXECUTED, 0 FAIL.",
+
+  "real_provider_validation_passed": false,
+  "real_provider_executed": false,
+  "real_provider_requests": 0,
+  "real_provider_cost_cny": 0,
+  "real_provider_cost_usd": 0.0,
+
+  "model_verification_passed": true,
+  "pricing_verification_passed": true,
+  "fail_closed_verified": true,
+  "provider_path_audited": true,
+
+  "mvp_release_candidate": true,
+  "invite_only_release_authorized": true,
+  "public_production_authorized": false,
+  "real_provider_activation_authorized": false,
+
+  "runtime_final": {
+    "shadow_rollout_percent": 100,
+    "shadow_salt": "pi_v1",
+    "live_rollout_percent": 1,
+    "live_salt": "pi_live_v1",
+    "config_version": 12,
+    "provider_mode": "staging_replay",
+    "real_provider_enabled": false,
+    "real_provider_kill_switch": true,
+    "production_enabled": false
+  },
+
+  "cumulative_canary": {
+    "cumulative_shadow_requests": 125373,
+    "cumulative_live_requests": 708,
+    "cumulative_pi_violations": 0,
+    "cumulative_terminal_violations": 0
+  },
+
+  "p133_implemented": [
+    "backend/app/llm/pricing/deepseek_prices.json — updated to pricing_mode=official, verified USD prices",
+    "backend/docs/artifacts/company_v2_phase6v_p133_preflight_audit.json",
+    "backend/docs/artifacts/company_v2_phase6v_p133_p132_release_reconciliation.json",
+    "backend/docs/artifacts/company_v2_phase6v_p133_provider_path_audit.json",
+    "backend/docs/artifacts/company_v2_phase6v_p133_model_verification.json",
+    "backend/docs/artifacts/company_v2_phase6v_p133_pricing_verification.json",
+    "backend/docs/artifacts/company_v2_phase6v_p133_credential_audit.json",
+    "backend/docs/artifacts/company_v2_phase6v_p133_fail_closed_preflight.json",
+    "backend/docs/artifacts/company_v2_phase6v_p133_real_provider_results.json",
+    "backend/docs/artifacts/company_v2_phase6v_p133_cost_report.json",
+    "backend/docs/artifacts/company_v2_phase6v_p133_replay_restoration.json",
+    "backend/docs/artifacts/company_v2_phase6v_p133_mvp_regression.json",
+    "backend/docs/artifacts/company_v2_phase6v_p133_browser_e2e.json",
+    "backend/docs/artifacts/company_v2_phase6v_p133_mvp_release_gate.json",
+    "backend/docs/artifacts/company_v2_phase6v_p133_final_decision.json",
+    "backend/docs/artifacts/company_v2_phase6v_p133_report.md",
+    "backend/tests/test_phase6v_p133_final_mvp_gate.py — 112 targeted tests"
+  ],
+
+  "gate_summary": {
+    "pass": 19,
+    "partial": 2,
+    "not_evaluated": 1,
+    "not_executed": 4,
+    "fail": 0
+  },
+
+  "what_is_active": [
+    "100% Pi shadow (shadow_salt=pi_v1)",
+    "1% Pi replay-live arbitration (live_salt=pi_live_v1)",
+    "Legacy fallback for all requests",
+    "Kill switch (provider + live) available",
+    "Provider control plane (fail-closed, no real calls)",
+    "MVP invite-only access control",
+    "Answer feedback endpoint",
+    "Analytics events endpoint",
+    "Structured error monitoring",
+    "Verified model IDs (deepseek-v4-flash official)",
+    "Verified USD pricing in deepseek_prices.json"
+  ],
+
+  "what_is_not_authorized": [
+    "Real provider calls — requires DEEPSEEK_API_KEY_STAGING + explicit authorization",
+    "live rollout > 1%",
+    "public production deployment",
+    "ordinary external users",
+    "legacy executor removal"
+  ],
+
+  "next_phase": "MVP-R1 — Invite-only launch. No more pre-launch technical phases. Real provider activation (P1.33.5) can proceed in parallel when DEEPSEEK_API_KEY_STAGING is provisioned and explicit authorization granted."
+}

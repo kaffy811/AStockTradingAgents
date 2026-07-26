@@ -1,0 +1,102 @@
+{
+  "schema_version": "pi_canary_final_decision_v1",
+  "phase": "6V-P1.24",
+  "phase_title": "Containerized Staging Deployment, Gate C Closure & Conditional 100% Shadow Promotion",
+  "state": "B",
+  "state_description": "Docker not installed; containerized staging deployment not established; Gate C = UNKNOWN; 100% promotion NOT executed",
+  "generated_at": "2026-07-24T00:00:00.000000+00:00",
+  "base_sha": "11855396533c4350338fdb44b9ab6db0c7ea5c8a",
+  "evidence_sha": "a6fe07c22c4f48d929ff621fbc7914cfe23cbdba",
+
+  "conditional_owner_authorization_recorded": true,
+  "authorization_condition": "Gate C = PASS via containerized deployed staging runtime probe",
+  "authorization_condition_satisfied": false,
+  "authorization_condition_satisfied_reason": "Docker Engine not installed on this machine. No containerized backend process could be started. Gate C remains UNKNOWN — cannot verify deployed effective runtime at rollout=75/v8/pi_v1.",
+
+  "docker_assessment": {
+    "docker_installed": false,
+    "gate_c_closeable_this_run": false,
+    "install_path": "brew install --cask docker-desktop (requires user action)"
+  },
+
+  "gate_results": {
+    "A": "pass",
+    "B": "unknown",
+    "C": "unknown",
+    "D": "not_evaluated",
+    "E": "not_evaluated",
+    "F": "not_evaluated",
+    "G": "not_evaluated",
+    "H": "not_evaluated",
+    "I": "not_evaluated",
+    "J": "not_evaluated",
+    "K": "not_evaluated",
+    "L": "not_evaluated",
+    "M": "not_evaluated",
+    "N": "not_evaluated",
+    "O": "not_evaluated"
+  },
+
+  "gate_c_status": "unknown",
+  "deployed_runtime_verified": false,
+
+  "promotion_authorized": false,
+  "promotion_attempted": false,
+  "promotion_applied": false,
+
+  "actual_rollout_percent_after_phase": 75,
+  "actual_config_version_after_phase": 8,
+  "stable_bucket_salt_version": "pi_v1",
+
+  "continue_one_hundred_percent_shadow": false,
+  "continue_seventy_five_percent_shadow": true,
+
+  "rollback_required": false,
+  "rollback_applied": false,
+  "rollback_reason": "No promotion was applied. State unchanged from P1.23. No rollback necessary.",
+
+  "live": false,
+  "production_enabled": false,
+  "provider_serving_calls": 0,
+  "recommended_for_live_serving": false,
+  "recommended_for_production": false,
+  "legacy_deprecation_authorized": false,
+
+  "code_improvements_this_phase": [
+    "canary_policy.py: snapshot v2 — added process_id, deployment_sha, config_fingerprint, evidence_mode=containerized_deployed_staging_runtime when DEPLOYMENT_MODE env var set",
+    "config.py: added pi_canary_snapshot_path field",
+    "main.py: lifespan persists snapshot to pi_canary_snapshot_path when configured",
+    "docker-compose.staging.yml: isolated staging compose override created",
+    ".env.staging.example: staging config template created"
+  ],
+
+  "blocking_reason": "Docker Engine not installed. Cannot create containerized staging deployment. Gate C remains UNKNOWN.",
+
+  "test_evidence": {
+    "targeted_passed": 174,
+    "cross_phase_passed": 3282,
+    "full_fundamental_passed": 4820,
+    "entire_backend_passed": 6651,
+    "frontend_passed": 688,
+    "total_backend_failed": 0,
+    "total_frontend_failed": 0
+  },
+
+  "cumulative_p18_through_p124": {
+    "phases_covered": ["P1.8", "P1.9", "P1.10", "P1.11", "P1.12", "P1.13", "P1.14",
+                       "P1.15", "P1.16", "P1.17", "P1.18", "P1.19", "P1.20", "P1.21",
+                       "P1.22", "P1.23", "P1.24"],
+    "total_selected": 45373,
+    "zero_violations": 0,
+    "violation_rate": 0.0,
+    "soak_health": "excellent"
+  },
+
+  "next_phase_recommendation": {
+    "phase": "6V-P1.25",
+    "objective": "Install Docker Desktop and execute containerized Gate C closure",
+    "prerequisite": "Install Docker Desktop via 'brew install --cask docker-desktop', start Docker Desktop, verify docker compose version",
+    "then": "Re-run P1.24 containerized deployment procedure → Gate C = PASS → 100%/v9 promotion",
+    "note": "Do not add further offline soak. Resolve Docker blocker first."
+  }
+}

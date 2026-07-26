@@ -1,0 +1,205 @@
+{
+  "report_id": 1,
+  "report_year": 2024,
+  "report_type": "annual",
+  "human_review_queue": [
+    {
+      "field": "revenue",
+      "status": "definition_mismatch",
+      "reason": "structured value appears to be main business revenue, not operating revenue",
+      "confidence": 1.0,
+      "official_value": 54822111649.52,
+      "structured_value": 50227475991.67,
+      "provider_definition": "main_business_revenue",
+      "matched_label": "主营业务收入",
+      "field_definition_match": {
+        "status": "definition_mismatch",
+        "match_type": "incompatible",
+        "field": "revenue",
+        "canonical_name": "营业收入",
+        "matched_label": "主营业务收入",
+        "provider_definition": "main_business_revenue",
+        "incompatible_labels": [
+          "主营业务收入",
+          "main_business_revenue"
+        ],
+        "reason": "structured value appears to be main business revenue, not operating revenue"
+      },
+      "evidence_page": 6,
+      "evidence_excerpt": "营业收入 54,822,111,649.52"
+    },
+    {
+      "field": "net_profit_parent",
+      "status": "definition_mismatch",
+      "reason": "structured value appears to be net profit, not parent-company net profit",
+      "confidence": 1.0,
+      "official_value": 424777342.95,
+      "structured_value": 482101037.78,
+      "provider_definition": "net_profit",
+      "matched_label": "净利润",
+      "field_definition_match": {
+        "status": "definition_mismatch",
+        "match_type": "incompatible",
+        "field": "net_profit_parent",
+        "canonical_name": "归属于上市公司股东的净利润",
+        "matched_label": "净利润",
+        "provider_definition": "net_profit",
+        "incompatible_labels": [
+          "净利润",
+          "net_profit",
+          "含少数股东"
+        ],
+        "reason": "structured value appears to be net profit, not parent-company net profit"
+      },
+      "evidence_page": 6,
+      "evidence_excerpt": "归属于上市公司股东的净利润 424,777,342.95"
+    },
+    {
+      "field": "roe_weighted",
+      "status": "definition_mismatch",
+      "reason": "structured field is generic ROE, not confirmed weighted average ROE",
+      "confidence": 1.0,
+      "official_value": 0.0654,
+      "structured_value": 0.063051,
+      "provider_definition": "unknown_roe",
+      "matched_label": "roeAvg",
+      "field_definition_match": {
+        "status": "definition_mismatch",
+        "match_type": "unknown",
+        "field": "roe_weighted",
+        "canonical_name": "加权平均净资产收益率",
+        "matched_label": "roeAvg",
+        "provider_definition": "unknown_roe",
+        "incompatible_labels": [
+          "净资产收益率",
+          "ROE",
+          "roe",
+          "unknown_roe"
+        ],
+        "reason": "structured field is generic ROE, not confirmed weighted average ROE"
+      },
+      "evidence_page": 6,
+      "evidence_excerpt": "加权平均净资产收益率（%）6.54"
+    }
+  ],
+  "non_blocking_findings": [
+    {
+      "field": "operating_cashflow",
+      "status": "structured_field_missing",
+      "reason": "结构化未找到该字段，但年报明确披露。",
+      "confidence": 1.0,
+      "official_value": 1393832602.16,
+      "structured_value": null,
+      "provider_definition": null,
+      "matched_label": null,
+      "field_definition_match": {
+        "status": "unknown",
+        "match_type": "unknown",
+        "field": "operating_cashflow",
+        "canonical_name": "经营活动产生的现金流量净额",
+        "matched_label": "",
+        "provider_definition": "unknown",
+        "reason": "field definition could not be confirmed from available labels"
+      },
+      "evidence_page": 14
+    },
+    {
+      "field": "total_assets",
+      "status": "structured_field_missing",
+      "reason": "结构化未找到该字段，但年报明确披露。",
+      "confidence": 1.0,
+      "official_value": 26001740331.42,
+      "structured_value": null,
+      "provider_definition": null,
+      "matched_label": null,
+      "field_definition_match": {
+        "status": "unknown",
+        "match_type": "unknown",
+        "field": "total_assets",
+        "canonical_name": "资产总计",
+        "matched_label": "",
+        "provider_definition": "unknown",
+        "reason": "field definition could not be confirmed from available labels"
+      },
+      "evidence_page": 107
+    },
+    {
+      "field": "equity_parent",
+      "status": "structured_field_missing",
+      "reason": "结构化未找到该字段，但年报明确披露。",
+      "confidence": 1.0,
+      "official_value": 6760918501.91,
+      "structured_value": null,
+      "provider_definition": null,
+      "matched_label": null,
+      "field_definition_match": {
+        "status": "unknown",
+        "match_type": "unknown",
+        "field": "equity_parent",
+        "canonical_name": "归属于上市公司股东的净资产",
+        "matched_label": "",
+        "provider_definition": "unknown",
+        "reason": "field definition could not be confirmed from available labels"
+      },
+      "evidence_page": 6
+    },
+    {
+      "field": "eps_basic",
+      "status": "structured_field_missing",
+      "reason": "结构化未找到该字段，但年报明确披露。",
+      "confidence": 1.0,
+      "official_value": 0.3,
+      "structured_value": null,
+      "provider_definition": null,
+      "matched_label": null,
+      "field_definition_match": {
+        "status": "unknown",
+        "match_type": "unknown",
+        "field": "eps_basic",
+        "canonical_name": "基本每股收益",
+        "matched_label": "",
+        "provider_definition": "unknown",
+        "reason": "field definition could not be confirmed from available labels"
+      },
+      "evidence_page": 6
+    },
+    {
+      "field": "total_share",
+      "status": "period_basis_mismatch",
+      "reason": "年报未直接提供2024-12-31总股本，证据中仅有2024-12-12的总股本1,432,296,037股，无法确认期末准确数值，需人工核实。",
+      "confidence": 0.3,
+      "official_value": null,
+      "structured_value": 1432942234.0,
+      "provider_definition": "total_share",
+      "matched_label": "总股本",
+      "field_definition_match": {
+        "status": "matched",
+        "match_type": "exact",
+        "field": "total_share",
+        "canonical_name": "总股本",
+        "matched_label": "总股本",
+        "provider_definition": "total_share"
+      },
+      "evidence_page": null
+    },
+    {
+      "field": "float_share",
+      "status": "official_field_not_found",
+      "reason": "未在年报摘要中找到流通股数相关证据，无法校核。",
+      "confidence": 0.0,
+      "official_value": null,
+      "structured_value": 1432942234.0,
+      "provider_definition": "float_share",
+      "matched_label": "流通股本",
+      "field_definition_match": {
+        "status": "matched",
+        "match_type": "exact",
+        "field": "float_share",
+        "canonical_name": "流通股本",
+        "matched_label": "流通股本",
+        "provider_definition": "float_share"
+      },
+      "evidence_page": null
+    }
+  ]
+}

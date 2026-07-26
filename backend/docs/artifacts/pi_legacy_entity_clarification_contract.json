@@ -1,0 +1,54 @@
+{
+  "schema_version": "pi_legacy_entity_clarification_contract_v1",
+  "phase": "6V-P1.6.8",
+  "generated_at": "2026-07-19T16:03:11.411257+00:00",
+  "scope": "generic Legacy chat clarification — resolver-driven, never Pi shadow output, never hardcoded companies",
+  "contract_example": {
+    "status": "clarification_required",
+    "clarification": {
+      "kind": "entity_selection",
+      "prompt": "请确认你指的是哪家公司：",
+      "query_term": "平安",
+      "candidates": [
+        {
+          "display_name": "平安银行",
+          "symbol": "000001",
+          "market": "CN",
+          "reason": "名称以“平安”开头"
+        },
+        {
+          "display_name": "中国平安",
+          "symbol": "601318",
+          "market": "CN",
+          "reason": "名称包含“平安”"
+        }
+      ],
+      "selection_required": true
+    }
+  },
+  "candidate_rules": {
+    "trigger": "normal resolution failed AND a short Chinese alias matches 2..8 distinct short names in the resolver index",
+    "dedup": "market+symbol, then cross-market duplicate names keep the highest-priority market (CN>HK>US)",
+    "ordering": "prefix match -> short_name length -> market priority -> symbol (fully deterministic)",
+    "cap": 5,
+    "stopwords_blocked": [
+      "年报",
+      "季报",
+      "银行",
+      "保险",
+      "公司",
+      "集团",
+      "..."
+    ],
+    "no_report_tool_call": true,
+    "no_url": true,
+    "no_auto_selection": true,
+    "no_internal_confidence_prompt_or_cot": true
+  },
+  "transport": {
+    "sync": "ChatMessageSendResponse.metadata.{response_kind,clarification} (additive)",
+    "sse": "single agent_completed terminal event carries response_kind/clarification (old clients ignore)",
+    "persistence": "chat_messages.msg_metadata JSONB via existing compaction whitelist — no migration",
+    "session_detail": "ChatMessageItem.metadata sanitized subset restores candidates after refresh"
+  }
+}

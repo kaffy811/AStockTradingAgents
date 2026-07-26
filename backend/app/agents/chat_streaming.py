@@ -39,6 +39,7 @@ import logging
 
 from app.agents.chat_orchestrator import process_message
 from app.agents.financial_safety_postprocessor import sanitize_financial_answer
+from app.core.database import AsyncSessionLocal
 from app.services.chat_service import (
     save_user_message,
     save_assistant_message,
@@ -67,7 +68,9 @@ ETYPE_RAG_REVIEW_START    = "rag_review_started"
 ETYPE_RAG_REVIEW_DONE     = "rag_review_completed"
 ETYPE_CONFIRM_REQUIRED    = "confirmation_required"
 ETYPE_ANSWER_DELTA        = "answer_delta"
+ETYPE_ANSWER_COMPLETED    = "answer_completed"
 ETYPE_CARDS_DELTA         = "cards_delta"
+ETYPE_MESSAGE_PERSISTED   = "message_persisted"
 ETYPE_COMPLETED           = "agent_completed"
 ETYPE_ERROR               = "agent_error"
 ETYPE_KEEPALIVE           = "keepalive"
@@ -167,6 +170,80 @@ class ChatStreamEvent:
 _KEEPALIVE_INTERVAL = 15.0   # seconds between keepalive comments
 _ANSWER_CHUNK_SIZE  = 25     # chars per answer_delta chunk
 _TOOL_EVENT_DELAY   = 0.05   # seconds between streaming consecutive tool events
+_EMPTY_FINAL_ANSWER_TEXT = "报告数据已获取，但本次回答生成失败，请重新尝试。"
+_ORCHESTRATION_TIMEOUT_SECONDS = 55.0
+_DB_OPERATION_TIMEOUT_SECONDS = 8.0
+_DB_ROLLBACK_TIMEOUT_SECONDS = 3.0
+
+
+async def _rollback_safely(db: Any, *, owner: str) -> None:
+    try:
+        await asyncio.wait_for(db.rollback(), timeout=_DB_ROLLBACK_TIMEOUT_SECONDS)
+    except asyncio.TimeoutError:
+        log.warning("db_session_rollback_timeout owner=%s", owner)
+    except Exception as exc:  # noqa: BLE001
+        log.warning("db_session_rollback_failed owner=%s error_class=%s", owner, type(exc).__name__)
+
+
+class _BorrowedSessionContext:
+    """Compatibility context for unit tests that inject a mocked DB session."""
+
+    def __init__(self, session: Any) -> None:
+        self.session = session
+
+    async def __aenter__(self) -> Any:
+        return self.session
+
+    async def __aexit__(self, exc_type: Any, exc: Any, tb: Any) -> bool:
+        return False
+
+
+def _session_context(db_override: Any = None) -> Any:
+    if db_override is not None:
+        return _BorrowedSessionContext(db_override)
+    return AsyncSessionLocal()
+
+
+async def _run_short_db_operation(
+    owner: str,
+    operation: Callable[[Any], Any],
+    *,
+    db_override: Any = None,
+) -> Any:
+    """Run one DB operation in an isolated transaction and close the session."""
+    async with _session_context(db_override) as session:
+        try:
+            result = operation(session)
+            if hasattr(result, "__await__"):
+                result = await asyncio.wait_for(result, timeout=_DB_OPERATION_TIMEOUT_SECONDS)
+            await asyncio.wait_for(session.commit(), timeout=_DB_OPERATION_TIMEOUT_SECONDS)
+            return result
+        except asyncio.TimeoutError:
+            await _rollback_safely(session, owner=owner)
+            log.warning("db_session_failed owner=%s error_class=TimeoutError", owner)
+            raise
+        except asyncio.CancelledError:
+            await _rollback_safely(session, owner=owner)
+            raise
+        except Exception:
+            await _rollback_safely(session, owner=owner)
+            log.exception("db_session_failed owner=%s", owner)
+            raise
+
+
+def _answer_text_from_final_payload(payload: dict) -> str:
+    """Build a user-visible text answer from a structured final_answer payload."""
+    if not isinstance(payload, dict):
+        return str(payload or "").strip()
+    for key in ("full_text", "answer", "content", "text", "message", "response"):
+        value = payload.get(key)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+    return "\n\n".join(
+        str(payload.get(key) or "").strip()
+        for key in ("summary", "analysis", "disclaimer")
+        if str(payload.get(key) or "").strip()
+    ).strip()
 
 
 async def stream_chat_message(
@@ -174,7 +251,7 @@ async def stream_chat_message(
     user_id: uuid.UUID,
     content: str,
     output_language: str,
-    db: Any,
+    db: Any = None,
 ) -> AsyncGenerator[str, None]:
     """
     Async generator that yields SSE-formatted strings for the chat stream
@@ -183,6 +260,10 @@ async def stream_chat_message(
     Callers should wrap this in StreamingResponse (media_type="text/event-stream").
     Client disconnection / hard timeout triggers CancelledError which cancels
     the background orchestration task automatically.
+
+    The optional ``db`` argument is retained for existing unit tests and direct
+    internal callers.  The HTTP route intentionally does not pass its request
+    scoped session here; production streaming uses operation-scoped sessions.
     """
     queue: asyncio.Queue[str | None] = asyncio.Queue()
     seq_counter = [0]
@@ -219,6 +300,7 @@ async def stream_chat_message(
         """
         # C25: track whether these critical events have been emitted
         final_answer_sent = [False]
+        answer_completed_sent = [False]
         done_sent         = [False]
         # Track the orchestration result so we can persist it even on error
         _result_ref: list = [None]
@@ -229,16 +311,14 @@ async def stream_chat_message(
 
         try:
             # ── Phase 1: persist user message ─────────────────────────────────
-            user_msg = await save_user_message(
-                db, session_id, user_id, content, output_language
+            user_message_id = await _run_short_db_operation(
+                "chat_stream.user_message",
+                lambda op_db: _save_user_message_id(op_db, session_id, user_id, content, output_language),
+                db_override=db,
             )
-            # C30.3.1: commit user message immediately so it is durable
-            # regardless of what happens in later phases, and so that the
-            # session starts Phase 1b and Phase 4 with zero pending state.
-            await db.commit()
             await queue.put(_make_sse(
                 ETYPE_USER_SAVED,
-                {"message_id": str(user_msg.id)},
+                {"message_id": user_message_id},
             ))
 
             # ── Phase 1b: auto-update session title on first message ──────────
@@ -246,15 +326,17 @@ async def stream_chat_message(
             # fails we explicitly rollback so the session is clean before the
             # orchestrator (Phase 4) starts — no PendingRollback can leak.
             try:
-                new_title = await maybe_update_session_title(db, session_id, content)
+                new_title = await _run_short_db_operation(
+                    "chat_stream.session_title",
+                    lambda op_db: maybe_update_session_title(op_db, session_id, content),
+                    db_override=db,
+                )
                 if new_title:
-                    await db.commit()  # C30.3.1: commit title in own mini-tx
                     await queue.put(_make_sse(
                         "session_title_updated",
                         {"session_id": str(session_id), "title": new_title},
                     ))
             except Exception:
-                await db.rollback()  # C30.3.1: clean up poisoned session
                 log.debug("chat_streaming: session title update failed (non-fatal)")
 
             # ── Phase 2: emit immediate phase events ──────────────────────────
@@ -280,6 +362,8 @@ async def stream_chat_message(
             async def _emit(event_type: str, payload: dict) -> None:
                 """Safe callback passed to orchestrator / skills."""
                 try:
+                    if event_type in ("agent_completed", ETYPE_COMPLETED):
+                        return
                     # Track tool_completed events for dedup in Phase 5
                     if event_type == "tool_completed":
                         key = f"{payload.get('tool_name', '')}|{payload.get('started_at', '')}"
@@ -292,27 +376,80 @@ async def stream_chat_message(
                     if event_type in ("final_answer", ETYPE_FINAL_ANSWER):
                         payload = sanitize_financial_answer(payload)
                         final_answer_sent[0] = True
-                    if event_type in ("agent_completed", ETYPE_COMPLETED):
-                        done_sent[0] = True
+                    if event_type == ETYPE_ANSWER_COMPLETED:
+                        answer_completed_sent[0] = True
                     sse = _make_sse(event_type, payload, mid=assistant_placeholder_id)
                     await queue.put(sse)
                 except Exception:  # never crash the main flow
                     log.debug("stream emit failed for %s", event_type)
 
             # ── Phase 4: run orchestrator ─────────────────────────────────────
-            result = _result_ref[0] = await process_message(
-                content=content,
-                db=db,
-                user_id=user_id,
-                output_language=output_language,
-                session_id=session_id,
-                event_callback=_emit,
-            )
+            async with _session_context(db) as legacy_db:
+                legacy_task: asyncio.Task | None = None
+                try:
+                    legacy_task = asyncio.create_task(
+                        process_message(
+                            content=content,
+                            db=legacy_db,
+                            user_id=user_id,
+                            output_language=output_language,
+                            session_id=session_id,
+                            event_callback=_emit,
+                        )
+                    )
+                    result = _result_ref[0] = await asyncio.wait_for(
+                        asyncio.shield(legacy_task),
+                        timeout=_ORCHESTRATION_TIMEOUT_SECONDS,
+                    )
+                    await legacy_db.rollback()
+                except asyncio.TimeoutError:
+                    if legacy_task is not None:
+                        legacy_task.cancel()
+                        done, _pending = await asyncio.wait({legacy_task}, timeout=1.0)
+                        for completed in done:
+                            try:
+                                completed.exception()
+                            except asyncio.CancelledError:
+                                pass
+                            except Exception as exc:  # noqa: BLE001
+                                log.debug("chat_streaming: timed-out legacy task failed during cancellation: %s", exc)
+                    _record_shadow_timeout_diagnostic(
+                        raw_query=content,
+                        conversation_id=str(session_id),
+                        user_id=str(user_id),
+                    )
+                    await _rollback_safely(legacy_db, owner="chat_stream.legacy_execution_timeout")
+                    raise TimeoutError("STREAM_ORCHESTRATION_TIMEOUT")
+                except asyncio.CancelledError:
+                    if legacy_task is not None:
+                        legacy_task.cancel()
+                    await _rollback_safely(legacy_db, owner="chat_stream.legacy_execution")
+                    raise
+                except Exception:
+                    if legacy_task is not None and not legacy_task.done():
+                        legacy_task.cancel()
+                    await _rollback_safely(legacy_db, owner="chat_stream.legacy_execution")
+                    raise
 
             # C32.1.4: flag confirmation-only results so finally doesn't send
             # fallback final_answer (which would show "本次请求未能完成" to the user)
             if result.confirmation is not None and not result.answer:
                 _has_confirmation_only[0] = True
+            else:
+                answer_text = str(result.answer or "").strip()
+                if not answer_text:
+                    result.answer = _EMPTY_FINAL_ANSWER_TEXT
+                    result.metadata = {
+                        **(result.metadata or {}),
+                        "status": "failed",
+                        "error_code": "EMPTY_FINAL_ANSWER",
+                    }
+                else:
+                    result.answer = answer_text
+                    result.metadata = {
+                        **(result.metadata or {}),
+                        "status": (result.metadata or {}).get("status") or "completed",
+                    }
 
             # ── Phase 5: stream tool events from result (fallback for non-real-time) ──
             for te in result.tool_events:
@@ -387,29 +524,62 @@ async def stream_chat_message(
                     ))
                     await asyncio.sleep(0.02)
 
-            # ── Phase 9: persist assistant message ────────────────────────────
-            saved_msg = await save_assistant_message(
-                db=db,
-                session_id=session_id,
-                user_id=user_id,
-                answer=result.answer,
-                tool_events=result.tool_events,
-                cards=result.cards,
-                confirmation=result.confirmation,
-                output_language=output_language,
-                extra_metadata={**result.metadata, "streamed": True},
-            )
-            await update_session_last_message(db, session_id)
-            await db.commit()
+            # ── Phase 8b: canonical answer completion ───────────────────────
+            if not _has_confirmation_only[0]:
+                await queue.put(_make_sse(
+                    ETYPE_ANSWER_COMPLETED,
+                    {
+                        "answer":        answer,
+                        "final_answer":  answer,
+                        "answer_length": len(answer),
+                        "status":        result.metadata.get("status", "completed"),
+                        "error_code":    result.metadata.get("error_code"),
+                    },
+                    mid=assistant_placeholder_id,
+                ))
+                answer_completed_sent[0] = True
 
-            final_mid = str(saved_msg.id)
+            # ── Phase 9: persist assistant message ────────────────────────────
+            final_mid = await _run_short_db_operation(
+                "chat_stream.assistant_message",
+                lambda op_db: _save_assistant_message_id(
+                    op_db,
+                    session_id=session_id,
+                    user_id=user_id,
+                    answer=result.answer,
+                    tool_events=result.tool_events,
+                    cards=result.cards,
+                    confirmation=result.confirmation,
+                    output_language=output_language,
+                    extra_metadata={**result.metadata, "streamed": True},
+                ),
+                db_override=db,
+            )
+            await queue.put(_make_sse(
+                ETYPE_MESSAGE_PERSISTED,
+                {
+                    "message_id":           final_mid,
+                    "assistant_message_id": final_mid,
+                    "answer_length":        len(result.answer or ""),
+                    "status":               result.metadata.get("status", "completed"),
+                    "error_code":           result.metadata.get("error_code"),
+                },
+                mid=final_mid,
+            ))
             await queue.put(_make_sse(
                 ETYPE_COMPLETED,
                 {
-                    "message_id":       final_mid,
-                    "has_confirmation": result.confirmation is not None,
-                    "has_cards":        bool(result.cards),
-                    "answer_length":    len(result.answer),
+                    "message_id":           final_mid,
+                    "assistant_message_id": final_mid,
+                    "has_confirmation":     result.confirmation is not None,
+                    "has_cards":            bool(result.cards),
+                    "answer_length":        len(result.answer or ""),
+                    "status":               result.metadata.get("status", "completed"),
+                    "error_code":           result.metadata.get("error_code"),
+                    # P1.6.8: structured clarification rides the single terminal
+                    # event; old clients ignore unknown fields.
+                    "response_kind":        result.metadata.get("response_kind"),
+                    "clarification":        result.metadata.get("clarification"),
                 },
                 mid=final_mid,
             ))
@@ -420,15 +590,30 @@ async def stream_chat_message(
             # C25: guarantee final_answer + done are emitted even on exception
             try:
                 # C32.1.4: skip fallback for confirmation-only flows
-                if not final_answer_sent[0] and not _has_confirmation_only[0]:
+                if not final_answer_sent[0] and not answer_completed_sent[0] and not _has_confirmation_only[0]:
+                    fallback_payload = build_fallback_final_answer(
+                        _sanitize_error_for_user(exc)  # C30.3.6: no raw DB errors
+                    )
                     await queue.put(_make_sse(
                         ETYPE_FINAL_ANSWER,
-                        build_fallback_final_answer(
-                            _sanitize_error_for_user(exc)  # C30.3.6: no raw DB errors
-                        ),
+                        fallback_payload,
                         mid=assistant_placeholder_id,
                     ))
                     final_answer_sent[0] = True
+                    if not answer_completed_sent[0]:
+                        fallback_answer = _answer_text_from_final_payload(fallback_payload) or _EMPTY_FINAL_ANSWER_TEXT
+                        await queue.put(_make_sse(
+                            ETYPE_ANSWER_COMPLETED,
+                            {
+                                "answer":        fallback_answer,
+                                "final_answer":  fallback_answer,
+                                "answer_length": len(fallback_answer),
+                                "status":        "failed",
+                                "error_code":    "STREAM_ORCHESTRATION_ERROR",
+                            },
+                            mid=assistant_placeholder_id,
+                        ))
+                        answer_completed_sent[0] = True
                 await queue.put(_make_sse(
                     ETYPE_ERROR,
                     {"error": "请求处理失败，请稍后重试。"},
@@ -439,57 +624,80 @@ async def stream_chat_message(
                         ETYPE_COMPLETED,
                         {
                             "message_id":       assistant_placeholder_id,
+                            "assistant_message_id": assistant_placeholder_id,
                             "has_confirmation": False,
                             "has_cards":        False,
                             "answer_length":    0,
+                            "status":           "failed",
+                            "error_code":       "STREAM_ORCHESTRATION_ERROR",
                         },
                         mid=assistant_placeholder_id,
                     ))
                     done_sent[0] = True
             except Exception:
                 pass
-            # C32-fix: persist assistant message even on error so it survives reload.
-            # Use the real answer if orchestration ran; otherwise save an error note.
-            try:
-                await db.rollback()  # clear any pending rollback from failed tx
-                _err_result = _result_ref[0]
-                _err_answer = (
-                    _err_result.answer
-                    if _err_result is not None and _err_result.answer
-                    else "请求处理遇到错误，无法生成完整分析。请稍后重试。"
-                )
-                await save_assistant_message(
-                    db=db,
-                    session_id=session_id,
-                    user_id=user_id,
-                    answer=_err_answer,
-                    tool_events=_err_result.tool_events if _err_result else [],
-                    cards=[],
-                    confirmation=None,
-                    output_language=output_language,
-                    extra_metadata={"streamed": True, "error": True},
-                )
-                await db.commit()
-            except Exception:
-                log.debug("chat_streaming: could not persist assistant message on error (non-fatal)")
+            # C32-fix: persist assistant message even on error when possible,
+            # but never delay the terminal event or stream sentinel.
+            _err_result = _result_ref[0]
+            _err_answer = (
+                _err_result.answer
+                if _err_result is not None and _err_result.answer
+                else "请求处理遇到错误，无法生成完整分析。请稍后重试。"
+            )
+            _persist_task = asyncio.create_task(_persist_error_assistant_message_best_effort(
+                db_override=db,
+                session_id=session_id,
+                user_id=user_id,
+                answer=_err_answer,
+                tool_events=_err_result.tool_events if _err_result else [],
+                output_language=output_language,
+            ))
+
+            def _consume_persist_error(done_task: asyncio.Task) -> None:
+                try:
+                    done_task.exception()
+                except asyncio.CancelledError:
+                    pass
+                except Exception as persist_exc:  # noqa: BLE001
+                    log.debug("chat_streaming: error assistant persistence task failed: %s", persist_exc)
+
+            _persist_task.add_done_callback(_consume_persist_error)
         finally:
             # C25: last-resort guarantee — if anything above crashed silently
             try:
                 # C32.1.4: confirmation-only results don't need a final_answer
-                if not final_answer_sent[0] and not _has_confirmation_only[0]:
+                if not final_answer_sent[0] and not answer_completed_sent[0] and not _has_confirmation_only[0]:
+                    fallback_payload = build_fallback_final_answer("")
                     await queue.put(_make_sse(
                         ETYPE_FINAL_ANSWER,
-                        build_fallback_final_answer(""),
+                        fallback_payload,
+                        mid=assistant_placeholder_id,
+                    ))
+                    final_answer_sent[0] = True
+                if not answer_completed_sent[0] and not _has_confirmation_only[0]:
+                    fallback_answer = _answer_text_from_final_payload(build_fallback_final_answer("")) or _EMPTY_FINAL_ANSWER_TEXT
+                    await queue.put(_make_sse(
+                        ETYPE_ANSWER_COMPLETED,
+                        {
+                            "answer":        fallback_answer,
+                            "final_answer":  fallback_answer,
+                            "answer_length": len(fallback_answer),
+                            "status":        "failed",
+                            "error_code":    "EMPTY_FINAL_ANSWER",
+                        },
                         mid=assistant_placeholder_id,
                     ))
                 if not done_sent[0]:
                     await queue.put(_make_sse(
                         ETYPE_COMPLETED,
                         {
-                            "message_id":       assistant_placeholder_id,
-                            "has_confirmation": False,
-                            "has_cards":        False,
-                            "answer_length":    0,
+                            "message_id":           assistant_placeholder_id,
+                            "assistant_message_id": assistant_placeholder_id,
+                            "has_confirmation":     False,
+                            "has_cards":            False,
+                            "answer_length":        0,
+                            "status":               "failed",
+                            "error_code":           "STREAM_INCOMPLETE",
                         },
                         mid=assistant_placeholder_id,
                     ))
@@ -524,3 +732,105 @@ async def stream_chat_message(
     except Exception:
         task.cancel()
         raise
+
+
+async def _save_user_message_id(
+    db: Any,
+    session_id: uuid.UUID,
+    user_id: uuid.UUID,
+    content: str,
+    output_language: str,
+) -> str:
+    msg = await save_user_message(db, session_id, user_id, content, output_language)
+    return str(msg.id)
+
+
+async def _save_assistant_message_id(
+    db: Any,
+    *,
+    session_id: uuid.UUID,
+    user_id: uuid.UUID,
+    answer: str,
+    tool_events: list,
+    cards: list,
+    confirmation: dict | None,
+    output_language: str,
+    extra_metadata: dict | None,
+) -> str:
+    saved_msg = await save_assistant_message(
+        db=db,
+        session_id=session_id,
+        user_id=user_id,
+        answer=answer,
+        tool_events=tool_events,
+        cards=cards,
+        confirmation=confirmation,
+        output_language=output_language,
+        extra_metadata=extra_metadata,
+    )
+    await update_session_last_message(db, session_id)
+    return str(saved_msg.id)
+
+
+async def _persist_error_assistant_message_best_effort(
+    *,
+    db_override: Any,
+    session_id: uuid.UUID,
+    user_id: uuid.UUID,
+    answer: str,
+    tool_events: list,
+    output_language: str,
+) -> None:
+    try:
+        await _run_short_db_operation(
+            "chat_stream.error_assistant_message",
+            lambda op_db: _save_assistant_message_id(
+                op_db,
+                session_id=session_id,
+                user_id=user_id,
+                answer=answer,
+                tool_events=tool_events,
+                cards=[],
+                confirmation=None,
+                output_language=output_language,
+                extra_metadata={"streamed": True, "error": True},
+            ),
+            db_override=db_override,
+        )
+    except Exception:
+        log.debug("chat_streaming: could not persist assistant message on error (non-fatal)")
+
+
+def _record_shadow_timeout_diagnostic(*, raw_query: str, conversation_id: str, user_id: str) -> None:
+    try:
+        from app.agent_runtime.contracts import new_id  # noqa: PLC0415
+        from app.agent_runtime.shadow_correlation import current_correlation  # noqa: PLC0415
+        from app.agent_runtime.shadow_diagnostics import pi_shadow_diagnostics_sink  # noqa: PLC0415
+        from app.core.config import settings  # noqa: PLC0415
+
+        if (getattr(settings, "agent_executor_mode", "legacy") or "").strip().lower() != "pi_compatible_shadow":
+            return
+        correlation = current_correlation()
+        pi_shadow_diagnostics_sink.record(
+            raw_query=raw_query,
+            conversation_id=conversation_id,
+            user_id=user_id,
+            correlation=correlation,
+            result={
+                "schema_version": "pi_financial_runtime_v1",
+                "trace_id": correlation.get("request_trace_id") or new_id("trace"),
+                "run_id": correlation.get("shadow_run_id") or new_id("run"),
+                "status": "timeout",
+                "agent_id": "official_report_pdf_pi_v1",
+                "turn_count": 0,
+                "tool_call_count": 0,
+                "metrics": {"latency_ms": int(_ORCHESTRATION_TIMEOUT_SECONDS * 1000), "model_calls": 0, "tool_calls": 0},
+                "error": {"code": "PI_SHADOW_STREAM_ORCHESTRATION_TIMEOUT"},
+                "events": [],
+                "findings": [],
+                "evidence_ids": [],
+                "shadow_input": {"conversation_id": conversation_id},
+            },
+        )
+    except Exception as exc:  # noqa: BLE001
+        log.debug("chat_streaming: shadow timeout diagnostic failed: %s", exc)

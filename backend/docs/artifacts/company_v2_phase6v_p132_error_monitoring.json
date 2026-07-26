@@ -1,0 +1,57 @@
+{
+  "schema_version": "mvp_error_monitoring_v1",
+  "phase": "6V-P1.32",
+  "generated_at": "2026-07-26T02:00:00Z",
+
+  "implementation_status": "IMPLEMENTED",
+
+  "monitoring_components": {
+    "structured_error_events": {
+      "table": "mvp_analytics_event",
+      "endpoint": "POST /mvp/analytics/event",
+      "error_categories": ["chat", "provider", "error"],
+      "severity_levels": ["p0", "p1", "p2", "info"]
+    },
+    "server_side_logging": {
+      "p0_p1": "log.error() — visible in container logs, triggers alerting",
+      "p2_info": "log.warning() / log.info()"
+    },
+    "existing_logging": {
+      "CompanyV2RequestIdMiddleware": "Request ID tracking across all requests",
+      "structured_debug_logger": "Existing structured logging for company_v2 flows",
+      "canary_runtime_snapshot": "Config version and rollout logged at startup"
+    }
+  },
+
+  "error_classification": {
+    "user_input_error": "HTTP 400/422 — validation failures, bad request format",
+    "business_data_missing": "HTTP 404 or empty response — no financial data for symbol",
+    "system_exception": "HTTP 500 — database error, Redis error, unexpected exception",
+    "provider_exception": "Real provider timeout, rate limit, API error, credential error",
+    "review_rejected": "Review Agent rejected Pi response — legacy served"
+  },
+
+  "monitored_error_types": [
+    "HTTP 5xx responses",
+    "Chat answer failures",
+    "Provider failures (gated — State B, no real provider)",
+    "Review Agent rejections",
+    "Fallback triggers",
+    "Timeouts",
+    "Data source failures",
+    "Database errors",
+    "Redis errors"
+  ],
+
+  "each_error_records": [
+    "error_class (ProviderControlError subclass name or HTTP error class)",
+    "error_severity (p0/p1/p2/info)",
+    "session_id (hashed)",
+    "event_category",
+    "created_at"
+  ],
+
+  "not_recorded": ["API keys", "Authorization headers", "Full prompts", "Full responses", "PII"],
+
+  "alerting": "P0/P1 events emit server log.error() — alerting via log monitoring in P1.33+"
+}

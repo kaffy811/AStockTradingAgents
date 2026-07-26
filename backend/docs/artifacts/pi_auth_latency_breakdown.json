@@ -1,0 +1,27 @@
+{
+  "auth_timeout_root_cause_confirmed": true,
+  "cold_lookup": {
+    "cache_hit": false,
+    "cache_lookup_ms": 0,
+    "cleanup_ms": 215,
+    "connection_checkout_ms": 4215,
+    "connection_establish_ms": 0,
+    "db_execute_ms": 1196,
+    "deadline_ms": 10000,
+    "principal_build_ms": 0,
+    "row_decode_ms": 0,
+    "singleflight_wait_ms": 0,
+    "status": "success",
+    "timeout_phase": null,
+    "token_parse_ms": 0,
+    "total_ms": 5626,
+    "user_id_hash": "1c63878d531b"
+  },
+  "environment_type": "local_live",
+  "followup_auth_total_ms": 0,
+  "followup_cache_hit": true,
+  "phase": "6V-P1.6.2",
+  "root_cause": "cold auth principal lookup was dominated by connection_checkout_ms, while db_execute_ms was sub-2s in final A01",
+  "schema_version": "pi_auth_latency_breakdown_v1",
+  "timeout_count": 0
+}

@@ -1,31 +1,59 @@
 from collections.abc import AsyncGenerator
+import logging
 
 from redis.asyncio import Redis, from_url
+from sqlalchemy.engine import make_url
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
     create_async_engine,
 )
 from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy.pool import NullPool
 
 from app.core.config import settings
+from app.core.database_pool_policy import resolve_database_pool_policy
+
+log = logging.getLogger(__name__)
 
 # ── SQLAlchemy ────────────────────────────────────────────────────────────────
-# NullPool: disables SQLAlchemy's local connection pool.
-#   Supabase Transaction Pooler (PgBouncer) already manages pooling server-side;
-#   running a second pool on top causes prepared-statement conflicts.
-# statement_cache_size=0: asyncpg caches prepared statements by default.
-#   PgBouncer in transaction mode routes statements to different backend
-#   connections, so a statement cached on connection A may not exist on
-#   connection B → DuplicatePreparedStatementError. Setting cache size to 0
-#   disables client-side prepared statement caching entirely.
+# DB_CONNECTION_MODE explicitly controls local pooling policy:
+# - transaction_pooler: Supabase/PgBouncer transaction pooling; no prepared
+#   statements, short transactions, and either NullPool or a very small queue
+#   pool. Never use 5+10 burst connections here.
+# - session_pooler/direct: bounded AsyncAdaptedQueuePool with pre-ping/recycle.
 
-async_engine = create_async_engine(
+_pool_policy = resolve_database_pool_policy(
     settings.database_url,
-    poolclass=NullPool,
-    connect_args={"statement_cache_size": 0},
-    echo=settings.debug,
+    settings.database_transaction_pool_strategy,
+    connection_mode=settings.database_connection_mode,
+    pool_pre_ping=settings.database_pool_pre_ping,
+    command_timeout_seconds=settings.database_command_timeout_seconds,
+    pool_size=settings.database_pool_size,
+    max_overflow=settings.database_max_overflow,
+    direct_pool_size=settings.database_direct_pool_size,
+    direct_max_overflow=settings.database_direct_max_overflow,
+    pool_recycle_seconds=settings.database_pool_recycle_seconds,
+    pool_timeout_seconds=settings.database_pool_timeout_seconds,
+)
+_database_url = make_url(settings.database_url)
+_engine_kwargs = {
+    **_pool_policy.pool_kwargs,
+    "echo": settings.database_sql_echo,
+    "hide_parameters": settings.database_sql_hide_parameters,
+}
+
+async_engine = create_async_engine(settings.database_url, **_engine_kwargs)
+
+log.info(
+    "database engine configured mode=%s host_class=%s port=%s pool=%s pool_size=%s max_overflow=%s pool_timeout=%s command_timeout=%s",
+    _pool_policy.connection_mode,
+    "supabase_pooler" if "pooler.supabase.com" in (_database_url.host or "") else "database_host",
+    _database_url.port,
+    _pool_policy.pool_class.__name__,
+    _engine_kwargs.get("pool_size"),
+    _engine_kwargs.get("max_overflow"),
+    _engine_kwargs.get("pool_timeout"),
+    settings.database_command_timeout_seconds,
 )
 
 AsyncSessionLocal = async_sessionmaker(
@@ -75,6 +103,9 @@ async def init_db() -> None:
     from app.models import industry           # noqa: F401
     from app.models import industry_hot_stock # noqa: F401
     from app.models import watchlist_item     # noqa: F401
+    from app.models import company_v2_report_rag  # noqa: F401
+    from app.models import company_v2_financial_fusion_job  # noqa: F401
+    from app.models import company_v2_financial_fusion_worker_observation  # noqa: F401
 
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)

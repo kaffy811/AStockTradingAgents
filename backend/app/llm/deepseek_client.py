@@ -4,10 +4,11 @@ import asyncio
 import logging
 from typing import AsyncGenerator
 
-from openai import OpenAI, APIError, AuthenticationError
+from openai import OpenAI, APIError, AuthenticationError, RateLimitError, APITimeoutError
 
 from app.core.config import settings
 from app.llm.base import BaseLLMClient
+from app.llm.provider_control.usage import ProviderUsageResult
 
 log = logging.getLogger(__name__)
 
@@ -31,10 +32,15 @@ class DeepSeekClient(BaseLLMClient):
         self._default_model  = settings.deepseek_default_model
         self._pro_model      = settings.deepseek_pro_model
         self._reasoner_model = settings.deepseek_reasoner_model  # C32
+        # P1.31: explicit timeout ≤30s (SDK default 600s is unsafe for live arbitration)
+        _timeout = getattr(settings, "pi_real_provider_timeout_seconds", 30.0)
         self._client = OpenAI(
             api_key=settings.deepseek_api_key,
             base_url=settings.deepseek_base_url,
+            timeout=_timeout,
         )
+        # P1.31: last call usage (captured from response.usage)
+        self._last_usage: ProviderUsageResult = ProviderUsageResult.not_captured()
 
     def chat(
         self,
@@ -58,14 +64,37 @@ class DeepSeekClient(BaseLLMClient):
                 temperature=temperature,
             )
         except AuthenticationError as exc:
+            self._last_usage = ProviderUsageResult.not_captured()
             raise ValueError(f"DeepSeek authentication failed: {exc}") from exc
+        except RateLimitError as exc:
+            # P1.31: rate limit → legacy_pi_failed signal
+            self._last_usage = ProviderUsageResult.not_captured()
+            raise RuntimeError(
+                f"DeepSeek rate limit exceeded (legacy_pi_failed): {exc}"
+            ) from exc
+        except APITimeoutError as exc:
+            self._last_usage = ProviderUsageResult.not_captured()
+            raise RuntimeError(
+                f"DeepSeek API timeout after {getattr(settings, 'pi_real_provider_timeout_seconds', 30)}s: {exc}"
+            ) from exc
         except APIError as exc:
+            self._last_usage = ProviderUsageResult.not_captured()
             raise RuntimeError(f"DeepSeek API error [{exc.status_code}]: {exc.message}") from exc
+
+        # P1.31: capture token usage from response
+        self._last_usage = ProviderUsageResult.from_openai_usage(
+            getattr(response, "usage", None)
+        )
 
         content = response.choices[0].message.content
         if content is None:
             raise RuntimeError("DeepSeek returned an empty response (content is None).")
         return content
+
+    @property
+    def last_usage(self) -> ProviderUsageResult:
+        """Return token usage from the most recent chat() call."""
+        return self._last_usage
 
     # ── Convenience shortcuts ─────────────────────────────────────────────────
 

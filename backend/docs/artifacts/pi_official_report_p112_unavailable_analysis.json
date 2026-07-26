@@ -1,0 +1,44 @@
+{
+  "schema_version": "pi_official_report_p112_unavailable_analysis_v1",
+  "phase": "6V-P1.12",
+  "generated_at": "2026-07-21T23:35:00.000000+00:00",
+  "source_sha": "a97b0ec021c7577f6a51267c3bb311ee47db0eb9",
+  "before_p111": {
+    "unavailable_rate": 0.152,
+    "missing_staging_data": 0.089,
+    "true_official_absence": 0.031,
+    "invalid_year": 0.0,
+    "unavailable_future_year": 0.012,
+    "provider_pollution": 0.012,
+    "unsupported_type": 0.0,
+    "ambiguous_entity": 0.0,
+    "stale_or_inactive": 0.008
+  },
+  "after_p111b": {
+    "unavailable_rate": 0.088,
+    "missing_staging_data": 0.0,
+    "true_official_absence": 0.056,
+    "invalid_year": 0.0,
+    "unavailable_future_year": 0.012,
+    "provider_pollution": 0.008,
+    "unsupported_type": 0.0,
+    "ambiguous_entity": 0.0,
+    "stale_or_inactive": 0.012
+  },
+  "improvement": {
+    "total_unavailable_rate_delta": -0.064,
+    "missing_staging_data_eliminated": true,
+    "wrong_year_count": 0,
+    "correct_unavailable_maintained": true,
+    "provider_pollution_improved": true
+  },
+  "known_exceptions": [
+    {
+      "ts_code": "300209.SZ",
+      "year": 2024,
+      "category": "provider_pollution",
+      "reason": "inquiry_reply_pollution_no_annual_full_for_2024",
+      "behavior": "unavailable_correct"
+    }
+  ]
+}

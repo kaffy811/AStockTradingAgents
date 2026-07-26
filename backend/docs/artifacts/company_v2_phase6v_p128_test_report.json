@@ -1,0 +1,59 @@
+{
+  "schema_version": "pi_canary_test_report_v2",
+  "phase": "6V-P1.28",
+  "generated_at": "2026-07-25T17:55:00.000000+00:00",
+  "p127_evidence_closure_tests": {
+    "command": "python3.11 -m pytest backend/tests/test_phase6v_p127_chat_orchestration_soak.py -v -p no:warnings --tb=short",
+    "collected": 132,
+    "passed": 132,
+    "failed": 0,
+    "skipped": 0,
+    "exit_code": 0,
+    "previously_skipped_now_pass": 54
+  },
+  "p128_targeted_suite": {
+    "file": "backend/tests/test_phase6v_p128_live_canary.py",
+    "collected": 187,
+    "passed": 187,
+    "failed": 0,
+    "skipped": 0,
+    "exit_code": 0,
+    "coverage": [
+      "exactly_once_trace_accounting",
+      "y1_count_reconciliation",
+      "independent_live_cohort_design",
+      "1pct_deterministic_selection",
+      "live_subset_of_shadow",
+      "approved_pi_arbitration",
+      "review_reject_fallback",
+      "timeout_fallback",
+      "exception_fallback",
+      "kill_switch",
+      "l1_through_l10_window_validation",
+      "arbitration_evidence",
+      "fallback_evidence",
+      "browser_e2e_40_cases",
+      "version_monotonicity",
+      "gate_a_through_r_evaluation"
+    ]
+  },
+  "entire_backend": {
+    "command": "python3.11 -m pytest tests/ -q --tb=no --ignore=tests/integration --ignore=tests/test_cors.py -p no:warnings",
+    "collected": 7361,
+    "passed": 7319,
+    "failed": 0,
+    "skipped": 42,
+    "exit_code": 0,
+    "skip_breakdown": {
+      "db_connected_tj1": 15,
+      "p127_window_validation_now_all_pass": 0,
+      "other_conditional_skips": 27
+    },
+    "pre_existing_excluded": 0,
+    "note": "P1.28 targeted suite adds 187 new tests. P1.27 previously-skipped 54 tests now all PASS (counted in passed)."
+  },
+  "frontend": {
+    "vitest_run": {"command": "npx vitest run", "passed": 414, "failed": 0, "exit_code": 0},
+    "vite_build": {"command": "npx vite build", "status": "PASS", "modules": 195}
+  }
+}

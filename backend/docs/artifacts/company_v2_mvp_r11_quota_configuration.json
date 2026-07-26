@@ -1,0 +1,35 @@
+{
+  "schema_version": "pi_canary_quota_config_v1",
+  "phase": "MVP-R1.1",
+  "generated_at": "2026-07-26T08:00:00Z",
+
+  "quota_settings": {
+    "mvp_daily_quota_per_user": 10,
+    "mvp_global_daily_quota": 300,
+    "mvp_max_concurrent_per_user": 1
+  },
+
+  "quota_check_endpoint": "GET /mvp/quota/check/{user_id}",
+  "quota_check_fields": ["allowed", "reason", "daily_used", "daily_limit"],
+
+  "quota_exceeded_response": {
+    "allowed": false,
+    "reason": "今日测试额度已用完，请明天继续使用。",
+    "http_status": 200,
+    "no_500": true,
+    "no_duplicate_message": true,
+    "no_provider_call": true
+  },
+
+  "quota_enforcement_method": "Count chat_message_sent events in mvp_analytics_event for user today",
+
+  "admin_actions": [
+    "Adjust single user quota: increase mvp_daily_quota_per_user in env for all users (TODO: per-user override)",
+    "Reset quota: quota resets daily at midnight (no manual reset needed for day boundary)",
+    "Disable abusive user: set mvp_invite.expires_at = NOW() in DB",
+    "Close all chat: set MVp_KILL_CHAT=true in env, restart"
+  ],
+
+  "gate_l5_result": "PASS",
+  "gate_l6_result": "PASS"
+}

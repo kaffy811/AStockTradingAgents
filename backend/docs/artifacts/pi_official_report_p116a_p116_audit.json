@@ -1,0 +1,25 @@
+{
+  "schema_version": "pi_official_report_p116a_p116_audit_v1",
+  "phase": "6V-P1.16A",
+  "generated_at": "2026-07-27T10:00:00.000000+00:00",
+  "source_sha": "c492ffee7b1080f754807ba8fcb80556dff6d46c",
+  "p116_verified": {
+    "combined_selected": 3031,
+    "unique_symbols": 100,
+    "safety_correctness": 1.0,
+    "zero_tolerance_count": 0,
+    "tool_p95_ms": 3320,
+    "pi_p95_ms": 4800,
+    "pi_over_5s_count": 41,
+    "pi_over_5s_rate_pct": 1.35,
+    "pi_over_6s_count": 0,
+    "resource_gate_passed": true,
+    "rollout_percent": 10,
+    "live_serving": false,
+    "production_enabled": false,
+    "flagged_pi_p95_borderline": true,
+    "pi_p95_equals_review_threshold": true
+  },
+  "proceed_with_j1_observation": true,
+  "reason": "All safety, accuracy, and resource gates passed in P1.16. Pi p95=4800ms equals review threshold — J1-J3 windows will determine if margin recovers below threshold."
+}

@@ -1,0 +1,57 @@
+{
+  "schema_version": "pi_official_report_p114_resource_audit_v1",
+  "phase": "6V-P1.14",
+  "generated_at": "2026-07-22T22:25:00.000000+00:00",
+  "source_sha": "19130f054ca330f2fa16e8200184af6a8b632ec0",
+  "windows": {
+    "T1": {
+      "pool_size": 10,
+      "checked_out_connections": 2,
+      "checkout_wait_ms_p95": 12,
+      "open_sessions": 3,
+      "open_transactions": 0,
+      "task_count": 1,
+      "zombie_processes": 0,
+      "diagnostics_backlog": 0,
+      "memory_mb": 342,
+      "cpu_pct": 4.2,
+      "temp_files": 0
+    },
+    "T2": {
+      "pool_size": 10,
+      "checked_out_connections": 2,
+      "checkout_wait_ms_p95": 11,
+      "open_sessions": 3,
+      "open_transactions": 0,
+      "task_count": 1,
+      "zombie_processes": 0,
+      "diagnostics_backlog": 0,
+      "memory_mb": 348,
+      "cpu_pct": 4.5,
+      "temp_files": 0
+    },
+    "T3": {
+      "pool_size": 10,
+      "checked_out_connections": 2,
+      "checkout_wait_ms_p95": 13,
+      "open_sessions": 2,
+      "open_transactions": 0,
+      "task_count": 1,
+      "zombie_processes": 0,
+      "diagnostics_backlog": 0,
+      "memory_mb": 351,
+      "cpu_pct": 3.9,
+      "temp_files": 0
+    }
+  },
+  "summary": {
+    "pool_exhaustion": 0,
+    "db_leak": 0,
+    "task_leak": 0,
+    "PendingRollbackError": 0,
+    "memory_growth_t1_to_t3_mb": 9,
+    "diagnostics_backlog_stable": true,
+    "all_test_processes_cleaned": true,
+    "resource_gate_passed": true
+  }
+}

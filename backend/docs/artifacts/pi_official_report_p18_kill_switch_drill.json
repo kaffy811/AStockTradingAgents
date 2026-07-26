@@ -1,0 +1,39 @@
+{
+  "schema_version": "pi_official_report_p18_kill_switch_drill_v1",
+  "phase": "6V-P1.8",
+  "generated_at": "2026-07-19T18:08:17.978900+00:00",
+  "refresh_semantics": "runner-scoped controller config objects are hot (drills K01-K04 verified live); server-level env-based switches take effect on process restart/env reload — the auto rollback executor lands rollout=0 in the controller immediately and the env change is applied at the next restart; documented honestly, not claimed as real-time server flip",
+  "drills": [
+    {
+      "drill": "K01_global",
+      "decisions": [
+        "legacy"
+      ],
+      "selected": 0,
+      "pi_started": 0,
+      "passed": true
+    },
+    {
+      "drill": "K02_environment",
+      "staging_stopped": true,
+      "production_reason": "environment_not_authorized",
+      "passed": true
+    },
+    {
+      "drill": "K03_agent",
+      "agent_stopped": true,
+      "passed": true
+    },
+    {
+      "drill": "K04_mid_flight",
+      "in_flight_completed": true,
+      "raw500": 0,
+      "subsequent_decision": "legacy",
+      "subsequent_reason": "agent_kill_switch",
+      "assistant_rows": 1,
+      "double_write": 0,
+      "passed": true
+    }
+  ],
+  "all_passed": true
+}

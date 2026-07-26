@@ -1,0 +1,114 @@
+{
+  "schema_version": "pi_canary_budget_guard_v1",
+  "phase": "6V-P1.30",
+  "generated_at": "2026-07-25T20:12:00.000000+00:00",
+  "label": "P1.30 Budget Guard Assessment — Gates F, G, H, I",
+
+  "runtime_implementation_check": {
+    "PI_REAL_PROVIDER_ENABLED_in_settings": false,
+    "PI_REAL_PROVIDER_MAX_REQUESTS_in_settings": false,
+    "PI_REAL_PROVIDER_MAX_COST_CNY_in_settings": false,
+    "PI_REAL_PROVIDER_MAX_CONCURRENCY_in_settings": false,
+    "PI_REAL_PROVIDER_RATE_LIMIT_in_settings": false,
+    "PI_REAL_PROVIDER_TIMEOUT_in_settings": false,
+    "RequestBudgetGuard_module_exists": false,
+    "CostAccumulator_module_exists": false,
+    "ProviderCircuitBreaker_module_exists": false,
+    "AtomicRequestCounter_in_redis_exists": false,
+    "AtomicCostAccumulator_in_redis_exists": false
+  },
+
+  "search_evidence": {
+    "searched": ["backend/app/core/config.py", "backend/app/agent_runtime/", "backend/app/llm/"],
+    "pi_real_provider_fields_found": 0,
+    "budget_guard_classes_found": 0
+  },
+
+  "gate_f_request_budget": {
+    "status": "FAIL",
+    "implementation_status": "NOT_IMPLEMENTED",
+    "requirement": "max_requests=100 enforced atomically before each real provider call",
+    "current_state": "No request counter. No enforcement. Any number of real calls would be made without guard."
+  },
+
+  "gate_g_cost_budget": {
+    "status": "FAIL",
+    "implementation_status": "NOT_IMPLEMENTED",
+    "requirement": "max_cost_cny=100 enforced with atomic accumulator before each real provider call",
+    "current_state": "No cost accumulator. Token usage not captured in DeepSeekClient. Cannot compute cost."
+  },
+
+  "gate_h_concurrency_rate_limit": {
+    "status": "NOT_EVALUATED",
+    "implementation_status": "NOT_IMPLEMENTED",
+    "requirement": "PI_REAL_PROVIDER_MAX_CONCURRENCY=2, rate limit configured, timeout set",
+    "current_state": "No concurrency limiter for real provider. No rate limit handler. No explicit timeout on OpenAI client."
+  },
+
+  "gate_i_provider_fail_closed": {
+    "status": "FAIL",
+    "implementation_status": "NOT_IMPLEMENTED",
+    "requirement": "PI_REAL_PROVIDER_ENABLED=false → zero real calls regardless of live selection",
+    "current_state": "Flag does not exist in Settings. No fail-closed guard in DeepSeekClient or call path. Real provider is currently inactive only because provider_mode=staging_replay is set at orchestration level — but there is no explicit PI_REAL_PROVIDER_ENABLED=false kill that would prevent activation if mode were changed."
+  },
+
+  "p1_31_implementation_plan": {
+    "phase": "Implement before P1.31 real provider testing",
+    "steps": [
+      {
+        "step": 1,
+        "task": "Add PI_REAL_PROVIDER_ENABLED to Settings (default: false)",
+        "file": "backend/app/core/config.py"
+      },
+      {
+        "step": 2,
+        "task": "Add PI_REAL_PROVIDER_MAX_REQUESTS (default: 100), PI_REAL_PROVIDER_MAX_COST_CNY (default: 100) to Settings",
+        "file": "backend/app/core/config.py"
+      },
+      {
+        "step": 3,
+        "task": "Capture usage.prompt_tokens, usage.completion_tokens in DeepSeekClient",
+        "file": "backend/app/llm/deepseek_client.py"
+      },
+      {
+        "step": 4,
+        "task": "Implement RequestBudgetGuard with Redis atomic counter (INCR with pre-check)",
+        "file": "backend/app/agent_runtime/provider_budget_guard.py (new)"
+      },
+      {
+        "step": 5,
+        "task": "Implement CostAccumulator with Redis INCRBYFLOAT and budget check",
+        "file": "backend/app/agent_runtime/provider_budget_guard.py"
+      },
+      {
+        "step": 6,
+        "task": "Wire RequestBudgetGuard into Pi agent call path before DeepSeekClient.chat()",
+        "file": "backend/app/agents/financial_agent.py"
+      },
+      {
+        "step": 7,
+        "task": "Add ProviderCircuitBreaker: opens on budget breach or credential failure",
+        "file": "backend/app/agent_runtime/provider_budget_guard.py"
+      },
+      {
+        "step": 8,
+        "task": "Set explicit timeout on OpenAI client (e.g., timeout=20.0)",
+        "file": "backend/app/llm/deepseek_client.py"
+      },
+      {
+        "step": 9,
+        "task": "Handle RateLimitError → legacy_pi_failed fallback",
+        "file": "backend/app/llm/deepseek_client.py"
+      },
+      {
+        "step": 10,
+        "task": "Add GET /pi-canary/provider-budget probe endpoint",
+        "file": "backend/app/routers/ (new or extend existing canary router)"
+      }
+    ]
+  },
+
+  "current_provider_mode_safety": "staging_replay is currently safe because real LLM API calls only occur when pipeline explicitly routes to Pi execution. In staging_replay mode, Pi agent shadow-runs but uses pre-recorded/mock responses. No real provider calls occur.",
+
+  "verdict": "Budget guard infrastructure NOT IMPLEMENTED. Gates F, G, I FAIL. Real provider cannot be safely activated until implementation complete."
+}

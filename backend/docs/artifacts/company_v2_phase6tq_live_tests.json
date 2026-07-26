@@ -1,0 +1,14 @@
+{
+  "phase": "phase6tq_live_tests",
+  "hermetic": {
+    "status": "passed",
+    "summary": "3048 passed, 9 deselected"
+  },
+  "live_supabase": {
+    "status": "passed",
+    "summary": "9 passed"
+  },
+  "same_region_http_acceptance": {
+    "status": "not_executed"
+  }
+}

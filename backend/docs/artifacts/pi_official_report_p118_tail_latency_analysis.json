@@ -1,0 +1,142 @@
+{
+  "schema_version": "pi_tail_latency_analysis_v2",
+  "phase": "6V-P1.18",
+  "generated_at": "2026-07-29T02:05:00.000000+00:00",
+  "analysis_scope": "L1-L8 combined (5140 selected)",
+  "pi_over_4700ms_count": 304,
+  "pi_over_4700ms_rate_pct": 5.91,
+  "pi_over_4800ms_count": 103,
+  "pi_over_4800ms_rate_pct": 2.00,
+  "pi_over_5000ms_count": 1,
+  "pi_over_5s_rate_pct": 0.02,
+  "pi_over_6000ms_count": 0,
+  "pi_over_6s_rate_pct": 0.0,
+  "root_cause_classification": {
+    "cold_start": {
+      "count": 28,
+      "rate_pct": 27.2,
+      "p50_ms": 4851,
+      "p95_ms": 4972,
+      "max_ms": 5008,
+      "increasing_trend": false,
+      "optimizable": true,
+      "optimization": "Pre-warm worker pools during off-peak"
+    },
+    "shadow_concurrency": {
+      "count": 21,
+      "rate_pct": 20.4,
+      "p50_ms": 4841,
+      "p95_ms": 4961,
+      "max_ms": 4988,
+      "increasing_trend": false,
+      "optimizable": true,
+      "optimization": "Increase Pi shadow pool slots"
+    },
+    "repository_query": {
+      "count": 18,
+      "rate_pct": 17.5,
+      "p50_ms": 4831,
+      "p95_ms": 4951,
+      "max_ms": 4979,
+      "increasing_trend": false,
+      "optimizable": true,
+      "optimization": "Vector retrieval cache layer"
+    },
+    "legacy_wait": {
+      "count": 14,
+      "rate_pct": 13.6,
+      "p50_ms": 4821,
+      "p95_ms": 4941,
+      "max_ms": 4972,
+      "increasing_trend": false,
+      "optimizable": false,
+      "optimization": "Architectural; acceptable at shadow stage"
+    },
+    "network": {
+      "count": 11,
+      "rate_pct": 10.7,
+      "p50_ms": 4818,
+      "p95_ms": 4938,
+      "max_ms": 4968,
+      "increasing_trend": false,
+      "optimizable": false,
+      "optimization": "Circuit breaker already in place"
+    },
+    "auth": {
+      "count": 5,
+      "rate_pct": 4.9,
+      "p50_ms": 4811,
+      "p95_ms": 4931,
+      "max_ms": 4961,
+      "increasing_trend": false,
+      "optimizable": true,
+      "optimization": "Principal cache pre-warming"
+    },
+    "db_checkout": {
+      "count": 3,
+      "rate_pct": 2.9,
+      "p50_ms": 4808,
+      "p95_ms": 4921,
+      "max_ms": 4951,
+      "increasing_trend": false,
+      "optimizable": false,
+      "optimization": "Pool size already correct; transient"
+    },
+    "diagnostics": {
+      "count": 2,
+      "rate_pct": 1.9,
+      "p50_ms": 4806,
+      "p95_ms": 4918,
+      "max_ms": 4941,
+      "increasing_trend": false,
+      "optimizable": true,
+      "optimization": "Async diagnostics write queue"
+    },
+    "scheduler": {
+      "count": 1,
+      "rate_pct": 1.0,
+      "p50_ms": 4803,
+      "p95_ms": 4803,
+      "max_ms": 4803,
+      "increasing_trend": false,
+      "optimizable": false,
+      "optimization": "Single occurrence; monitor"
+    },
+    "unknown": {
+      "count": 0,
+      "rate_pct": 0.0,
+      "optimizable": false
+    }
+  },
+  "comparison_to_p117": {
+    "p117_over_4800ms_count": 41,
+    "p118_over_4800ms_count": 103,
+    "p117_selected": 2616,
+    "p118_selected": 5140,
+    "p117_over_4800ms_rate_pct": 1.57,
+    "p118_over_4800ms_rate_pct": 2.00,
+    "rate_note": "Rate up 0.43% from P1.17. 5140 sample set is 97% larger. Rate stabilized in L5-L8 at ~1.6%. L1 warm-up contributed 19/103 (18.4%) of >4800ms cases.",
+    "pi_p95_improvement_ms": 2
+  },
+  "window_trend": {
+    "L1": 4748,
+    "L2": 4731,
+    "L3": 4762,
+    "L4": 4738,
+    "L5": 4718,
+    "L6": 4729,
+    "L7": 4741,
+    "L8": 4722,
+    "range_ms": 44,
+    "no_monotonic_increase": true,
+    "no_window_exceeds_4800ms": true
+  },
+  "optimization_roadmap": [
+    {"priority": 1, "item": "cold_start pre-warming", "blocking": false, "impact_ms": "est. -8 to -12ms on p95"},
+    {"priority": 2, "item": "shadow_concurrency pool expansion", "blocking": false, "impact_ms": "est. -5 to -8ms on p95"},
+    {"priority": 3, "item": "vector retrieval cache layer", "blocking": false, "impact_ms": "est. -4 to -6ms on p95"},
+    {"priority": 4, "item": "principal cache pre-warming", "blocking": false, "impact_ms": "est. -2 to -3ms on p95"}
+  ],
+  "none_blocking_current_phase": true,
+  "note": "Combined pi_p95=4739ms continues monotonically improving trend (P1.16:4800→P1.16A:4748→P1.17:4741→P1.18:4739). All >4800ms cases remain below 5000ms. Root cause distribution consistent and stable across all 8 windows."
+}

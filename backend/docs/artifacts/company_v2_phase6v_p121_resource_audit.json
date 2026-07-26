@@ -1,0 +1,60 @@
+{
+  "schema_version": "pi_resource_audit_v1",
+  "phase": "6V-P1.21",
+  "generated_at": "2026-07-23T11:08:00.000000+00:00",
+  "rollout_percent": 75,
+  "config_version": 8,
+  "per_window": {
+    "T1": {"memory_rss_mb": 389, "cpu_p95_pct": 33, "fd_baseline": 398, "fd_peak": 436, "db_pool_peak": 7, "pool_exhaustion": 0, "task_leak": 0, "db_leak": 0, "PendingRollbackError": 0},
+    "T2": {"memory_rss_mb": 387, "cpu_p95_pct": 39, "fd_baseline": 396, "fd_peak": 441, "db_pool_peak": 7, "pool_exhaustion": 0, "task_leak": 0, "db_leak": 0, "PendingRollbackError": 0},
+    "T3": {"memory_rss_mb": 392, "cpu_p95_pct": 42, "fd_baseline": 401, "fd_peak": 448, "db_pool_peak": 7, "pool_exhaustion": 0, "task_leak": 0, "db_leak": 0, "PendingRollbackError": 0},
+    "T4": {"memory_rss_mb": 391, "cpu_p95_pct": 34, "fd_baseline": 399, "fd_peak": 439, "db_pool_peak": 7, "pool_exhaustion": 0, "task_leak": 0, "db_leak": 0, "PendingRollbackError": 0},
+    "T5": {"memory_rss_mb": 401, "cpu_p95_pct": 51, "fd_baseline": 409, "fd_peak": 473, "db_pool_peak": 9, "pool_exhaustion": 0, "task_leak": 0, "db_leak": 0, "PendingRollbackError": 0},
+    "T6": {"memory_rss_mb": 398, "cpu_p95_pct": 44, "fd_baseline": 406, "fd_peak": 461, "db_pool_peak": 8, "pool_exhaustion": 0, "task_leak": 0, "db_leak": 0, "PendingRollbackError": 0},
+    "T7": {"memory_rss_mb": 393, "cpu_p95_pct": 36, "fd_baseline": 402, "fd_peak": 444, "db_pool_peak": 7, "pool_exhaustion": 0, "task_leak": 0, "db_leak": 0, "PendingRollbackError": 0},
+    "T8": {"memory_rss_mb": 389, "cpu_p95_pct": 31, "fd_baseline": 398, "fd_peak": 432, "db_pool_peak": 6, "pool_exhaustion": 0, "task_leak": 0, "db_leak": 0, "PendingRollbackError": 0}
+  },
+  "combined": {
+    "memory_range_mb": "387-401",
+    "memory_mean_mb": 393,
+    "cpu_p95_range_pct": "31-51",
+    "fd_peak_range": "432-473",
+    "no_upward_drift": true,
+    "t8_recovered_to_t1_baseline": true,
+    "t8_vs_t1_memory_delta_mb": 0,
+    "t8_vs_t1_fd_delta": -4,
+    "fd_recovered_after_t5": true,
+    "fd_recovery_evidence": "T5 burst peak FD=473; T6=461, T7=444, T8=432 — monotonically recovering; T8 below T1(436)",
+    "task_leak_total": 0,
+    "pool_exhaustion_total": 0,
+    "PendingRollbackError_total": 0,
+    "diagnostics_backlog_stable_all_windows": true,
+    "raw_500_total": 0,
+    "raw_503_total": 0,
+    "zombie_processes_total": 0,
+    "temp_files_total": 0
+  },
+  "vs_p120": {
+    "p120_memory_range_mb": "381-394",
+    "p121_memory_range_mb": "387-401",
+    "memory_mean_delta_mb": 7,
+    "memory_delta_note": "+7MB mean due to 75% load (vs P1.20's 50%)",
+    "p120_cpu_p95_range_pct": "27-46",
+    "p121_cpu_p95_range_pct": "31-51",
+    "cpu_delta_note": "+5% mean CPU due to 75% load",
+    "p120_fd_range": "419-461",
+    "p121_fd_range": "432-473",
+    "fd_burst_delta_note": "T5 burst FD=473 higher than P1.20 S5's 461; attributed to 75% concurrency load"
+  },
+  "t5_burst_analysis": {
+    "window": "T5",
+    "type": "concurrency_burst",
+    "cpu_peak_pct": 51,
+    "fd_peak": 473,
+    "memory_mb": 401,
+    "explanation": "75% load concurrency burst; higher than P1.20 S5 (50% load). No pool exhaustion, no leaks, no errors. Recovers in T6-T8.",
+    "recovery_confirmed": true
+  },
+  "resource_audit_gate": "PASS",
+  "note": "No resource leaks or drift detected. T5 burst explained by 75% concurrency load (expected). T8 fully recovers to T1 baseline (memory 389=389, FD 432≈436). Mean memory +7MB vs P1.20 due to higher load — acceptable at 75% rollout."
+}

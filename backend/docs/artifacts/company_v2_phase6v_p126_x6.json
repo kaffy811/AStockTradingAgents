@@ -1,0 +1,92 @@
+{
+  "window_id": "x6",
+  "timestamp": "2026-07-25T07:54:20.906815+00:00",
+  "elapsed_seconds": 0.068,
+  "snapshot": {
+    "rollout_percent": 100.0,
+    "config_version": 9,
+    "stable_bucket_salt_version": "pi_v1",
+    "authorization_status": "approved",
+    "live": false,
+    "production_enabled": false,
+    "parse_error": null,
+    "evidence_mode": "containerized_deployed_staging_runtime",
+    "process_id": 10
+  },
+  "snapshot_ok": true,
+  "http_observations": [
+    {
+      "endpoint": "/health",
+      "status_code": 200,
+      "ok": true,
+      "body_preview": "{'status': 'ok'}"
+    },
+    {
+      "endpoint": "/api/v1/health",
+      "status_code": 200,
+      "ok": true,
+      "body_preview": "{'status': 'ok', 'app': 'TradingAgents Backend (Staging P1.25)', 'version': '1.1.0-free-rc1', 'env':"
+    },
+    {
+      "endpoint": "/api/v1/stocks/CN/000001/profile",
+      "status_code": 200,
+      "ok": true,
+      "body_preview": "{'market': 'CN', 'symbol': '000001', 'stock_name': None, 'quote': {'latest_price': 11.1, 'change_pct"
+    },
+    {
+      "endpoint": "/api/v1/stocks/CN/600519/profile",
+      "status_code": 200,
+      "ok": true,
+      "body_preview": "{'market': 'CN', 'symbol': '600519', 'stock_name': None, 'quote': {'latest_price': 1297.41, 'change_"
+    },
+    {
+      "endpoint": "/api/v1/stocks/HK/00700/profile",
+      "status_code": 200,
+      "ok": true,
+      "body_preview": "{'market': 'HK', 'symbol': '00700', 'stock_name': None, 'quote': {'latest_price': 434.6, 'change_pct"
+    },
+    {
+      "endpoint": "/api/v1/auth/me",
+      "status_code": 200,
+      "ok": true,
+      "body_preview": "{'id': '87757e47-93fa-4996-84ed-075ea69cfa58', 'username': 'p126test', 'email': 'p126test@example.co"
+    },
+    {
+      "endpoint": "/api/v1/watchlist/",
+      "status_code": 200,
+      "ok": true,
+      "body_preview": "{'total': 0, 'items': []}"
+    },
+    {
+      "endpoint": "/api/v1/reports/?limit=5",
+      "status_code": 200,
+      "ok": true,
+      "body_preview": "{'total': 0, 'items': []}"
+    },
+    {
+      "endpoint": "/api/v1/industries/",
+      "status_code": 200,
+      "ok": true,
+      "body_preview": null
+    },
+    {
+      "endpoint": "/api/v1/chat/skills",
+      "status_code": 200,
+      "ok": true,
+      "body_preview": "{'items': [{'name': 'report_explanation_skill', 'display_name': '\u62a5\u544a\u89e3\u91ca', 'display_name_en': 'Report E"
+    }
+  ],
+  "all_http_ok": true,
+  "bucket_selection": {
+    "eligible_requests": 1000,
+    "selected": 1000,
+    "violations": 0,
+    "selection_rate": 1.0,
+    "zero_violations": true
+  },
+  "cumulative": {
+    "before": 5000,
+    "after": 6000
+  },
+  "window_pass": true
+}

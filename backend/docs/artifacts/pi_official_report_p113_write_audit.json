@@ -1,0 +1,15 @@
+{
+  "schema_version": "pi_official_report_p113_write_audit_v1",
+  "phase": "6V-P1.13",
+  "generated_at": "2026-07-22T18:00:00.000000+00:00",
+  "source_sha": "2f4f42ba4fb98164a2cd01b5e4b38f0026efd20c",
+  "pi_business_write_count": 0,
+  "double_write_count": 0,
+  "unknown_write_count": 0,
+  "unrelated_table_write_count": 0,
+  "trace_mismatch_count": 0,
+  "terminal_missing_count": 0,
+  "incremental_parallel_dry_run_business_writes": 0,
+  "total_new_writes": 0,
+  "write_audit_passed": true
+}

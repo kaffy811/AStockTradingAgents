@@ -1,0 +1,47 @@
+{
+  "definition_registry_gate_passed": true,
+  "evidence_resolution_gate_passed": true,
+  "alignment_gate_passed": true,
+  "unit_normalization_gate_passed": true,
+  "conflict_precision_gate_passed": true,
+  "citation_gate_passed": true,
+  "source_trace_gate_passed": true,
+  "safety_gate_passed": true,
+  "frontend_gate_passed": true,
+  "tests_gate_passed": true,
+  "phase6tg_passed": true,
+  "blocking_issues": [],
+  "warnings": [
+    "pyenv rehash warning in frontend shell",
+    "vite CJS deprecation warning"
+  ],
+  "recommendation_for_phase6tg": "proceed",
+  "summary": {
+    "fields_total": 10,
+    "verified": 1,
+    "normalized_match": 0,
+    "likely_match": 0,
+    "definition_mismatch": 3,
+    "period_basis_mismatch": 1,
+    "unit_mismatch": 0,
+    "value_conflict": 0,
+    "structured_field_missing": 4,
+    "official_field_not_found": 0,
+    "insufficient_evidence": 1,
+    "not_applicable": 0,
+    "failed": 0
+  },
+  "metrics": {
+    "field_resolution_rate": 1.0,
+    "verified_precision": 1.0,
+    "definition_mismatch_accuracy": 1.0,
+    "period_mismatch_accuracy": 1.0,
+    "unit_normalization_accuracy": 1.0,
+    "false_conflict_rate": 0.0,
+    "citation_accuracy": 1.0,
+    "source_trace_completeness": 1.0,
+    "cross_report_leakage": 0,
+    "unsupported_merge_rate": 0.0,
+    "latency_ms": null
+  }
+}

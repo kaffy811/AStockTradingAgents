@@ -1,0 +1,63 @@
+{
+  "schema_version": "pi_official_report_p113_browser_regression_v1",
+  "phase": "6V-P1.13",
+  "generated_at": "2026-07-22T18:00:00.000000+00:00",
+  "source_sha": "2f4f42ba4fb98164a2cd01b5e4b38f0026efd20c",
+  "cases": [
+    {
+      "id": "BR1",
+      "description": "贵州茅台最新财报 → PDF follow-up",
+      "user_visible_response": "legacy_only",
+      "pi_result_shown": false,
+      "duplicate_assistant_message": false,
+      "duplicate_tool_card": false,
+      "loading_ended_normally": true,
+      "legacy_persisted_after_refresh": true,
+      "result": "passed"
+    },
+    {
+      "id": "BR2",
+      "description": "五粮液2024年报查询",
+      "user_visible_response": "legacy_only",
+      "pi_result_shown": false,
+      "duplicate_assistant_message": false,
+      "duplicate_tool_card": false,
+      "loading_ended_normally": true,
+      "legacy_persisted_after_refresh": true,
+      "result": "passed"
+    },
+    {
+      "id": "BR3",
+      "description": "平安歧义澄清",
+      "user_visible_response": "legacy_only",
+      "pi_result_shown": false,
+      "clarification_card_shown": true,
+      "duplicate_clarification": false,
+      "result": "passed"
+    },
+    {
+      "id": "BR4",
+      "description": "中报unsupported类型",
+      "user_visible_response": "legacy_only",
+      "unsupported_type_handled": true,
+      "pi_result_shown": false,
+      "result": "passed"
+    },
+    {
+      "id": "BR5",
+      "description": "不存在年份unavailable",
+      "user_visible_response": "legacy_only",
+      "unavailable_handled_correctly": true,
+      "wrong_year_fallback": false,
+      "pi_result_shown": false,
+      "result": "passed"
+    }
+  ],
+  "total_cases": 5,
+  "passed": 5,
+  "failed": 0,
+  "user_visible_legacy_only_confirmed": true,
+  "pi_result_leaked": false,
+  "duplicate_ui_elements": false,
+  "browser_regression_passed": true
+}

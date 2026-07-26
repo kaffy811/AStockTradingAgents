@@ -1,0 +1,20 @@
+{
+  "schema_version": "pi_official_report_p116_incremental_parallel_1_v1",
+  "phase": "6V-P1.16",
+  "run_during_window": "H3",
+  "generated_at": "2026-07-24T18:30:00.000000+00:00",
+  "dry_run": true,
+  "environment": "staging",
+  "business_writes": 0,
+  "provider_access_isolated": true,
+  "serving_provider_calls_during_etl": 0,
+  "pi_business_write_count": 0,
+  "db_lock_conflicts": 0,
+  "pool_exhaustion": 0,
+  "PendingRollbackError": 0,
+  "etl_audit_write_count": 4,
+  "new_candidates_discovered": 0,
+  "apply_executed": false,
+  "isolation_passed": true,
+  "note": "First incremental dry-run executed during H3 window. No new candidates discovered. ETL audit writes=4 (not counted as pi business writes). Full isolation confirmed."
+}

@@ -1,0 +1,64 @@
+{
+  "schema_version": "pi_official_report_p111_missing_coverage_backlog_v1",
+  "phase": "6V-P1.11B",
+  "generated_at": "2026-07-21T22:00:00.000000+00:00",
+  "source_sha": "d86ce16d599399e0b6c2a30b74de361d6998b442",
+  "summary": {
+    "universe_size": 100,
+    "three_year_complete_symbols": 63,
+    "incomplete_symbols": 37,
+    "total_missing_entries": 37,
+    "target_years": [2022, 2023, 2024],
+    "excluded_years_note": "2025 is excluded from target — original approved universe covers 2022-2024 only"
+  },
+  "missing_by_category": {
+    "missing_only_2024": {
+      "count": 24,
+      "reason": "genuine_not_yet_filed",
+      "explanation": "These companies had not filed their 2024 annual reports on cninfo as of 2026-07 search window. 2024 annual reports are typically filed in Q1 2025, and some smaller-cap companies file late.",
+      "remediation": "Re-run cninfo discovery crawler after 2025-04-30 deadline passes for all filers"
+    },
+    "missing_only_2022": {
+      "count": 5,
+      "reason": "historical_data_gap",
+      "explanation": "2022 data was not available in the cninfo discovery batch for these symbols — likely archived or non-standard filing path",
+      "remediation": "Manual verification via cninfo search with ts_code+year"
+    },
+    "missing_multiple_years": {
+      "count": 8,
+      "reason": "mixed_gap",
+      "explanation": "Missing 2+ target years — combination of late IPO (listed after 2022) or structural gaps in cninfo coverage",
+      "remediation": "Expand universe search window; check listing date to exclude pre-IPO years"
+    }
+  },
+  "known_exceptions": [
+    {
+      "ts_code": "300209.SZ",
+      "symbol": "300209",
+      "company_name": "互动娱乐",
+      "year": 2024,
+      "exception_type": "genuine_unavailable_inquiry_pollution",
+      "reason": "inquiry_reply_pollution_no_annual_full_for_2024",
+      "expected_behavior": "return_unavailable_correct",
+      "should_be_excluded_from_coverage_target": true,
+      "note": "300209 2024年报在cninfo目录中被互动问答回复污染，全量年报文件不存在，正确返回unavailable"
+    }
+  ],
+  "excluded_from_scope": {
+    "year_2025": {
+      "excluded": true,
+      "reason": "2025 annual reports not in original approved universe for P1.11; will be addressed in a future phase"
+    },
+    "year_2021_and_earlier": {
+      "excluded_from_target": true,
+      "reason": "pre-existing records for 2021 and earlier are not part of P1.11 target; they exist as legacy canary data"
+    }
+  },
+  "remediation_options": [
+    "Wait for 2024 annual reports to be filed (re-run discovery after Q1 2025 filing deadline)",
+    "Expand universe search window to include manual cninfo search for historical gaps",
+    "Investigate late-IPO companies: exclude pre-listing years from three_year_complete calculation",
+    "Phase P1.12: targeted backfill for the 37 incomplete companies"
+  ],
+  "next_phase_recommendation": "P1.12 — targeted backfill for 37 incomplete symbols; priority to 2024-gap companies once filing window closes"
+}

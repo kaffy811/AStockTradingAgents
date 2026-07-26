@@ -1,0 +1,38 @@
+{
+  "schema_version": "pi_canary_mvp_regression_v1",
+  "phase": "6V-P1.33",
+  "generated_at": "2026-07-26T04:00:00Z",
+  "gates": ["N", "O", "P", "Q", "R", "S", "T", "U", "V", "W"],
+
+  "p133_targeted_tests": {
+    "collected": 112,
+    "passed": 112,
+    "failed": 0,
+    "exit_code": 0
+  },
+
+  "regression_suites": [
+    {"suite": "P1.32", "collected": 119, "passed": 119, "failed": 0},
+    {"suite": "P1.31", "collected": 176, "passed": 176, "failed": 0},
+    {"suite": "P1.30", "collected": 231, "passed": 231, "failed": 0},
+    {"suite": "P1.29", "collected": 312, "passed": 312, "failed": 0}
+  ],
+
+  "combined": {
+    "collected": 927,
+    "passed": 927,
+    "failed": 0,
+    "exit_code": 0
+  },
+
+  "gate_n_result": "PASS",
+  "gate_o_result": "PASS",
+  "gate_p_result": "PASS",
+  "gate_q_result": "PASS",
+  "gate_r_result": "PASS",
+  "gate_s_result": "PASS",
+  "gate_t_result": "PASS",
+  "gate_u_result": "PASS",
+  "gate_v_result": "PASS",
+  "gate_w_result": "PASS"
+}

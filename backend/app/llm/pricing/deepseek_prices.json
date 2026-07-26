@@ -1,0 +1,117 @@
+{
+  "schema_version": "deepseek_pricing_v2",
+  "pricing_mode": "official",
+  "verified": true,
+  "currency": "USD",
+  "price_unit": "per_1m_tokens",
+  "exchange_rate_cny_per_usd_estimate": "7.20",
+  "exchange_rate_note": "Estimated exchange rate for CNY budget guard. Actual settlement uses real-time rate. Budget guard uses conservative estimate (floor at 7.0 CNY/USD).",
+  "source_url": "https://api-docs.deepseek.com/quick_start/pricing",
+  "source_retrieval_date": "2026-07-26",
+  "pricing_version": "v2-official-2026-07-26",
+  "generated_at": "2026-07-26T03:00:00Z",
+  "pricing_cny_source": "official",
+  "pricing_cny_fx_rate_required": false,
+  "verification_note": "Prices verified from https://api-docs.deepseek.com/quick_start/pricing on 2026-07-26. Currency is USD per 1M tokens. deepseek-chat and deepseek-reasoner deprecated 2026/07/24; official IDs are deepseek-v4-flash and deepseek-v4-pro.",
+  "model_deprecation_notice": "deepseek-chat deprecated 2026/07/24 (maps to deepseek-v4-flash non-thinking). deepseek-reasoner deprecated 2026/07/24 (maps to deepseek-v4-flash thinking mode).",
+  "models": {
+    "deepseek-v4-flash": {
+      "model_id": "deepseek-v4-flash",
+      "official_api_id": "deepseek-v4-flash",
+      "deprecated_aliases": ["deepseek-chat", "deepseek-v3"],
+      "deprecation_note": "deepseek-chat deprecated 2026/07/24; use deepseek-v4-flash directly.",
+      "context_length_tokens": 1000000,
+      "max_output_tokens": 384000,
+      "enabled_for_staging_real": false,
+      "recommended_for_mvp": true,
+      "pricing": {
+        "input_per_1m_tokens_cny": "1",
+        "output_per_1m_tokens_cny": "2",
+        "cached_input_per_1m_tokens_cny": "0.02",
+        "reasoning_per_1m_tokens_cny": "2",
+        "verified": true,
+        "currency": "CNY",
+        "source": "official",
+        "note": "Official DeepSeek CNY prices. Not estimated from USD."
+      },
+      "pricing_usd": {
+        "input_cache_miss_per_1m": "0.14",
+        "input_cache_hit_per_1m": "0.0028",
+        "output_per_1m": "0.28",
+        "verified": true
+      },
+      "pricing_cny_estimate": {
+        "input_cache_miss_per_1m": "1.008",
+        "input_cache_hit_per_1m": "0.020",
+        "output_per_1m": "2.016",
+        "exchange_rate_used": "7.20",
+        "verified": false,
+        "note": "CNY estimate only. Actual budget guard uses conservative exchange rate floor."
+      }
+    },
+    "deepseek-v4-pro": {
+      "model_id": "deepseek-v4-pro",
+      "official_api_id": "deepseek-v4-pro",
+      "deprecated_aliases": [],
+      "context_length_tokens": 1000000,
+      "max_output_tokens": 384000,
+      "enabled_for_staging_real": false,
+      "recommended_for_mvp": false,
+      "pricing": {
+        "input_per_1m_tokens_cny": "3",
+        "output_per_1m_tokens_cny": "6",
+        "cached_input_per_1m_tokens_cny": "0.025",
+        "reasoning_per_1m_tokens_cny": "6",
+        "verified": true,
+        "currency": "CNY",
+        "source": "official"
+      },
+      "pricing_usd": {
+        "input_cache_miss_per_1m": "0.435",
+        "input_cache_hit_per_1m": "0.003625",
+        "output_per_1m": "0.87",
+        "verified": true
+      },
+      "pricing_cny_estimate": {
+        "input_cache_miss_per_1m": "3.132",
+        "input_cache_hit_per_1m": "0.026",
+        "output_per_1m": "6.264",
+        "exchange_rate_used": "7.20",
+        "verified": false,
+        "note": "CNY estimate only."
+      }
+    },
+    "deepseek-reasoner": {
+      "model_id": "deepseek-reasoner",
+      "official_api_id": "deepseek-v4-flash",
+      "deprecation_status": "deprecated_2026_07_24",
+      "deprecation_note": "deepseek-reasoner deprecated 2026/07/24. Maps to thinking mode of deepseek-v4-flash. Use deepseek-v4-flash (thinking mode) for new integrations.",
+      "enabled_for_staging_real": false,
+      "recommended_for_mvp": false,
+      "pricing": {
+        "input_per_1m_tokens_cny": "1",
+        "output_per_1m_tokens_cny": "2",
+        "cached_input_per_1m_tokens_cny": "0.02",
+        "reasoning_per_1m_tokens_cny": "2",
+        "verified": true,
+        "currency": "CNY",
+        "source": "official",
+        "note": "Deprecated alias — same pricing as deepseek-v4-flash"
+      },
+      "pricing_usd": {
+        "input_cache_miss_per_1m": "0.14",
+        "input_cache_hit_per_1m": "0.0028",
+        "output_per_1m": "0.28",
+        "verified": true,
+        "note": "Deprecated — maps to deepseek-v4-flash pricing"
+      },
+      "pricing_cny_estimate": {
+        "input_cache_miss_per_1m": "1.008",
+        "input_cache_hit_per_1m": "0.020",
+        "output_per_1m": "2.016",
+        "exchange_rate_used": "7.20",
+        "verified": false
+      }
+    }
+  }
+}

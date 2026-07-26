@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     app_name: str = "TradingAgents Backend"
     app_env: str = "development"
     app_title: str = "TradingAgents API"
-    app_version: str = "0.1.0"
+    app_version: str = "1.1.0-free-rc1"
     debug: bool = True
     cors_origins: list[str] = [
         "http://localhost:3000",
@@ -67,6 +67,122 @@ class Settings(BaseSettings):
     # Database
     database_url: str = Field(..., description="postgresql+asyncpg://...")
     redis_url: str | None = "redis://localhost:6379"
+    database_connection_mode: str = "transaction_pooler"  # direct | session_pooler | transaction_pooler
+    database_transaction_pool_strategy: str = "small_queue_pool"  # small_queue_pool | null_pool
+    database_pool_pre_ping: bool = True
+    database_pool_size: int = 2
+    database_max_overflow: int = 2
+    database_direct_pool_size: int = 5
+    database_direct_max_overflow: int = 10
+    database_pool_recycle_seconds: int = 1800
+    database_pool_timeout_seconds: float = 30.0
+    database_command_timeout_seconds: float = 45.0
+    database_sql_echo: bool = False
+    database_sql_hide_parameters: bool = True
+    auth_db_lookup_timeout_seconds: float = 10.0
+    auth_db_connect_timeout_seconds: float = 10.0
+    auth_db_query_timeout_seconds: float = 10.0
+    auth_db_cleanup_timeout_seconds: float = 3.0
+    auth_user_cache_ttl_seconds: int = 60
+    auth_db_timeout_threshold: int = 3
+    auth_circuit_open_seconds: float = 20.0
+
+    # Company V2 RAG repository backend（Phase 6T-J1）
+    # 合法值：database（默认，PostgreSQL 永久持久化）/ memory（仅隔离测试用，非永久）
+    # database 初始化失败时抛结构化错误，禁止静默 fallback 到 memory。
+    company_v2_rag_repository_backend: str = "database"
+    company_v2_rag_chunk_batch_size: int = 200
+    company_v2_rag_db_run_timeout_seconds: float = 60.0
+    chat_runtime_mode: str = "legacy"  # legacy | layered_v1 | shadow
+    chat_layered_intents: str = "financial_report,financial_comparison,official_report_pdf,financial_snapshot,quote_query"
+    agent_executor_mode: str = "legacy"  # legacy | pi_compatible_shadow | pi_compatible
+    pi_agent_max_turns: int = 3
+    pi_agent_max_tool_calls: int = 4
+    pi_agent_max_parallel_tools: int = 2
+    pi_agent_default_deadline_ms: int = 5000
+    pi_official_report_tool_timeout_ms: int = 10000
+    pi_agent_shadow_enabled: bool = False
+    pi_agent_allowed_agents: str = ""
+    pi_agent_shadow_diagnostics_path: str = ""
+    # ── Phase 6V-P1.7: staging canary proposal — everything defaults OFF ──
+    # Formal enablement requires an approved, versioned authorization; these
+    # defaults keep the canary fully disabled (proposal only).
+    pi_executor_global_kill_switch: bool = False
+    pi_canary_environment: str = "staging"          # staging only; production needs its own authorization
+    pi_canary_authorization_status: str = "proposed"  # proposed|approved|rejected|revoked|disabled
+    pi_canary_allowed_agents: str = ""              # exact agent ids, comma separated, no wildcards
+    pi_canary_rollout_percent: float = 0.0
+    pi_canary_max_rollout_percent: float = 5.0
+    pi_canary_fallback_mode: str = "legacy"
+    pi_canary_environment_kill_switch: bool = False
+    pi_canary_agent_kill_switch: bool = False
+    pi_canary_authorization_expires_at: str = ""
+    pi_canary_config_version: int = 1
+    pi_canary_stable_bucket_salt: str = "pi_v1"   # stable across config_version changes; ensures monotonic rollout
+    pi_canary_approval_reference: str = ""
+    # Phase 6V-P1.24: if set, lifespan writes a sanitized runtime snapshot JSON here.
+    # Used by containerized staging probe to verify deployed effective config.
+    # Must be writable by the application process; defaults to "" (disabled).
+    pi_canary_snapshot_path: str = ""
+    pi_canary_auto_rollback_enabled: bool = True
+    pi_canary_health_window_minutes: int = 30
+    pi_canary_min_sample_size: int = 50
+    # Phase 6V-P1.31: provider mode (staging_replay | staging_real)
+    # staging_replay = use replay data only (no real provider calls)
+    # staging_real   = use real provider (requires all P1.31 gates PASS + explicit authorization)
+    pi_canary_provider_mode: str = "staging_replay"
+
+    # ── Phase 6V-P1.31: Real Provider Control Plane ────────────────────────────
+    # ALL defaults are fail-closed. NEVER change without explicit project owner authorization.
+
+    # Staging-only DeepSeek API key. MUST be separate from DEEPSEEK_API_KEY (production).
+    # Gate D: real provider MUST use this key only; MUST NOT fall back to deepseek_api_key.
+    deepseek_api_key_staging: str | None = None
+
+    # Master enable flag. Default False (fail-closed).
+    # Gate I: real provider activation requires this = True AND kill_switch = False.
+    pi_real_provider_enabled: bool = False
+
+    # Kill switch. Default True (fail-closed). Set False only with authorization.
+    # Gate I: if True, all real provider calls are blocked regardless of enabled flag.
+    pi_real_provider_kill_switch: bool = True
+
+    # Provider identity
+    pi_real_provider_name: str = "deepseek"
+    pi_real_provider_model: str = "deepseek-v4-flash"
+
+    # Gate F: maximum real provider requests per activation window (hard cap = 100).
+    pi_real_provider_max_requests: int = 100
+
+    # Gate G: maximum real provider cost in CNY per activation window.
+    pi_real_provider_max_cost_cny: float = 100.0
+
+    # Gate H: maximum concurrent real provider calls (cross-worker via Redis lease).
+    pi_real_provider_max_concurrency: int = 2
+
+    # Gate H: per-minute rate limit for real provider (across all workers)
+    pi_real_provider_max_rpm: int = 10
+
+    # Gate H: rate limit — maximum real provider calls per minute (cross-worker sliding window).
+    pi_real_provider_rate_limit_per_minute: int = 60
+
+    # Gate H: explicit timeout on OpenAI client (seconds). SDK default is 600s — unsafe.
+    pi_real_provider_timeout_seconds: float = 30.0
+
+    # Circuit breaker: consecutive failure threshold before OPEN.
+    pi_real_provider_circuit_breaker_failure_threshold: int = 5
+
+    # Circuit breaker: seconds before attempting HALF_OPEN recovery.
+    pi_real_provider_circuit_breaker_recovery_seconds: float = 60.0
+
+    # Gate E: pricing version identifier. "unverified" = test fixture only.
+    pi_real_provider_pricing_version: str = "unverified"
+
+    # Redis budget namespace (all keys prefixed with this).
+    pi_real_provider_budget_namespace: str = "pi_provider_staging"
+
+    # Audit trail: enable logging to pi_real_provider_audit table.
+    pi_real_provider_audit_enabled: bool = True
     # Set to False in production to skip Base.metadata.create_all at startup.
     # Production deployments should run: uv run alembic upgrade head
     enable_create_all: bool = True
@@ -99,6 +215,32 @@ class Settings(BaseSettings):
     # AkShare 备用数据源开关（默认关闭）
     # 设置 ENABLE_AKSHARE=true 后 Tushare 失败时自动降级到 AkShare
     enable_akshare: bool = False
+    # Phase 6A: Zero-cost data mode
+    # DATA_MODE=free: skip Tushare Pro-only APIs, use BaoStock+AkShare
+    data_mode: str = "standard"  # "standard" | "free"
+    enable_tushare: bool = True   # Set False in free mode to disable Tushare Pro APIs
+    enable_baostock: bool = False  # BaoStock primary for free mode
+    enable_report_pdf: bool = False  # Report PDF attachment feature
+    enable_report_rag: bool = False  # Phase 6F: PDF→pgvector RAG
+    enable_company_v2_debug_api: bool = True
+    debug_company_v2: bool = False
+    company_v2_raw_preview_chars: int = 2000
+    company_v2_provider_timeout_seconds: float = 8.0
+    company_v2_provider_timeout_baostock_seconds: float = 20.0
+    company_v2_provider_timeout_akshare_seconds: float = 12.0
+    company_v2_provider_timeout_http_seconds: float = 8.0
+    company_v2_debug_full_timeout_seconds: float = 45.0
+    company_v2_debug_module_timeout_seconds: float = 20.0
+    company_v2_debug_script_symbol_timeout_seconds: float = 90.0
+    # Phase 6G: Report RAG embedding provider (separate from financial_rag embedding_provider)
+    # mock (default, CI-safe, 0-cost) | local (sentence-transformers) | disabled
+    report_embedding_provider: str = "mock"
+    # Model name or local path for sentence-transformers (used when report_embedding_provider=local)
+    # Recommended: BAAI/bge-small-zh-v1.5 (384d), intfloat/multilingual-e5-small (384d)
+    report_embedding_model: str | None = None
+    # Target embedding dimension — must match report_chunks.embedding vector(N)
+    # Default 1536 matches current schema. Change requires new migration.
+    report_embedding_dim: int = 384
     # Tushare 令牌桶速率限制（积分/分钟）；基础账户 500，付费账户可调高
     tushare_rate_limit_per_min: int = 500
     # Tushare API 调用超时（秒）
@@ -113,6 +255,81 @@ class Settings(BaseSettings):
     # Orchestrator 内部异常时自动 fallback 至原 FinancialAgent。
     enable_multi_agent_orchestrator: bool = False
 
+    # AI Fundamental Analysis Agent (Phase 3)
+    # ai_provider: which LLM provider to use for fundamental analysis
+    #   "deepseek" (default) — uses DEEPSEEK_API_KEY
+    #   "openai"             — uses OPENAI_API_KEY (future)
+    # ai_enabled: master switch; set to false to always return partial=true
+    ai_provider: str = "deepseek"
+    ai_enabled: bool = True
+
+    @property
+    def ai_api_key(self) -> str | None:
+        """Unified API key lookup based on ai_provider."""
+        if self.ai_provider == "deepseek":
+            return self.deepseek_api_key
+        if self.ai_provider == "openai":
+            return self.openai_api_key
+        return None
+
+    # Phase 6K: Report Chat Cache
+    report_chat_cache_ttl_seconds: int = 1800        # 30 min default
+    enable_report_chat_cache: bool = True
+    report_chat_cache_version: str = "v1"
+
+    # Phase 6K: Report Chat Rate Limit
+    report_chat_rate_limit_per_minute: int = 10
+    report_chat_rate_limit_per_hour: int = 100
+    enable_report_chat_rate_limit: bool = True
+
+    # Phase 6K: Report Chat Session Memory
+    report_chat_memory_ttl_seconds: int = 3600       # 1 hour
+    report_chat_memory_max_turns: int = 5
+    enable_report_chat_memory: bool = True
+
+    # Phase 6T-H: Financial Evidence Fusion Rollout
+    company_v2_financial_fusion_enabled: bool = False
+    company_v2_financial_fusion_rollout_percent: int = 0
+    company_v2_financial_fusion_symbol_allowlist: str = ""
+    company_v2_financial_fusion_auto_run: bool = False
+    company_v2_financial_fusion_max_fields_per_request: int = 10
+    company_v2_financial_fusion_timeout_seconds: int = 60
+    company_v2_financial_fusion_cache_ttl_seconds: int = 86400
+    company_v2_financial_fusion_cache_version: str = "v1"
+    company_v2_financial_fusion_structured_data_version: str = "v1"
+    company_v2_financial_fusion_field_definition_registry_version: str = "v1"
+    company_v2_financial_fusion_tolerance_version: str = "v1"
+    company_v2_financial_fusion_singleflight_ttl_seconds: int = 60
+    company_v2_financial_fusion_stage3_authorized: bool = False
+    company_v2_financial_fusion_worker_mode: str = "shadow"
+    company_v2_financial_fusion_worker_enabled: bool = False
+    company_v2_financial_fusion_worker_lease_seconds: int = 60
+    company_v2_financial_fusion_worker_heartbeat_seconds: int = 15
+
+    # ── Phase MVP-R1.1: Invite-Only MVP Launch Controls ───────────────────────
+    # Wave management
+    mvp_max_invited_users: int = 50
+    mvp_wave1_max_users: int = 10
+    mvp_wave2_max_users: int = 30
+    mvp_wave3_max_users: int = 50
+    mvp_current_wave: int = 0          # 0=not started, 1=wave1, 2=wave2, 3=wave3
+
+    # Quota
+    mvp_daily_quota_per_user: int = 10
+    mvp_global_daily_quota: int = 300
+    mvp_max_concurrent_per_user: int = 1
+
+    # Access control
+    mvp_public_registration_enabled: bool = False   # MUST remain False for invite-only
+    mvp_new_invites_enabled: bool = True
+    mvp_new_login_enabled: bool = True
+    mvp_new_chat_enabled: bool = True
+
+    # Kill switches (independent)
+    mvp_kill_invites: bool = False
+    mvp_kill_login: bool = False
+    mvp_kill_chat: bool = False
+
     # Auth
     secret_key: str = Field(..., min_length=16)
     access_token_expire_minutes: int = 60
@@ -120,3 +337,8 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+
+def get_settings() -> Settings:
+    """Return the singleton settings instance."""
+    return settings

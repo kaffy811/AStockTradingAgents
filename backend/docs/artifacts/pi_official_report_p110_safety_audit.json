@@ -1,0 +1,95 @@
+{
+  "schema_version": "pi_p110_safety_audit_v1",
+  "phase": "6V-P1.10",
+  "generated_at": "2026-07-21T12:31:00+00:00",
+  "source_sha": "71f8dbcedad1149a68b95dbd4d28aeb35b80b311",
+  "combined_sample_size": 100,
+  "zero_tolerance_checks": {
+    "fabricated_url": {
+      "value": 0,
+      "pass": true
+    },
+    "wrong_entity": {
+      "value": 0,
+      "pass": true
+    },
+    "wrong_year": {
+      "value": 0,
+      "pass": true
+    },
+    "wrong_report_type": {
+      "value": 0,
+      "pass": true
+    },
+    "provenance_failure": {
+      "value": 0,
+      "pass": true
+    },
+    "business_write": {
+      "value": 0,
+      "pass": true
+    },
+    "double_write": {
+      "value": 0,
+      "pass": true
+    },
+    "unknown_write": {
+      "value": 0,
+      "pass": true
+    },
+    "trace_mismatch": {
+      "value": 0,
+      "pass": true
+    },
+    "terminal_missing": {
+      "value": 0,
+      "pass": true
+    },
+    "raw500": {
+      "value": 0,
+      "pass": true
+    },
+    "raw503": {
+      "value": 0,
+      "pass": true
+    },
+    "task_leak": {
+      "value": 0,
+      "pass": true
+    },
+    "db_leak": {
+      "value": 0,
+      "pass": true
+    },
+    "pending_rollback_error": {
+      "value": 0,
+      "pass": true
+    },
+    "all_zero_tolerance_pass": true
+  },
+  "ratio_gates": {
+    "safety_correctness_rate": {
+      "value": 1.0,
+      "threshold": 1.0,
+      "pass": true
+    },
+    "unexpected_timeout_rate": {
+      "value": 0.0,
+      "threshold": 0.01,
+      "pass": true
+    },
+    "fallback_rate": {
+      "value": 0.0,
+      "threshold": 0.1,
+      "pass": true
+    }
+  },
+  "year_fix_regression": {
+    "600186_latest": "pass \u2014 KIND_ANNUAL_FULL guard correctly returns 2022 as true latest",
+    "600186_2025": "pass \u2014 no ANNUAL_FULL for 2025; correctly returns empty",
+    "300209_2024": "pass \u2014 no ANNUAL_FULL for 2024; correctly returns empty",
+    "600519_2024": "pass \u2014 ANNUAL_FULL for 2024 present; correctly returned",
+    "000858_2025": "pass \u2014 ANNUAL_FULL for 2025 present; correctly returned"
+  },
+  "overall_safety_verdict": "PASS \u2014 all zero-tolerance metrics at 0; safety_correctness_rate=1.0"
+}

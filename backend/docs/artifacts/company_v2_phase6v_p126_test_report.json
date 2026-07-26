@@ -1,0 +1,42 @@
+{
+  "schema_version": "pi_canary_test_report_v1",
+  "phase": "6V-P1.26",
+  "generated_at": "2026-07-25T08:02:00.000000+00:00",
+  "targeted_tests": {
+    "p126_file": "tests/fundamental/test_phase6v_p126_deployed_soak.py",
+    "p126_collected": 197,
+    "p126_passed": 197,
+    "p126_failed": 0,
+    "p125_file": "tests/fundamental/test_phase6v_p125_docker_staging.py",
+    "p125_collected": 198,
+    "p125_passed": 198,
+    "p125_failed": 0,
+    "combined_passed": 395,
+    "combined_failed": 0
+  },
+  "entire_backend": {
+    "run_command": "python3.11 -m pytest tests/ -q --tb=no (excluding known collection-error files and integration)",
+    "passed": 5662,
+    "pre_existing_failed": 920,
+    "skipped": 6,
+    "new_failures_introduced_by_p126": 0,
+    "note": "920 pre-existing failures exist in origin/release/demo-staging baseline; P1.26 adds only new files (soak script + artifacts + test) with zero code changes to existing modules"
+  },
+  "frontend": {
+    "run": false,
+    "reason": "Frontend build environment not available in staging worktree; last run was P1.25 with 688 PASS"
+  },
+  "soak_harness_validation": {
+    "run_deployed_shadow_soak_py": "PASS",
+    "windows_executed": 10,
+    "total_selected": 10000,
+    "violations": 0,
+    "all_http_endpoints_200": true
+  },
+  "canary_math_validation": {
+    "100_percent_rollout_all_selected": true,
+    "75_percent_rollout_partial": true,
+    "bucket_range_0_9999": true
+  },
+  "overall_verdict": "PASS"
+}

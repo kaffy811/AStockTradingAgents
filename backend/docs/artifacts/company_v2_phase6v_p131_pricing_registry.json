@@ -1,0 +1,42 @@
+{
+  "schema_version": "pi_canary_pricing_registry_v1",
+  "phase": "6V-P1.31",
+  "generated_at": "2026-07-26T00:00:00Z",
+  "gate": "E",
+
+  "status": "NOT_EVALUATED",
+  "reason": "Pricing registry implemented in test_fixture mode. Prices NOT verified from authoritative source (platform.deepseek.com/api-docs/pricing with retrieval date). Gate E cannot PASS until verified.",
+
+  "implementation": {
+    "file": "backend/app/llm/provider_control/pricing.py",
+    "class": "PricingRegistry",
+    "pricing_file": "backend/app/llm/pricing/deepseek_prices.json",
+    "arithmetic": "Decimal (never float)",
+    "verified_field": false,
+    "pricing_mode": "test_fixture",
+    "source_url": null,
+    "source_retrieval_date": null
+  },
+
+  "models_registered": [
+    {"model_id": "deepseek-v4-flash", "enabled_for_staging_real": false, "verified": false},
+    {"model_id": "deepseek-v4-pro", "enabled_for_staging_real": false, "verified": false},
+    {"model_id": "deepseek-reasoner", "enabled_for_staging_real": false, "verified": false}
+  ],
+
+  "test_fixture_prices_cny_per_1m_tokens": {
+    "deepseek-v4-flash": {"input": "1.0", "output": "2.0", "cached_input": "0.1"},
+    "deepseek-v4-pro": {"input": "4.0", "output": "8.0", "cached_input": "1.0"},
+    "deepseek-reasoner": {"input": "4.0", "output": "16.0", "cached_input": "1.0", "reasoning": "16.0"}
+  },
+
+  "for_p132_activation": [
+    "Retrieve pricing from platform.deepseek.com/api-docs/pricing",
+    "Record exact URL and retrieval date",
+    "Set verified=true in deepseek_prices.json",
+    "Set source_url and source_retrieval_date",
+    "Set enabled_for_staging_real=true for the target model only",
+    "Re-run pricing tests with require_verified=True",
+    "Gate E can then be evaluated as PASS"
+  ]
+}

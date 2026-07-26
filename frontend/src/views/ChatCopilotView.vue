@@ -66,6 +66,7 @@
               @action="onCardAction"
               @edit-user="onEditUser"
               @retry-ai="onRetryAi"
+              @select-candidate="onSelectCandidate"
             />
             <!-- C32.3: Conversation marker rail (right side of message area) -->
             <ConversationMarkers
@@ -99,6 +100,7 @@ import { ref, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import AppHeader             from '../components/AppHeader.vue'
 import ChatMessageList        from '../components/chat/ChatMessageList.vue'
+import { candidateSelectionText, clarificationFromMetadata } from '../utils/clarification.js'
 import ChatQuickActions       from '../components/chat/ChatQuickActions.vue'
 import ChatInputBox           from '../components/chat/ChatInputBox.vue'
 import ChatSessionSidebar     from '../components/chat/ChatSessionSidebar.vue'
@@ -347,6 +349,7 @@ function _restoreMessages(sessionDetail) {
         toolTrace:       m.tool_events ?? [],
         resultCard:      (m.cards ?? [])[0] ?? null,
         confirmation:    conf,
+        clarification:   clarificationFromMetadata(m.metadata),
         isStreaming:     false,
         status:          'done',
         thinkingItems:   [],
@@ -602,6 +605,14 @@ async function ensureSession() {
 
 // ── Send flow ─────────────────────────────────────────────────────────────────
 
+function onSelectCandidate(_msgId, cand) {
+  // P1.6.8: clicking a candidate sends the explicit selection as a normal user
+  // turn (no resolver call, no URL assembly on the frontend).
+  const text = candidateSelectionText(cand)
+  if (!text || isSending.value) return
+  onSend(text)
+}
+
 async function onSend(text) {
   if (!text.trim() || isSending.value) return
 
@@ -808,6 +819,10 @@ async function _sendApiStream(text, assistantMsg) {
 
       case 'agent_completed':
         _clearTimeouts()
+        // P1.6.8: structured clarification rides the terminal event
+        if (payload.clarification?.candidates?.length) {
+          liveMsg.clarification = payload.clarification
+        }
         applyChatUiEvent(liveMsg, { type: 'ui_done' })
         commitAssistantMessage(liveMsg)
         return

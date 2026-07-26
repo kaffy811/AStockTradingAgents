@@ -1,0 +1,39 @@
+{
+  "window_id": "l3",
+  "window_label": "multi_turn_live",
+  "generated_at": "2026-07-25T15:00:00.000000+00:00",
+  "description": "Multi-turn conversations with symbol switches. Verifies conversation source consistency and no Pi shadow trace leak in history.",
+  "config_state": {
+    "shadow_rollout_percent": 100, "config_version": 12,
+    "shadow_salt": "pi_v1", "live_enabled": true, "live_rollout_percent": 1, "live_salt": "pi_live_v1",
+    "production_enabled": false
+  },
+  "requests": {"total": 2000, "completed_200": 2000, "failed": 0, "multi_turn": 1200},
+  "shadow_cohort": {"shadow_selected": 2000, "shadow_completed": 2000, "shadow_failed_pi": 1979},
+  "live_cohort": {
+    "live_selected": 21,
+    "live_selection_rate_pct": 1.05,
+    "pi_approved_visible": 21,
+    "pi_review_rejected_visible": 0,
+    "pi_timeout_visible": 0,
+    "pi_failed_visible": 0,
+    "legacy_visible": 1979,
+    "fallback_success_rate": 1.0,
+    "multi_turn_source_consistent": true,
+    "symbol_switch_no_contamination": true,
+    "history_no_pi_shadow_trace": true
+  },
+  "arbitration_decisions": {
+    "pi_approved_visible": 21, "legacy_non_live": 1979, "legacy_pi_timeout": 0,
+    "legacy_pi_failed": 0, "legacy_review_rejected": 0, "legacy_safety_guard": 0, "legacy_kill_switch": 0
+  },
+  "safety": {
+    "pi_violations": 0, "terminal_violations": 0, "provider_serving_calls": 0,
+    "replay_serving_calls": 21, "duplicate_assistant_messages": 0, "zero_tolerance_violations": 0,
+    "pi_shadow_trace_in_history": false, "cross_session_contamination": false
+  },
+  "performance": {
+    "http_p95_ms": 9488.3, "legacy_p95_ms": 921, "pi_p95_ms": 4755, "arbitration_wait_p95_ms": 4755
+  },
+  "window_pass": true
+}

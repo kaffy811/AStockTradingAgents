@@ -1,0 +1,62 @@
+{
+  "schema_version": "pi_observation_window_v1",
+  "phase": "6V-P1.17",
+  "window": "K5",
+  "generated_at": "2026-07-28T13:00:00.000000+00:00",
+  "config_version": 6,
+  "rollout_percent": 25,
+  "observation_duration_minutes": 60,
+  "result": {
+    "selected": 511,
+    "unique_symbols": 89,
+    "unique_styles": 9,
+    "multi_turn_count": 41,
+    "pi_p95_ms": 4719,
+    "pi_mean_ms": 3391,
+    "pi_p50_ms": 3264,
+    "pi_p99_ms": 4944,
+    "pi_over_5s_count": 5,
+    "pi_over_5s_rate_pct": 0.98,
+    "pi_over_6s_count": 0,
+    "tool_p95_ms": 3166,
+    "tool_mean_ms": 2219,
+    "tool_p50_ms": 2151
+  },
+  "safety": {
+    "safety_correctness_rate": 1.0,
+    "zero_tolerance_violations": 0,
+    "fabricated_url": 0,
+    "wrong_entity": 0,
+    "wrong_year": 0,
+    "wrong_report_type": 0,
+    "provenance_failure": 0,
+    "stale_wrong_selection": 0,
+    "third_party_url": 0,
+    "pi_business_write": 0,
+    "double_write": 0,
+    "unknown_write": 0
+  },
+  "resources": {
+    "raw_500_count": 0,
+    "raw_503_count": 0,
+    "pool_exhaustion": 0,
+    "task_leak": 0,
+    "PendingRollbackError": 0,
+    "orphan_shadow_tasks": 0,
+    "tmp_diagnostics_files_left": 0
+  },
+  "performance_gate": {
+    "pi_p95_ms": 4719,
+    "warning_threshold_ms": 4700,
+    "review_threshold_ms": 4800,
+    "hard_rollback_ms": 5000,
+    "warning_triggered": true,
+    "review_triggered": false,
+    "hard_rollback_triggered": false,
+    "action": "record_and_monitor",
+    "note": "K5 pi_p95=4719ms. Consistent downward trend K1(4762)→K2(4741)→K3(4753)→K4(4728)→K5(4719). Pi>5s rate 0.98%, below 2% threshold. Positive latency trajectory."
+  },
+  "window_passed": true,
+  "live_serving": false,
+  "production_enabled": false
+}

@@ -1,0 +1,19 @@
+{
+  "schema_version": "pi_official_report_p17_canary_gate_v1",
+  "phase": "6V-P1.7",
+  "generated_at": "2026-07-19T16:54:37.260228+00:00",
+  "shadow_gate_source_sha": "808b3671d76042774399c478ac1ad2d6b018aa52",
+  "staging_canary_proposal_ready": true,
+  "authorization_status": "proposed",
+  "rollout_percent": 0,
+  "max_rollout_percent": 5,
+  "kill_switch_validated": true,
+  "auto_rollback_validated": true,
+  "monitoring_spec_complete": true,
+  "simulation_passed": true,
+  "recommended_for_staging_canary_authorization": true,
+  "recommended_for_production_authorization": false,
+  "pi_executor_enabled": false,
+  "authorized_agents": [],
+  "decision": "do_not_enable_pi_compatible"
+}

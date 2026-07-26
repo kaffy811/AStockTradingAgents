@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-07-17T06:52:18.253422+00:00",
+  "environment_ready": false,
+  "preflight_blockers": [
+    "TLS_SSLCertVerificationError",
+    "POSTGRES_TLS_FAILED",
+    "RAG_POSTGRES_NOT_READY"
+  ],
+  "tls_root_cause": "certificate_verification_failure",
+  "apply_executed": false,
+  "reason": "preflight_failed: TLS certificate verification failed; Postgres/RAG not ready",
+  "scope": {
+    "market": "CN",
+    "symbol": "000858",
+    "report_year": 2025
+  },
+  "write_count": 0,
+  "affected_rows": 0,
+  "conflicts": [],
+  "dry_run_summary": {
+    "rows_checked": 6,
+    "complete_rows": 3,
+    "legacy_unverified_rows": 3,
+    "empty_rows": 0,
+    "proposed_write_count": 0
+  },
+  "dry_run_coverage": {
+    "requested_metrics": 42,
+    "available_metrics": 42,
+    "verified_metrics": 16,
+    "annual_exact_metrics": 16,
+    "legacy_unverified": 9,
+    "unit_unknown": 9,
+    "period_unknown": 0,
+    "conflicts": 0,
+    "coverage_rate": 0.381
+  },
+  "revenue_candidate": {
+    "status": "verified",
+    "raw_value": 40528509770.23,
+    "raw_unit": "CNY",
+    "period_end": "2025-12-31",
+    "period_type": "annual",
+    "normalized_value": 40528509770.23,
+    "normalized_unit": "CNY",
+    "source_key": "revenue"
+  },
+  "roe_candidate": {
+    "status": "unverified",
+    "reason_codes": [
+      "TARGET_PERIOD_UNAVAILABLE"
+    ],
+    "raw_value": null,
+    "raw_unit": null,
+    "period_end": null,
+    "period_type": null
+  },
+  "rollback": {
+    "required": false,
+    "old_values_preserved": true
+  }
+}

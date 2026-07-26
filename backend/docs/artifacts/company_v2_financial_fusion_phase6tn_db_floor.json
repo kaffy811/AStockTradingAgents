@@ -1,0 +1,15 @@
+{
+  "phase": "phase6tn_db_floor",
+  "ok": true,
+  "samples": 30,
+  "select_1_p50_ms": 525.73,
+  "select_1_p95_ms": 1824.29,
+  "select_1_max_ms": 2343.89,
+  "primary_key_select_p50_ms": 526.59,
+  "primary_key_select_p95_ms": 1303.2,
+  "insert_commit_p50_ms": 811.43,
+  "insert_commit_p95_ms": 1290.98,
+  "insert_rollback_p50_ms": 1021.81,
+  "insert_rollback_p95_ms": 2169.73,
+  "minimum_expected_create_ms": 1863.75
+}

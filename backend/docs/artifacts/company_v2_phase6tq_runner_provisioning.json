@@ -1,0 +1,18 @@
+{
+  "phase": "phase6tq_runner_provisioning",
+  "provider": null,
+  "region": "ap-northeast-2",
+  "availability_zone": null,
+  "instance_runtime_type": null,
+  "os": null,
+  "python_version": null,
+  "application_commit_sha": null,
+  "sqlalchemy_version": null,
+  "asyncpg_version": null,
+  "endpoint_type": "transaction_pooler",
+  "runner_started_at": null,
+  "runner_destroyed_at": null,
+  "retained_for_staging": false,
+  "provisioned": false,
+  "blocker": "no cloud provisioning control plane available in this session"
+}

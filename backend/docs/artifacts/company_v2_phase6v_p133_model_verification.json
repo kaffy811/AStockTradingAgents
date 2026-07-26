@@ -1,0 +1,74 @@
+{
+  "schema_version": "pi_canary_model_verification_v2",
+  "phase": "6V-P1.33",
+  "generated_at": "2026-07-26T04:00:00Z",
+  "gate": "E",
+
+  "verification_source": "https://api-docs.deepseek.com/quick_start/pricing",
+  "retrieval_date": "2026-07-26",
+  "verification_method": "WebFetch from authoritative DeepSeek API documentation",
+
+  "verified_official_model_ids": [
+    {
+      "official_api_id": "deepseek-v4-flash",
+      "status": "CURRENT",
+      "verified": true,
+      "note": "Official model ID. Non-thinking and thinking modes available via API parameter.",
+      "deprecated_aliases": ["deepseek-chat", "deepseek-v3"],
+      "deprecation_date": "2026-07-24"
+    },
+    {
+      "official_api_id": "deepseek-v4-pro",
+      "status": "CURRENT",
+      "verified": true,
+      "note": "Official model ID.",
+      "deprecated_aliases": []
+    }
+  ],
+
+  "deprecated_model_ids": [
+    {
+      "id": "deepseek-chat",
+      "deprecated_date": "2026-07-24",
+      "maps_to": "deepseek-v4-flash",
+      "action_required": "Update any hardcoded references to use deepseek-v4-flash"
+    },
+    {
+      "id": "deepseek-reasoner",
+      "deprecated_date": "2026-07-24",
+      "maps_to": "deepseek-v4-flash (thinking mode)",
+      "action_required": "Update any hardcoded references to use deepseek-v4-flash with thinking enabled"
+    },
+    {
+      "id": "deepseek-v3",
+      "deprecated_date": "2026-07-24",
+      "maps_to": "deepseek-v4-flash",
+      "action_required": "Update any hardcoded references"
+    }
+  ],
+
+  "config_py_audit": {
+    "deepseek_default_model_setting": "deepseek-v4-flash",
+    "is_correct_official_id": true,
+    "action_required": false,
+    "note": "config.py already uses correct official model ID. No changes needed."
+  },
+
+  "deepseek_prices_json_update": {
+    "updated": true,
+    "file": "backend/app/llm/pricing/deepseek_prices.json",
+    "changes": [
+      "pricing_mode: official",
+      "verified: true",
+      "currency: USD",
+      "source_url added",
+      "source_retrieval_date: 2026-07-26",
+      "deepseek-v4-flash/pro USD prices verified",
+      "deepseek-reasoner marked deprecated_2026_07_24",
+      "deprecation_notice added to schema_version"
+    ]
+  },
+
+  "gate_e_result": "PASS",
+  "gate_e_evidence": "deepseek-v4-flash confirmed as official current API model ID from authoritative source. deepseek_prices.json updated. config.py already correct."
+}

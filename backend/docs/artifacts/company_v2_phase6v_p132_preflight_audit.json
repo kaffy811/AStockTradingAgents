@@ -1,0 +1,49 @@
+{
+  "schema_version": "pi_canary_preflight_v1",
+  "phase": "6V-P1.32",
+  "generated_at": "2026-07-26T02:00:00Z",
+  "base_sha": "d7ccdf955a96303f3559f5883773b12f0c8661e8",
+  "p131_final_sha": "d7ccdf955a96303f3559f5883773b12f0c8661e8",
+
+  "shadow_rollout_percent": 100,
+  "live_rollout_percent": 1,
+  "config_version": 12,
+
+  "shadow_bucket_salt": "pi_v1",
+  "live_bucket_salt": "pi_live_v1",
+
+  "provider_mode": "staging_replay",
+  "real_provider_enabled": false,
+
+  "provider_control_plane_ready": true,
+  "provider_control_plane_in_call_path": false,
+  "provider_control_plane_wired_p132": true,
+
+  "pricing_verified": false,
+  "pricing_mode": "test_fixture",
+
+  "staging_credential_ready": false,
+  "staging_credential_field": "DEEPSEEK_API_KEY_STAGING",
+  "staging_credential_status": "NOT_SET",
+
+  "mvp_invite_implemented": false,
+  "mvp_feedback_implemented": false,
+  "mvp_analytics_implemented": false,
+  "mvp_error_monitoring_implemented": false,
+
+  "mvp_release_candidate": false,
+  "production_authorized": false,
+
+  "p0_gaps": [
+    "ProviderActivationGate not wired into factory.py call path",
+    "mvp_invite table and endpoints not implemented",
+    "chat_feedback endpoint not implemented",
+    "mvp_analytics_event table and endpoints not implemented",
+    "Structured error monitoring not implemented",
+    "Kill switch runbook not written"
+  ],
+
+  "state_determination": "State B — DEEPSEEK_API_KEY_STAGING not provisioned; real provider calls = 0",
+  "real_provider_calls": 0,
+  "real_provider_cost_cny": "0"
+}

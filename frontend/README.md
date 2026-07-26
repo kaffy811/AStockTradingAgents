@@ -88,6 +88,34 @@ curl http://localhost:8080/api/v1/stock/600519/modules/valuation | python -m jso
 curl "http://localhost:8080/api/v1/stock/600519/modules/growth?period=annual&limit=8"
 ```
 
+## 数据导出
+
+### CSV 导出
+- 范围：当前分组中已加载的模块（有行数据的模块）
+- 格式：UTF-8 with BOM（兼容 Excel 直接打开）
+- 触发：工具栏 "↓ CSV" 按钮，或模块卡片 "↓" 按钮
+
+### Excel (.xlsx) 导出
+- **导出当前模块**：点击模块卡片的 "XLS" 按钮
+- **导出当前分组**：工具栏 "↓ Excel" → "导出当前分组"（一个工作簿，每个模块一个 Sheet）
+- **导出全部已加载**：工具栏 "↓ Excel" → "导出全部已加载"（仅导出已缓存模块，不触发新请求）
+- **加载全部后导出**：工具栏 "↓ Excel" → "加载全部后导出"（先请求所有可用模块，再全量导出）
+
+导出规则：
+- `null`/`undefined` → 空单元格（不输出"—"字符串）
+- 每个 Sheet 顶部包含元数据（更新时间、数据来源、partial/stale 状态）
+- 使用 `field_labels` 作为列标题
+- `目录` Sheet 列出所有导出模块及状态
+- Planned 模块不包含在导出中
+
+**故障排查：**
+
+**stale=true（黄色提示）**
+数据来自后端缓存，非最新行情。可点击模块卡片 "↻" 刷新单个模块，或工具栏 "↻" 刷新当前分组。
+
+**partial=true（橙色提示）**
+部分字段获取失败，数据不完整但仍可用。通常因 Tushare 配额不足或接口返回不完整，属正常现象，导出的 Excel 中对应字段为空单元格。
+
 ## Build
 
 ```bash
@@ -95,4 +123,4 @@ npm run build   # 生产构建
 npm run dev     # 开发服务器
 ```
 
-注意：ECharts 约 1MB，生产构建后 StockDetailView chunk 约 1.2MB（gzip 400KB），属正常现象。
+注意：ECharts 约 1MB，xlsx（SheetJS）约 800KB，生产构建后 StockDetailView chunk 约 1.2MB（gzip 400KB），属正常现象。xlsx 通过动态 import 懒加载，不影响首屏性能。

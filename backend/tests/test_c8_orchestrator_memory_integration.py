@@ -90,20 +90,16 @@ async def test_write_memory_skips_when_no_session_id():
 async def test_write_memory_extracts_symbol():
     calls = {}
 
-    async def fake_update_symbols(db, sid, uid, info):
-        calls["symbols"] = info
+    async def fake_apply(db, sid, uid, **kwargs):
+        calls.update(kwargs)
 
-    with patch("app.agents.chat_orchestrator._mem.update_symbols", fake_update_symbols), \
-         patch("app.agents.chat_orchestrator._mem.update_output_language", AsyncMock()), \
-         patch("app.agents.chat_orchestrator._mem.update_intents", AsyncMock()), \
-         patch("app.agents.chat_orchestrator._mem.update_task_state", AsyncMock()), \
-         patch("app.agents.chat_orchestrator._mem.update_pending_confirmation", AsyncMock()):
+    with patch("app.agents.chat_orchestrator._mem.apply_memory_updates", fake_apply):
 
         db = AsyncMock()
         result = OrchestratorResult(answer="ok")
         await _write_memory_from_result(db, SESSION_ID, USER_ID, "688146 为什么涨", result, "zh-CN")
 
-    assert calls.get("symbols", {}).get("symbol") == "688146"
+    assert calls.get("symbols", [{}])[0].get("symbol") == "688146"
 
 
 # ── _write_memory_from_result — output_language ────────────────────────────────
@@ -112,20 +108,16 @@ async def test_write_memory_extracts_symbol():
 async def test_write_memory_writes_output_language():
     calls = {}
 
-    async def fake_update_lang(db, sid, uid, lang):
-        calls["language"] = lang
+    async def fake_apply(db, sid, uid, **kwargs):
+        calls.update(kwargs)
 
-    with patch("app.agents.chat_orchestrator._mem.update_symbols", AsyncMock()), \
-         patch("app.agents.chat_orchestrator._mem.update_output_language", fake_update_lang), \
-         patch("app.agents.chat_orchestrator._mem.update_intents", AsyncMock()), \
-         patch("app.agents.chat_orchestrator._mem.update_task_state", AsyncMock()), \
-         patch("app.agents.chat_orchestrator._mem.update_pending_confirmation", AsyncMock()):
+    with patch("app.agents.chat_orchestrator._mem.apply_memory_updates", fake_apply):
 
         db = AsyncMock()
         result = OrchestratorResult(answer="ok")
         await _write_memory_from_result(db, SESSION_ID, USER_ID, "hello", result, "en-US")
 
-    assert calls.get("language") == "en-US"
+    assert calls.get("output_language") == "en-US"
 
 
 # ── _write_memory_from_result — intent from skill_name ────────────────────────
@@ -134,14 +126,10 @@ async def test_write_memory_writes_output_language():
 async def test_write_memory_writes_intent_from_skill_name():
     calls = {}
 
-    async def fake_update_intents(db, sid, uid, intent):
-        calls["intent"] = intent
+    async def fake_apply(db, sid, uid, **kwargs):
+        calls.update(kwargs)
 
-    with patch("app.agents.chat_orchestrator._mem.update_symbols", AsyncMock()), \
-         patch("app.agents.chat_orchestrator._mem.update_output_language", AsyncMock()), \
-         patch("app.agents.chat_orchestrator._mem.update_intents", fake_update_intents), \
-         patch("app.agents.chat_orchestrator._mem.update_task_state", AsyncMock()), \
-         patch("app.agents.chat_orchestrator._mem.update_pending_confirmation", AsyncMock()):
+    with patch("app.agents.chat_orchestrator._mem.apply_memory_updates", fake_apply):
 
         db = AsyncMock()
         result = OrchestratorResult(answer="ok", metadata={"skill_name": "anomaly_skill"})
@@ -156,21 +144,17 @@ async def test_write_memory_writes_intent_from_skill_name():
 async def test_write_memory_writes_pending_confirmation_id():
     calls = {}
 
-    async def fake_update_conf(db, sid, uid, conf_id):
-        calls["confirmation_id"] = conf_id
+    async def fake_apply(db, sid, uid, **kwargs):
+        calls.update(kwargs)
 
-    with patch("app.agents.chat_orchestrator._mem.update_symbols", AsyncMock()), \
-         patch("app.agents.chat_orchestrator._mem.update_output_language", AsyncMock()), \
-         patch("app.agents.chat_orchestrator._mem.update_intents", AsyncMock()), \
-         patch("app.agents.chat_orchestrator._mem.update_task_state", AsyncMock()), \
-         patch("app.agents.chat_orchestrator._mem.update_pending_confirmation", fake_update_conf):
+    with patch("app.agents.chat_orchestrator._mem.apply_memory_updates", fake_apply):
 
         db = AsyncMock()
         confirmation = {"id": "conf-abc-123", "type": "add_watchlist", "text": "?"}
         result = OrchestratorResult(answer="", confirmation=confirmation)
         await _write_memory_from_result(db, SESSION_ID, USER_ID, "加入自选", result, "zh-CN")
 
-    assert calls.get("confirmation_id") == "conf-abc-123"
+    assert calls.get("pending_confirmation_id") == "conf-abc-123"
 
 
 # ── _write_memory_from_result — fire-and-forget safety ────────────────────────

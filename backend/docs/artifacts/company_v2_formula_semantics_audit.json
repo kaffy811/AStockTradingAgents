@@ -1,0 +1,751 @@
+{
+  "records": [
+    {
+      "symbol": "600519",
+      "check_id": "dupont_roe_formula",
+      "status": "warning",
+      "check_strength": "weak",
+      "tags": [
+        "DUPONT_PROVIDER_DEFINED",
+        "ACCOUNTING_DEFINITION_DIFFERENCE",
+        "DUPONT_FORMULA_WEAK_CHECK"
+      ],
+      "expected": 0.2053499582642378,
+      "actual": 0.105687,
+      "relative_diff_pct": 48.5332,
+      "module_key": "dupont",
+      "field_name": "roe",
+      "source_provider": "baostock",
+      "raw_field": "dupont_roe",
+      "normalized_field": "roe",
+      "period": "2026-03-31",
+      "stat_date": "2026-03-31",
+      "publish_date": "2026-04-25",
+      "report_period_type": "quarterly",
+      "value_unit": "%",
+      "percent_scale": "decimal_to_percent",
+      "numerator_field": null,
+      "denominator_field": null,
+      "numerator_period": null,
+      "denominator_period": null,
+      "denominator_unit": null,
+      "suspected_issue": "PROVIDER_ACCOUNTING_DEFINITION_DIFFERENT",
+      "evidence": {
+        "roe": 0.105687,
+        "net_margin": 0.967631,
+        "asset_turnover": 0.175399,
+        "equity_multiplier": 1.209923,
+        "computed_roe": 0.2053499582642378,
+        "formula_context": [
+          {
+            "period": "2026-03-31",
+            "report_period_type": "quarterly",
+            "value_basis": "unknown",
+            "unit": "%",
+            "percent_scale": "decimal_to_percent",
+            "provider_definition": "dupont_provider_defined",
+            "source_module": "dupont",
+            "source_provider": "baostock",
+            "raw_field": "dupont_roe",
+            "normalized_field": "roe",
+            "publish_date": "2026-04-25"
+          },
+          {
+            "period": "2026-03-31",
+            "report_period_type": "quarterly",
+            "value_basis": "unknown",
+            "unit": "%",
+            "percent_scale": "decimal_to_percent",
+            "provider_definition": "dupont_provider_defined",
+            "source_module": "dupont",
+            "source_provider": "baostock",
+            "raw_field": "dupont_npi",
+            "normalized_field": "net_margin",
+            "publish_date": "2026-04-25"
+          },
+          {
+            "period": "2026-03-31",
+            "report_period_type": "quarterly",
+            "value_basis": "unknown",
+            "unit": "ratio",
+            "percent_scale": "unknown",
+            "provider_definition": "dupont_provider_defined",
+            "source_module": "dupont",
+            "source_provider": "baostock",
+            "raw_field": "dupont_at",
+            "normalized_field": "asset_turnover",
+            "publish_date": "2026-04-25"
+          },
+          {
+            "period": "2026-03-31",
+            "report_period_type": "quarterly",
+            "value_basis": "unknown",
+            "unit": "ratio",
+            "percent_scale": "unknown",
+            "provider_definition": "dupont_provider_defined",
+            "source_module": "dupont",
+            "source_provider": "baostock",
+            "raw_field": "dupont_am",
+            "normalized_field": "equity_multiplier",
+            "publish_date": "2026-04-25"
+          }
+        ]
+      },
+      "recommended_fix": [
+        "compare provider definitions for Dupont components"
+      ]
+    },
+    {
+      "symbol": "600519",
+      "check_id": "net_margin_formula",
+      "status": "warning",
+      "check_strength": "weak",
+      "tags": [
+        "FORMULA_CONTEXT_MISSING"
+      ],
+      "expected": 0.16363352995439587,
+      "actual": 0.522245,
+      "relative_diff_pct": 68.6673,
+      "module_key": "profitability",
+      "field_name": "net_margin",
+      "source_provider": "baostock",
+      "raw_field": "net_margin",
+      "normalized_field": "net_margin",
+      "period": "2026-03-31",
+      "stat_date": "2026-03-31",
+      "publish_date": "2026-04-25",
+      "report_period_type": "quarterly",
+      "value_unit": "%",
+      "percent_scale": "decimal_to_percent",
+      "numerator_field": "net_profit",
+      "denominator_field": "revenue",
+      "numerator_period": "2026-03-31",
+      "denominator_period": "2026-03-31",
+      "denominator_unit": "unknown",
+      "suspected_issue": "VALIDATION_FORMULA_NOT_APPLICABLE",
+      "evidence": {
+        "net_profit": 28153831489.89,
+        "revenue": 172054171890.91,
+        "formula_context": [
+          {
+            "period": "2026-03-31",
+            "report_period_type": "quarterly",
+            "value_basis": "unknown",
+            "unit": "%",
+            "percent_scale": "decimal_to_percent",
+            "provider_definition": "unknown",
+            "source_module": "profitability",
+            "source_provider": "baostock",
+            "raw_field": "net_margin",
+            "normalized_field": "net_margin",
+            "publish_date": "2026-04-25"
+          },
+          {
+            "period": "2026-03-31",
+            "report_period_type": "quarterly",
+            "value_basis": "unknown",
+            "unit": "unknown",
+            "percent_scale": "unknown",
+            "provider_definition": "unknown",
+            "source_module": "profitability",
+            "source_provider": "baostock_aggregate",
+            "raw_field": null,
+            "normalized_field": "net_profit",
+            "publish_date": "2026-04-25"
+          },
+          {
+            "period": "2026-03-31",
+            "report_period_type": "quarterly",
+            "value_basis": "unknown",
+            "unit": "unknown",
+            "percent_scale": "unknown",
+            "provider_definition": "unknown",
+            "source_module": "profitability",
+            "source_provider": "baostock_aggregate",
+            "raw_field": null,
+            "normalized_field": "revenue",
+            "publish_date": "2026-04-25"
+          }
+        ]
+      },
+      "recommended_fix": [
+        "align period and value_basis before validating net_margin",
+        "inspect BaoStock field definition",
+        "avoid cross-module strong formula check"
+      ]
+    },
+    {
+      "symbol": "600519",
+      "check_id": "gross_margin_formula",
+      "status": "skipped",
+      "check_strength": "informational",
+      "tags": [
+        "FORMULA_CONTEXT_MISSING"
+      ],
+      "expected": null,
+      "actual": null,
+      "relative_diff_pct": null,
+      "module_key": "profitability",
+      "field_name": "gross_margin",
+      "source_provider": "baostock",
+      "raw_field": "gross_margin",
+      "normalized_field": "gross_margin",
+      "period": "2026-03-31",
+      "stat_date": "2026-03-31",
+      "publish_date": "2026-04-25",
+      "report_period_type": "quarterly",
+      "value_unit": "%",
+      "percent_scale": "decimal_to_percent",
+      "numerator_field": null,
+      "denominator_field": null,
+      "numerator_period": null,
+      "denominator_period": null,
+      "denominator_unit": null,
+      "suspected_issue": "VALIDATION_FORMULA_NOT_APPLICABLE",
+      "evidence": {
+        "formula_context": [
+          {
+            "period": "2026-03-31",
+            "report_period_type": "quarterly",
+            "value_basis": "unknown",
+            "unit": "%",
+            "percent_scale": "decimal_to_percent",
+            "provider_definition": "unknown",
+            "source_module": "profitability",
+            "source_provider": "baostock",
+            "raw_field": "gross_margin",
+            "normalized_field": "gross_margin",
+            "publish_date": "2026-04-25"
+          },
+          {
+            "period": "2026-03-31",
+            "report_period_type": "quarterly",
+            "value_basis": "unknown",
+            "unit": "unknown",
+            "percent_scale": "unknown",
+            "provider_definition": "unknown",
+            "source_module": "profitability",
+            "source_provider": "baostock_aggregate",
+            "raw_field": null,
+            "normalized_field": "gross_profit",
+            "publish_date": "2026-04-25"
+          },
+          {
+            "period": "2026-03-31",
+            "report_period_type": "quarterly",
+            "value_basis": "unknown",
+            "unit": "unknown",
+            "percent_scale": "unknown",
+            "provider_definition": "unknown",
+            "source_module": "profitability",
+            "source_provider": "baostock_aggregate",
+            "raw_field": null,
+            "normalized_field": "revenue",
+            "publish_date": "2026-04-25"
+          }
+        ]
+      },
+      "recommended_fix": [
+        "align period and value_basis before validating net_margin"
+      ]
+    },
+    {
+      "symbol": "000725",
+      "check_id": "dupont_roe_formula",
+      "status": "warning",
+      "check_strength": "weak",
+      "tags": [
+        "DUPONT_PROVIDER_DEFINED",
+        "ACCOUNTING_DEFINITION_DIFFERENCE",
+        "DUPONT_FORMULA_WEAK_CHECK"
+      ],
+      "expected": 0.3765730625947025,
+      "actual": 0.012619,
+      "relative_diff_pct": 96.649,
+      "module_key": "dupont",
+      "field_name": "roe",
+      "source_provider": "baostock",
+      "raw_field": "dupont_roe",
+      "normalized_field": "roe",
+      "period": "2026-03-31",
+      "stat_date": "2026-03-31",
+      "publish_date": "2026-04-30",
+      "report_period_type": "quarterly",
+      "value_unit": "%",
+      "percent_scale": "decimal_to_percent",
+      "numerator_field": null,
+      "denominator_field": null,
+      "numerator_period": null,
+      "denominator_period": null,
+      "denominator_unit": null,
+      "suspected_issue": "PROVIDER_ACCOUNTING_DEFINITION_DIFFERENT",
+      "evidence": {
+        "roe": 0.012619,
+        "net_margin": 0.998907,
+        "asset_turnover": 0.116697,
+        "equity_multiplier": 3.230461,
+        "computed_roe": 0.3765730625947025,
+        "formula_context": [
+          {
+            "period": "2026-03-31",
+            "report_period_type": "quarterly",
+            "value_basis": "unknown",
+            "unit": "%",
+            "percent_scale": "decimal_to_percent",
+            "provider_definition": "dupont_provider_defined",
+            "source_module": "dupont",
+            "source_provider": "baostock",
+            "raw_field": "dupont_roe",
+            "normalized_field": "roe",
+            "publish_date": "2026-04-30"
+          },
+          {
+            "period": "2026-03-31",
+            "report_period_type": "quarterly",
+            "value_basis": "unknown",
+            "unit": "%",
+            "percent_scale": "decimal_to_percent",
+            "provider_definition": "dupont_provider_defined",
+            "source_module": "dupont",
+            "source_provider": "baostock",
+            "raw_field": "dupont_npi",
+            "normalized_field": "net_margin",
+            "publish_date": "2026-04-30"
+          },
+          {
+            "period": "2026-03-31",
+            "report_period_type": "quarterly",
+            "value_basis": "unknown",
+            "unit": "ratio",
+            "percent_scale": "unknown",
+            "provider_definition": "dupont_provider_defined",
+            "source_module": "dupont",
+            "source_provider": "baostock",
+            "raw_field": "dupont_at",
+            "normalized_field": "asset_turnover",
+            "publish_date": "2026-04-30"
+          },
+          {
+            "period": "2026-03-31",
+            "report_period_type": "quarterly",
+            "value_basis": "unknown",
+            "unit": "ratio",
+            "percent_scale": "unknown",
+            "provider_definition": "dupont_provider_defined",
+            "source_module": "dupont",
+            "source_provider": "baostock",
+            "raw_field": "dupont_am",
+            "normalized_field": "equity_multiplier",
+            "publish_date": "2026-04-30"
+          }
+        ]
+      },
+      "recommended_fix": [
+        "compare provider definitions for Dupont components"
+      ]
+    },
+    {
+      "symbol": "000725",
+      "check_id": "net_margin_formula",
+      "status": "warning",
+      "check_strength": "weak",
+      "tags": [
+        "FORMULA_CONTEXT_MISSING"
+      ],
+      "expected": 0.008353709639075058,
+      "actual": 0.033511,
+      "relative_diff_pct": 75.0717,
+      "module_key": "profitability",
+      "field_name": "net_margin",
+      "source_provider": "baostock",
+      "raw_field": "net_margin",
+      "normalized_field": "net_margin",
+      "period": "2026-03-31",
+      "stat_date": "2026-03-31",
+      "publish_date": "2026-04-30",
+      "report_period_type": "quarterly",
+      "value_unit": "%",
+      "percent_scale": "decimal_to_percent",
+      "numerator_field": "net_profit",
+      "denominator_field": "revenue",
+      "numerator_period": "2026-03-31",
+      "denominator_period": "2026-03-31",
+      "denominator_unit": "unknown",
+      "suspected_issue": "VALIDATION_FORMULA_NOT_APPLICABLE",
+      "evidence": {
+        "net_profit": 1709087317.0,
+        "revenue": 204590222888.0,
+        "formula_context": [
+          {
+            "period": "2026-03-31",
+            "report_period_type": "quarterly",
+            "value_basis": "unknown",
+            "unit": "%",
+            "percent_scale": "decimal_to_percent",
+            "provider_definition": "unknown",
+            "source_module": "profitability",
+            "source_provider": "baostock",
+            "raw_field": "net_margin",
+            "normalized_field": "net_margin",
+            "publish_date": "2026-04-30"
+          },
+          {
+            "period": "2026-03-31",
+            "report_period_type": "quarterly",
+            "value_basis": "unknown",
+            "unit": "unknown",
+            "percent_scale": "unknown",
+            "provider_definition": "unknown",
+            "source_module": "profitability",
+            "source_provider": "baostock_aggregate",
+            "raw_field": null,
+            "normalized_field": "net_profit",
+            "publish_date": "2026-04-30"
+          },
+          {
+            "period": "2026-03-31",
+            "report_period_type": "quarterly",
+            "value_basis": "unknown",
+            "unit": "unknown",
+            "percent_scale": "unknown",
+            "provider_definition": "unknown",
+            "source_module": "profitability",
+            "source_provider": "baostock_aggregate",
+            "raw_field": null,
+            "normalized_field": "revenue",
+            "publish_date": "2026-04-30"
+          }
+        ]
+      },
+      "recommended_fix": [
+        "align period and value_basis before validating net_margin",
+        "inspect BaoStock field definition",
+        "avoid cross-module strong formula check"
+      ]
+    },
+    {
+      "symbol": "000725",
+      "check_id": "gross_margin_formula",
+      "status": "skipped",
+      "check_strength": "informational",
+      "tags": [
+        "FORMULA_CONTEXT_MISSING"
+      ],
+      "expected": null,
+      "actual": null,
+      "relative_diff_pct": null,
+      "module_key": "profitability",
+      "field_name": "gross_margin",
+      "source_provider": "baostock",
+      "raw_field": "gross_margin",
+      "normalized_field": "gross_margin",
+      "period": "2026-03-31",
+      "stat_date": "2026-03-31",
+      "publish_date": "2026-04-30",
+      "report_period_type": "quarterly",
+      "value_unit": "%",
+      "percent_scale": "decimal_to_percent",
+      "numerator_field": null,
+      "denominator_field": null,
+      "numerator_period": null,
+      "denominator_period": null,
+      "denominator_unit": null,
+      "suspected_issue": "VALIDATION_FORMULA_NOT_APPLICABLE",
+      "evidence": {
+        "formula_context": [
+          {
+            "period": "2026-03-31",
+            "report_period_type": "quarterly",
+            "value_basis": "unknown",
+            "unit": "%",
+            "percent_scale": "decimal_to_percent",
+            "provider_definition": "unknown",
+            "source_module": "profitability",
+            "source_provider": "baostock",
+            "raw_field": "gross_margin",
+            "normalized_field": "gross_margin",
+            "publish_date": "2026-04-30"
+          },
+          {
+            "period": "2026-03-31",
+            "report_period_type": "quarterly",
+            "value_basis": "unknown",
+            "unit": "unknown",
+            "percent_scale": "unknown",
+            "provider_definition": "unknown",
+            "source_module": "profitability",
+            "source_provider": "baostock_aggregate",
+            "raw_field": null,
+            "normalized_field": "gross_profit",
+            "publish_date": "2026-04-30"
+          },
+          {
+            "period": "2026-03-31",
+            "report_period_type": "quarterly",
+            "value_basis": "unknown",
+            "unit": "unknown",
+            "percent_scale": "unknown",
+            "provider_definition": "unknown",
+            "source_module": "profitability",
+            "source_provider": "baostock_aggregate",
+            "raw_field": null,
+            "normalized_field": "revenue",
+            "publish_date": "2026-04-30"
+          }
+        ]
+      },
+      "recommended_fix": [
+        "align period and value_basis before validating net_margin"
+      ]
+    },
+    {
+      "symbol": "601686",
+      "check_id": "dupont_roe_formula",
+      "status": "warning",
+      "check_strength": "weak",
+      "tags": [
+        "DUPONT_PROVIDER_DEFINED",
+        "ACCOUNTING_DEFINITION_DIFFERENCE",
+        "DUPONT_FORMULA_WEAK_CHECK"
+      ],
+      "expected": 1.4010487298199854,
+      "actual": 0.018961,
+      "relative_diff_pct": 98.6467,
+      "module_key": "dupont",
+      "field_name": "roe",
+      "source_provider": "baostock",
+      "raw_field": "dupont_roe",
+      "normalized_field": "roe",
+      "period": "2026-03-31",
+      "stat_date": "2026-03-31",
+      "publish_date": "2026-04-29",
+      "report_period_type": "quarterly",
+      "value_unit": "%",
+      "percent_scale": "decimal_to_percent",
+      "numerator_field": null,
+      "denominator_field": null,
+      "numerator_period": null,
+      "denominator_period": null,
+      "denominator_unit": null,
+      "suspected_issue": "PROVIDER_ACCOUNTING_DEFINITION_DIFFERENT",
+      "evidence": {
+        "roe": 0.018961,
+        "net_margin": 0.896523,
+        "asset_turnover": 0.448859,
+        "equity_multiplier": 3.481624,
+        "computed_roe": 1.4010487298199854,
+        "formula_context": [
+          {
+            "period": "2026-03-31",
+            "report_period_type": "quarterly",
+            "value_basis": "unknown",
+            "unit": "%",
+            "percent_scale": "decimal_to_percent",
+            "provider_definition": "dupont_provider_defined",
+            "source_module": "dupont",
+            "source_provider": "baostock",
+            "raw_field": "dupont_roe",
+            "normalized_field": "roe",
+            "publish_date": "2026-04-29"
+          },
+          {
+            "period": "2026-03-31",
+            "report_period_type": "quarterly",
+            "value_basis": "unknown",
+            "unit": "%",
+            "percent_scale": "decimal_to_percent",
+            "provider_definition": "dupont_provider_defined",
+            "source_module": "dupont",
+            "source_provider": "baostock",
+            "raw_field": "dupont_npi",
+            "normalized_field": "net_margin",
+            "publish_date": "2026-04-29"
+          },
+          {
+            "period": "2026-03-31",
+            "report_period_type": "quarterly",
+            "value_basis": "unknown",
+            "unit": "ratio",
+            "percent_scale": "unknown",
+            "provider_definition": "dupont_provider_defined",
+            "source_module": "dupont",
+            "source_provider": "baostock",
+            "raw_field": "dupont_at",
+            "normalized_field": "asset_turnover",
+            "publish_date": "2026-04-29"
+          },
+          {
+            "period": "2026-03-31",
+            "report_period_type": "quarterly",
+            "value_basis": "unknown",
+            "unit": "ratio",
+            "percent_scale": "unknown",
+            "provider_definition": "dupont_provider_defined",
+            "source_module": "dupont",
+            "source_provider": "baostock",
+            "raw_field": "dupont_am",
+            "normalized_field": "equity_multiplier",
+            "publish_date": "2026-04-29"
+          }
+        ]
+      },
+      "recommended_fix": [
+        "compare provider definitions for Dupont components"
+      ]
+    },
+    {
+      "symbol": "601686",
+      "check_id": "net_margin_formula",
+      "status": "warning",
+      "check_strength": "weak",
+      "tags": [
+        "FORMULA_CONTEXT_MISSING"
+      ],
+      "expected": 0.0028430893614642266,
+      "actual": 0.013534,
+      "relative_diff_pct": 78.993,
+      "module_key": "profitability",
+      "field_name": "net_margin",
+      "source_provider": "baostock",
+      "raw_field": "net_margin",
+      "normalized_field": "net_margin",
+      "period": "2026-03-31",
+      "stat_date": "2026-03-31",
+      "publish_date": "2026-04-29",
+      "report_period_type": "quarterly",
+      "value_unit": "%",
+      "percent_scale": "decimal_to_percent",
+      "numerator_field": "net_profit",
+      "denominator_field": "revenue",
+      "numerator_period": "2026-03-31",
+      "denominator_period": "2026-03-31",
+      "denominator_unit": "unknown",
+      "suspected_issue": "VALIDATION_FORMULA_NOT_APPLICABLE",
+      "evidence": {
+        "net_profit": 144062444.38,
+        "revenue": 50671092626.44,
+        "formula_context": [
+          {
+            "period": "2026-03-31",
+            "report_period_type": "quarterly",
+            "value_basis": "unknown",
+            "unit": "%",
+            "percent_scale": "decimal_to_percent",
+            "provider_definition": "unknown",
+            "source_module": "profitability",
+            "source_provider": "baostock",
+            "raw_field": "net_margin",
+            "normalized_field": "net_margin",
+            "publish_date": "2026-04-29"
+          },
+          {
+            "period": "2026-03-31",
+            "report_period_type": "quarterly",
+            "value_basis": "unknown",
+            "unit": "unknown",
+            "percent_scale": "unknown",
+            "provider_definition": "unknown",
+            "source_module": "profitability",
+            "source_provider": "baostock_aggregate",
+            "raw_field": null,
+            "normalized_field": "net_profit",
+            "publish_date": "2026-04-29"
+          },
+          {
+            "period": "2026-03-31",
+            "report_period_type": "quarterly",
+            "value_basis": "unknown",
+            "unit": "unknown",
+            "percent_scale": "unknown",
+            "provider_definition": "unknown",
+            "source_module": "profitability",
+            "source_provider": "baostock_aggregate",
+            "raw_field": null,
+            "normalized_field": "revenue",
+            "publish_date": "2026-04-29"
+          }
+        ]
+      },
+      "recommended_fix": [
+        "align period and value_basis before validating net_margin",
+        "inspect BaoStock field definition",
+        "avoid cross-module strong formula check"
+      ]
+    },
+    {
+      "symbol": "601686",
+      "check_id": "gross_margin_formula",
+      "status": "skipped",
+      "check_strength": "informational",
+      "tags": [
+        "FORMULA_CONTEXT_MISSING"
+      ],
+      "expected": null,
+      "actual": null,
+      "relative_diff_pct": null,
+      "module_key": "profitability",
+      "field_name": "gross_margin",
+      "source_provider": "baostock",
+      "raw_field": "gross_margin",
+      "normalized_field": "gross_margin",
+      "period": "2026-03-31",
+      "stat_date": "2026-03-31",
+      "publish_date": "2026-04-29",
+      "report_period_type": "quarterly",
+      "value_unit": "%",
+      "percent_scale": "decimal_to_percent",
+      "numerator_field": null,
+      "denominator_field": null,
+      "numerator_period": null,
+      "denominator_period": null,
+      "denominator_unit": null,
+      "suspected_issue": "VALIDATION_FORMULA_NOT_APPLICABLE",
+      "evidence": {
+        "formula_context": [
+          {
+            "period": "2026-03-31",
+            "report_period_type": "quarterly",
+            "value_basis": "unknown",
+            "unit": "%",
+            "percent_scale": "decimal_to_percent",
+            "provider_definition": "unknown",
+            "source_module": "profitability",
+            "source_provider": "baostock",
+            "raw_field": "gross_margin",
+            "normalized_field": "gross_margin",
+            "publish_date": "2026-04-29"
+          },
+          {
+            "period": "2026-03-31",
+            "report_period_type": "quarterly",
+            "value_basis": "unknown",
+            "unit": "unknown",
+            "percent_scale": "unknown",
+            "provider_definition": "unknown",
+            "source_module": "profitability",
+            "source_provider": "baostock_aggregate",
+            "raw_field": null,
+            "normalized_field": "gross_profit",
+            "publish_date": "2026-04-29"
+          },
+          {
+            "period": "2026-03-31",
+            "report_period_type": "quarterly",
+            "value_basis": "unknown",
+            "unit": "unknown",
+            "percent_scale": "unknown",
+            "provider_definition": "unknown",
+            "source_module": "profitability",
+            "source_provider": "baostock_aggregate",
+            "raw_field": null,
+            "normalized_field": "revenue",
+            "publish_date": "2026-04-29"
+          }
+        ]
+      },
+      "recommended_fix": [
+        "align period and value_basis before validating net_margin"
+      ]
+    }
+  ]
+}

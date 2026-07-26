@@ -1,0 +1,76 @@
+{
+  "report_id": 2,
+  "symbol": "600519",
+  "human_review_queue": [
+    {
+      "field": "revenue",
+      "status": "conflict",
+      "reason": "VALUE_DIFF_EXCEEDS_TOLERANCE",
+      "confidence": 0.95,
+      "official_value": 168838102514.79,
+      "structured_value": 172054171890.91,
+      "provider_definition": null,
+      "matched_label": null,
+      "field_definition_match": {
+        "status": "unknown",
+        "match_type": "unknown",
+        "field": "revenue",
+        "canonical_name": "营业收入",
+        "matched_label": "",
+        "provider_definition": "unknown",
+        "reason": "field definition could not be confirmed from available labels"
+      },
+      "evidence_page": 6,
+      "evidence_excerpt": "营业收入 168,838,102,514.79"
+    },
+    {
+      "field": "net_profit_parent",
+      "status": "definition_mismatch",
+      "reason": "field definition text indicates a different financial concept",
+      "confidence": 0.98,
+      "official_value": 82320067101.68,
+      "structured_value": 85310324833.67,
+      "provider_definition": null,
+      "matched_label": null,
+      "field_definition_match": {
+        "status": "definition_mismatch",
+        "match_type": "incompatible",
+        "field": "net_profit_parent",
+        "canonical_name": "归属于上市公司股东的净利润",
+        "matched_label": "net_profit",
+        "provider_definition": "unknown",
+        "incompatible_labels": [
+          "net_profit"
+        ],
+        "reason": "field definition text indicates a different financial concept"
+      },
+      "evidence_page": 6,
+      "evidence_excerpt": "归属于上市公司股东的净利润 82,320,067,101.68"
+    },
+    {
+      "field": "roe_weighted",
+      "status": "definition_mismatch",
+      "reason": "field definition text indicates a different financial concept",
+      "confidence": 0.95,
+      "official_value": 32.53,
+      "structured_value": 34.462,
+      "provider_definition": null,
+      "matched_label": null,
+      "field_definition_match": {
+        "status": "definition_mismatch",
+        "match_type": "incompatible",
+        "field": "roe_weighted",
+        "canonical_name": "加权平均净资产收益率",
+        "matched_label": "ROE",
+        "provider_definition": "unknown",
+        "incompatible_labels": [
+          "ROE",
+          "roe"
+        ],
+        "reason": "field definition text indicates a different financial concept"
+      },
+      "evidence_page": 6,
+      "evidence_excerpt": "加权平均净资产收益率（%） 32.53"
+    }
+  ]
+}

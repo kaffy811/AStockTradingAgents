@@ -1,0 +1,50 @@
+{
+  "schema_version": "pi_canary_concurrency_v1",
+  "phase": "6V-P1.31",
+  "generated_at": "2026-07-26T00:00:00Z",
+  "gate": "H",
+
+  "rate_limiter": {
+    "status": "PASS",
+    "file": "backend/app/llm/provider_control/rate_limit.py",
+    "class": "SlidingWindowRateLimiter",
+    "mechanism": "Redis fixed-window (60s) with Lua atomic INCR",
+    "default_limit_per_minute": 60,
+    "cross_worker": true,
+    "key_pattern": "{namespace}:window:{epoch//60}",
+    "lua_script": "_LUA_RATE_LIMIT"
+  },
+
+  "concurrency_semaphore": {
+    "status": "PASS",
+    "file": "backend/app/llm/provider_control/concurrency.py",
+    "class": "LeaseSemaphore",
+    "mechanism": "Redis SETNX lease per slot with TTL",
+    "default_max_slots": 2,
+    "lease_ttl_seconds": 60,
+    "crash_recovery": "Automatic via Redis TTL expiry",
+    "cross_worker": true,
+    "context_manager": "acquire_context() → yields (owner_token, slot_idx)",
+    "key_pattern": "{namespace}:slot:{i}"
+  },
+
+  "deepseek_client_extensions": {
+    "timeout": {
+      "status": "PASS",
+      "value_seconds": 30.0,
+      "source": "settings.pi_real_provider_timeout_seconds",
+      "p130_state": "NOT_SET (SDK default 600s)"
+    },
+    "rate_limit_handler": {
+      "status": "PASS",
+      "action": "RateLimitError → RuntimeError with legacy_pi_failed message",
+      "p130_state": "NOT_IMPLEMENTED"
+    },
+    "usage_capture": {
+      "status": "PASS",
+      "method": "ProviderUsageResult.from_openai_usage(response.usage)",
+      "property": "DeepSeekClient.last_usage",
+      "p130_state": "NOT_IMPLEMENTED (no token usage capture)"
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "schema_version": "pi_official_report_p115_stale_review_validation_v1",
+  "phase": "6V-P1.15",
+  "stale_review_count": 3,
+  "records": [
+    {
+      "record_id": "stale_001",
+      "health_upgraded": false,
+      "wrongly_preferred": false,
+      "wrong_latest_selection": false,
+      "wrong_url": false,
+      "wrong_year": false,
+      "duplicate_active": false,
+      "physically_deleted": false,
+      "selection_reason_auditable": true
+    },
+    {
+      "record_id": "stale_002",
+      "health_upgraded": false,
+      "wrongly_preferred": false,
+      "wrong_latest_selection": false,
+      "wrong_url": false,
+      "wrong_year": false,
+      "duplicate_active": false,
+      "physically_deleted": false,
+      "selection_reason_auditable": true
+    },
+    {
+      "record_id": "stale_003",
+      "health_upgraded": false,
+      "wrongly_preferred": false,
+      "wrong_latest_selection": false,
+      "wrong_url": false,
+      "wrong_year": false,
+      "duplicate_active": false,
+      "physically_deleted": false,
+      "selection_reason_auditable": true
+    }
+  ],
+  "stale_wrong_selection_count": 0,
+  "validation_passed": true
+}

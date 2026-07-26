@@ -1,0 +1,11 @@
+{
+  "schema_version": "pi_official_report_p18_canary_write_audit_v1",
+  "phase": "6V-P1.8",
+  "generated_at": "2026-07-20T11:29:04.537740+00:00",
+  "method": "row-level owner attribution per turn window (P1.6.5 machinery)",
+  "pi_business_writes": 0,
+  "assistant_double_writes": 0,
+  "unknown_writes": 0,
+  "legacy_writes_expected_per_turn": "1 user + 1 assistant (2+2 for multi-turn)",
+  "all_50_requests_clean": true
+}

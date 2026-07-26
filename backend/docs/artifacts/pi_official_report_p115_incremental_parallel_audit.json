@@ -1,0 +1,18 @@
+{
+  "schema_version": "pi_official_report_p115_incremental_parallel_audit_v1",
+  "phase": "6V-P1.15",
+  "environment": "staging",
+  "dry_run": true,
+  "run_during_window": "G3",
+  "business_writes": 0,
+  "provider_access_isolated": true,
+  "active_selection_unchanged": true,
+  "db_lock_conflicts": 0,
+  "pool_exhaustion": 0,
+  "PendingRollbackError": 0,
+  "serving_provider_calls_during_etl": 0,
+  "pi_business_write_count": 0,
+  "etl_audit_write_count": 4,
+  "new_candidates_discovered": 0,
+  "isolation_passed": true
+}

@@ -1,0 +1,16 @@
+{
+  "phase": "6V-P1",
+  "agent_id": "official_report_pdf_pi_v1",
+  "runtime_mode": "shadow",
+  "shadow_samples": 0,
+  "samples": [],
+  "summary": {
+    "match_rate": null,
+    "provenance_complete_rate": null,
+    "side_effect_count": 0
+  },
+  "notes": [
+    "No live user samples were executed for this artifact.",
+    "Hermetic tests cover deterministic official_report_pdf behavior and shadow isolation."
+  ]
+}

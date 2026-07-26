@@ -1,0 +1,362 @@
+{
+  "ok": true,
+  "report_id": 1,
+  "report_year": 2024,
+  "report_type": "annual",
+  "pdf_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF",
+  "download_status": "verified",
+  "parse_status": "parsed",
+  "page_count": 265,
+  "parsed_page_sidecar_exists": true,
+  "ai_verification_status": "needs_human_review",
+  "fields": {
+    "revenue": {
+      "status": "definition_mismatch",
+      "official_value": 54822111649.52,
+      "structured_value": 50227475991.67,
+      "unit": "CNY",
+      "relative_diff_pct": 8.380989931988925,
+      "confidence": 1.0,
+      "evidence_page": 6,
+      "evidence_excerpt": "营业收入 54,822,111,649.52",
+      "reason": "structured value appears to be main business revenue, not operating revenue",
+      "needs_human_review": true,
+      "structured_period": "2024-12-31",
+      "structured_field_name": "revenue",
+      "field_definition_match": {
+        "status": "definition_mismatch",
+        "field": "revenue",
+        "canonical_name": "营业收入",
+        "matched_aliases": [
+          "营业收入"
+        ],
+        "incompatible_aliases": [
+          "主营业务收入"
+        ],
+        "reason": "structured value appears to be main business revenue, not operating revenue"
+      },
+      "field_definition": "营业收入"
+    },
+    "net_profit_parent": {
+      "status": "definition_mismatch",
+      "official_value": 424777342.95,
+      "structured_value": 482101037.78,
+      "unit": "CNY",
+      "relative_diff_pct": 11.89039025801866,
+      "confidence": 1.0,
+      "evidence_page": 6,
+      "evidence_excerpt": "归属于上市公司股东的净利润 424,777,342.95",
+      "reason": "structured value appears to be net profit, not parent-company net profit",
+      "needs_human_review": true,
+      "structured_period": "2024-12-31",
+      "structured_field_name": "net_profit_parent",
+      "field_definition_match": {
+        "status": "definition_mismatch",
+        "field": "net_profit_parent",
+        "canonical_name": "归属于上市公司股东的净利润",
+        "matched_aliases": [
+          "归属于上市公司股东的净利润",
+          "归母净利润"
+        ],
+        "incompatible_aliases": [
+          "净利润",
+          "含少数股东"
+        ],
+        "reason": "structured value appears to be net profit, not parent-company net profit"
+      },
+      "field_definition": "归属于上市公司股东的净利润"
+    },
+    "net_profit": {
+      "status": "verified",
+      "official_value": 482101037.78,
+      "structured_value": 482101037.78,
+      "unit": "CNY",
+      "relative_diff_pct": 0.0,
+      "confidence": 1.0,
+      "evidence_page": 111,
+      "evidence_excerpt": "五、净利润（净亏损以“－”号填列） 482,101,037.78",
+      "reason": "年报净利润与结构化值一致。",
+      "needs_human_review": false,
+      "structured_period": "2024-12-31",
+      "structured_field_name": "net_profit",
+      "field_definition_match": {
+        "status": "unknown",
+        "field": "net_profit",
+        "canonical_name": "净利润",
+        "matched_aliases": [],
+        "incompatible_aliases": [],
+        "reason": "field definition could not be confirmed from available labels"
+      },
+      "field_definition": "净利润"
+    },
+    "operating_cashflow": {
+      "status": "structured_field_missing",
+      "official_value": 1393832602.16,
+      "structured_value": null,
+      "unit": "CNY",
+      "relative_diff_pct": null,
+      "confidence": 1.0,
+      "evidence_page": 14,
+      "evidence_excerpt": "经营活动产生的现金流量净额 1,393,832,602.16",
+      "reason": "结构化未找到该字段，但年报明确披露。",
+      "needs_human_review": false,
+      "structured_period": null,
+      "structured_field_name": "operating_cashflow",
+      "field_definition_match": {
+        "status": "unknown",
+        "field": "operating_cashflow",
+        "canonical_name": "经营活动产生的现金流量净额",
+        "matched_aliases": [],
+        "incompatible_aliases": [],
+        "reason": "field definition could not be confirmed from available labels"
+      },
+      "field_definition": "经营活动产生的现金流量净额"
+    },
+    "total_assets": {
+      "status": "structured_field_missing",
+      "official_value": 26001740331.42,
+      "structured_value": null,
+      "unit": "CNY",
+      "relative_diff_pct": null,
+      "confidence": 1.0,
+      "evidence_page": 107,
+      "evidence_excerpt": "资产总计 26,001,740,331.42",
+      "reason": "结构化未找到该字段，但年报明确披露。",
+      "needs_human_review": false,
+      "structured_period": null,
+      "structured_field_name": "total_assets",
+      "field_definition_match": {
+        "status": "unknown",
+        "field": "total_assets",
+        "canonical_name": "资产总计",
+        "matched_aliases": [],
+        "incompatible_aliases": [],
+        "reason": "field definition could not be confirmed from available labels"
+      },
+      "field_definition": "资产总计"
+    },
+    "equity_parent": {
+      "status": "structured_field_missing",
+      "official_value": 6760918501.91,
+      "structured_value": null,
+      "unit": "CNY",
+      "relative_diff_pct": null,
+      "confidence": 1.0,
+      "evidence_page": 6,
+      "evidence_excerpt": "归属于上市公司股东的净资产 6,760,918,501.91",
+      "reason": "结构化未找到该字段，但年报明确披露。",
+      "needs_human_review": false,
+      "structured_period": null,
+      "structured_field_name": "equity_parent",
+      "field_definition_match": {
+        "status": "unknown",
+        "field": "equity_parent",
+        "canonical_name": "归属于上市公司股东的净资产",
+        "matched_aliases": [],
+        "incompatible_aliases": [],
+        "reason": "field definition could not be confirmed from available labels"
+      },
+      "field_definition": "归属于上市公司股东的净资产"
+    },
+    "eps_basic": {
+      "status": "structured_field_missing",
+      "official_value": 0.3,
+      "structured_value": null,
+      "unit": "CNY/share",
+      "relative_diff_pct": null,
+      "confidence": 1.0,
+      "evidence_page": 6,
+      "evidence_excerpt": "基本每股收益（元／股） 0.30",
+      "reason": "结构化未找到该字段，但年报明确披露。",
+      "needs_human_review": false,
+      "structured_period": null,
+      "structured_field_name": "eps_basic",
+      "field_definition_match": {
+        "status": "unknown",
+        "field": "eps_basic",
+        "canonical_name": "基本每股收益",
+        "matched_aliases": [],
+        "incompatible_aliases": [],
+        "reason": "field definition could not be confirmed from available labels"
+      },
+      "field_definition": "基本每股收益"
+    },
+    "roe_weighted": {
+      "status": "definition_mismatch",
+      "official_value": 0.0654,
+      "structured_value": 0.063051,
+      "unit": "%",
+      "relative_diff_pct": 3.591743119266061,
+      "confidence": 1.0,
+      "evidence_page": 6,
+      "evidence_excerpt": "加权平均净资产收益率（%）6.54",
+      "reason": "field definition text indicates a different financial concept",
+      "needs_human_review": true,
+      "structured_period": "2024-12-31",
+      "structured_field_name": "roe_weighted",
+      "field_definition_match": {
+        "status": "definition_mismatch",
+        "field": "roe_weighted",
+        "canonical_name": "加权平均净资产收益率",
+        "matched_aliases": [],
+        "incompatible_aliases": [
+          "roe"
+        ],
+        "reason": "field definition text indicates a different financial concept"
+      },
+      "field_definition": "加权平均净资产收益率"
+    },
+    "total_share": {
+      "status": "period_basis_mismatch",
+      "official_value": null,
+      "structured_value": 1432942234.0,
+      "unit": "shares",
+      "relative_diff_pct": null,
+      "confidence": 0.3,
+      "evidence_page": null,
+      "evidence_excerpt": "",
+      "reason": "年报未直接提供2024-12-31总股本，证据中仅有2024-12-12的总股本1,432,296,037股，无法确认期末准确数值，需人工核实。",
+      "needs_human_review": false,
+      "structured_period": "2024-12-31",
+      "structured_field_name": "total_share",
+      "field_definition_match": {
+        "status": "unknown",
+        "field": "total_share",
+        "canonical_name": "总股本",
+        "matched_aliases": [],
+        "incompatible_aliases": [],
+        "reason": "field definition could not be confirmed from available labels"
+      },
+      "field_definition": "总股本"
+    },
+    "float_share": {
+      "status": "official_field_not_found",
+      "official_value": null,
+      "structured_value": 1432942234.0,
+      "unit": "shares",
+      "relative_diff_pct": null,
+      "confidence": 0.0,
+      "evidence_page": null,
+      "evidence_excerpt": "",
+      "reason": "未在年报摘要中找到流通股数相关证据，无法校核。",
+      "needs_human_review": false,
+      "structured_period": "2024-12-31",
+      "structured_field_name": "float_share",
+      "field_definition_match": {
+        "status": "unknown",
+        "field": "float_share",
+        "canonical_name": "流通股本",
+        "matched_aliases": [],
+        "incompatible_aliases": [],
+        "reason": "field definition could not be confirmed from available labels"
+      },
+      "field_definition": "流通股本"
+    }
+  },
+  "human_review_queue": [
+    {
+      "field": "revenue",
+      "status": "definition_mismatch",
+      "reason": "structured value appears to be main business revenue, not operating revenue",
+      "confidence": 1.0,
+      "official_value": 54822111649.52,
+      "structured_value": 50227475991.67,
+      "evidence_page": 6,
+      "evidence_excerpt": "营业收入 54,822,111,649.52"
+    },
+    {
+      "field": "net_profit_parent",
+      "status": "definition_mismatch",
+      "reason": "structured value appears to be net profit, not parent-company net profit",
+      "confidence": 1.0,
+      "official_value": 424777342.95,
+      "structured_value": 482101037.78,
+      "evidence_page": 6,
+      "evidence_excerpt": "归属于上市公司股东的净利润 424,777,342.95"
+    },
+    {
+      "field": "roe_weighted",
+      "status": "definition_mismatch",
+      "reason": "field definition text indicates a different financial concept",
+      "confidence": 1.0,
+      "official_value": 0.0654,
+      "structured_value": 0.063051,
+      "evidence_page": 6,
+      "evidence_excerpt": "加权平均净资产收益率（%）6.54"
+    }
+  ],
+  "non_blocking_findings": [
+    {
+      "field": "operating_cashflow",
+      "status": "structured_field_missing",
+      "reason": "结构化未找到该字段，但年报明确披露。",
+      "confidence": 1.0,
+      "official_value": 1393832602.16,
+      "structured_value": null,
+      "evidence_page": 14
+    },
+    {
+      "field": "total_assets",
+      "status": "structured_field_missing",
+      "reason": "结构化未找到该字段，但年报明确披露。",
+      "confidence": 1.0,
+      "official_value": 26001740331.42,
+      "structured_value": null,
+      "evidence_page": 107
+    },
+    {
+      "field": "equity_parent",
+      "status": "structured_field_missing",
+      "reason": "结构化未找到该字段，但年报明确披露。",
+      "confidence": 1.0,
+      "official_value": 6760918501.91,
+      "structured_value": null,
+      "evidence_page": 6
+    },
+    {
+      "field": "eps_basic",
+      "status": "structured_field_missing",
+      "reason": "结构化未找到该字段，但年报明确披露。",
+      "confidence": 1.0,
+      "official_value": 0.3,
+      "structured_value": null,
+      "evidence_page": 6
+    },
+    {
+      "field": "total_share",
+      "status": "period_basis_mismatch",
+      "reason": "年报未直接提供2024-12-31总股本，证据中仅有2024-12-12的总股本1,432,296,037股，无法确认期末准确数值，需人工核实。",
+      "confidence": 0.3,
+      "official_value": null,
+      "structured_value": 1432942234.0,
+      "evidence_page": null
+    },
+    {
+      "field": "float_share",
+      "status": "official_field_not_found",
+      "reason": "未在年报摘要中找到流通股数相关证据，无法校核。",
+      "confidence": 0.0,
+      "official_value": null,
+      "structured_value": 1432942234.0,
+      "evidence_page": null
+    }
+  ],
+  "summary_counts": {
+    "verified_count": 1,
+    "likely_match_count": 0,
+    "true_conflict_count": 0,
+    "structured_field_missing_count": 4,
+    "official_field_not_found_count": 1,
+    "definition_mismatch_count": 3,
+    "period_basis_mismatch_count": 1,
+    "unit_scale_suspected_count": 0,
+    "insufficient_evidence_count": 0,
+    "needs_human_review_count": 3
+  },
+  "warnings": [
+    "revenue字段结构化值对应主营业务收入而非营业收入，已标记不匹配。",
+    "net_profit_parent字段结构化值误取为净利润（含少数股东），请确认源数据。",
+    "roe_weighted字段结构化值与年报存在差异（6.3051% vs 6.54%），需核实计算口径。"
+  ],
+  "semantic_calibration_input": "phase6tc2_real_ai_output_replay"
+}

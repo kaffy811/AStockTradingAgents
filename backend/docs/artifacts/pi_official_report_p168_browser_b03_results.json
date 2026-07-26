@@ -1,0 +1,53 @@
+{
+  "schema_version": "pi_official_report_p168_browser_b03_results_v1",
+  "phase": "6V-P1.6.8",
+  "generated_at": "2026-07-19T16:03:11.411257+00:00",
+  "acceptance_sha": "66a24e7 (base 1551339, p168/legacy-clarification-candidates)",
+  "frontend": "http://127.0.0.1:5173 (vite dev, p168 worktree)",
+  "backend": "http://127.0.0.1:8023 (p168 worktree)",
+  "browser": "headless Google Chrome via Playwright (scratch venv)",
+  "preflight": {
+    "backend_health": true,
+    "login_ok": true,
+    "auth_me_ok": true
+  },
+  "http_5xx": {
+    "500": 0,
+    "503": 0
+  },
+  "b03": {
+    "case_id": "B03",
+    "executed": true,
+    "loading_completed": true,
+    "assistant_message_count": 1,
+    "clarification_card_count": 1,
+    "candidate_buttons": [
+      "平安银行\n000001",
+      "平安电工\n001359",
+      "中国平安\n601318"
+    ],
+    "pab_present": true,
+    "zgpa_present": true,
+    "candidates_deduped": true,
+    "auto_selected": false,
+    "pdf_url_emitted": false,
+    "internal_status_leaked": false,
+    "duplicate_tool_cards": 0,
+    "console_error_count": 0,
+    "console_error_samples": [],
+    "candidate_order": [
+      "平安银行\n000001",
+      "平安电工\n001359",
+      "中国平安\n601318"
+    ],
+    "candidate_clicked": true,
+    "followup_loading_completed": true,
+    "followup_assistant_count": 2,
+    "followup_reambiguous": false,
+    "followup_mentions_zgpa": true,
+    "followup_wrong_company": false,
+    "refresh_candidates_restored": true,
+    "refresh_persistence_passed": true
+  },
+  "b03_passed": true
+}

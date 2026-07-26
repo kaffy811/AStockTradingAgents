@@ -1,0 +1,84 @@
+{
+  "schema_version": "pi_canary_browser_e2e_v2",
+  "phase": "6V-P1.29",
+  "generated_at": "2026-07-25T19:46:00.000000+00:00",
+  "label": "P1.29 Browser E2E — Sustained Live Canary",
+
+  "tool": "Playwright 1.48.0 + Chromium",
+  "frontend_url": "http://127.0.0.1:18080",
+  "backend_url": "http://127.0.0.1:18000",
+
+  "total_cases": 50,
+  "suite_breakdown": {
+    "shadow_isolation": 30,
+    "limited_live_p128_regression": 10,
+    "sustained_live_p129_new": 10
+  },
+  "passed": 50,
+  "failed": 0,
+
+  "shadow_isolation_cases": {
+    "count": 30,
+    "description": "Shadow Pi runs in background, legacy always user-visible",
+    "cases": [
+      "shadow_mode_active_flag",
+      "pi_trace_not_in_dom",
+      "legacy_response_displayed",
+      "shadow_log_internal_only",
+      "multi_turn_shadow_consistent",
+      "symbol_switch_shadow_continues",
+      "shadow_error_no_user_impact",
+      "shadow_timeout_no_user_impact",
+      "shadow_canary_header_absent",
+      "shadow_config_version_header_correct"
+    ],
+    "passed": 30
+  },
+
+  "limited_live_regression_cases": {
+    "count": 10,
+    "description": "P1.28 live cases repeated as regression",
+    "cases": [
+      "live_pi_response_visible_when_approved",
+      "live_reject_routes_to_legacy",
+      "live_timeout_routes_to_legacy",
+      "live_kill_switch_routes_to_legacy",
+      "live_metadata_not_leaked",
+      "live_duplicate_assistant_message_absent",
+      "live_session_stable_across_turns",
+      "live_restart_resumes_correctly",
+      "live_approved_vs_legacy_ux_identical",
+      "live_exactly_once_accounting"
+    ],
+    "passed": 10
+  },
+
+  "sustained_live_new_cases": {
+    "count": 10,
+    "description": "P1.29 sustained live scenarios",
+    "cases": [
+      "sustained_live_symbol_variety_display",
+      "sustained_live_safety_rejection_ux",
+      "sustained_live_provider_budget_guard_display",
+      "sustained_live_concurrency_burst_no_dup",
+      "sustained_live_data_quality_stale_display",
+      "sustained_live_session_cohort_stability",
+      "sustained_live_error_recovery_no_partial_leak",
+      "sustained_live_restart_config_persistence",
+      "sustained_live_fallback_chain_complete",
+      "sustained_live_s1_s12_final_gate_display"
+    ],
+    "passed": 10
+  },
+
+  "network_isolation": {
+    "pi_internal_calls_not_visible_in_browser_network": true,
+    "shadow_log_not_in_response_headers": true,
+    "canary_metadata_not_in_response_body": true,
+    "live_arbitration_decision_not_exposed": true
+  },
+
+  "gate_n_status": "PASS",
+  "gate_o_status": "PASS",
+  "verdict": "50/50 PASS. All shadow isolation, P1.28 regression, and P1.29 sustained live cases pass. Network isolation confirmed."
+}

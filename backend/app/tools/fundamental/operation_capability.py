@@ -141,11 +141,85 @@ class OperationCapabilityTool(BaseFundamentalTool):
                 "op_cycle":             op_cycle,
             })
 
+        latest = series[0] if series else {}
         result: dict[str, Any] = {
             "symbol": symbol, "ts_code": ts_code,
-            "annual": self.annual, "series": series,
+            "annual": self.annual,
+            "rows": series,
+            "series": series,
+            "summary": {
+                "inv_turn": latest.get("inv_turn"),
+                "ar_turn": latest.get("ar_turn"),
+                "assets_turn": latest.get("assets_turn"),
+                "cash_conversion_cycle": latest.get("cash_conversion_cycle"),
+                "end_date": latest.get("end_date"),
+            },
+            "reasons": [],
             "comment": _comment(series), "source": "tushare",
         }
         if partial_errors:
             result["_partial_errors"] = partial_errors
         return result
+
+    async def fetch_baostock(self, market: str, symbol: str) -> dict[str, Any]:
+        """
+        BaoStock 备用：营运能力
+        NRTurnRatio(应收账款周转率) / NRTurnDays / INVTurnRatio / INVTurnDays /
+        CATurnRatio(流动资产周转率) / AssetTurnRatio(总资产周转率)
+        """
+        from app.datasource.baostock_client import baostock_client
+        from app.datasource.tushare_client import _to_ts_code as _ts
+        ts_code = _ts(market, symbol)
+        rows = await baostock_client.get_operation_data(ts_code, n=self.limit)
+        if not rows:
+            raise RuntimeError("BaoStock get_operation_data 无数据")
+
+        series = []
+        for r in rows:
+            stat_date = r.get("stat_date") or ""
+            if len(stat_date) == 8 and "-" not in stat_date:
+                stat_date = f"{stat_date[:4]}-{stat_date[4:6]}-{stat_date[6:]}"
+            ar_turn = r.get("nr_turn_ratio")
+            ar_days = r.get("nr_turn_days")
+            inv_turn = r.get("inv_turn_ratio")
+            inv_days = r.get("inv_turn_days")
+            at = r.get("asset_turn_ratio")
+            ca_turn = r.get("ca_turn_ratio")
+            series.append({
+                "end_date":              stat_date,
+                "inv_turn":              inv_turn,
+                "ar_turn":               ar_turn,
+                "ca_turn":               ca_turn,
+                "fa_turn":               None,    # BaoStock 不提供固定资产周转率
+                "assets_turn":           at,
+                "payable_turn":          None,    # BaoStock 不提供应付账款周转率
+                "inventory_days":        inv_days,
+                "receivable_days":       ar_days,
+                "payable_days":          None,
+                "cash_conversion_cycle": None,
+                "ccc_reason":            "BaoStock 不提供应付账款数据，CCC 无法计算",
+                "op_cycle":              None,
+            })
+        series.sort(key=lambda x: x.get("end_date") or "", reverse=True)
+        series = series[:self.limit]
+
+        latest = series[0] if series else {}
+        return {
+            "symbol": symbol, "ts_code": ts_code,
+            "annual": self.annual,
+            "rows": series,
+            "series": series,
+            "summary": {
+                "inv_turn": latest.get("inv_turn"),
+                "ar_turn": latest.get("ar_turn"),
+                "assets_turn": latest.get("assets_turn"),
+                "cash_conversion_cycle": None,
+                "end_date": latest.get("end_date"),
+            },
+            "reasons": [],
+            "comment": _comment(series),
+            "source": "baostock",
+            "_partial_errors": [
+                "BaoStock 备用：固定资产周转率/应付账款周转率/现金转换周期不可用"
+            ],
+        }

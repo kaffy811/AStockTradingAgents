@@ -26,6 +26,18 @@ function _findLastIndex(arr, predicate) {
   return -1
 }
 
+function _answerText(value) {
+  if (!value) return ''
+  if (typeof value === 'string') return value.trim()
+  if (typeof value === 'object') {
+    for (const key of ['full_text', 'answer', 'final_answer', 'content', 'response', 'text', 'message']) {
+      const text = _answerText(value[key])
+      if (text) return text
+    }
+  }
+  return ''
+}
+
 // ── Main reducer ───────────────────────────────────────────────────────────────
 
 /**
@@ -345,17 +357,53 @@ export function applyChatUiEvent(message, uiEvent) {
       break
     }
 
+    case 'ui_answer_completed': {
+      const text = _answerText(uiEvent.answer)
+      if (text) {
+        message.answerContent = text
+        message.content = text
+        message.error = uiEvent.status === 'failed' ? (message.error || '回答生成失败，请重试') : null
+      } else if (!(message.answerContent || message.content)) {
+        message.status = 'error'
+        message.isStreaming = false
+        message.error = '回答生成失败，请重试'
+        message.content = '回答生成失败，请重试'
+      }
+      message.answerStatus = uiEvent.status ?? 'completed'
+      message.answerErrorCode = uiEvent.errorCode ?? null
+      break
+    }
+
+    case 'ui_message_persisted': {
+      if (uiEvent.messageId) message.persistedMessageId = uiEvent.messageId
+      message.persistedAnswerLength = uiEvent.answerLength
+      break
+    }
+
     // ── Terminal: done ─────────────────────────────────────────────────────────
     // Replace arrays (not forEach-mutate) so Vue always detects the change.
     // Also clear "执行中…" summary text and stamp finishedAt.
     case 'ui_done': {
       const _now = Date.now()
-      message.status      = 'done'
+      const terminalStatus = uiEvent.status ?? 'completed'
+      const hasBody = !!(message.answerContent || message.content)
+      const isFailure = terminalStatus === 'failed' || terminalStatus === 'error'
+      const isCancelled = terminalStatus === 'cancelled'
+      const isEmptyCompleted = uiEvent.answerLength === 0 && !uiEvent.hasConfirmation && !hasBody
+      const terminalFailed = isFailure || isEmptyCompleted
+      message.status      = terminalFailed ? 'error' : (isCancelled ? 'cancelled' : 'done')
       message.isStreaming = false
+      if (uiEvent.messageId) message.persistedMessageId = uiEvent.messageId
+      if (terminalFailed && !message.content) {
+        message.content = '回答生成失败，请重试'
+      }
+      if (terminalFailed) {
+        message.error = message.error || '回答生成失败，请重试'
+      }
       // C30.5.1: clear transient error set by agent_error when the run actually completed.
       // If the resultCard is an analysis_run with a non-failure status, the error popup is
       // a false negative — the analysis is running or done, not broken.
-      if (message.error &&
+      if (!terminalFailed && message.error &&
           message.resultCard?.type === 'analysis_run' &&
           !['failed', 'cancelled'].includes(message.resultCard?.data?.status ?? '')) {
         message.error = null
@@ -367,17 +415,32 @@ export function applyChatUiEvent(message, uiEvent) {
         (s.status === 'failed' || s.status === 'error') && (s.summary === '中断' || !s.summary)
       message.reasoningSteps = (message.reasoningSteps ?? []).map(s =>
         s.status === 'running' || _isTransientFailed(s)
-          ? { ...s, status: 'success', summary: s.summary && s.summary !== '中断' ? s.summary : '已完成', finishedAt: _now }
+          ? {
+              ...s,
+              status: terminalFailed ? 'failed' : 'success',
+              summary: terminalFailed ? (s.summary || '回答生成失败') : (s.summary && s.summary !== '中断' ? s.summary : '已完成'),
+              finishedAt: _now,
+            }
           : s
       )
       message.toolTrace = (message.toolTrace ?? []).map(t =>
         t.status === 'running' || _isTransientFailed(t)
-          ? { ...t, status: 'success', summary: (t.summary && t.summary !== '执行中…' && t.summary !== '中断') ? t.summary : '已完成', finishedAt: _now }
+          ? {
+              ...t,
+              status: terminalFailed ? 'error' : 'success',
+              summary: terminalFailed ? (t.summary && t.summary !== '执行中…' ? t.summary : '回答生成失败') : ((t.summary && t.summary !== '执行中…' && t.summary !== '中断') ? t.summary : '已完成'),
+              finishedAt: _now,
+            }
           : t
       )
       message.agentTrace = (message.agentTrace ?? []).map(a =>
         a.status === 'running' || _isTransientFailed(a)
-          ? { ...a, status: 'success', summary: a.summary && a.summary !== '中断' ? a.summary : '已完成', finishedAt: _now }
+          ? {
+              ...a,
+              status: terminalFailed ? 'failed' : 'success',
+              summary: terminalFailed ? (a.summary || '回答生成失败') : (a.summary && a.summary !== '中断' ? a.summary : '已完成'),
+              finishedAt: _now,
+            }
           : a
       )
       break

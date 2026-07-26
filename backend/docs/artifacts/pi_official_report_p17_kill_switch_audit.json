@@ -1,0 +1,33 @@
+{
+  "schema_version": "pi_official_report_p17_kill_switch_audit_v1",
+  "phase": "6V-P1.7",
+  "generated_at": "2026-07-19T16:52:12.517384+00:00",
+  "switches": {
+    "global": {
+      "field": "pi_executor_global_kill_switch",
+      "scope": "all Pi canary everywhere",
+      "priority": 1
+    },
+    "environment": {
+      "field": "pi_canary_environment_kill_switch",
+      "scope": "staging (or named env)",
+      "priority": 2
+    },
+    "agent": {
+      "field": "pi_canary_agent_kill_switch",
+      "scope": "official_report_pdf_pi_v1 only",
+      "priority": 3
+    }
+  },
+  "priority_order": "global > environment > agent > rollout",
+  "refresh_mechanism": "settings are read per-decision via load_canary_config; with the current pydantic-settings architecture a config change requires process restart/env reload — documented limitation; no code deployment needed",
+  "in_flight_policy": "new requests stop immediately; in-flight requests follow existing runtime cancellation policy and are never resumed",
+  "audit": "kill_switch_state embedded in every compact canary audit event",
+  "validated_by": [
+    "test_global_kill_switch_wins_over_everything",
+    "test_environment_kill_switch_precedes_authorization",
+    "test_agent_kill_switch_stops_selected_agent",
+    "simulation S05"
+  ],
+  "validation_passed": true
+}

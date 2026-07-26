@@ -1,0 +1,370 @@
+{
+  "phase": "6T-J stage2 index",
+  "executed_at": "2026-07-11",
+  "index_chain": "scripts/company_v2_financial_fusion_stage2_prepare.py --step index → company_v2_report_rag_index_service (existing chain, no new implementation)",
+  "version_metadata": {
+    "parser_name": "company_v2_pdf_text_parser (pypdf page-level)",
+    "parser_version": "company-v2-pages-v1",
+    "parse_version_source": "app/services/company_v2_report_chunker.py PARSE_VERSION constant (real code constant, not fabricated)",
+    "page_sidecar_schema_version": "pages.json v1 (report_id/page_count/text_pages/parse_status/warnings)",
+    "chunking_version": "company-v2-pages-v1 (chunker bound to PARSE_VERSION)",
+    "embedding_model": "company-v2-hash-keyword",
+    "embedding_version": "company-v2-hash-keyword-v1",
+    "embedding_note": "deterministic hash-keyword embedding (existing company_v2 design), not an LLM embedding"
+  },
+  "results": [
+    {
+      "symbol": "600519",
+      "report_id": 2,
+      "rag_document_id": 1,
+      "status": "indexed",
+      "page_count": 143,
+      "chunk_count": 211,
+      "embedded_chunks": 211,
+      "index_generation": 1,
+      "embedding_model": "company-v2-hash-keyword",
+      "embedding_version": "company-v2-hash-keyword-v1"
+    },
+    {
+      "symbol": "300750",
+      "report_id": 3,
+      "rag_document_id": 2,
+      "status": "indexed",
+      "page_count": 232,
+      "chunk_count": 299,
+      "embedded_chunks": 299,
+      "index_generation": 1,
+      "embedding_model": "company-v2-hash-keyword",
+      "embedding_version": "company-v2-hash-keyword-v1"
+    },
+    {
+      "symbol": "000725",
+      "report_id": 4,
+      "rag_document_id": 3,
+      "status": "indexed",
+      "page_count": 227,
+      "chunk_count": 311,
+      "embedded_chunks": 311,
+      "index_generation": 1,
+      "embedding_model": "company-v2-hash-keyword",
+      "embedding_version": "company-v2-hash-keyword-v1"
+    },
+    {
+      "symbol": "000001",
+      "report_id": 5,
+      "rag_document_id": 4,
+      "status": "indexed",
+      "page_count": 288,
+      "chunk_count": 396,
+      "embedded_chunks": 396,
+      "index_generation": 1,
+      "embedding_model": "company-v2-hash-keyword",
+      "embedding_version": "company-v2-hash-keyword-v1"
+    }
+  ],
+  "chunk_validation": {
+    "2": {
+      "chunks": 211,
+      "pages_with_chunks": 143,
+      "pages_without_chunks": 0
+    },
+    "3": {
+      "chunks": 299,
+      "pages_with_chunks": 232,
+      "pages_without_chunks": 0
+    },
+    "4": {
+      "chunks": 311,
+      "pages_with_chunks": 227,
+      "pages_without_chunks": 0
+    },
+    "5": {
+      "chunks": 396,
+      "pages_with_chunks": 288,
+      "pages_without_chunks": 0
+    },
+    "totals": {
+      "invalid_page_chunks": 0,
+      "empty_chunks": 0,
+      "duplicate_chunks": 0,
+      "cross_symbol_chunks": 0,
+      "cross_report_chunks": 0
+    }
+  },
+  "retrieval_smoke": [
+    {
+      "symbol": "600519",
+      "report_id": 2,
+      "query": "营业收入",
+      "retrieved": 6,
+      "top_page": 6,
+      "citation_page_valid": true,
+      "isolation_ok": true,
+      "evidence_found": true,
+      "retrieved_report_ids": [
+        2
+      ],
+      "cross_report_leakage_detected": false
+    },
+    {
+      "symbol": "600519",
+      "report_id": 2,
+      "query": "净利润",
+      "retrieved": 6,
+      "top_page": 143,
+      "citation_page_valid": true,
+      "isolation_ok": true,
+      "evidence_found": true,
+      "retrieved_report_ids": [
+        2
+      ],
+      "cross_report_leakage_detected": false
+    },
+    {
+      "symbol": "600519",
+      "report_id": 2,
+      "query": "经营活动产生的现金流量净额",
+      "retrieved": 6,
+      "top_page": 6,
+      "citation_page_valid": true,
+      "isolation_ok": true,
+      "evidence_found": true,
+      "retrieved_report_ids": [
+        2
+      ],
+      "cross_report_leakage_detected": false
+    },
+    {
+      "symbol": "600519",
+      "report_id": 2,
+      "query": "资产总计",
+      "retrieved": 6,
+      "top_page": 57,
+      "citation_page_valid": true,
+      "isolation_ok": true,
+      "evidence_found": true,
+      "retrieved_report_ids": [
+        2
+      ],
+      "cross_report_leakage_detected": false
+    },
+    {
+      "symbol": "300750",
+      "report_id": 3,
+      "query": "营业收入",
+      "retrieved": 6,
+      "top_page": 11,
+      "citation_page_valid": true,
+      "isolation_ok": true,
+      "evidence_found": true,
+      "retrieved_report_ids": [
+        3
+      ],
+      "cross_report_leakage_detected": false
+    },
+    {
+      "symbol": "300750",
+      "report_id": 3,
+      "query": "净利润",
+      "retrieved": 6,
+      "top_page": 232,
+      "citation_page_valid": true,
+      "isolation_ok": true,
+      "evidence_found": true,
+      "retrieved_report_ids": [
+        3
+      ],
+      "cross_report_leakage_detected": false
+    },
+    {
+      "symbol": "300750",
+      "report_id": 3,
+      "query": "经营活动产生的现金流量净额",
+      "retrieved": 6,
+      "top_page": 11,
+      "citation_page_valid": true,
+      "isolation_ok": true,
+      "evidence_found": true,
+      "retrieved_report_ids": [
+        3
+      ],
+      "cross_report_leakage_detected": false
+    },
+    {
+      "symbol": "300750",
+      "report_id": 3,
+      "query": "资产总计",
+      "retrieved": 6,
+      "top_page": 113,
+      "citation_page_valid": true,
+      "isolation_ok": true,
+      "evidence_found": true,
+      "retrieved_report_ids": [
+        3
+      ],
+      "cross_report_leakage_detected": false
+    },
+    {
+      "symbol": "000725",
+      "report_id": 4,
+      "query": "营业收入",
+      "retrieved": 6,
+      "top_page": 13,
+      "citation_page_valid": true,
+      "isolation_ok": true,
+      "evidence_found": true,
+      "retrieved_report_ids": [
+        4
+      ],
+      "cross_report_leakage_detected": false
+    },
+    {
+      "symbol": "000725",
+      "report_id": 4,
+      "query": "净利润",
+      "retrieved": 6,
+      "top_page": 12,
+      "citation_page_valid": true,
+      "isolation_ok": true,
+      "evidence_found": true,
+      "retrieved_report_ids": [
+        4
+      ],
+      "cross_report_leakage_detected": false
+    },
+    {
+      "symbol": "000725",
+      "report_id": 4,
+      "query": "经营活动产生的现金流量净额",
+      "retrieved": 6,
+      "top_page": 25,
+      "citation_page_valid": true,
+      "isolation_ok": true,
+      "evidence_found": true,
+      "retrieved_report_ids": [
+        4
+      ],
+      "cross_report_leakage_detected": false
+    },
+    {
+      "symbol": "000725",
+      "report_id": 4,
+      "query": "资产总计",
+      "retrieved": 6,
+      "top_page": 97,
+      "citation_page_valid": true,
+      "isolation_ok": true,
+      "evidence_found": true,
+      "retrieved_report_ids": [
+        4
+      ],
+      "cross_report_leakage_detected": false
+    },
+    {
+      "symbol": "000001",
+      "report_id": 5,
+      "query": "营业收入",
+      "retrieved": 6,
+      "top_page": 17,
+      "citation_page_valid": true,
+      "isolation_ok": true,
+      "evidence_found": true,
+      "retrieved_report_ids": [
+        5
+      ],
+      "cross_report_leakage_detected": false
+    },
+    {
+      "symbol": "000001",
+      "report_id": 5,
+      "query": "净利润",
+      "retrieved": 6,
+      "top_page": 18,
+      "citation_page_valid": true,
+      "isolation_ok": true,
+      "evidence_found": true,
+      "retrieved_report_ids": [
+        5
+      ],
+      "cross_report_leakage_detected": false
+    },
+    {
+      "symbol": "000001",
+      "report_id": 5,
+      "query": "经营活动产生的现金流量净额",
+      "retrieved": 6,
+      "top_page": 19,
+      "citation_page_valid": true,
+      "isolation_ok": true,
+      "evidence_found": true,
+      "retrieved_report_ids": [
+        5
+      ],
+      "cross_report_leakage_detected": false
+    },
+    {
+      "symbol": "000001",
+      "report_id": 5,
+      "query": "吸收存款",
+      "retrieved": 6,
+      "top_page": 29,
+      "citation_page_valid": true,
+      "isolation_ok": true,
+      "evidence_found": true,
+      "retrieved_report_ids": [
+        5
+      ],
+      "cross_report_leakage_detected": false
+    }
+  ],
+  "idempotency": [
+    {
+      "report_id": 2,
+      "duplicate_index_avoided": true,
+      "rag_document_id_stable": true,
+      "generation_stable": true
+    },
+    {
+      "report_id": 3,
+      "duplicate_index_avoided": true,
+      "rag_document_id_stable": true,
+      "generation_stable": true
+    },
+    {
+      "report_id": 4,
+      "duplicate_index_avoided": true,
+      "rag_document_id_stable": true,
+      "generation_stable": true
+    },
+    {
+      "report_id": 5,
+      "duplicate_index_avoided": true,
+      "rag_document_id_stable": true,
+      "generation_stable": true
+    }
+  ],
+  "stale_generation_test": {
+    "new_generation": 2,
+    "old_generation_status": "stale",
+    "old_marked_stale": true,
+    "supersedes": 1,
+    "audit_history_preserved": true,
+    "restored_generation": 3,
+    "restored_pdf_hash_correct": true
+  },
+  "permanence_check": {
+    "passed": false,
+    "evidence": {
+      "new_process_status": "all 4 report_ids -> pending, chunk_count=0, repository empty",
+      "db_company_v2_report_rag_documents_rows": 0,
+      "db_company_v2_report_rag_chunks_rows": 0
+    },
+    "root_cause": "CompanyV2ReportRagRepository is in-memory only (dict). DB tables company_v2_report_rag_documents/chunks exist (migration applied) and match the dataclasses 1:1, but no service code writes them ('replace with PostgreSQL/pgvector later' per repository docstring).",
+    "conclusion": "Index quality checks pass within a process, but the index does NOT survive process restart. Permanent-RAG requirement not met by current code."
+  },
+  "blocking_issue": "RAG_INDEX_NOT_PERSISTENT",
+  "next_action_options": [
+    "Authorize wiring CompanyV2ReportRagRepository to the existing company_v2_report_rag_documents/chunks tables (schema already present, 1:1 field match)",
+    "Until then Stage 2 index gate remains failed; fusion cannot proceed"
+  ]
+}

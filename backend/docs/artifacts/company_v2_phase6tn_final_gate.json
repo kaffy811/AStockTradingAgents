@@ -1,0 +1,19 @@
+{
+  "phase6tn_passed": false,
+  "phase6tm_passed": false,
+  "phase6tl_passed": false,
+  "phase6tk_passed": false,
+  "stage2_rollout_status": "hold",
+  "stage3_status": "not_authorized",
+  "auto_run": false,
+  "rollout_percent": 0,
+  "blocking_issues": [
+    "STEADY_STATE_JOB_CREATE_P50_EXCEEDS_GATE"
+  ],
+  "recommendation_for_next_step": "hold",
+  "job_create_gate_passed": false,
+  "db_floor_ok": true,
+  "steady_state_create_p50_ms": 1367.75,
+  "steady_state_create_p95_ms": 2097.94,
+  "minimum_expected_create_ms": 1863.75
+}
