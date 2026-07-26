@@ -160,6 +160,9 @@ class Settings(BaseSettings):
     # Gate H: maximum concurrent real provider calls (cross-worker via Redis lease).
     pi_real_provider_max_concurrency: int = 2
 
+    # Gate H: per-minute rate limit for real provider (across all workers)
+    pi_real_provider_max_rpm: int = 10
+
     # Gate H: rate limit — maximum real provider calls per minute (cross-worker sliding window).
     pi_real_provider_rate_limit_per_minute: int = 60
 

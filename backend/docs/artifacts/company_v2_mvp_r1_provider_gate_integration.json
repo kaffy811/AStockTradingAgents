@@ -1,0 +1,36 @@
+{
+  "schema_version": "pi_canary_gate_integration_v1",
+  "phase": "MVP-R1",
+  "generated_at": "2026-07-26T06:00:00Z",
+
+  "gate_integration_type": "ProviderControlPlane — 8/8 checks in formal call path",
+
+  "before_mvp_r1": {
+    "function": "check_real_provider_gate()",
+    "checks_active": 3,
+    "checks_skipped": 5,
+    "skipped": ["request_budget", "cost_budget", "rate_limit", "concurrency", "circuit_breaker"]
+  },
+
+  "after_mvp_r1": {
+    "class": "ProviderControlPlane",
+    "function": "get_provider_control_plane().check_gate()",
+    "checks_active_with_redis": 8,
+    "checks_active_without_redis": 3,
+    "gate_decision_type": "ProviderGateDecision",
+    "decision_fields": ["allowed", "blocked_reason", "reservation_id", "budget_snapshot", "credential_source", "pricing_version", "gate_checks_performed", "gate_checks_skipped"]
+  },
+
+  "formal_call_path": [
+    "Analysis Agent",
+    "→ get_provider_control_plane().check_gate(estimated_cost_cny)",
+    "→ ProviderActivationGate.check_all() [8 checks]",
+    "→ DeepSeekClient (only if gate_pass=True)",
+    "→ Usage Settlement (per-request CNY Decimal)",
+    "→ Review Agent",
+    "→ Live Arbitration (1% live gate)"
+  ],
+
+  "bypass_entry_points": "NONE — DeepSeekClient only accessible through gate in staging_real mode",
+  "fail_closed_default": true
+}

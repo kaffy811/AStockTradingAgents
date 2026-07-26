@@ -1,0 +1,14 @@
+{
+  "schema_version": "pi_canary_feedback_v1",
+  "phase": "MVP-R1",
+  "generated_at": "2026-07-26T06:00:00Z",
+
+  "feedback_model": "chat_feedback (P1.32)",
+  "endpoint": "POST /chat/feedback",
+  "categories": ["helpful", "not_helpful", "data_inaccurate", "irrelevant", "display_issue", "other"],
+  "pii_protection": "comment sanitized, no PII stored",
+  "success_confirmation": "shown to user after submit",
+
+  "gate_u_result": "PASS",
+  "gate_l8_result": "PASS"
+}

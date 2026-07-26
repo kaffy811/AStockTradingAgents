@@ -1,0 +1,51 @@
+{
+  "schema_version": "pi_canary_preflight_v2",
+  "phase": "MVP-R1",
+  "generated_at": "2026-07-26T06:00:00Z",
+  "base_sha": "cf4c65b1522736e9e66bd8053885b61a51520816",
+  "base_branch": "release/demo-staging",
+  "worktree": "/private/tmp/tradingagents-mvp-r1",
+
+  "p133_base_validation": {
+    "gates_pass": 19,
+    "gates_partial": 2,
+    "gates_not_evaluated": 1,
+    "gates_not_executed": 4,
+    "gates_fail": 0,
+    "tests_pass": 112,
+    "tests_fail": 0,
+    "real_provider_executed": false,
+    "config_version": 12
+  },
+
+  "p0_blockers": [
+    {
+      "id": "P0-1",
+      "description": "check_real_provider_gate() only checks 3/8 conditions. Budget, concurrency, rate-limit, circuit-breaker not injected.",
+      "resolution": "ProviderControlPlane created with Redis injection. All 8 checks now in formal call path."
+    },
+    {
+      "id": "P0-2",
+      "description": "pricing.py PricingRegistry._load() reads entry.get('pricing', {}) but JSON has 'pricing_usd' key only → all CNY prices = Decimal('0').",
+      "resolution": "deepseek_prices.json updated with 'pricing' key containing official CNY prices. fx_rate not required."
+    }
+  ],
+
+  "credential_status": {
+    "DEEPSEEK_API_KEY_STAGING": "NOT_SET",
+    "state": "B",
+    "real_provider_authorized": false
+  },
+
+  "runtime_snapshot": {
+    "config_version": 12,
+    "provider_mode": "staging_replay",
+    "real_provider_enabled": false,
+    "real_provider_kill_switch": true,
+    "shadow_rollout_percent": 100,
+    "live_rollout_percent": 1,
+    "production_enabled": false
+  },
+
+  "proceed_with_mvp_r1": true
+}

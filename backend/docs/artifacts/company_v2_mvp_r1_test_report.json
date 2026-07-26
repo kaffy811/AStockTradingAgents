@@ -1,0 +1,15 @@
+{
+  "schema_version": "pi_canary_test_report_v2",
+  "phase": "MVP-R1",
+  "generated_at": "2026-07-26T06:00:00Z",
+
+  "suites": [
+    {"suite": "MVP-R1 targeted", "collected": 114, "passed": 114, "failed": 0, "note": "test_mvp_r1_invite_launch.py"},
+    {"suite": "P1.33 + P1.32 regression", "collected": 231, "passed": 231, "failed": 0, "note": "test_phase6v_p133_final_mvp_gate.py + test_phase6v_p132_mvp_release.py"},
+    {"suite": "P1.31 regression", "collected": 176, "passed": 176, "failed": 0},
+    {"suite": "P1.30 regression", "collected": 231, "passed": 231, "failed": 0},
+    {"suite": "P1.29 regression", "collected": 312, "passed": 312, "failed": 0}
+  ],
+
+  "note": "114/114 MVP-R1 targeted PASS. 231/231 P1.33+P1.32 regression PASS. Zero failures."
+}

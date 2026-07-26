@@ -1,0 +1,18 @@
+{
+  "schema_version": "pi_canary_redis_injection_v1",
+  "phase": "MVP-R1",
+  "generated_at": "2026-07-26T06:00:00Z",
+
+  "implementation": "ProviderControlPlane in provider_control/control_plane.py",
+
+  "guards_injected": [
+    {"guard": "RequestBudgetGuard", "redis_key": "pi_provider_staging:request_count", "max": 30},
+    {"guard": "CostAccumulator", "redis_key": "pi_provider_staging:cost_cny", "max_cny": 20.0},
+    {"guard": "SlidingWindowRateLimiter", "redis_key": "pi_provider_staging:rate:{window}", "max_rpm": 10},
+    {"guard": "LeaseSemaphore", "redis_keys": "pi_provider_staging:slot:{0..1}", "max_slots": 2},
+    {"guard": "ProviderCircuitBreaker", "redis_key": "pi_provider_staging:circuit_*", "threshold": 5}
+  ],
+
+  "degraded_mode": "If Redis unavailable: only 3 synchronous checks run (kill_switch, enabled, credential). All real calls still blocked in State B.",
+  "singleton_pattern": "get_provider_control_plane() — lazy init, module-level cache, force_new=True for tests"
+}

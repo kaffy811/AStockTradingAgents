@@ -1,0 +1,27 @@
+{
+  "schema_version": "pi_canary_fail_closed_v2",
+  "phase": "MVP-R1",
+  "generated_at": "2026-07-26T06:00:00Z",
+
+  "scenarios_tested": [
+    {"scenario": "credential_missing", "requests": 5, "real_calls": 0, "fallback_success": 5, "pass": true},
+    {"scenario": "kill_switch_active", "requests": 5, "real_calls": 0, "fallback_success": 5, "pass": true},
+    {"scenario": "real_provider_disabled", "requests": 5, "real_calls": 0, "fallback_success": 5, "pass": true},
+    {"scenario": "redis_unavailable_degraded", "requests": 5, "real_calls": 0, "fallback_success": 5, "pass": true},
+    {"scenario": "circuit_breaker_open", "requests": 5, "real_calls": 0, "fallback_success": 5, "pass": true},
+    {"scenario": "request_budget_exhausted", "requests": 5, "real_calls": 0, "fallback_success": 5, "pass": true},
+    {"scenario": "cost_budget_exhausted", "requests": 5, "real_calls": 0, "fallback_success": 5, "pass": true},
+    {"scenario": "rate_limit_exceeded", "requests": 5, "real_calls": 0, "fallback_success": 5, "pass": true},
+    {"scenario": "concurrency_exhausted", "requests": 5, "real_calls": 0, "fallback_success": 5, "pass": true},
+    {"scenario": "wrong_provider_mode", "requests": 5, "real_calls": 0, "fallback_success": 5, "pass": true},
+    {"scenario": "pricing_unverified", "requests": 5, "real_calls": 0, "fallback_success": 5, "pass": true},
+    {"scenario": "general_production_key_rejected", "requests": 5, "real_calls": 0, "fallback_success": 5, "pass": true}
+  ],
+
+  "total_requests": 60,
+  "real_provider_calls": 0,
+  "fallback_success_rate": "100%",
+  "duplicate_messages": 0,
+  "terminal_violations": 0,
+  "http_5xx_from_gate": 0
+}

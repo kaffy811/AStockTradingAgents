@@ -1,4 +1,5 @@
 import logging
+from typing import Any
 
 from app.core.config import settings
 from app.llm.base import BaseLLMClient
@@ -6,39 +7,51 @@ from app.llm.base import BaseLLMClient
 log = logging.getLogger(__name__)
 
 
-def check_real_provider_gate() -> dict:
+def check_real_provider_gate(
+    *,
+    redis_client: Any | None = None,
+    estimated_cost_cny: "Decimal | None" = None,
+) -> dict:
     """
-    Phase 6V-P1.32: Run ProviderActivationGate.check_all() and return result.
+    Phase MVP-R1: Run full ProviderControlPlane gate (8/8 checks when Redis available).
 
-    Called before any real provider call attempt. Fail-closed by default
-    (kill_switch=True, enabled=False) — safe to call at any time.
+    Falls back to 3-check synchronous gate if Redis is not injected.
+    Returns ProviderGateDecision as dict for backward compatibility.
+
+    Args:
+        redis_client: Optional Redis client. If None, only synchronous checks run.
+        estimated_cost_cny: Estimated cost for cost budget check. Defaults to 0.
 
     Returns:
         {
           "gate_pass": bool,
-          "blocked_by": str | None,   # human-readable reason
-          "error_class": str | None,  # ProviderControlError subclass name
+          "blocked_by": str | None,
+          "allowed": bool,
+          "reservation_id": str | None,
+          "gate_checks_performed": list[str],
+          "gate_checks_skipped": list[str],
+          "total_checks_active": int,
         }
     """
-    from app.llm.provider_control.activation_gate import ProviderActivationGate
-    from app.llm.provider_control.errors import ProviderControlError
+    from decimal import Decimal
+    # activation_gate is the underlying gate used by ProviderControlPlane
+    from app.llm.provider_control.activation_gate import ProviderActivationGate  # noqa: F401
+    from app.llm.provider_control.control_plane import get_provider_control_plane
 
-    gate = ProviderActivationGate(settings=settings)
-    try:
-        gate.check_all()
-        log.info("pi_canary: real provider activation gate PASS")
-        return {"gate_pass": True, "blocked_by": None, "error_class": None}
-    except ProviderControlError as exc:
-        gate_id = getattr(exc, "gate", "unknown")
-        log.warning(
-            "pi_canary: real provider activation gate BLOCKED [Gate %s] %s: %s",
-            gate_id, type(exc).__name__, exc,
-        )
-        return {
-            "gate_pass": False,
-            "blocked_by": str(exc),
-            "error_class": type(exc).__name__,
-        }
+    est = estimated_cost_cny if estimated_cost_cny is not None else Decimal("0")
+    plane = get_provider_control_plane(redis_client=redis_client)
+    decision = plane.check_gate(estimated_cost_cny=est)
+
+    return {
+        "gate_pass": decision.allowed,
+        "blocked_by": decision.blocked_reason,
+        "error_class": decision.error_class,
+        "allowed": decision.allowed,
+        "reservation_id": decision.reservation_id,
+        "gate_checks_performed": decision.gate_checks_performed,
+        "gate_checks_skipped": decision.gate_checks_skipped,
+        "total_checks_active": plane.total_checks_active,
+    }
 
 
 def get_llm_client() -> BaseLLMClient:

@@ -1,0 +1,23 @@
+{
+  "schema_version": "pi_canary_cost_report_v2",
+  "phase": "MVP-R1",
+  "generated_at": "2026-07-26T06:00:00Z",
+
+  "state": "B",
+  "model": "deepseek-v4-flash",
+  "pricing_currency": "CNY",
+  "pricing_source": "official",
+  "pricing_fx_required": false,
+
+  "cost_settlement_method": "input_cost + cached_input_cost + output_cost (Decimal, per-request)",
+  "usage_missing_policy": "conservative upper-bound estimate, block further calls",
+
+  "real_provider_calls": 0,
+  "total_cost_cny": "0",
+  "budget_limit_cny": 20.0,
+  "budget_consumed_percent": 0.0,
+
+  "cost_per_request_formula": "Decimal(input_tokens) * 1/1M + Decimal(cached_tokens) * 0.02/1M + Decimal(output_tokens) * 2/1M (CNY, deepseek-v4-flash)",
+
+  "rp4_result": "NOT_EXECUTED"
+}
