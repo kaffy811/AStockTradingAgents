@@ -1,0 +1,63 @@
+{
+  "schema_version": "pi_canary_probe_closure_v1",
+  "phase": "6V-P1.23",
+  "phase_title": "Deployed Runtime Probe Closure",
+  "generated_at": "2026-07-23T17:00:00.000000+00:00",
+  "base_sha": "779da4cd3f33ff6a1b21b7c36cf182b7b2c4500d",
+
+  "gate_c_previous": "unknown",
+  "gate_c_previous_phase": "P1.22",
+  "gate_c_status": "unknown",
+  "gate_c_upgraded": false,
+  "gate_c_upgrade_reason": "Probe performed but does not satisfy Section 7 deployed runtime requirements. No change from P1.22.",
+
+  "deployed_runtime_verified": false,
+  "deployed_runtime_verification_reason": "No accessible running staging instance found. Local probe returned repository defaults, not staging overrides.",
+
+  "probe_method_attempted": "local_process_with_real_settings",
+  "probe_method_satisfies_section_7": false,
+
+  "section_7_requirements_not_met": [
+    "process does not use staging deployment startup command",
+    "process uses repository default env not staging .env",
+    "no PI_CANARY_ROLLOUT_PERCENT=75 in environment",
+    "cannot prove deployment_sha"
+  ],
+
+  "section_7_requirements_met": [
+    "runtime_loader (load_canary_config) verified with real pydantic_settings.Settings",
+    "probe function get_effective_shadow_config_snapshot() confirmed operational",
+    "evidence_mode=runtime_loader_integration_verified"
+  ],
+
+  "promotion_blocked": true,
+  "blocking_reason": "Gate C = UNKNOWN blocks conditional owner authorization condition",
+  "blocking_gates": ["C"],
+
+  "final_rollout": 75,
+  "final_config_version": 8,
+  "final_stable_bucket_salt": "pi_v1",
+  "final_authorization_status_staging_target": "authorized",
+  "final_live": false,
+  "final_production_enabled": false,
+
+  "state_b_confirmed": true,
+  "state_description": "State B: Gate C = UNKNOWN, runtime probe not closeable, 100% promotion NOT executed. Rollout remains at 75% shadow. Conditional authorization condition not satisfied.",
+
+  "shadow_continuation": {
+    "continue_shadow": true,
+    "shadow_percent": 75,
+    "config_version": 8,
+    "rationale": "With Gate C UNKNOWN and promotion blocked, the 75% shadow soak continues accumulating evidence. Zero violations across P1.8–P1.22 (45373 selections) support continued soak at current level."
+  },
+
+  "path_to_gate_c_pass": {
+    "step_1": "Gain SSH/direct access to the staging VPS server.",
+    "step_2": "Confirm .env on staging server contains PI_CANARY_ROLLOUT_PERCENT=75 and PI_CANARY_CONFIG_VERSION=8.",
+    "step_3": "Confirm staging Docker container is running (docker compose ps).",
+    "step_4": "Execute probe via SSH into running container or against exposed health/diagnostics endpoint.",
+    "step_5": "Confirm probe returns rollout_percent=75 and authorization_status=authorized.",
+    "step_6": "Record probe result as gate_c_contribution=PASS.",
+    "phase": "6V-P1.24"
+  }
+}

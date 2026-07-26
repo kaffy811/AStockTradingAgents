@@ -1,0 +1,112 @@
+{
+  "schema_version": "pi_canary_test_report_v1",
+  "phase": "6V-P1.24",
+  "phase_title": "Containerized Staging Deployment, Gate C Closure & Conditional 100% Shadow Promotion",
+  "generated_at": "2026-07-24T00:00:00.000000+00:00",
+  "base_sha": "11855396533c4350338fdb44b9ab6db0c7ea5c8a",
+  "evidence_sha": "a6fe07c22c4f48d929ff621fbc7914cfe23cbdba",
+
+  "live": false,
+  "production_enabled": false,
+  "provider_serving_calls": 0,
+
+  "test_suites": {
+    "targeted": {
+      "suite_id": "targeted",
+      "suite_label": "P1.24 Phase-Targeted Suite",
+      "test_file": "test_phase6v_p124_containerized_staging.py + test_phase6v_p17_canary_policy.py",
+      "command": "DATABASE_URL='postgresql+asyncpg://...' SECRET_KEY='...' uv run pytest tests/fundamental/test_phase6v_p124_containerized_staging.py tests/fundamental/test_phase6v_p17_canary_policy.py -q",
+      "collected": 174,
+      "passed": 174,
+      "failed": 0,
+      "skipped": 0,
+      "duration_seconds": 0.48,
+      "exit_code": 0,
+      "suite_pass": true,
+      "breakdown": {
+        "p124_tests": 141,
+        "p17_canary_policy_tests": 33
+      }
+    },
+    "cross_phase": {
+      "suite_id": "cross_phase",
+      "suite_label": "Cross-Phase 6V P1 Regression Suite",
+      "glob": "test_phase6v_p1*.py",
+      "command": "uv run pytest tests/fundamental/ -k phase6v_p1 -q",
+      "collected": 3282,
+      "passed": 3282,
+      "failed": 0,
+      "skipped": 0,
+      "duration_seconds": 5.45,
+      "exit_code": 0,
+      "suite_pass": true
+    },
+    "full_fundamental": {
+      "suite_id": "full_fundamental",
+      "suite_label": "Full Fundamental Tests",
+      "path": "tests/fundamental/",
+      "command": "uv run pytest tests/fundamental/ -q",
+      "collected": 4835,
+      "passed": 4820,
+      "failed": 0,
+      "skipped": 15,
+      "duration_seconds": 36.53,
+      "exit_code": 0,
+      "suite_pass": true,
+      "skip_reason": "15 tests skipped: external data source unavailable in CI environment (expected)"
+    },
+    "entire_backend": {
+      "suite_id": "entire_backend",
+      "suite_label": "Entire Backend Test Suite",
+      "path": "tests/",
+      "command": "uv run pytest tests/ -q",
+      "collected": 6666,
+      "passed": 6651,
+      "failed": 0,
+      "skipped": 15,
+      "collection_errors": 0,
+      "duration_seconds": 172.51,
+      "exit_code": 0,
+      "suite_pass": true,
+      "skip_reason": "15 tests skipped: external data source unavailable in CI environment (expected)"
+    }
+  },
+
+  "frontend_tests": {
+    "frontend_vitest": {
+      "framework": "vitest",
+      "test_files": 62,
+      "passed": 688,
+      "failed": 0,
+      "duration_seconds": 2.93,
+      "exit_code": 0,
+      "suite_pass": true
+    },
+    "frontend_build": {
+      "tool": "vite build",
+      "duration_seconds": 2.56,
+      "exit_code": 0,
+      "build_pass": true
+    }
+  },
+
+  "security": {
+    "secret_scan": {
+      "tool": "secret_scan",
+      "result": "clean",
+      "violations_found": 0,
+      "suite_pass": true,
+      "notes": ".env.staging.example contains placeholders only; .env.staging.local gitignored"
+    }
+  },
+
+  "overall_pass": true,
+  "all_suites_pass": true,
+  "total_backend_passed": 6651,
+  "total_backend_failed": 0,
+  "total_frontend_passed": 688,
+  "total_frontend_failed": 0,
+
+  "regression_gate": "PASS",
+  "regression_gate_note": "All test suites pass. Zero failures across 6651 backend and 688 frontend tests."
+}

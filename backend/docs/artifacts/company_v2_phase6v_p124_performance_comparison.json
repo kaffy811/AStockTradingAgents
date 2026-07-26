@@ -1,0 +1,17 @@
+{
+  "schema_version": "pi_canary_performance_comparison_v1",
+  "phase": "6V-P1.24",
+  "generated_at": "2026-07-24T00:00:00.000000+00:00",
+  "performance_review_applicable": false,
+  "reason": "100% observation not executed — Gate C = UNKNOWN",
+  "p122_sustained_75_baseline": {
+    "pi_p95_ms_range": [4743, 4781],
+    "tool_p95_ms_range": [3259, 3274],
+    "pi_over_5s": 0,
+    "pi_over_6s": 0,
+    "memory_max_mb": 403,
+    "cpu_max_pct": 52,
+    "fd_max": 476
+  },
+  "p124_100pct_performance": "NOT_MEASURED"
+}

@@ -1,0 +1,55 @@
+{
+  "schema_version": "pi_official_report_p112_incremental_pilot_v1",
+  "phase": "6V-P1.12",
+  "generated_at": "2026-07-22T00:00:00.000000+00:00",
+  "source_sha": "a97b0ec021c7577f6a51267c3bb311ee47db0eb9",
+  "environment": "staging",
+  "mode": "dry-run",
+  "pilot_symbols": ["600519","000858","601318","000001","300750","000725","300209","600186","688146","688549"],
+  "since": "2026-01-01",
+  "results": {
+    "symbols_queried": 10,
+    "new_documents": 0,
+    "unchanged_documents": 28,
+    "metadata_updates": 0,
+    "revised_documents": 0,
+    "superseded_documents": 0,
+    "stale_candidates": 0,
+    "inactive_candidates": 0,
+    "rejected_documents": 0,
+    "provider_errors": 0,
+    "business_writes": 0
+  },
+  "classification_breakdown": {
+    "600519": {"2022":"unchanged","2023":"unchanged","2024":"unchanged","latest":"unchanged"},
+    "000858": {"2022":"unchanged","2023":"unchanged","2024":"unchanged","latest":"unchanged"},
+    "601318": {"2022":"unchanged","2023":"unchanged","2024":"unchanged","latest":"unchanged"},
+    "000001": {"2022":"unchanged","2023":"unchanged","2024":"unchanged","latest":"unchanged"},
+    "300750": {"2022":"unchanged","2023":"unchanged","2024":"unchanged","latest":"unchanged"},
+    "000725": {"2022":"unchanged","2023":"unchanged","2024":"unchanged","latest":"unchanged"},
+    "300209": {"2022":"unchanged","2023":"unchanged","2024":"provider_pollution","latest":"unchanged"},
+    "600186": {"2022":"unchanged","2023":"unchanged","2024":"unchanged","latest":"unchanged"},
+    "688146": {"2022":"unchanged","2023":"unchanged","2024":"unchanged","latest":"unchanged"},
+    "688549": {"2022":"unchanged","2023":"unchanged","2024":"unchanged","latest":"unchanged"}
+  },
+  "url_health_spot_check": {
+    "checked": 10,
+    "healthy": 10,
+    "temporary_failure": 0,
+    "permanent_failure": 0,
+    "redirected_official": 0,
+    "redirected_third_party": 0
+  },
+  "pilot_gate": {
+    "wrong_company": 0,
+    "wrong_year": 0,
+    "wrong_type": 0,
+    "duplicate_active": 0,
+    "unverified_active": 0,
+    "stale_misjudge": 0,
+    "third_party_active": 0,
+    "provider_errors_unexplained": 0,
+    "pilot_passed": true
+  },
+  "authorized_for_full_dry_run": true
+}

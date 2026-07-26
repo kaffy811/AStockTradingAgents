@@ -1,0 +1,14 @@
+{
+  "schema_version": "pi_canary_runtime_probe_v1",
+  "phase": "6V-P1.24",
+  "probe_target": "100% containerized staging runtime (post-promotion)",
+  "generated_at": "2026-07-24T00:00:00.000000+00:00",
+
+  "probe_applicable": false,
+  "probe_applicable_reason": "100% promotion was not executed (Gate C = UNKNOWN; promotion_applied=false)",
+
+  "probe_performed": false,
+  "probe_result": null,
+
+  "note": "This artifact is intentionally empty. Per Phase 6V-P1.24 rules: 'If Gate C does not pass: do not generate false 100% runtime probe'. Promotion artifact marks attempted=false."
+}

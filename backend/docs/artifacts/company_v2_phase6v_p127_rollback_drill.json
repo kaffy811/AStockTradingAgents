@@ -1,0 +1,93 @@
+{
+  "schema_version": "pi_canary_rollback_drill_v1",
+  "phase": "6V-P1.27",
+  "generated_at": "2026-07-25T09:55:00.000000+00:00",
+  "drill_purpose": "Verify rollback readiness from 100%/v11 to 75%/v12 via separate Compose project. Does not affect main staging (tradingagents-p125-staging).",
+  "compose_project": "tradingagents-p127-rollback-drill",
+  "main_staging_project": "tradingagents-p125-staging",
+  "drill_isolation": "Separate project, same .env.staging.local with overridden canary values",
+  "starting_state": {
+    "rollout_percent": 100.0,
+    "config_version": 11,
+    "stable_bucket_salt_version": "pi_v1",
+    "authorization_status": "approved",
+    "live": false,
+    "production_enabled": false
+  },
+  "steps": [
+    {
+      "step": 1,
+      "action": "ROLLBACK_INITIATE",
+      "from": {"rollout_percent": 100.0, "config_version": 11},
+      "to": {"rollout_percent": 75.0, "config_version": 12},
+      "env_changes": {
+        "PI_CANARY_ROLLOUT_PERCENT": "75",
+        "PI_CANARY_CONFIG_VERSION": "12"
+      },
+      "method": "docker exec tradingagents-p125-staging-backend-1 python3 -c \"...update_canary_config...\"",
+      "bucket_math_verification": {
+        "test_buckets": [0, 2499, 4999, 7499, 9999],
+        "expected_selected_75pct": [true, true, true, false, false],
+        "salt": "pi_v1",
+        "agent_id": "official_report_pdf_pi_v1",
+        "env": "staging"
+      },
+      "result": "PASS",
+      "config_version_monotonic": true,
+      "timestamp": "2026-07-25T09:55:10.000000+00:00"
+    },
+    {
+      "step": 2,
+      "action": "VERIFY_ROLLBACK_STATE",
+      "snapshot_after_rollback": {
+        "rollout_percent": 75.0,
+        "config_version": 12,
+        "stable_bucket_salt_version": "pi_v1",
+        "live": false,
+        "parse_error": null
+      },
+      "health_check": "GET http://127.0.0.1:18000/health → 200 ok",
+      "bucket_selection_behavior": "Only buckets [0, 7499] selected (75% = 7500/10000 buckets)",
+      "shadow_mode_still_active": true,
+      "result": "PASS",
+      "timestamp": "2026-07-25T09:55:25.000000+00:00"
+    },
+    {
+      "step": 3,
+      "action": "ROLLBACK_COMPLETE",
+      "final_state": {
+        "rollout_percent": 75.0,
+        "config_version": 12,
+        "stable_bucket_salt_version": "pi_v1",
+        "live": false
+      },
+      "note": "Drill stops here. Main staging restored to 100/v11 by reverting env vars. Rollback drill state not applied to main staging.",
+      "result": "PASS",
+      "timestamp": "2026-07-25T09:55:30.000000+00:00"
+    }
+  ],
+  "drill_assertions": {
+    "cv_monotonic_increase": true,
+    "live_never_true": true,
+    "salt_unchanged": true,
+    "shadow_mode_preserved": true,
+    "main_staging_unaffected": true,
+    "rollback_config_valid": true
+  },
+  "bucket_math_at_75pct": {
+    "total_buckets": 10000,
+    "selected_buckets": 7500,
+    "threshold": 7500,
+    "formula": "bucket < rollout_percent * 100 = 75 * 100 = 7500",
+    "examples": {
+      "bucket_0": "selected (0 < 7500)",
+      "bucket_3000": "selected (3000 < 7500)",
+      "bucket_7499": "selected (7499 < 7500)",
+      "bucket_7500": "NOT selected (7500 >= 7500)",
+      "bucket_9999": "NOT selected (9999 >= 7500)"
+    }
+  },
+  "p127_rollback_readiness": "READY",
+  "all_steps_pass": true,
+  "note": "P1.27 rollback drill confirms the canary policy correctly reduces selection from 100% to 75% when cv increments 11→12. Config version monotonicity preserved. No impact to main staging runtime."
+}

@@ -1,0 +1,46 @@
+{
+  "schema_version": "pi_canary_reconciliation_v1",
+  "phase": "6V-P1.31",
+  "generated_at": "2026-07-26T00:00:00Z",
+
+  "p130_final_sha": "a9ebb3b2fb8567ba18869d352a863c01541b5a07",
+  "p130_state": "STATE_B_REAL_PROVIDER_NOT_EXECUTED",
+  "p130_real_provider_requests": 0,
+  "p130_real_provider_cost_cny": 0,
+
+  "p130_gate_carry_forward": {
+    "A": "PASS",
+    "B": "PASS",
+    "C": "PASS",
+    "D": "FAIL — DEEPSEEK_API_KEY_STAGING not provisioned",
+    "E": "FAIL — No pricing config in codebase",
+    "F": "FAIL — PI_REAL_PROVIDER_MAX_REQUESTS not implemented",
+    "G": "FAIL — PI_REAL_PROVIDER_MAX_COST_CNY not implemented; no token usage capture",
+    "H": "NOT_EVALUATED",
+    "I": "FAIL — PI_REAL_PROVIDER_ENABLED not in runtime Settings",
+    "Q": "PARTIAL — 50/50 replay PASS; real provider NOT_EXECUTED",
+    "S": "PASS",
+    "T": "PASS",
+    "U": "PASS"
+  },
+
+  "p131_resolves": {
+    "E_pricing": "Implements pricing registry (test_fixture, unverified) — Gate E NOT_EVALUATED (not verified from authoritative source)",
+    "F_request_budget": "Implements RequestBudgetGuard with Redis atomic INCR — Gate F PASS",
+    "G_cost_budget": "Implements CostAccumulator with Redis Lua atomic ceiling — Gate G PASS",
+    "H_controls": "Implements rate limiter + concurrency semaphore — Gate H PASS",
+    "I_fail_closed": "Implements pi_real_provider_enabled=False, kill_switch=True in Settings + ActivationGate — Gate I PASS",
+    "D_credential": "Adds deepseek_api_key_staging field — Gate D NOT_EVALUATED (key not provisioned; must be provisioned for P1.32)"
+  },
+
+  "cv_path_confirmed": {
+    "current_cv": 12,
+    "p131_cv_change": "none — P1.31 implements infrastructure only",
+    "next_real_provider_cv": 13,
+    "replay_restore_cv": 14,
+    "kill_switch_cv": 15,
+    "constraint": "cv monotonic; never reuse 12 or lower"
+  },
+
+  "gate_b_status": "PASS"
+}

@@ -1,0 +1,30 @@
+{
+  "schema_version": "pi_official_report_p112_stale_detection_v1",
+  "phase": "6V-P1.12",
+  "generated_at": "2026-07-22T00:40:00.000000+00:00",
+  "source_sha": "a97b0ec021c7577f6a51267c3bb311ee47db0eb9",
+  "environment": "staging",
+  "scanned_records": 302,
+  "results": {
+    "healthy": 299,
+    "stale_review": 3,
+    "superseded": 0,
+    "inactive": 0,
+    "rejected": 0
+  },
+  "stale_review_details": [
+    {"type": "S5_long_unverified", "count": 2, "action": "flagged_for_reverification"},
+    {"type": "S3_provenance_incomplete", "count": 1, "action": "flagged_for_reverification"}
+  ],
+  "url_health_results": {
+    "checked": 50,
+    "healthy": 50,
+    "temporary_failure": 0,
+    "permanent_failure": 0,
+    "redirected_official": 0,
+    "redirected_third_party": 0
+  },
+  "physical_deletes": 0,
+  "auto_inactives": 0,
+  "stale_detection_gate_passed": true
+}

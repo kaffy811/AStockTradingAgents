@@ -1,0 +1,32 @@
+{
+  "schema_version": "pi_browser_regression_v1",
+  "phase": "6V-P1.20",
+  "generated_at": "2026-07-23T06:30:00.000000+00:00",
+  "rollout_percent": 50,
+  "config_version": 7,
+  "test_cases": [
+    {"id": "BR-01", "description": "Legacy response returned for non-selected user", "result": "PASS", "carried_from": "P1.19"},
+    {"id": "BR-02", "description": "Pi shadow response not visible in user-facing UI", "result": "PASS", "carried_from": "P1.19"},
+    {"id": "BR-03", "description": "Terminal event fires exactly once per request", "result": "PASS", "carried_from": "P1.19"},
+    {"id": "BR-04", "description": "No duplicate assistant messages rendered", "result": "PASS", "carried_from": "P1.19"},
+    {"id": "BR-05", "description": "No duplicate tool cards rendered", "result": "PASS", "carried_from": "P1.19"},
+    {"id": "BR-06", "description": "Pi shadow does not trigger provider serving calls visible in browser network tab", "result": "PASS", "carried_from": "P1.19"},
+    {"id": "BR-07", "description": "Session isolation: Pi state does not persist to next session", "result": "PASS", "carried_from": "P1.19"},
+    {"id": "BR-08", "description": "Multi-turn conversation: legacy path maintained for non-selected users", "result": "PASS", "carried_from": "P1.19"},
+    {"id": "BR-09", "description": "Error handling: Pi shadow failure falls back transparently to legacy", "result": "PASS", "carried_from": "P1.19"},
+    {"id": "BR-10", "description": "Bucket assignment consistent across page refresh (same session)", "result": "PASS", "carried_from": "P1.19"},
+    {"id": "BR-11", "description": "No Pi-specific UI elements leaked to non-Pi users", "result": "PASS", "carried_from": "P1.19"},
+    {"id": "BR-12", "description": "Browser console: zero Pi-related error or warning messages", "result": "PASS", "carried_from": "P1.19"},
+    {"id": "BR-13", "description": "Network requests: shadow calls not observable in browser DevTools", "result": "PASS", "carried_from": "P1.19"},
+    {"id": "BR-14", "description": "Performance: page response time unchanged for non-selected users", "result": "PASS", "carried_from": "P1.19"},
+    {"id": "BR-15", "description": "Post-restart: Pi shadow not exposed in resumed sessions (S2 post_restart window)", "result": "PASS", "new_in": "P1.20"},
+    {"id": "BR-16", "description": "Concurrency: no session cross-contamination under burst load (S5 concurrency_burst window)", "result": "PASS", "new_in": "P1.20"}
+  ],
+  "total_cases": 16,
+  "passed": 16,
+  "failed": 0,
+  "browser_regression_passed": true,
+  "legacy_only_confirmed": true,
+  "pi_user_visible_leakage_all_windows": 0,
+  "note": "16/16 browser regression tests passed. BR-15 and BR-16 are new cases added for P1.20 to cover restart isolation (S2) and concurrency session isolation (S5). All 14 P1.19 cases carried forward and confirmed."
+}

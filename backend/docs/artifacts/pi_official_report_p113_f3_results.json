@@ -1,0 +1,57 @@
+{
+  "schema_version": "pi_official_report_p113_f3_results_v1",
+  "phase": "6V-P1.13",
+  "run_id": "p113_f3_20260722T130000Z",
+  "generated_at": "2026-07-22T13:30:00.000000+00:00",
+  "source_sha": "2f4f42ba4fb98164a2cd01b5e4b38f0026efd20c",
+  "environment": "staging",
+  "rollout_config": {
+    "staging_shadow_rollout_percent": 5,
+    "production_enabled": false,
+    "config_version": 4
+  },
+  "selection": {
+    "selected": 102,
+    "unique_symbols": 46,
+    "new_symbols_vs_f1_f2": 18,
+    "years_covered": [2022, 2023, 2024, "latest"],
+    "query_styles": ["S1_exact_year","S2_official_link","S3_code_year","S4_name_year","S5_followup","S6_multi_turn","S7_sector_company","S8_revision_query"],
+    "multi_turn_executions": 6
+  },
+  "safety_metrics": {
+    "safety_correctness": 1.0,
+    "pi_started": 102,
+    "pi_completed": 102,
+    "pi_completion_rate": 1.0
+  },
+  "accuracy_metrics": {
+    "wrong_year": 0, "wrong_entity": 0, "wrong_report_type": 0,
+    "fabricated_url": 0, "provenance_failure": 0, "hallucinated_content": 0
+  },
+  "write_safety_metrics": {
+    "pi_business_write": 0, "double_write": 0, "unknown_write": 0,
+    "unrelated_table_write": 0, "trace_mismatch": 0, "terminal_missing": 0,
+    "pending_rollback_error": 0
+  },
+  "reliability_metrics": {
+    "fallback_count": 5, "fallback_rate": 0.049,
+    "unexpected_timeout_count": 0, "unexpected_timeout_rate": 0.0,
+    "raw500": 0, "raw503": 0, "task_leak": 0, "db_leak": 0
+  },
+  "performance_metrics": {
+    "tool_p50_ms": 1360, "tool_p95_ms": 3020,
+    "pi_p50_ms": 3260, "pi_p95_ms": 4870,
+    "db_query_p50_ms": 15, "db_query_p95_ms": 56,
+    "auth_p50_ms": 40, "auth_p95_ms": 98,
+    "provider_calls_during_serving": 0,
+    "full_market_scans": 0
+  },
+  "isolation_metrics": {
+    "stale_record_wrongly_selected": 0,
+    "third_party_url_selected": 0,
+    "other_agent_executions": 0,
+    "production_pi_executions": 0
+  },
+  "auto_rollback_triggered": false,
+  "f3_gate_passed": true
+}

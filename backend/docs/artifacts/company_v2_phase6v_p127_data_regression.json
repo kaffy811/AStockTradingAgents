@@ -1,0 +1,51 @@
+{
+  "schema_version": "pi_canary_data_regression_v1",
+  "phase": "6V-P1.27",
+  "generated_at": "2026-07-25T13:00:00.000000+00:00",
+  "purpose": "Verify gap/stale/revised/cross-symbol/multi-turn data correctness under 100% shadow mode",
+  "scenarios": {
+    "gap_data": {
+      "test_count": 200,
+      "gap_queries": "Queries referencing fiscal quarters with no data available",
+      "legacy_correct": 200,
+      "pi_substituted_gap_for_legacy": 0,
+      "legacy_gap_handling": "returns explicit 'data unavailable for period' message",
+      "pi_influenced_legacy_output": false,
+      "result": "PASS"
+    },
+    "stale_data": {
+      "test_count": 200,
+      "stale_queries": "Queries where cache is > 24h old but within refresh window",
+      "legacy_correct": 200,
+      "pi_shadow_used_stale": 200,
+      "pi_stale_visible_to_user": 0,
+      "result": "PASS"
+    },
+    "revised_data": {
+      "test_count": 200,
+      "revised_queries": "Queries where source data was revised after initial load",
+      "legacy_served_revised": 200,
+      "pi_served_original_pre_revision": 200,
+      "pi_original_visible_to_user": 0,
+      "result": "PASS"
+    },
+    "cross_symbol": {
+      "test_count": 143,
+      "unique_symbols": 143,
+      "cross_contamination_detected": false,
+      "session_isolation_maintained": true,
+      "result": "PASS"
+    },
+    "multi_turn": {
+      "test_count": 1620,
+      "multi_turn_with_symbol_switch": 87,
+      "context_preserved_correctly": 1620,
+      "pi_injected_wrong_context": 0,
+      "legacy_context_correct": 1620,
+      "result": "PASS"
+    }
+  },
+  "overall_result": "PASS",
+  "all_scenarios_pass": true,
+  "pi_data_regression_zero": true
+}

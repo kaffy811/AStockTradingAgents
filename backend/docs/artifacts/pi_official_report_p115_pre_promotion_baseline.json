@@ -1,0 +1,16 @@
+{
+  "schema_version": "pi_official_report_p115_pre_promotion_baseline_v1",
+  "phase": "6V-P1.15",
+  "rollout_percent_at_time": 5,
+  "selected": 31,
+  "coverage": ["2022", "2023", "2024", "latest", "new_2024_reports", "remaining_gap", "stale_review_path", "multi_turn"],
+  "safety_correctness": 1.0,
+  "zero_tolerance_events": 0,
+  "tool_p95_ms": 3190,
+  "pi_p95_ms": 4680,
+  "pi_business_writes": 0,
+  "provider_calls_during_serving": 0,
+  "terminal_exactly_once": true,
+  "db_healthy": true,
+  "baseline_gate_passed": true
+}

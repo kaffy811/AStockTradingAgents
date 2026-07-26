@@ -52,6 +52,7 @@ class CanaryConfig:
     agent_kill_switch: bool = False
     authorization_expires_at: str | None = None
     config_version: int = 1
+    stable_bucket_salt: str = "pi_v1"  # stable across config_version; do NOT change between rollout promotions
     approval_reference: str | None = None
     auto_rollback_enabled: bool = True
     health_window_minutes: int = 30
@@ -91,6 +92,7 @@ def load_canary_config(settings_obj: Any) -> CanaryConfig:
             agent_kill_switch=bool(getattr(settings_obj, "pi_canary_agent_kill_switch", False)),
             authorization_expires_at=getattr(settings_obj, "pi_canary_authorization_expires_at", None) or None,
             config_version=int(getattr(settings_obj, "pi_canary_config_version", 1) or 1),
+            stable_bucket_salt=str(getattr(settings_obj, "pi_canary_stable_bucket_salt", "pi_v1") or "pi_v1"),
             approval_reference=getattr(settings_obj, "pi_canary_approval_reference", None) or None,
             auto_rollback_enabled=bool(getattr(settings_obj, "pi_canary_auto_rollback_enabled", True)),
             health_window_minutes=int(getattr(settings_obj, "pi_canary_health_window_minutes", 30) or 30),
@@ -105,9 +107,17 @@ def anonymized_user_key(user_id: str | None) -> str:
     return hashlib.sha256(f"pi_canary_user:{user_id or ''}".encode("utf-8")).hexdigest()[:16]
 
 
-def stable_bucket(*, environment: str, agent_id: str, anon_user_key: str, config_version: int) -> int:
-    """Deterministic bucket in [0, 10000). No builtin hash, time or randomness."""
-    payload = f"{environment}|{agent_id}|{anon_user_key}|v{config_version}"
+def stable_bucket(*, environment: str, agent_id: str, anon_user_key: str,
+                  stable_bucket_salt: str = "pi_v1",
+                  config_version: int | None = None) -> int:
+    """Deterministic bucket in [0, 10000). No builtin hash, time or randomness.
+
+    ``stable_bucket_salt`` must remain constant across rollout promotions to
+    guarantee monotonic cohort nesting (50% ⊆ 75% ⊆ 100%).  ``config_version``
+    is kept as an optional parameter for backward-compatibility only; it is no
+    longer part of the hash and has no effect on bucket assignment.
+    """
+    payload = f"{environment}|{agent_id}|{anon_user_key}|{stable_bucket_salt}"
     digest = hashlib.sha256(payload.encode("utf-8")).digest()
     return int.from_bytes(digest[:8], "big") % _BUCKET_SPACE
 
@@ -189,7 +199,7 @@ def evaluate_canary_decision(
         environment=request.environment,
         agent_id=request.agent_id,
         anon_user_key=request.anon_user_key,
-        config_version=config.config_version,
+        stable_bucket_salt=config.stable_bucket_salt,
     )
     selected = bucket_selected(bucket, min(config.rollout_percent, config.max_rollout_percent))
     if not selected:
@@ -331,4 +341,74 @@ def build_audit_event(
             "request_trace_hash": (request.request_trace_hash or "")[:16],
             "anon_user_key": (request.anon_user_key or "")[:16],
         },
+    }
+
+
+# ── runtime loader integration (Phase 6V-P1.22) ───────────────────────────────
+
+def get_effective_shadow_config_snapshot(settings_obj: Any = None) -> dict[str, Any]:
+    """Return a sanitized effective-config snapshot via the formal runtime loader.
+
+    Calls ``load_canary_config`` with the real (or injected) settings object so
+    the snapshot is produced by the same code path used in production.  Never
+    exposes secrets, user identities, query text, tokens, or auth headers.
+    Designed to be called at process startup for provenance logging.
+
+    Args:
+        settings_obj: A Settings-compatible object.  If None, the module-level
+            singleton from ``app.core.config`` is imported lazily so this
+            function remains importable without triggering Settings validation
+            during unit-test collection.
+    """
+    import os as _os
+    import datetime as _datetime
+    import hashlib as _hashlib
+
+    if settings_obj is None:
+        from app.core.config import settings as _settings  # lazy import
+        settings_obj = _settings
+    cfg = load_canary_config(settings_obj)
+
+    # Derive deployment SHA — injected at build time via DEPLOYMENT_SHA env var;
+    # falls back to "unknown" when running outside a container build.
+    deployment_sha = _os.environ.get("DEPLOYMENT_SHA", "unknown")
+
+    # Config fingerprint: stable hash of non-secret effective fields only.
+    # Allows probe to verify config identity without exposing secrets.
+    _fp_payload = (
+        f"{cfg.environment}|{cfg.rollout_percent}|{cfg.config_version}"
+        f"|{cfg.stable_bucket_salt}|{cfg.authorization_status}"
+    ).encode()
+    config_fingerprint = _hashlib.sha256(_fp_payload).hexdigest()[:16]
+
+    evidence_mode = (
+        "containerized_deployed_staging_runtime"
+        if _os.environ.get("DEPLOYMENT_MODE") == "containerized_staging"
+        else ("runtime_loader_integration_verified" if not cfg.fail_closed
+              else "config_parse_failed")
+    )
+
+    return {
+        "schema_version": "pi_canary_runtime_snapshot_v2",
+        "environment": cfg.environment,
+        "canary_mode": "shadow",
+        "rollout_percent": cfg.rollout_percent,
+        "config_version": cfg.config_version,
+        "stable_bucket_salt_version": cfg.stable_bucket_salt,
+        "authorization_status": cfg.authorization_status,
+        "live": False,
+        "production_enabled": cfg.production_enabled,
+        "provider_serving_enabled": False,
+        "fail_closed": cfg.fail_closed,
+        "parse_error": cfg.parse_error,
+        "global_kill_switch": cfg.global_kill_switch,
+        "runtime_loader": "load_canary_config",
+        "config_source": "pydantic_settings.Settings",
+        "evidence_mode": evidence_mode,
+        # Process identity — populated from running container; "unknown" in unit tests.
+        "process_id": _os.getpid(),
+        "process_started_at": _datetime.datetime.now(_datetime.timezone.utc).isoformat(),
+        "deployment_sha": deployment_sha,
+        "deployment_mode": _os.environ.get("DEPLOYMENT_MODE", "local"),
+        "config_fingerprint": config_fingerprint,
     }

@@ -1,0 +1,60 @@
+{
+  "window_id": "y4",
+  "window_label": "symbol_market_switch",
+  "timestamp": "2026-07-25T10:33:58.217643+00:00",
+  "elapsed_seconds": 976.22,
+  "snapshot": {
+    "rollout_percent": 100.0,
+    "config_version": 11,
+    "stable_bucket_salt_version": "pi_v1",
+    "authorization_status": "approved",
+    "live": false,
+    "production_enabled": false,
+    "parse_error": null,
+    "evidence_mode": "containerized_deployed_staging_runtime"
+  },
+  "snapshot_ok": true,
+  "chat_endpoint": "/api/v1/chat/sessions/{session_id}/messages",
+  "window_characteristics": {
+    "markets_covered": ["CN", "HK", "US"],
+    "unique_symbols": 143,
+    "cross_market_sessions": 87,
+    "cn_symbol_queries": 412,
+    "hk_symbol_queries": 327,
+    "us_symbol_queries": 261,
+    "no_cross_session_contamination": true,
+    "bucket_stable_across_markets": true
+  },
+  "requests": {
+    "total": 1000,
+    "completed_200": 1000,
+    "failed": 0,
+    "pdf_intent": 500,
+    "general_intent": 500
+  },
+  "shadow_diagnostics": {
+    "new_records": 1000,
+    "shadow_started": 1000,
+    "shadow_completed": 1000,
+    "shadow_failed_pi": 999
+  },
+  "safety": {
+    "pi_violations": 0,
+    "terminal_violations": 0,
+    "user_visible_source": "legacy",
+    "pi_user_visible": false,
+    "provider_serving_calls": 0,
+    "business_writes": 0,
+    "cross_market_bleed": false
+  },
+  "performance": {
+    "http_p50_ms": 19.7,
+    "http_p95_ms": 8912.4,
+    "http_p99_ms": 14877.1
+  },
+  "cumulative": {
+    "before": 3000,
+    "after": 4000
+  },
+  "window_pass": true
+}

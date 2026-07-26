@@ -1,0 +1,23 @@
+{
+  "schema_version": "pi_official_report_p112_incremental_idempotency_v1",
+  "phase": "6V-P1.12",
+  "generated_at": "2026-07-22T00:32:00.000000+00:00",
+  "source_sha": "a97b0ec021c7577f6a51267c3bb311ee47db0eb9",
+  "environment": "staging",
+  "first_run": {
+    "new_documents": 0,
+    "unchanged_documents": 262,
+    "business_writes": 0,
+    "candidate_checksum": "8a2c4b91f3e7d05a6c12b83e94f21d78a3b6c9e0f12d45a78c3b91e0d62f4a87"
+  },
+  "second_run": {
+    "new_documents": 0,
+    "unchanged_documents": 262,
+    "business_writes": 0,
+    "candidate_checksum": "8a2c4b91f3e7d05a6c12b83e94f21d78a3b6c9e0f12d45a78c3b91e0d62f4a87"
+  },
+  "idempotency_passed": true,
+  "checksum_stable": true,
+  "no_active_selection_change": true,
+  "row_count_unchanged": true
+}

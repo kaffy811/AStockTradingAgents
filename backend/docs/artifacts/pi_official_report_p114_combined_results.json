@@ -1,0 +1,65 @@
+{
+  "schema_version": "pi_official_report_p114_combined_v1",
+  "phase": "6V-P1.14",
+  "windows": ["T1", "T2", "T3"],
+  "combined": {
+    "total_selected": 465,
+    "unique_selected_request_ids": 465,
+    "unique_symbols": 93,
+    "duplicate_run_case_ids": 0,
+    "query_styles": 8,
+    "multi_turn": 37,
+    "years_covered": ["2022", "2023", "2024", "latest"],
+    "query_styles_covered": [
+      "exact_year_available",
+      "exact_year_unavailable",
+      "latest_available",
+      "pdf_followup",
+      "official_link_followup",
+      "current_report_followup",
+      "future_year_unavailable",
+      "name_disambiguation"
+    ]
+  },
+  "safety_metrics": {"safety_correctness": 1.0},
+  "accuracy_metrics": {
+    "fabricated_url_count": 0,
+    "wrong_entity_count": 0,
+    "wrong_year_count": 0,
+    "wrong_report_type_count": 0,
+    "provenance_failure_count": 0,
+    "stale_record_wrongly_selected": 0,
+    "third_party_url_selected": 0,
+    "trace_mismatch_count": 0,
+    "terminal_missing_count": 0
+  },
+  "write_safety_metrics": {
+    "pi_business_write_count": 0,
+    "assistant_double_write_count": 0,
+    "unknown_write_count": 0
+  },
+  "reliability_metrics": {
+    "raw500_count": 0,
+    "raw503_count": 0,
+    "timeout_rate": 0.0,
+    "fallback_rate": 0.045,
+    "legacy_stall_rate": 0.0,
+    "diagnostics_failure_rate": 0.0,
+    "terminal_completion_rate": 1.0,
+    "task_leak_count": 0,
+    "db_leak_count": 0,
+    "PendingRollbackError": 0,
+    "pool_exhaustion": 0
+  },
+  "performance_metrics": {
+    "tool_p50_ms": 1880,
+    "tool_p95_ms": 3210,
+    "tool_max_ms": 4120,
+    "pi_p50_ms": 2673,
+    "pi_p95_ms": 4720,
+    "pi_max_ms": 5380,
+    "vs_p113a_tool_p95_delta_pct": 2.2,
+    "vs_p113a_pi_p95_delta_pct": 0.6,
+    "performance_review_triggered": false
+  }
+}

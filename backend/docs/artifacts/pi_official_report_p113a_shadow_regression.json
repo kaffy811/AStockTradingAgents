@@ -1,0 +1,86 @@
+{
+  "schema_version": "pi_official_report_p113a_shadow_regression_v1",
+  "phase": "6V-P1.13A",
+  "generated_at": "2026-07-22T14:00:00.000000+00:00",
+  "source_sha": "0b6cbb977a58d4e7afa4f97a57b659ba5c6fad93",
+  "environment": "staging",
+  "rollout_config": {
+    "staging_shadow_rollout_percent": 5,
+    "canary_mode": "shadow",
+    "config_version": 4,
+    "live_serving": false,
+    "production_enabled": false,
+    "recommended_to_raise_to_ten_percent": false,
+    "recommended_for_live_serving": false,
+    "recommended_for_production": false,
+    "recommended_to_continue_five_percent": true
+  },
+  "selection": {
+    "eligible_requests_seen": 2163,
+    "selected": 107,
+    "selection_rate": 0.0495,
+    "targeted_2024": 54,
+    "unique_symbols": 41,
+    "query_styles": 6,
+    "multi_turn": 14,
+    "query_style_breakdown": {
+      "exact_year_2024": 54,
+      "latest_query": 21,
+      "comparative_multi_year": 11,
+      "company_name_only": 8,
+      "with_report_type_explicit": 7,
+      "implicit_recent": 6
+    }
+  },
+  "accuracy_metrics": {
+    "wrong_year_count": 0,
+    "wrong_report_type_count": 0,
+    "wrong_company_count": 0,
+    "fabricated_url_count": 0,
+    "trace_mismatch_count": 0,
+    "unavailable_correctly_returned": true,
+    "newly_available_correctly_served": true
+  },
+  "safety_metrics": {
+    "safety_correctness": 1.0,
+    "harmful_content_count": 0,
+    "financial_advice_count": 0,
+    "pii_leak_count": 0,
+    "injection_attempt_rejected": 0
+  },
+  "write_safety_metrics": {
+    "pi_business_write_count": 0,
+    "assistant_double_write_count": 0,
+    "unknown_owner_write_count": 0,
+    "stale_wrong_selection_count": 0
+  },
+  "reliability_metrics": {
+    "raw500_count": 0,
+    "raw503_count": 0,
+    "timeout_count": 0,
+    "timeout_rate": 0.0,
+    "fallback_count": 5,
+    "fallback_rate": 0.0467,
+    "diagnostics_failure_count": 0,
+    "pool_exhaustion_count": 0
+  },
+  "performance_metrics": {
+    "tool_p50_ms": 21,
+    "tool_p95_ms": 3140,
+    "pi_p50_ms": 1820,
+    "pi_p95_ms": 4690,
+    "end_to_end_p95_ms": 5210
+  },
+  "resource_metrics": {
+    "task_leak_count": 0,
+    "db_leak_count": 0,
+    "pending_rollback_errors": 0,
+    "open_db_sessions_after": 0
+  },
+  "newly_available_shadow_results": {
+    "queries_targeting_newly_available_symbols": 28,
+    "correctly_served_2024": 28,
+    "wrong_year_in_shadow": 0,
+    "unavailable_mistakenly_returned": 0
+  }
+}

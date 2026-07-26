@@ -1,0 +1,64 @@
+{
+  "schema_version": "pi_canary_compose_validation_v1",
+  "phase": "6V-P1.24",
+  "generated_at": "2026-07-24T00:00:00.000000+00:00",
+
+  "compose_files": {
+    "docker_compose_yml": {
+      "path": "docker-compose.yml",
+      "exists": true,
+      "services": ["redis", "migrate", "backend", "frontend"],
+      "backend_expose": "8000 (internal only)",
+      "frontend_ports": "80:80",
+      "database": "external Supabase (not compose-managed)"
+    },
+    "docker_compose_staging_yml": {
+      "path": "docker-compose.staging.yml",
+      "exists": true,
+      "created_this_phase": true,
+      "overrides": {
+        "network": "staging-internal",
+        "backend_ports": "127.0.0.1:18000:8000",
+        "frontend_ports": "127.0.0.1:18080:80",
+        "environment_additions": [
+          "APP_ENV=staging",
+          "PI_CANARY_SNAPSHOT_PATH=/tmp/tradingagents-runtime/pi_canary_snapshot.json",
+          "DEPLOYMENT_MODE=containerized_staging",
+          "DEPLOYMENT_SHA=${DEPLOYMENT_SHA:-unknown}"
+        ],
+        "healthcheck": "curl -f http://localhost:8000/health"
+      }
+    }
+  },
+
+  "compose_config_validation": {
+    "attempted": false,
+    "reason": "docker compose command not available — Docker not installed",
+    "result": "SKIPPED",
+    "compose_config_valid": null
+  },
+
+  "container_health": {
+    "checked": false,
+    "reason": "Docker not installed; containers not started",
+    "result": "SKIPPED"
+  },
+
+  "runtime_snapshot_probe": {
+    "performed": false,
+    "reason": "Docker not installed; no running container to probe",
+    "result": "SKIPPED"
+  },
+
+  "secret_scan": {
+    "env_staging_example_scanned": true,
+    "contains_real_secrets": false,
+    "contains_placeholders_only": true,
+    "env_staging_local_committed": false,
+    "env_staging_local_gitignored": true,
+    "docker_compose_staging_yml_secret_safe": true
+  },
+
+  "validation_outcome": "INCOMPLETE — Docker not installed; structural validation only possible via file review",
+  "gate_b_status": "UNKNOWN — Docker not available; container health cannot be verified"
+}

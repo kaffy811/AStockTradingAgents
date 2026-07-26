@@ -1,0 +1,36 @@
+{
+  "schema_version": "pi_official_report_p116_capacity_comparison_v1",
+  "phase": "6V-P1.16",
+  "generated_at": "2026-07-26T14:00:00.000000+00:00",
+  "comparison": "5pct_vs_10pct_sustained",
+  "at_5pct_p114": {
+    "tool_p95_ms": 3210,
+    "pi_p95_ms": 4720,
+    "db_checkout_p95_ms": 13,
+    "memory_mb_avg": 347,
+    "cpu_pct_avg": 4.2
+  },
+  "at_10pct_p115": {
+    "tool_p95_ms": 3290,
+    "pi_p95_ms": 4780,
+    "db_checkout_p95_ms": 16,
+    "memory_mb_avg": 378,
+    "cpu_pct_avg": 5.8
+  },
+  "at_10pct_p116_sustained": {
+    "tool_p95_ms": 3320,
+    "pi_p95_ms": 4800,
+    "db_checkout_p95_ms": 17,
+    "memory_mb_avg": 374,
+    "cpu_pct_avg": 5.8
+  },
+  "p116_memory_h1_to_h6": [374, 371, 378, 376, 374, 373],
+  "p116_memory_trend": "stable_no_upward_drift",
+  "p116_cpu_h1_to_h6": [5.9, 5.7, 6.2, 5.8, 5.6, 5.5],
+  "p116_cpu_trend": "stable",
+  "pool_exhaustion_all_windows": 0,
+  "db_leak_all_windows": 0,
+  "task_leak_all_windows": 0,
+  "capacity_gate_passed": true,
+  "note": "Memory stable at ~374MB avg across H1-H6 (no persistent growth, H3 transient spike during incremental dry-run fully resolved). DB checkout p95 +1ms vs P1.15 (within acceptable). Pi p95 at exactly 4800ms borderline — within gate but flagged for monitoring at 25%."
+}

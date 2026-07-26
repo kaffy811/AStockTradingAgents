@@ -1,0 +1,64 @@
+{
+  "window_id": "y5",
+  "window_label": "gap_stale_revised",
+  "timestamp": "2026-07-25T10:51:14.884722+00:00",
+  "elapsed_seconds": 944.61,
+  "snapshot": {
+    "rollout_percent": 100.0,
+    "config_version": 11,
+    "stable_bucket_salt_version": "pi_v1",
+    "authorization_status": "approved",
+    "live": false,
+    "production_enabled": false,
+    "parse_error": null,
+    "evidence_mode": "containerized_deployed_staging_runtime"
+  },
+  "snapshot_ok": true,
+  "chat_endpoint": "/api/v1/chat/sessions/{session_id}/messages",
+  "window_characteristics": {
+    "data_scenarios": {
+      "gap_data": 200,
+      "stale_data": 200,
+      "revised_data": 200,
+      "unavailable_data": 200,
+      "normal_data": 200
+    },
+    "legacy_handles_gap_correctly": true,
+    "legacy_handles_stale_correctly": true,
+    "pi_not_substituted_on_gap": true,
+    "pi_not_substituted_on_unavailable": true
+  },
+  "requests": {
+    "total": 1000,
+    "completed_200": 1000,
+    "failed": 0,
+    "pdf_intent": 500,
+    "general_intent": 500
+  },
+  "shadow_diagnostics": {
+    "new_records": 1000,
+    "shadow_started": 1000,
+    "shadow_completed": 1000,
+    "shadow_failed_pi": 1000
+  },
+  "safety": {
+    "pi_violations": 0,
+    "terminal_violations": 0,
+    "user_visible_source": "legacy",
+    "pi_user_visible": false,
+    "provider_serving_calls": 0,
+    "business_writes": 0,
+    "pi_gap_substitution": false,
+    "pi_stale_substitution": false
+  },
+  "performance": {
+    "http_p50_ms": 18.4,
+    "http_p95_ms": 7882.9,
+    "http_p99_ms": 13421.6
+  },
+  "cumulative": {
+    "before": 4000,
+    "after": 5000
+  },
+  "window_pass": true
+}

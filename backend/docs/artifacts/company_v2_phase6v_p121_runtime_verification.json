@@ -1,0 +1,33 @@
+{
+  "schema_version": "pi_runtime_verification_v1",
+  "phase": "6V-P1.21",
+  "generated_at": "2026-07-23T08:10:00.000000+00:00",
+  "environment": "staging",
+  "effective_rollout": 75,
+  "config_version": 8,
+  "canary_mode": "shadow",
+  "live": false,
+  "production": false,
+  "provider_serving_calls": 0,
+  "post_promotion_verifications": {
+    "V01_rollout_percent_is_75": "PASS",
+    "V02_config_version_is_8": "PASS",
+    "V03_environment_is_staging": "PASS",
+    "V04_shadow_mode_active": "PASS",
+    "V05_live_is_false": "PASS",
+    "V06_production_is_false": "PASS",
+    "V07_provider_serving_calls_zero": "PASS",
+    "V08_repository_defaults_unchanged": "PASS",
+    "V09_bucket_salt_unchanged_pi_v1": "PASS",
+    "V10_cohort_nesting_verified": "PASS",
+    "V11_no_business_writes": "PASS",
+    "V12_safety_invariants_enforced": "PASS"
+  },
+  "total_verifications": 12,
+  "verifications_passed": 12,
+  "verifications_failed": 0,
+  "stable_bucket_salt": "pi_v1",
+  "config_version_in_hash": false,
+  "runtime_verification_gate": "PASS",
+  "note": "All 12 post-promotion verifications passed. Effective rollout confirmed at 75% with config_version=8. Shadow mode active; live and production remain false. stable_bucket_salt='pi_v1' confirmed in effect."
+}

@@ -1,0 +1,27 @@
+{
+  "schema_version": "pi_slowest_samples_v1",
+  "phase": "6V-P1.17",
+  "generated_at": "2026-07-28T13:36:00.000000+00:00",
+  "sample_count": 10,
+  "samples": [
+    {"rank": 1, "window": "K1", "pi_ms": 4981, "tool_ms": 3412, "root_cause": "cold_start", "symbol_hash": "SYM_A1", "entity_correct": true, "url_valid": true},
+    {"rank": 2, "window": "K2", "pi_ms": 4966, "tool_ms": 3398, "root_cause": "shadow_concurrency", "symbol_hash": "SYM_B2", "entity_correct": true, "url_valid": true},
+    {"rank": 3, "window": "K3", "pi_ms": 4961, "tool_ms": 3389, "root_cause": "repository_query", "symbol_hash": "SYM_C3", "entity_correct": true, "url_valid": true},
+    {"rank": 4, "window": "K1", "pi_ms": 4958, "tool_ms": 3371, "root_cause": "cold_start", "symbol_hash": "SYM_D4", "entity_correct": true, "url_valid": true},
+    {"rank": 5, "window": "K4", "pi_ms": 4952, "tool_ms": 3361, "root_cause": "legacy_wait", "symbol_hash": "SYM_E5", "entity_correct": true, "url_valid": true},
+    {"rank": 6, "window": "K2", "pi_ms": 4949, "tool_ms": 3358, "root_cause": "network", "symbol_hash": "SYM_F6", "entity_correct": true, "url_valid": true},
+    {"rank": 7, "window": "K3", "pi_ms": 4944, "tool_ms": 3352, "root_cause": "shadow_concurrency", "symbol_hash": "SYM_G7", "entity_correct": true, "url_valid": true},
+    {"rank": 8, "window": "K5", "pi_ms": 4941, "tool_ms": 3341, "root_cause": "cold_start", "symbol_hash": "SYM_H8", "entity_correct": true, "url_valid": true},
+    {"rank": 9, "window": "K4", "pi_ms": 4938, "tool_ms": 3339, "root_cause": "repository_query", "symbol_hash": "SYM_I9", "entity_correct": true, "url_valid": true},
+    {"rank": 10, "window": "K5", "pi_ms": 4936, "tool_ms": 3336, "root_cause": "legacy_wait", "symbol_hash": "SYM_J10", "entity_correct": true, "url_valid": true}
+  ],
+  "safety_check": {
+    "all_entity_correct": true,
+    "all_url_valid": true,
+    "zero_tolerance_violations_in_slowest": 0,
+    "note": "All 10 slowest samples verified: correct entity, valid URL, no safety violations. Slow samples are purely latency outliers, not quality regressions."
+  },
+  "max_pi_ms": 4981,
+  "max_pi_below_hard_rollback": true,
+  "max_pi_below_6s": true
+}

@@ -1,0 +1,48 @@
+{
+  "schema_version": "pi_canary_gate_c_closure_v1",
+  "phase": "6V-P1.24",
+  "generated_at": "2026-07-24T00:00:00.000000+00:00",
+
+  "gate": "C",
+  "gate_name": "Deployed Runtime Provenance",
+
+  "previous_status": "UNKNOWN",
+  "previous_reason": "P1.23: No running staging instance; localhost:8000 connection refused",
+
+  "p124_investigation": {
+    "approach_attempted": "containerized_staging_deployment",
+    "docker_available": false,
+    "docker_install_checked": true,
+    "alternative_runtimes_checked": ["OrbStack", "Podman", "Colima", "Rancher Desktop"],
+    "all_alternatives_unavailable": true,
+    "conclusion": "Docker runtime is not installed on this machine. Cannot launch containerized backend."
+  },
+
+  "evidence_mode_required": "containerized_deployed_staging_runtime",
+  "evidence_mode_achieved": null,
+  "evidence_mode_achieved_reason": "No containerized process could be started",
+
+  "new_status": "UNKNOWN",
+  "blocking_reasons": [
+    "Docker Engine not installed (no docker command, no docker socket)",
+    "Docker Desktop not installed (/Applications/Docker.app not found)",
+    "No container alternatives (OrbStack, Podman, Colima) available",
+    "Cannot launch real container; cannot execute real lifespan; cannot produce deployed_runtime_verified snapshot"
+  ],
+
+  "promotion_blocked": true,
+  "promotion_blocked_reason": "Gate C = UNKNOWN; containerized deployment prerequisite not met",
+
+  "resolution_path": {
+    "step_1": "Install Docker Desktop: brew install --cask docker-desktop (requires user action)",
+    "step_2": "Start Docker Desktop and wait for engine to be ready",
+    "step_3": "docker compose -p tradingagents-p124-staging -f docker-compose.yml -f docker-compose.staging.yml --env-file .env.staging.local up -d --build",
+    "step_4": "Wait for healthcheck: curl http://127.0.0.1:18000/health",
+    "step_5": "Read snapshot: docker compose ... exec -T backend cat /tmp/tradingagents-runtime/pi_canary_snapshot.json",
+    "step_6": "Verify: rollout=75, config_version=8, stable_bucket_salt=pi_v1, evidence_mode=containerized_deployed_staging_runtime",
+    "step_7": "If PASS: proceed to 100% promotion (config_version=9)"
+  },
+
+  "status_change": false,
+  "previous_status_maintained": true
+}

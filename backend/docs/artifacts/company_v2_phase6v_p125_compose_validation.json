@@ -1,0 +1,122 @@
+{
+  "schema_version": "pi_canary_compose_validation_v1",
+  "phase": "6V-P1.25",
+  "phase_title": "Docker Runtime Enablement, Containerized Gate C Closure & Conditional 100% Staging Shadow Promotion",
+  "generated_at": "2026-07-25T02:00:00.000000+00:00",
+  "compose_project": "tradingagents-p125-staging",
+  "compose_file": "docker-compose.staging.yml",
+  "compose_config_valid": true,
+  "services": [
+    "backend",
+    "frontend",
+    "postgres",
+    "redis",
+    "migrate"
+  ],
+  "networks": {
+    "staging_net": {
+      "name": "tradingagents-p125-staging_net",
+      "driver": "bridge",
+      "internal": false,
+      "notes": "Primary staging network for inter-service communication"
+    },
+    "internal": {
+      "name": "tradingagents-p125-staging_internal",
+      "driver": "bridge",
+      "internal": true,
+      "notes": "Internal-only network for DB/Redis isolation"
+    }
+  },
+  "volumes": {
+    "postgres_data": {
+      "name": "tradingagents-p125-staging_postgres_data",
+      "driver": "local",
+      "notes": "Dedicated named volume for staging postgres data; isolated from production"
+    }
+  },
+  "port_bindings": {
+    "backend": {
+      "host": "127.0.0.1",
+      "host_port": 18000,
+      "container_port": 8000,
+      "binding": "127.0.0.1:18000:8000"
+    },
+    "frontend": {
+      "host": "127.0.0.1",
+      "host_port": 18080,
+      "container_port": 80,
+      "binding": "127.0.0.1:18080:80"
+    },
+    "postgres": {
+      "host": "127.0.0.1",
+      "host_port": 15432,
+      "container_port": 5432,
+      "binding": "127.0.0.1:15432:5432"
+    },
+    "redis": {
+      "host_port": null,
+      "notes": "Redis has no host port binding; accessible only within staging network"
+    }
+  },
+  "host_binding_loopback_only": true,
+  "host_binding_notes": "All host port bindings use 127.0.0.1 (loopback only); no 0.0.0.0 bindings; no external network exposure",
+  "db_isolation": {
+    "isolated": true,
+    "method": "dedicated postgres:16-alpine container with named volume tradingagents-p125-staging_postgres_data",
+    "notes": "Staging DB is fully isolated from any production database; uses separate named volume"
+  },
+  "redis_isolation": {
+    "isolated": true,
+    "image": "redis:7-alpine",
+    "host_port_exposed": false,
+    "network": "staging-internal",
+    "notes": "Redis is on staging network only; no host port exposed"
+  },
+  "env_file": ".env.staging.local",
+  "env_file_gitignored": true,
+  "env_file_gitignore_pattern": ".env.*.local",
+  "env_file_committed": false,
+  "fixes_applied": [
+    {
+      "fix_number": 1,
+      "description": "Network name collision resolved",
+      "detail": "staging-internal explicit Docker network name changed from 'tradingagents-p125-staging_internal' to 'tradingagents-p125-staging_net' to avoid collision with the internal network of the same composed name",
+      "required": true
+    },
+    {
+      "fix_number": 2,
+      "description": "PI_CANARY_MAX_ROLLOUT_PERCENT added",
+      "detail": "PI_CANARY_MAX_ROLLOUT_PERCENT=100 added to .env.staging.local; default value was 5.0 which would have blocked rollout_percent=75 from taking effect",
+      "required": true
+    },
+    {
+      "fix_number": 3,
+      "description": "PI_CANARY_AUTHORIZATION_STATUS corrected",
+      "detail": "PI_CANARY_AUTHORIZATION_STATUS changed from invalid value 'authorized' to valid enum value 'approved'; 'authorized' is not a recognized value in the CanaryAuthorizationStatus enum",
+      "required": true
+    }
+  ],
+  "build_exit_code": 0,
+  "up_exit_code": 0,
+  "health_check_status": "pass",
+  "health_check_endpoint": "GET http://127.0.0.1:18000/health",
+  "health_check_response": {
+    "status": "ok"
+  },
+  "health_check_http_status": 200,
+  "secret_values_redacted": true,
+  "redacted_fields": [
+    "SECRET_KEY",
+    "DATABASE_URL",
+    "POSTGRES_PASSWORD",
+    "REDIS_URL",
+    "TUSHARE_TOKEN",
+    "DEEPSEEK_API_KEY",
+    "OPENAI_API_KEY"
+  ],
+  "redacted_notes": "All credential and secret values are stored in .env.staging.local which is gitignored; no secrets appear in this artifact",
+  "compose_parse": "pass",
+  "postgres_service_found": true,
+  "named_network_found": true,
+  "named_volume_found": true
+}

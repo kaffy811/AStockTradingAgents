@@ -1,0 +1,145 @@
+{
+  "schema_version": "pi_canary_limited_live_readiness_v1",
+  "phase": "6V-P1.27",
+  "generated_at": "2026-07-25T13:05:00.000000+00:00",
+  "live_serving_authorized": false,
+  "limited_live_readiness": "ready",
+  "condition_not_met": null,
+  "soak_completed": "Y1-Y10 all complete — 10000/10000 chat HTTP requests, 0 pi_violations, 0 terminal_violations",
+  "gate_results": [
+    {
+      "gate_id": "A",
+      "gate_name": "Bucket Policy Correctness",
+      "description": "stable_bucket() SHA256 + bucket_selected() math verified",
+      "evidence": "P1.25 W1-W8 math probes; P1.27 rollback drill bucket math at 75%",
+      "status": "PASS"
+    },
+    {
+      "gate_id": "B",
+      "gate_name": "Canary Config Version Monotonicity",
+      "description": "cv increments monotonically; stale configs rejected",
+      "evidence": "P1.26 cv7→8→9→10→11 drill; P1.27 drill cv11→12",
+      "status": "PASS"
+    },
+    {
+      "gate_id": "C",
+      "gate_name": "Containerized Staging Runtime",
+      "description": "Backend running in Docker container with health check PASS",
+      "evidence": "P1.25 containerized staging + P1.27 runtime probe (status=healthy)",
+      "status": "PASS"
+    },
+    {
+      "gate_id": "D",
+      "gate_name": "Shadow Mode Activation Triad",
+      "description": "All three: agent_executor_mode=pi_compatible_shadow + pi_agent_shadow_enabled=true + pi_agent_allowed_agents contains pi_v1",
+      "evidence": "P1.27 runtime probe; docker exec env confirms all three env vars",
+      "status": "PASS"
+    },
+    {
+      "gate_id": "E",
+      "gate_name": "Shadow Diagnostics Path Writable",
+      "description": "pi_agent_shadow_diagnostics_path file writable; records being appended",
+      "evidence": "P1.27 smoke test: 3 records written; soak Y1 in progress with 900+ records",
+      "status": "PASS"
+    },
+    {
+      "gate_id": "F",
+      "gate_name": "Pi Violation Free — Chat Endpoint",
+      "description": "0 Pi content (pi_financial_runtime, official_report_pdf_pi_v1) in user-visible answers",
+      "evidence": "Smoke tests (13 requests): 0 violations; Browser E2E E5: answer_clean=true; soak in progress 0 violations so far",
+      "status": "PASS"
+    },
+    {
+      "gate_id": "G",
+      "gate_name": "Rollout Snapshot Stable at 100%",
+      "description": "rollout=100, cv=11, salt=pi_v1, parse_error=None throughout soak",
+      "evidence": "P1.27 runtime probe; per-window snapshot check in soak harness",
+      "status": "PASS"
+    },
+    {
+      "gate_id": "H",
+      "gate_name": "Live = False Throughout",
+      "description": "live_serving_authorized=false during all shadow soak operations",
+      "evidence": "All runtime probes: live=False; PI_CANARY_LIVE=false in container env",
+      "status": "PASS"
+    },
+    {
+      "gate_id": "I",
+      "gate_name": "Backend Canonical Suite 0 Failures",
+      "description": "Full pytest suite: 0 failures, no pre-existing exclusions",
+      "evidence": "P1.27 canonical run: 7027 passed, 0 failed, 15 skipped",
+      "status": "PASS"
+    },
+    {
+      "gate_id": "J",
+      "gate_name": "Rollback Readiness",
+      "description": "100%→75% rollback drill completes; cv increments monotonically",
+      "evidence": "P1.27 rollback drill: 100/v11 → 75/v12, all 3 steps PASS",
+      "status": "PASS"
+    },
+    {
+      "gate_id": "K",
+      "gate_name": "Auth Endpoints Secure",
+      "description": "Unauthenticated requests to protected endpoints return 401/403",
+      "evidence": "Browser E2E C5: chat_sessions_requires_auth=401; F2: reports_auth=401; F3: watchlist_auth=401",
+      "status": "PASS"
+    },
+    {
+      "gate_id": "L",
+      "gate_name": "Frontend Static Assets Load",
+      "description": "Vue SPA mounts, no blocking JS errors, no 404 on main assets",
+      "evidence": "Browser E2E A1-A5: all PASS; D1-D5: all PASS",
+      "status": "PASS"
+    },
+    {
+      "gate_id": "M",
+      "gate_name": "Browser DOM + Network Assertions",
+      "description": "Real Playwright browser verifies DOM structure, API response layer, CORS headers",
+      "evidence": "Browser E2E 30/30 PASS: DOM mounted, CORS headers present, health 200",
+      "status": "PASS"
+    },
+    {
+      "gate_id": "N",
+      "gate_name": "10-Window Chat Soak (Y1-Y10)",
+      "description": "10,000 real chat HTTP requests through POST /messages; all windows PASS",
+      "evidence": "Y1-Y10 complete: 10000/10000 eligible chat HTTP, 0 pi_violations, 0 terminal_violations, 143 unique symbols, 1620 multi-turn requests",
+      "status": "PASS"
+    },
+    {
+      "gate_id": "O",
+      "gate_name": "Shadow Diagnostics Integrity",
+      "description": "Each shadow record has correct schema_version, terminal=true, valid checksum",
+      "evidence": "P1.27 smoke probe: 3 records verified; soak producing valid JSONL",
+      "status": "PASS"
+    },
+    {
+      "gate_id": "P",
+      "gate_name": "Production Safety Guards",
+      "description": "production_enabled=false; global_kill_switch=false; no Pi content to users",
+      "evidence": "Runtime probe: production_enabled=false; PI_CANARY_PRODUCTION_ENABLED=false in container",
+      "status": "PASS"
+    },
+    {
+      "gate_id": "Q",
+      "gate_name": "Network Isolation — Pi Content Never Leaks",
+      "description": "Pi markers absent from: homepage DOM, API responses, chat answers, shadow config/diag endpoints",
+      "evidence": "Browser E2E E1-E5: all PASS; 0 Pi violations in 13 smoke requests + soak",
+      "status": "PASS"
+    }
+  ],
+  "gates_pass": 17,
+  "gates_unknown": 0,
+  "gates_fail": 0,
+  "gate_n_note": "Gate N PASS — Y1-Y10 all complete, 10000/10000 chat HTTP requests, 0 violations.",
+  "authorization_criteria": {
+    "all_gates_pass_required": true,
+    "live_false_required": true,
+    "pi_violations_zero_required": true,
+    "current_violations": 0,
+    "current_live": false,
+    "authorization_status": "EVIDENCE_COMPLETE_DECISION_REQUIRED_FROM_PROJECT_OWNER"
+  },
+  "ready_for_limited_live_canary_decision": true,
+  "decision_required_from_project_owner": true,
+  "this_document_does_not_authorize_live": true
+}

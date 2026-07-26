@@ -1,0 +1,49 @@
+{
+  "schema_version": "pi_canary_deployment_mapping_v1",
+  "phase": "6V-P1.23",
+  "phase_title": "Deployed Runtime Probe Closure",
+  "generated_at": "2026-07-23T17:00:00.000000+00:00",
+  "base_sha": "779da4cd3f33ff6a1b21b7c36cf182b7b2c4500d",
+
+  "investigation_summary": "Deployment platform investigation performed to locate running staging instance for Gate C probe.",
+
+  "deployment_found": true,
+  "deployment_type": "docker_compose_self_hosted_vps",
+  "deployment_manifest": "docker-compose.yml",
+  "deployment_manifest_path": "docker-compose.yml",
+  "startup_command": "docker compose up -d",
+  "environment_source": ".env file (not committed, staging server)",
+
+  "cicd_pipeline_found": false,
+  "cicd_pipeline_path": null,
+  "cicd_investigation_note": ".github/workflows/ does not exist. No CI/CD pipeline detected in repository.",
+
+  "pi_canary_vars_in_env_example": false,
+  "pi_canary_vars_investigation": ".env.example does not contain PI_CANARY_ROLLOUT_PERCENT or any pi_canary_* variables. Staging overrides must be set manually in the server .env file.",
+
+  "staging_service_running": false,
+  "staging_service_probe_command": "curl --noproxy localhost http://localhost:8000",
+  "staging_service_probe_exit_code": 7,
+  "staging_service_probe_exit_meaning": "Connection refused — no service listening on localhost:8000",
+  "staging_url": null,
+  "staging_url_investigation": "No staging URL discovered in any config files, docker-compose.yml, .env.example, or documentation.",
+
+  "local_proxy_note": "http_proxy=http://127.0.0.1:7890 is a local proxy tool (e.g. Clash/V2Ray). It is not a staging service and not relevant to the Gate C probe.",
+
+  "probe_access_method": "none_available",
+  "deployment_sha_accessible": false,
+  "deployment_sha_verification_possible": false,
+
+  "files_investigated": [
+    "docker-compose.yml",
+    ".env.example",
+    ".github/workflows/ (absent)",
+    "docs/server_deployment_guide.md"
+  ],
+
+  "conclusion": "docker-compose.yml found — deployment infrastructure exists. However, no running staging instance is accessible from the current environment. The staging deployment requires manual VPS access to start and configure with PI_CANARY_ROLLOUT_PERCENT=75 in the server .env file. Gate C cannot be closed without direct access to the running staging process.",
+
+  "note": "docker-compose.yml found but no running staging instance accessible from CI environment. No CI/CD pipeline. Staging deployment requires manual VPS access.",
+
+  "recommended_path_forward": "Gain SSH/VPS access to the staging server. Ensure .env sets PI_CANARY_ROLLOUT_PERCENT=75. Run docker compose up -d. Execute probe via SSH or expose a diagnostics endpoint. Re-attempt Gate C closure in P1.24."
+}

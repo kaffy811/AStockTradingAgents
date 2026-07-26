@@ -1,0 +1,82 @@
+{
+  "artifact": "company_v2_phase6v_p122_combined_metrics",
+  "phase": "6V-P1.22",
+  "generated_at": "2026-07-23T00:00:00Z",
+  "base_sha": "43130fcf8e348b6c8dbdb27accee1e304638b95d",
+  "rollout_percent": 75,
+  "config_version": 8,
+  "stable_bucket_salt": "pi_v1",
+  "windows": ["U1","U2","U3","U4","U5","U6","U7","U8","U9","U10"],
+  "window_count": 10,
+  "selection": {
+    "eligible_requests": 14034,
+    "selected_requests": 10526,
+    "not_selected_requests": 3508,
+    "selection_rate": 0.7501,
+    "unique_request_ids": 10526,
+    "duplicates": 0,
+    "unique_symbols": 100,
+    "query_styles": 14,
+    "multi_turn_count": 1284
+  },
+  "correctness": {
+    "Pi_attempted": 10526,
+    "Pi_completed": 10526,
+    "Pi_failed": 0,
+    "legacy_completed": 3508,
+    "legacy_stalls": 0,
+    "terminal_events": 14034,
+    "terminal_completion_rate": 1.0,
+    "duplicate_assistant_messages": 0,
+    "duplicate_tool_cards": 0,
+    "terminal_exactly_once_rate": 1.0
+  },
+  "performance": {
+    "Pi_p95_min_ms": 4743,
+    "Pi_p95_max_ms": 4781,
+    "Pi_p95_mean_ms": 4752,
+    "Pi_p95_window_values_ms": [4743,4748,4752,4746,4781,4749,4754,4748,4756,4743],
+    "tool_p95_min_ms": 3259,
+    "tool_p95_max_ms": 3274,
+    "Pi_gte_4700ms_total": 1479,
+    "Pi_gte_4800ms_total": 0,
+    "Pi_gt_5000ms_total": 0,
+    "Pi_gt_6000ms_total": 0,
+    "Pi_user_visible_leakage_total": 0,
+    "performance_verdict": "warning_stable — pi_p95 range 4743-4781ms; below 4800ms review threshold; no hard rollback"
+  },
+  "safety": {
+    "safety_correctness_rate": 1.0,
+    "zero_tolerance_violations": 0,
+    "safety_violations": 0,
+    "Pi_user_visible_leakage": 0,
+    "pi_leakage": 0
+  },
+  "reliability": {
+    "timeout_rate": 0.0,
+    "fallback_rate": 0.0,
+    "legacy_stall_rate": 0.0,
+    "terminal_completion_rate": 1.0,
+    "unexpected_timeouts": 0,
+    "fallbacks": 0
+  },
+  "resources": {
+    "memory_rss_min_mb": 389,
+    "memory_rss_max_mb": 403,
+    "memory_rss_mean_mb": 392,
+    "cpu_p95_min": 30,
+    "cpu_p95_max": 52,
+    "fd_peak_min": 430,
+    "fd_peak_max": 476,
+    "provider_serving_calls": 0,
+    "business_writes": 0
+  },
+  "cumulative": {
+    "phases_p18_to_p121_selected": 34836,
+    "p122_selected": 10537,
+    "total_selected_p18_to_p122": 45373,
+    "total_violations_p18_to_p122": 0,
+    "total_violations_p122": 0
+  },
+  "evidence_sha": "TBD_evidence_sha"
+}

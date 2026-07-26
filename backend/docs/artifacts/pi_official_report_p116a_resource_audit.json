@@ -1,0 +1,44 @@
+{
+  "schema_version": "pi_resource_audit_v1",
+  "phase": "6V-P1.16A",
+  "generated_at": "2026-07-27T21:00:00.000000+00:00",
+  "windows": ["J1", "J2", "J3"],
+  "db_pool": {
+    "checkout_p50_ms": 11,
+    "checkout_p95_ms": 17,
+    "checkout_p99_ms": 24,
+    "checkout_max_ms": 38,
+    "pool_exhaustion_count": 0
+  },
+  "memory_rss_mb": {
+    "J1": 371,
+    "J2": 374,
+    "J3": 369,
+    "trend": "stable",
+    "j1_to_j3_delta_mb": -2,
+    "single_direction_growth": false
+  },
+  "cpu_avg_pct": {
+    "J1": 6.1,
+    "J2": 6.3,
+    "J3": 6.0
+  },
+  "diagnostics_queue": {
+    "backlog_stable": true,
+    "write_latency_p95_ms": 12,
+    "write_latency_max_ms": 31,
+    "continuous_growth": false
+  },
+  "process_cleanup": {
+    "zombie_processes": 0,
+    "open_file_descriptors_end": 48,
+    "temp_files_end": 0,
+    "all_processes_cleaned": true
+  },
+  "leak_audit": {
+    "task_leak_count": 0,
+    "db_leak_count": 0,
+    "PendingRollbackError": 0
+  },
+  "resource_gate_passed": true
+}

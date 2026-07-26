@@ -1,0 +1,49 @@
+{
+  "schema_version": "deepseek_pricing_v1",
+  "pricing_mode": "test_fixture",
+  "verified": false,
+  "verification_note": "Prices NOT verified from authoritative source. Must NOT use for real cost calculation without verification from https://platform.deepseek.com/api-docs/pricing (retrieval date required). All values are placeholder fixtures for testing budget guard arithmetic only.",
+  "currency": "CNY",
+  "generated_at": "2026-07-26T00:00:00Z",
+  "source_url": null,
+  "source_retrieval_date": null,
+  "models": {
+    "deepseek-v4-flash": {
+      "model_id": "deepseek-v4-flash",
+      "aliases": ["deepseek-chat", "deepseek-v3"],
+      "enabled_for_staging_real": false,
+      "pricing": {
+        "input_per_1m_tokens_cny": "1.0",
+        "output_per_1m_tokens_cny": "2.0",
+        "cached_input_per_1m_tokens_cny": "0.1",
+        "verified": false,
+        "fixture_note": "Test fixture only — do not use for real cost tracking"
+      }
+    },
+    "deepseek-v4-pro": {
+      "model_id": "deepseek-v4-pro",
+      "aliases": [],
+      "enabled_for_staging_real": false,
+      "pricing": {
+        "input_per_1m_tokens_cny": "4.0",
+        "output_per_1m_tokens_cny": "8.0",
+        "cached_input_per_1m_tokens_cny": "1.0",
+        "verified": false,
+        "fixture_note": "Test fixture only — do not use for real cost tracking"
+      }
+    },
+    "deepseek-reasoner": {
+      "model_id": "deepseek-reasoner",
+      "aliases": ["deepseek-r1"],
+      "enabled_for_staging_real": false,
+      "pricing": {
+        "input_per_1m_tokens_cny": "4.0",
+        "output_per_1m_tokens_cny": "16.0",
+        "cached_input_per_1m_tokens_cny": "1.0",
+        "reasoning_per_1m_tokens_cny": "16.0",
+        "verified": false,
+        "fixture_note": "Test fixture only — do not use for real cost tracking"
+      }
+    }
+  }
+}

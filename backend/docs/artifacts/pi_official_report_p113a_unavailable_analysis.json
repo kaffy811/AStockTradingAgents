@@ -1,0 +1,71 @@
+{
+  "schema_version": "pi_official_report_p113a_unavailable_analysis_v1",
+  "phase": "6V-P1.13A",
+  "generated_at": "2026-07-22T12:30:00.000000+00:00",
+  "source_sha": "0b6cbb977a58d4e7afa4f97a57b659ba5c6fad93",
+  "environment": "staging",
+  "analysis_scope": "2024_annual_report_unavailability",
+  "before_fill": {
+    "total_2024_gaps": 37,
+    "breakdown": {
+      "staged_missing_provider_available": 18,
+      "provider_not_found": 8,
+      "officially_not_disclosed": 3,
+      "summary_only": 3,
+      "wrong_report_type_only": 2,
+      "manual_review_required": 3
+    },
+    "fillable_count": 18,
+    "genuinely_unavailable_count": 19
+  },
+  "after_fill": {
+    "total_2024_gaps": 19,
+    "breakdown": {
+      "provider_not_found": 8,
+      "officially_not_disclosed": 3,
+      "summary_only": 3,
+      "wrong_report_type_only": 2,
+      "manual_review_required": 3
+    },
+    "fillable_count": 0,
+    "genuinely_unavailable_count": 19
+  },
+  "gap_reduction": {
+    "gaps_eliminated": 18,
+    "gaps_remaining": 19,
+    "reduction_pct": 48.6,
+    "note": "All fillable gaps eliminated. Remaining 19 are genuine data unavailability."
+  },
+  "unavailability_root_causes": {
+    "provider_not_found": {
+      "count": 8,
+      "root_cause": "cninfo API returned no results for these ts_code+year+type queries; some may be restructured or legacy issuers",
+      "remediation": "Manual cninfo search; check if company reorganized or delisted"
+    },
+    "officially_not_disclosed": {
+      "count": 3,
+      "root_cause": "CSRC/Exchange disclosure registry confirms 2024 annual not filed as of 2026-07-22",
+      "remediation": "Monitor filing deadline; re-query after regulatory extension expires"
+    },
+    "summary_only": {
+      "count": 3,
+      "root_cause": "Provider returned 年报摘要 (annual summary) not full 年度报告; full text not available via cninfo for these issuers",
+      "remediation": "Check SSE/SZSE direct filing portal for full text version"
+    },
+    "wrong_report_type_only": {
+      "count": 2,
+      "root_cause": "Provider returned semi-annual or quarterly report when annual was requested; annual not separately filed",
+      "remediation": "Check if issuer uses integrated reporting format"
+    },
+    "manual_review_required": {
+      "count": 3,
+      "root_cause": "Entity ambiguity, ts_code mismatch, or company reorganization prevents automated resolution",
+      "remediation": "Human analyst verification required before ingestion"
+    }
+  },
+  "quality_confirmation": {
+    "zero_wrong_data_inserted": true,
+    "unavailable_correctly_served": true,
+    "no_fabricated_urls": true
+  }
+}

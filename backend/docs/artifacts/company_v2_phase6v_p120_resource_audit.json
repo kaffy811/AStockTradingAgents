@@ -1,0 +1,122 @@
+{
+  "schema_version": "pi_resource_audit_v1",
+  "phase": "6V-P1.20",
+  "generated_at": "2026-07-23T06:20:00.000000+00:00",
+  "rollout_percent": 50,
+  "config_version": 7,
+  "per_window": {
+    "S1": {
+      "memory_rss_mb": 383,
+      "cpu_pct_p95": 28,
+      "file_descriptors_peak": 421,
+      "db_pool_peak": 6,
+      "pool_exhaustion": 0,
+      "task_leak": 0,
+      "db_leak": 0,
+      "PendingRollbackError": 0
+    },
+    "S2": {
+      "memory_rss_mb": 381,
+      "cpu_pct_p95": 34,
+      "file_descriptors_peak": 429,
+      "db_pool_peak": 7,
+      "pool_exhaustion": 0,
+      "task_leak": 0,
+      "db_leak": 0,
+      "PendingRollbackError": 0
+    },
+    "S3": {
+      "memory_rss_mb": 387,
+      "cpu_pct_p95": 37,
+      "file_descriptors_peak": 434,
+      "db_pool_peak": 8,
+      "pool_exhaustion": 0,
+      "task_leak": 0,
+      "db_leak": 0,
+      "PendingRollbackError": 0
+    },
+    "S4": {
+      "memory_rss_mb": 385,
+      "cpu_pct_p95": 29,
+      "file_descriptors_peak": 426,
+      "db_pool_peak": 6,
+      "pool_exhaustion": 0,
+      "task_leak": 0,
+      "db_leak": 0,
+      "PendingRollbackError": 0
+    },
+    "S5": {
+      "memory_rss_mb": 394,
+      "cpu_pct_p95": 46,
+      "file_descriptors_peak": 461,
+      "db_pool_peak": 12,
+      "pool_exhaustion": 0,
+      "task_leak": 0,
+      "db_leak": 0,
+      "PendingRollbackError": 0
+    },
+    "S6": {
+      "memory_rss_mb": 391,
+      "cpu_pct_p95": 39,
+      "file_descriptors_peak": 451,
+      "db_pool_peak": 10,
+      "pool_exhaustion": 0,
+      "task_leak": 0,
+      "db_leak": 0,
+      "PendingRollbackError": 0
+    },
+    "S7": {
+      "memory_rss_mb": 386,
+      "cpu_pct_p95": 31,
+      "file_descriptors_peak": 432,
+      "db_pool_peak": 7,
+      "pool_exhaustion": 0,
+      "task_leak": 0,
+      "db_leak": 0,
+      "PendingRollbackError": 0
+    },
+    "S8": {
+      "memory_rss_mb": 383,
+      "cpu_pct_p95": 27,
+      "file_descriptors_peak": 419,
+      "db_pool_peak": 6,
+      "pool_exhaustion": 0,
+      "task_leak": 0,
+      "db_leak": 0,
+      "PendingRollbackError": 0
+    }
+  },
+  "combined": {
+    "memory_rss_mb_range": "381-394",
+    "memory_rss_mb_mean": 386,
+    "memory_delta_vs_p119_mean_mb": 0,
+    "no_upward_drift": true,
+    "cpu_pct_p95_range": "27-46",
+    "cpu_peak_window": "S5",
+    "cpu_peak_reason": "concurrency_burst",
+    "fd_peak_range": "419-461",
+    "fd_peak_window": "S5",
+    "fd_peak_reason": "concurrency_burst",
+    "fd_recovered_after_s5": true,
+    "fd_s6_vs_s5_delta": -10,
+    "fd_s7_vs_s5_delta": -29,
+    "fd_s8_vs_s5_delta": -42,
+    "fd_s8_vs_s1_delta": -2,
+    "s8_vs_s1_memory_delta_mb": 0,
+    "s8_vs_s1_fd_delta": -2,
+    "s8_recovered_to_s1_baseline": true,
+    "pool_exhaustion_total": 0,
+    "task_leak_total": 0,
+    "db_leak_total": 0,
+    "PendingRollbackError_total": 0,
+    "diagnostics_backlog_stable_all_windows": true,
+    "diagnostics_cleared_between_windows": true,
+    "p119_mean_memory_rss_mb": 386,
+    "context": "S5/S6 resource peaks explained by concurrency_burst and dry_run_parallel workloads respectively. Both are temporary and expected. Resources recovered to S1-level by S8 confirming no accumulation or structural degradation."
+  },
+  "s5_explained": "concurrency_burst: temporary CPU/FD/db_pool elevation due to high concurrency; pool_exhaustion=0 confirms headroom adequate",
+  "s6_explained": "dry_run_parallel overhead: slight elevation from concurrent dry-run candidate evaluation; temporary, expected",
+  "s7_confirmed": "long_running: no monotonic drift detected over 120-minute extended observation",
+  "resource_audit_passed": true,
+  "note": "All resource metrics stable. Memory 381-394MB range (mean 386MB, same as P1.19). S5 concurrency burst peaks are temporary and explainable. S8 recovers to S1 baseline (memory 383=383, FD 419≈421). No leaks, no exhaustion, no rollback errors across all 8 windows."
+}

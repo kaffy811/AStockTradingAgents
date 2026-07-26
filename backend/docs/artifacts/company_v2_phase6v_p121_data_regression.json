@@ -1,0 +1,41 @@
+{
+  "schema_version": "pi_data_regression_v1",
+  "phase": "6V-P1.21",
+  "generated_at": "2026-07-23T11:10:00.000000+00:00",
+  "rollout_percent": 75,
+  "config_version": 8,
+  "data_categories": {
+    "additions_correct": {
+      "count": 18,
+      "description": "Fields present in Pi output that are correct and verified against source",
+      "examples": ["revenue_ttm", "gross_margin", "operating_income", "ebitda", "net_income_ttm", "eps_diluted", "pe_ratio", "pb_ratio", "ps_ratio", "debt_to_equity", "current_ratio", "quick_ratio", "roa", "roe", "roic", "free_cash_flow", "capex", "dividend_yield"]
+    },
+    "gaps_unavailable": {
+      "count": 19,
+      "description": "Fields not returned by Pi due to data unavailability; correctly handled as null/absent",
+      "examples": ["segment_revenue", "geographic_breakdown", "backlog", "order_intake", "employee_count_quarterly", "r_and_d_by_product", "store_count", "same_store_sales", "contract_value", "pipeline", "churn_rate", "nrr", "arr", "gmv", "take_rate", "loan_book", "npl_ratio", "tier1_capital", "solvency_ratio"]
+    },
+    "stale_review": {
+      "count": 3,
+      "description": "Fields where Pi output references data older than expected freshness window; auditable but not zero-tolerance",
+      "examples": ["quarterly_eps_comparison", "ytd_return_vs_benchmark", "trailing_12m_volume"]
+    }
+  },
+  "cross_symbol_contamination": {
+    "detected": false,
+    "test_pairs_checked": 50,
+    "contamination_count": 0
+  },
+  "high_load_verification": {
+    "t3_multi_turn_heavy_verified": true,
+    "t5_concurrency_burst_verified": true,
+    "cross_symbol_contamination_at_75pct": false,
+    "note": "Verified at 75% load (T3 multi_turn_heavy, T5 concurrency_burst); no cross-symbol contamination detected even under concurrent load"
+  },
+  "wrong_year_count": 0,
+  "wrong_entity_count": 0,
+  "fabricated_data_count": 0,
+  "provenance_failure_count": 0,
+  "data_regression_gate": "PASS",
+  "note": "18 additions correct, 19 gaps unavailable (correctly absent), 3 stale_review auditable. No wrong-year, wrong-entity, or fabricated data violations. Cross-symbol contamination=0 verified at both normal (T1/T4) and high-load (T3/T5) windows."
+}

@@ -1,0 +1,82 @@
+{
+  "schema_version": "pi_official_report_p114_browser_regression_v1",
+  "phase": "6V-P1.14",
+  "generated_at": "2026-07-22T22:00:00.000000+00:00",
+  "source_sha": "19130f054ca330f2fa16e8200184af6a8b632ec0",
+  "cases_tested": 7,
+  "cases": [
+    {
+      "case": "guizhou_moutai_latest_plus_pdf_followup",
+      "symbol": "600519.SH",
+      "steps": ["latest query", "pdf followup"],
+      "passed": true,
+      "user_sees_legacy_only": true,
+      "terminal_exactly_once": true,
+      "no_duplicate_tool_card": true
+    },
+    {
+      "case": "new_2024_company_sample",
+      "symbol": "000401.SZ",
+      "steps": ["2024 exact-year query", "verify report title"],
+      "passed": true,
+      "user_sees_legacy_only": true,
+      "terminal_exactly_once": true,
+      "no_duplicate_tool_card": true
+    },
+    {
+      "case": "remaining_2024_gap_company",
+      "symbol": "600001.SH",
+      "steps": ["2024 exact-year query returns unavailable"],
+      "passed": true,
+      "user_sees_legacy_only": true,
+      "no_wrong_year_fallback": true,
+      "terminal_exactly_once": true
+    },
+    {
+      "case": "pingan_name_disambiguation",
+      "symbol": "601318.SH",
+      "steps": ["query with partial name", "disambiguation resolved"],
+      "passed": true,
+      "user_sees_legacy_only": true,
+      "terminal_exactly_once": true
+    },
+    {
+      "case": "semi_annual_unsupported",
+      "symbol": "000002.SZ",
+      "steps": ["semi-annual query declined", "redirected to legacy"],
+      "passed": true,
+      "user_sees_legacy_only": true,
+      "no_semi_returned": true,
+      "terminal_exactly_once": true
+    },
+    {
+      "case": "historical_year_query_2022",
+      "symbol": "600036.SH",
+      "steps": ["2022 exact-year query"],
+      "passed": true,
+      "user_sees_legacy_only": true,
+      "correct_year_returned": true,
+      "terminal_exactly_once": true
+    },
+    {
+      "case": "conversation_persistence_after_refresh",
+      "steps": ["send query", "page refresh", "verify conversation retained"],
+      "passed": true,
+      "conversation_persistence": true,
+      "no_duplicate_assistant_message": true,
+      "loading_ends_normally": true
+    }
+  ],
+  "summary": {
+    "all_passed": true,
+    "user_sees_legacy_only": true,
+    "pi_result_not_displayed": true,
+    "no_duplicate_assistant_message": true,
+    "no_duplicate_tool_card": true,
+    "no_duplicate_disclaimer": true,
+    "loading_ends_normally": true,
+    "terminal_exactly_once": true,
+    "conversation_persistence": true
+  },
+  "browser_regression_passed": true
+}

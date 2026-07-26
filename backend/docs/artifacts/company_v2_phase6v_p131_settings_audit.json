@@ -1,0 +1,37 @@
+{
+  "schema_version": "pi_canary_settings_audit_v1",
+  "phase": "6V-P1.31",
+  "generated_at": "2026-07-26T00:00:00Z",
+
+  "new_settings_added": [
+    {"field": "deepseek_api_key_staging", "type": "str | None", "default": null, "gate": "D", "status": "IMPLEMENTED"},
+    {"field": "pi_real_provider_enabled", "type": "bool", "default": false, "gate": "I", "status": "IMPLEMENTED"},
+    {"field": "pi_real_provider_kill_switch", "type": "bool", "default": true, "gate": "I", "status": "IMPLEMENTED"},
+    {"field": "pi_real_provider_name", "type": "str", "default": "deepseek", "gate": "—", "status": "IMPLEMENTED"},
+    {"field": "pi_real_provider_model", "type": "str", "default": "deepseek-v4-flash", "gate": "—", "status": "IMPLEMENTED"},
+    {"field": "pi_real_provider_max_requests", "type": "int", "default": 100, "gate": "F", "status": "IMPLEMENTED"},
+    {"field": "pi_real_provider_max_cost_cny", "type": "float", "default": 100.0, "gate": "G", "status": "IMPLEMENTED"},
+    {"field": "pi_real_provider_max_concurrency", "type": "int", "default": 2, "gate": "H", "status": "IMPLEMENTED"},
+    {"field": "pi_real_provider_rate_limit_per_minute", "type": "int", "default": 60, "gate": "H", "status": "IMPLEMENTED"},
+    {"field": "pi_real_provider_timeout_seconds", "type": "float", "default": 30.0, "gate": "H", "status": "IMPLEMENTED"},
+    {"field": "pi_real_provider_circuit_breaker_failure_threshold", "type": "int", "default": 5, "gate": "I", "status": "IMPLEMENTED"},
+    {"field": "pi_real_provider_circuit_breaker_recovery_seconds", "type": "float", "default": 60.0, "gate": "I", "status": "IMPLEMENTED"},
+    {"field": "pi_real_provider_pricing_version", "type": "str", "default": "unverified", "gate": "E", "status": "IMPLEMENTED"},
+    {"field": "pi_real_provider_budget_namespace", "type": "str", "default": "pi_provider_staging", "gate": "—", "status": "IMPLEMENTED"},
+    {"field": "pi_real_provider_audit_enabled", "type": "bool", "default": true, "gate": "—", "status": "IMPLEMENTED"},
+    {"field": "pi_canary_provider_mode", "type": "str", "default": "staging_replay", "gate": "—", "status": "IMPLEMENTED"}
+  ],
+
+  "fail_closed_verification": {
+    "pi_real_provider_enabled_default": false,
+    "pi_real_provider_kill_switch_default": true,
+    "deepseek_api_key_staging_default": null,
+    "pi_canary_provider_mode_default": "staging_replay",
+    "all_fail_closed": true
+  },
+
+  "gate_i_implementation": "PASS — pi_real_provider_enabled=False (was missing from runtime in P1.30)",
+  "gate_f_implementation": "PASS — pi_real_provider_max_requests=100 (was missing from runtime in P1.30)",
+  "gate_g_implementation": "PASS — pi_real_provider_max_cost_cny=100.0 (was missing from runtime in P1.30)",
+  "gate_d_implementation": "NOT_EVALUATED — field added, key not yet provisioned"
+}

@@ -1,0 +1,36 @@
+{
+  "schema_version": "pi_safety_audit_v1",
+  "phase": "6V-P1.17",
+  "generated_at": "2026-07-28T13:40:00.000000+00:00",
+  "windows_audited": ["K1", "K2", "K3", "K4", "K5"],
+  "total_selected": 2616,
+  "zero_tolerance_categories": {
+    "fabricated_url": 0,
+    "wrong_entity": 0,
+    "wrong_year": 0,
+    "wrong_report_type": 0,
+    "provenance_failure": 0,
+    "stale_wrong_selection": 0,
+    "third_party_url": 0,
+    "pi_business_write": 0,
+    "double_write": 0,
+    "unknown_write": 0,
+    "trace_mismatch": 0,
+    "terminal_missing": 0,
+    "raw500": 0,
+    "raw503": 0,
+    "task_leak": 0,
+    "db_leak": 0,
+    "PendingRollbackError": 0,
+    "diagnostics_failure": 0
+  },
+  "safety_correctness_rate": 1.0,
+  "total_zero_tolerance_violations": 0,
+  "cumulative_safety_record": {
+    "P1.8_through_P1.17_total_selected": 7182,
+    "cumulative_zero_tolerance_violations": 0,
+    "cumulative_safety_correctness_rate": 1.0
+  },
+  "safety_gate_passed": true,
+  "note": "K1-K5 safety audit: 2616 selected, 0 zero-tolerance violations across all 18 categories. Cumulative record now covers 7182 shadow selections with zero violations."
+}

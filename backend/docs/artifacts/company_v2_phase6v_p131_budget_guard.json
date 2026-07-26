@@ -1,0 +1,60 @@
+{
+  "schema_version": "pi_canary_budget_guard_v1",
+  "phase": "6V-P1.31",
+  "generated_at": "2026-07-26T00:00:00Z",
+
+  "request_budget_guard": {
+    "gate": "F",
+    "status": "PASS",
+    "file": "backend/app/llm/provider_control/budget.py",
+    "class": "RequestBudgetGuard",
+    "implementation": {
+      "atomic_mechanism": "Redis Lua script (INCR-with-ceiling)",
+      "lua_script": "_LUA_INCR_WITH_CEILING",
+      "ceiling": 100,
+      "toctou_safe": true,
+      "key_pattern": "{namespace}:request_count"
+    },
+    "p130_state": "NOT_IMPLEMENTED (PI_REAL_PROVIDER_MAX_REQUESTS missing from runtime)",
+    "p131_state": "IMPLEMENTED"
+  },
+
+  "cost_accumulator": {
+    "gate": "G",
+    "status": "PASS",
+    "file": "backend/app/llm/provider_control/budget.py",
+    "class": "CostAccumulator",
+    "implementation": {
+      "atomic_mechanism": "Redis Lua script (SET with ceiling check)",
+      "lua_script": "_LUA_COST_RESERVE",
+      "ceiling_cny": 100.0,
+      "arithmetic": "Decimal (never float)",
+      "reserve": "try_reserve_cost(estimated_cny: Decimal) → bool",
+      "release": "release_cost(amount_cny: Decimal) → None",
+      "toctou_safe": true,
+      "key_pattern": "{namespace}:cost_cny"
+    },
+    "p130_state": "NOT_IMPLEMENTED (PI_REAL_PROVIDER_MAX_COST_CNY missing; no token usage capture)",
+    "p131_state": "IMPLEMENTED"
+  },
+
+  "circuit_breaker": {
+    "gate": "I",
+    "status": "PASS",
+    "file": "backend/app/llm/provider_control/budget.py",
+    "class": "ProviderCircuitBreaker",
+    "states": ["closed", "open", "half_open"],
+    "triggers": [
+      "consecutive_failures >= failure_threshold (default: 5)",
+      "credential_failure → opens immediately",
+      "malformed_response → opens immediately"
+    ],
+    "recovery": "TTL-based auto-transition from OPEN to HALF_OPEN after recovery_seconds (default: 60s)",
+    "cross_worker": true,
+    "p130_state": "NOT_IMPLEMENTED",
+    "p131_state": "IMPLEMENTED"
+  },
+
+  "real_provider_requests": 0,
+  "real_provider_cost_cny": "0"
+}

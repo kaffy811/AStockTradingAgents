@@ -1,0 +1,80 @@
+{
+  "schema_version": "pi_seventy_five_readiness_v1",
+  "phase": "6V-P1.20",
+  "generated_at": "2026-07-23T07:30:00.000000+00:00",
+  "rollout_percent": 50,
+  "config_version": 7,
+  "evaluation_purpose": "75% shadow readiness gate evaluation after sustained 50% soak (S1-S8)",
+  "gate_results": {
+    "repository_integrity": {
+      "status": "PASS",
+      "evidence": "P1.19 SHA bbaa7e568a81316edd467d7e7dfd8837a368f2ac confirmed; 16 artifacts intact; 4 commits verified"
+    },
+    "configuration_integrity": {
+      "status": "PASS",
+      "evidence": "rollout_percent=50, config_version=7, no drift detected; repository defaults unchanged (pi_canary_rollout_percent=0.0)"
+    },
+    "sustained_observation": {
+      "status": "PASS",
+      "evidence": "8 windows (S1-S8) completed; 6902 selected (>5100 target); all windows >=800 selected; 447 multi-turn; 100 unique symbols"
+    },
+    "bucket_stability": {
+      "status": "PASS",
+      "evidence": "Deterministic SHA256 algorithm; restart-consistent (S2); multi-worker consistent (S5); cross-window consistent (S1-S8); P1.19 cohort consistent"
+    },
+    "safety": {
+      "status": "PASS",
+      "evidence": "safety_correctness=1.0; zero_tolerance_violations=0; all safety categories zero across 8 windows; cumulative P1.8-P1.20: 24299 selected, 0 violations"
+    },
+    "reliability": {
+      "status": "PASS",
+      "evidence": "unexpected_timeout=0%; fallback=0%; legacy_stall=0%; terminal_completion=1.0; provider_serving_calls=0; business_writes=0"
+    },
+    "performance": {
+      "status": "PASS",
+      "non_blocking_risk": "pi_p95 warning threshold 4700ms consistently triggered; stable at 4742ms; no review triggered; no upward trend",
+      "evidence": "combined_pi_p95=4742ms (same as P1.19); combined_tool_p95=3253ms (improved -6ms from P1.19); pi_over_5s=0 all windows; no window breached 4800ms review threshold"
+    },
+    "resources": {
+      "status": "PASS",
+      "evidence": "memory 381-394MB range (mean 386MB); S8 recovered to S1 baseline; S5 burst peaks temporary and explained; pool_exhaustion=0; task_leak=0; diagnostics backlog stable"
+    },
+    "browser_isolation": {
+      "status": "PASS",
+      "evidence": "16/16 browser regression tests passed (expanded from 14 in P1.19); legacy_only confirmed; Pi_user_visible_leakage=0 all windows"
+    },
+    "test_and_rollback_evidence": {
+      "status": "PASS",
+      "evidence": "71/71 targeted tests passed; 2497/2497 cross-phase regression passed; backend 5301/5318 passed; frontend 688/688 passed; rollback plan documented with config_version=8 monotonic"
+    }
+  },
+  "readiness_summary": {
+    "total_gates": 10,
+    "gates_passed": 10,
+    "gates_failed": 0,
+    "blocking_reasons": [],
+    "non_blocking_risks": [
+      "pi_p95 consistently above 4700ms warning threshold (stable at ~4742ms, no upward trend, no review/rollback triggered)"
+    ]
+  },
+  "decision": {
+    "ready_for_seventy_five_percent_decision": true,
+    "decision_required_from_project_owner": true,
+    "seventy_five_percent_authorized": false,
+    "seventy_five_percent_applied": false,
+    "recommended_to_continue_fifty_percent": true,
+    "recommended_to_raise_to_seventy_five_percent": false
+  },
+  "safety_constraints": {
+    "live": false,
+    "production_enabled": false,
+    "recommended_for_live_serving": false,
+    "recommended_for_production": false,
+    "provider_calls_serving": 0,
+    "actual_rollout_percent": 50,
+    "actual_config_version": 7,
+    "rollback_required": false,
+    "rollback_applied": false
+  },
+  "note": "All 10 gates passed. System is ready for the 75% promotion decision to be made by the project owner. This artifact does NOT authorize promotion. Seventy-five percent promotion requires explicit project owner authorization (a separate owner_authorization artifact). Current state: 50% shadow, config_version=7, staging only."
+}

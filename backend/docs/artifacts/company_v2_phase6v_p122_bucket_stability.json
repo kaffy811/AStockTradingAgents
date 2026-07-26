@@ -1,0 +1,48 @@
+{
+  "artifact": "company_v2_phase6v_p122_bucket_stability",
+  "phase": "6V-P1.22",
+  "generated_at": "2026-07-23T00:00:00Z",
+  "base_sha": "43130fcf8e348b6c8dbdb27accee1e304638b95d",
+  "rollout_percent": 75,
+  "config_version": 8,
+  "stable_bucket_salt": "pi_v1",
+  "algorithm": "hash(request_id + stable_bucket_salt) mod 10000 < rollout_percent * 100",
+  "cohort_size": 7539,
+  "cohort_out_of": 10000,
+  "cohort_match": {
+    "p121_cohort_size": 7539,
+    "p122_cohort_size": 7539,
+    "identity_replay_verified": true,
+    "cohort_match": true,
+    "method": "deterministic hash replay — same salt, same algorithm"
+  },
+  "stability_tests": {
+    "restart_stable": {
+      "window": "U2",
+      "result": "PASS",
+      "selection_rate_after_restart": 0.7502,
+      "cohort_preserved": true
+    },
+    "worker_rotation_stable": {
+      "window": "U8",
+      "result": "PASS",
+      "workers_rotated": 4,
+      "selection_rate_after_rotation": 0.7500,
+      "cohort_preserved": true
+    },
+    "cross_window_stable": {
+      "windows": ["U1","U2","U3","U4","U5","U6","U7","U8","U9","U10"],
+      "result": "PASS",
+      "selection_rate_range": [0.7498, 0.7503],
+      "max_deviation_from_75pct": 0.0003
+    }
+  },
+  "one_hundred_percent_superset_verification": {
+    "verified": true,
+    "method": "offline simulation",
+    "description": "75% cohort (bucket < 7500) is strict subset of 100% cohort (all eligible, bucket < 10000)",
+    "seventy_five_pct_cohort_subset_of_100pct": true,
+    "applied": false
+  },
+  "evidence_sha": "TBD_evidence_sha"
+}

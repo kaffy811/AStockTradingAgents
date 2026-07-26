@@ -1,0 +1,59 @@
+{
+  "schema_version": "pi_canary_preflight_v1",
+  "phase": "6V-P1.31",
+  "generated_at": "2026-07-26T00:00:00Z",
+  "base_sha": "a9ebb3b2fb8567ba18869d352a863c01541b5a07",
+  "branch": "p131/provider-control-plane",
+  "base_branch": "release/demo-staging",
+
+  "runtime_state": {
+    "config_version": 12,
+    "provider_mode": "staging_replay",
+    "real_provider_enabled": false,
+    "shadow_rollout_percent": 100,
+    "shadow_salt": "pi_v1",
+    "live_rollout_percent": 1,
+    "live_salt": "pi_live_v1",
+    "production_enabled": false,
+    "ordinary_external_users": 0
+  },
+
+  "p130_carry_forward": {
+    "state": "STATE_B_REAL_PROVIDER_NOT_EXECUTED",
+    "gates_pass": 6,
+    "gates_fail": 5,
+    "gates_partial": 1,
+    "gates_not_evaluated": 10,
+    "cumulative_live_requests": 708,
+    "cumulative_violations": 0
+  },
+
+  "p131_objective": "Implement provider control plane infrastructure. No real API calls authorized.",
+
+  "pre_implementation_checks": {
+    "provider_control_dir_exists": false,
+    "pricing_registry_exists": false,
+    "usage_normalization_exists": false,
+    "budget_guard_exists": false,
+    "rate_limiter_exists": false,
+    "semaphore_exists": false,
+    "circuit_breaker_exists": false,
+    "runtime_probe_exists": false,
+    "audit_module_exists": false,
+    "activation_gate_exists": false,
+    "fake_provider_harness_exists": false,
+    "pi_real_provider_enabled_in_settings": false,
+    "pi_real_provider_kill_switch_in_settings": false,
+    "deepseek_api_key_staging_in_settings": false,
+    "deepseek_client_has_explicit_timeout": false,
+    "deepseek_client_handles_rate_limit": false,
+    "deepseek_client_captures_usage": false,
+    "pi_real_provider_audit_migration_exists": false,
+    "probe_endpoint_exists": false
+  },
+
+  "p131_authorization": "NOT_AUTHORIZED for real provider calls. Implementation only.",
+  "real_provider_calls_authorized": false,
+  "live_expansion_authorized": false,
+  "production_authorized": false
+}

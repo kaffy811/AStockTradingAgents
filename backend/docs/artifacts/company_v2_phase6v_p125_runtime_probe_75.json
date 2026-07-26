@@ -1,0 +1,133 @@
+{
+  "schema_version": "pi_canary_runtime_probe_v2",
+  "phase": "6V-P1.25",
+  "phase_title": "Docker Runtime Enablement, Containerized Gate C Closure & Conditional 100% Staging Shadow Promotion",
+  "generated_at": "2026-07-25T02:00:00.000000+00:00",
+  "probe_target_rollout": 75,
+  "probe_applicable": true,
+  "probe_performed": true,
+  "probe_method": "containerized_deployed_staging_runtime",
+  "container_id_short": "tradingagents-p125-staging-backend-1",
+  "container_name": "tradingagents-p125-staging-backend-1",
+  "process_id": 10,
+  "process_started_at": "2026-07-25T01:51:17.304567+00:00",
+  "health_check_status": "pass",
+  "health_check_endpoint": "GET http://127.0.0.1:18000/health",
+  "health_check_http_status": 200,
+  "health_check_response": {
+    "status": "ok"
+  },
+  "snapshot_source": "docker exec tradingagents-p125-staging-backend-1 cat /tmp/tradingagents-runtime/pi_canary_snapshot.json",
+  "snapshot_path_in_container": "/tmp/tradingagents-runtime/pi_canary_snapshot.json",
+  "snapshot": {
+    "schema_version": "pi_canary_runtime_snapshot_v2",
+    "environment": "staging",
+    "canary_mode": "shadow",
+    "rollout_percent": 75.0,
+    "config_version": 8,
+    "stable_bucket_salt_version": "pi_v1",
+    "authorization_status": "approved",
+    "live": false,
+    "production_enabled": false,
+    "provider_serving_enabled": false,
+    "fail_closed": false,
+    "parse_error": null,
+    "global_kill_switch": false,
+    "runtime_loader": "load_canary_config",
+    "config_source": "pydantic_settings.Settings",
+    "evidence_mode": "containerized_deployed_staging_runtime",
+    "process_id": 10,
+    "process_started_at": "2026-07-25T01:51:17.304567+00:00",
+    "deployment_sha": "aa65f73be3f0155a12fdcc3f9a57750232b8353f",
+    "deployment_mode": "containerized_staging",
+    "config_fingerprint": "57f2d2d598bf8813"
+  },
+  "gate_conditions": [
+    {
+      "field": "rollout_percent",
+      "required": 75.0,
+      "actual": 75.0,
+      "pass": true
+    },
+    {
+      "field": "config_version",
+      "required": 8,
+      "actual": 8,
+      "pass": true
+    },
+    {
+      "field": "stable_bucket_salt_version",
+      "required": "pi_v1",
+      "actual": "pi_v1",
+      "pass": true
+    },
+    {
+      "field": "authorization_status",
+      "required": "approved",
+      "actual": "approved",
+      "pass": true
+    },
+    {
+      "field": "live",
+      "required": false,
+      "actual": false,
+      "pass": true
+    },
+    {
+      "field": "production_enabled",
+      "required": false,
+      "actual": false,
+      "pass": true
+    },
+    {
+      "field": "provider_serving_enabled",
+      "required": false,
+      "actual": false,
+      "pass": true
+    },
+    {
+      "field": "evidence_mode",
+      "required": "containerized_deployed_staging_runtime",
+      "actual": "containerized_deployed_staging_runtime",
+      "pass": true
+    },
+    {
+      "field": "deployment_sha",
+      "required_prefix": "aa65f73",
+      "actual": "aa65f73be3f0155a12fdcc3f9a57750232b8353f",
+      "pass": true
+    },
+    {
+      "field": "parse_error",
+      "required": null,
+      "actual": null,
+      "pass": true
+    },
+    {
+      "field": "process_id",
+      "required": "valid positive integer",
+      "actual": 10,
+      "pass": true
+    },
+    {
+      "field": "process_started_at",
+      "required": "valid ISO 8601 timestamp",
+      "actual": "2026-07-25T01:51:17.304567+00:00",
+      "pass": true
+    }
+  ],
+  "all_gate_conditions_pass": true,
+  "gate_b_status": "pass",
+  "gate_c_status": "pass",
+  "deployed_runtime_verified": true,
+  "evidence_mode": "containerized_deployed_staging_runtime",
+  "p123_comparison": {
+    "p123_gate_c": "unknown",
+    "p123_evidence_mode": "no_deployed_staging_accessible",
+    "p125_gate_c": "pass",
+    "p125_evidence_mode": "containerized_deployed_staging_runtime",
+    "blocker_resolved": "Docker Desktop was already installed; compose up succeeded; backend running at 127.0.0.1:18000"
+  },
+  "real_container_running": true,
+  "config_matches_intended": true
+}

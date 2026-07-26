@@ -1,0 +1,20 @@
+{
+  "schema_version": "pi_official_report_p116_auto_rollback_audit_v1",
+  "phase": "6V-P1.16",
+  "generated_at": "2026-07-26T14:00:00.000000+00:00",
+  "conditions_tested": 8,
+  "conditions": [
+    {"id": 1, "desc": "pi_over_6s_rate > 1%", "triggered": false, "observed": "0%"},
+    {"id": 2, "desc": "safety_correctness < 1.0", "triggered": false, "observed": "1.0"},
+    {"id": 3, "desc": "pi_business_write_count > 0", "triggered": false, "observed": 0},
+    {"id": 4, "desc": "raw500_rate > 5%", "triggered": false, "observed": "0%"},
+    {"id": 5, "desc": "pool_exhaustion > 0", "triggered": false, "observed": 0},
+    {"id": 6, "desc": "PendingRollbackError > 0", "triggered": false, "observed": 0},
+    {"id": 7, "desc": "timeout_rate > 5%", "triggered": false, "observed": "0%"},
+    {"id": 8, "desc": "fabricated_url_count > 0", "triggered": false, "observed": 0}
+  ],
+  "auto_rollback_triggered": false,
+  "current_rollout_percent": 10,
+  "subsequent_success_would_dilute_failure": false,
+  "audit_passed": true
+}

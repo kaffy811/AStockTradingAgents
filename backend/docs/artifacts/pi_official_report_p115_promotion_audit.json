@@ -1,0 +1,22 @@
+{
+  "schema_version": "pi_official_report_p115_promotion_audit_v1",
+  "phase": "6V-P1.15",
+  "promotion_source": "project_owner_manual_decision",
+  "environment": "staging",
+  "agent_id": "official_report_pdf_pi_v1",
+  "from_rollout_percent": 5,
+  "to_rollout_percent": 10,
+  "from_phase": "active_c2",
+  "to_phase": "active_c3",
+  "config_version_before": 4,
+  "config_version_after": 5,
+  "live_serving": false,
+  "production": false,
+  "max_rollout_allowed": 10,
+  "above_max_rejected": true,
+  "repository_default_config_unchanged": true,
+  "fail_closed_on_failure": true,
+  "rollout_verified": 10,
+  "promotion_audit_passed": true,
+  "promotion_checksum": "sha256(69a0169+5to10+config_v5+staging+shadow_only)"
+}

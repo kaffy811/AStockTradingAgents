@@ -43,7 +43,8 @@ def _selected_user(config: CanaryConfig) -> CanaryRequest:
     for i in range(4000):
         key = anonymized_user_key(f"probe-{i}")
         bucket = stable_bucket(environment="staging", agent_id=CANARY_AGENT_ID,
-                               anon_user_key=key, config_version=config.config_version)
+                               anon_user_key=key,
+                               stable_bucket_salt=getattr(config, "stable_bucket_salt", "pi_v1"))
         if bucket_selected(bucket, config.rollout_percent):
             return _request(anon_user_key=key)
     raise AssertionError("no bucket-selected probe found")
@@ -172,12 +173,22 @@ def test_bucketing_deterministic_across_calls():
     assert len(buckets) == 1
 
 
-# 15
-def test_config_version_rebuckets_users():
+# 15 — updated P1.21: stable_bucket now uses stable_bucket_salt (not config_version) to
+# guarantee monotonic cohort nesting across rollout promotions (50% ⊆ 75%).
+# config_version is accepted for backward-compatibility but no longer affects the bucket.
+def test_stable_bucket_stable_across_config_version():
+    """bucket must be identical regardless of config_version (cohort monotonic nesting)."""
     key = anonymized_user_key("rebucket-user")
     b1 = stable_bucket(environment="staging", agent_id=CANARY_AGENT_ID, anon_user_key=key, config_version=1)
     b2 = stable_bucket(environment="staging", agent_id=CANARY_AGENT_ID, anon_user_key=key, config_version=2)
-    assert b1 != b2  # sha256 collision over version change is practically impossible
+    assert b1 == b2  # config_version no longer participates in hash; salt "pi_v1" is stable
+
+def test_stable_bucket_salt_changes_cohort():
+    """Different stable_bucket_salt values must produce different buckets (by design)."""
+    key = anonymized_user_key("salt-user")
+    b1 = stable_bucket(environment="staging", agent_id=CANARY_AGENT_ID, anon_user_key=key, stable_bucket_salt="pi_v1")
+    b2 = stable_bucket(environment="staging", agent_id=CANARY_AGENT_ID, anon_user_key=key, stable_bucket_salt="pi_v2")
+    assert b1 != b2  # intentional: different salts allow controlled cohort reset
 
 
 # 16

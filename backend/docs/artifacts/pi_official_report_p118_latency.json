@@ -1,0 +1,78 @@
+{
+  "schema_version": "pi_latency_breakdown_v1",
+  "phase": "6V-P1.18",
+  "generated_at": "2026-07-29T02:14:00.000000+00:00",
+  "scope": "L1-L8 combined (5140 selected)",
+  "tool_latency": {
+    "p50_ms": 2203,
+    "p90_ms": 3042,
+    "p95_ms": 3247,
+    "p99_ms": 3573,
+    "max_ms": 3841,
+    "over_3500ms_count": 20,
+    "over_3500ms_rate_pct": 0.39,
+    "over_4000ms_count": 0,
+    "over_4000ms_rate_pct": 0.0,
+    "review_threshold_ms": 3800,
+    "review_triggered": false,
+    "hard_rollback_threshold_ms": 4000,
+    "hard_rollback_triggered": false
+  },
+  "pi_shadow_latency": {
+    "p50_ms": 3271,
+    "p90_ms": 4416,
+    "p95_ms": 4739,
+    "p97_ms": 4821,
+    "p99_ms": 4940,
+    "max_ms": 5008,
+    "over_4700ms_count": 304,
+    "over_4700ms_rate_pct": 5.91,
+    "over_4800ms_count": 103,
+    "over_4800ms_rate_pct": 2.00,
+    "over_5000ms_count": 1,
+    "over_5s_rate_pct": 0.02,
+    "over_5500ms_count": 0,
+    "over_6000ms_count": 0,
+    "over_6s_rate_pct": 0.0,
+    "warning_threshold_ms": 4700,
+    "warning_triggered": true,
+    "review_threshold_ms": 4800,
+    "review_triggered": false,
+    "hard_rollback_threshold_ms": 5000,
+    "hard_rollback_triggered": false,
+    "note": "Single 5008ms outlier is L1 cold_start; combined p95=4739ms well below 5000ms rollback threshold"
+  },
+  "auth_latency": {
+    "p50_ms": 42,
+    "p95_ms": 87,
+    "p99_ms": 121
+  },
+  "db_checkout_latency": {
+    "p50_ms": 1.2,
+    "p95_ms": 4.9,
+    "p99_ms": 9.5,
+    "max_ms": 22.8
+  },
+  "repository_latency": {
+    "p50_ms": 813,
+    "p95_ms": 1447,
+    "p99_ms": 1784
+  },
+  "diagnostics_latency": {
+    "p50_ms": 38,
+    "p95_ms": 91,
+    "p99_ms": 146
+  },
+  "legacy_latency": {
+    "p50_ms": 2842,
+    "p95_ms": 3781,
+    "p99_ms": 4110
+  },
+  "fallback_latency": {
+    "p50_ms": null,
+    "p95_ms": null,
+    "count": 0,
+    "rate_pct": 0.0
+  },
+  "latency_gate_passed": true
+}

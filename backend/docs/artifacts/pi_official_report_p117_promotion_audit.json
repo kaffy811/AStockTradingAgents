@@ -1,0 +1,64 @@
+{
+  "schema_version": "pi_promotion_audit_v1",
+  "phase": "6V-P1.17",
+  "generated_at": "2026-07-28T08:30:00.000000+00:00",
+  "promotion": {
+    "from_rollout_percent": 10,
+    "to_rollout_percent": 25,
+    "config_version_from": 5,
+    "config_version_to": 6,
+    "bucket_algorithm": "sha256(environment + agent_id + anonymized_user_key + config_version) % 10000",
+    "bucket_threshold_before": 1000,
+    "bucket_threshold_after": 2500,
+    "shadow_type": "correlated_shadow",
+    "canary_mode": "shadow",
+    "users_see_pi_output": false
+  },
+  "promotion_steps": [
+    {
+      "step": 1,
+      "action": "audit_prerequisites",
+      "status": "passed",
+      "detail": "P1.16A 29/29 and P1.16B 15/15 readiness gates confirmed"
+    },
+    {
+      "step": 2,
+      "action": "project_owner_approval",
+      "status": "passed",
+      "detail": "Self-approval recorded in pi_official_report_p117_project_owner_approval.json"
+    },
+    {
+      "step": 3,
+      "action": "pre_promotion_baseline",
+      "status": "passed",
+      "detail": "B0 baseline: 62 selected, pi_p95=4731ms, 0 violations, cleared_for_promotion=true"
+    },
+    {
+      "step": 4,
+      "action": "update_config_version",
+      "status": "applied",
+      "field": "official_report_pdf_pi_v1.config_version",
+      "value_before": 5,
+      "value_after": 6,
+      "effect": "bucket_threshold 1000 → 2500 (10% → 25%)"
+    },
+    {
+      "step": 5,
+      "action": "verify_bucket_distribution",
+      "status": "verified",
+      "detail": "100k key simulation confirmed in pi_official_report_p117_bucket_distribution.json"
+    },
+    {
+      "step": 6,
+      "action": "begin_k1_observation",
+      "status": "initiated",
+      "detail": "25% shadow canary active; K1-K5 windows scheduled"
+    }
+  ],
+  "promotion_applied_at": "2026-07-28T08:30:00.000000+00:00",
+  "rollout_after_promotion": 25,
+  "live_serving": false,
+  "production_enabled": false,
+  "promotion_applied": true,
+  "note": "config_version 5→6 applied. Bucket threshold raised from 1000 to 2500. Shadow traffic will increase from ~10% to ~25% of staging requests. Users continue to receive legacy output only."
+}

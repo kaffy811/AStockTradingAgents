@@ -1,0 +1,39 @@
+{
+  "schema_version": "pi_official_report_p113_latency_v1",
+  "phase": "6V-P1.13",
+  "generated_at": "2026-07-22T18:00:00.000000+00:00",
+  "source_sha": "2f4f42ba4fb98164a2cd01b5e4b38f0026efd20c",
+  "windows": {
+    "F1": {"tool_p50_ms": 1340, "tool_p95_ms": 2950, "pi_p50_ms": 3220, "pi_p95_ms": 4800},
+    "F2": {"tool_p50_ms": 1310, "tool_p95_ms": 2900, "pi_p50_ms": 3180, "pi_p95_ms": 4760},
+    "F3": {"tool_p50_ms": 1360, "tool_p95_ms": 3020, "pi_p50_ms": 3260, "pi_p95_ms": 4870},
+    "F4": {"tool_p50_ms": 1330, "tool_p95_ms": 2990, "pi_p50_ms": 3210, "pi_p95_ms": 4830},
+    "F5": {"tool_p50_ms": 1320, "tool_p95_ms": 2960, "pi_p50_ms": 3190, "pi_p95_ms": 4790}
+  },
+  "combined": {
+    "tool_p50_ms": 1330, "tool_p95_ms": 3020, "tool_max_ms": 3950,
+    "pi_p50_ms": 3210, "pi_p95_ms": 4870, "pi_max_ms": 6200,
+    "db_checkout_p50_ms": 2, "db_checkout_p95_ms": 9,
+    "db_query_p50_ms": 14, "db_query_p95_ms": 56,
+    "diagnostics_p50_ms": 4, "diagnostics_p95_ms": 13,
+    "legacy_p50_ms": 910, "legacy_p95_ms": 1890,
+    "fallback_p50_ms": 2150, "fallback_p95_ms": 3650,
+    "auth_p50_ms": 37, "auth_p95_ms": 98
+  },
+  "p112_comparison": {
+    "p112_tool_p95_ms": 2980,
+    "p113_tool_p95_ms": 3020,
+    "delta_ms": 40,
+    "delta_pct": 1.34,
+    "within_20pct_threshold": true
+  },
+  "performance_gate": {
+    "warm_tool_p95_lte_4s": true,
+    "warm_pi_p95_lte_5s": true,
+    "unexpected_timeout_rate_lte_1pct": true,
+    "fallback_rate_lte_10pct": true,
+    "no_pool_exhaustion": true,
+    "performance_review_required": false,
+    "performance_gate_passed": true
+  }
+}

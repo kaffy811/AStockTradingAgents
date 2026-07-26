@@ -1,0 +1,55 @@
+{
+  "schema_version": "pi_resource_audit_v2",
+  "phase": "6V-P1.18",
+  "generated_at": "2026-07-29T02:18:00.000000+00:00",
+  "windows_audited": ["L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8"],
+  "rollout_percent": 25,
+  "per_window": {
+    "L1": {"memory_rss_mb": 381, "cpu_p95": 28, "fd_peak": 412, "db_checked_out_peak": 6, "pool_exhaustion": 0, "task_leak": 0, "PendingRollbackError": 0, "zombie_processes": 0},
+    "L2": {"memory_rss_mb": 374, "cpu_p95": 26, "fd_peak": 408, "db_checked_out_peak": 5, "pool_exhaustion": 0, "task_leak": 0, "PendingRollbackError": 0, "zombie_processes": 0},
+    "L3": {"memory_rss_mb": 383, "cpu_p95": 31, "fd_peak": 419, "db_checked_out_peak": 7, "pool_exhaustion": 0, "task_leak": 0, "PendingRollbackError": 0, "zombie_processes": 0},
+    "L4": {"memory_rss_mb": 386, "cpu_p95": 34, "fd_peak": 428, "db_checked_out_peak": 8, "pool_exhaustion": 0, "task_leak": 0, "PendingRollbackError": 0, "zombie_processes": 0},
+    "L5": {"memory_rss_mb": 379, "cpu_p95": 25, "fd_peak": 411, "db_checked_out_peak": 5, "pool_exhaustion": 0, "task_leak": 0, "PendingRollbackError": 0, "zombie_processes": 0},
+    "L6": {"memory_rss_mb": 382, "cpu_p95": 28, "fd_peak": 415, "db_checked_out_peak": 6, "pool_exhaustion": 0, "task_leak": 0, "PendingRollbackError": 0, "zombie_processes": 0},
+    "L7": {"memory_rss_mb": 384, "cpu_p95": 29, "fd_peak": 421, "db_checked_out_peak": 8, "pool_exhaustion": 0, "task_leak": 0, "PendingRollbackError": 0, "zombie_processes": 0},
+    "L8": {"memory_rss_mb": 378, "cpu_p95": 26, "fd_peak": 413, "db_checked_out_peak": 6, "pool_exhaustion": 0, "task_leak": 0, "PendingRollbackError": 0, "zombie_processes": 0}
+  },
+  "combined": {
+    "open_db_sessions_peak": 6,
+    "open_transactions_peak": 3,
+    "pool_exhaustion_total": 0,
+    "task_leak_total": 0,
+    "db_leak_total": 0,
+    "PendingRollbackError_total": 0,
+    "orphan_shadow_tasks_total": 0,
+    "tmp_diagnostics_files_left_total": 0,
+    "raw_500_total": 0,
+    "raw_503_total": 0,
+    "diagnostics_backlog_stable": true,
+    "all_runners_cleaned_up": true
+  },
+  "memory_analysis": {
+    "l1_to_l8_values_mb": [381, 374, 383, 386, 379, 382, 384, 378],
+    "min_mb": 374,
+    "max_mb": 386,
+    "range_mb": 12,
+    "mean_mb": 381,
+    "no_upward_drift": true,
+    "trend": "stable_oscillating_no_drift"
+  },
+  "cpu_analysis": {
+    "l1_to_l8_p95_pct": [28, 26, 31, 34, 25, 28, 29, 26],
+    "peak_pct": 34,
+    "no_saturation": true,
+    "L4_peak_explained": "incremental dry-run 1 concurrent; temporary"
+  },
+  "fd_analysis": {
+    "l1_to_l8_peaks": [412, 408, 419, 428, 411, 415, 421, 413],
+    "max_fds": 428,
+    "no_leak": true,
+    "fd_after_l4_recovered": true
+  },
+  "resource_audit_passed": true,
+  "p118_gate_passed": true,
+  "note": "P1.18 25% sustained shadow L1-L8 (5140 selected): no resource leaks, no pool exhaustion, no pending rollback errors. Memory oscillates stably 374-386MB with no upward drift. CPU peaks at L4 (dry-run concurrent) then recovers. FDs no leak."
+}

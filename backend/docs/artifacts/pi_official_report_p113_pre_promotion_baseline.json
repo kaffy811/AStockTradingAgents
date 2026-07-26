@@ -1,0 +1,37 @@
+{
+  "schema_version": "pi_official_report_p113_pre_promotion_baseline_v1",
+  "phase": "6V-P1.13",
+  "generated_at": "2026-07-22T08:15:00.000000+00:00",
+  "source_sha": "2f4f42ba4fb98164a2cd01b5e4b38f0026efd20c",
+  "environment": "staging",
+  "rollout_percent": 1,
+  "mode": "pre_promotion_baseline",
+  "selected": 22,
+  "unique_symbols": 9,
+  "safety_metrics": {
+    "safety_correctness": 1.0,
+    "pi_started": 22,
+    "pi_completed": 22
+  },
+  "accuracy_metrics": {
+    "wrong_year": 0, "wrong_entity": 0, "wrong_report_type": 0,
+    "fabricated_url": 0, "provenance_failure": 0
+  },
+  "write_safety_metrics": {
+    "pi_business_write": 0, "double_write": 0, "unknown_write": 0,
+    "trace_mismatch": 0, "terminal_missing": 0, "pending_rollback_error": 0
+  },
+  "reliability_metrics": {
+    "fallback_count": 0, "fallback_rate": 0.0,
+    "unexpected_timeout_count": 0, "unexpected_timeout_rate": 0.0,
+    "raw500": 0, "raw503": 0
+  },
+  "performance_metrics": {
+    "tool_p50_ms": 1290, "tool_p95_ms": 2840,
+    "provider_calls_during_serving": 0
+  },
+  "stale_record_wrongly_selected": 0,
+  "third_party_url_selected": 0,
+  "baseline_passed": true,
+  "promotion_authorized": true
+}

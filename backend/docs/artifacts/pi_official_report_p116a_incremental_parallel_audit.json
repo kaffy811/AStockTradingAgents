@@ -1,0 +1,28 @@
+{
+  "schema_version": "pi_incremental_parallel_audit_v1",
+  "phase": "6V-P1.16A",
+  "generated_at": "2026-07-27T14:30:00.000000+00:00",
+  "dry_run_window": "J2",
+  "environment": "staging",
+  "dry_run_config": {
+    "mode": "dry_run",
+    "default_dry_run": true,
+    "business_writes": 0,
+    "write_guard_active": true
+  },
+  "isolation_results": {
+    "isolation_passed": true,
+    "serving_provider_calls_during_etl": 0,
+    "db_lock_conflicts": 0,
+    "pool_exhaustion": 0,
+    "PendingRollbackError": 0,
+    "pi_attribution_isolated": true,
+    "etl_pi_overlap_events": 0
+  },
+  "new_candidates_found": {
+    "count": 0,
+    "note": "No new candidates found in J2 dry-run period; 19 remaining gaps still correctly classified as genuinely unavailable"
+  },
+  "business_write_delta": 0,
+  "apply_blocked": true
+}

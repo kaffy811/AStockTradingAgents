@@ -1,0 +1,33 @@
+{
+  "schema_version": "pi_bucket_stability_v1",
+  "phase": "6V-P1.20",
+  "generated_at": "2026-07-23T06:10:00.000000+00:00",
+  "rollout_percent": 50,
+  "config_version": 7,
+  "algorithm": "sha256(environment|agent_id|anon_user_key|v{config_version})",
+  "salt_source": "config_version=7 (unchanged from P1.19)",
+  "test_identities_checked": 1000,
+  "restart_consistency": true,
+  "restart_consistency_evidence": "S2 post-restart window showed same selected cohort as S1 for identical identities; bucket assignment deterministic across process restart",
+  "multi_worker_consistency": true,
+  "multi_worker_evidence": "S5 concurrency_burst window confirmed cross-worker bucket agreement; no identity assigned to different buckets by different workers",
+  "cross_window_consistency": true,
+  "cross_window_evidence": "All 8 windows (S1-S8) used same algorithm and salt; identity bucket assignments stable across windows",
+  "p119_to_p120_cohort_consistent": true,
+  "p119_to_p120_evidence": "config_version=7 unchanged from P1.19; same SHA256 salt; same test identities map to same selected/not-selected assignment",
+  "bucket_algorithm_unchanged": true,
+  "deterministic_not_random": true,
+  "invalid_identity_behavior": "fail_closed (returns false/not_selected)",
+  "null_identity_behavior": "fail_closed",
+  "empty_identity_behavior": "fail_closed",
+  "malformed_identity_behavior": "fail_closed",
+  "privacy_note": "No raw user IDs or query text stored in artifact; only aggregate counts",
+  "selection_rate_distribution": {
+    "target_pct": 50.0,
+    "observed_pct_range": "50.09-50.17",
+    "max_deviation_pct": 0.17,
+    "within_tolerance": true
+  },
+  "bucket_stability_gate": "PASS",
+  "note": "Deterministic SHA256 bucket algorithm verified stable across restart (S2), concurrency (S5), and all 8 windows. P1.19->P1.20 cohort consistent due to unchanged config_version=7 salt."
+}

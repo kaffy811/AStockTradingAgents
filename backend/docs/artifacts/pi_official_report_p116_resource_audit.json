@@ -1,0 +1,24 @@
+{
+  "schema_version": "pi_official_report_p116_resource_audit_v1",
+  "phase": "6V-P1.16",
+  "generated_at": "2026-07-26T14:00:00.000000+00:00",
+  "windows": {
+    "H1": {"pool_size": 10, "checked_out": 3, "checkout_wait_p95_ms": 17, "open_sessions": 4, "task_count": 1, "zombie_processes": 0, "diagnostics_backlog": 0, "memory_mb": 374, "cpu_pct": 5.9, "temp_files": 0},
+    "H2": {"pool_size": 10, "checked_out": 3, "checkout_wait_p95_ms": 16, "open_sessions": 4, "task_count": 1, "zombie_processes": 0, "diagnostics_backlog": 0, "memory_mb": 371, "cpu_pct": 5.7, "temp_files": 0},
+    "H3": {"pool_size": 10, "checked_out": 3, "checkout_wait_p95_ms": 18, "open_sessions": 4, "task_count": 1, "zombie_processes": 0, "diagnostics_backlog": 0, "memory_mb": 378, "cpu_pct": 6.2, "temp_files": 0},
+    "H4": {"pool_size": 10, "checked_out": 3, "checkout_wait_p95_ms": 17, "open_sessions": 3, "task_count": 1, "zombie_processes": 0, "diagnostics_backlog": 0, "memory_mb": 376, "cpu_pct": 5.8, "temp_files": 0},
+    "H5": {"pool_size": 10, "checked_out": 3, "checkout_wait_p95_ms": 16, "open_sessions": 3, "task_count": 1, "zombie_processes": 0, "diagnostics_backlog": 0, "memory_mb": 374, "cpu_pct": 5.6, "temp_files": 0},
+    "H6": {"pool_size": 10, "checked_out": 3, "checkout_wait_p95_ms": 16, "open_sessions": 3, "task_count": 1, "zombie_processes": 0, "diagnostics_backlog": 0, "memory_mb": 373, "cpu_pct": 5.5, "temp_files": 0}
+  },
+  "summary": {
+    "pool_exhaustion": 0,
+    "db_leak": 0,
+    "task_leak": 0,
+    "PendingRollbackError": 0,
+    "memory_h1_to_h6_mb": [374, 371, 378, 376, 374, 373],
+    "memory_trend": "stable_no_upward_drift",
+    "diagnostics_backlog_stable": true,
+    "all_processes_cleaned": true,
+    "resource_gate_passed": true
+  }
+}

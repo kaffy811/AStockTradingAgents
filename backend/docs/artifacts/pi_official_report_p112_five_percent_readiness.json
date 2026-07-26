@@ -1,0 +1,33 @@
+{
+  "schema_version": "pi_official_report_p112_five_percent_readiness_v1",
+  "phase": "6V-P1.12",
+  "generated_at": "2026-07-22T07:00:00.000000+00:00",
+  "source_sha": "a97b0ec021c7577f6a51267c3bb311ee47db0eb9",
+  "environment": "staging",
+  "conditions": {
+    "p111b_quality_gate_passed": true,
+    "covered_symbols_100": true,
+    "exact_year_correctness_1_0": true,
+    "selected_shadow_gte_150": true,
+    "unique_symbols_gte_60": true,
+    "safety_correctness_1_0": true,
+    "all_zero_tolerance_zero": true,
+    "tool_p95_lte_4s": true,
+    "pi_p95_lte_5s": true,
+    "unexpected_timeout_rate_lte_1pct": true,
+    "fallback_rate_lte_10pct": true,
+    "incremental_refresh_validated": true,
+    "idempotency_validated": true,
+    "stale_detection_validated": true,
+    "superseded_handling_validated": true,
+    "provider_calls_during_serving_zero": true,
+    "production_disabled": true,
+    "live_serving_disabled": true
+  },
+  "conditions_met": 18,
+  "conditions_total": 18,
+  "ready_for_five_percent_decision": true,
+  "recommended_to_raise_to_five_percent": false,
+  "decision_required_from_project_owner": true,
+  "note": "All 18 readiness conditions satisfied. This artifact documents that the technical prerequisites are met. The DECISION to raise to 5% remains with the project owner and is NOT authorized in this phase."
+}

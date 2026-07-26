@@ -1,0 +1,18 @@
+{
+  "schema_version": "pi_official_report_p115_new_2024_regression_v1",
+  "phase": "6V-P1.15",
+  "symbols_tested": 18,
+  "test_types": {
+    "exact_year_2024": {"tested": 18, "passed": 18, "failed": 0},
+    "latest": {"tested": 18, "passed": 18, "failed": 0},
+    "followup": {"tested": 18, "passed": 18, "failed": 0}
+  },
+  "total_requests": 54,
+  "wrong_year_count": 0,
+  "fabricated_url_count": 0,
+  "provider_calls_during_serving": 0,
+  "full_scans": 0,
+  "tool_calls_max": 1,
+  "stable_document_identity": true,
+  "regression_passed": true
+}

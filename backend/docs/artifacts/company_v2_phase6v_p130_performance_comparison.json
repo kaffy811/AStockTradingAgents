@@ -1,0 +1,45 @@
+{
+  "schema_version": "pi_canary_performance_comparison_v1",
+  "phase": "6V-P1.30",
+  "generated_at": "2026-07-25T20:20:00.000000+00:00",
+  "label": "P1.30 Performance Comparison",
+
+  "replay_non_live": {
+    "http_p50_ms": 312,
+    "http_p95_ms": 891,
+    "http_p99_ms": 1203
+  },
+  "replay_live": {
+    "http_p50_ms": 2341,
+    "http_p95_ms": 4758,
+    "http_p99_ms": 4781,
+    "pi_p95_ms": 4758,
+    "note": "P1.30 continued replay observation (5000 requests)"
+  },
+  "real_provider_live": {
+    "status": "NOT_EVALUATED",
+    "reason": "Real provider not executed"
+  },
+  "real_provider_fallback": {
+    "status": "NOT_EVALUATED",
+    "reason": "Real provider not executed"
+  },
+
+  "pi_p95_vs_threshold": {
+    "p130_pi_p95_ms": 4758,
+    "warning_threshold_ms": 4700,
+    "review_threshold_ms": 4800,
+    "gate_k_replay": "PASS",
+    "gate_o_real_provider": "NOT_EVALUATED"
+  },
+
+  "legacy_degradation": {
+    "p130_legacy_p95_ms": 891,
+    "p129_baseline_ms": 892,
+    "degradation_pct": 0.1,
+    "threshold_pct": 10.0,
+    "gate_l_status": "PASS"
+  },
+
+  "verdict": "Replay-live performance stable. Real provider performance comparison deferred to P1.31."
+}

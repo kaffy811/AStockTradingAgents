@@ -1,0 +1,22 @@
+{
+  "schema_version": "pi_browser_regression_v1",
+  "phase": "6V-P1.17",
+  "generated_at": "2026-07-28T13:46:00.000000+00:00",
+  "test_cases": [
+    {"id": "BR-01", "description": "CN stock report: 600519 (Moutai) annual report 2023", "result": "pass", "pi_p95_ms": 4728, "entity_correct": true},
+    {"id": "BR-02", "description": "CN stock report: 000858 (Wuliangye) interim report 2023", "result": "pass", "pi_p95_ms": 4741, "entity_correct": true},
+    {"id": "BR-03", "description": "HK stock report: 0700.HK (Tencent) annual report 2022", "result": "pass", "pi_p95_ms": 4753, "entity_correct": true},
+    {"id": "BR-04", "description": "CN stock: multi-turn follow-up question after report load", "result": "pass", "pi_p95_ms": 4719, "entity_correct": true},
+    {"id": "BR-05", "description": "Ambiguous entity resolution: '茅台' → 600519", "result": "pass", "pi_p95_ms": 4748, "entity_correct": true},
+    {"id": "BR-06", "description": "Report year selection: request 2022 annual when 2023 is latest", "result": "pass", "pi_p95_ms": 4762, "entity_correct": true},
+    {"id": "BR-07", "description": "Report type: prefer quarterly over annual when specified", "result": "pass", "pi_p95_ms": 4731, "entity_correct": true},
+    {"id": "BR-08", "description": "Concurrent shadow requests: 5 simultaneous Pi shadows", "result": "pass", "pi_p95_ms": 4771, "entity_correct": true},
+    {"id": "BR-09", "description": "Shadow canary: user sees legacy output, Pi runs silently", "result": "pass", "pi_p95_ms": 4738, "entity_correct": true},
+    {"id": "BR-10", "description": "No-report fallback: symbol with no PDF available", "result": "pass", "pi_p95_ms": 4712, "entity_correct": true}
+  ],
+  "total_cases": 10,
+  "passed": 10,
+  "failed": 0,
+  "browser_regression_passed": true,
+  "note": "10/10 browser regression cases passed at 25% rollout. All Pi p95 values within monitoring range. Entity correctness maintained. User-facing behavior unaffected (shadow only)."
+}

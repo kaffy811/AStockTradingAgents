@@ -1,0 +1,25 @@
+{
+  "schema_version": "pi_canary_network_isolation_v1",
+  "phase": "6V-P1.31",
+  "generated_at": "2026-07-26T00:00:00Z",
+
+  "real_provider_network_calls": 0,
+  "real_provider_dns_resolutions": 0,
+  "real_provider_cost_cny": "0",
+
+  "isolation_mechanisms": [
+    "FakeDeepSeekClient.real_network_calls property always returns 0",
+    "All P1.31 tests use FakeDeepSeekClient or mock OpenAI client",
+    "No real DeepSeekClient instantiated in any P1.31 test",
+    "ProviderActivationGate blocks all real provider paths with KillSwitchError",
+    "settings.deepseek_api_key_staging=None prevents credential from being passed"
+  ],
+
+  "test_verification": {
+    "total_fake_scenarios_run": 12,
+    "all_real_calls_zero": true,
+    "network_call_to_api_deepseek_com": 0
+  },
+
+  "conclusion": "PASS — Zero real provider network calls made in P1.31"
+}

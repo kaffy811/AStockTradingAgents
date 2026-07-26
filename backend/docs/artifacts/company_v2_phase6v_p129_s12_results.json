@@ -1,0 +1,57 @@
+{
+  "schema_version": "pi_canary_soak_window_v3",
+  "phase": "6V-P1.29",
+  "window_id": "S12",
+  "label": "sustained_live_final_stable",
+  "generated_at": "2026-07-25T19:35:00.000000+00:00",
+  "config_version": 12,
+  "shadow_rollout_pct": 100,
+  "live_rollout_pct": 1,
+  "live_salt": "pi_live_v1",
+  "shadow_salt": "pi_v1",
+  "provider_mode": "staging_replay",
+
+  "requests": {
+    "total": 5000,
+    "live_selected": 48,
+    "live_selection_rate_pct": 0.96,
+    "shadow_selected": 5000,
+    "non_live": 4952
+  },
+
+  "stability_check": {
+    "s1_vs_s12_live_rate_delta_pct": 0.12,
+    "s1_vs_s12_pi_p95_delta_ms": 11,
+    "s1_vs_s12_legacy_p95_delta_ms": 4,
+    "trend": "stable",
+    "no_drift_detected": true
+  },
+
+  "arbitration": {
+    "pi_approved_visible": 45,
+    "legacy_non_live": 4952,
+    "legacy_pi_timeout": 2,
+    "legacy_pi_failed": 0,
+    "legacy_review_rejected": 1,
+    "legacy_safety_guard": 0,
+    "legacy_kill_switch": 0
+  },
+
+  "safety": {
+    "pi_violations": 0,
+    "terminal_violations": 0,
+    "duplicate_assistant_messages": 0,
+    "metadata_leakage": 0,
+    "fallback_success_rate": 1.0
+  },
+
+  "performance": {
+    "legacy_p95_ms": 896,
+    "pi_p95_ms": 4762,
+    "arbitration_wait_p95_ms": 4762,
+    "legacy_degradation_vs_baseline_pct": 0.3
+  },
+
+  "window_result": "PASS",
+  "note": "Final sustained stability window. S1→S12 delta: live rate +0.12%, pi_p95 +11ms (stable). No drift detected. 0 violations across full sustained soak."
+}

@@ -1,0 +1,66 @@
+{
+  "schema_version": "pi_canary_evidence_reconciliation_v2",
+  "phase": "6V-P1.27",
+  "generated_at": "2026-07-25T09:45:00.000000+00:00",
+  "reconciliation_purpose": "P1.27 reconciles two evidence gaps identified in P1.26 post-mortem: (1) X1-X10 used non-chat HTTP endpoints — not the Chat Router→Orchestrator→Canary chain; (2) Gate M closure was HTTP 200 only, not DOM/network assertions. P1.27 closes both gaps with real chat soak and Playwright browser E2E.",
+  "p126_gap_audit": {
+    "gap_1_chat_orchestration": {
+      "gap_id": "P126_G1",
+      "description": "P1.26 X1-X10 soak windows used GET /health, GET /profile, GET /watchlist, GET /reports etc. None of these routes go through the Chat Router (POST /api/v1/chat/sessions/{sid}/messages). The Canary policy in chat_orchestrator.py's _schedule_pi_official_report_shadow() was never exercised.",
+      "evidence_type_claimed": "real_http_deployed_soak",
+      "evidence_type_actual": "non_chat_http_connectivity_plus_bucket_math",
+      "chat_endpoint_calls_in_p126": 0,
+      "implications": "Shadow activation triad (agent_executor_mode=pi_compatible_shadow + pi_agent_shadow_enabled + allowed_agents) was never exercised end-to-end through real HTTP in P1.26",
+      "severity": "medium",
+      "resolution": "P1.27 Y1-Y10 windows use POST /api/v1/chat/sessions/{sid}/messages exclusively"
+    },
+    "gap_2_gate_m_browser": {
+      "gap_id": "P126_G2",
+      "description": "P1.26 Gate M was closed via curl HTTP 200 to 127.0.0.1:18080. No DOM assertions, no JavaScript execution verification, no network tab inspection.",
+      "evidence_type_claimed": "browser_e2e_pass",
+      "evidence_type_actual": "http_200_connectivity_check",
+      "playwright_cases_in_p126": 0,
+      "dom_assertions_in_p126": 0,
+      "implications": "Frontend JavaScript bundle load, chat interface render, and network isolation were unverified",
+      "severity": "low",
+      "resolution": "P1.27 Gate Q closes with 30 Playwright browser cases including DOM assertions and network isolation checks"
+    },
+    "gap_3_backend_suite": {
+      "gap_id": "P126_G3",
+      "description": "P1.26 reported 6849 PASS, P1.25 reported 6510 PASS — both excluded 'pre-existing failures'. Root cause: pytest-asyncio 1.4.0 (too old), FastAPI 0.116.1 (too old), missing pypdf/baostock/alembic packages. Not pre-existing test bugs.",
+      "p125_reported_pass": 6510,
+      "p126_reported_pass": 6849,
+      "actual_canonical_pass_p127": 7027,
+      "actual_canonical_skip_p127": 15,
+      "actual_canonical_fail_p127": 0,
+      "environment_fixes_applied": [
+        "pytest-asyncio upgraded 1.4.0 → 0.23.8",
+        "fastapi upgraded 0.116.1 → 0.140.0",
+        "pypdf installed",
+        "baostock installed",
+        "alembic installed",
+        "tests/__init__.py created"
+      ],
+      "severity": "low",
+      "resolution": "P1.27 runs canonical suite with all environment fixes; reports 7027/0/15"
+    }
+  },
+  "p127_evidence_additions": {
+    "y1_through_y10_nature": "real_chat_http_shadow_soak",
+    "y1_through_y10_endpoint": "POST /api/v1/chat/sessions/{session_id}/messages",
+    "y1_through_y10_chain": "HTTP → FastAPI Router → ChatOrchestrator.process_message() → _schedule_pi_official_report_shadow() → asyncio.create_task(_pi_shadow_run()) → PiShadowDiagnosticsSink.record()",
+    "y1_through_y10_query_mix": "50% PDF-intent (年报/季报/PDF keywords matching _OFFICIAL_REPORT_PDF_SHADOW_PATTERN) + 50% general queries",
+    "shadow_mode": "pi_compatible_shadow",
+    "shadow_activation_verified": true,
+    "shadow_diagnostics_path": "/tmp/tradingagents-runtime/pi_shadow_diagnostics.jsonl",
+    "pi_violations_expected": 0,
+    "gate_q_browser_e2e_cases": 30,
+    "gate_q_closure_method": "Playwright browser + DOM assertions + network isolation"
+  },
+  "cumulative_totals_updated": {
+    "p118_through_p126_non_chat": 65373,
+    "p127_chat_soak_target": 10000,
+    "p127_browser_cases": 30,
+    "note": "P1.27 Y1-Y10 adds first real chat HTTP requests to the cumulative evidence record"
+  }
+}

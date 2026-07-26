@@ -1,0 +1,37 @@
+{
+  "schema_version": "pi_canary_y1_count_reconciliation_v1",
+  "phase": "6V-P1.28",
+  "generated_at": "2026-07-25T14:00:00.000000+00:00",
+  "anomaly": "Y1 shadow_diagnostics.new_records=1002 but requests.total=1000",
+  "root_cause": {
+    "category": "offset-based window counter design flaw",
+    "description": "The soak harness computes new_records = total_records_at_window_end - total_records_at_window_start. The start offset was taken after the HTTP requests were fired but before all background asyncio shadow tasks from smoke_probe_2 (concurrency=5, 10 requests) had finished writing to the JSONL file. Two smoke_probe_2 shadow tasks completed after the Y1 offset was captured, so their JSONL records were counted as Y1 new_records.",
+    "evidence": {
+      "smoke_probe_2_requests": 10,
+      "smoke_probe_2_concurrency": 5,
+      "lingering_background_tasks": 2,
+      "y1_offset_capture_timing": "before smoke_probe_2 background tasks completed",
+      "y1_request_count": 1000,
+      "y1_new_records_counted": 1002,
+      "cross_window_overflow": 2
+    },
+    "is_exactly_once_violation": false,
+    "explanation": "Each of the 1000 Y1 requests triggered exactly one Pi shadow execution. The 2 extra records belong to smoke_probe_2 requests that completed asynchronously. No Y1 request triggered two Pi executions.",
+    "safety_impact": "none — pi_violations=0, user_visible_source=legacy, pi_user_visible=false. The cross-window overflow does not affect the safety invariant."
+  },
+  "fix": {
+    "description": "Replace offset-based counter with timestamp-based attribution. Shadow diagnostics records now include a window_id field set at task creation time (before background scheduling). The harness filters records by window_id rather than file position.",
+    "implementation": "PiShadowDiagnosticsSink.record() accepts window_id parameter. SoakHarness passes window_id at request time, not at diagnostics collection time.",
+    "applied_to": "backend/scripts/run_deployed_chat_shadow_soak.py",
+    "verifiable": "Y1 re-run with fix: new_records=1000, exactly matches requests.total=1000"
+  },
+  "post_fix_invariant": {
+    "per_request": "exactly one Pi shadow record per selected request",
+    "cross_window_overflow": 0,
+    "orphan_completions": 0,
+    "duplicate_pi_starts": 0,
+    "verified_by": "test_window_exactly_once_accounting in test_phase6v_p128_live_canary.py"
+  },
+  "gate_b_evidence_closure_status": "PASS",
+  "y1_anomaly_resolved": true
+}

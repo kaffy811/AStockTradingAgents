@@ -1,0 +1,62 @@
+{
+  "schema_version": "pi_canary_fail_closed_dry_run_v1",
+  "phase": "6V-P1.30",
+  "generated_at": "2026-07-25T20:14:00.000000+00:00",
+  "label": "P1.30 Fail-Closed Dry Run (Replay Mode)",
+
+  "dry_run_mode": "staging_replay with real_provider_enabled=false (current runtime state)",
+  "purpose": "Verify that with current runtime config (provider_mode=staging_replay, real_provider_enabled=false), zero real provider calls are made for live-eligible requests",
+
+  "requests_sent": 20,
+  "live_cohort": {
+    "live_selected": 0,
+    "live_selection_rate_pct": 0.0,
+    "note": "20 requests insufficient for statistical live selection at 1% rate; consistent with expectation (binomial p=0.01, expected 0.2)"
+  },
+
+  "shadow_behavior": {
+    "shadow_selected": 20,
+    "shadow_mode": "staging_replay",
+    "real_provider_calls": 0,
+    "replay_calls": 20,
+    "provider_serving_calls": 0
+  },
+
+  "fail_closed_scenarios_tested": [
+    {
+      "scenario": "pi_real_provider_enabled_flag_absent",
+      "condition": "PI_REAL_PROVIDER_ENABLED not in Settings",
+      "result": "staging_replay used; 0 real calls",
+      "verified": true,
+      "note": "Flag absence is itself fail-closed: no flag = no real calls"
+    },
+    {
+      "scenario": "provider_mode_replay",
+      "condition": "provider_mode=staging_replay in runtime config",
+      "result": "staging_replay used; 0 real calls",
+      "verified": true
+    },
+    {
+      "scenario": "missing_credential_effect",
+      "condition": "DEEPSEEK_API_KEY not set (simulated in test isolation)",
+      "result": "DeepSeekClient.__init__ raises ValueError; Pi shadow fails gracefully",
+      "verified_via_unit_test": true,
+      "real_calls": 0
+    }
+  ],
+
+  "dry_run_results": {
+    "real_provider_calls": 0,
+    "pi_real_provider_visible": 0,
+    "legacy_fallback_served": 20,
+    "http_success": 20,
+    "terminal_violations": 0,
+    "duplicate_assistant_messages": 0
+  },
+
+  "note": "Full fail-closed validation as specified (provider_mode=staging_real, real_provider_enabled=false) cannot be executed because the staging_real mode and PI_REAL_PROVIDER_ENABLED flag are not implemented in runtime. The current validation confirms the existing replay-mode fail-closed behavior is intact. Full dry run with staging_real mode is a P1.31 prerequisite implementation item.",
+
+  "gate_i_current_status": "FAIL (flag not implemented)",
+  "gate_i_replay_safety_confirmed": true,
+  "verdict": "Current system is safe (replay mode, 0 real calls). Full fail-closed validation (staging_real + disabled flag) requires P1.31 implementation."
+}

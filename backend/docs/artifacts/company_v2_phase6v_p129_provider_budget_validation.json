@@ -1,0 +1,67 @@
+{
+  "schema_version": "pi_canary_provider_budget_v1",
+  "phase": "6V-P1.29",
+  "generated_at": "2026-07-25T19:44:00.000000+00:00",
+  "label": "P1.29 Real Provider Budget Validation (Fail-Closed Verification)",
+
+  "test_mode": "unit_test_only",
+  "real_provider_activated": false,
+  "real_provider_calls_made": 0,
+  "reason": "PI_REAL_PROVIDER_ENABLED=false across all P1.29 windows",
+
+  "fail_closed_tests": [
+    {
+      "test": "disabled_by_default",
+      "condition": "PI_REAL_PROVIDER_ENABLED not set",
+      "result": "staging_replay used; 0 real calls",
+      "status": "PASS"
+    },
+    {
+      "test": "disabled_explicit_false",
+      "condition": "PI_REAL_PROVIDER_ENABLED=false",
+      "result": "staging_replay used; 0 real calls",
+      "status": "PASS"
+    },
+    {
+      "test": "budget_guard_request_cap_unit",
+      "condition": "mocked request_count >= PI_REAL_PROVIDER_MAX_REQUESTS(100)",
+      "result": "circuit_breaker_open → staging_replay fallback",
+      "status": "PASS"
+    },
+    {
+      "test": "budget_guard_cost_cap_unit",
+      "condition": "mocked estimated_cost >= PI_REAL_PROVIDER_MAX_COST_CNY(100)",
+      "result": "circuit_breaker_open → staging_replay fallback",
+      "status": "PASS"
+    },
+    {
+      "test": "provider_kill_switch_unit",
+      "condition": "PI_REAL_PROVIDER_ENABLED toggled false during live window",
+      "result": "in-flight calls complete; new calls route to staging_replay",
+      "status": "PASS"
+    },
+    {
+      "test": "canary_kill_switch_independent",
+      "condition": "PI_CANARY_LIVE_ENABLED=false with PI_REAL_PROVIDER_ENABLED=true (unit mock)",
+      "result": "live selection drops to 0; no real provider calls possible",
+      "status": "PASS"
+    }
+  ],
+
+  "budget_guard_unit_tests": {
+    "passed": 6,
+    "failed": 0
+  },
+
+  "staging_credential_isolation": {
+    "staging_key_variable": "DEEPSEEK_API_KEY_STAGING",
+    "production_key_variable": "DEEPSEEK_API_KEY",
+    "isolation_verified": true,
+    "note": "Staging key not yet provisioned for P1.29 (not needed — real provider not activated)"
+  },
+
+  "gate_s_status": "NOT_EVALUATED",
+  "gate_s_reason": "Real provider activation requires explicit P1.30 authorization. P1.29 verifies fail-closed design only.",
+
+  "verdict": "Fail-closed design verified. 0 real provider calls in P1.29. Budget guard unit-tested. Real activation deferred to P1.30."
+}

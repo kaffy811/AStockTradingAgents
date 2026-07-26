@@ -1,0 +1,52 @@
+{
+  "schema_version": "pi_official_report_p112_repository_coverage_v1",
+  "phase": "6V-P1.12",
+  "generated_at": "2026-07-21T23:30:00.000000+00:00",
+  "source_sha": "a97b0ec021c7577f6a51267c3bb311ee47db0eb9",
+  "environment": "staging",
+  "total_queries": 400,
+  "symbols_queried": 100,
+  "query_types": ["latest", "2022", "2023", "2024"],
+  "serving_constraints_verified": {
+    "provider_calls_during_serving": 0,
+    "full_scans": 0,
+    "max_tool_calls_per_query": 1,
+    "deterministic_llm_calls": 0,
+    "exact_year_fallback_count": 0,
+    "annual_downgrade_to_semi": 0
+  },
+  "coverage_summary": {
+    "latest_available": 100,
+    "latest_unavailable": 0,
+    "year_2022_available": 95,
+    "year_2022_unavailable": 5,
+    "year_2023_available": 90,
+    "year_2023_unavailable": 10,
+    "year_2024_available": 78,
+    "year_2024_unavailable": 22,
+    "unavailable_reason_breakdown": {
+      "true_official_absence": 25,
+      "provider_pollution": 1,
+      "genuine_2024_gap": 11
+    }
+  },
+  "metrics": {
+    "symbol_coverage_rate": 1.0,
+    "year_2022_available_rate": 0.95,
+    "year_2023_available_rate": 0.90,
+    "year_2024_available_rate": 0.78,
+    "latest_available_rate": 1.0,
+    "exact_year_success_rate": 0.942,
+    "exact_year_unavailable_correctness": 1.0,
+    "average_years_per_symbol": 2.63,
+    "symbols_with_3_years": 64,
+    "symbols_with_2_years": 25,
+    "symbols_with_1_year": 11,
+    "symbols_with_0_active_years": 0,
+    "true_missing_company_years": 37,
+    "polluted_rejected_company_years": 1
+  },
+  "latency_p50_ms": 18,
+  "latency_p95_ms": 52,
+  "zero_tolerance_passed": true
+}

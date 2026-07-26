@@ -1,0 +1,19 @@
+{
+  "schema_version": "pi_canary_replay_restoration_v1",
+  "phase": "6V-P1.32",
+  "generated_at": "2026-07-26T02:00:00Z",
+
+  "restoration_required": false,
+  "reason": "Real provider never activated in P1.32 (State B); staging remained in replay throughout",
+
+  "final_state": {
+    "config_version": 12,
+    "provider_mode": "staging_replay",
+    "real_provider_enabled": false,
+    "shadow_rollout_percent": 100,
+    "live_rollout_percent": 1,
+    "production": false
+  },
+
+  "note": "Config version stays at 12 (no real provider was activated). cv=13 (staging_real) and cv=14 (restored replay) are reserved for P1.33 when staging key is provisioned."
+}

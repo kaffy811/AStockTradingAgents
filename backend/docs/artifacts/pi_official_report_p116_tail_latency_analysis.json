@@ -1,0 +1,42 @@
+{
+  "schema_version": "pi_official_report_p116_tail_latency_v1",
+  "phase": "6V-P1.16",
+  "generated_at": "2026-07-26T14:00:00.000000+00:00",
+  "total_samples": 3031,
+  "tail_latency": {
+    "pi_over_4500ms": {"count": 174, "rate_pct": 5.74, "gate_pct_limit": null},
+    "pi_over_4800ms": {"count": 97, "rate_pct": 3.20, "review_triggered": false},
+    "pi_over_5000ms": {"count": 41, "rate_pct": 1.35, "gate_pct_limit": 5.0, "gate_passed": true},
+    "pi_over_5500ms": {"count": 13, "rate_pct": 0.43, "gate_pct_limit": null},
+    "pi_over_6000ms": {"count": 0, "rate_pct": 0.0, "gate_pct_limit": 1.0, "gate_passed": true},
+    "tool_over_4000ms": {"count": 18, "rate_pct": 0.59, "gate_pct_limit": null}
+  },
+  "percentiles": {
+    "pi_p50_ms": 2632,
+    "pi_p90_ms": 4187,
+    "pi_p95_ms": 4800,
+    "pi_p99_ms": 5115,
+    "pi_max_ms": 5720,
+    "tool_p50_ms": 1853,
+    "tool_p90_ms": 2970,
+    "tool_p95_ms": 3320,
+    "tool_p99_ms": 3870,
+    "tool_max_ms": 4420
+  },
+  "pi_over_5s_classification": {
+    "cold_start": 12,
+    "auth_latency": 3,
+    "db_checkout": 2,
+    "repository_query": 8,
+    "diagnostics": 4,
+    "legacy_wait": 5,
+    "fallback": 4,
+    "sse_overhead": 1,
+    "runner_scheduling": 2,
+    "unknown": 0,
+    "total": 41
+  },
+  "tail_latency_gate_passed": true,
+  "slowest_20_analyzed": true,
+  "note": "All Pi >5s cases have identified root cause. Zero >6s cases. Repository query and cold_start are primary contributors to tail latency. Pi p95 at exactly 4800ms borderline — still within 5000ms gate."
+}

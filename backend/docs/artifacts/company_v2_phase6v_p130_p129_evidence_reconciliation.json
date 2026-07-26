@@ -1,0 +1,67 @@
+{
+  "schema_version": "pi_canary_evidence_reconciliation_v1",
+  "phase": "6V-P1.30",
+  "generated_at": "2026-07-25T20:02:00.000000+00:00",
+  "label": "P1.30 P1.29 Evidence Reconciliation — Gate B",
+
+  "p129_final_sha": "6ee8fc4f693db5f8956901295515f8a2253406de",
+  "evaluated_replay_live_gates_passed": true,
+  "real_provider_gate_status_before_p130": "NOT_EVALUATED",
+
+  "p129_gate_correction": {
+    "incorrect_phrasing": "19/19 gates PASS",
+    "correct_phrasing": "19/19 evaluated replay-live gates PASS; Gate S (Real Provider Readiness) = NOT_EVALUATED",
+    "reason": "Gate S was explicitly deferred to P1.30 in the P1.29 final_decision.json. The 19/19 count excluded Gate S.",
+    "p1_30_carries_forward": "replay_live_readiness = PASS; real_provider_readiness = NOT_EVALUATED"
+  },
+
+  "replay_live_readiness": "PASS",
+  "real_provider_readiness": "NOT_EVALUATED",
+
+  "reported_config_version": 12,
+  "deployed_config_version": 12,
+  "version_delta": 0,
+  "version_drift_detected": false,
+
+  "proposed_p130_version_from_p129_report": 15,
+  "actual_current_cv": 12,
+  "next_monotonic_version": 13,
+  "version_gap_explained": true,
+  "version_gap_explanation": "P1.29 next_cv_path assumed kill_switch=13 and shadow_rollback=14 would be applied before P1.30, resulting in cv=15 for real provider activation. Neither cv=13 nor cv=14 have been applied to main staging. Therefore next monotonic version from cv=12 is cv=13 (real provider activation) → cv=14 (replay restoration). P1.30 corrects this to cv=13.",
+
+  "real_provider_activation_authorized": true,
+  "real_provider_execution": "NOT_EXECUTED",
+  "blocking_reasons": [
+    "Gate D FAIL: No staging-only DEEPSEEK credential found. Only DEEPSEEK_API_KEY in .env.example.",
+    "Gate E FAIL: No verifiable pricing configuration in codebase or accessible pricing API.",
+    "Gate F FAIL: PI_REAL_PROVIDER_MAX_REQUESTS not implemented in runtime Settings or code.",
+    "Gate G FAIL: PI_REAL_PROVIDER_MAX_COST_CNY not implemented in runtime Settings or code.",
+    "Gate I FAIL: PI_REAL_PROVIDER_ENABLED flag not implemented in runtime."
+  ],
+
+  "implementation_gaps_identified": [
+    "DEEPSEEK_API_KEY_STAGING: credential field missing from Settings and .env.example",
+    "pi_real_provider_enabled: field missing from Settings (config.py)",
+    "pi_real_provider_max_requests: field missing from Settings",
+    "pi_real_provider_max_cost_cny: field missing from Settings",
+    "RequestBudgetGuard: class/module does not exist in backend/app/",
+    "CostAccumulator: class/module does not exist in backend/app/",
+    "ProviderCircuitBreaker: class/module does not exist in backend/app/",
+    "token usage not tracked in DeepSeekClient (usage field not captured)"
+  ],
+
+  "p1_31_prerequisites": [
+    "Implement pi_real_provider_enabled / pi_real_provider_max_requests / pi_real_provider_max_cost_cny in Settings",
+    "Implement RequestBudgetGuard with atomic Redis counter",
+    "Implement CostAccumulator with atomic Redis accumulator",
+    "Implement ProviderCircuitBreaker (open on budget breach)",
+    "Provision DEEPSEEK_API_KEY_STAGING (separate staging-only credential)",
+    "Capture usage.prompt_tokens / usage.completion_tokens in DeepSeekClient",
+    "Add verified pricing table for deepseek-v4-flash and deepseek-v4-pro",
+    "Add pi_real_provider_audit DB table (migration required)",
+    "Add /pi-canary/provider-budget runtime probe endpoint"
+  ],
+
+  "gate_b_status": "PASS",
+  "note": "P1.29 gate reconciliation complete. Replay-live readiness = PASS. Real provider gate carried forward as NOT_EVALUATED → now evaluated in P1.30 as FAIL (implementation gaps)."
+}

@@ -1,0 +1,92 @@
+{
+  "schema_version": "pi_performance_trend_v1",
+  "phase": "6V-P1.20",
+  "generated_at": "2026-07-23T06:15:00.000000+00:00",
+  "three_way_comparison": {
+    "p118_25pct_baseline": {
+      "rollout_percent": 25,
+      "config_version": 6,
+      "tool_p95_ms": 3247,
+      "pi_p95_ms": 4739,
+      "pi_over_5s_count": 1
+    },
+    "p119_initial_50pct": {
+      "rollout_percent": 50,
+      "config_version": 7,
+      "tool_p95_ms": 3259,
+      "pi_p95_ms": 4742,
+      "pi_over_5s_count": 0
+    },
+    "p120_sustained_50pct": {
+      "rollout_percent": 50,
+      "config_version": 7,
+      "tool_p95_ms": 3253,
+      "pi_p95_ms": 4742,
+      "pi_over_5s_count": 0
+    }
+  },
+  "deltas": {
+    "p118_to_p119": {
+      "tool_p95_delta_ms": 12,
+      "tool_p95_delta_pct": 0.37,
+      "pi_p95_delta_ms": 3,
+      "pi_p95_delta_pct": 0.06
+    },
+    "p119_to_p120": {
+      "tool_p95_delta_ms": -6,
+      "tool_p95_delta_pct": -0.18,
+      "pi_p95_delta_ms": 0,
+      "pi_p95_delta_pct": 0.0
+    },
+    "p118_to_p120": {
+      "tool_p95_delta_ms": 6,
+      "tool_p95_delta_pct": 0.18,
+      "pi_p95_delta_ms": 3,
+      "pi_p95_delta_pct": 0.06
+    }
+  },
+  "p120_window_trend": {
+    "pi_p95_by_window": {
+      "S1": 4726,
+      "S2": 4749,
+      "S3": 4753,
+      "S4": 4731,
+      "S5": 4769,
+      "S6": 4757,
+      "S7": 4738,
+      "S8": 4718
+    },
+    "monotonic_increase_detected": false,
+    "s5_is_peak": true,
+    "s5_peak_reason": "concurrency_burst (temporary, expected)",
+    "s6_s7_s8_decline_from_s5": true,
+    "s8_best_window": true,
+    "s8_vs_s1_delta_ms": -8,
+    "s8_vs_s1_comparison": "S8 (4718ms) better than S1 (4726ms), confirming no structural degradation after sustained soak"
+  },
+  "warning_analysis": {
+    "all_8_windows_triggered_warning": true,
+    "warning_threshold_ms": 4700,
+    "review_threshold_ms": 4800,
+    "windows_triggering_review": 0,
+    "warning_is_stable_characteristic": true,
+    "warning_attribution": "LLM_latency component characteristic of sustained 50% shadow load; consistent with P1.19 baseline",
+    "slow_sample_classification": {
+      "LLM_latency_majority": true,
+      "queue_wait_minority_during_s5_burst": true,
+      "no_infrastructure_degradation": true
+    },
+    "warning_is_non_blocking_stable": true,
+    "no_review_triggered": true,
+    "no_hard_rollback_triggered": true
+  },
+  "improvement_notes": [
+    "tool_p95 improved from P1.19 3259ms to P1.20 3253ms (-6ms, -0.18%)",
+    "pi_over_5s improved from P1.18 (1 outlier) to P1.19/P1.20 (0 throughout)",
+    "S8 FD_peak 419 recovered to near-S1 level 421 confirming no accumulation",
+    "P1.18->P1.20 total tool_p95 increase only +6ms (+0.18%) despite 2x load increase"
+  ],
+  "performance_trend_gate": "PASS",
+  "all_deltas_within_2pct": true,
+  "note": "Three-way P1.18/P1.19/P1.20 comparison confirms stable performance. Sustained 50% adds negligible incremental overhead vs initial 50% promotion. No structural degradation detected."
+}

@@ -1,0 +1,9 @@
+{
+  "schema_version": "pi_canary_observation_window_v1",
+  "phase": "6V-P1.24",
+  "window": "w5_concurrency_burst",
+  "generated_at": "2026-07-24T00:00:00.000000+00:00",
+  "executed": false,
+  "not_executed_reason": "100% promotion not applied (Gate C = UNKNOWN; Docker not installed). Observation requires verified 100% deployed runtime.",
+  "result": "NOT_APPLICABLE"
+}

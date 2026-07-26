@@ -1,0 +1,41 @@
+{
+  "schema_version": "pi_p117_audit_v1",
+  "phase": "6V-P1.18",
+  "generated_at": "2026-07-28T15:00:00.000000+00:00",
+  "audit_purpose": "Re-verify P1.17 gate before commencing P1.18 sustained observation",
+  "base_sha": "ce41b99d98b0b512f71ac6c491bbc44fc6a52261",
+  "p117_gate_confirmed": {
+    "rollout_percent": 25,
+    "config_version": 6,
+    "total_selected": 2616,
+    "unique_symbols": 100,
+    "combined_pi_p95_ms": 4741,
+    "pi_over_5s_rate_pct": 1.30,
+    "pi_over_6s_count": 0,
+    "safety_correctness_rate": 1.0,
+    "zero_tolerance_violations": 0,
+    "browser_regression": "10/10",
+    "resource_gate_passed": true,
+    "p117_gate_passed": true,
+    "live_serving": false,
+    "production_enabled": false
+  },
+  "consistency_checks": {
+    "rollout_matches_config_version": true,
+    "artifact_runtime_consistent": true,
+    "code_state_consistent": true,
+    "no_staged_changes_in_worktree": true,
+    "worktree_clean": true,
+    "head_equals_remote": true
+  },
+  "formal_defaults_verified": {
+    "AGENT_EXECUTOR_MODE": "legacy",
+    "PI_AGENT_SHADOW_ENABLED": false,
+    "authorized_agents": [],
+    "default_rollout": 0,
+    "production_enabled": false
+  },
+  "p1_18_preconditions_met": true,
+  "cleared_for_l1_observation": true,
+  "note": "P1.17 gate fully consistent. All metrics confirmed. Proceeding to P1.18 L1-L8 sustained observation at 25% shadow."
+}

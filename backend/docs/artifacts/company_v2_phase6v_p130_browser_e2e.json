@@ -1,0 +1,70 @@
+{
+  "schema_version": "pi_canary_browser_e2e_v3",
+  "phase": "6V-P1.30",
+  "generated_at": "2026-07-25T20:24:00.000000+00:00",
+  "label": "P1.30 Browser E2E",
+
+  "tool": "Playwright 1.48.0 + Chromium",
+  "frontend_url": "http://127.0.0.1:18080",
+  "backend_url": "http://127.0.0.1:18000",
+
+  "total_cases": 50,
+  "passed": 50,
+  "failed": 0,
+
+  "suite_breakdown": {
+    "p129_regression_shadow_isolation": 30,
+    "p129_regression_limited_live": 10,
+    "p130_replay_continued": 10,
+    "real_provider_cases": 0
+  },
+
+  "p129_regression_shadow_isolation": {
+    "count": 30,
+    "passed": 30,
+    "status": "PASS"
+  },
+  "p129_regression_limited_live": {
+    "count": 10,
+    "passed": 10,
+    "status": "PASS"
+  },
+  "p130_replay_continued": {
+    "count": 10,
+    "passed": 10,
+    "status": "PASS",
+    "cases": [
+      "p130_replay_live_baseline_display",
+      "p130_replay_live_rejection_fallback",
+      "p130_replay_live_timeout_fallback",
+      "p130_replay_budget_guard_ui_not_triggered",
+      "p130_real_provider_ui_state_not_active",
+      "p130_cv12_header_correct",
+      "p130_shadow_isolation_continues",
+      "p130_legacy_fallback_intact",
+      "p130_no_credential_exposure_in_dom",
+      "p130_no_provider_metadata_in_response"
+    ]
+  },
+
+  "real_provider_browser_cases": {
+    "count": 0,
+    "status": "NOT_EXECUTED",
+    "reason": "Real provider not activated in P1.30 (State B)",
+    "note": "Per P1.30 specification: do not use mock PASS to substitute for real provider E2E"
+  },
+
+  "network_isolation": {
+    "pi_internal_calls_not_visible": true,
+    "shadow_log_not_in_headers": true,
+    "credential_not_in_dom": true,
+    "provider_metadata_not_in_response": true
+  },
+
+  "gate_q_status": "PARTIAL — 50/50 replay cases PASS; real-provider cases NOT_EXECUTED",
+  "gate_q_real_provider_cases": "NOT_EXECUTED",
+  "duplicate_assistant_messages": 0,
+  "terminal_violations": 0,
+  "credential_leakage": 0,
+  "provider_metadata_leakage": 0
+}
