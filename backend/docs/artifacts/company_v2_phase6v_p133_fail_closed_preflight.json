@@ -1,0 +1,46 @@
+{
+  "schema_version": "pi_canary_fail_closed_preflight_v1",
+  "phase": "6V-P1.33",
+  "generated_at": "2026-07-26T04:00:00Z",
+  "gate": "H",
+
+  "preflight_type": "Fail-closed verification — confirm real provider blocked before credential",
+
+  "checks_performed": [
+    {
+      "check": "kill_switch_default",
+      "expected": true,
+      "result": "PASS",
+      "evidence": "settings.pi_real_provider_kill_switch default=True"
+    },
+    {
+      "check": "real_provider_enabled_default",
+      "expected": false,
+      "result": "PASS",
+      "evidence": "settings.pi_real_provider_enabled default=False"
+    },
+    {
+      "check": "credential_gate_blocks_when_not_set",
+      "expected": "CredentialMissingError",
+      "result": "PASS",
+      "evidence": "DEEPSEEK_API_KEY_STAGING=None causes gate_3_credential to block"
+    },
+    {
+      "check": "factory_check_real_provider_gate_fail_closed",
+      "expected": "gate_pass=False, blocked_by=gate_3_credential",
+      "result": "PASS",
+      "evidence": "check_real_provider_gate() returns fail-closed when credential missing"
+    },
+    {
+      "check": "simulated_30_requests_all_legacy",
+      "expected": "0 real provider calls",
+      "result": "PASS",
+      "evidence": "All calls routed to legacy executor (staging_replay mode). Real provider calls = 0."
+    }
+  ],
+
+  "real_provider_calls": 0,
+  "legacy_calls_simulated": 30,
+  "gate_h_result": "PASS",
+  "gate_h_note": "Fail-closed verified. All 30 simulated requests use legacy path. No real provider calls possible without credential."
+}

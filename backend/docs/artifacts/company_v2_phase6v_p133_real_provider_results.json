@@ -1,0 +1,21 @@
+{
+  "schema_version": "pi_canary_real_provider_results_v2",
+  "phase": "6V-P1.33",
+  "generated_at": "2026-07-26T04:00:00Z",
+  "gates": ["I", "J", "K"],
+
+  "state": "B",
+  "state_reason": "DEEPSEEK_API_KEY_STAGING not provisioned. Real provider calls cannot be made.",
+
+  "real_provider_requests": 0,
+  "real_provider_responses": 0,
+  "real_provider_errors": 0,
+  "real_provider_cost_usd": 0.0,
+  "real_provider_cost_cny": 0.0,
+
+  "gate_i_result": "NOT_EXECUTED",
+  "gate_j_result": "NOT_EXECUTED",
+  "gate_k_result": "NOT_EXECUTED",
+
+  "note": "State B. All gates I/J/K require real provider connectivity. Deferred pending credential provisioning."
+}
