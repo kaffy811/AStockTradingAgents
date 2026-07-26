@@ -1,0 +1,48 @@
+{
+  "schema_version": "pi_canary_invite_config_v1",
+  "phase": "MVP-R1.1",
+  "generated_at": "2026-07-26T08:00:00Z",
+
+  "invite_system": {
+    "model": "mvp_invite",
+    "table": "mvp_invite",
+    "endpoints": [
+      "POST /mvp/invites/check",
+      "POST /mvp/invites/redeem",
+      "POST /mvp/invites"
+    ],
+    "code_format": "secrets.token_urlsafe(36)[:48]",
+    "fields": ["id", "invite_code", "email", "created_by", "redeemed", "redeemed_at", "redeemed_by_user_id", "max_uses", "use_count", "expires_at", "note", "created_at"]
+  },
+
+  "wave_management": {
+    "max_invited_users": 50,
+    "wave1_max_users": 10,
+    "wave2_max_users": 30,
+    "wave3_max_users": 50,
+    "current_wave": 0,
+    "wave_endpoint": "GET /mvp/wave/status"
+  },
+
+  "access_control": {
+    "mvp_public_registration_enabled": false,
+    "mvp_new_invites_enabled": true,
+    "mvp_new_login_enabled": true,
+    "mvp_kill_invites": false,
+    "mvp_kill_login": false
+  },
+
+  "gate_l2_result": "PASS",
+  "gate_l3_result": "PASS",
+
+  "owner_steps_to_add_wave1_users": [
+    "1. Generate invite codes via POST /mvp/invites with admin token",
+    "   Body: { 'email': 'user@example.com', 'max_uses': 1, 'note': 'Wave 1 internal tester' }",
+    "   Response includes: invite_code",
+    "2. Send invite code to user securely (email, DM — NOT in Git)",
+    "3. User redeems via POST /mvp/invites/redeem: { 'invite_code': '...' }",
+    "4. Monitor activated_at via mvp_invite table",
+    "5. Verify GET /mvp/wave/status shows current_wave=1 after setting env",
+    "6. Add at most 10 users in Wave 1"
+  ]
+}

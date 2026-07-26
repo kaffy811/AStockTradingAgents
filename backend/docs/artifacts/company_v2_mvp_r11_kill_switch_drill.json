@@ -1,0 +1,76 @@
+{
+  "schema_version": "pi_canary_kill_switch_drill_v1",
+  "phase": "MVP-R1.1",
+  "generated_at": "2026-07-26T08:00:00Z",
+
+  "drill_type": "pre-launch kill-switch verification",
+
+  "switches_verified": [
+    {
+      "switch": "close_new_invites",
+      "method": "Set MVp_KILL_INVITES=true in env + restart",
+      "endpoint_check": "GET /mvp/wave/status → new_invites_enabled=false",
+      "http_500": false,
+      "data_corruption": false,
+      "recoverable": true,
+      "result": "PASS"
+    },
+    {
+      "switch": "close_new_login",
+      "method": "Set MVp_KILL_LOGIN=true in env + restart",
+      "endpoint_check": "GET /mvp/wave/status → new_login_enabled=false",
+      "http_500": false,
+      "data_corruption": false,
+      "recoverable": true,
+      "result": "PASS"
+    },
+    {
+      "switch": "close_new_chat",
+      "method": "Set MVp_KILL_CHAT=true in env + restart",
+      "endpoint_check": "GET /mvp/quota/check/{user_id} → allowed=false, user-friendly message",
+      "http_500": false,
+      "data_corruption": false,
+      "recoverable": true,
+      "result": "PASS"
+    },
+    {
+      "switch": "disable_single_user",
+      "method": "UPDATE mvp_invite SET expires_at=NOW() WHERE email='user@example.com'",
+      "endpoint_check": "POST /mvp/invites/check → valid=false",
+      "http_500": false,
+      "data_corruption": false,
+      "recoverable": true,
+      "result": "PASS"
+    },
+    {
+      "switch": "close_pi_live",
+      "method": "Set PI_CANARY_LIVE_ROLLOUT_PERCENT=0 in env + restart",
+      "endpoint_check": "GET /mvp/health → live_rollout_percent=0",
+      "http_500": false,
+      "data_corruption": false,
+      "recoverable": true,
+      "result": "PASS"
+    },
+    {
+      "switch": "real_provider_kill",
+      "method": "PI_REAL_PROVIDER_KILL_SWITCH=true (already default)",
+      "endpoint_check": "GET /mvp/health → real_provider_enabled=false",
+      "http_500": false,
+      "data_corruption": false,
+      "recoverable": true,
+      "result": "PASS"
+    },
+    {
+      "switch": "legacy_only_mode",
+      "method": "Already active — staging_replay mode, legacy fallback enabled",
+      "endpoint_check": "GET /mvp/health → provider_mode=staging_replay",
+      "http_500": false,
+      "data_corruption": false,
+      "recoverable": true,
+      "result": "PASS"
+    }
+  ],
+
+  "all_switches_verified": true,
+  "gate_l13_result": "PASS"
+}

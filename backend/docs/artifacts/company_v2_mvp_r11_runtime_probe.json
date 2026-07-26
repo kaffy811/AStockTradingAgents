@@ -1,0 +1,29 @@
+{
+  "schema_version": "pi_canary_runtime_probe_v2",
+  "phase": "MVP-R1.1",
+  "generated_at": "2026-07-26T08:00:00Z",
+
+  "deployment_sha": "d6e927bea89292d8e7f6b3e6e509a7bce6598147",
+  "config_version": 12,
+
+  "runtime_config": {
+    "provider_mode": "staging_replay",
+    "real_provider_enabled": false,
+    "real_provider_kill_switch": true,
+    "shadow_rollout_percent": 100,
+    "shadow_salt": "pi_v1",
+    "live_rollout_percent": 1,
+    "live_salt": "pi_live_v1",
+    "production_enabled": false,
+    "legacy_fallback_enabled": true,
+    "public_registration_enabled": false
+  },
+
+  "health_status": "healthy",
+  "backend_started": true,
+  "database_connected": true,
+  "drift_detected": false,
+
+  "gate_l1_result": "PASS",
+  "note": "Runtime matches expected State B configuration. No drift."
+}

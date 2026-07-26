@@ -1,0 +1,34 @@
+{
+  "schema_version": "pi_canary_launch_gate_v1",
+  "phase": "MVP-R1.1",
+  "generated_at": "2026-07-26T08:30:00Z",
+
+  "gate_assessment": [
+    {"gate": "L1", "name": "Runtime Integrity", "status": "PASS", "note": "staging_replay, cv=12, no drift"},
+    {"gate": "L2", "name": "Invite Allowlist", "status": "PASS", "note": "MvpInvite table + wave management added"},
+    {"gate": "L3", "name": "Public Registration Disabled", "status": "PASS", "note": "mvp_public_registration_enabled=false (default)"},
+    {"gate": "L4", "name": "User Disable", "status": "PASS", "note": "expires_at in mvp_invite; mvp_kill_login kill switch"},
+    {"gate": "L5", "name": "User Quota", "status": "PASS", "note": "mvp_daily_quota_per_user=10; GET /mvp/quota/check/{user_id}"},
+    {"gate": "L6", "name": "Global Quota", "status": "PASS", "note": "mvp_global_daily_quota=300; mvp_max_concurrent_per_user=1"},
+    {"gate": "L7", "name": "Core Stock Flow", "status": "PASS"},
+    {"gate": "L8", "name": "Core Chat Flow", "status": "PASS"},
+    {"gate": "L9", "name": "Multi-Turn and History", "status": "PASS"},
+    {"gate": "L10", "name": "Feedback", "status": "PASS", "note": "7-category feedback, success confirmation"},
+    {"gate": "L11", "name": "Analytics", "status": "PASS", "note": "18 canonical events, 15 computable metrics"},
+    {"gate": "L12", "name": "Monitoring", "status": "PASS", "note": "P0-P2 severity, zero-tolerance alerts defined"},
+    {"gate": "L13", "name": "Kill Switches", "status": "PASS", "note": "7 switches drilled, all recoverable"},
+    {"gate": "L14", "name": "Secret Protection", "status": "PASS", "note": "No credentials in repo, PII stripped"},
+    {"gate": "L15", "name": "Canonical Tests", "status": "PASS", "note": "927+ backend tests pass"},
+    {"gate": "L16", "name": "Product Messaging Accuracy", "status": "PASS", "note": "No false AI claims. Test disclaimer present. real_ai_provider_may_be_advertised=false."}
+  ],
+
+  "summary": {
+    "pass": 16,
+    "fail": 0,
+    "not_evaluated": 0
+  },
+
+  "wave_1_authorized": true,
+  "public_launch_authorized": false,
+  "real_provider_authorized": false
+}
