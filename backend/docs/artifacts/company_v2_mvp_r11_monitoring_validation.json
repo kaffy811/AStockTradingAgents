@@ -1,0 +1,39 @@
+{
+  "schema_version": "pi_canary_monitoring_v1",
+  "phase": "MVP-R1.1",
+  "generated_at": "2026-07-26T08:00:00Z",
+
+  "error_severity": {
+    "P0": "log.error — immediate alert to project owner",
+    "P1": "log.error",
+    "P2": "log.warning",
+    "info": "log.info"
+  },
+
+  "monitored_dimensions": [
+    "backend_health",
+    "frontend_availability",
+    "database_health",
+    "redis_health",
+    "http_5xx_rate",
+    "chat_failure_rate",
+    "fallback_failure_rate",
+    "latency_p50_p95",
+    "quota_blocks",
+    "frontend_js_errors"
+  ],
+
+  "zero_tolerance_alerts": [
+    "any session mismatch",
+    "any credential leak",
+    "any severe data fabrication",
+    "any duplicate user-visible message",
+    "fallback success < 100%",
+    "15-min core success rate < 95%"
+  ],
+
+  "alert_recipient": "project owner only",
+  "dual_approval_required": false,
+
+  "gate_l12_result": "PASS"
+}

@@ -267,6 +267,105 @@ async def record_analytics_event(
     return AnalyticsEventResponse(ok=True, event_id=str(event.id))
 
 
+# ---------------------------------------------------------------------------
+# Phase MVP-R1.1: Quota check
+# ---------------------------------------------------------------------------
+
+class QuotaCheckResponse(BaseModel):
+    allowed: bool
+    reason: str | None = None
+    daily_used: int = 0
+    daily_limit: int = 0
+
+
+@router.get("/mvp/quota/check/{user_id}", response_model=QuotaCheckResponse)
+async def check_user_quota(
+    user_id: str,
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Check whether a user has remaining daily chat quota.
+    Returns allowed=False with reason if quota exceeded.
+    """
+    from datetime import date
+    from sqlalchemy import func
+
+    from app.core.config import settings
+
+    daily_limit = settings.mvp_daily_quota_per_user
+
+    # Count chat_message_sent events for this user today
+    today_start = datetime.combine(date.today(), datetime.min.time())
+    result = await db.execute(
+        select(func.count(MvpAnalyticsEvent.id)).where(
+            MvpAnalyticsEvent.user_id == user_id,
+            MvpAnalyticsEvent.event_name == "chat_message_sent",
+            MvpAnalyticsEvent.created_at >= today_start,
+        )
+    )
+    daily_used = result.scalar() or 0
+
+    if not settings.mvp_new_chat_enabled or settings.mvp_kill_chat:
+        return QuotaCheckResponse(
+            allowed=False,
+            reason="当前聊天功能暂时关闭，请稍后再试。",
+            daily_used=daily_used,
+            daily_limit=daily_limit,
+        )
+
+    if daily_used >= daily_limit:
+        return QuotaCheckResponse(
+            allowed=False,
+            reason="今日测试额度已用完，请明天继续使用。",
+            daily_used=daily_used,
+            daily_limit=daily_limit,
+        )
+
+    return QuotaCheckResponse(
+        allowed=True,
+        daily_used=daily_used,
+        daily_limit=daily_limit,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Phase MVP-R1.1: Wave status
+# ---------------------------------------------------------------------------
+
+class WaveStatusResponse(BaseModel):
+    current_wave: int
+    max_invited_users: int
+    wave_limits: dict
+    new_invites_enabled: bool
+    new_login_enabled: bool
+    new_chat_enabled: bool
+    kill_switches: dict
+
+
+@router.get("/mvp/wave/status", response_model=WaveStatusResponse)
+async def get_wave_status():
+    """Return current invite wave configuration."""
+    from app.core.config import settings
+
+    return WaveStatusResponse(
+        current_wave=settings.mvp_current_wave,
+        max_invited_users=settings.mvp_max_invited_users,
+        wave_limits={
+            "wave1": settings.mvp_wave1_max_users,
+            "wave2": settings.mvp_wave2_max_users,
+            "wave3": settings.mvp_wave3_max_users,
+        },
+        new_invites_enabled=settings.mvp_new_invites_enabled and not settings.mvp_kill_invites,
+        new_login_enabled=settings.mvp_new_login_enabled and not settings.mvp_kill_login,
+        new_chat_enabled=settings.mvp_new_chat_enabled and not settings.mvp_kill_chat,
+        kill_switches={
+            "kill_invites": settings.mvp_kill_invites,
+            "kill_login": settings.mvp_kill_login,
+            "kill_chat": settings.mvp_kill_chat,
+        },
+    )
+
+
 @router.get("/mvp/health")
 async def mvp_health():
     """MVP readiness probe — provider gate status + runtime snapshot."""

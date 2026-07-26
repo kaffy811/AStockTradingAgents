@@ -1,0 +1,47 @@
+{
+  "schema_version": "pi_canary_daily_report_v1",
+  "phase": "MVP-R1.1",
+  "date": "TBD",
+  "day": 6,
+  "note": "Fill with actual observed data. Do NOT prefill. Zero means zero.",
+
+  "users": {
+    "invited_cumulative": null,
+    "activated_cumulative": null,
+    "daily_active": null,
+    "new_today": null
+  },
+
+  "product": {
+    "stock_searches": null,
+    "chat_requests": null,
+    "successful_answers": null,
+    "failed_answers": null,
+    "fallbacks": null,
+    "follow_up_messages": null
+  },
+
+  "feedback": {
+    "feedback_count": null,
+    "helpful_count": null,
+    "unhelpful_count": null
+  },
+
+  "safety": {
+    "quota_blocks": null,
+    "http_5xx": null,
+    "frontend_errors": null,
+    "session_mismatches": 0,
+    "duplicate_messages": 0,
+    "zero_tolerance_violations": 0
+  },
+
+  "latency": {
+    "p50_ms": null,
+    "p95_ms": null
+  },
+
+  "wave_decision": null,
+  "issues_found": [],
+  "p0_blockers": []
+}

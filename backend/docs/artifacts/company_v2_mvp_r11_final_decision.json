@@ -1,0 +1,54 @@
+{
+  "schema_version": "pi_canary_final_decision_v3",
+  "phase": "MVP-R1.1",
+  "generated_at": "2026-07-26T08:30:00Z",
+  "phase_label": "Invite-Only Launch Ready — State B (Awaiting First Users)",
+
+  "decision": "INVITE_ONLY_WAVE1_READY",
+
+  "gates_resolved_this_phase": [
+    "L2: Wave management config added",
+    "L3: mvp_public_registration_enabled=false confirmed",
+    "L5: mvp_daily_quota_per_user=10 + GET /mvp/quota/check/{user_id}",
+    "L6: mvp_global_daily_quota=300 + mvp_max_concurrent_per_user=1",
+    "L13: Kill switch drill — 7 switches verified"
+  ],
+
+  "launch_gate_summary": {
+    "l_gates_pass": 16,
+    "l_gates_fail": 0
+  },
+
+  "invited_users": 0,
+  "activated_users": 0,
+  "wave": 0,
+
+  "real_provider_executed": false,
+  "real_provider_calls": 0,
+  "real_provider_cost_cny": "0",
+
+  "runtime_final": {
+    "config_version": 12,
+    "provider_mode": "staging_replay",
+    "shadow_rollout_percent": 100,
+    "live_rollout_percent": 1,
+    "real_provider_enabled": false,
+    "real_provider_kill_switch": true,
+    "production_enabled": false,
+    "public_registration_enabled": false
+  },
+
+  "wave1_authorized": true,
+  "invite_users_may_be_added": true,
+  "real_ai_provider_may_be_advertised": false,
+  "public_production_authorized": false,
+  "further_pre_launch_phases_required": false,
+
+  "owner_actions_to_launch": [
+    "1. Generate invite codes: POST /mvp/invites (admin auth required)",
+    "2. Send invite codes to up to 10 Wave-1 users securely",
+    "3. Monitor Wave-1 for 2+ days before Wave-2",
+    "4. Update company_v2_mvp_r11_day1.json through day7.json with actual data",
+    "5. Complete company_v2_mvp_r11_week1_review.md on Day 7"
+  ]
+}

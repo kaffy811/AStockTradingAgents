@@ -306,6 +306,30 @@ class Settings(BaseSettings):
     company_v2_financial_fusion_worker_lease_seconds: int = 60
     company_v2_financial_fusion_worker_heartbeat_seconds: int = 15
 
+    # ── Phase MVP-R1.1: Invite-Only MVP Launch Controls ───────────────────────
+    # Wave management
+    mvp_max_invited_users: int = 50
+    mvp_wave1_max_users: int = 10
+    mvp_wave2_max_users: int = 30
+    mvp_wave3_max_users: int = 50
+    mvp_current_wave: int = 0          # 0=not started, 1=wave1, 2=wave2, 3=wave3
+
+    # Quota
+    mvp_daily_quota_per_user: int = 10
+    mvp_global_daily_quota: int = 300
+    mvp_max_concurrent_per_user: int = 1
+
+    # Access control
+    mvp_public_registration_enabled: bool = False   # MUST remain False for invite-only
+    mvp_new_invites_enabled: bool = True
+    mvp_new_login_enabled: bool = True
+    mvp_new_chat_enabled: bool = True
+
+    # Kill switches (independent)
+    mvp_kill_invites: bool = False
+    mvp_kill_login: bool = False
+    mvp_kill_chat: bool = False
+
     # Auth
     secret_key: str = Field(..., min_length=16)
     access_token_expire_minutes: int = 60
