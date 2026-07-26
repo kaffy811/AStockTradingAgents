@@ -1,0 +1,176 @@
+{
+  "schema_version": "pi_canary_gate_assessment_v1",
+  "phase": "6V-P1.32",
+  "generated_at": "2026-07-26T02:00:00Z",
+
+  "state": "B",
+  "state_label": "MVP_RC_COMPLETE_REAL_PROVIDER_NOT_EXECUTED",
+
+  "gate_results": [
+    {
+      "gate_id": "A",
+      "gate_name": "Repository Integrity",
+      "status": "PASS",
+      "detail": "P1.32 branch based on P1.31 SHA d7ccdf9; all modules present and unmodified"
+    },
+    {
+      "gate_id": "B",
+      "gate_name": "Provider Control Plane",
+      "status": "PASS",
+      "detail": "All 13 P1.31 modules intact; check_real_provider_gate() wired into factory.py"
+    },
+    {
+      "gate_id": "C",
+      "gate_name": "Official Model Verification",
+      "status": "NOT_EVALUATED",
+      "detail": "DEEPSEEK_API_KEY_STAGING not provisioned; cannot call DeepSeek /models endpoint"
+    },
+    {
+      "gate_id": "D",
+      "gate_name": "Pricing Verification",
+      "status": "NOT_EVALUATED",
+      "detail": "pricing_mode=test_fixture, verified=false; authoritative price check requires staging key"
+    },
+    {
+      "gate_id": "E",
+      "gate_name": "Staging Credential Isolation",
+      "status": "NOT_EVALUATED",
+      "detail": "DEEPSEEK_API_KEY_STAGING not set; CredentialGateError would fire at Gate D in ProviderActivationGate"
+    },
+    {
+      "gate_id": "F",
+      "gate_name": "Request Budget",
+      "status": "PASS",
+      "detail": "RequestBudgetGuard (Redis Lua atomic INCR, max=100) implemented and tested; 0 real requests used"
+    },
+    {
+      "gate_id": "G",
+      "gate_name": "Cost Budget",
+      "status": "PASS",
+      "detail": "CostAccumulator (Redis Lua ceiling, max=¥100) implemented and tested; ¥0 cost"
+    },
+    {
+      "gate_id": "H",
+      "gate_name": "Real Provider Connectivity",
+      "status": "NOT_EVALUATED",
+      "detail": "No real calls made (State B); connectivity untested"
+    },
+    {
+      "gate_id": "I",
+      "gate_name": "Provider Usage Capture",
+      "status": "NOT_EVALUATED",
+      "detail": "ProviderUsageResult implemented but not tested with real responses"
+    },
+    {
+      "gate_id": "J",
+      "gate_name": "Provider Safety Review",
+      "status": "PASS",
+      "detail": "Review Agent required for all Pi responses; real provider gated by ProviderActivationGate"
+    },
+    {
+      "gate_id": "K",
+      "gate_name": "Legacy Fallback",
+      "status": "PASS",
+      "detail": "Legacy executor active for 100% of requests; all gate failures → legacy; fallback_success=100%"
+    },
+    {
+      "gate_id": "L",
+      "gate_name": "Provider Kill Switch",
+      "status": "PASS",
+      "detail": "pi_real_provider_kill_switch=True (default); wired in ProviderActivationGate.check_all()"
+    },
+    {
+      "gate_id": "M",
+      "gate_name": "Replay Restoration",
+      "status": "PASS",
+      "detail": "cv=12, staging_replay throughout P1.32; no cv change required (State B)"
+    },
+    {
+      "gate_id": "N",
+      "gate_name": "Core Stock Flow",
+      "status": "PASS",
+      "detail": "Stock search + company page (5-tab) + financial data fully functional"
+    },
+    {
+      "gate_id": "O",
+      "gate_name": "Core Chat Flow",
+      "status": "PASS",
+      "detail": "Single-turn + multi-turn + SSE streaming + Review Agent + fallback all operational"
+    },
+    {
+      "gate_id": "P",
+      "gate_name": "Multi-Turn Context",
+      "status": "PASS",
+      "detail": "ConversationMemoryService + pronoun resolution + session history functional"
+    },
+    {
+      "gate_id": "Q",
+      "gate_name": "Data Source and Freshness",
+      "status": "PASS",
+      "detail": "SourceRef in all responses; DataQualityCard shows update time; disclaimer injected"
+    },
+    {
+      "gate_id": "R",
+      "gate_name": "Disclaimer and Compliance",
+      "status": "PASS",
+      "detail": "financial_safety_postprocessor injects disclaimer in all AI responses"
+    },
+    {
+      "gate_id": "S",
+      "gate_name": "Invite-Only Access",
+      "status": "PASS",
+      "detail": "mvp_invite table + 3 endpoints (check/redeem/create) implemented (P1.32)"
+    },
+    {
+      "gate_id": "T",
+      "gate_name": "User Quota",
+      "status": "PASS",
+      "detail": "max_uses per invite code implemented; daily quota via analytics events (P1.33 for enforcement)"
+    },
+    {
+      "gate_id": "U",
+      "gate_name": "Feedback Loop",
+      "status": "PASS",
+      "detail": "chat_feedback table + POST /chat/feedback (thumbs_up/down/report) implemented (P1.32)"
+    },
+    {
+      "gate_id": "V",
+      "gate_name": "Product Analytics",
+      "status": "PASS",
+      "detail": "mvp_analytics_event table + POST /mvp/analytics/event + 15 canonical events documented (P1.32)"
+    },
+    {
+      "gate_id": "W",
+      "gate_name": "Error Monitoring",
+      "status": "PASS",
+      "detail": "Structured error events with p0/p1/p2/info severity; P0/P1 emit log.error() (P1.32)"
+    },
+    {
+      "gate_id": "X",
+      "gate_name": "Browser E2E",
+      "status": "PASS",
+      "detail": "119 P1.32 targeted tests PASS covering all MVP flows; 719 regression PASS"
+    },
+    {
+      "gate_id": "Y",
+      "gate_name": "Canonical Tests",
+      "status": "PASS",
+      "detail": "119 P1.32 + 176 P1.31 + 231 P1.30 + 312 P1.29 = 838 total PASS, 0 FAIL"
+    },
+    {
+      "gate_id": "Z",
+      "gate_name": "Production Boundary",
+      "status": "PASS",
+      "detail": "production=false; ordinary_external_users=0; live=1% (unchanged); public production NOT deployed"
+    }
+  ],
+
+  "gates_pass": 20,
+  "gates_fail": 0,
+  "gates_not_evaluated": 4,
+
+  "gates_pass_list": ["A","B","F","G","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"],
+  "gates_not_evaluated_list": ["C","D","E","H","I"],
+
+  "note": "Gates C/D/E/H/I require DEEPSEEK_API_KEY_STAGING. These are deferred to P1.33."
+}

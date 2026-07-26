@@ -20,6 +20,7 @@ from app.routers.report_discovery import router as report_discovery_router
 from app.routers.report_rag import router as report_rag_router
 from app.routers.report_chat import report_chat_router
 from app.routers.pi_canary_provider import router as pi_canary_provider_router
+from app.routers.mvp import router as mvp_router
 from app.services.cache_service import set_event_loop
 from app.core.structured_debug_logger import CompanyV2RequestIdMiddleware
 
@@ -121,3 +122,4 @@ app.include_router(company_v2_debug_router)  # /api/v2/company/{market}/{symbol}
 app.include_router(company_v2_financial_fusion_router)  # /api/v2/company/{market}/{symbol}/financial-fusion/...
 app.include_router(company_v2_report_rag_router)  # /api/v2/company/{market}/{symbol}/reports/{id}/rag/...
 app.include_router(pi_canary_provider_router)     # /pi-canary/provider-budget (P1.31)
+app.include_router(mvp_router)                    # /mvp/*, /chat/feedback (P1.32)

@@ -1,0 +1,45 @@
+{
+  "schema_version": "pi_canary_runtime_probe_v1",
+  "phase": "6V-P1.32",
+  "probe_type": "final",
+  "generated_at": "2026-07-26T02:00:00Z",
+
+  "config_version": 12,
+  "provider_mode": "staging_replay",
+  "real_provider_enabled": false,
+  "real_provider_kill_switch": true,
+
+  "shadow_rollout_percent": 100,
+  "shadow_salt": "pi_v1",
+  "live_rollout_percent": 1,
+  "live_salt": "pi_live_v1",
+
+  "request_cap": 100,
+  "cost_cap_cny": 100.0,
+  "max_concurrency": 2,
+  "rate_limit_per_minute": 60,
+  "timeout_seconds": 30,
+
+  "production": false,
+  "ordinary_external_users": 0,
+  "cumulative_live_requests": 708,
+  "cumulative_violations": 0,
+
+  "activation_gate_result": {
+    "gate_pass": false,
+    "blocked_by": "Real provider kill switch is active (pi_real_provider_kill_switch=True)",
+    "error_class": "KillSwitchError"
+  },
+
+  "mvp_endpoints_registered": [
+    "POST /mvp/invites/check",
+    "POST /mvp/invites/redeem",
+    "POST /mvp/invites",
+    "POST /chat/feedback",
+    "POST /mvp/analytics/event",
+    "GET /mvp/health"
+  ],
+
+  "staging_credential_present": false,
+  "state": "B — MVP RC implemented, real provider NOT activated"
+}

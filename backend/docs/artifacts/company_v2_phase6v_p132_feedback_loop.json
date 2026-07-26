@@ -1,0 +1,56 @@
+{
+  "schema_version": "mvp_feedback_v1",
+  "phase": "6V-P1.32",
+  "generated_at": "2026-07-26T02:00:00Z",
+
+  "implementation_status": "IMPLEMENTED",
+
+  "table": "chat_feedback",
+  "migration": "n2o3p4q5r6s7",
+
+  "endpoint": {
+    "method": "POST",
+    "path": "/chat/feedback",
+    "auth": "optional"
+  },
+
+  "feedback_types": [
+    "thumbs_up",
+    "thumbs_down",
+    "report"
+  ],
+
+  "feedback_details_for_report": [
+    "data_inaccurate",
+    "not_relevant",
+    "load_failed",
+    "answer_too_long",
+    "other"
+  ],
+
+  "stored_fields": {
+    "session_id": "Chat session identifier",
+    "message_id": "Specific message identifier",
+    "user_id": "Optional user ID",
+    "feedback_type": "thumbs_up | thumbs_down | report",
+    "feedback_detail": "Subcategory for report type",
+    "comment": "Optional free text (max 1000 chars)",
+    "answer_snippet": "First 200 chars of answer (no PII, no full prompt)"
+  },
+
+  "not_stored": [
+    "Full answer text",
+    "User prompt / question",
+    "Authorization headers",
+    "API keys",
+    "Session tokens",
+    "Personal information"
+  ],
+
+  "computable_metrics": [
+    "thumbs_up rate = thumbs_up / (thumbs_up + thumbs_down)",
+    "report rate = report / total_answers",
+    "top report categories",
+    "feedback by session / symbol / time"
+  ]
+}

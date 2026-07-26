@@ -1,0 +1,31 @@
+{
+  "schema_version": "pi_canary_provider_activation_v1",
+  "phase": "6V-P1.32",
+  "generated_at": "2026-07-26T02:00:00Z",
+
+  "activation_attempted": false,
+  "activation_state": "NOT_EXECUTED",
+
+  "gate_evaluation_order": [
+    {"check": "I1_kill_switch", "result": "BLOCKED", "detail": "pi_real_provider_kill_switch=True (default)"},
+    {"check": "I2_enabled_flag", "result": "NOT_REACHED", "detail": "Blocked at I1"},
+    {"check": "D_credential", "result": "NOT_REACHED", "detail": "Blocked at I1"},
+    {"check": "F_request_budget", "result": "NOT_REACHED", "detail": "Blocked at I1"},
+    {"check": "G_cost_budget", "result": "NOT_REACHED", "detail": "Blocked at I1"},
+    {"check": "H1_rate_limit", "result": "NOT_REACHED", "detail": "Blocked at I1"},
+    {"check": "H2_concurrency", "result": "NOT_REACHED", "detail": "Blocked at I1"},
+    {"check": "I3_circuit_breaker", "result": "NOT_REACHED", "detail": "Blocked at I1"}
+  ],
+
+  "blocker_summary": "Kill switch active + credential missing + enabled=False = triple fail-closed protection",
+
+  "fail_closed_verification": {
+    "requests_sent": 0,
+    "real_provider_calls": 0,
+    "legacy_fallback": "all requests served by staging_replay (as before P1.32)",
+    "config_version_unchanged": true,
+    "cv": 12
+  },
+
+  "note": "P1.32 delivers State B. Real provider activation requires P1.33 (staging key provisioned + pricing verified + explicit authorization)."
+}

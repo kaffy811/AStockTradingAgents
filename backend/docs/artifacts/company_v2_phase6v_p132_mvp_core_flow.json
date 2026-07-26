@@ -1,0 +1,26 @@
+{
+  "schema_version": "mvp_core_flow_v1",
+  "phase": "6V-P1.32",
+  "generated_at": "2026-07-26T02:00:00Z",
+
+  "core_flow_status": "PASS",
+
+  "flow_steps": {
+    "login": {"status": "PASS", "implementation": "JWT auth, /auth/login endpoint, token refresh"},
+    "invite_access": {"status": "PASS", "implementation": "mvp_invite table + POST /mvp/invites/check + redeem (P1.32)"},
+    "stock_search": {"status": "PASS", "implementation": "/api/v1/stocks/search, StockMasterService"},
+    "company_page": {"status": "PASS", "implementation": "StockDetailView 5-tab: Overview/Financial/Technical/News/Dashboard"},
+    "financial_data": {"status": "PASS", "implementation": "FundamentalDataService + AKShare/BaoStock/Tushare fallback chain"},
+    "chat_single_turn": {"status": "PASS", "implementation": "/api/v1/chat/sessions + /messages/stream SSE"},
+    "chat_multi_turn": {"status": "PASS", "implementation": "ConversationMemoryService + session context"},
+    "review_agent": {"status": "PASS", "implementation": "ReviewAgent validates before Pi visible"},
+    "fallback": {"status": "PASS", "implementation": "legacy executor fallback on any Pi/provider failure"},
+    "disclaimer": {"status": "PASS", "implementation": "Injected in all financial responses via financial_safety_postprocessor"},
+    "data_source": {"status": "PASS", "implementation": "SourceRef in all answers, DataQualityCard.vue"},
+    "history": {"status": "PASS", "implementation": "chat_sessions + chat_messages + HistoryView"},
+    "feedback": {"status": "PASS", "implementation": "POST /chat/feedback → chat_feedback table (P1.32)"}
+  },
+
+  "mvp_blocker_exists": false,
+  "note": "All core flow steps verified as implemented. Real provider activation deferred to P1.33 (State B)."
+}

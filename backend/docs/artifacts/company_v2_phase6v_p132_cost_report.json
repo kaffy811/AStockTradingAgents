@@ -1,0 +1,20 @@
+{
+  "schema_version": "pi_canary_cost_report_v1",
+  "phase": "6V-P1.32",
+  "generated_at": "2026-07-26T02:00:00Z",
+
+  "real_provider_cost_cny": "0.00",
+  "request_count": 0,
+  "budget_cap_requests": 100,
+  "budget_cap_cny": "100.00",
+  "budget_utilized_percent": "0%",
+  "budget_remaining_requests": 100,
+  "budget_remaining_cny": "100.00",
+
+  "cost_per_request_avg_cny": null,
+  "model_used": null,
+  "pricing_verified": false,
+  "pricing_mode": "test_fixture",
+
+  "note": "State B — no real provider calls executed. Budget fully available for P1.33."
+}
