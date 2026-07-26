@@ -1,0 +1,24 @@
+{
+  "schema_version": "pi_canary_replay_restoration_v2",
+  "phase": "6V-P1.33",
+  "generated_at": "2026-07-26T04:00:00Z",
+  "gate": "M",
+
+  "state": "B",
+  "note": "No real provider activation occurred. staging_replay mode was never changed. Nothing to restore.",
+
+  "cv_path": {
+    "p132_cv": 12,
+    "p133_target_cv_staging_real": 13,
+    "p133_target_cv_replay_restored": 14,
+    "actual_cv": 12,
+    "cv_changed": false
+  },
+
+  "provider_mode_before": "staging_replay",
+  "provider_mode_after": "staging_replay",
+  "mode_changed": false,
+
+  "gate_m_result": "PASS",
+  "gate_m_note": "Replay mode unchanged. cv=12 maintained. No restoration required (nothing was changed)."
+}

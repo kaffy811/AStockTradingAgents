@@ -1,0 +1,49 @@
+{
+  "schema_version": "pi_canary_preflight_v2",
+  "phase": "6V-P1.33",
+  "generated_at": "2026-07-26T04:00:00Z",
+  "base_sha": "386f357279e3de456cd25e630f1d2016a6dccf93",
+  "base_branch": "release/demo-staging",
+  "worktree": "/private/tmp/tradingagents-p133",
+
+  "p132_base_validation": {
+    "mvp_release_candidate": true,
+    "gates_pass": 20,
+    "gates_fail": 0,
+    "gates_not_evaluated": 6,
+    "tests_pass": 838,
+    "tests_fail": 0,
+    "real_provider_executed": false,
+    "real_provider_requests": 0,
+    "config_version": 12
+  },
+
+  "p133_scope": "Final MVP gate: verify model IDs, verify pricing, audit provider call path, confirm State B fail-closed, document real provider NOT_EXECUTED outcome",
+
+  "credential_status": {
+    "DEEPSEEK_API_KEY_STAGING": "NOT_SET",
+    "real_provider_authorized": false,
+    "state": "B"
+  },
+
+  "runtime_snapshot": {
+    "config_version": 12,
+    "provider_mode": "staging_replay",
+    "shadow_rollout_percent": 100,
+    "shadow_salt": "pi_v1",
+    "live_rollout_percent": 1,
+    "live_salt": "pi_live_v1",
+    "real_provider_enabled": false,
+    "real_provider_kill_switch": true,
+    "production_enabled": false
+  },
+
+  "p0_gaps": [],
+  "p1_gaps": [
+    "DEEPSEEK_API_KEY_STAGING not provisioned — deferred to MVP-R1 or explicit authorization",
+    "Budget guard uses CNY, pricing verified in USD — exchange rate estimate used"
+  ],
+
+  "proceed_with_p133": true,
+  "proceed_note": "State B confirmed. P1.33 will document verified findings and State B outcome without executing real provider calls."
+}
