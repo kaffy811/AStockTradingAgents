@@ -1,0 +1,20 @@
+{
+  "schema_version": "pi_canary_provider_safety_v1",
+  "phase": "MVP-R1",
+  "generated_at": "2026-07-26T06:00:00Z",
+
+  "safety_checks": [
+    {"check": "no_pii_in_requests", "result": "PASS"},
+    {"check": "no_credentials_in_requests", "result": "PASS"},
+    {"check": "disclaimer_present", "result": "PASS"},
+    {"check": "review_agent_validates_output", "result": "PASS"},
+    {"check": "stock_binding_verified", "result": "PASS"},
+    {"check": "session_isolation_verified", "result": "PASS"},
+    {"check": "duplicate_message_prevention", "result": "PASS"}
+  ],
+
+  "real_provider_safety_checks": "NOT_EXECUTED (State B)",
+  "approved_pi_visible": 0,
+  "rejected_pi_visible": 0,
+  "terminal_violations": 0
+}

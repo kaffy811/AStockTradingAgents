@@ -1,0 +1,13 @@
+{
+  "schema_version": "pi_canary_quota_v1",
+  "phase": "MVP-R1",
+  "generated_at": "2026-07-26T06:00:00Z",
+
+  "daily_quota_per_user": 10,
+  "global_daily_chat_quota": 300,
+  "global_weekly_cost_budget_cny": 50,
+
+  "quota_system": "mvp_analytics_event + per-user counter in DB",
+  "gate_t_result": "PASS",
+  "gate_l11_result": "PASS"
+}

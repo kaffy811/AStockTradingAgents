@@ -1,0 +1,34 @@
+{
+  "schema_version": "pi_canary_reconciliation_v1",
+  "phase": "MVP-R1",
+  "generated_at": "2026-07-26T06:00:00Z",
+
+  "p133_merge_sha": "cf4c65b1522736e9e66bd8053885b61a51520816",
+  "p133_feature_sha": "772e20b",
+
+  "official_models_verified": true,
+  "pricing_verified": true,
+
+  "pricing_currency_before_mvp_r1": "USD (with CNY estimate)",
+  "pricing_currency_after_mvp_r1": "CNY",
+  "pricing_requires_fx_conversion": false,
+
+  "pricing_p0_bug": "PricingRegistry read entry.get('pricing', {}) but JSON had no 'pricing' key → Decimal('0') for all CNY prices. Fixed in MVP-R1 by adding 'pricing' key with official CNY values.",
+
+  "real_provider_gate_complete_before_fix": false,
+  "real_provider_gate_complete_after_fix": true,
+  "gate_checks_before": 3,
+  "gate_checks_after": 8,
+
+  "staging_credential_present_before_fix": false,
+  "staging_credential_present_after_fix": false,
+
+  "real_provider_calls_before_phase": 0,
+  "invite_only_launch_authorized_by_owner": true,
+  "public_production_authorized": false,
+
+  "p133_partial_gates_resolved": [
+    "Gate C (Call Path Budget Controls) — now PASS: 8/8 checks in formal call path via ProviderControlPlane",
+    "Gate G (Budget Guard Currency) — now PASS: official CNY prices used directly, no FX conversion"
+  ]
+}

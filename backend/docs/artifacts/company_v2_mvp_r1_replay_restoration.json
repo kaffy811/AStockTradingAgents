@@ -1,0 +1,13 @@
+{
+  "schema_version": "pi_canary_replay_restoration_v2",
+  "phase": "MVP-R1",
+  "generated_at": "2026-07-26T06:00:00Z",
+
+  "state": "B",
+  "provider_mode_changed": false,
+  "config_version_changed": false,
+  "actual_cv": 12,
+  "provider_mode": "staging_replay",
+  "rp6_result": "PASS",
+  "note": "Replay mode unchanged. No activation — no restoration needed."
+}
