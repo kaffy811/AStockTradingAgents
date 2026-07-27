@@ -98,7 +98,14 @@ Docker + Alembic 部署就绪，183 模块前端 build 通过，compileall 零�
 
 | 数字 | 背景 |
 |------|------|
-| 183 | Vite 生产 build 模块数 |
+| 120s → 35–45s | 4 Agent 从串行改为并行后的综合报告端到端时延，约 3× 提升 |
+| 16/16 | 4 个 Uvicorn worker + Redis registry 压测通过的并发分析 run（两种 engine 各 8 个） |
+| 3/3、0 重复 | Redis `after_event_id` 重连回放事件全部正确；LangGraph 多 worker 测试 event_id 无重复 |
+| 4,975/4,975 | 后端自动化测试通过（另 15 个 live-service 测试按 marker 跳过，0 failed） |
+| 688/688 | 前端 Vitest 自动化测试通过，62 个测试文件，0 failed |
+| 4 / 1,217 | 已持久化的活跃 RAG 报告文档 / chunks（211 + 299 + 311 + 396） |
+| 100% | 601686 多报告 RAG 评估 retrieval hit rate 与 citation page accuracy（8 个评估问题） |
+| 109 / 11 | FastAPI router 中声明的 HTTP 接口 / Vue 顶层业务页面 |
 | 5,166 | stock_master A 股覆盖数（申万 CSV 导入） |
 | 30 | 申万一级行业数 |
 | 6 | 分析范围（analysis_scope）选项数 |
@@ -107,3 +114,5 @@ Docker + Alembic 部署就绪，183 模块前端 build 通过，compileall 零�
 | 1 | SSE 断线自动重连次数（500ms delay，after_event_id replay）|
 | b4d8e2f1a6c9 | 最新 Alembic migration head |
 | 3 | cancel 检查点数量（agent 前/synthesis 前/report_ready 前）|
+
+> 数据口径：以上来自仓库回看测试记录与 release artifacts。当前没有可核验的“API fallback 前后请求成功率”、BM25 fallback 实际次数、内部用户数、周活跃用户数或节省人工研究时间，因此不写入简历成果数字。后续应通过 API 请求日志、RAG telemetry 与匿名产品埋点补采。

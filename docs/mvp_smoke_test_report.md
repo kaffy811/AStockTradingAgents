@@ -11,7 +11,7 @@
 ### 后端启动
 
 ```bash
-cd backend
+ cd backend
 uv run uvicorn app.main:app --reload --port 8000
 ```
 
