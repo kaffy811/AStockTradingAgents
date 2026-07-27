@@ -1,225 +1,230 @@
 <template>
-  <div class="admin-invites">
-    <div class="admin-header">
-      <h1>Invite Management</h1>
-      <span class="admin-badge">Admin</span>
+  <div class="admin-page">
+
+    <!-- ── 403 guard ─────────────────────────────────────────────────────── -->
+    <div v-if="!authStore.isAdmin" class="forbidden-card card">
+      <h2>403 — 权限不足</h2>
+      <p>此页面仅管理员可访问。</p>
+      <RouterLink to="/" class="btn btn-primary">返回首页</RouterLink>
     </div>
 
-    <div v-if="authError" class="error-banner">
-      {{ authError }}
-    </div>
+    <!-- ── Admin UI ─────────────────────────────────────────────────────── -->
+    <template v-else>
+      <div class="admin-header">
+        <h1 class="admin-title">管理后台 — 邀请码</h1>
+        <span class="admin-badge">Admin</span>
+      </div>
 
-    <!-- Create invite form -->
-    <section class="card create-section">
-      <h2>Create Invite Code</h2>
-      <form @submit.prevent="createInvite" class="create-form">
-        <label>
-          Bind to Email (optional)
-          <input v-model="form.email" type="email" placeholder="user@example.com" />
-        </label>
-        <label>
-          Max Uses
-          <input v-model.number="form.max_uses" type="number" min="1" max="100" />
-        </label>
-        <label>
-          Note (optional)
-          <input v-model="form.note" type="text" maxlength="500" placeholder="e.g. Beta tester, Wave 1" />
-        </label>
-        <button type="submit" :disabled="creating">
-          {{ creating ? 'Creating…' : 'Create Invite' }}
-        </button>
-      </form>
+      <!-- Global error -->
+      <div v-if="globalError" class="alert-error">{{ globalError }}</div>
 
-      <!-- Show the generated code once -->
-      <div v-if="newCode" class="code-reveal">
-        <p class="code-label">Copy this code now — it will not be shown again:</p>
-        <div class="code-box">
-          <span class="code-text">{{ newCode }}</span>
-          <button class="copy-btn" @click="copyCode">{{ copied ? 'Copied!' : 'Copy' }}</button>
+      <!-- ── Create form ─────────────────────────────────────────────────── -->
+      <section class="card create-section">
+        <h2 class="section-title">生成邀请码</h2>
+        <form @submit.prevent="createInvite" class="create-form">
+          <div class="form-group">
+            <label>绑定邮箱（可选）</label>
+            <input v-model="form.email" type="email" placeholder="user@example.com" />
+          </div>
+          <div class="form-group">
+            <label>最大使用次数</label>
+            <input v-model.number="form.max_uses" type="number" min="1" max="100" />
+          </div>
+          <div class="form-group">
+            <label>备注（可选）</label>
+            <input v-model="form.note" type="text" maxlength="500" placeholder="e.g. 内测用户 Wave 1" />
+          </div>
+          <button type="submit" class="btn btn-primary" :disabled="creating">
+            <span v-if="creating" class="spinner" />
+            <span v-else>生成邀请码</span>
+          </button>
+        </form>
+
+        <!-- ── One-time code reveal ───────────────────────────────────────── -->
+        <div v-if="newCode" class="code-reveal">
+          <p class="code-reveal-warning">
+            ⚠️ 完整邀请码只显示一次，请立即复制并安全传递给用户。
+          </p>
+          <div class="code-box">
+            <span class="code-text">{{ newCode }}</span>
+            <button type="button" class="copy-btn" @click="copyCode">
+              {{ copied ? '✓ 已复制' : '复制' }}
+            </button>
+          </div>
+          <button type="button" class="dismiss-btn" @click="newCode = null">
+            我已保存，关闭
+          </button>
         </div>
-        <button class="dismiss-btn" @click="newCode = null">Dismiss</button>
-      </div>
-    </section>
+      </section>
 
-    <!-- Invite list -->
-    <section class="card list-section">
-      <div class="list-header">
-        <h2>All Invite Codes</h2>
-        <button @click="loadInvites" :disabled="loading" class="refresh-btn">
-          {{ loading ? 'Loading…' : 'Refresh' }}
-        </button>
-      </div>
+      <!-- ── Invite list ─────────────────────────────────────────────────── -->
+      <section class="card list-section">
+        <div class="list-header">
+          <h2 class="section-title">全部邀请码</h2>
+          <button type="button" class="btn-refresh" @click="loadInvites" :disabled="loading">
+            {{ loading ? '加载中…' : '刷新' }}
+          </button>
+        </div>
 
-      <div v-if="invites.length === 0 && !loading" class="empty-state">
-        No invite codes yet.
-      </div>
+        <p v-if="!loading && invites.length === 0" class="empty-state">
+          暂无邀请码，点击上方生成。
+        </p>
 
-      <table v-else class="invite-table">
-        <thead>
-          <tr>
-            <th>Prefix</th>
-            <th>Email</th>
-            <th>Uses</th>
-            <th>Status</th>
-            <th>Note</th>
-            <th>Created</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="inv in invites" :key="inv.id" :class="{ redeemed: inv.redeemed }">
-            <td class="mono">{{ inv.code_prefix }}…</td>
-            <td>{{ inv.email || '—' }}</td>
-            <td>{{ inv.use_count }} / {{ inv.max_uses }}</td>
-            <td>
-              <span :class="statusClass(inv)">{{ statusLabel(inv) }}</span>
-            </td>
-            <td class="note-cell">{{ inv.note || '' }}</td>
-            <td class="date-cell">{{ formatDate(inv.created_at) }}</td>
-            <td>
+        <div v-else class="invite-list">
+          <div
+            v-for="inv in invites"
+            :key="inv.id"
+            class="invite-row"
+            :class="{ 'invite-row--used': inv.redeemed || inv.use_count >= inv.max_uses }"
+          >
+            <div class="inv-main">
+              <span class="inv-code mono">{{ inv.code_prefix }}</span>
+              <span :class="badgeClass(inv)" class="badge">{{ statusLabel(inv) }}</span>
+            </div>
+            <div class="inv-meta">
+              <span v-if="inv.email" class="meta-item">📧 {{ inv.email }}</span>
+              <span class="meta-item">{{ inv.use_count }}/{{ inv.max_uses }} 次</span>
+              <span class="meta-item date">创建 {{ formatDate(inv.created_at) }}</span>
+              <span v-if="inv.redeemed_at" class="meta-item date">使用 {{ formatDate(inv.redeemed_at) }}</span>
+              <span v-if="inv.note" class="meta-item note">{{ inv.note }}</span>
+            </div>
+            <div class="inv-actions">
               <button
-                v-if="!inv.redeemed"
+                v-if="!inv.redeemed && inv.use_count < inv.max_uses"
+                type="button"
                 class="revoke-btn"
-                @click="revokeInvite(inv.id)"
-              >Revoke</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
+                @click="revokeInvite(inv)"
+              >撤销</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </template>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { RouterLink } from 'vue-router'
+import { useAuthStore } from '../stores/auth.js'
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
+const authStore = useAuthStore()
 
-const invites = ref([])
-const loading = ref(false)
-const creating = ref(false)
-const authError = ref(null)
-const newCode = ref(null)
-const copied = ref(false)
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8000/api/v1'
 
-const form = ref({
-  email: '',
-  max_uses: 1,
-  note: '',
-})
+// ── State ─────────────────────────────────────────────────────────────────
+const invites     = ref([])
+const loading     = ref(false)
+const creating    = ref(false)
+const globalError = ref('')
+const newCode     = ref(null)
+const copied      = ref(false)
 
-function getToken() {
-  return localStorage.getItem('access_token') || ''
-}
+const form = ref({ email: '', max_uses: 1, note: '' })
 
+// ── Helpers ───────────────────────────────────────────────────────────────
 function authHeaders() {
   return {
     'Content-Type': 'application/json',
-    Authorization: `Bearer ${getToken()}`,
+    Authorization: `Bearer ${localStorage.getItem('ta_token') || ''}`,
   }
 }
 
+// ── Load invites ──────────────────────────────────────────────────────────
 async function loadInvites() {
-  loading.value = true
-  authError.value = null
+  if (!authStore.isAdmin) return
+  loading.value    = true
+  globalError.value = ''
   try {
-    const res = await fetch(`${API_BASE}/mvp/admin/invites`, {
-      headers: authHeaders(),
-    })
-    if (res.status === 403) {
-      authError.value = 'Access denied — admin account required.'
-      return
-    }
-    if (res.status === 401) {
-      authError.value = 'Not logged in. Please log in as an admin user.'
-      return
-    }
+    const res = await fetch(`${API_BASE}/admin/invites`, { headers: authHeaders() })
+    if (res.status === 403) { globalError.value = '权限不足，请以管理员账号登录。'; return }
+    if (!res.ok) { globalError.value = `加载失败 (${res.status})`; return }
     invites.value = await res.json()
   } catch (e) {
-    authError.value = `Failed to load invites: ${e.message}`
+    globalError.value = `网络错误：${e.message}`
   } finally {
     loading.value = false
   }
 }
 
+// ── Create invite ─────────────────────────────────────────────────────────
 async function createInvite() {
-  creating.value = true
-  newCode.value = null
-  authError.value = null
+  creating.value   = true
+  newCode.value    = null
+  globalError.value = ''
   try {
     const body = {
       max_uses: form.value.max_uses || 1,
-      email: form.value.email || null,
-      note: form.value.note || null,
+      email:    form.value.email    || null,
+      note:     form.value.note     || null,
     }
-    const res = await fetch(`${API_BASE}/mvp/invites`, {
+    const res = await fetch(`${API_BASE}/admin/invites`, {
       method: 'POST',
       headers: authHeaders(),
       body: JSON.stringify(body),
     })
-    if (res.status === 403) {
-      authError.value = 'Access denied — admin account required.'
-      return
-    }
+    if (res.status === 403) { globalError.value = '权限不足。'; return }
     if (!res.ok) {
       const err = await res.json().catch(() => ({}))
-      authError.value = err.detail || 'Failed to create invite.'
+      globalError.value = err.detail || '生成失败'
       return
     }
     const data = await res.json()
     newCode.value = data.invite_code
-    form.value = { email: '', max_uses: 1, note: '' }
+    form.value    = { email: '', max_uses: 1, note: '' }
     await loadInvites()
   } finally {
     creating.value = false
   }
 }
 
-async function revokeInvite(id) {
-  if (!confirm('Revoke this invite code? This cannot be undone.')) return
-  authError.value = null
+// ── Revoke invite ─────────────────────────────────────────────────────────
+async function revokeInvite(inv) {
+  if (!confirm(`确定撤销邀请码 ${inv.code_prefix}？此操作不可恢复。`)) return
+  globalError.value = ''
   try {
-    const res = await fetch(`${API_BASE}/mvp/admin/invites/${id}`, {
-      method: 'DELETE',
+    const res = await fetch(`${API_BASE}/admin/invites/${inv.id}/revoke`, {
+      method: 'POST',
       headers: authHeaders(),
     })
-    if (!res.ok && res.status !== 204) {
-      authError.value = 'Failed to revoke invite.'
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}))
+      globalError.value = err.detail || '撤销失败'
       return
     }
     await loadInvites()
   } catch (e) {
-    authError.value = `Error: ${e.message}`
+    globalError.value = `错误：${e.message}`
   }
 }
 
+// ── Copy code ─────────────────────────────────────────────────────────────
 async function copyCode() {
   if (!newCode.value) return
   try {
     await navigator.clipboard.writeText(newCode.value)
     copied.value = true
-    setTimeout(() => { copied.value = false }, 2000)
-  } catch {
-    // fallback: select text
-  }
+    setTimeout(() => { copied.value = false }, 2500)
+  } catch { /* fallback: user selects manually */ }
 }
 
+// ── Display helpers ───────────────────────────────────────────────────────
 function statusLabel(inv) {
-  if (inv.redeemed) return 'Redeemed'
-  if (inv.expires_at && new Date(inv.expires_at) < new Date()) return 'Expired'
-  if (inv.use_count >= inv.max_uses) return 'Used up'
-  return 'Active'
+  if (inv.redeemed) return '已使用'
+  if (inv.expires_at && new Date(inv.expires_at) < new Date()) return '已过期'
+  if (inv.use_count >= inv.max_uses) return '已用完'
+  return '有效'
 }
 
-function statusClass(inv) {
-  const label = statusLabel(inv)
-  if (label === 'Active') return 'badge badge-active'
-  if (label === 'Redeemed') return 'badge badge-redeemed'
-  return 'badge badge-expired'
+function badgeClass(inv) {
+  const l = statusLabel(inv)
+  if (l === '有效') return 'badge--active'
+  if (l === '已使用') return 'badge--used'
+  return 'badge--expired'
 }
 
 function formatDate(iso) {
-  if (!iso) return '—'
+  if (!iso) return ''
   return new Date(iso).toLocaleString('zh-CN', {
     year: 'numeric', month: '2-digit', day: '2-digit',
     hour: '2-digit', minute: '2-digit',
@@ -230,251 +235,251 @@ onMounted(loadInvites)
 </script>
 
 <style scoped>
-.admin-invites {
-  max-width: 900px;
+.admin-page {
+  max-width: 860px;
   margin: 0 auto;
-  padding: 24px 16px;
-  font-family: var(--font-sans, system-ui, sans-serif);
+  padding: 1.5rem 1rem 3rem;
 }
 
+/* ── 403 ────────────────────────────────────────────────────────────────── */
+.forbidden-card {
+  text-align: center;
+  padding: 3rem 2rem;
+}
+
+.forbidden-card h2 {
+  font-size: 1.5rem;
+  margin: 0 0 0.5rem;
+  color: var(--text-primary);
+}
+
+.forbidden-card p {
+  color: var(--text-secondary);
+  margin: 0 0 1.5rem;
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────── */
 .admin-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 24px;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
 }
 
-.admin-header h1 {
-  font-size: 1.5rem;
+.admin-title {
+  font-size: 1.375rem;
   font-weight: 700;
   margin: 0;
-  color: var(--color-text-primary, #111);
+  color: var(--text-primary);
 }
 
 .admin-badge {
   background: #7c3aed;
   color: #fff;
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 0.7rem;
+  font-weight: 700;
   padding: 2px 8px;
   border-radius: 4px;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
-.error-banner {
-  background: #fef2f2;
-  border: 1px solid #fca5a5;
-  color: #dc2626;
-  padding: 12px 16px;
+/* ── Alert ──────────────────────────────────────────────────────────────── */
+.alert-error {
+  margin-bottom: 1rem;
+  padding: 0.625rem 1rem;
   border-radius: 8px;
-  margin-bottom: 20px;
-  font-size: 0.9rem;
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+  font-size: 0.85rem;
 }
 
-.card {
-  background: var(--color-surface, #fff);
-  border: 1px solid var(--color-border, #e5e7eb);
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 20px;
+/* ── Card sections ──────────────────────────────────────────────────────── */
+.create-section, .list-section {
+  margin-bottom: 1.25rem;
 }
 
-.card h2 {
-  font-size: 1rem;
+.section-title {
+  font-size: 0.95rem;
   font-weight: 600;
-  margin: 0 0 16px;
-  color: var(--color-text-primary, #111);
+  margin: 0 0 1rem;
+  color: var(--text-primary);
 }
 
+/* ── Create form ────────────────────────────────────────────────────────── */
 .create-form {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 0.75rem;
 }
 
-.create-form label {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: 0.85rem;
-  color: var(--color-text-secondary, #555);
-}
-
-.create-form input {
-  padding: 8px 12px;
-  border: 1px solid var(--color-border, #d1d5db);
-  border-radius: 6px;
-  font-size: 0.9rem;
-  background: var(--color-input-bg, #f9fafb);
-  color: var(--color-text-primary, #111);
-}
-
-.create-form button[type="submit"] {
-  align-self: flex-start;
-  padding: 8px 20px;
-  background: #7c3aed;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.create-form button[type="submit"]:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
+/* ── Code reveal ────────────────────────────────────────────────────────── */
 .code-reveal {
-  margin-top: 16px;
-  background: #f0fdf4;
-  border: 1px solid #86efac;
+  margin-top: 1.25rem;
+  padding: 1rem;
   border-radius: 8px;
-  padding: 16px;
+  background: rgba(34, 197, 94, 0.08);
+  border: 1px solid rgba(34, 197, 94, 0.3);
 }
 
-.code-label {
-  font-size: 0.85rem;
-  color: #166534;
-  margin: 0 0 8px;
+.code-reveal-warning {
+  font-size: 0.82rem;
+  color: #4ade80;
+  margin: 0 0 0.75rem;
 }
 
 .code-box {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.625rem;
 }
 
 .code-text {
   font-family: monospace;
-  font-size: 0.95rem;
-  word-break: break-all;
-  color: #111;
-  background: #fff;
-  border: 1px solid #d1fae5;
-  border-radius: 4px;
-  padding: 6px 10px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 4px;
+  background: rgba(0,0,0,0.2);
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  color: #4ade80;
   flex: 1;
 }
 
-.copy-btn,
-.dismiss-btn {
-  padding: 6px 14px;
+.copy-btn {
+  padding: 0.4rem 0.875rem;
   border-radius: 6px;
-  font-size: 0.85rem;
-  cursor: pointer;
-  border: 1px solid #86efac;
-  background: #fff;
-  color: #166534;
+  border: 1px solid #4ade80;
+  background: transparent;
+  color: #4ade80;
+  font-size: 0.82rem;
   font-weight: 600;
+  cursor: pointer;
 }
+
+.copy-btn:hover { background: rgba(74,222,128,0.1); }
 
 .dismiss-btn {
-  margin-top: 10px;
   display: block;
-  border-color: #d1d5db;
-  color: #555;
+  margin-top: 0.75rem;
+  padding: 0.4rem 0.875rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-soft);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  cursor: pointer;
 }
 
+/* ── List header ────────────────────────────────────────────────────────── */
 .list-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: 0.75rem;
 }
 
-.refresh-btn {
-  padding: 6px 14px;
-  border: 1px solid var(--color-border, #d1d5db);
-  background: var(--color-surface, #fff);
+.btn-refresh {
+  background: none;
+  border: 1px solid var(--border-soft);
   border-radius: 6px;
-  font-size: 0.85rem;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
   cursor: pointer;
-  color: var(--color-text-secondary, #555);
 }
+
+.btn-refresh:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .empty-state {
   text-align: center;
-  padding: 32px;
-  color: var(--color-text-secondary, #9ca3af);
-  font-size: 0.9rem;
+  padding: 2rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
 }
 
-.invite-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.85rem;
+/* ── Invite rows ────────────────────────────────────────────────────────── */
+.invite-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
 }
 
-.invite-table th {
-  text-align: left;
-  padding: 8px 10px;
-  border-bottom: 1px solid var(--color-border, #e5e7eb);
-  color: var(--color-text-secondary, #6b7280);
-  font-weight: 600;
+.invite-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 0.875rem;
+  border-radius: 8px;
+  background: var(--surface-card);
+  border: 1px solid var(--border-soft);
+  transition: opacity 0.15s;
 }
 
-.invite-table td {
-  padding: 8px 10px;
-  border-bottom: 1px solid var(--color-border, #f3f4f6);
-  color: var(--color-text-primary, #111);
-}
-
-.invite-table tr.redeemed td {
+.invite-row--used {
   opacity: 0.5;
 }
 
-.mono {
-  font-family: monospace;
+.inv-main {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-width: 0;
 }
 
-.note-cell {
-  max-width: 150px;
+.inv-code {
+  font-family: monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--text-primary);
+}
+
+.inv-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem 0.875rem;
+  flex: 1;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.meta-item.note {
+  font-style: italic;
+  max-width: 180px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.date-cell {
-  white-space: nowrap;
-  font-size: 0.8rem;
+.inv-actions {
+  flex-shrink: 0;
 }
 
+/* ── Badge ──────────────────────────────────────────────────────────────── */
 .badge {
   display: inline-block;
-  padding: 2px 8px;
+  padding: 1px 7px;
   border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 0.72rem;
+  font-weight: 700;
 }
 
-.badge-active {
-  background: #d1fae5;
-  color: #065f46;
-}
+.badge--active  { background: rgba(74,222,128,0.15); color: #4ade80; }
+.badge--used    { background: rgba(139,92,246,0.15); color: #a78bfa; }
+.badge--expired { background: rgba(239,68,68,0.15);  color: #f87171; }
 
-.badge-redeemed {
-  background: #e0e7ff;
-  color: #3730a3;
-}
-
-.badge-expired {
-  background: #fee2e2;
-  color: #991b1b;
-}
-
+/* ── Revoke button ──────────────────────────────────────────────────────── */
 .revoke-btn {
-  padding: 4px 10px;
-  border: 1px solid #fca5a5;
-  background: #fff;
-  color: #dc2626;
-  border-radius: 4px;
-  font-size: 0.8rem;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid rgba(239,68,68,0.4);
+  background: transparent;
+  color: #f87171;
+  border-radius: 5px;
+  font-size: 0.78rem;
   cursor: pointer;
 }
 
-.revoke-btn:hover {
-  background: #fef2f2;
-}
+.revoke-btn:hover { background: rgba(239,68,68,0.1); }
 </style>

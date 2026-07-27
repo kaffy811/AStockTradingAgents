@@ -335,6 +335,15 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 60
     refresh_token_expire_days: int = 30
 
+    # Email verification (Phase MVP-R1.3)
+    # EMAIL_PROVIDER: fake (default) | resend | sendgrid
+    email_provider: str = "fake"
+    email_from: str = "noreply@tradingagents.ai"
+    email_api_key: str | None = None
+    email_verification_ttl_seconds: int = 600   # 10 minutes
+    # Set True in production to require email verification on register
+    email_verification_required: bool = False
+
 
 settings = Settings()
 

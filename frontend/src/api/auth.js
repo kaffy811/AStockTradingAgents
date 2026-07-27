@@ -33,16 +33,14 @@ export async function loginApi(username, password) {
  * @param {string} inviteCode
  * @returns {Promise<UserPublic>}
  */
-export async function registerApi(username, email, password, inviteCode) {
+export async function registerApi(username, email, password, inviteCode, emailVerificationCode) {
+  const body = { username, email, password, invite_code: inviteCode }
+  if (emailVerificationCode) body.email_verification_code = emailVerificationCode
+
   const res = await fetch(`${API_BASE}/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      username,
-      email,
-      password,
-      invite_code: inviteCode,
-    }),
+    body: JSON.stringify(body),
   })
 
   const data = await res.json()
@@ -51,6 +49,27 @@ export async function registerApi(username, email, password, inviteCode) {
     throw new Error(data.detail || `HTTP ${res.status}`)
   }
 
+  return data
+}
+
+/**
+ * Request a 6-digit email verification code.
+ * Validates the invite code server-side but does NOT consume it.
+ *
+ * @param {string} email
+ * @param {string} inviteCode
+ * @returns {Promise<{ ok: boolean, message: string, retry_after: number }>}
+ */
+export async function requestEmailVerificationApi(email, inviteCode) {
+  const res = await fetch(`${API_BASE}/auth/email-verification/request`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, invite_code: inviteCode }),
+  })
+  const data = await res.json()
+  if (!res.ok) {
+    throw new Error(data.detail || `HTTP ${res.status}`)
+  }
   return data
 }
 

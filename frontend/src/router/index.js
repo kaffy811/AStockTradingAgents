@@ -60,6 +60,7 @@ const routes = [
     path: '/admin/invites',
     name: 'AdminInvites',
     component: () => import('../views/AdminInvitesView.vue'),
+    meta: { requiresAdmin: true },
   },
 ]
 
@@ -69,7 +70,8 @@ const router = createRouter({
 })
 
 router.beforeEach((to) => {
-  const token = localStorage.getItem('ta_token')
+  const token   = localStorage.getItem('ta_token')
+  const isAdmin = localStorage.getItem('ta_is_admin') === 'true'
 
   // 已登录用户访问登录/注册页面，回首页
   if (token && to.meta.public) {
@@ -79,6 +81,11 @@ router.beforeEach((to) => {
   // 未登录用户只能访问 public 页面
   if (!token && !to.meta.public) {
     return { path: '/login' }
+  }
+
+  // 管理员路由：非管理员跳回首页
+  if (to.meta.requiresAdmin && !isAdmin) {
+    return { path: '/' }
   }
 })
 
