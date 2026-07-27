@@ -704,6 +704,10 @@ class TestInviteCreateAdminOnly:
         db = AsyncMock()
         db.add = MagicMock()
         db.commit = AsyncMock()
+        # Collision check: no existing invite with the generated hash
+        _no_collision = MagicMock()
+        _no_collision.scalar_one_or_none.return_value = None
+        db.execute = AsyncMock(return_value=_no_collision)
 
         admin = self._make_admin()
         result = await create_invite(req, db, admin)
@@ -723,6 +727,9 @@ class TestInviteCreateAdminOnly:
         added_invites = []
         db.add = MagicMock(side_effect=added_invites.append)
         db.commit = AsyncMock()
+        _no_collision = MagicMock()
+        _no_collision.scalar_one_or_none.return_value = None
+        db.execute = AsyncMock(return_value=_no_collision)
 
         admin = self._make_admin()
         result = await create_invite(req, db, admin)
@@ -741,11 +748,14 @@ class TestInviteCreateAdminOnly:
         db = AsyncMock()
         db.add = MagicMock()
         db.commit = AsyncMock()
+        _no_collision = MagicMock()
+        _no_collision.scalar_one_or_none.return_value = None
+        db.execute = AsyncMock(return_value=_no_collision)
         admin = self._make_admin()
 
         result = await create_invite(req, db, admin)
         assert result.invite_code is not None
-        assert len(result.invite_code) >= 8
+        assert len(result.invite_code) == 8  # new format: exactly 8 chars
 
     @pytest.mark.asyncio
     async def test_create_invite_response_has_code_prefix(self):
@@ -755,11 +765,15 @@ class TestInviteCreateAdminOnly:
         db = AsyncMock()
         db.add = MagicMock()
         db.commit = AsyncMock()
+        _no_collision = MagicMock()
+        _no_collision.scalar_one_or_none.return_value = None
+        db.execute = AsyncMock(return_value=_no_collision)
         admin = self._make_admin()
 
         result = await create_invite(req, db, admin)
         assert result.code_prefix is not None
-        assert result.invite_code.startswith(result.code_prefix)
+        # For 8-char codes, code_prefix == invite_code (prefix IS the full code)
+        assert result.code_prefix == result.invite_code
 
     @pytest.mark.asyncio
     async def test_create_invite_with_email_binding(self):
@@ -769,6 +783,9 @@ class TestInviteCreateAdminOnly:
         db = AsyncMock()
         db.add = MagicMock()
         db.commit = AsyncMock()
+        _no_collision = MagicMock()
+        _no_collision.scalar_one_or_none.return_value = None
+        db.execute = AsyncMock(return_value=_no_collision)
         admin = self._make_admin()
 
         result = await create_invite(req, db, admin)
@@ -783,6 +800,9 @@ class TestInviteCreateAdminOnly:
         added = []
         db.add = MagicMock(side_effect=added.append)
         db.commit = AsyncMock()
+        _no_collision = MagicMock()
+        _no_collision.scalar_one_or_none.return_value = None
+        db.execute = AsyncMock(return_value=_no_collision)
         admin = self._make_admin()
 
         await create_invite(req, db, admin)
@@ -797,6 +817,9 @@ class TestInviteCreateAdminOnly:
         added = []
         db.add = MagicMock(side_effect=added.append)
         db.commit = AsyncMock()
+        _no_collision = MagicMock()
+        _no_collision.scalar_one_or_none.return_value = None
+        db.execute = AsyncMock(return_value=_no_collision)
         admin = self._make_admin()
 
         await create_invite(req, db, admin)
