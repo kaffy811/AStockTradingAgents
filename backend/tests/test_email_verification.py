@@ -1,6 +1,6 @@
 """
-Phase MVP-R1.3 — Email Verification Service Tests
-Coverage: 28 tests
+Phase MVP-R1.3 / MVP-R1.3-sec — Email Verification Service Tests
+Coverage: 36 tests (28 original adapted + 4 new HMAC tests + 4 new IP tests)
 
 A. FakeEmailSender (4)
 B. get_email_sender factory (4)
@@ -8,10 +8,13 @@ C. request_verification_code (8)
 D. verify_code (6)
 E. consume_code (3)
 F. Register endpoint with email verification (3)
+G. HMAC-SHA256 security properties (4)  ← NEW
+H. IP rate limiting (4)                  ← NEW
 """
 from __future__ import annotations
 
 import hashlib
+import hmac as _hmac
 import sys
 import uuid
 from pathlib import Path
@@ -22,9 +25,40 @@ import pytest
 BACKEND = Path(__file__).parent.parent
 sys.path.insert(0, str(BACKEND))
 
+# ── Test constants ─────────────────────────────────────────────────────────────
+TEST_HMAC_SECRET = "test-secret-32-bytes-for-unit-tests!!"  # 38 bytes — safe in tests
+
+
+def _compute_hmac(email: str, code: str, secret: str = TEST_HMAC_SECRET) -> str:
+    """Compute the same HMAC as email_verification._hmac_code for test assertions."""
+    key = secret.encode("utf-8")
+    msg = f"{email.strip().lower()}|register|{code}".encode("utf-8")
+    return _hmac.new(key, msg, hashlib.sha256).hexdigest()
+
 
 def _sha256(s: str) -> str:
+    """Plain SHA-256 — used only in section G to prove HMAC != SHA-256."""
     return hashlib.sha256(s.encode()).hexdigest()
+
+
+def _mock_request(ip: str = "10.0.0.1") -> MagicMock:
+    """Build a minimal FastAPI Request mock with a client IP."""
+    req = MagicMock()
+    req.client = MagicMock()
+    req.client.host = ip
+    req.headers = {}
+    return req
+
+
+def _settings_patch(s, *, required: bool = False) -> None:
+    """Apply common email verification settings to a settings mock."""
+    s.email_verification_ttl_seconds = 600
+    s.email_verification_hmac_secret = TEST_HMAC_SECRET
+    s.email_verification_required = required
+    s.trusted_proxy_ips = "127.0.0.1,::1"
+    s.email_ip_send_hourly_limit = 20
+    s.email_ip_fail_hourly_limit = 15
+    s.register_ip_hourly_limit = 10
 
 
 # ===========================================================================
@@ -46,17 +80,18 @@ class TestFakeEmailSender:
         await sender.send_verification("a@test.com", "111111")
         await sender.send_verification("b@test.com", "222222")
         assert len(sender.sent) == 2
+        assert ("a@test.com", "111111") in sender.sent
+        assert ("b@test.com", "222222") in sender.sent
 
     @pytest.mark.asyncio
-    async def test_fake_last_code_returns_correct_code(self):
+    async def test_fake_last_code_returns_most_recent(self):
         from app.services.email_sender import FakeEmailSender
         sender = FakeEmailSender()
-        await sender.send_verification("a@test.com", "111111")
-        await sender.send_verification("a@test.com", "999999")
-        assert sender.last_code("a@test.com") == "999999"
+        await sender.send_verification("u@test.com", "000001")
+        await sender.send_verification("u@test.com", "000002")
+        assert sender.last_code("u@test.com") == "000002"
 
-    @pytest.mark.asyncio
-    async def test_fake_last_code_returns_none_for_unknown(self):
+    def test_fake_last_code_none_for_unknown_email(self):
         from app.services.email_sender import FakeEmailSender
         sender = FakeEmailSender()
         assert sender.last_code("nobody@test.com") is None
@@ -66,35 +101,35 @@ class TestFakeEmailSender:
 # B. get_email_sender factory
 # ===========================================================================
 
-class TestEmailSenderFactory:
+class TestGetEmailSenderFactory:
     def test_fake_provider_returns_fake_sender(self):
-        from app.services.email_sender import FakeEmailSender, get_email_sender
-        with patch("app.services.email_sender.settings") as mock_settings:
-            mock_settings.email_provider = "fake"
+        from app.services.email_sender import get_email_sender, FakeEmailSender
+        with patch("app.services.email_sender.settings") as s:
+            s.email_provider = "fake"
             sender = get_email_sender()
         assert isinstance(sender, FakeEmailSender)
 
-    def test_resend_provider_needs_api_key(self):
+    def test_resend_without_api_key_raises(self):
         from app.services.email_sender import get_email_sender
-        with patch("app.services.email_sender.settings") as mock_settings:
-            mock_settings.email_provider = "resend"
-            mock_settings.email_api_key = None
+        with patch("app.services.email_sender.settings") as s:
+            s.email_provider = "resend"
+            s.email_api_key = None
             with pytest.raises(RuntimeError, match="EMAIL_API_KEY"):
                 get_email_sender()
 
-    def test_resend_provider_with_key_returns_sender(self):
-        from app.services.email_sender import ResendEmailSender, get_email_sender
-        with patch("app.services.email_sender.settings") as mock_settings:
-            mock_settings.email_provider = "resend"
-            mock_settings.email_api_key = "key_test"
-            mock_settings.email_from = "no-reply@test.com"
+    def test_resend_with_api_key_returns_resend_sender(self):
+        from app.services.email_sender import get_email_sender, ResendEmailSender
+        with patch("app.services.email_sender.settings") as s:
+            s.email_provider = "resend"
+            s.email_api_key = "re_test_key"
+            s.email_from = "test@example.com"
             sender = get_email_sender()
         assert isinstance(sender, ResendEmailSender)
 
     def test_unknown_provider_defaults_to_fake(self):
-        from app.services.email_sender import FakeEmailSender, get_email_sender
-        with patch("app.services.email_sender.settings") as mock_settings:
-            mock_settings.email_provider = "unknown_xyz"
+        from app.services.email_sender import get_email_sender, FakeEmailSender
+        with patch("app.services.email_sender.settings") as s:
+            s.email_provider = "notarealprovider"
             sender = get_email_sender()
         assert isinstance(sender, FakeEmailSender)
 
@@ -105,7 +140,6 @@ class TestEmailSenderFactory:
 
 class TestRequestVerificationCode:
     def _make_redis(self, *, cooldown=False, hourly_count=0) -> MagicMock:
-        """Build a minimal Redis mock for the verification flow."""
         r = AsyncMock()
         r.exists = AsyncMock(return_value=int(cooldown))
         r.ttl = AsyncMock(return_value=45)
@@ -127,7 +161,7 @@ class TestRequestVerificationCode:
         redis = self._make_redis()
         with patch("app.services.email_verification.get_redis", return_value=redis), \
              patch("app.services.email_verification.settings") as s:
-            s.email_verification_ttl_seconds = 600
+            _settings_patch(s)
             result = await ev.request_verification_code("user@test.com")
 
         assert result.ok is True
@@ -139,7 +173,7 @@ class TestRequestVerificationCode:
         redis = self._make_redis()
         with patch("app.services.email_verification.get_redis", return_value=redis), \
              patch("app.services.email_verification.settings") as s:
-            s.email_verification_ttl_seconds = 600
+            _settings_patch(s)
             result = await ev.request_verification_code("user@test.com")
 
         assert result.ok is True
@@ -154,7 +188,7 @@ class TestRequestVerificationCode:
         redis = self._make_redis(cooldown=True)
         with patch("app.services.email_verification.get_redis", return_value=redis), \
              patch("app.services.email_verification.settings") as s:
-            s.email_verification_ttl_seconds = 600
+            _settings_patch(s)
             result = await ev.request_verification_code("user@test.com")
 
         assert result.ok is False
@@ -167,7 +201,7 @@ class TestRequestVerificationCode:
         redis = self._make_redis(hourly_count=5)
         with patch("app.services.email_verification.get_redis", return_value=redis), \
              patch("app.services.email_verification.settings") as s:
-            s.email_verification_ttl_seconds = 600
+            _settings_patch(s)
             result = await ev.request_verification_code("user@test.com")
 
         assert result.ok is False
@@ -177,7 +211,9 @@ class TestRequestVerificationCode:
     async def test_redis_unavailable_raises_runtime_error(self):
         from app.services import email_verification as ev
 
-        with patch("app.services.email_verification.get_redis", return_value=None):
+        with patch("app.services.email_verification.get_redis", return_value=None), \
+             patch("app.services.email_verification.settings") as s:
+            _settings_patch(s)
             with pytest.raises(RuntimeError, match="Redis"):
                 await ev.request_verification_code("user@test.com")
 
@@ -190,30 +226,29 @@ class TestRequestVerificationCode:
         assert "import random" not in source
 
     @pytest.mark.asyncio
-    async def test_code_hash_stored_not_plaintext(self):
-        """The pipeline stores SHA-256, not the raw code."""
+    async def test_hmac_stored_not_plaintext_or_sha256(self):
+        """The pipeline stores HMAC-SHA256, not the raw code or plain SHA-256."""
         from app.services import email_verification as ev
 
-        stored_value = None
         redis = self._make_redis()
-
-        original_execute = redis.pipeline.return_value.execute
         pipe = redis.pipeline.return_value
         stored_calls = []
         pipe.set = MagicMock(side_effect=lambda *a, **kw: stored_calls.append(a))
 
         with patch("app.services.email_verification.get_redis", return_value=redis), \
              patch("app.services.email_verification.settings") as s:
-            s.email_verification_ttl_seconds = 600
+            _settings_patch(s)
             result = await ev.request_verification_code("user@test.com")
 
         assert result.ok is True
         plaintext_code = result.message
-        # First set() call stores the hash
         if stored_calls:
-            stored_hash = stored_calls[0][1]   # second arg to set()
-            assert stored_hash == _sha256(plaintext_code)
-        # Key point: the plaintext is in result.message for the caller to send, not stored
+            stored_hash = stored_calls[0][1]
+            expected_hmac = _compute_hmac("user@test.com", plaintext_code)
+            plain_sha256 = _sha256(plaintext_code)
+            assert stored_hash == expected_hmac, "Must store HMAC-SHA256"
+            assert stored_hash != plain_sha256, "Must NOT store plain SHA-256"
+            assert stored_hash != plaintext_code, "Must NOT store plaintext code"
 
     @pytest.mark.asyncio
     async def test_email_normalized_before_keying(self):
@@ -232,31 +267,37 @@ class TestVerifyCode:
         from app.services import email_verification as ev
 
         code = "123456"
-        code_hash = _sha256(code)
+        email = "user@test.com"
+        stored_hmac = _compute_hmac(email, code)
 
         redis = AsyncMock()
-        redis.get = AsyncMock(side_effect=[code_hash.encode(), b"0"])
+        redis.get = AsyncMock(side_effect=[stored_hmac.encode(), b"0"])
         redis.ttl = AsyncMock(return_value=500)
         redis.set = AsyncMock()
         redis.delete = AsyncMock()
 
-        with patch("app.services.email_verification.get_redis", return_value=redis):
-            result = await ev.verify_code("user@test.com", code)
+        with patch("app.services.email_verification.get_redis", return_value=redis), \
+             patch("app.services.email_verification.settings") as s:
+            _settings_patch(s)
+            result = await ev.verify_code(email, code)
         assert result.ok is True
 
     @pytest.mark.asyncio
     async def test_wrong_code_returns_failure(self):
         from app.services import email_verification as ev
 
-        code_hash = _sha256("123456")
+        email = "user@test.com"
+        stored_hmac = _compute_hmac(email, "123456")
 
         redis = AsyncMock()
-        redis.get = AsyncMock(side_effect=[code_hash.encode(), b"0"])
+        redis.get = AsyncMock(side_effect=[stored_hmac.encode(), b"0"])
         redis.ttl = AsyncMock(return_value=500)
         redis.set = AsyncMock()
 
-        with patch("app.services.email_verification.get_redis", return_value=redis):
-            result = await ev.verify_code("user@test.com", "999999")
+        with patch("app.services.email_verification.get_redis", return_value=redis), \
+             patch("app.services.email_verification.settings") as s:
+            _settings_patch(s)
+            result = await ev.verify_code(email, "999999")
         assert result.ok is False
 
     @pytest.mark.asyncio
@@ -266,7 +307,9 @@ class TestVerifyCode:
         redis = AsyncMock()
         redis.get = AsyncMock(return_value=None)
 
-        with patch("app.services.email_verification.get_redis", return_value=redis):
+        with patch("app.services.email_verification.get_redis", return_value=redis), \
+             patch("app.services.email_verification.settings") as s:
+            _settings_patch(s)
             result = await ev.verify_code("user@test.com", "123456")
         assert result.ok is False
         assert "过期" in result.message or "不存在" in result.message
@@ -275,17 +318,19 @@ class TestVerifyCode:
     async def test_max_attempts_exceeded_invalidates_code(self):
         from app.services import email_verification as ev
 
-        code_hash = _sha256("123456")
+        email = "user@test.com"
+        stored_hmac = _compute_hmac(email, "123456")
 
         redis = AsyncMock()
-        # hash_key → stored hash; attempts_key → 5 (at limit)
-        redis.get = AsyncMock(side_effect=[code_hash.encode(), b"5"])
+        redis.get = AsyncMock(side_effect=[stored_hmac.encode(), b"5"])
         redis.delete = AsyncMock()
 
-        with patch("app.services.email_verification.get_redis", return_value=redis):
-            result = await ev.verify_code("user@test.com", "999999")
+        with patch("app.services.email_verification.get_redis", return_value=redis), \
+             patch("app.services.email_verification.settings") as s:
+            _settings_patch(s)
+            result = await ev.verify_code(email, "999999")
         assert result.ok is False
-        redis.delete.assert_called_once()  # code invalidated
+        redis.delete.assert_called_once()
 
     @pytest.mark.asyncio
     async def test_redis_unavailable_raises(self):
@@ -299,17 +344,20 @@ class TestVerifyCode:
     async def test_attempt_counter_incremented_on_failure(self):
         from app.services import email_verification as ev
 
-        code_hash = _sha256("123456")
+        email = "user@test.com"
+        stored_hmac = _compute_hmac(email, "123456")
 
         redis = AsyncMock()
-        redis.get = AsyncMock(side_effect=[code_hash.encode(), b"1"])
+        redis.get = AsyncMock(side_effect=[stored_hmac.encode(), b"1"])
         redis.ttl = AsyncMock(return_value=500)
         redis.set = AsyncMock()
 
-        with patch("app.services.email_verification.get_redis", return_value=redis):
-            result = await ev.verify_code("user@test.com", "000000")  # wrong code
+        with patch("app.services.email_verification.get_redis", return_value=redis), \
+             patch("app.services.email_verification.settings") as s:
+            _settings_patch(s)
+            result = await ev.verify_code(email, "000000")  # wrong code
         assert result.ok is False
-        redis.set.assert_called_once()  # attempt counter updated
+        redis.set.assert_called_once()
 
 
 # ===========================================================================
@@ -337,7 +385,6 @@ class TestConsumeCode:
         from app.services import email_verification as ev
 
         with patch("app.services.email_verification.get_redis", return_value=None):
-            # Should log warning, not raise
             await ev.consume_code("user@test.com")
 
     @pytest.mark.asyncio
@@ -350,7 +397,6 @@ class TestConsumeCode:
         with patch("app.services.email_verification.get_redis", return_value=redis):
             await ev.consume_code("user@test.com")
 
-        # cooldown key is NOT deleted (prevents immediate re-registration)
         args = redis.delete.call_args[0]
         assert not any("ev:cooldown:" in k for k in args)
 
@@ -358,6 +404,18 @@ class TestConsumeCode:
 # ===========================================================================
 # F. Register endpoint with email verification
 # ===========================================================================
+
+def _make_ip_ok_mocks() -> dict:
+    """Return patch targets that make all IP rate limit checks pass."""
+    from app.services.email_verification import IpCheckResult
+    ok = IpCheckResult(allowed=True)
+    return {
+        "app.services.email_verification.check_ip_register_limit": AsyncMock(return_value=ok),
+        "app.services.email_verification.record_ip_register": AsyncMock(return_value=None),
+        "app.services.email_verification.check_ip_fail_limit": AsyncMock(return_value=ok),
+        "app.services.email_verification.record_ip_fail": AsyncMock(return_value=None),
+    }
+
 
 class TestRegisterWithEmailVerification:
     @pytest.mark.asyncio
@@ -371,15 +429,22 @@ class TestRegisterWithEmailVerification:
             email="new@test.com",
             password="password123",
             invite_code="VALIDCOD",
-            email_verification_code=None,  # missing
+            email_verification_code=None,
         )
 
         db = AsyncMock()
+        request = _mock_request()
+        ip_mocks = _make_ip_ok_mocks()
 
-        with patch("app.routers.auth.settings") as s:
-            s.email_verification_required = True
+        with patch("app.routers.auth.settings") as s, \
+             patch("app.services.email_verification.check_ip_register_limit",
+                   ip_mocks["app.services.email_verification.check_ip_register_limit"]), \
+             patch("app.services.email_verification.record_ip_register",
+                   ip_mocks["app.services.email_verification.record_ip_register"]):
+            _settings_patch(s, required=True)
+            s.trusted_proxy_ips = "127.0.0.1,::1"
             with pytest.raises(HTTPException) as exc:
-                await register(body, db)
+                await register(request, body, db)
         assert exc.value.status_code == 400
         assert "验证码" in str(exc.value.detail)
 
@@ -388,7 +453,7 @@ class TestRegisterWithEmailVerification:
         """When a valid email code is provided, email_verified_at is set."""
         from app.models.user import RegisterRequest
         from app.models.mvp import MvpInvite
-        from app.models.user import User
+        from app.services.email_verification import VerifyResult
 
         body = RegisterRequest(
             username="verifieduser",
@@ -405,7 +470,6 @@ class TestRegisterWithEmailVerification:
         invite.email = None
         invite.redeemed = False
 
-        # First call: invite; second: no duplicate user
         no_dup = MagicMock()
         no_dup.scalar_one_or_none.return_value = None
         invite_res = MagicMock()
@@ -415,46 +479,41 @@ class TestRegisterWithEmailVerification:
         db.execute = AsyncMock(side_effect=[invite_res, no_dup])
         db.flush = AsyncMock()
         db.commit = AsyncMock()
-        db.refresh = AsyncMock()
-
-        # Mock verify_code to return ok
-        from unittest.mock import AsyncMock as AM
-        from app.services.email_verification import VerifyResult
 
         created_users = []
-        original_add = db.add
         db.add = MagicMock(side_effect=created_users.append)
 
+        async def _refresh(obj):
+            obj.id = uuid.uuid4()
+            obj.username = "verifieduser"
+            obj.email = "v@test.com"
+            obj.is_active = True
+            obj.is_admin = False
+            from datetime import datetime
+            obj.created_at = datetime.utcnow()
+            obj.email_verified_at = datetime.utcnow()
+
+        db.refresh = _refresh
+        request = _mock_request()
+        ip_mocks = _make_ip_ok_mocks()
+
         with patch("app.routers.auth.settings") as s, \
-             patch("app.services.email_verification.get_redis", return_value=None):
-            s.email_verification_required = False  # optional path
+             patch("app.services.email_verification.verify_code",
+                   AsyncMock(return_value=VerifyResult(ok=True, message="ok"))), \
+             patch("app.services.email_verification.consume_code", AsyncMock()), \
+             patch("app.services.email_verification.check_ip_register_limit",
+                   ip_mocks["app.services.email_verification.check_ip_register_limit"]), \
+             patch("app.services.email_verification.check_ip_fail_limit",
+                   ip_mocks["app.services.email_verification.check_ip_fail_limit"]), \
+             patch("app.services.email_verification.record_ip_register",
+                   ip_mocks["app.services.email_verification.record_ip_register"]):
+            _settings_patch(s, required=False)  # optional path
+            s.trusted_proxy_ips = "127.0.0.1,::1"
+            from app.routers.auth import register
+            result = await register(request, body, db)
 
-            # Patch verify_code to return ok
-            with patch("app.services.email_verification.verify_code",
-                       return_value=VerifyResult(ok=True, message="ok")) as mock_verify, \
-                 patch("app.services.email_verification.consume_code", return_value=None):
-
-                from app.routers.auth import register
-
-                # Set up db.refresh to fill in the user
-                async def _refresh(obj):
-                    obj.id = uuid.uuid4()
-                    obj.username = "verifieduser"
-                    obj.email = "v@test.com"
-                    obj.is_active = True
-                    obj.is_admin = False
-                    from datetime import datetime
-                    obj.created_at = datetime.utcnow()
-                    obj.email_verified_at = datetime.utcnow()
-
-                db.refresh = _refresh
-
-                result = await register(body, db)
-
-        # The user object created should have email_verified_at set
         if created_users:
-            user_obj = created_users[0]
-            assert user_obj.email_verified_at is not None
+            assert created_users[0].email_verified_at is not None
 
     @pytest.mark.asyncio
     async def test_register_skips_verification_when_not_required(self):
@@ -498,10 +557,134 @@ class TestRegisterWithEmailVerification:
             obj.email_verified_at = None
 
         db.refresh = _refresh
+        request = _mock_request()
+        ip_mocks = _make_ip_ok_mocks()
 
-        with patch("app.routers.auth.settings") as s:
-            s.email_verification_required = False
+        with patch("app.routers.auth.settings") as s, \
+             patch("app.services.email_verification.check_ip_register_limit",
+                   ip_mocks["app.services.email_verification.check_ip_register_limit"]), \
+             patch("app.services.email_verification.record_ip_register",
+                   ip_mocks["app.services.email_verification.record_ip_register"]):
+            _settings_patch(s, required=False)
+            s.trusted_proxy_ips = "127.0.0.1,::1"
             from app.routers.auth import register
-            # Should not raise
-            result = await register(body, db)
+            result = await register(request, body, db)
         assert result.username == "newuser2"
+
+
+# ===========================================================================
+# G. HMAC-SHA256 security properties  (NEW in MVP-R1.3-sec)
+# ===========================================================================
+
+class TestHmacSecurity:
+    def test_same_code_different_email_produces_different_hmac(self):
+        """HMAC is bound to the email address — prevents cross-email replay."""
+        code = "123456"
+        hmac1 = _compute_hmac("alice@test.com", code)
+        hmac2 = _compute_hmac("bob@test.com", code)
+        assert hmac1 != hmac2, "Same code with different emails must produce different HMACs"
+
+    def test_hmac_result_is_not_plain_sha256_of_code(self):
+        """HMAC must be structurally different from SHA-256(code)."""
+        code = "654321"
+        hmac_val = _compute_hmac("user@test.com", code)
+        plain_sha = _sha256(code)
+        assert hmac_val != plain_sha, "HMAC must not equal SHA-256(code)"
+
+    def test_wrong_code_does_not_verify(self):
+        """A code that differs by one digit must not match the stored HMAC."""
+        email = "user@test.com"
+        real_code = "123456"
+        wrong_code = "123457"
+        hmac_real = _compute_hmac(email, real_code)
+        hmac_wrong = _compute_hmac(email, wrong_code)
+        assert hmac_real != hmac_wrong
+
+    def test_no_hmac_secret_raises_runtime_error_at_startup(self):
+        """Missing HMAC secret in production must cause startup validation to fail."""
+        from app.core.startup_validation import validate_startup_config
+
+        config = MagicMock()
+        config.app_env = "production"
+        config.email_verification_hmac_secret = ""   # not configured
+        config.email_verification_required = True
+        config.email_provider = "resend"
+        config.email_api_key = "key"
+        config.email_from = "from@example.com"
+
+        with pytest.raises(ValueError, match="HMAC_SECRET"):
+            validate_startup_config(config)
+
+    def test_short_hmac_secret_rejected_in_production(self):
+        """HMAC secret shorter than 32 bytes must be rejected."""
+        from app.core.startup_validation import validate_startup_config
+
+        config = MagicMock()
+        config.app_env = "production"
+        config.email_verification_hmac_secret = "short"  # < 32 bytes
+        config.email_verification_required = True
+        config.email_provider = "resend"
+        config.email_api_key = "key"
+        config.email_from = "from@example.com"
+
+        with pytest.raises(ValueError, match="32"):
+            validate_startup_config(config)
+
+
+# ===========================================================================
+# H. IP rate limiting  (NEW in MVP-R1.3-sec)
+# ===========================================================================
+
+class TestIpRateLimiting:
+    def _make_redis_with_count(self, count: int) -> AsyncMock:
+        r = AsyncMock()
+        r.get = AsyncMock(return_value=str(count).encode())
+        pipe = AsyncMock()
+        pipe.incr = MagicMock()
+        pipe.expire = MagicMock()
+        pipe.execute = AsyncMock(return_value=[count + 1, True])
+        r.pipeline = MagicMock(return_value=pipe)
+        return r
+
+    @pytest.mark.asyncio
+    async def test_ip_send_limit_allows_under_threshold(self):
+        from app.services import email_verification as ev
+
+        redis = self._make_redis_with_count(5)
+        with patch("app.services.email_verification.get_redis", return_value=redis), \
+             patch("app.services.email_verification.settings") as s:
+            _settings_patch(s)
+            result = await ev.check_ip_send_limit("1.2.3.4")
+        assert result.allowed is True
+
+    @pytest.mark.asyncio
+    async def test_ip_send_limit_blocks_at_threshold(self):
+        from app.services import email_verification as ev
+
+        redis = self._make_redis_with_count(20)  # at limit
+        with patch("app.services.email_verification.get_redis", return_value=redis), \
+             patch("app.services.email_verification.settings") as s:
+            _settings_patch(s)
+            result = await ev.check_ip_send_limit("1.2.3.4")
+        assert result.allowed is False
+        assert result.retry_after > 0
+
+    @pytest.mark.asyncio
+    async def test_ip_register_limit_blocks_at_threshold(self):
+        from app.services import email_verification as ev
+
+        redis = self._make_redis_with_count(10)  # at limit
+        with patch("app.services.email_verification.get_redis", return_value=redis), \
+             patch("app.services.email_verification.settings") as s:
+            _settings_patch(s)
+            result = await ev.check_ip_register_limit("5.6.7.8")
+        assert result.allowed is False
+
+    @pytest.mark.asyncio
+    async def test_ip_check_raises_when_redis_unavailable(self):
+        """IP rate limit check must raise RuntimeError when Redis is down (fail-closed)."""
+        from app.services import email_verification as ev
+
+        with patch("app.services.email_verification.get_redis", return_value=None):
+            with pytest.raises(RuntimeError, match="Redis"):
+                await ev.check_ip_send_limit("1.2.3.4")

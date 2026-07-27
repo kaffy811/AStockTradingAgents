@@ -45,6 +45,40 @@ def _hash_code(code: str) -> str:
     return hashlib.sha256(code.encode("utf-8")).hexdigest()
 
 
+def _mock_request(ip: str = "127.0.0.1") -> MagicMock:
+    req = MagicMock()
+    req.client = MagicMock()
+    req.client.host = ip
+    req.headers = {}
+    return req
+
+
+async def _do_register(body, db, extra_patches: dict | None = None):
+    """Call register() with a mock Request and IP rate-limit mocks pre-applied.
+
+    MVP-R1.3-sec: register() now takes (request, body, db) and calls IP rate
+    limiters against Redis. This wrapper satisfies both requirements so that
+    pre-existing R1.2 tests keep passing unchanged.
+    """
+    from contextlib import ExitStack
+    from app.services.email_verification import IpCheckResult
+
+    ok = IpCheckResult(allowed=True)
+    patches = {
+        "app.services.email_verification.check_ip_register_limit": AsyncMock(return_value=ok),
+        "app.services.email_verification.record_ip_register": AsyncMock(),
+        "app.services.email_verification.check_ip_fail_limit": AsyncMock(return_value=ok),
+        "app.services.email_verification.record_ip_fail": AsyncMock(),
+        **(extra_patches or {}),
+    }
+    request = _mock_request()
+    with ExitStack() as stack:
+        for target, mock_obj in patches.items():
+            stack.enter_context(patch(target, mock_obj))
+        from app.routers.auth import register
+        return await register(request, body, db)
+
+
 # ===========================================================================
 # A. Invite code hashing (12 tests)
 # ===========================================================================
@@ -237,7 +271,7 @@ class TestAuthRegisterInviteRequired:
 
         with patch("app.routers.auth.UserPublic") as mock_up:
             mock_up.model_validate = MagicMock(return_value=fake_user)
-            result = await register(body, db)
+            result = await _do_register(body, db)
         assert db.commit.called
 
     @pytest.mark.asyncio
@@ -255,7 +289,7 @@ class TestAuthRegisterInviteRequired:
             invite_code="fakecodeXYZ12345",
         )
         with pytest.raises(HTTPException) as exc:
-            await register(body, db)
+            await _do_register(body, db)
         assert exc.value.status_code == 400
 
     @pytest.mark.asyncio
@@ -276,7 +310,7 @@ class TestAuthRegisterInviteRequired:
             invite_code=code,
         )
         with pytest.raises(HTTPException) as exc:
-            await register(body, db)
+            await _do_register(body, db)
         assert exc.value.status_code == 400
 
     @pytest.mark.asyncio
@@ -297,7 +331,7 @@ class TestAuthRegisterInviteRequired:
             invite_code=code,
         )
         with pytest.raises(HTTPException) as exc:
-            await register(body, db)
+            await _do_register(body, db)
         assert exc.value.status_code == 400
 
     @pytest.mark.asyncio
@@ -318,7 +352,7 @@ class TestAuthRegisterInviteRequired:
             invite_code=code,
         )
         with pytest.raises(HTTPException) as exc:
-            await register(body, db)
+            await _do_register(body, db)
         assert exc.value.status_code == 400
 
     @pytest.mark.asyncio
@@ -357,7 +391,7 @@ class TestAuthRegisterInviteRequired:
         )
         with patch("app.routers.auth.UserPublic") as mock_up:
             mock_up.model_validate = MagicMock(return_value=fake_user)
-            result = await register(body, db)
+            result = await _do_register(body, db)
         assert db.commit.called
 
     @pytest.mark.asyncio
@@ -394,7 +428,7 @@ class TestAuthRegisterInviteRequired:
         )
         with patch("app.routers.auth.UserPublic") as mock_up:
             mock_up.model_validate = MagicMock(return_value=fake_user)
-            await register(body, db)
+            await _do_register(body, db)
         assert invite.use_count == 1
 
     @pytest.mark.asyncio
@@ -432,7 +466,7 @@ class TestAuthRegisterInviteRequired:
         )
         with patch("app.routers.auth.UserPublic") as mock_up:
             mock_up.model_validate = MagicMock(return_value=fake_user)
-            await register(body, db)
+            await _do_register(body, db)
         assert invite.redeemed is True
 
     @pytest.mark.asyncio
@@ -460,7 +494,7 @@ class TestAuthRegisterInviteRequired:
             invite_code=code,
         )
         with pytest.raises(HTTPException) as exc:
-            await register(body, db)
+            await _do_register(body, db)
         assert exc.value.status_code == 409
 
     def test_register_invite_code_lookup_uses_hash(self):
@@ -1271,7 +1305,7 @@ class TestAtomicRegisterRedeem:
         )
         with patch("app.routers.auth.UserPublic") as mock_up:
             mock_up.model_validate = MagicMock(return_value=fake_user)
-            await register(body, db)
+            await _do_register(body, db)
         assert db.commit.call_count == 1
 
     @pytest.mark.asyncio
@@ -1314,7 +1348,7 @@ class TestAtomicRegisterRedeem:
         )
         with patch("app.routers.auth.UserPublic") as mock_up:
             mock_up.model_validate = MagicMock(return_value=fake_user)
-            await register(body, db)
+            await _do_register(body, db)
         assert not db.rollback.called
 
 

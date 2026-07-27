@@ -1,14 +1,20 @@
 <template>
   <div class="admin-page">
 
-    <!-- ── 403 guard ─────────────────────────────────────────────────────── -->
-    <div v-if="!authStore.isAdmin" class="forbidden-card card">
+    <!-- ── Server auth loading ───────────────────────────────────────────── -->
+    <div v-if="authLoading" class="auth-loading">
+      <span class="spinner" />
+      <span>正在验证身份…</span>
+    </div>
+
+    <!-- ── 403 guard (server-confirmed) ─────────────────────────────────── -->
+    <div v-else-if="!serverConfirmedAdmin" class="forbidden-card card">
       <h2>403 — 权限不足</h2>
       <p>此页面仅管理员可访问。</p>
       <RouterLink to="/" class="btn btn-primary">返回首页</RouterLink>
     </div>
 
-    <!-- ── Admin UI ─────────────────────────────────────────────────────── -->
+    <!-- ── Admin UI (only after server confirms is_admin=true) ───────────── -->
     <template v-else>
       <div class="admin-header">
         <h1 class="admin-title">管理后台 — 邀请码</h1>
@@ -78,7 +84,7 @@
             :class="{ 'invite-row--used': inv.redeemed || inv.use_count >= inv.max_uses }"
           >
             <div class="inv-main">
-              <span class="inv-code mono">{{ inv.code_prefix }}</span>
+              <span class="inv-code mono">{{ inv.code_prefix }}••••</span>
               <span :class="badgeClass(inv)" class="badge">{{ statusLabel(inv) }}</span>
             </div>
             <div class="inv-meta">
@@ -111,6 +117,12 @@ import { useAuthStore } from '../stores/auth.js'
 const authStore = useAuthStore()
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8000/api/v1'
+
+// ── Server-side admin confirmation ────────────────────────────────────────
+// We always call /auth/me on mount so that a user who manually sets
+// ta_is_admin=true in localStorage cannot bypass the server-side guard.
+const authLoading         = ref(true)
+const serverConfirmedAdmin = ref(false)
 
 // ── State ─────────────────────────────────────────────────────────────────
 const invites     = ref([])
@@ -231,7 +243,27 @@ function formatDate(iso) {
   })
 }
 
-onMounted(loadInvites)
+// ── Server-side admin check ───────────────────────────────────────────────
+// Always call /auth/me first; only proceed if server returns is_admin=true.
+// This prevents localStorage tampering from granting access.
+async function verifyAdminAndLoad() {
+  authLoading.value = true
+  try {
+    await authStore.fetchMe()
+    if (authStore.isAdmin) {
+      serverConfirmedAdmin.value = true
+      await loadInvites()
+    } else {
+      serverConfirmedAdmin.value = false
+    }
+  } catch {
+    serverConfirmedAdmin.value = false
+  } finally {
+    authLoading.value = false
+  }
+}
+
+onMounted(verifyAdminAndLoad)
 </script>
 
 <style scoped>
@@ -239,6 +271,17 @@ onMounted(loadInvites)
   max-width: 860px;
   margin: 0 auto;
   padding: 1.5rem 1rem 3rem;
+}
+
+/* ── Auth loading ───────────────────────────────────────────────────────── */
+.auth-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  justify-content: center;
+  padding: 3rem 2rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
 }
 
 /* ── 403 ────────────────────────────────────────────────────────────────── */

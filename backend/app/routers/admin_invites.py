@@ -107,10 +107,13 @@ async def create_invite(
             detail="生成唯一邀请码失败，请重试。",
         )
 
+    # Store only first 4 chars as prefix — never the full 8-char code in DB.
+    code_prefix = plaintext_code[:4]
+
     invite = MvpInvite(
         id=uuid.uuid4(),
         code_hash=code_hash,
-        code_prefix=plaintext_code,      # for 8-char codes, prefix == full code
+        code_prefix=code_prefix,
         email=req.email,
         max_uses=req.max_uses,
         note=req.note,
@@ -122,11 +125,11 @@ async def create_invite(
     await db.commit()
     log.info(
         "admin_invite created: prefix=%s email=%s max_uses=%d by=%s",
-        plaintext_code, req.email, req.max_uses, admin.username,
+        code_prefix, req.email, req.max_uses, admin.username,
     )
     return AdminInviteCreateResponse(
-        invite_code=plaintext_code,
-        code_prefix=plaintext_code,
+        invite_code=plaintext_code,   # plaintext returned ONCE — never stored
+        code_prefix=code_prefix,
         email=req.email,
         max_uses=req.max_uses,
         created_at=invite.created_at.isoformat(),

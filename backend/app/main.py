@@ -28,6 +28,10 @@ from app.core.structured_debug_logger import CompanyV2RequestIdMiddleware
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Fail-fast for staging/production misconfig (email verification, HMAC secret, etc.)
+    from app.core.startup_validation import validate_startup_config
+    validate_startup_config(settings)
+
     await init_db()       # Creates tables; raises clearly if Postgres is unreachable
     await connect_redis() # Best-effort; logs a warning if Redis is down
     # 注入 event loop 供 sync_* cache 方法使用（to_thread / ThreadPoolExecutor 场景）

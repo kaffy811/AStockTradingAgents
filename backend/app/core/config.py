@@ -335,7 +335,7 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 60
     refresh_token_expire_days: int = 30
 
-    # Email verification (Phase MVP-R1.3)
+    # Email verification (Phase MVP-R1.3 / MVP-R1.3-sec)
     # EMAIL_PROVIDER: fake (default) | resend | sendgrid
     email_provider: str = "fake"
     email_from: str = "noreply@tradingagents.ai"
@@ -343,6 +343,21 @@ class Settings(BaseSettings):
     email_verification_ttl_seconds: int = 600   # 10 minutes
     # Set True in production to require email verification on register
     email_verification_required: bool = False
+    # HMAC-SHA256 secret for verification code hashing.
+    # MUST be set to a random 32+ byte value in staging/production.
+    # Empty string → fail-closed at startup when app_env is staging/production.
+    email_verification_hmac_secret: str = ""
+
+    # IP rate limiting (Phase MVP-R1.3-sec)
+    # Comma-separated list of IPv4/IPv6 addresses of trusted reverse proxies.
+    # Only these IPs may contribute an X-Forwarded-For header that we trust.
+    trusted_proxy_ips: str = "127.0.0.1,::1"
+    # Max verification code sends per IP per clock-hour
+    email_ip_send_hourly_limit: int = 20
+    # Max verification code failures per IP before IP is blocked (TTL: 1 hour)
+    email_ip_fail_hourly_limit: int = 15
+    # Max registration attempts per IP per clock-hour
+    register_ip_hourly_limit: int = 10
 
 
 settings = Settings()

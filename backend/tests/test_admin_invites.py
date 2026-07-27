@@ -1,12 +1,13 @@
 """
-Phase MVP-R1.3 — Admin Invite Management Tests
-Coverage: 24 tests
+Phase MVP-R1.3 / MVP-R1.3-sec — Admin Invite Management Tests
+Coverage: 30 tests (24 original + 6 new security tests)
 
 A. Auth: non-admin access denied (4)
 B. Admin can create and list invites (6)
 C. GET list never returns plaintext codes (4)
 D. Revoke endpoint (6)
 E. Code generation properties (4)
+F. Invite code non-disclosure / prefix security (6)  ← NEW
 """
 from __future__ import annotations
 
@@ -106,7 +107,8 @@ class TestAdminInviteCRUD:
         assert len(result.invite_code) == 8
 
     @pytest.mark.asyncio
-    async def test_create_invite_prefix_equals_code(self):
+    async def test_create_invite_prefix_is_4_chars(self):
+        """code_prefix stored in DB must be only the first 4 chars — not the full code."""
         from app.routers.admin_invites import create_invite, AdminInviteCreateRequest
 
         req = AdminInviteCreateRequest(max_uses=1)
@@ -114,7 +116,8 @@ class TestAdminInviteCRUD:
         admin = _make_principal(is_admin=True, username="admin")
 
         result = await create_invite(req, db, admin)
-        assert result.code_prefix == result.invite_code
+        assert len(result.code_prefix) == 4
+        assert result.code_prefix != result.invite_code
 
     @pytest.mark.asyncio
     async def test_create_invite_with_email(self):
@@ -383,3 +386,132 @@ class TestCodeGenerationProperties:
         from app.routers.admin_invites import _generate_invite_code
         codes = [_generate_invite_code() for _ in range(100)]
         assert len(set(codes)) == 100
+
+
+# ===========================================================================
+# F. Invite code non-disclosure / prefix security  (NEW in MVP-R1.3-sec)
+# ===========================================================================
+
+class TestInviteCodeNonDisclosure:
+    @pytest.mark.asyncio
+    async def test_new_invite_code_is_exactly_8_chars(self):
+        """POST create must return exactly 8-char invite codes."""
+        from app.routers.admin_invites import create_invite, AdminInviteCreateRequest
+
+        req = AdminInviteCreateRequest(max_uses=1)
+        db = _no_collision_db()
+        admin = _make_principal(is_admin=True, username="admin")
+
+        result = await create_invite(req, db, admin)
+        assert len(result.invite_code) == 8, (
+            f"invite_code should be 8 chars, got {len(result.invite_code)}"
+        )
+
+    @pytest.mark.asyncio
+    async def test_code_prefix_is_exactly_4_chars(self):
+        """DB-stored code_prefix must be exactly 4 chars — NOT the full code."""
+        from app.routers.admin_invites import create_invite, AdminInviteCreateRequest
+
+        req = AdminInviteCreateRequest(max_uses=1)
+        db = _no_collision_db()
+        admin = _make_principal(is_admin=True, username="admin")
+
+        result = await create_invite(req, db, admin)
+        assert len(result.code_prefix) == 4, (
+            f"code_prefix should be 4 chars, got {len(result.code_prefix)!r}"
+        )
+
+    @pytest.mark.asyncio
+    async def test_code_prefix_is_not_full_invite_code(self):
+        """code_prefix must never equal invite_code for 8-char codes."""
+        from app.routers.admin_invites import create_invite, AdminInviteCreateRequest
+
+        req = AdminInviteCreateRequest(max_uses=1)
+        db = _no_collision_db()
+        admin = _make_principal(is_admin=True, username="admin")
+
+        result = await create_invite(req, db, admin)
+        assert result.code_prefix != result.invite_code, (
+            "code_prefix must not equal invite_code — storing full code would leak it"
+        )
+
+    @pytest.mark.asyncio
+    async def test_list_response_does_not_contain_full_invite_code(self):
+        """GET /admin/invites must not return a field that equals the full invite code."""
+        from app.routers.admin_invites import list_invites, create_invite, AdminInviteCreateRequest
+        import json
+
+        # 1. Create an invite and capture the plaintext code
+        create_db = _no_collision_db()
+        admin = _make_principal(is_admin=True, username="admin")
+        created = await create_invite(AdminInviteCreateRequest(max_uses=1), create_db, admin)
+        full_code = created.invite_code
+
+        # 2. List invites — mock DB returning an invite with only the 4-char prefix
+        inv = MagicMock()
+        inv.id = uuid.uuid4()
+        inv.code_prefix = full_code[:4]   # only prefix stored
+        inv.email = None
+        inv.max_uses = 1
+        inv.use_count = 0
+        inv.redeemed = False
+        inv.redeemed_at = None
+        inv.expires_at = None
+        inv.note = None
+        inv.created_at = datetime.utcnow()
+        inv.created_by = "admin"
+
+        scalars = MagicMock()
+        scalars.all.return_value = [inv]
+        result_mock = MagicMock()
+        result_mock.scalars.return_value = scalars
+        list_db = AsyncMock()
+        list_db.execute = AsyncMock(return_value=result_mock)
+
+        items = await list_invites(db=list_db, admin=admin)
+        assert len(items) == 1
+        item = items[0]
+
+        # Serialise to JSON dict and verify full code is absent
+        item_dict = json.loads(item.model_dump_json())
+        for key, val in item_dict.items():
+            assert val != full_code, (
+                f"List response field '{key}' contains the full invite code — must not leak it"
+            )
+
+    @pytest.mark.asyncio
+    async def test_db_stored_prefix_does_not_equal_full_code(self):
+        """The MvpInvite.code_prefix stored to DB must not equal the full invite code."""
+        from app.routers.admin_invites import create_invite, AdminInviteCreateRequest
+
+        added = []
+        req = AdminInviteCreateRequest(max_uses=1)
+        db = _no_collision_db()
+        db.add = MagicMock(side_effect=added.append)
+        admin = _make_principal(is_admin=True, username="admin")
+
+        result = await create_invite(req, db, admin)
+        stored = added[0]
+
+        # The DB-stored prefix must not equal the full plaintext code
+        assert stored.code_prefix != result.invite_code, (
+            "MvpInvite.code_prefix stored to DB must not be the full invite code"
+        )
+        assert len(stored.code_prefix) == 4
+
+    @pytest.mark.asyncio
+    async def test_create_response_contains_full_invite_code_exactly_once(self):
+        """POST create must return the full invite_code in the response body."""
+        from app.routers.admin_invites import create_invite, AdminInviteCreateRequest
+
+        req = AdminInviteCreateRequest(max_uses=1)
+        db = _no_collision_db()
+        admin = _make_principal(is_admin=True, username="admin")
+
+        result = await create_invite(req, db, admin)
+
+        # Exactly one field holds the full code in the create response
+        assert result.invite_code is not None
+        assert len(result.invite_code) == 8
+        # Prefix is different (first 4 chars)
+        assert result.code_prefix == result.invite_code[:4]
