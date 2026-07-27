@@ -32,6 +32,15 @@ async def get_current_user(
     return await load_auth_principal(user_id, token_exp=payload.get("exp"))
 
 
+async def get_admin_user(
+    principal: AuthPrincipal = Depends(get_current_user),
+) -> AuthPrincipal:
+    """Requires the caller to be authenticated AND have is_admin=True."""
+    if not getattr(principal, "is_admin", False):
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Admin access required")
+    return principal
+
+
 async def get_optional_user(
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(_optional_bearer),
     db: Any = None,

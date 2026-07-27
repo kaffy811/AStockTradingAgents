@@ -1,16 +1,21 @@
 """
-MVP Release Candidate endpoints — Phase 6V-P1.32.
+MVP Release Candidate endpoints — Phase MVP-R1.2.
 
 Endpoints
 ---------
 POST /mvp/invites/check     — check invite code validity (public)
-POST /mvp/invites/redeem    — redeem invite code (public)
-POST /mvp/invites           — create invite code (admin)
+POST /mvp/invites           — create invite code (admin only)
 POST /chat/feedback         — submit answer feedback (auth optional)
 POST /mvp/analytics/event   — record analytics event (internal)
 GET  /mvp/health            — MVP readiness probe
+GET  /mvp/quota/check/{user_id} — check user daily quota (Phase MVP-R1.1)
+GET  /mvp/wave/status       — wave configuration (Phase MVP-R1.1)
+GET  /mvp/admin/invites     — list all invites (admin only)
+DELETE /mvp/admin/invites/{invite_id} — revoke an invite (admin only)
 
 Security:
+- POST /mvp/invites requires Bearer token with is_admin=True (MVP-R1.2 fix)
+- Invite codes are hashed (SHA-256) at creation; plaintext is never stored
 - No PII in stored records (snippet max 200 chars, no raw prompts/responses)
 - Feedback comment max 1000 chars
 - Analytics properties stripped of PII-named keys
@@ -18,18 +23,20 @@ Security:
 """
 from __future__ import annotations
 
+import hashlib
 import logging
 import secrets
 import uuid
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
+from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
 
 from app.core.database import get_db
+from app.dependencies import get_admin_user
 from app.models.mvp import ChatFeedback, MvpAnalyticsEvent, MvpInvite
 
 log = logging.getLogger(__name__)
@@ -43,6 +50,11 @@ _PII_PROPERTY_KEYS = frozenset({
 })
 
 
+def _hash_invite_code(code: str) -> str:
+    """Return SHA-256 hex digest of a plaintext invite code."""
+    return hashlib.sha256(code.encode("utf-8")).hexdigest()
+
+
 # ── Request / Response schemas ────────────────────────────────────────────────
 
 class InviteCheckRequest(BaseModel):
@@ -54,16 +66,6 @@ class InviteCheckResponse(BaseModel):
     message: str
 
 
-class InviteRedeemRequest(BaseModel):
-    invite_code: str = Field(..., min_length=8, max_length=64)
-    user_id: Optional[int] = None
-
-
-class InviteRedeemResponse(BaseModel):
-    success: bool
-    message: str
-
-
 class InviteCreateRequest(BaseModel):
     email: Optional[str] = Field(None, max_length=255)
     max_uses: int = Field(1, ge=1, le=100)
@@ -71,10 +73,26 @@ class InviteCreateRequest(BaseModel):
 
 
 class InviteCreateResponse(BaseModel):
+    # Plaintext code returned ONCE to the admin — not stored server-side
     invite_code: str
+    code_prefix: str
     email: Optional[str]
     max_uses: int
     created_at: str
+
+
+class InviteListItem(BaseModel):
+    id: str
+    code_prefix: str
+    email: Optional[str]
+    max_uses: int
+    use_count: int
+    redeemed: bool
+    redeemed_at: Optional[str]
+    expires_at: Optional[str]
+    note: Optional[str]
+    created_at: str
+    created_by: str
 
 
 class FeedbackRequest(BaseModel):
@@ -113,15 +131,16 @@ class AnalyticsEventResponse(BaseModel):
     event_id: str
 
 
-# ── Endpoints ─────────────────────────────────────────────────────────────────
+# ── Public endpoints ──────────────────────────────────────────────────────────
 
 @router.post("/mvp/invites/check", response_model=InviteCheckResponse)
 async def check_invite(
     req: InviteCheckRequest, db: AsyncSession = Depends(get_db)
 ):
     """Check invite code validity without consuming a use."""
+    code_hash = _hash_invite_code(req.invite_code)
     result = await db.execute(
-        select(MvpInvite).where(MvpInvite.invite_code == req.invite_code)
+        select(MvpInvite).where(MvpInvite.code_hash == code_hash)
     )
     invite = result.scalar_one_or_none()
 
@@ -137,68 +156,102 @@ async def check_invite(
     return InviteCheckResponse(valid=True, message="Invite code is valid.")
 
 
-@router.post("/mvp/invites/redeem", response_model=InviteRedeemResponse)
-async def redeem_invite(
-    req: InviteRedeemRequest, db: AsyncSession = Depends(get_db)
-):
-    """Redeem an invite code — increments use_count, marks redeemed when exhausted."""
-    result = await db.execute(
-        select(MvpInvite).where(MvpInvite.invite_code == req.invite_code)
-    )
-    invite = result.scalar_one_or_none()
-
-    if not invite:
-        raise HTTPException(status_code=404, detail="Invalid invite code.")
-
-    if invite.expires_at and invite.expires_at < datetime.utcnow():
-        raise HTTPException(status_code=400, detail="Invite code has expired.")
-
-    if invite.use_count >= invite.max_uses:
-        raise HTTPException(status_code=400, detail="Invite code fully redeemed.")
-
-    invite.use_count += 1
-    if invite.use_count >= invite.max_uses:
-        invite.redeemed = True
-        invite.redeemed_at = datetime.utcnow()
-    if req.user_id is not None:
-        invite.redeemed_by_user_id = req.user_id
-
-    await db.commit()
-    log.info(
-        "mvp_invite redeemed: prefix=%s uses=%d/%d user_id=%s",
-        req.invite_code[:4], invite.use_count, invite.max_uses, req.user_id,
-    )
-    return InviteRedeemResponse(success=True, message="Invite code redeemed successfully.")
-
+# ── Admin-only invite management ──────────────────────────────────────────────
 
 @router.post("/mvp/invites", response_model=InviteCreateResponse)
 async def create_invite(
-    req: InviteCreateRequest, db: AsyncSession = Depends(get_db)
+    req: InviteCreateRequest,
+    db: AsyncSession = Depends(get_db),
+    admin=Depends(get_admin_user),
 ):
-    """Create a new invite code (admin endpoint — no auth enforced in MVP)."""
-    code = secrets.token_urlsafe(36)[:48]
+    """Create a new invite code. Admin only (is_admin=True Bearer token required).
+
+    The plaintext code is returned ONCE in the response and never stored.
+    The server persists only the SHA-256 hash and an 8-char prefix.
+    """
+    # Generate a cryptographically random 48-char URL-safe code
+    plaintext_code = secrets.token_urlsafe(36)[:48]
+    code_hash = _hash_invite_code(plaintext_code)
+    code_prefix = plaintext_code[:8]
+
     invite = MvpInvite(
         id=uuid.uuid4(),
-        invite_code=code,
+        code_hash=code_hash,
+        code_prefix=code_prefix,
         email=req.email,
         max_uses=req.max_uses,
         note=req.note,
-        created_by="admin",
+        created_by=str(admin.username),
         created_at=datetime.utcnow(),
     )
     db.add(invite)
     await db.commit()
     log.info(
-        "mvp_invite created: prefix=%s email=%s max_uses=%d",
-        code[:4], req.email, req.max_uses,
+        "mvp_invite created: prefix=%s email=%s max_uses=%d by=%s",
+        code_prefix, req.email, req.max_uses, admin.username,
     )
     return InviteCreateResponse(
-        invite_code=code,
+        invite_code=plaintext_code,
+        code_prefix=code_prefix,
         email=req.email,
         max_uses=req.max_uses,
         created_at=invite.created_at.isoformat(),
     )
 
+
+@router.get("/mvp/admin/invites", response_model=List[InviteListItem])
+async def list_invites(
+    db: AsyncSession = Depends(get_db),
+    admin=Depends(get_admin_user),
+):
+    """List all invite codes (admin only). Plaintext codes are not shown."""
+    result = await db.execute(
+        select(MvpInvite).order_by(desc(MvpInvite.created_at)).limit(500)
+    )
+    invites = result.scalars().all()
+    return [
+        InviteListItem(
+            id=str(inv.id),
+            code_prefix=inv.code_prefix or "????????",
+            email=inv.email,
+            max_uses=inv.max_uses,
+            use_count=inv.use_count,
+            redeemed=inv.redeemed,
+            redeemed_at=inv.redeemed_at.isoformat() if inv.redeemed_at else None,
+            expires_at=inv.expires_at.isoformat() if inv.expires_at else None,
+            note=inv.note,
+            created_at=inv.created_at.isoformat(),
+            created_by=inv.created_by,
+        )
+        for inv in invites
+    ]
+
+
+@router.delete("/mvp/admin/invites/{invite_id}", status_code=204)
+async def revoke_invite(
+    invite_id: str,
+    db: AsyncSession = Depends(get_db),
+    admin=Depends(get_admin_user),
+):
+    """Revoke (delete) an invite by ID. Admin only."""
+    try:
+        invite_uuid = uuid.UUID(invite_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid invite ID format.")
+
+    result = await db.execute(
+        select(MvpInvite).where(MvpInvite.id == invite_uuid)
+    )
+    invite = result.scalar_one_or_none()
+    if not invite:
+        raise HTTPException(status_code=404, detail="Invite not found.")
+
+    await db.delete(invite)
+    await db.commit()
+    log.info("mvp_invite revoked: id=%s by=%s", invite_id, admin.username)
+
+
+# ── Feedback & analytics ──────────────────────────────────────────────────────
 
 @router.post("/chat/feedback", response_model=FeedbackResponse)
 async def submit_feedback(
@@ -254,7 +307,6 @@ async def record_analytics_event(
     db.add(event)
     await db.commit()
 
-    # P0/P1 errors surface as server-side error log for monitoring
     if req.error_severity in ("p0", "p1"):
         log.error(
             "mvp_error_monitor [%s] event=%s error_class=%s session=%s",
@@ -283,10 +335,7 @@ async def check_user_quota(
     user_id: str,
     db: AsyncSession = Depends(get_db),
 ):
-    """
-    Check whether a user has remaining daily chat quota.
-    Returns allowed=False with reason if quota exceeded.
-    """
+    """Check whether a user has remaining daily chat quota."""
     from datetime import date
     from sqlalchemy import func
 
@@ -294,7 +343,6 @@ async def check_user_quota(
 
     daily_limit = settings.mvp_daily_quota_per_user
 
-    # Count chat_message_sent events for this user today
     today_start = datetime.combine(date.today(), datetime.min.time())
     result = await db.execute(
         select(func.count(MvpAnalyticsEvent.id)).where(
@@ -375,7 +423,7 @@ async def mvp_health():
     gate_result = check_real_provider_gate()
     return {
         "ok": True,
-        "phase": "6V-P1.32",
+        "phase": "MVP-R1.2",
         "mvp_mode": "invite_only",
         "provider_mode": getattr(settings, "pi_canary_provider_mode", "staging_replay"),
         "real_provider_enabled": getattr(settings, "pi_real_provider_enabled", False),

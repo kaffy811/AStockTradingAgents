@@ -1,0 +1,74 @@
+{
+  "artifact": "p0_security_audit",
+  "phase": "MVP-R1.2",
+  "date": "2026-07-26",
+  "p0_issues": [
+    {
+      "id": "P0-R1.2-1",
+      "title": "POST /auth/register has no invite code requirement",
+      "severity": "P0",
+      "status": "FIXED",
+      "description": "Any user could register without an invite code, bypassing the invite-only wave control.",
+      "fix": "RegisterRequest now requires invite_code field. Router validates and atomically redeems the code.",
+      "file": "backend/app/routers/auth.py"
+    },
+    {
+      "id": "P0-R1.2-2",
+      "title": "POST /mvp/invites has no admin authorization",
+      "severity": "P0",
+      "status": "FIXED",
+      "description": "Any unauthenticated request could create invite codes, giving arbitrary users access.",
+      "fix": "Endpoint now requires Bearer token with is_admin=True via get_admin_user dependency.",
+      "file": "backend/app/routers/mvp.py"
+    },
+    {
+      "id": "P0-R1.2-3",
+      "title": "Invite codes stored as plaintext in mvp_invite table",
+      "severity": "P0",
+      "status": "FIXED",
+      "description": "If DB is compromised, all invite codes are immediately usable.",
+      "fix": "Only SHA-256 hash (code_hash) and 8-char prefix (code_prefix) stored. Plaintext never persisted.",
+      "file": "backend/app/models/mvp.py"
+    },
+    {
+      "id": "P0-R1.2-4",
+      "title": "No is_admin field on User model",
+      "severity": "P0",
+      "status": "FIXED",
+      "description": "Admin authorization had no persistent flag in the database.",
+      "fix": "is_admin (Boolean, default=false) added to app_users table via migration o3p4q5r6s7t8.",
+      "file": "backend/app/models/user.py"
+    },
+    {
+      "id": "P0-R1.2-5",
+      "title": "MVP tables missing from Supabase (migration never applied)",
+      "severity": "P0",
+      "status": "REMEDIATION_REQUIRED",
+      "description": "Migrations n2o3p4q5r6s7 and o3p4q5r6s7t8 must be applied to Supabase. Until applied, all MVP endpoints fail with 500.",
+      "fix": "Run: cd backend && alembic upgrade head",
+      "note": "Owner must run this against the production Supabase connection string."
+    }
+  ],
+  "non_p0_improvements": [
+    {
+      "id": "I1",
+      "title": "Login now supports email in the username field",
+      "description": "If the login value contains '@', it is treated as an email lookup."
+    },
+    {
+      "id": "I2",
+      "title": "Separate /mvp/invites/redeem endpoint removed",
+      "description": "Redemption is now atomic inside POST /auth/register to prevent TOCTOU."
+    },
+    {
+      "id": "I3",
+      "title": "Admin CLI create_admin.py for first-admin bootstrap",
+      "description": "python -m app.cli.create_admin --username admin --email ... --password ..."
+    },
+    {
+      "id": "I4",
+      "title": "Admin frontend at /admin/invites",
+      "description": "Vue SPA for creating, listing, and revoking invite codes."
+    }
+  ]
+}

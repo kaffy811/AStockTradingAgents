@@ -31,6 +31,7 @@ class AuthPrincipal:
     is_active: bool
     created_at: datetime | None = None
     role: str = "user"
+    is_admin: bool = False
     token_exp: int | None = None
     cache_status: str = "miss"
 
@@ -157,6 +158,7 @@ class AuthPrincipalCache:
             username=principal.username,
             email=principal.email,
             is_active=principal.is_active,
+            is_admin=principal.is_admin,
             created_at=principal.created_at,
             role=principal.role,
             token_exp=None,
@@ -216,12 +218,15 @@ def _pool_snapshot() -> dict[str, Any]:
 
 
 def _principal_from_user(user: User, *, token_exp: int | None, cache_status: str) -> AuthPrincipal:
+    is_admin = bool(getattr(user, "is_admin", False))
     return AuthPrincipal(
         id=user.id,
         username=user.username,
         email=user.email,
         is_active=bool(user.is_active),
+        is_admin=is_admin,
         created_at=user.created_at,
+        role="admin" if is_admin else "user",
         token_exp=token_exp,
         cache_status=cache_status,
     )
@@ -305,7 +310,7 @@ async def load_auth_principal(user_id: str, *, token_exp: int | None = None, for
 
                     execute_started = time.perf_counter()
                     result = await asyncio.wait_for(session.execute(
-                        select(User.id, User.username, User.email, User.is_active, User.created_at)
+                        select(User.id, User.username, User.email, User.is_active, User.is_admin, User.created_at)
                         .where(User.id == uuid.UUID(str(user_id)))
                     ), timeout=settings.auth_db_query_timeout_seconds)
                     trace["db_execute_ms"] = int((time.perf_counter() - execute_started) * 1000)
@@ -315,11 +320,14 @@ async def load_auth_principal(user_id: str, *, token_exp: int | None = None, for
                     if row is None:
                         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "User not found")
                     build_started = time.perf_counter()
+                    _is_admin = bool(getattr(row, "is_admin", False))
                     principal = AuthPrincipal(
                         id=row.id,
                         username=row.username,
                         email=row.email,
                         is_active=bool(row.is_active),
+                        is_admin=_is_admin,
+                        role="admin" if _is_admin else "user",
                         created_at=row.created_at,
                         token_exp=token_exp,
                         cache_status="miss",
