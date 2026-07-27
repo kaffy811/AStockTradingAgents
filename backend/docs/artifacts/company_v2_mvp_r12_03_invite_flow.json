@@ -1,0 +1,52 @@
+{
+  "artifact": "invite_flow_design",
+  "phase": "MVP-R1.2",
+  "date": "2026-07-26",
+  "invite_lifecycle": {
+    "step1_create": {
+      "endpoint": "POST /mvp/invites",
+      "auth": "Bearer token, is_admin=True required",
+      "action": "Generate 48-char URL-safe code, store SHA-256 hash + 8-char prefix",
+      "returns": "plaintext code (shown once), code_prefix, email, created_at",
+      "storage": "code_hash only — plaintext NEVER stored"
+    },
+    "step2_deliver": {
+      "method": "Admin copies plaintext code from POST /mvp/invites response",
+      "channel": "Secure out-of-band (WeChat, email, direct message)",
+      "note": "Code cannot be recovered after this step"
+    },
+    "step3_check": {
+      "endpoint": "POST /mvp/invites/check",
+      "auth": "Public",
+      "action": "Hash input code, lookup by code_hash, check expiry/use_count",
+      "returns": "valid bool + message"
+    },
+    "step4_register": {
+      "endpoint": "POST /auth/register",
+      "auth": "Public (invite_code required)",
+      "transaction": [
+        "SELECT mvp_invite FOR UPDATE WHERE code_hash = sha256(invite_code)",
+        "Validate: exists, not expired, use_count < max_uses, email binding if set",
+        "SELECT app_users WHERE username OR email (duplicate check)",
+        "INSERT INTO app_users (username, email, hashed_password)",
+        "FLUSH to get user.id",
+        "UPDATE mvp_invite SET use_count+=1, redeemed_by_user_id=user.id",
+        "COMMIT"
+      ],
+      "atomic": true,
+      "toctou_safe": true
+    }
+  },
+  "code_hash_scheme": {
+    "algorithm": "SHA-256",
+    "encoding": "hex",
+    "length": 64,
+    "input": "UTF-8 encoded plaintext code",
+    "lookup_key": "code_hash column, unique index"
+  },
+  "email_binding": {
+    "optional": true,
+    "behavior": "If invite.email is set, RegisterRequest.email must match (case-insensitive)",
+    "purpose": "Ensures a code issued to alice@company.com cannot be used by another person"
+  }
+}

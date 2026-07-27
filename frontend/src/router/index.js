@@ -44,6 +44,11 @@ const routes = [
     name: 'ChatCopilot',
     component: () => import('../views/ChatCopilotView.vue'),
   },
+  {
+    path: '/admin/invites',
+    name: 'AdminInvites',
+    component: () => import('../views/AdminInvitesView.vue'),
+  },
 ]
 
 const router = createRouter({

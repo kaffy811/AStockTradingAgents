@@ -21,6 +21,7 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(254), unique=True, nullable=False, index=True)
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    is_admin: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False, server_default="false")
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
@@ -38,9 +39,11 @@ class RegisterRequest(BaseModel):
     username: str = Field(min_length=3, max_length=32)
     email: EmailStr
     password: str = Field(min_length=8)
+    invite_code: str = Field(min_length=8, max_length=64)
 
 
 class LoginRequest(BaseModel):
+    # Accepts username OR email in this field
     username: str
     password: str
 
@@ -60,6 +63,7 @@ class UserPublic(BaseModel):
     username: str
     email: EmailStr
     is_active: bool
+    is_admin: bool
     created_at: datetime
 
     model_config = {"from_attributes": True}
