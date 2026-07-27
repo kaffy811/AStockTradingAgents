@@ -32,12 +32,16 @@
         </button>
         <div v-if="error" class="error-box">{{ error }}</div>
       </div>
+      <p class="register-link">
+        没有账号？<RouterLink to="/register">使用邀请码注册</RouterLink>
+      </p>
     </div>
   </div>
 </template>
 
 <script setup>
 import { reactive, ref } from 'vue'
+import { RouterLink } from 'vue-router'
 import { useAuthStore } from '../stores/auth.js'
 
 const authStore = useAuthStore()
@@ -93,5 +97,21 @@ async function handleLogin() {
 
 .login-form input {
   width: 100%;
+}
+
+.register-link {
+  margin: 1rem 0 0;
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.register-link a {
+  color: var(--accent-primary);
+  text-decoration: none;
+}
+
+.register-link a:hover {
+  text-decoration: underline;
 }
 </style>
