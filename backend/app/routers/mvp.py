@@ -55,6 +55,19 @@ def _hash_invite_code(code: str) -> str:
     return hashlib.sha256(code.encode("utf-8")).hexdigest()
 
 
+# Unambiguous alphabet: no O/0/I/1 to avoid transcription errors
+_INVITE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+
+
+def generate_invite_code(length: int = 8) -> str:
+    """Generate a cryptographically random invite code of exactly `length` chars.
+
+    Uses an unambiguous subset of uppercase letters and digits (excludes O, 0, I, 1).
+    Must use secrets module — not random.
+    """
+    return "".join(secrets.choice(_INVITE_ALPHABET) for _ in range(length))
+
+
 # ── Request / Response schemas ────────────────────────────────────────────────
 
 class InviteCheckRequest(BaseModel):
@@ -167,12 +180,25 @@ async def create_invite(
     """Create a new invite code. Admin only (is_admin=True Bearer token required).
 
     The plaintext code is returned ONCE in the response and never stored.
-    The server persists only the SHA-256 hash and an 8-char prefix.
+    The server persists only the SHA-256 hash; code_prefix equals the full 8-char code.
     """
-    # Generate a cryptographically random 48-char URL-safe code
-    plaintext_code = secrets.token_urlsafe(36)[:48]
-    code_hash = _hash_invite_code(plaintext_code)
-    code_prefix = plaintext_code[:8]
+    # Try up to 10 times to guard against the astronomically unlikely hash collision
+    for _ in range(10):
+        plaintext_code = generate_invite_code()
+        code_hash = _hash_invite_code(plaintext_code)
+        existing = await db.execute(
+            select(MvpInvite).where(MvpInvite.code_hash == code_hash)
+        )
+        if existing.scalar_one_or_none() is None:
+            break
+    else:
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to generate a unique invite code. Please retry.",
+        )
+
+    # For 8-char codes the prefix IS the full code
+    code_prefix = plaintext_code
 
     invite = MvpInvite(
         id=uuid.uuid4(),

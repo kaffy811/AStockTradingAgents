@@ -36,22 +36,25 @@
             v-model="password"
             type="password"
             autocomplete="new-password"
-            placeholder="••••••••"
+            placeholder="请输入密码（至少8位）"
             minlength="8"
             required
           />
         </div>
 
         <div class="form-group">
-          <label for="invite_code">Invite Code</label>
+          <label for="invite_code">8位邀请码</label>
           <input
             id="invite_code"
             v-model="inviteCode"
             type="text"
             autocomplete="off"
-            placeholder="8-character code"
+            placeholder="请输入8位邀请码"
+            spellcheck="false"
+            @input="onInviteInput"
             required
           />
+          <p v-if="inviteFormatHint" class="field-hint">{{ inviteFormatHint }}</p>
         </div>
 
         <div v-if="errorMsg" class="auth-error">{{ errorMsg }}</div>
@@ -71,19 +74,41 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth.js'
 
 const authStore  = useAuthStore()
 const router     = useRouter()
 
-const username   = ref('')
-const email      = ref('')
-const password   = ref('')
-const inviteCode = ref('')
-const loading    = ref(false)
-const errorMsg   = ref('')
+const username        = ref('')
+const email           = ref('')
+const password        = ref('')
+const inviteCode      = ref('')
+const loading         = ref(false)
+const errorMsg        = ref('')
+
+// Valid new-format character set (uppercase letters + digits, no O/0/I/1)
+const NEW_CODE_CHARS = /^[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]+$/
+
+// Live format hint for the invite code field (only for 8-char new-format input)
+const inviteFormatHint = computed(() => {
+  const v = inviteCode.value.trim()
+  if (!v || v.length !== 8) return ''
+  if (!NEW_CODE_CHARS.test(v.toUpperCase())) {
+    return '邀请码包含无效字符，请检查后重新输入'
+  }
+  return ''
+})
+
+function onInviteInput() {
+  const v = inviteCode.value
+  // Auto-uppercase only when input looks like a new 8-char code (short input)
+  // Preserve original case for longer legacy codes (> 8 chars)
+  if (v.length <= 8) {
+    inviteCode.value = v.toUpperCase()
+  }
+}
 
 async function handleRegister() {
   errorMsg.value = ''
@@ -92,7 +117,7 @@ async function handleRegister() {
     await authStore.register(username.value.trim(), email.value.trim(), password.value, inviteCode.value.trim())
     router.push('/login')
   } catch (err) {
-    errorMsg.value = err.message || 'Registration failed'
+    errorMsg.value = err.message || '注册失败，请检查邀请码是否有效'
   } finally {
     loading.value = false
   }
@@ -135,6 +160,12 @@ async function handleRegister() {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+
+.field-hint {
+  margin: 0.25rem 0 0;
+  font-size: 0.78rem;
+  color: #f87171;
 }
 
 .auth-error {

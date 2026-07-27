@@ -28,7 +28,7 @@
             v-model="password"
             type="password"
             autocomplete="current-password"
-            placeholder="••••••••"
+            placeholder="请输入密码"
             required
           />
         </div>

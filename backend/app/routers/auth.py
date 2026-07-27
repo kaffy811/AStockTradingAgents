@@ -51,7 +51,13 @@ async def register(body: RegisterRequest, db: AsyncSession = Depends(get_db)):
     Atomic transaction:
       SELECT FOR UPDATE invite → validate → INSERT user → consume invite → COMMIT
     """
-    code_hash = _hash_invite_code(body.invite_code)
+    # Normalize invite code before hashing:
+    # - Strip surrounding whitespace (copy-paste artifact)
+    # - 8-char new-format codes: uppercase so "7kmr9x2p" == "7KMR9X2P"
+    # - Longer legacy codes (48-char URL-safe): preserve original case
+    raw_code = body.invite_code.strip()
+    normalized_code = raw_code.upper() if len(raw_code) == 8 else raw_code
+    code_hash = _hash_invite_code(normalized_code)
 
     # ── Lock and validate invite ───────────────────────────────────────────────
     # Use SELECT FOR UPDATE to prevent concurrent redemption of the same code.
