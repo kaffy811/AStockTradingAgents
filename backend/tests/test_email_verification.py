@@ -59,6 +59,8 @@ def _settings_patch(s, *, required: bool = False) -> None:
     s.email_ip_send_hourly_limit = 20
     s.email_ip_fail_hourly_limit = 15
     s.register_ip_hourly_limit = 10
+    # MVP-R1.3-sec: invite_code_hmac_secret is needed for 8-char invite hash
+    s.invite_code_hmac_secret = "test-invite-hmac-32bytes-ok-test!!"
 
 
 # ===========================================================================

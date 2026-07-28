@@ -19,6 +19,7 @@ Coverage:
 from __future__ import annotations
 
 import hashlib
+import hmac as _hmac
 import json
 import secrets
 import sys
@@ -36,9 +37,19 @@ sys.path.insert(0, str(BACKEND))
 ARTIFACTS = BACKEND / "docs" / "artifacts"
 MIGRATION_DIR = BACKEND / "alembic" / "versions"
 
+TEST_INVITE_HMAC_SECRET = "test-invite-hmac-secret-32bytes!!"  # 34 bytes
+
+
+@pytest.fixture(autouse=True)
+def _patch_invite_hmac_secret():
+    """Inject INVITE_CODE_HMAC_SECRET into settings for every test in this module."""
+    import app.core.config as _config_mod
+    with patch.object(_config_mod.settings, "invite_code_hmac_secret", TEST_INVITE_HMAC_SECRET):
+        yield
+
 
 # ---------------------------------------------------------------------------
-# Helper — hash invite code exactly as the app does
+# Helper — hash invite code exactly as the app does (v1 SHA-256 for legacy codes)
 # ---------------------------------------------------------------------------
 
 def _hash_code(code: str) -> str:
@@ -806,8 +817,8 @@ class TestInviteCreateAdminOnly:
 
         result = await create_invite(req, db, admin)
         assert result.code_prefix is not None
-        # For 8-char codes, code_prefix == invite_code (prefix IS the full code)
-        assert result.code_prefix == result.invite_code
+        # For 8-char codes, code_prefix is the first 4 chars (not the full code)
+        assert result.code_prefix == result.invite_code[:4]
 
     @pytest.mark.asyncio
     async def test_create_invite_with_email_binding(self):

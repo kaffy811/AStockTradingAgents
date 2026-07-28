@@ -348,6 +348,12 @@ class Settings(BaseSettings):
     # Empty string → fail-closed at startup when app_env is staging/production.
     email_verification_hmac_secret: str = ""
 
+    # HMAC-SHA256 secret for 8-char invite code hashing (Phase MVP-R1.3-sec).
+    # MUST differ from SECRET_KEY and EMAIL_VERIFICATION_HMAC_SECRET.
+    # MUST be at least 32 bytes in staging/production.
+    # Empty string → fail-closed at startup when app_env is staging/production.
+    invite_code_hmac_secret: str = ""
+
     # IP rate limiting (Phase MVP-R1.3-sec)
     # Comma-separated list of IPv4/IPv6 addresses of trusted reverse proxies.
     # Only these IPs may contribute an X-Forwarded-For header that we trust.

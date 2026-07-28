@@ -12,16 +12,35 @@ F. Invite code non-disclosure / prefix security (6)  ← NEW
 from __future__ import annotations
 
 import hashlib
+import hmac as _hmac
 import sys
 import uuid
 from datetime import datetime
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
 BACKEND = Path(__file__).parent.parent
 sys.path.insert(0, str(BACKEND))
+
+TEST_INVITE_HMAC_SECRET = "test-invite-hmac-secret-32bytes!!"  # 34 bytes
+
+
+def _compute_invite_hmac(code: str) -> str:
+    """Compute the expected HMAC-SHA256 for an 8-char invite code (v2 path)."""
+    normalized = code.strip().upper() if len(code.strip()) == 8 else code.strip()
+    key = TEST_INVITE_HMAC_SECRET.encode("utf-8")
+    msg = f"invite|v2|{normalized}".encode("utf-8")
+    return _hmac.new(key, msg, hashlib.sha256).hexdigest()
+
+
+@pytest.fixture(autouse=True)
+def _patch_invite_hmac_secret():
+    """Inject INVITE_CODE_HMAC_SECRET into settings for every test in this module."""
+    import app.core.config as _config_mod
+    with patch.object(_config_mod.settings, "invite_code_hmac_secret", TEST_INVITE_HMAC_SECRET):
+        yield
 
 
 def _make_principal(is_admin: bool = False, username: str = "user"):
@@ -143,8 +162,8 @@ class TestAdminInviteCRUD:
         result = await create_invite(req, db, admin)
         assert len(added) == 1
         inv_obj = added[0]
-        # Stored hash should be sha256 of the returned plaintext
-        expected_hash = hashlib.sha256(result.invite_code.encode()).hexdigest()
+        # Stored hash should be HMAC-SHA256 (v2) of the returned 8-char plaintext
+        expected_hash = _compute_invite_hmac(result.invite_code)
         assert inv_obj.code_hash == expected_hash
 
     @pytest.mark.asyncio

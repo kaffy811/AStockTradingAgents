@@ -16,7 +16,6 @@ but are superseded by this router for frontend usage.
 """
 from __future__ import annotations
 
-import hashlib
 import logging
 import secrets
 import uuid
@@ -28,9 +27,11 @@ from pydantic import BaseModel, Field
 from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.core.database import get_db
 from app.dependencies import get_admin_user
 from app.models.mvp import MvpInvite
+from app.services.invite_hasher import hash_invite_code as _hash_invite_code_impl
 
 log = logging.getLogger(__name__)
 
@@ -40,7 +41,7 @@ _INVITE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
 
 
 def _hash_invite_code(code: str) -> str:
-    return hashlib.sha256(code.encode("utf-8")).hexdigest()
+    return _hash_invite_code_impl(code, settings)
 
 
 def _generate_invite_code(length: int = 8) -> str:

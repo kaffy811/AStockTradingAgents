@@ -15,6 +15,7 @@ Coverage:
 from __future__ import annotations
 
 import hashlib
+import hmac as _hmac
 import sys
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
@@ -27,9 +28,27 @@ sys.path.insert(0, str(BACKEND))
 _INVITE_ALPHABET_SET = frozenset("ABCDEFGHJKLMNPQRSTUVWXYZ23456789")
 _FORBIDDEN_CHARS = frozenset("OI01")  # chars excluded to avoid confusion
 
+TEST_INVITE_HMAC_SECRET = "test-invite-hmac-secret-32bytes!!"  # 34 bytes
+
 
 def _hash(code: str) -> str:
     return hashlib.sha256(code.encode("utf-8")).hexdigest()
+
+
+def _compute_invite_hmac(code: str) -> str:
+    """Compute expected HMAC-SHA256 for an 8-char code (v2 path)."""
+    normalized = code.strip().upper()  # 8-char codes are uppercased
+    key = TEST_INVITE_HMAC_SECRET.encode("utf-8")
+    msg = f"invite|v2|{normalized}".encode("utf-8")
+    return _hmac.new(key, msg, hashlib.sha256).hexdigest()
+
+
+@pytest.fixture(autouse=True)
+def _patch_invite_hmac_secret():
+    """Inject INVITE_CODE_HMAC_SECRET into settings for every test in this module."""
+    import app.core.config as _config_mod
+    with patch.object(_config_mod.settings, "invite_code_hmac_secret", TEST_INVITE_HMAC_SECRET):
+        yield
 
 
 def _mock_request(ip: str = "127.0.0.1") -> MagicMock:
@@ -151,15 +170,19 @@ class TestNoPlainstextInModel:
 
 
 # ===========================================================================
-# 5. SHA-256 hash of 8-char code is what would be stored
+# 5. HMAC-SHA256 hash of 8-char code is what would be stored (v2 scheme)
 # ===========================================================================
 
 class TestHashStorage:
-    def test_8char_code_hash_is_sha256(self):
+    def test_8char_code_hash_is_hmac_sha256(self):
+        """8-char codes must use HMAC-SHA256 (v2), not plain SHA-256."""
         from app.routers.mvp import _hash_invite_code, generate_invite_code
         code = generate_invite_code()
-        expected = hashlib.sha256(code.encode("utf-8")).hexdigest()
+        expected = _compute_invite_hmac(code)
+        plain_sha256 = hashlib.sha256(code.encode("utf-8")).hexdigest()
         assert _hash_invite_code(code) == expected
+        assert _hash_invite_code(code) != plain_sha256, \
+            "8-char code must use HMAC (not plain SHA-256) for brute-force protection"
 
     def test_hash_length_is_64(self):
         from app.routers.mvp import _hash_invite_code, generate_invite_code

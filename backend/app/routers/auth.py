@@ -8,7 +8,6 @@ Changes vs MVP-R1.2:
 """
 from __future__ import annotations
 
-import hashlib
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -37,13 +36,14 @@ from app.models.user import (
     UserPublic,
 )
 from app.dependencies import get_current_user
+from app.services.invite_hasher import hash_invite_code as _hash_invite_code_impl, normalize_invite_code
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 def _hash_invite_code(code: str) -> str:
-    """Return SHA-256 hex digest of a plaintext invite code."""
-    return hashlib.sha256(code.encode("utf-8")).hexdigest()
+    """Hash a plaintext invite code using the unified invite_hasher (HMAC v2 for 8-char, SHA-256 v1 for legacy)."""
+    return _hash_invite_code_impl(code, settings)
 
 
 def _get_client_ip(request: Request) -> str:
@@ -126,8 +126,8 @@ async def request_email_verification(
         )
 
     # ── Validate invite code without consuming ────────────────────────────────
-    raw_code = body.invite_code.strip()
-    normalized_code = raw_code.upper() if len(raw_code) == 8 else raw_code
+    raw_code = body.invite_code
+    normalized_code = normalize_invite_code(raw_code)
     code_hash = _hash_invite_code(normalized_code)
 
     result = await db.execute(
@@ -207,8 +207,8 @@ async def register(request: Request, body: RegisterRequest, db: AsyncSession = D
         raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS, ip_check.message)
 
     # ── Normalize invite code ─────────────────────────────────────────────────
-    raw_code = body.invite_code.strip()
-    normalized_code = raw_code.upper() if len(raw_code) == 8 else raw_code
+    raw_code = body.invite_code
+    normalized_code = normalize_invite_code(raw_code)
     code_hash = _hash_invite_code(normalized_code)
 
     # ── Email verification check (when required) ──────────────────────────────
