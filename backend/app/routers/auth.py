@@ -1,21 +1,23 @@
 """
-Auth router — MVP-R1.2.
+Auth router — MVP-R1.3.
 
-Changes vs MVP-R1.1:
-  POST /auth/register — requires invite_code; redeems it atomically in the same
-                        DB transaction as user creation (no TOCTOU race).
-  POST /auth/login    — accepts username OR email in the `username` field.
+Changes vs MVP-R1.2:
+  POST /auth/email-verification/request — send 6-digit code (validates invite, rate-limited)
+  POST /auth/register — optionally requires email_verification_code when
+                        settings.email_verification_required=True
 """
 from __future__ import annotations
 
-import hashlib
-from datetime import datetime
+from datetime import datetime, timezone
+from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from jose import JWTError
+from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.core.database import get_db
 from app.core.security import (
     create_access_token,
@@ -34,33 +36,217 @@ from app.models.user import (
     UserPublic,
 )
 from app.dependencies import get_current_user
+from app.services.invite_hasher import hash_invite_code as _hash_invite_code_impl, normalize_invite_code
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 def _hash_invite_code(code: str) -> str:
-    """Return SHA-256 hex digest of a plaintext invite code."""
-    return hashlib.sha256(code.encode("utf-8")).hexdigest()
+    """Hash a plaintext invite code using the unified invite_hasher (HMAC v2 for 8-char, SHA-256 v1 for legacy)."""
+    return _hash_invite_code_impl(code, settings)
 
+
+def _get_client_ip(request: Request) -> str:
+    """Return the real client IP, honouring X-Forwarded-For only from trusted proxies.
+
+    Trusted proxy IPs are read from settings.trusted_proxy_ips (comma-separated).
+    If the direct connection IP is not in the trusted list, it is used as-is.
+    If it IS a trusted proxy, we walk X-Forwarded-For right-to-left and return
+    the first address that is not itself a trusted proxy.
+
+    This prevents IP spoofing: an untrusted client cannot inject a forged header.
+    """
+    trusted = set(
+        ip.strip()
+        for ip in getattr(settings, "trusted_proxy_ips", "127.0.0.1,::1").split(",")
+        if ip.strip()
+    )
+    direct_ip = request.client.host if request.client else "127.0.0.1"
+
+    if direct_ip not in trusted:
+        return direct_ip
+
+    # Direct connection is a trusted proxy — read X-Forwarded-For
+    xff = request.headers.get("X-Forwarded-For", "")
+    if not xff:
+        return direct_ip
+
+    # Walk right-to-left; first non-trusted IP is the client
+    candidates = [ip.strip() for ip in xff.split(",")]
+    for ip in reversed(candidates):
+        if ip and ip not in trusted:
+            return ip
+
+    return direct_ip
+
+
+# ── Email verification request schema ─────────────────────────────────────────
+
+class EmailVerificationRequest(BaseModel):
+    email: EmailStr
+    invite_code: str = Field(min_length=8, max_length=64)
+
+
+class EmailVerificationResponse(BaseModel):
+    ok: bool
+    message: str
+    retry_after: int = 0   # seconds until next send is allowed
+
+
+# ── Email verification request endpoint ───────────────────────────────────────
+
+@router.post(
+    "/email-verification/request",
+    response_model=EmailVerificationResponse,
+)
+async def request_email_verification(
+    request: Request,
+    body: EmailVerificationRequest,
+    db: AsyncSession = Depends(get_db),
+):
+    """Send a 6-digit verification code to the email address.
+
+    - Validates that the invite code exists and is unused (does NOT consume it).
+    - Rate limited: 60s cooldown, max 5/hr per email, max per-IP/hr.
+    - Uses generic responses to avoid leaking whether email is registered.
+    """
+    from app.services import email_verification as ev_service
+    from app.services.email_sender import get_email_sender
+
+    client_ip = _get_client_ip(request)
+
+    # ── IP rate limit: sends ──────────────────────────────────────────────────
+    try:
+        ip_check = await ev_service.check_ip_send_limit(client_ip)
+    except RuntimeError as e:
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, str(e))
+    if not ip_check.allowed:
+        return EmailVerificationResponse(
+            ok=False, message=ip_check.message, retry_after=ip_check.retry_after
+        )
+
+    # ── Validate invite code without consuming ────────────────────────────────
+    raw_code = body.invite_code
+    normalized_code = normalize_invite_code(raw_code)
+    code_hash = _hash_invite_code(normalized_code)
+
+    result = await db.execute(
+        select(MvpInvite).where(MvpInvite.code_hash == code_hash)
+    )
+    invite = result.scalar_one_or_none()
+
+    if not invite:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "邀请码无效。")
+    if invite.expires_at and invite.expires_at < datetime.utcnow():
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "邀请码已过期。")
+    if invite.use_count >= invite.max_uses:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "邀请码已被使用。")
+    if invite.email and invite.email.lower() != str(body.email).lower():
+        # Generic error — don't reveal email binding details
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "邀请码无效。")
+
+    # ── Generate code and enforce per-email rate limits ───────────────────────
+    try:
+        send_result = await ev_service.request_verification_code(str(body.email))
+    except RuntimeError as e:
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, str(e))
+
+    if not send_result.ok:
+        return EmailVerificationResponse(
+            ok=False,
+            message=send_result.message,
+            retry_after=send_result.retry_after,
+        )
+
+    # The plaintext code is in send_result.message — send it, NEVER log it
+    plaintext_code = send_result.message
+    try:
+        sender = get_email_sender()
+        await sender.send_verification(str(body.email), plaintext_code)
+    except Exception as exc:
+        import logging
+        logging.getLogger(__name__).error("Email send failed (provider error; code NOT logged)")
+        raise HTTPException(
+            status.HTTP_502_BAD_GATEWAY,
+            "邮件发送失败，请稍后再试。",
+        )
+
+    # Record successful send against IP counter (best-effort — already checked above)
+    try:
+        await ev_service.record_ip_send(client_ip)
+    except RuntimeError:
+        pass
+
+    return EmailVerificationResponse(ok=True, message="验证码已发送，请查收邮件。")
+
+
+# ── Register endpoint ─────────────────────────────────────────────────────────
 
 @router.post("/register", response_model=UserPublic, status_code=status.HTTP_201_CREATED)
-async def register(body: RegisterRequest, db: AsyncSession = Depends(get_db)):
+async def register(request: Request, body: RegisterRequest, db: AsyncSession = Depends(get_db)):
     """
     Register a new user.  An unused, valid invite code is required.
 
+    When settings.email_verification_required=True, a valid email_verification_code
+    must also be provided and will be consumed atomically.
+
     Atomic transaction:
-      SELECT FOR UPDATE invite → validate → INSERT user → consume invite → COMMIT
+      [verify email code] → SELECT FOR UPDATE invite → validate → INSERT user
+      → set email_verified_at → consume invite → COMMIT → [delete Redis code]
     """
-    # Normalize invite code before hashing:
-    # - Strip surrounding whitespace (copy-paste artifact)
-    # - 8-char new-format codes: uppercase so "7kmr9x2p" == "7KMR9X2P"
-    # - Longer legacy codes (48-char URL-safe): preserve original case
-    raw_code = body.invite_code.strip()
-    normalized_code = raw_code.upper() if len(raw_code) == 8 else raw_code
+    from app.services import email_verification as ev_service
+
+    client_ip = _get_client_ip(request)
+
+    # ── IP rate limit: registrations ──────────────────────────────────────────
+    try:
+        ip_check = await ev_service.check_ip_register_limit(client_ip)
+    except RuntimeError as e:
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, str(e))
+    if not ip_check.allowed:
+        raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS, ip_check.message)
+
+    # ── Normalize invite code ─────────────────────────────────────────────────
+    raw_code = body.invite_code
+    normalized_code = normalize_invite_code(raw_code)
     code_hash = _hash_invite_code(normalized_code)
 
-    # ── Lock and validate invite ───────────────────────────────────────────────
-    # Use SELECT FOR UPDATE to prevent concurrent redemption of the same code.
+    # ── Email verification check (when required) ──────────────────────────────
+    email_verified_now = False
+    if settings.email_verification_required:
+        if not body.email_verification_code:
+            raise HTTPException(
+                status.HTTP_400_BAD_REQUEST,
+                "邮箱验证码不能为空。",
+            )
+        # Check IP failure limit before attempting verification
+        try:
+            fail_check = await ev_service.check_ip_fail_limit(client_ip)
+        except RuntimeError as e:
+            raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, str(e))
+        if not fail_check.allowed:
+            raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS, fail_check.message)
+        try:
+            vr = await ev_service.verify_code(str(body.email), body.email_verification_code)
+        except RuntimeError as e:
+            raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, str(e))
+        if not vr.ok:
+            # Record failure against IP
+            try:
+                await ev_service.record_ip_fail(client_ip)
+            except RuntimeError:
+                pass
+            raise HTTPException(status.HTTP_400_BAD_REQUEST, vr.message)
+        email_verified_now = True
+    elif body.email_verification_code:
+        # Optional: if the user provides a code even when not required, verify it
+        try:
+            vr = await ev_service.verify_code(str(body.email), body.email_verification_code)
+            email_verified_now = vr.ok
+        except RuntimeError:
+            pass  # Redis unavailable — treat as no verification
+
+    # ── Lock and validate invite ──────────────────────────────────────────────
     result = await db.execute(
         select(MvpInvite)
         .where(MvpInvite.code_hash == code_hash)
@@ -77,16 +263,15 @@ async def register(body: RegisterRequest, db: AsyncSession = Depends(get_db)):
     if invite.use_count >= invite.max_uses:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Invite code has already been used.")
 
-    # If the invite was bound to a specific email, enforce that binding
-    if invite.email and invite.email.lower() != body.email.lower():
+    if invite.email and invite.email.lower() != str(body.email).lower():
         raise HTTPException(
             status.HTTP_400_BAD_REQUEST,
             "This invite code is bound to a different email address.",
         )
 
-    # ── Check username/email uniqueness ────────────────────────────────────────
+    # ── Check username/email uniqueness ───────────────────────────────────────
     dup = await db.execute(
-        select(User).where(or_(User.username == body.username, User.email == body.email))
+        select(User).where(or_(User.username == body.username, User.email == str(body.email)))
     )
     if dup.scalar_one_or_none():
         raise HTTPException(status.HTTP_409_CONFLICT, "Username or email already exists.")
@@ -94,11 +279,11 @@ async def register(body: RegisterRequest, db: AsyncSession = Depends(get_db)):
     # ── Create user + consume invite in single transaction ────────────────────
     user = User(
         username=body.username,
-        email=body.email,
+        email=str(body.email),
         hashed_password=hash_password(body.password),
+        email_verified_at=datetime.now(timezone.utc) if email_verified_now else None,
     )
     db.add(user)
-    # Flush to get user.id before we reference it in the invite
     await db.flush()
 
     invite.use_count += 1
@@ -109,7 +294,20 @@ async def register(body: RegisterRequest, db: AsyncSession = Depends(get_db)):
 
     await db.commit()
     await db.refresh(user)
-    return UserPublic.model_validate(user)
+
+    # ── Post-commit: record IP registration + clean up Redis verification keys ──
+    try:
+        await ev_service.record_ip_register(client_ip)
+    except RuntimeError:
+        pass  # non-fatal: limit was already checked above
+
+    if email_verified_now:
+        try:
+            await ev_service.consume_code(str(body.email))
+        except Exception:
+            pass  # non-fatal: keys expire via TTL anyway
+
+    return UserPublic.from_orm_user(user)
 
 
 @router.post("/login", response_model=TokenResponse)
@@ -161,12 +359,12 @@ async def refresh(body: RefreshRequest):
 @router.get("/me", response_model=UserPublic)
 async def me(current_user=Depends(get_current_user)):
     # current_user is AuthPrincipal — reconstruct a minimal UserPublic
-    from uuid import UUID
     return UserPublic(
         id=current_user.id,
         username=current_user.username,
         email=current_user.email,
         is_active=current_user.is_active,
         is_admin=getattr(current_user, "is_admin", False),
-        created_at=current_user.created_at or datetime.utcnow(),
+        email_verified=getattr(current_user, "email_verified", False),
+        created_at=getattr(current_user, "created_at", None) or datetime.utcnow(),
     )

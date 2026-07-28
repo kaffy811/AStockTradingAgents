@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { loginApi, registerApi, meApi } from '../api/auth.js'
+import { loginApi, registerApi, meApi, requestEmailVerificationApi } from '../api/auth.js'
 
 export const useAuthStore = defineStore('auth', () => {
   const token        = ref(localStorage.getItem('ta_token')         || '')
@@ -51,11 +51,20 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   /**
-   * Register a new user with an invite code.
+   * Register a new user with an invite code and optional email verification code.
    * Throws on failure — caller handles the error.
    */
-  async function register(username, email, password, inviteCode) {
-    await registerApi(username, email, password, inviteCode)
+  async function register(username, email, password, inviteCode, emailVerificationCode) {
+    await registerApi(username, email, password, inviteCode, emailVerificationCode)
+  }
+
+  /**
+   * Request a 6-digit email verification code.
+   * Validates the invite code server-side without consuming it.
+   * Throws on failure — caller handles the error.
+   */
+  async function requestEmailVerification(email, inviteCode) {
+    return await requestEmailVerificationApi(email, inviteCode)
   }
 
   /** Clear session state and localStorage.
@@ -75,6 +84,6 @@ export const useAuthStore = defineStore('auth', () => {
   return {
     token, refreshToken, currentUser, isAdmin,
     sessionExpired, authReady, isAuthenticated,
-    login, register, fetchMe, logout,
+    login, register, requestEmailVerification, fetchMe, logout,
   }
 })

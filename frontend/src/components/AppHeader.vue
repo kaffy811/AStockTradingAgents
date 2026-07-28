@@ -21,6 +21,14 @@
       <RouterLink to="/me" class="nav-link" active-class="nav-link--active">
         {{ t('nav_me') }}
       </RouterLink>
+      <RouterLink
+        v-if="authStore.isAdmin"
+        to="/admin/invites"
+        class="nav-link nav-link--admin"
+        active-class="nav-link--active"
+      >
+        管理后台
+      </RouterLink>
     </nav>
 
     <div class="user-badge">
@@ -119,6 +127,11 @@ function handleLogout() {
 }
 
 .logout-btn:hover { color: var(--danger); }
+
+.nav-link--admin {
+  color: var(--accent);
+  font-weight: 600;
+}
 
 /* ── Mobile ≤640px: BottomTabBar takes over nav, hide .app-nav ── */
 @media (max-width: 640px) {

@@ -23,7 +23,6 @@ Security:
 """
 from __future__ import annotations
 
-import hashlib
 import logging
 import secrets
 import uuid
@@ -35,9 +34,11 @@ from pydantic import BaseModel, Field
 from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.core.database import get_db
 from app.dependencies import get_admin_user
 from app.models.mvp import ChatFeedback, MvpAnalyticsEvent, MvpInvite
+from app.services.invite_hasher import hash_invite_code as _hash_invite_code_impl, normalize_invite_code
 
 log = logging.getLogger(__name__)
 
@@ -51,8 +52,8 @@ _PII_PROPERTY_KEYS = frozenset({
 
 
 def _hash_invite_code(code: str) -> str:
-    """Return SHA-256 hex digest of a plaintext invite code."""
-    return hashlib.sha256(code.encode("utf-8")).hexdigest()
+    """Hash invite code using unified invite_hasher (HMAC v2 for 8-char, SHA-256 v1 for legacy)."""
+    return _hash_invite_code_impl(code, settings)
 
 
 # Unambiguous alphabet: no O/0/I/1 to avoid transcription errors
@@ -151,7 +152,7 @@ async def check_invite(
     req: InviteCheckRequest, db: AsyncSession = Depends(get_db)
 ):
     """Check invite code validity without consuming a use."""
-    code_hash = _hash_invite_code(req.invite_code)
+    code_hash = _hash_invite_code(normalize_invite_code(req.invite_code))
     result = await db.execute(
         select(MvpInvite).where(MvpInvite.code_hash == code_hash)
     )
@@ -180,7 +181,7 @@ async def create_invite(
     """Create a new invite code. Admin only (is_admin=True Bearer token required).
 
     The plaintext code is returned ONCE in the response and never stored.
-    The server persists only the SHA-256 hash; code_prefix equals the full 8-char code.
+    The server persists only the HMAC hash and the first 4 chars as code_prefix.
     """
     # Try up to 10 times to guard against the astronomically unlikely hash collision
     for _ in range(10):
@@ -197,8 +198,8 @@ async def create_invite(
             detail="Failed to generate a unique invite code. Please retry.",
         )
 
-    # For 8-char codes the prefix IS the full code
-    code_prefix = plaintext_code
+    # Store only first 4 chars as prefix — never the full 8-char code in DB.
+    code_prefix = plaintext_code[:4]
 
     invite = MvpInvite(
         id=uuid.uuid4(),
