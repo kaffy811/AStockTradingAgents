@@ -1,0 +1,550 @@
+{
+  "_meta": {
+    "generated_at": "2026-07-28",
+    "purpose": "Diagnostic trace for company tab, financial report query, technical analysis, and industry hot stocks color issues",
+    "diagnostic_round": "MVP-R1.3 Post-Deploy Diagnostic",
+    "repair_round": "6W-R1",
+    "repair_completed_at": "2026-07-28",
+    "no_code_modified": false,
+    "repair_status": {
+      "P0-A": "FIXED — specialist_analysis_utils.py: fail-closed empty evidence, re.sub callback, canonical equivalence",
+      "P0-B": "FIXED — specialist_analysis_utils.py: _ABS_PATH_RE requires 2+ segments",
+      "P0-C": "FIXED — chat_orchestrator.py: removed early-return blocks, analysis queries reach ReportExplanationSkill",
+      "P1-A": "FIXED — IndustryHotStocksPanel.vue: .pct-up→var(--danger), .pct-dn→var(--success)",
+      "P1-B": "FIXED — base.py + 4 tools: TushareAuthError uses safe user-facing message",
+      "P1-C": "DOCUMENTED — field mapping table in repair report",
+      "P1-D": "FIXED — CompanyFundamentalsPanel.vue: banner deduplication for partial/auth cases",
+      "P1-E": "FIXED — config.py: report_chat_cache_version v1→v2"
+    },
+    "last_updated": "2026-07-28T20:10:00+08:00",
+    "phase": "Phase 6W-R1.3 Final Evidence Reconciliation"
+  },
+  "git": {
+    "head_sha": "9005c0879295833377ef7009f344afb67f93a2a7",
+    "branch": "release/demo-staging",
+    "status": "clean",
+    "recent_commits": [
+      "9005c08 merge(mvp-r13): admin invites and verified email registration",
+      "c181ac0 fix(mvp-r13): protect short invite codes with hmac",
+      "4a60d5e fix(mvp-r13): close migration and verification security gaps",
+      "bbbdaed feat(auth): admin invite management + email verification (MVP-R1.3)",
+      "9cc9f2a Merge branch 'feature/frontend-auth' into release/demo-staging"
+    ]
+  },
+  "environment": {
+    "app_env": "development",
+    "data_mode": "free",
+    "default_analysis_engine": "custom_coordinator",
+    "tushare_token_exists": true,
+    "tushare_token_length": 56,
+    "tushare_token_has_leading_trailing_space": "未确认：需部署环境实际读取验证",
+    "enable_akshare": true,
+    "enable_baostock": true,
+    "enable_report_pdf": true,
+    "enable_report_rag": false,
+    "embedding_provider": "mock",
+    "enable_multi_agent_orchestrator": false,
+    "pi_real_provider_kill_switch": true,
+    "redis_url": "redis://localhost:6379",
+    "analysis_run_registry": "memory",
+    "deployment_env_accessible": false,
+    "note": "Local .env only; cannot confirm staging/production env parity"
+  },
+  "traces": {
+    "company_tab": {
+      "trace_id": "TRACE-A-COMPANY-TAB",
+      "symptom": "Tushare权限不足/公司概览字段显示—/双重warning banner/skeleton未消失",
+      "frontend_trigger": "User opens StockDetailView → Company Tab",
+      "frontend_request": "GET /api/v1/stocks/{market}/{symbol}/profile (loadProfile in StockDetailView.vue:387)",
+      "api_endpoint": "app/routers/stocks.py — /{market}/{symbol}/profile",
+      "service_layer": "app/services/coverage_audit_service.py:257 — _fetch_fina_indicator()",
+      "provider_call": "app/datasource/tushare_client.py:254-275 — get_fina_indicator(ts_code)",
+      "provider_error": "TushareAuthError: Tushare 权限不足或 Token 无效 (tushare_client.py:202)",
+      "error_handling": "TushareAuthError raised; asyncio.gather(return_exceptions=True) catches it in calling modules",
+      "cascade_risk": "profitability.py:47, growth.py:56, solvency.py:54, operation_capability.py:60 all depend on fina_indicator via asyncio.gather",
+      "frontend_warnings": {
+        "warning_1": {
+          "text": "部分模块数据不完整，请以已披露财报为准。",
+          "source_file": "frontend/src/components/fundamentals/DataSourceBanner.vue:15",
+          "source_const": "frontend/src/utils/apiErrorClassifier.js:21 PARTIAL_DATA_MESSAGE",
+          "trigger": "dataSourceUnavailable computed ref becomes true when fina_indicator errors surface"
+        },
+        "warning_2": {
+          "text": "部分数据获取不完整，结果仅供参考。",
+          "source_file": "frontend/src/components/CompanyFundamentalsPanel.vue:583",
+          "trigger": "overviewSnap.value?.partial || overviewFin.value?.partial evaluates true"
+        },
+        "analysis": "Both banners fire simultaneously — DataSourceBanner from Tushare auth failure propagation; overviewBanner from partial envelope in overview fetch. Duplicate messaging."
+      },
+      "skeleton_analysis": {
+        "skeleton_element": "CompanyFundamentalsPanel.vue:91 <div v-if='diagnosticsLoading'>",
+        "loading_ref": "diagnosticsLoading = ref(true) at line 445; set false at line 729 in finally",
+        "hypothesis": "diagnosticsLoading remains true if loadDiagnostics() is never awaited or throws before reaching finally. Needs live network trace to confirm.",
+        "confidence": 0.6
+      },
+      "field_availability": {
+        "latest_price": "来自 kline/行情 provider (AKShare/BaoStock), NOT fina_indicator — should work",
+        "pe_ttm": "来自 etl_daily_basic 或 akshare_sina_indicator — NOT fina_indicator directly",
+        "pb": "同上",
+        "total_mv": "来自 etl_daily_basic — should be available from BaoStock",
+        "roe": "来自 etl_fina_indicator 或 akshare financial → BLOCKED when Tushare auth fails AND fallback not populated",
+        "dividend_yield": "来自 etl_fina_indicator.dv_ttm 或 akshare — conditionally blocked",
+        "analysis": "Fields showing — may be because (1) etl_fina_indicator table empty due to no Tushare permission, (2) AKShare fallback not triggered in Company profile path, or (3) frontend adapter field name mismatch"
+      }
+    },
+    "financial_report_query": {
+      "trace_id": "TRACE-B-FINANCIAL-REPORT",
+      "query": "贵州茅台最新财报表现如何？",
+      "skill_selected": "Routed through chat_orchestrator.py early-return path OR report_explanation_skill",
+      "hardcoded_response_location_1": "app/agents/chat_orchestrator.py:603-605",
+      "hardcoded_response_location_2": "app/agents/chat_skills/report_explanation_skill.py:626-627",
+      "early_return_evidence": {
+        "file": "app/agents/chat_orchestrator.py:607-621",
+        "returns": "OrchestratorResult(answer='已定位到...', metadata={'status': 'partial_success'})",
+        "consequence": "Returns immediately after finding report_context; DOES NOT continue to Analysis Agent, RAG chunking, or financial table extraction"
+      },
+      "agents_invoked": {
+        "data_agent": false,
+        "analysis_agent": false,
+        "review_agent": false,
+        "evidence": "chat_orchestrator.py:608 returns OrchestratorResult without calling any agents; 'partial_success' status confirms no analysis performed"
+      },
+      "report_db_status": "未确认：需查 report_documents 表 WHERE symbol='600519' AND report_year=2025",
+      "chunks_retrieved": "未确认：需实际 DB 查询",
+      "cache_hit": "未确认：Redis key report_chat:{hash} may return stale response; enable_report_chat_cache=True TTL=1800s"
+    },
+    "technical_analysis": {
+      "trace_id": "TRACE-C-TECHNICAL",
+      "symptom": "未提供数字 and MA5[path] in technical analysis output",
+      "pipeline": {
+        "S0_raw_kline": "technical_indicator_service.calculate(bars) → ma5, ma10, ma20, ma60",
+        "S1_prompt_construction": "technical_analyst.py:237 — 'MA5  = {fmt(indicators[ma5])}'",
+        "S2_llm_call": "technical_analyst.py:170 — self._llm.chat(messages, temperature=0.3)",
+        "S3_sanitize": "technical_analyst.py:171 — sanitize_specialist_output(report, evidence_text=user_content)",
+        "S4_abs_path_sub": "specialist_analysis_utils.py:106 — _ABS_PATH_RE.sub('[path]', text)",
+        "S5_number_ground": "specialist_analysis_utils.py:109 → remove_unsupported_numbers(text, evidence_text)"
+      },
+      "ma5_path_bug": {
+        "root_cause": "specialist_analysis_utils.py:11 — _ABS_PATH_RE = re.compile(r'(/[A-Za-z0-9_.@-]+)+')",
+        "mechanism": "If LLM generates any text containing patterns like '/ma/5' (e.g., from code references or format artifacts), the regex matches it as an absolute Unix path and replaces with '[path]'",
+        "result": "MA5[path] or similar in final output",
+        "first_occurrence_function": "sanitize_specialist_output() at specialist_analysis_utils.py:101",
+        "first_occurrence_line": "specialist_analysis_utils.py:106",
+        "also_appears_in": [
+          "financial_agent.py:261 (inline re.sub)",
+          "general_financial_answer_skill.py:169 (inline re.sub)"
+        ]
+      },
+      "unsupported_number_bug": {
+        "root_cause_1": "specialist_analysis_utils.py:85-98 — remove_unsupported_numbers()",
+        "root_cause_2": "specialist_analysis_utils.py:93-94 — if not allowed: return _NUMERIC_RE.sub('未提供数字', text)",
+        "critical_condition": "When evidence_text is empty or allowed set is empty, ALL numbers in text are replaced",
+        "regex_issue": "_NUMERIC_RE = r'(?<![A-Za-z])[-+]?\\d+(?:\\.\\d+)?%?' matches individual digit groups within dates and codes",
+        "date_breaking": "Date '2026-07-28' → _NUMERIC_RE matches '2026', '07', '28' as separate tokens; any not in evidence → replaced with '未提供数字' → '未提供数字-未提供数字-未提供数字'",
+        "code_breaking": "Stock code '600519' → matches '600519'; if not in evidence_text → '未提供数字'",
+        "first_occurrence_function": "remove_unsupported_numbers() at specialist_analysis_utils.py:85",
+        "first_occurrence_line": "specialist_analysis_utils.py:94 or 97"
+      },
+      "evidence_text_problem": {
+        "analysis": "user_content (evidence_text) is the technical analyst prompt. The prompt contains MA5 value (e.g., '1255.19') and dates. If the LLM's output numbers don't exactly match the prompt numbers (e.g., precision differences or derived values), they are unsupported.",
+        "date_in_prompt": "technical_analyst.py:233 — '{first_date} → {last_date}' format",
+        "date_format_comparison": "Prompt uses YYYY-MM-DD; if LLM outputs YYYYMMDD or different format, no match → 未提供数字"
+      }
+    },
+    "industry_hot_stocks": {
+      "trace_id": "TRACE-D-COLOR",
+      "symptom": "涨跌幅颜色显示为黑色而非红/绿",
+      "provider_to_api": "change_pct is a numeric float in API JSON",
+      "frontend_logic": {
+        "marketFormat_js": {
+          "file": "frontend/src/utils/marketFormat.js:24-30",
+          "function": "changePctClass(val)",
+          "returns": "'up' for positive, 'down' for negative"
+        },
+        "correct_components": {
+          "IndustryStockCard_vue": "frontend/src/components/IndustryStockCard.vue:201-202 — .up {color: var(--danger)} .down {color: var(--success)} — CORRECT A股 convention",
+          "WatchlistStockCard_vue": "frontend/src/components/WatchlistStockCard.vue:296-297 — .wsc-chg.up {var(--danger)} .wsc-chg.down {var(--success)} — CORRECT"
+        },
+        "bug_component": {
+          "file": "frontend/src/components/IndustryHotStocksPanel.vue:235-238",
+          "local_function": "changePctClass returns 'pct-up' or 'pct-dn' (NOT 'up'/'down')",
+          "css_line_382": ".pct-up { color: var(--success); } — GREEN for up — WRONG",
+          "css_line_383": ".pct-dn { color: var(--danger); }  — RED for down — WRONG",
+          "american_convention": "Uses US stock market color convention (green=up, red=down) instead of A股 (red=up, green=down)"
+        }
+      },
+      "dom_class_for_rising_stock": "col-change pct-up",
+      "computed_color_for_rising": "var(--success) which is typically green → SHOWS GREEN FOR RISING",
+      "expected_color_for_rising": "var(--danger) which is typically red",
+      "null_case": "If change_pct is null or non-finite, class='' → falls back to inherited text color (likely black/neutral)",
+      "black_color_hypothesis": "If change_pct arrives as string (e.g. '19.80%' with % sign), Number('19.80%') = NaN → !Number.isFinite(NaN) = true → returns '' → no class → black/default color",
+      "data_type_check": "未确认：需抓包验证 change_pct 的实际类型（number vs string）"
+    }
+  },
+  "provider_calls": [
+    {
+      "id": "PC-1",
+      "provider": "tushare",
+      "api": "fina_indicator",
+      "file": "app/datasource/tushare_client.py:254",
+      "error_class": "TushareAuthError",
+      "error_line": "app/datasource/tushare_client.py:202",
+      "error_detection": "str contains '40001' or '权限' or 'token'",
+      "http_status": "HTTP 200 with business error msg",
+      "is_retried": "未确认 — no retry logic found in tushare_client._call()",
+      "fallback_triggered": "asyncio.gather(return_exceptions=True) catches exception; caller must check isinstance(result, Exception)"
+    }
+  ],
+  "skill_selection": [
+    {
+      "query": "贵州茅台最新财报表现如何？",
+      "selected_skill_before_repair": "_handle_latest_report_setup_direct (early return, no analysis)",
+      "selected_skill_after_repair": "ReportExplanationSkill via SkillRegistry (priority=10, full RAG analysis)",
+      "evidence_file": "app/agents/chat_orchestrator.py — P0-C removed early-return blocks",
+      "early_return": false,
+      "agents_called_after_skill": "ReportChatCopilotAgent + RAG retrieval via ReportExplanationSkill"
+    }
+  ],
+  "agent_invocations": [
+    {
+      "query": "贵州茅台最新财报表现如何？",
+      "data_agent_invoked_before_repair": false,
+      "data_agent_invoked_after_repair": true,
+      "analysis_agent_invoked_before_repair": false,
+      "analysis_agent_invoked_after_repair": true,
+      "review_agent_invoked_before_repair": false,
+      "review_agent_invoked_after_repair": true,
+      "repair": "P0-C removed chat_orchestrator.py early-return; queries now reach ReportExplanationSkill"
+    }
+  ],
+  "stage_snapshots": [
+    {
+      "stage": "S0",
+      "name": "MA5 raw value",
+      "source": "technical_indicator_service.calculate(bars)['ma5']",
+      "example": "1255.19 (numeric float)"
+    },
+    {
+      "stage": "S1",
+      "name": "Prompt construction",
+      "source": "technical_analyst.py:237",
+      "example": "MA5  = 1255.19"
+    },
+    {
+      "stage": "S2",
+      "name": "LLM raw response",
+      "actual": "未确认 — no live trace available"
+    },
+    {
+      "stage": "S3",
+      "name": "After _ABS_PATH_RE.sub",
+      "source": "specialist_analysis_utils.py:106",
+      "mechanism": "If LLM output contains /something/5 pattern → replaced with [path]"
+    },
+    {
+      "stage": "S4",
+      "name": "After remove_unsupported_numbers",
+      "source": "specialist_analysis_utils.py:85-98",
+      "first_occurrence_of_unsupported": "Line 94: if not allowed: return _NUMERIC_RE.sub('未提供数字', text)",
+      "note": "If evidence_text is empty, ALL numbers become 未提供数字"
+    }
+  ],
+  "frontend_rendering": [
+    {
+      "component": "IndustryHotStocksPanel.vue",
+      "function": "changePctClass(pct)",
+      "line": "235-238",
+      "returns_for_positive": "pct-up",
+      "returns_for_negative": "pct-dn",
+      "css_pct_up": ".pct-up { color: var(--success); } — LINE 382 — GREEN = WRONG for A股",
+      "css_pct_dn": ".pct-dn { color: var(--danger); } — LINE 383 — RED = WRONG for A股",
+      "bug_type": "Reversed A股 color convention (American convention used)"
+    },
+    {
+      "component": "WatchlistStockCard.vue + IndustryStockCard.vue",
+      "function": "changePctClass from marketFormat.js",
+      "returns_for_positive": "up",
+      "returns_for_negative": "down",
+      "css": ".up { color: var(--danger) } .down { color: var(--success) }",
+      "status": "CORRECT A股 convention"
+    }
+  ],
+  "cache_findings": [
+    {
+      "cache_type": "report_chat",
+      "ttl": 1800,
+      "version_before_repair": "v1",
+      "version_after_repair": "v2",
+      "enabled": true,
+      "risk_before": "Stale 'partial_success' response with hardcoded strings may be cached for 30 min",
+      "repair_action": "P1-E: bumped to v2 in config.py; v1 keys expire naturally (no FLUSHALL)"
+    },
+    {
+      "cache_type": "analysis_run_registry",
+      "type": "memory",
+      "risk": "In-memory registry means single-worker only; multi-worker deployment would break SSE streaming"
+    }
+  ],
+  "confirmed_root_causes": [
+    {
+      "id": "RC-1",
+      "symptom": "MA5[path] in technical analysis",
+      "file": "app/agents/specialist_analysis_utils.py",
+      "line": 11,
+      "function": "sanitize_specialist_output() → _ABS_PATH_RE.sub",
+      "evidence": "_ABS_PATH_RE = re.compile(r'(/[A-Za-z0-9_.@-]+)+') matches path-like patterns in LLM output",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "RC-2",
+      "symptom": "未提供数字 replacing dates, codes, prices",
+      "file": "app/agents/specialist_analysis_utils.py",
+      "line": "85-98",
+      "function": "remove_unsupported_numbers()",
+      "evidence": "_NUMERIC_RE matches individual digit groups; when evidence_text empty → all numbers replaced",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "RC-3",
+      "symptom": "财报查询只返回定位文案，无实际分析",
+      "file": "app/agents/chat_orchestrator.py",
+      "line": "603-621",
+      "function": "early return OrchestratorResult after report_context found, before any Analysis Agent call",
+      "evidence": "metadata.status='partial_success'; no data_agent, analysis_agent, or review_agent called",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "RC-4",
+      "symptom": "行业热股涨跌颜色错误 (上涨绿色/下跌红色)",
+      "file": "frontend/src/components/IndustryHotStocksPanel.vue",
+      "line": "382-383",
+      "function": "CSS .pct-up / .pct-dn",
+      "evidence": ".pct-up uses var(--success)=green; .pct-dn uses var(--danger)=red; opposite of A股 convention",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "RC-5",
+      "symptom": "两条相似warning同时显示",
+      "files": [
+        "frontend/src/components/fundamentals/DataSourceBanner.vue:15",
+        "frontend/src/components/CompanyFundamentalsPanel.vue:583"
+      ],
+      "evidence": "DataSourceBanner triggered by dataSourceUnavailable; overviewBanner triggered by partial envelope — both fire when Tushare auth fails",
+      "confidence": "HIGH"
+    }
+  ],
+  "unconfirmed_hypotheses": [
+    {
+      "id": "H-1",
+      "symptom": "skeleton/loading未消失",
+      "hypothesis": "diagnosticsLoading stays true if loadDiagnostics() throws unhandled exception before finally block",
+      "missing_evidence": "Live network trace or console error log from browser",
+      "confidence": 0.55
+    },
+    {
+      "id": "H-2",
+      "symptom": "PE/PB/市值等字段显示—",
+      "hypothesis": "These come from etl_daily_basic (not fina_indicator) but the profile API path may not have AKShare fallback",
+      "missing_evidence": "Actual API response JSON for /stocks/{market}/{symbol}/profile",
+      "confidence": 0.6
+    },
+    {
+      "id": "H-3",
+      "symptom": "行业热股颜色显示黑色（非绿/红）",
+      "hypothesis": "change_pct arrives as string with '%' sign; Number('19.80%')=NaN → class='' → default black",
+      "missing_evidence": "Actual network response JSON showing change_pct type",
+      "confidence": 0.45
+    },
+    {
+      "id": "H-4",
+      "symptom": "Tushare token may have trailing whitespace",
+      "hypothesis": "Token length 56 chars; Tushare tokens are typically 32 hex chars; length mismatch suggests possible whitespace",
+      "missing_evidence": "Cannot read actual token value; needs deployment env check",
+      "confidence": 0.5
+    }
+  ],
+  "test_count_reconciliation": {
+    "number_104_source": "R1.2 report arithmetic error — 75+22+5+2 was miscounted; corrected total is 75",
+    "number_75_source": "R1/R1.1/R1.2 combined: 22(R1.2 pipeline) + 12(R1.1 acceptance) + 18(R1 routing) + 31(specialist utils) = 83; 75 = the 4 suites without specialist utils run count; actual verified combined: 75",
+    "number_92_source": "R1.3 new frontend tests: 43(R1.3 three suites) + 9(R1.1 color) + 10(status badge) + 15(skeleton) = reported as 92 in R1.1 report draft; actual new R1.3 frontend tests: 43 new + 9 existing = 52",
+    "number_7527_source": "full backend pytest tests/ run (bakl4eouy) exit code 1; 7527 PASSED but suite is NOT all-passing (21 failures exist)",
+    "number_21_source": "21 pre-existing failures in P127/P131/P132 soak/staging test files; ALL confirmed FAIL at baseline SHA 9005c08 in clean worktree",
+    "correct_description": {
+      "backend_R1_suites": "75/75 PASS (exit 0)",
+      "frontend_R1_plus_R1.3": "740/740 PASS (exit 0)",
+      "full_backend": "8704 PASS, 21 FAIL (pre-existing), 15 SKIP (exit 1)",
+      "vite_build": "exit 0, built in 2.69s"
+    }
+  },
+  "baseline_failure_comparison": {
+    "method": "git worktree at SHA 9005c0879295833377ef7009f344afb67f93a2a7",
+    "worktree_path": "/tmp/r13_baseline",
+    "baseline_result": "21/21 tested node IDs FAIL at baseline",
+    "current_result": "21/21 same node IDs FAIL in current workspace",
+    "regression_introduced": false,
+    "node_ids": [
+      "tests/test_phase6v_p127_chat_orchestration_soak.py::TestBackendCanonicalSuite::test_pass_count",
+      "tests/test_phase6v_p127_chat_orchestration_soak.py::TestCombinedChatMetrics::test_10000_requests",
+      "tests/test_phase6v_p127_chat_orchestration_soak.py::TestCombinedChatMetrics::test_10_windows",
+      "tests/test_phase6v_p127_chat_orchestration_soak.py::TestCombinedChatMetrics::test_all_windows_pass",
+      "tests/test_phase6v_p127_chat_orchestration_soak.py::TestCombinedChatMetrics::test_chat_endpoint",
+      "tests/test_phase6v_p127_chat_orchestration_soak.py::TestCombinedChatMetrics::test_schema",
+      "tests/test_phase6v_p127_chat_orchestration_soak.py::TestCombinedChatMetrics::test_shadow_mode",
+      "tests/test_phase6v_p127_chat_orchestration_soak.py::TestCombinedChatMetrics::test_soak_health",
+      "tests/test_phase6v_p127_chat_orchestration_soak.py::TestCombinedChatMetrics::test_zero_pi_violations",
+      "tests/test_phase6v_p127_chat_orchestration_soak.py::TestScopeReconciliation::test_p127_7027_pass",
+      "tests/test_phase6v_p131_provider_control_plane.py::TestPricingFile::test_pricing_file_marked_unverified",
+      "tests/test_phase6v_p131_provider_control_plane.py::TestPricingFile::test_pricing_mode_is_test_fixture",
+      "tests/test_phase6v_p131_provider_control_plane.py::TestPricingRegistry::test_alias_lookup_works",
+      "tests/test_phase6v_p131_provider_control_plane.py::TestPricingRegistry::test_flash_model_not_verified",
+      "tests/test_phase6v_p131_provider_control_plane.py::TestPricingRegistry::test_globally_not_verified",
+      "tests/test_phase6v_p131_provider_control_plane.py::TestPricingRegistry::test_pricing_mode_is_test_fixture",
+      "tests/test_phase6v_p131_provider_control_plane.py::TestPricingRegistry::test_pro_model_not_verified",
+      "tests/test_phase6v_p131_provider_control_plane.py::TestPricingRegistry::test_require_verified_raises_when_unverified",
+      "tests/test_phase6v_p132_mvp_release.py::TestInviteRouterEndpoints::test_redeem_invite_endpoint_registered",
+      "tests/test_phase6v_p132_mvp_release.py::TestMvpHealthEndpoint::test_health_returns_phase_p132",
+      "tests/test_phase6v_p132_mvp_release.py::TestMvpInviteModel::test_invite_has_invite_code_column"
+    ]
+  },
+  "original_query_trace": {
+    "query": "贵州茅台最新财报表现如何？",
+    "normalized": "贵州茅台最新财报表现如何？",
+    "pdf_shadow_match": false,
+    "pdf_analysis_override": "NOT triggered (pdf shadow false → no override needed)",
+    "latest_report_setup_predicate_match": true,
+    "early_return_blocked": "P0-C fix: no early return from _match_latest_report_setup_candidate",
+    "selected_route": "ReportExplanationSkill",
+    "intent": "analysis",
+    "test_node": "tests/test_phase6w_r1_p0c_report_query_routing.py::TestBlockingBSixQueryRoutingMatrix::test_q1_analysis_financial_report_performance",
+    "test_result": "PASS",
+    "locator_queries_also_tested": [
+      "请给我贵州茅台最新年报官方PDF → PDF-handler (Q3)",
+      "贵州茅台最新报告是哪一份？ → PDF-handler (Q5)"
+    ],
+    "numeric_validation": "wired in _do_chat(); empty evidence → partial=True, NUMERIC_EVIDENCE_MISSING in errors",
+    "cache_intent_type": "analysis (namespaced separately from locator)"
+  },
+  "company_six_field_trace": {
+    "fields": {
+      "latest_price": {
+        "source": "Tushare daily_basic → QuoteSnapshotTool.fetch()",
+        "api_key": "close",
+        "backend_tool": "app/tools/fundamental/quote_snapshot.py",
+        "api_path": "GET /api/v1/stocks/{market}/{symbol}/fundamentals/snapshot",
+        "json_key": "data.close",
+        "adapter": "CompanyOverviewCards: price ?? latest_price ?? close",
+        "component": "CompanyOverviewCards.vue",
+        "dom_label": "最新价 (or 最近收盘价 for kline fallback)",
+        "test": "phase6wR1_3CompanyOverviewSix.test.js::latest_price PASS"
+      },
+      "pe_ttm": {
+        "source": "Tushare daily_basic",
+        "api_key": "pe_ttm",
+        "backend_tool": "app/tools/fundamental/quote_snapshot.py",
+        "json_key": "data.pe_ttm",
+        "component": "CompanyOverviewCards.vue",
+        "dom_label": "PE(TTM)",
+        "test": "phase6wR1_3CompanyOverviewSix.test.js::pe_ttm PASS"
+      },
+      "pb": {
+        "source": "Tushare daily_basic",
+        "api_key": "pb",
+        "json_key": "data.pb",
+        "component": "CompanyOverviewCards.vue",
+        "dom_label": "PB",
+        "test": "phase6wR1_3CompanyOverviewSix.test.js::pb PASS"
+      },
+      "total_market_cap": {
+        "source": "Tushare daily_basic → total_mv (万元) * 1e4 = 元",
+        "api_key": "total_mv",
+        "json_key": "data.total_mv",
+        "unit_conversion": "万元 → 元 in backend; 亿元 display in frontend if >= 1e8",
+        "component": "CompanyOverviewCards.vue fmtMv()",
+        "dom_label": "总市值 (亿元)",
+        "test": "phase6wR1_3CompanyOverviewSix.test.js::total_market_cap PASS"
+      },
+      "roe": {
+        "source": "Tushare financial data → financial_summary tool",
+        "api_key": "series[0].roe",
+        "json_key": "data.series[0].roe",
+        "component": "CompanyOverviewCards.vue finData.roe",
+        "dom_label": "ROE (%)",
+        "test": "phase6wR1_3CompanyOverviewSix.test.js::roe PASS"
+      },
+      "dividend_yield_ttm": {
+        "source": "Tushare daily_basic",
+        "api_key": "dv_ttm",
+        "json_key": "data.dv_ttm",
+        "component": "CompanyOverviewCards.vue snapData.dv_ttm",
+        "dom_label": "股息率(TTM) (%)",
+        "test": "phase6wR1_3CompanyOverviewSix.test.js::dividend_yield_ttm PASS"
+      }
+    },
+    "degradation_tested": true,
+    "null_fields_show_dash": true
+  },
+  "frontend_status_badge": {
+    "badge_function": "badgeClass(status) in src/utils/warningMap.js",
+    "green_badge_source": "badgeClass(\"success\") → badge-success → color: var(--success) [green]",
+    "used_in": [
+      "AgentStatusBar.vue",
+      "SectionAccordion.vue"
+    ],
+    "agent_status_values": [
+      "success",
+      "timeout",
+      "error"
+    ],
+    "partial_success_mapping": "badgeClass(\"partial_success\") → badge-failed → color: var(--danger) [RED]",
+    "report_chat_panel": "uses result.partial (boolean) → rcp-partial-badge class (NOT badge-success)",
+    "conclusion": "partial_success CANNOT display as green success badge in any frontend component",
+    "tests": "phase6wR1_3StatusBadge.test.js 10/10 PASS"
+  },
+  "loading_runtime_scenarios": {
+    "implementation": "CompanyFundamentalsPanel.vue — 6 finally blocks confirmed",
+    "scenarios": {
+      "scenario_1": "overview resolve, modules reject → skeleton clears (finally)",
+      "scenario_2": "Tushare auth error → authRequired only, no overviewBanner duplicate",
+      "scenario_3": "tab switch → loading reset in finally prevents stale skeleton",
+      "scenario_4": "AI summary pending → separate aiSummaryLoading ref, does not block grid",
+      "scenario_5": "diagnostics reject → diagnosticsLoading cleared in finally, top skeleton gone"
+    },
+    "test_file": "phase6wR1_3SkeletonScenarios.test.js",
+    "test_count": 15,
+    "pass": 15
+  },
+  "warning_runtime_scenarios": {
+    "dedup_guard": "!dataSourceUnavailable.value before setting overviewBanner",
+    "auth_error_path": "authRequired.value = true only (no overviewBanner)",
+    "max_banners_per_scenario": 1,
+    "test": "phase6wR1_3SkeletonScenarios.test.js::Scenario 3 warning dedup PASS"
+  },
+  "browser_color_evidence": {
+    "playwright_available": true,
+    "playwright_version": "1.62.0",
+    "playwright_config": "NOT FOUND (no playwright.config.* in frontend/)",
+    "vitest_color_tests": "9/9 PASS (phase6wR1P1aColorConvention.test.js)",
+    "css_token_verified": {
+      ".pct-up": "color: var(--danger) [red = A股 rise]",
+      ".pct-dn": "color: var(--success) [green = A股 fall]"
+    },
+    "browser_getComputedStyle": "NOT EXECUTED — no playwright.config, no test runner entrypoint",
+    "assessment": "browser_evidence_unavailable — must be added to staging smoke test"
+  },
+  "frontend_full_suite": {
+    "command": "cd frontend && npx vitest run",
+    "test_files": 66,
+    "tests": 740,
+    "passed": 740,
+    "failed": 0,
+    "duration_s": 4.94,
+    "exit_code": 0
+  },
+  "build_result": {
+    "command": "cd frontend && npx vite build --mode production",
+    "exit_code": 0,
+    "built_in_s": 2.69,
+    "warnings": "chunk size warning (echarts 1135KB) — not an error",
+    "errors": 0
+  }
+}
