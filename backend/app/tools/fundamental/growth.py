@@ -14,7 +14,7 @@ from __future__ import annotations
 import asyncio, logging
 from typing import Any
 import pandas as pd
-from app.datasource.tushare_client import tushare_client, _to_ts_code
+from app.datasource.tushare_client import tushare_client, _to_ts_code, TushareAuthError
 from app.tools.fundamental.base import BaseFundamentalTool, FundamentalToolError
 from app.tools.fundamental._helpers import (
     safe_float, fmt_date, filter_report_type, filter_annual, row_get
@@ -59,7 +59,10 @@ class GrowthTool(BaseFundamentalTool):
 
         inc_df = pd.DataFrame()
         if isinstance(inc_result, Exception):
-            partial_errors.append(f"income 表失败: {inc_result}")
+            if isinstance(inc_result, TushareAuthError):
+                partial_errors.append("income 暂不可用（权限不足）")
+            else:
+                partial_errors.append(f"income 表失败: {inc_result}")
         else:
             inc_df = filter_report_type(inc_result)
             if self.annual: inc_df = filter_annual(inc_df)
@@ -68,7 +71,10 @@ class GrowthTool(BaseFundamentalTool):
         fi_df = pd.DataFrame()
         fi_by_date: dict[str, Any] = {}
         if isinstance(fi_result, Exception):
-            partial_errors.append(f"fina_indicator 表失败: {fi_result}")
+            if isinstance(fi_result, TushareAuthError):
+                partial_errors.append("fina_indicator 暂不可用（权限不足）")
+            else:
+                partial_errors.append(f"fina_indicator 表失败: {fi_result}")
         else:
             fi_df = fi_result.copy()
             if self.annual: fi_df = filter_annual(fi_df)

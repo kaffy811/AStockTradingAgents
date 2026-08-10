@@ -71,7 +71,18 @@ _DISCLAIMER = "\n\n_仅供研究参考，不构成投资建议。_"
 _EMPTY_FINAL_ANSWER_TEXT = "报告数据已获取，但本次回答生成失败，请重新尝试。"
 _CHAT_ENTITY_PIPELINE_VERSION = "d6_4"
 _OFFICIAL_REPORT_PDF_SHADOW_PATTERN = re.compile(
-    r"pdf|PDF|官方.{0,6}(链接|原文|PDF|pdf)|年报|年度报告|中报|半年报|季报|一季报|三季报|这份报告|那份报告|报告原文|报告.*在哪",
+    r"pdf|PDF|官方.{0,6}(链接|原文|PDF|pdf)|年报|年度报告|中报|半年报|季报|一季报|三季报|这份报告|那份报告|报告原文|报告.*在哪"
+    r"|报告.*哪一份|哪一份.*报告",  # R1.1-B: "最新报告是哪一份" locator pattern
+    re.IGNORECASE,
+)
+# R1.1-B: Analysis-intent override — prevents analysis queries that mention "年报" etc.
+# from being hijacked by the PDF early-return path.
+# When a query matches both the PDF pattern AND this pattern, it is routed to SkillRegistry
+# (ReportExplanationSkill) instead of _handle_official_report_pdf_direct.
+# Example: "分析茅台最新年报的盈利能力" → has "年报" (PDF pattern) + "分析/盈利能力" (here)
+#          → SkillRegistry (analysis intent wins).
+_PDF_ANALYSIS_OVERRIDE_RE = re.compile(
+    r"分析|如何|怎么样|表现|情况|盈利能力|净利|毛利|增长|同比|业绩|解读|研究|评价|走势|趋势",
     re.IGNORECASE,
 )
 _LATEST_REPORT_SETUP_PATTERN = re.compile(
@@ -1425,35 +1436,20 @@ async def process_message(
             session_id=session_id,
             current_query=content,
         )
-    if db is not None and _early_entity_hint and _match_latest_report_setup_candidate(content):
-        _early_entity_payload = {
-            "chat_entity_pipeline_version": _CHAT_ENTITY_PIPELINE_VERSION,
-            "raw_query": content,
-            "effective_query": content,
-            "resolver_called": False,
-            "resolver_result_count": 1,
-            "resolved_entities": [_entity_payload_from_hint(_early_entity_hint, source=_early_entity_hint.get("source") or "early_unambiguous_hint")],
-            "primary_entity": _entity_payload_from_hint(_early_entity_hint, source=_early_entity_hint.get("source") or "early_unambiguous_hint"),
-            "context_source": _early_entity_hint.get("source") or "early_unambiguous_hint",
-            "failure_reason": "",
-        }
-        if (getattr(settings, "agent_executor_mode", "legacy") or "legacy").strip().lower() == "pi_compatible_shadow":
-            await _record_pi_shadow_skipped(
-                content=content,
-                session_id=session_id,
-                user_id=user_id,
-                entity_payload=_early_entity_payload,
-                shadow_result_callback=shadow_result_callback,
-            )
-        await _emit("intent_detected", {"intent": "latest_report_setup_direct", "handler": "_handle_latest_report_setup_direct"})
-        return await _handle_latest_report_setup_direct(
-            content,
-            db,
-            user_id,
-            entity_hint=_early_entity_hint,
-            session_id=session_id,
-        )
-    if db is not None and _early_entity_hint and _match_official_report_pdf_shadow_candidate(content):
+    # P0-C fix: queries matching _LATEST_REPORT_SETUP_PATTERN are analysis intents
+    # ("最新财报表现如何", "最近年报怎么样") and must reach ReportExplanationSkill
+    # via the SkillRegistry.  The former early-return path returned partial_success
+    # after only resolving the report context, without invoking any analysis agent.
+    # These queries now fall through to the full orchestrator / SkillRegistry path.
+    if (
+        db is not None
+        and _early_entity_hint
+        and _match_official_report_pdf_shadow_candidate(content)
+        # R1.1-B: do NOT route to PDF locator when query expresses analysis intent.
+        # "分析茅台年报盈利能力" contains "年报" (PDF pattern) but the dominant intent
+        # is financial analysis, which belongs to ReportExplanationSkill.
+        and not _PDF_ANALYSIS_OVERRIDE_RE.search(content)
+    ):
         _early_entity = _entity_payload_from_hint(_early_entity_hint, source=_early_entity_hint.get("source") or "early_recent_session_hint")
         _early_entity_payload = {
             "chat_entity_pipeline_version": _CHAT_ENTITY_PIPELINE_VERSION,
@@ -1698,15 +1694,10 @@ async def process_message(
         except Exception as exc:  # noqa: BLE001
             log.debug("pi-compatible shadow scheduling failed: %s", exc)
 
-    if db is not None and _match_latest_report_setup_candidate(_effective_content) and _official_report_entity_hint:
-        await _emit("intent_detected", {"intent": "latest_report_setup_direct", "handler": "_handle_latest_report_setup_direct"})
-        return await _handle_latest_report_setup_direct(
-            _effective_content,
-            db,
-            user_id,
-            entity_hint=_official_report_entity_hint,
-            session_id=session_id,
-        )
+    # P0-C fix: do NOT short-circuit here for analysis queries.
+    # _match_latest_report_setup_candidate matches "最新财报如何", "最近年报怎么样" etc.
+    # which are financial analysis intents, not PDF-find intents.
+    # These must reach ReportExplanationSkill via the SkillRegistry path below.
 
     runtime_mode = (settings.chat_runtime_mode or "legacy").strip().lower()
     if runtime_mode in {"layered_v1", "shadow"}:

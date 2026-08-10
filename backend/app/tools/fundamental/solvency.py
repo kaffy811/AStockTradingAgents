@@ -16,7 +16,7 @@ from __future__ import annotations
 import asyncio, logging
 from typing import Any
 import pandas as pd
-from app.datasource.tushare_client import tushare_client, _to_ts_code
+from app.datasource.tushare_client import tushare_client, _to_ts_code, TushareAuthError
 from app.tools.fundamental.base import BaseFundamentalTool, FundamentalToolError
 from app.tools.fundamental._helpers import (
     safe_float, safe_div, fmt_date, filter_report_type, filter_annual, row_get
@@ -58,14 +58,20 @@ class SolvencyTool(BaseFundamentalTool):
         fi_by_date: dict[str, Any] = {}
 
         if isinstance(bs_result, Exception):
-            partial_errors.append(f"balancesheet 失败: {bs_result}")
+            if isinstance(bs_result, TushareAuthError):
+                partial_errors.append("balancesheet 暂不可用（权限不足）")
+            else:
+                partial_errors.append(f"balancesheet 失败: {bs_result}")
         else:
             bs_df = filter_report_type(bs_result)
             if self.annual: bs_df = filter_annual(bs_df)
             bs_df = bs_df.sort_values("end_date", ascending=False).head(self.limit)
 
         if isinstance(fi_result, Exception):
-            partial_errors.append(f"fina_indicator 失败: {fi_result}")
+            if isinstance(fi_result, TushareAuthError):
+                partial_errors.append("fina_indicator 暂不可用（权限不足）")
+            else:
+                partial_errors.append(f"fina_indicator 失败: {fi_result}")
         else:
             fi_tmp = fi_result.copy()
             if self.annual: fi_tmp = filter_annual(fi_tmp)

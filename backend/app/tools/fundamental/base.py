@@ -145,16 +145,26 @@ class BaseFundamentalTool(ABC):
           BaoStock（if ENABLE_BAOSTOCK）→ AkShare（if ENABLE_AKSHARE）→ err_envelope
         """
         from app.core.config import settings
-        from app.datasource.tushare_client import TushareError
+        from app.datasource.tushare_client import TushareError, TushareAuthError
 
         # Phase 6A: free mode 完全跳过 Tushare
         if settings.data_mode == "free":
             return await self._fetch_free_mode(market, symbol)
 
         # 尝试 Tushare
+        _is_permission_error = False
         try:
             data = await self.fetch(market, symbol)
             return ok_envelope(data)
+        except TushareAuthError as primary_err:
+            # P1-B: permission errors must NOT expose raw provider error to users.
+            # Log the raw detail internally; use a safe user-facing message in the envelope.
+            _is_permission_error = True
+            log.warning(
+                "Tushare 权限不足 [%s/%s/%s]: %s",
+                self.module_key, market, symbol, repr(primary_err),
+            )
+            primary_reason = "部分财务指标暂不可用，系统已继续使用其他可用数据源。"
         except TushareError as primary_err:
             primary_reason = str(primary_err)
             log.warning(
@@ -175,7 +185,7 @@ class BaseFundamentalTool(ABC):
                 exc_info=True,
             )
 
-        # Tushare 失败 → 尝试 AkShare
+        # Tushare 失败 → 尝试 AkShare（权限错误也试，因为 AkShare 是独立数据源）
         if settings.enable_akshare:
             try:
                 data = await self.fetch_akshare(market, symbol)
@@ -192,8 +202,14 @@ class BaseFundamentalTool(ABC):
                     self.module_key, market, symbol, fallback_err,
                 )
                 from app.core.error_codes import DATA_SOURCE_EMPTY, DATA_SOURCE_UNAVAILABLE
+                # P1-B: for permission errors, keep the safe user-facing reason
+                combined_reason = (
+                    primary_reason
+                    if _is_permission_error
+                    else f"Tushare 失败（{primary_reason}）；AkShare 也失败（{fallback_err}）"
+                )
                 return err_envelope(
-                    f"Tushare 失败（{primary_reason}）；AkShare 也失败（{fallback_err}）",
+                    combined_reason,
                     error_code=(
                         DATA_SOURCE_UNAVAILABLE
                         if self._is_network_error(fallback_err)

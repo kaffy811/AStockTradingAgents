@@ -10,7 +10,7 @@ from __future__ import annotations
 import asyncio, logging
 from typing import Any
 import pandas as pd
-from app.datasource.tushare_client import tushare_client, _to_ts_code
+from app.datasource.tushare_client import tushare_client, _to_ts_code, TushareAuthError
 from app.tools.fundamental.base import BaseFundamentalTool, FundamentalToolError
 from app.tools.fundamental._helpers import (
     safe_float, safe_pct, fmt_date, filter_report_type, filter_annual, row_get
@@ -50,7 +50,11 @@ class ProfitabilityTool(BaseFundamentalTool):
         fi_df, inc_df = pd.DataFrame(), pd.DataFrame()
 
         if isinstance(fi_result, Exception):
-            partial_errors.append(f"fina_indicator 失败: {fi_result}")
+            # P1-B: do not expose raw provider error messages to users
+            if isinstance(fi_result, TushareAuthError):
+                partial_errors.append("fina_indicator 暂不可用（权限不足）")
+            else:
+                partial_errors.append(f"fina_indicator 失败: {fi_result}")
         else:
             fi_df = fi_result.copy()
             if self.annual: fi_df = filter_annual(fi_df)
@@ -58,7 +62,11 @@ class ProfitabilityTool(BaseFundamentalTool):
 
         inc_by_date: dict[str, Any] = {}
         if isinstance(inc_result, Exception):
-            partial_errors.append(f"income 失败: {inc_result}")
+            # P1-B: do not expose raw provider error messages to users
+            if isinstance(inc_result, TushareAuthError):
+                partial_errors.append("income 暂不可用（权限不足）")
+            else:
+                partial_errors.append(f"income 失败: {inc_result}")
         else:
             inc_df_raw = filter_report_type(inc_result)
             if self.annual: inc_df_raw = filter_annual(inc_df_raw)

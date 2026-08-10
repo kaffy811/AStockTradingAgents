@@ -314,7 +314,8 @@ class ComprehensiveAnalysisCoordinator:
             report, sections, market, symbol, stock_identity
         )
 
-        metadata["partial"] = _is_partial_analysis(sections, statuses)
+        # R1.2 P0: sanitization artifacts force partial=True so status cannot be success
+        metadata["partial"] = _is_partial_analysis(sections, statuses) or validation.get("has_sanitization_artifacts", False)
         metadata["synthesis_validation"] = validation
         log.info("ComprehensiveCoordinator: done [%s/%s]", market, symbol)
         return {
@@ -422,7 +423,8 @@ class ComprehensiveAnalysisCoordinator:
             report, sections, market, symbol, stock_identity, stock_name=stock_name
         )
 
-        metadata["partial"] = _is_partial_analysis(sections, statuses)
+        # R1.2 P0: sanitization artifacts force partial=True
+        metadata["partial"] = _is_partial_analysis(sections, statuses) or validation.get("has_sanitization_artifacts", False)
         metadata["synthesis_validation"] = validation
         log.info("ComprehensiveCoordinator.analyze_async: done [%s/%s]", market, symbol)
         return {
@@ -609,7 +611,9 @@ class ComprehensiveAnalysisCoordinator:
         metadata["analysis_scope"]   = analysis_scope
         metadata["workflow_engine"]  = "custom_coordinator"
         metadata["output_language"]  = output_language
-        metadata["partial"]          = _is_partial_analysis(sections, statuses)
+        # R1.2 P0: sanitization artifacts in synthesis force partial
+        _artifacts_flag = validation.get("has_sanitization_artifacts", False) if analysis_scope == "comprehensive" else False
+        metadata["partial"]          = _is_partial_analysis(sections, statuses) or _artifacts_flag
         if analysis_scope == "comprehensive":
             metadata["synthesis_validation"] = validation
 
@@ -1437,6 +1441,10 @@ def _finalize_synthesis_report(
     shaped, missing_limits = _ensure_limitations(shaped, sections)
     shaped, duplicate_count = _remove_duplicate_paragraphs(shaped)
 
+    # R1.2 P0: detect residual sanitization artifacts in finalized report
+    from app.agents.specialist_analysis_utils import has_sanitization_artifacts  # noqa: PLC0415
+    _has_artifacts = has_sanitization_artifacts(shaped)
+
     validation = {
         "shape_coerced": shape_changed,
         "identity_corrections": identity_changes,
@@ -1445,6 +1453,8 @@ def _finalize_synthesis_report(
         "safety_violation_count": safety_replacements,
         "missing_limitation_count": missing_limits,
         "duplicate_section_count": duplicate_count,
+        # True when sanitization markers remain — callers should degrade status
+        "has_sanitization_artifacts": _has_artifacts,
     }
     return shaped, validation
 

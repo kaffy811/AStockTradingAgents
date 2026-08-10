@@ -672,6 +672,7 @@ class ReportExplanationSkill(BaseSkill):
             use_memory=True,
             force_refresh=False,
             event_callback=context.event_callback,
+            intent_type="analysis",  # R1.1-F: analysis intent — separate cache namespace from locator
         )
         result = result if isinstance(result, dict) else {}
         events.append(self._tool_event("report_chat_copilot", "统一财报解释主链", "success" if result else "error"))

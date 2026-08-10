@@ -799,9 +799,15 @@ class ReportChatCopilotAgent:
         session_id: str | None = None,
         use_memory: bool = True,
         event_callback: Any = None,
+        # Phase 6W-R1.1 Blocking-F: intent type for cache key separation
+        intent_type: str = "analysis",
     ) -> dict:
         """
         Returns structured result dict. Never raises.
+
+        *intent_type* is included in the Redis cache key to prevent locator
+        answers from being served for analysis queries and vice versa.
+        Values: ``"analysis"`` (default), ``"locator"``.
         """
         try:
             return await asyncio.wait_for(
@@ -819,6 +825,7 @@ class ReportChatCopilotAgent:
                     session_id=session_id,
                     use_memory=use_memory,
                     event_callback=event_callback,
+                    intent_type=intent_type,
                 ),
                 timeout=_REPORT_CHAT_OVERALL_TIMEOUT_SECONDS,
             )
@@ -848,6 +855,7 @@ class ReportChatCopilotAgent:
         session_id: str | None,
         use_memory: bool,
         event_callback: Any,
+        intent_type: str = "analysis",
     ) -> dict:
         from app.agent.report_chat_cache import (
             read_cache, write_cache, _empty_cache_meta,
@@ -1104,6 +1112,7 @@ class ReportChatCopilotAgent:
                 report_types=selected_report_types,
                 years=selected_years,
                 report_id=selected_report_id,
+                intent_type=intent_type,
             )
             if cached is not None:
                 log.debug("Cache HIT for %s question=%r", ts_code, normalized_question[:40])
@@ -1222,6 +1231,7 @@ class ReportChatCopilotAgent:
         allowed_chunk_ids = [c["chunk_id"] for c in chunks if c.get("chunk_id") is not None]
         if not chunks:
             timings["total_ms"] = _ms_since(total_start)
+            _no_evidence_errors = list(errors) + ["NO_REPORT_EVIDENCE", "NUMERIC_EVIDENCE_MISSING"]
             return {
                 "status": "failed",
                 "error_code": "NO_REPORT_EVIDENCE",
@@ -1238,8 +1248,17 @@ class ReportChatCopilotAgent:
                 "evidence_used": [],
                 "data_limitations": ["当前未检索到相关财报片段，不能编造财务数字"],
                 "disclaimer": "本内容基于已接入的公开财报片段，仅供参考，不构成投资建议。",
-                "errors": errors or ["NO_REPORT_EVIDENCE"],
+                "errors": _no_evidence_errors,
                 "partial": True,
+                # R1.2: numeric_validation always present — evidence_missing is the authoritative state
+                "numeric_validation": {
+                    "valid": False,
+                    "reason": "numeric_evidence_missing",
+                    "evidence_available": False,
+                    "replaced_count": 0,
+                    "unsupported_count": 0,
+                    "has_artifacts": False,
+                },
                 "cache_meta": cache_meta,
                 "memory_meta": {
                     **memory_meta_dict(session_id, len(memory_turns), False),
@@ -1533,11 +1552,59 @@ class ReportChatCopilotAgent:
             }
 
         is_rejection = review_status == "rejected" or classification == "rejected"
-        partial = bool(errors) or rag_result.get("partial", False) or review_status not in {"approved", "revised", "skipped"}
+
+        # ── R1.2 P0: Numeric validation gate ─────────────────────────────────
+        # Build evidence corpus from retrieved RAG chunks (same text the LLM saw).
+        # validate_numeric_claims() returns structured state so downstream can gate
+        # status without needing to re-parse the answer.
+        from app.agents.specialist_analysis_utils import (  # noqa: PLC0415
+            validate_numeric_claims,
+            has_sanitization_artifacts,
+        )
+        _evidence_text = " ".join(str(c.get("content") or "") for c in (chunks or []))
+        _nv = validate_numeric_claims(answer, _evidence_text)
+        _has_artifact = has_sanitization_artifacts(answer)
+
+        _numeric_validation = {
+            "valid":              _nv["valid"],
+            "reason":             _nv["reason"],
+            "evidence_available": _nv["evidence_available"],
+            "replaced_count":     _nv["replaced_count"],
+            "unsupported_count":  len(_nv.get("unsupported_tokens") or []),
+            "has_artifacts":      _has_artifact,
+        }
+
+        if not _nv["valid"]:
+            if _nv["reason"] == "numeric_evidence_missing":
+                # Empty evidence: numeric claims cannot be traced to source — must degrade
+                errors.append("NUMERIC_EVIDENCE_MISSING")
+                _lim = "数字声明无法通过证据验证（证据缺失），已降级"
+                if _lim not in (data_limitations or []):
+                    data_limitations = list(data_limitations or [])
+                    data_limitations.insert(0, _lim)
+            elif _nv["reason"] == "unsupported_numbers_found":
+                _bad = ", ".join(str(t) for t in (_nv.get("unsupported_tokens") or [])[:5])
+                errors.append(f"UNSUPPORTED_NUMBERS:{_bad}")
+                _lim = f"部分数字无法在证据中找到对应（{_bad}）"
+                if _lim not in (data_limitations or []):
+                    data_limitations = list(data_limitations or [])
+                    data_limitations.insert(0, _lim)
+
+        if _has_artifact:
+            errors.append("SANITIZATION_ARTIFACTS_IN_ANSWER")
+            _lim = "输出中存在净化标记（未提供数字/[path]），内容已降级"
+            if _lim not in (data_limitations or []):
+                data_limitations = list(data_limitations or [])
+                data_limitations.insert(0, _lim)
+
+        # numeric_invalid forces partial=True so status cannot be "completed"
+        _numeric_invalid = not _nv["valid"] or _has_artifact
+
+        partial = bool(errors) or _numeric_invalid or rag_result.get("partial", False) or review_status not in {"approved", "revised", "skipped"}
         timings["total_ms"] = _ms_since(total_start)
 
         result = {
-            "status":           "partial_success" if partial and chunks else "completed",
+            "status":             "partial_success" if partial and chunks else "completed",
             "answer":           answer,
             "source_chunks":    source_chunks_out,
             "review_audit":     review_audit,
@@ -1546,9 +1613,10 @@ class ReportChatCopilotAgent:
             "evidence_used":    evidence_used,
             "data_limitations": data_limitations,
             "disclaimer":       disclaimer,
-            "errors":           errors,
-            "partial":          partial,
-            "cache_meta":       cache_meta,
+            "errors":              errors,
+            "partial":             partial,
+            "numeric_validation":  _numeric_validation,  # R1.2: validation state for debugging/badge
+            "cache_meta":          cache_meta,
             "memory_meta": {
                 **memory_meta_dict(session_id, len(memory_turns), memory_context_used),
                 "report_context": report_context,
@@ -1570,6 +1638,7 @@ class ReportChatCopilotAgent:
                 years=selected_years,
                 report_id=selected_report_id,
                 is_rejection=is_rejection,
+                intent_type=intent_type,
             )
             # Refresh cache_meta in the returned result (key was computed inside write_cache)
             from app.agent.report_chat_cache import make_cache_key
@@ -1578,7 +1647,7 @@ class ReportChatCopilotAgent:
             _ttl = 60 if is_rejection else _settings.report_chat_cache_ttl_seconds
             result["cache_meta"] = {
                 "hit":         False,
-                "key":         make_cache_key(ts_code, normalized_question, selected_report_types, selected_years, selected_report_id),
+                "key":         make_cache_key(ts_code, normalized_question, selected_report_types, selected_years, selected_report_id, intent_type),
                 "ttl_seconds": _ttl,
                 "created_at":  int(_time.time()),
             }

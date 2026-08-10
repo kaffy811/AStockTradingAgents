@@ -14,7 +14,7 @@ from __future__ import annotations
 import asyncio, logging
 from typing import Any
 import pandas as pd
-from app.datasource.tushare_client import tushare_client, _to_ts_code
+from app.datasource.tushare_client import tushare_client, _to_ts_code, TushareAuthError
 from app.tools.fundamental.base import BaseFundamentalTool, FundamentalToolError
 from app.tools.fundamental._helpers import (
     safe_float, safe_pct, safe_div, fmt_date,
@@ -72,14 +72,20 @@ class CapitalOccupationTool(BaseFundamentalTool):
         inc_by_date: dict[str, Any] = {}
 
         if isinstance(bs_result, Exception):
-            partial_errors.append(f"balancesheet 失败: {bs_result}")
+            if isinstance(bs_result, TushareAuthError):
+                partial_errors.append("balancesheet 暂不可用（权限不足）")
+            else:
+                partial_errors.append(f"balancesheet 失败: {bs_result}")
         else:
             bs_df = filter_report_type(bs_result)
             if self.annual: bs_df = filter_annual(bs_df)
             bs_df = bs_df.sort_values("end_date", ascending=False).head(self.limit)
 
         if isinstance(inc_result, Exception):
-            partial_errors.append(f"income 失败，revenue 将为 null: {inc_result}")
+            if isinstance(inc_result, TushareAuthError):
+                partial_errors.append("income 暂不可用（权限不足），revenue 将为 null")
+            else:
+                partial_errors.append(f"income 失败，revenue 将为 null: {inc_result}")
         else:
             tmp = filter_report_type(inc_result)
             if self.annual: tmp = filter_annual(tmp)

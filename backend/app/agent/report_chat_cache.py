@@ -1,7 +1,10 @@
 """
 app/agent/report_chat_cache.py — 问财报 Redis TTL 缓存（Phase 6K）
 
-Cache key:  rc:{CACHE_VERSION}:{ts_code}:{question_hash}:{filters_hash}
+Cache key:  rc:{CACHE_VERSION}:{intent_type}:{ts_code}:{question_hash}:{filters_hash}
+            intent_type: "analysis" (default) or "locator"
+            Separates analysis answers from locator answers so different intents
+            never share a cache slot for the same (ts_code, question) pair.
 TTL:        REPORT_CHAT_CACHE_TTL_SECONDS (default 1800s / 30 min)
 
 Rules:
@@ -52,13 +55,19 @@ def make_cache_key(
     report_types: list[str] | None = None,
     years: list[int] | None = None,
     report_id: int | None = None,
+    intent_type: str = "analysis",
 ) -> str:
-    """Build deterministic cache key for a report-chat query."""
+    """Build deterministic cache key for a report-chat query.
+
+    The *intent_type* segment prevents analysis answers from being served for
+    locator queries and vice versa when the normalized question hashes collide.
+    Valid values: ``"analysis"`` (default), ``"locator"``.
+    """
     from app.core.config import settings
     version = settings.report_chat_cache_version or _CACHE_VERSION
     qh = _question_hash(normalized_question)
     fh = _filters_hash(report_types, years, report_id)
-    return f"rc:{version}:{ts_code}:{qh}:{fh}"
+    return f"rc:{version}:{intent_type}:{ts_code}:{qh}:{fh}"
 
 
 # ── Redis helpers ─────────────────────────────────────────────────────────────
@@ -87,6 +96,7 @@ async def read_cache(
     report_types: list[str] | None = None,
     years: list[int] | None = None,
     report_id: int | None = None,
+    intent_type: str = "analysis",
 ) -> dict | None:
     """
     Return cached chat result or None.
@@ -101,7 +111,7 @@ async def read_cache(
     if redis is None:
         return None
 
-    key = make_cache_key(ts_code, normalized_question, report_types, years, report_id)
+    key = make_cache_key(ts_code, normalized_question, report_types, years, report_id, intent_type)
     try:
         raw = await redis.get(key)
         if raw is None:
@@ -124,6 +134,7 @@ async def write_cache(
     years: list[int] | None = None,
     report_id: int | None = None,
     is_rejection: bool = False,
+    intent_type: str = "analysis",
 ) -> bool:
     """
     Write chat result to cache.
@@ -146,7 +157,7 @@ async def write_cache(
     if redis is None:
         return False
 
-    key = make_cache_key(ts_code, normalized_question, report_types, years, report_id)
+    key = make_cache_key(ts_code, normalized_question, report_types, years, report_id, intent_type)
     ttl = _REJECTION_TTL if is_rejection else settings.report_chat_cache_ttl_seconds
 
     payload = dict(result)

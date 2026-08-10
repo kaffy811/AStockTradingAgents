@@ -275,7 +275,8 @@ class Settings(BaseSettings):
     # Phase 6K: Report Chat Cache
     report_chat_cache_ttl_seconds: int = 1800        # 30 min default
     enable_report_chat_cache: bool = True
-    report_chat_cache_version: str = "v1"
+    # P1-E: bumped v1→v2 to invalidate stale caches after Phase 6W-R1 analysis fixes
+    report_chat_cache_version: str = "v2"
 
     # Phase 6K: Report Chat Rate Limit
     report_chat_rate_limit_per_minute: int = 10
