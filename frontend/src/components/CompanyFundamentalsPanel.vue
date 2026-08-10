@@ -580,7 +580,11 @@ async function loadOverview() {
     detectDataSourceUnavailable(overviewFin.value)
 
     if (overviewSnap.value?.partial || overviewFin.value?.partial) {
-      overviewBanner.value = { type: 'warn', msg: '部分数据获取不完整，结果仅供参考。' }
+      // P1-D dedup: DataSourceBanner already covers provider-unavailable partials.
+      // Only show overviewBanner for partial if DataSourceBanner is NOT visible.
+      if (!dataSourceUnavailable.value) {
+        overviewBanner.value = { type: 'warn', msg: '部分数据获取不完整，结果仅供参考。' }
+      }
     }
     if (overviewSnap.value?.stale || overviewFin.value?.stale) {
       overviewBanner.value = { type: 'stale', msg: '数据来自缓存，可能非最新。' }
@@ -589,7 +593,8 @@ async function loadOverview() {
     // Phase 6N-8A: 401 → login prompt, never a provider-failure message
     if (isAuthError(e)) {
       authRequired.value = true
-      overviewBanner.value = { type: 'error', msg: AUTH_REQUIRED_MESSAGE }
+      // P1-D dedup: DataSourceBanner shows auth error via authRequired flag;
+      // do NOT also set overviewBanner to avoid duplicate banners.
     } else {
       overviewBanner.value = { type: 'error', msg: `概览数据加载失败：${e.message || '未知错误'}` }
     }
