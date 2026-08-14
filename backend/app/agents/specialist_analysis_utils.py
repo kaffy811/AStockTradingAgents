@@ -125,9 +125,17 @@ def _build_allowed_set(evidence_text: str) -> set[str]:
     allowed: set[str] = set()
     for token in evidence_numbers(evidence_text):
         allowed.add(token)
-        allowed.add(_canonicalize_number(token))
+        canon = _canonicalize_number(token)
+        allowed.add(canon)
         # Also add the comma-stripped form so "1,315.90" ↔ "1315.90"
         allowed.add(token.replace(",", ""))
+        # Cross-form: bare number ↔ percentage.  Structured data stores growth
+        # rates as bare floats (e.g. "yoy": 15.38) while the LLM writes "15.38%".
+        # Conversely, chunk text may have "15.38%" while the LLM drops the sign.
+        if canon.endswith("%"):
+            allowed.add(canon[:-1])          # "15.38%" → "15.38"
+        else:
+            allowed.add(f"{canon}%")         # "15.38"  → "15.38%"
     return allowed
 
 

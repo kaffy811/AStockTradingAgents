@@ -44,10 +44,10 @@ _PROMPTS_DIR = Path(__file__).parent / "prompts"
 # ── Constants ─────────────────────────────────────────────────────────────────
 
 _MAX_QUESTION_LEN = 500
-_REPORT_CHAT_OVERALL_TIMEOUT_SECONDS = 45.0
+_REPORT_CHAT_OVERALL_TIMEOUT_SECONDS = 120.0
 _REPORT_SELECTION_TIMEOUT_SECONDS = 12.0
 _RAG_QUERY_TIMEOUT_SECONDS = 8.0
-_LLM_SYNTHESIS_TIMEOUT_SECONDS = 25.0
+_LLM_SYNTHESIS_TIMEOUT_SECONDS = 90.0
 _REVIEW_TIMEOUT_SECONDS = 5.0
 _EVIDENCE_CACHE_TTL_SECONDS = 20 * 60
 _SELECTION_CACHE_TTL_SECONDS = 45 * 60
@@ -653,6 +653,75 @@ async def _query_indexed_report_db_evidence(
     }
 
 
+def financial_evidence_compactor(
+    chunks: list[dict],
+    *,
+    max_chars_per_chunk: int = 400,
+    max_total_chars: int = 2000,
+) -> list[dict]:
+    """Compress RAG chunks for LLM prompt injection.
+
+    Preserves numeric and financial sentences; removes PDF boilerplate.
+    Targets ``max_total_chars`` total across all chunks so synthesis
+    prompt stays under ~5 000 chars even with system prompt overhead.
+    """
+    import re as _re
+
+    _NUM_RE = _re.compile(
+        r"\d[\d,.，．]*[%％亿万元千百]?|\b\d+\.\d+\b|"
+        r"营收|收入|利润|净利|毛利|现金流|每股|ROE|ROA|负债|资产|权益|"
+        r"增长|同比|环比|上升|下降|增加|减少|revenue|profit|growth|cash|equity|eps",
+        _re.IGNORECASE,
+    )
+    _BOILERPLATE_RE = _re.compile(
+        r"（适用|□不适用|√适用|前瞻性陈述|不构成.{0,10}承诺|"
+        r"是否存在被控股股东|是否存在违反规定|是否存在半数以上|"
+        r"敬请投资者注意|本公司郑重提示|年度报告摘要",
+        _re.IGNORECASE,
+    )
+    _SENT_RE = _re.compile(r"[。！？；;!?]|\n\n")
+
+    def _compress(text: str, cap: int) -> str:
+        if not text:
+            return ""
+        text = text.strip()
+        # Always process through boilerplate/financial filter regardless of length.
+        sentences = [s.strip() for s in _SENT_RE.split(text) if s.strip()]
+        kept: list[str] = []
+        total = 0
+        for s in sentences:
+            if _BOILERPLATE_RE.search(s):
+                continue
+            if _NUM_RE.search(s) and total + len(s) <= cap:
+                kept.append(s)
+                total += len(s)
+        if not kept:
+            # No financial sentences — keep all non-boilerplate content up to cap
+            for s in sentences:
+                if not _BOILERPLATE_RE.search(s) and total + len(s) <= cap:
+                    kept.append(s)
+                    total += len(s)
+        if not kept:
+            # Complete fallback: first `cap` chars of raw text
+            return text[:cap]
+        # Join and enforce hard cap (separator chars can push total slightly over)
+        return ("。".join(kept))[:cap]
+
+    per_chunk_cap = min(max_chars_per_chunk, max_total_chars // max(len(chunks), 1))
+    result = []
+    total_used = 0
+    for c in chunks:
+        raw = c.get("content") or ""
+        remaining = max_total_chars - total_used
+        cap = min(per_chunk_cap, remaining)
+        if cap <= 0:
+            break
+        compressed = _compress(raw, cap)
+        total_used += len(compressed)
+        result.append({**c, "content": compressed})
+    return result
+
+
 def _build_chunks_context(chunks: list[dict]) -> str:
     """Serialize RAG chunks as compact JSON for LLM prompt injection."""
     compact = []
@@ -910,6 +979,19 @@ class ReportChatCopilotAgent:
         # ── 0a. Normalize question ────────────────────────────────────────────
         normalized_question, was_normalized = _normalize_question(question)
 
+        # ── 0a.1 Auto-extract report year from question text ──────────────────
+        # When the caller did not supply an explicit `years` filter but the
+        # question contains a 4-digit year (e.g. "2024年财报"), use it as the
+        # report selection hint so the correct annual period is retrieved rather
+        # than always defaulting to the latest available report.
+        # Note: \b fails for Chinese text (Chinese chars are \w in Python Unicode
+        # mode), so we use digit-boundary lookarounds instead.
+        if not years:
+            import re as _re_yr
+            _yr_matches = _re_yr.findall(r'(?<!\d)(20[012]\d)(?!\d)', normalized_question)
+            if _yr_matches:
+                years = [int(y) for y in dict.fromkeys(_yr_matches)]  # deduplicated, order-preserving
+
         # ── 0b. Detect prompt injection ───────────────────────────────────────
         injection_detected = _detect_prompt_injection(question)
         if injection_detected:
@@ -1002,11 +1084,12 @@ class ReportChatCopilotAgent:
         selection = None
         selection_start = time.perf_counter()
         try:
-            cached_selection = await _cache_get_json(selection_key)
-            selection = _selection_from_metadata(cached_selection)
-            if selection is not None:
-                perf_meta["cache"]["selection"] = "hit"
-            else:
+            if not force_refresh:
+                cached_selection = await _cache_get_json(selection_key)
+                selection = _selection_from_metadata(cached_selection)
+                if selection is not None:
+                    perf_meta["cache"]["selection"] = "hit"
+            if selection is None:
                 selection = await asyncio.wait_for(
                     resolve_report_selection(
                         db=db,
@@ -1272,7 +1355,14 @@ class ReportChatCopilotAgent:
             }
 
         structured_financial_data: dict[str, Any] = {"fields": {}, "field_count": 0}
-        structured_cache_key = f"report_financial_fields:{selected_report_id or report_context.get('report_id')}:v1"
+        # Cache key includes a hash of current chunk IDs so stale extractions
+        # are automatically invalidated when the indexed chunks change.
+        _sf_chunk_hash = _hash_payload([c.get("chunk_id") for c in chunks])
+        structured_cache_key = (
+            f"report_financial_fields"
+            f":{selected_report_id or report_context.get('report_id')}"
+            f":{_sf_chunk_hash}:v2"
+        )
         cached_structured = await _cache_get_json(structured_cache_key)
         if isinstance(cached_structured, dict) and cached_structured.get("fields"):
             structured_financial_data = cached_structured
@@ -1298,7 +1388,12 @@ class ReportChatCopilotAgent:
         # ── 8. Build LLM prompt (with session memory context) ─────────────────
         await _emit_report_stage(event_callback, phase="report_synthesis", title="正在生成分析")
         system_prompt = _load_system_prompt()
-        chunks_json = _build_chunks_context(chunks)
+        # Compress evidence to ≤2000 chars before serialising for the LLM prompt.
+        # financial_evidence_compactor preserves numeric / financial sentences and
+        # strips PDF boilerplate, keeping synthesis prompt under ~5 000 chars total.
+        compacted_chunks = financial_evidence_compactor(chunks, max_chars_per_chunk=400, max_total_chars=2000)
+        chunks_json = _build_chunks_context(compacted_chunks)
+        perf_meta["prompt_evidence_chars"] = sum(len(c.get("content") or "") for c in compacted_chunks)
         report_metadata_json = _build_report_metadata_context(report_context)
 
         # Inject conversation history if available
@@ -1316,7 +1411,7 @@ class ReportChatCopilotAgent:
             f"\n结构化财务字段（structured_financial_data）：\n{json.dumps(structured_financial_data, ensure_ascii=False, default=str)}\n"
             "\nreview_audit：将在模型输出后由系统审核；模型不得假设审核通过。\n"
             f"{memory_section}"
-            f"\n已接入财报片段（source_chunks，共 {len(chunks)} 条）：\n"
+            f"\n已接入财报片段（source_chunks，共 {len(compacted_chunks)} 条）：\n"
             f"{chunks_json}\n\n"
             "请严格基于 report_metadata、structured_financial_data、source_chunks 和会话上下文回答问题，输出合法 JSON（不带代码块标记）。"
         )
@@ -1562,6 +1657,31 @@ class ReportChatCopilotAgent:
             has_sanitization_artifacts,
         )
         _evidence_text = " ".join(str(c.get("content") or "") for c in (chunks or []))
+        # Augment 1: structured financial extraction output (field values + raw_text
+        # windows around each regex match, which include nearby yoy% columns).
+        _sf_ev = json.dumps(structured_financial_data, ensure_ascii=False, default=str)
+        # Augment 2: report context metadata.  Adds disclosure_date (e.g.
+        # "2025-04-02") to the corpus so date-component tokens ("-04", "-02",
+        # "2025") extracted from dates mentioned in the LLM answer are in the
+        # allowed set and do not trigger UNSUPPORTED_NUMBERS.
+        _ctx_ev = json.dumps(report_context, ensure_ascii=False, default=str)
+        # Augment 3: 亿-unit equivalents of large raw yuan values.  The LLM often
+        # writes "约1,708.99亿元" after seeing the raw 170,899,152,276.34元 in
+        # evidence.  Dividing every large number (≥1e8) in the base corpus by 1e8
+        # and appending the result (to 2 d.p.) makes canonical "1708.99" visible
+        # to the allowed-set builder so these unit-converted claims pass.
+        _base_corpus = _evidence_text + " " + _sf_ev
+        _yi_extras: list[str] = []
+        for _ytok in re.findall(r"(?<![A-Za-z_])[-+]?[\d,]+(?:\.\d+)?", _base_corpus):
+            try:
+                _yv = float(_ytok.replace(",", "").lstrip("+"))
+            except ValueError:
+                continue
+            if abs(_yv) >= 1e8:
+                _yi_extras.append(f"{_yv / 1e8:.2f}")
+        _evidence_text = " ".join(
+            x for x in [_evidence_text, _sf_ev, _ctx_ev, " ".join(_yi_extras)] if x.strip()
+        ).strip()
         _nv = validate_numeric_claims(answer, _evidence_text)
         _has_artifact = has_sanitization_artifacts(answer)
 

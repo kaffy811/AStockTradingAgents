@@ -14,8 +14,10 @@ from app.services.report_document_classifier import KIND_ANNUAL_FULL, classify_r
 FORMAL_REPORT_TYPES = ("annual", "semi", "semi_annual", "q1", "q3")
 
 _REPORT_ID_RE = re.compile(r"\breport_id\s*[=:：]?\s*(\d+)\b", re.IGNORECASE)
-_YEAR_RE = re.compile(r"\b(20\d{2})\s*(?:年|年度)?")
-_PERIOD_RE = re.compile(r"\b(20\d{2})[-/](0[1369]|12)[-/](3[01]|30)\b")
+# Use digit-boundary lookarounds instead of \b: Chinese chars are \w in Python
+# Unicode mode so \b fails between CJK text and ASCII digits (e.g. "茅台2024年").
+_YEAR_RE = re.compile(r"(?<!\d)(20\d{2})(?!\d)\s*(?:年|年度)?")
+_PERIOD_RE = re.compile(r"(?<!\d)(20\d{2})[-/](0[1369]|12)[-/](3[01]|30)(?!\d)")
 
 
 @dataclass(frozen=True)
