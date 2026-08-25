@@ -722,20 +722,127 @@ def financial_evidence_compactor(
     return result
 
 
-def _build_chunks_context(chunks: list[dict]) -> str:
-    """Serialize RAG chunks as compact JSON for LLM prompt injection."""
-    compact = []
-    for c in chunks:
-        compact.append({
-            "chunk_id":      c.get("chunk_id"),
-            "report_type":   c.get("report_type"),
-            "report_year":   c.get("report_year"),
-            "period":        c.get("period"),
-            "section_title": c.get("section_title"),
-            "content":       (c.get("content") or "")[:1200],
-            "score":         c.get("score"),
+def _build_local_evidence_context(
+    chunks: list[dict],
+) -> tuple[str, dict[str, dict]]:
+    """Build LLM-safe evidence and a request-local resolver map.
+
+    Database chunk identifiers stay exclusively in ``evidence_map``.  The
+    serialized context exposes only stable labels scoped to this invocation.
+    """
+    model_evidence: list[dict] = []
+    evidence_map: dict[str, dict] = {}
+    for idx, chunk in enumerate(chunks, start=1):
+        evidence_id = f"E{idx}"
+        evidence_map[evidence_id] = chunk
+        model_evidence.append({
+            "evidence_id":  evidence_id,
+            "report_type":  chunk.get("report_type"),
+            "report_year":  chunk.get("report_year"),
+            "period":       chunk.get("period"),
+            "section":      chunk.get("section_title"),
+            "content":      (chunk.get("content") or "")[:1200],
+            "score":        chunk.get("score"),
         })
-    return json.dumps(compact, ensure_ascii=False, indent=None)
+    return json.dumps(model_evidence, ensure_ascii=False, indent=None), evidence_map
+
+
+def _strip_model_visible_chunk_metadata(value: Any) -> Any:
+    """Return a model-facing copy without raw chunk locator fields."""
+    if isinstance(value, dict):
+        return {
+            key: _strip_model_visible_chunk_metadata(item)
+            for key, item in value.items()
+            if "chunk_id" not in str(key).lower()
+        }
+    if isinstance(value, list):
+        return [_strip_model_visible_chunk_metadata(item) for item in value]
+    return value
+
+
+def _resolve_local_citations(
+    citations: Any,
+    evidence_map: dict[str, dict],
+) -> tuple[list[dict], dict]:
+    """Resolve request-local evidence labels into canonical source chunks."""
+    if citations is None:
+        citations = []
+    if not isinstance(citations, list):
+        return [], {"valid": False, "reason": "citations_not_list", "invalid_ids": []}
+
+    resolved: list[dict] = []
+    invalid_ids: list[str] = []
+    invalid_claim_ids: list[str] = []
+    seen: set[str] = set()
+    duplicate_ids: list[str] = []
+    for citation in citations:
+        if not isinstance(citation, dict):
+            invalid_ids.append("<non-object>")
+            continue
+        evidence_id = str(citation.get("evidence_id") or "").strip()
+        if not re.fullmatch(r"E[1-9]\d*", evidence_id) or evidence_id not in evidence_map:
+            invalid_ids.append(evidence_id or "<missing>")
+            continue
+        if evidence_id in seen:
+            duplicate_ids.append(evidence_id)
+            continue
+        seen.add(evidence_id)
+        chunk = evidence_map[evidence_id]
+        claim = str(citation.get("claim") or "").strip()[:500]
+        if not claim:
+            invalid_claim_ids.append(evidence_id)
+            continue
+        from app.agents.specialist_analysis_utils import validate_numeric_claims
+        claim_evidence = " ".join(
+            str(value or "")
+            for value in (
+                chunk.get("content"),
+                chunk.get("report_year"),
+                chunk.get("period"),
+            )
+        ).strip()
+        claim_validation = validate_numeric_claims(
+            claim,
+            claim_evidence,
+        )
+        if not claim_validation["valid"]:
+            invalid_claim_ids.append(evidence_id)
+            continue
+        resolved.append({
+            "chunk_id": chunk.get("chunk_id"),
+            "citation": claim,
+        })
+
+    valid = not invalid_ids and not duplicate_ids and not invalid_claim_ids
+    return resolved, {
+        "valid": valid,
+        "reason": "ok" if valid else "invalid_evidence_reference",
+        "invalid_ids": invalid_ids,
+        "duplicate_ids": duplicate_ids,
+        "invalid_claim_ids": invalid_claim_ids,
+        "resolved_count": len(resolved),
+    }
+
+
+def _citation_metadata_leaks(answer: str, retrieved_chunk_ids: list[Any]) -> list[str]:
+    """Find raw retrieved IDs only when used in citation/source context."""
+    text = str(answer or "")
+    leaks: list[str] = []
+    for raw_id in retrieved_chunk_ids:
+        if raw_id is None:
+            continue
+        chunk_id = str(raw_id)
+        escaped = re.escape(chunk_id)
+        patterns = (
+            rf"(?i)(?:chunk(?:_id)?|source[_\s-]*chunk|citation|evidence|source|id)"
+            rf"\s*[#:=：\(（\[]*\s*{escaped}(?!\d)",
+            rf"(?:来源|引用(?:编号)?|证据(?:片段)?|片段|编号|ID)"
+            rf"\s*[#:=：\(（\[]*\s*{escaped}(?!\d)",
+            rf"第\s*{escaped}\s*(?:个|条)?\s*(?:证据|片段|引用)",
+        )
+        if any(re.search(pattern, text) for pattern in patterns):
+            leaks.append(chunk_id)
+    return leaks
 
 
 def _build_report_metadata_context(report_context: dict[str, Any]) -> str:
@@ -1392,7 +1499,10 @@ class ReportChatCopilotAgent:
         # financial_evidence_compactor preserves numeric / financial sentences and
         # strips PDF boilerplate, keeping synthesis prompt under ~5 000 chars total.
         compacted_chunks = financial_evidence_compactor(chunks, max_chars_per_chunk=400, max_total_chars=2000)
-        chunks_json = _build_chunks_context(compacted_chunks)
+        chunks_json, evidence_map = _build_local_evidence_context(compacted_chunks)
+        model_structured_financial_data = _strip_model_visible_chunk_metadata(
+            structured_financial_data
+        )
         perf_meta["prompt_evidence_chars"] = sum(len(c.get("content") or "") for c in compacted_chunks)
         report_metadata_json = _build_report_metadata_context(report_context)
 
@@ -1408,10 +1518,10 @@ class ReportChatCopilotAgent:
             f"股票代码（ts_code）：{ts_code}\n\n"
             f"用户问题：{normalized_question}\n"
             f"\n本次选定报告（report_metadata）：\n{report_metadata_json}\n"
-            f"\n结构化财务字段（structured_financial_data）：\n{json.dumps(structured_financial_data, ensure_ascii=False, default=str)}\n"
+            f"\n结构化财务字段（structured_financial_data）：\n{json.dumps(model_structured_financial_data, ensure_ascii=False, default=str)}\n"
             "\nreview_audit：将在模型输出后由系统审核；模型不得假设审核通过。\n"
             f"{memory_section}"
-            f"\n已接入财报片段（source_chunks，共 {len(compacted_chunks)} 条）：\n"
+            f"\n已接入财报证据（evidence，共 {len(compacted_chunks)} 条）：\n"
             f"{chunks_json}\n\n"
             "请严格基于 report_metadata、structured_financial_data、source_chunks 和会话上下文回答问题，输出合法 JSON（不带代码块标记）。"
         )
@@ -1531,6 +1641,14 @@ class ReportChatCopilotAgent:
                 "safety_meta": safety_meta,
             }
 
+        # Resolve LLM-local labels before the existing canonical source review.
+        resolved_citations, citation_validation = _resolve_local_citations(
+            raw_llm_result.get("citations"),
+            evidence_map,
+        )
+        if not citation_validation["valid"]:
+            errors.append("CITATION_VALIDATION_FAILED")
+
         # ── 10. Compliance review via FundamentalReviewAgent ──────────────────
         review_input = {
             "summary":        raw_llm_result.get("answer", ""),
@@ -1543,7 +1661,7 @@ class ReportChatCopilotAgent:
             "answer":         raw_llm_result.get("answer", ""),
             "confidence":     raw_llm_result.get("confidence", "low"),
             "evidence_used":  raw_llm_result.get("evidence_used", []),
-            "source_chunks":  raw_llm_result.get("source_chunks", []),
+            "source_chunks":  resolved_citations,
             "disclaimer":     raw_llm_result.get("disclaimer", ""),
         }
 
@@ -1584,7 +1702,7 @@ class ReportChatCopilotAgent:
         confidence = final.get("confidence") or raw_llm_result.get("confidence", "low")
         evidence_used = final.get("evidence_used") or raw_llm_result.get("evidence_used", [])
         data_limitations = final.get("data_limitations") or raw_llm_result.get("data_limitations", [])
-        source_chunks_out = final.get("source_chunks") or raw_llm_result.get("source_chunks") or chunks
+        source_chunks_out = final.get("source_chunks") or resolved_citations or chunks
         disclaimer = final.get("disclaimer") or "本内容基于已接入的公开财报片段，仅供参考，不构成投资建议。"
 
         if not str(answer or "").strip():
@@ -1648,6 +1766,24 @@ class ReportChatCopilotAgent:
 
         is_rejection = review_status == "rejected" or classification == "rejected"
 
+        citation_leaks = _citation_metadata_leaks(answer, allowed_chunk_ids)
+        if citation_leaks:
+            errors.append("CITATION_METADATA_LEAK")
+            answer = _format_evidence_fallback_answer(
+                question=normalized_question,
+                report_context=report_context,
+                chunks=chunks,
+                reason="自动生成结果包含内部引用标识，已安全降级",
+            )
+            confidence = "medium" if chunks else "low"
+            data_limitations = list(data_limitations or [])
+            data_limitations.insert(0, "检测到内部引用标识，原始回答未发布")
+            review_audit = {
+                **(review_audit or {}),
+                "citation_metadata_leak": True,
+                "leaked_chunk_ids": citation_leaks,
+            }
+
         # ── R1.2 P0: Numeric validation gate ─────────────────────────────────
         # Build evidence corpus from retrieved RAG chunks (same text the LLM saw).
         # validate_numeric_claims() returns structured state so downstream can gate
@@ -1692,6 +1828,8 @@ class ReportChatCopilotAgent:
             "replaced_count":     _nv["replaced_count"],
             "unsupported_count":  len(_nv.get("unsupported_tokens") or []),
             "has_artifacts":      _has_artifact,
+            "citation_metadata_leak": bool(citation_leaks),
+            "citation_validation": citation_validation,
         }
 
         if not _nv["valid"]:
@@ -1744,6 +1882,8 @@ class ReportChatCopilotAgent:
             "safety_meta":      safety_meta,
             "performance_meta": {
                 **perf_meta,
+                "llm_evidence_ids": list(evidence_map),
+                "citation_validation": citation_validation,
                 "stage_timings_ms": timings,
             },
         }

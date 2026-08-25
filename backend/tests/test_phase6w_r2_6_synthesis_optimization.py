@@ -155,6 +155,8 @@ def _make_selection(report_id: int = 17, report_year: int = 2024):
         title=f"贵州茅台{report_year}年年度报告",
         disclosure_date=f"{report_year + 1}-03-30",
         selection_reason="latest_formal_report",
+        parsed=True,
+        rag_status="indexed",
     )
 
 
@@ -176,6 +178,7 @@ def _run_agent(
     chunks: list[dict] | None = None,
     force_refresh: bool = False,
     cached_selection_meta: dict | None = None,
+    citations: list[dict] | None = None,
 ) -> tuple[dict, MagicMock]:
     """Run agent, return (result, mock_cache_get) for inspection."""
     from app.agent.report_chat_copilot_agent import ReportChatCopilotAgent
@@ -190,7 +193,9 @@ def _run_agent(
         "evidence_used": ["营收数据"],
         "data_limitations": [],
         "disclaimer": "仅供参考。",
-        "source_chunks": [{"chunk_id": c["chunk_id"], "citation": "原文引用"} for c in chunks],
+        "citations": citations if citations is not None else [
+            {"evidence_id": "E1", "claim": "原文引用"}
+        ],
     }, ensure_ascii=False)
 
     mock_cache_get = AsyncMock(return_value=cached_selection_meta)
@@ -210,17 +215,19 @@ def _run_agent(
             mock_cache_get,
         ),
         patch("app.agent.report_chat_copilot_agent._cache_set_json", new_callable=AsyncMock),
-        patch("app.services.report_rag_service.ReportRagService") as MockRag,
+        patch(
+            "app.agent.report_chat_copilot_agent._query_indexed_report_db_evidence",
+            new_callable=AsyncMock,
+            return_value={
+                "chunks": chunks,
+                "partial": False,
+                "errors": [],
+                "provider": "indexed_report_db",
+                "search_mode": "indexed_db_lexical",
+            },
+        ),
         patch("app.llm.deepseek_client.DeepSeekClient") as MockLLM,
     ):
-        mock_rag = AsyncMock()
-        mock_rag.query = AsyncMock(return_value={
-            "chunks": chunks,
-            "partial": False,
-            "errors": [],
-            "provider": "pgvector",
-        })
-        MockRag.return_value = mock_rag
         MockLLM.return_value.chat = MagicMock(return_value=llm_payload)
 
         result = run(agent.chat(
@@ -232,6 +239,145 @@ def _run_agent(
             force_refresh=force_refresh,
         ))
     return result, mock_cache_get
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# CM — Request-local citations and metadata leak containment
+# ─────────────────────────────────────────────────────────────────────────────
+
+class TestCitationMetadataContainment:
+
+    def test_cm1_model_context_uses_local_ids_only(self):
+        from app.agent.report_chat_copilot_agent import _build_local_evidence_context
+
+        context, evidence_map = _build_local_evidence_context([
+            _make_chunk(chunk_id=3670),
+            _make_chunk(chunk_id=3677),
+        ])
+
+        assert '"evidence_id": "E1"' in context
+        assert '"evidence_id": "E2"' in context
+        assert "chunk_id" not in context
+        assert "3670" not in context
+        assert "3677" not in context
+        assert evidence_map["E1"]["chunk_id"] == 3670
+        assert evidence_map["E2"]["chunk_id"] == 3677
+
+    def test_cm2_valid_local_citation_resolves_to_raw_id(self):
+        from app.agent.report_chat_copilot_agent import _resolve_local_citations
+
+        resolved, audit = _resolve_local_citations(
+            [{"evidence_id": "E1", "claim": "营业收入同比增长"}],
+            {"E1": _make_chunk(chunk_id=3670)},
+        )
+
+        assert audit["valid"] is True
+        assert resolved == [{"chunk_id": 3670, "citation": "营业收入同比增长"}]
+
+    def test_cm2b_citation_claim_number_must_exist_in_mapped_evidence(self):
+        from app.agent.report_chat_copilot_agent import _resolve_local_citations
+
+        resolved, audit = _resolve_local_citations(
+            [{"evidence_id": "E1", "claim": "营业收入同比增长99.99%"}],
+            {"E1": _make_chunk("营业收入同比增长15.71%。", chunk_id=3670)},
+        )
+        assert resolved == []
+        assert audit["valid"] is False
+        assert audit["invalid_claim_ids"] == ["E1"]
+
+    @pytest.mark.parametrize("bad_id", ["E99", "3670", "chunk 3670", ""])
+    def test_cm3_invalid_or_raw_citation_id_rejected(self, bad_id):
+        from app.agent.report_chat_copilot_agent import _resolve_local_citations
+
+        resolved, audit = _resolve_local_citations(
+            [{"evidence_id": bad_id, "claim": "未经验证声明"}],
+            {"E1": _make_chunk(chunk_id=3670)},
+        )
+
+        assert resolved == []
+        assert audit["valid"] is False
+        assert audit["reason"] == "invalid_evidence_reference"
+
+    def test_cm4_duplicate_local_citation_rejected(self):
+        from app.agent.report_chat_copilot_agent import _resolve_local_citations
+
+        _, audit = _resolve_local_citations(
+            [
+                {"evidence_id": "E1", "claim": "声明一"},
+                {"evidence_id": "E1", "claim": "声明二"},
+            ],
+            {"E1": _make_chunk(chunk_id=3670)},
+        )
+        assert audit["valid"] is False
+        assert audit["duplicate_ids"] == ["E1"]
+
+    @pytest.mark.parametrize("answer", [
+        "根据 chunk 3670，营业收入同比增长。",
+        "依据 chunk_id=3670，营业收入增长。",
+        "来源 3670：营业收入增长。",
+        "引用编号3670显示营业收入增长。",
+        "证据片段 #3670 显示营业收入增长。",
+        "第3670个片段显示营业收入增长。",
+    ])
+    def test_cm5_known_leak_patterns_detected(self, answer):
+        from app.agent.report_chat_copilot_agent import _citation_metadata_leaks
+        assert _citation_metadata_leaks(answer, [3670, 3677]) == ["3670"]
+
+    def test_cm6_ordinary_financial_numbers_not_misclassified(self):
+        from app.agent.report_chat_copilot_agent import _citation_metadata_leaks
+
+        answer = "600519在2024年营业收入为1,708.99亿元，同比增长15.38%；业务数字3670保持稳定。"
+        assert _citation_metadata_leaks(answer, [3670, 3677]) == []
+
+    def test_cm7_structured_financial_copy_strips_chunk_fields(self):
+        from app.agent.report_chat_copilot_agent import _strip_model_visible_chunk_metadata
+
+        raw = {
+            "fields": [{"value": 1708.99, "source_chunk_id": 3670}],
+            "chunk_id": 3677,
+        }
+        safe = _strip_model_visible_chunk_metadata(raw)
+        assert safe == {"fields": [{"value": 1708.99}]}
+
+    def test_cm8_agent_resolves_e1_and_can_complete(self):
+        chunks = [_make_chunk("营业收入同比增长，盈利能力保持改善。", chunk_id=3670)]
+        result, _ = _run_agent(
+            llm_answer="营业收入同比增长，盈利能力保持改善。",
+            chunks=chunks,
+            force_refresh=True,
+            citations=[{"evidence_id": "E1", "claim": "营业收入同比增长"}],
+        )
+        assert result["status"] == "completed"
+        assert result["source_chunks"][0]["chunk_id"] == 3670
+        assert "E1" not in result["answer"]
+        assert "3670" not in result["answer"]
+        assert result["numeric_validation"]["citation_validation"]["valid"] is True
+        assert result["performance_meta"]["indexed_fast_path"] is True
+        assert result["performance_meta"]["llm_evidence_ids"] == ["E1"]
+
+    def test_cm9_agent_unknown_evidence_id_degrades(self):
+        chunks = [_make_chunk("营业收入同比增长。", chunk_id=3670)]
+        result, _ = _run_agent(
+            llm_answer="营业收入同比增长。",
+            chunks=chunks,
+            force_refresh=True,
+            citations=[{"evidence_id": "E99", "claim": "营业收入同比增长"}],
+        )
+        assert result["status"] != "completed"
+        assert "CITATION_VALIDATION_FAILED" in result["errors"]
+
+    def test_cm10_agent_leaked_raw_id_is_not_published_as_success(self):
+        chunks = [_make_chunk("营业收入同比增长。", chunk_id=3670)]
+        result, _ = _run_agent(
+            llm_answer="根据 chunk 3670，营业收入同比增长。",
+            chunks=chunks,
+            force_refresh=True,
+            citations=[{"evidence_id": "E1", "claim": "营业收入同比增长"}],
+        )
+        assert result["status"] != "completed"
+        assert "CITATION_METADATA_LEAK" in result["errors"]
+        assert "chunk 3670" not in result["answer"]
+        assert result["numeric_validation"]["citation_metadata_leak"] is True
 
 
 class TestSelectionCacheBypass:

@@ -192,11 +192,11 @@ async def test_phase6u_agent_uses_selected_report_for_rag_and_schema():
         }
 
     llm_payload = {
-        "answer": "## 结论\n2024年年报显示，经营现金流为正。\n\n## 关键数据\n仅基于已接入片段。\n\n## 解释\n不补充未提供数字。\n\n## 数据限制\n缺少结构化财务字段。\n\n## 来源\nchunk 10",
+        "answer": "## 结论\n2024年年报显示，经营现金流为正。\n\n## 关键数据\n仅基于已接入证据。\n\n## 解释\n不补充未提供数字。\n\n## 数据限制\n缺少结构化财务字段。\n\n## 来源\n公司年度报告。",
         "confidence": "medium",
         "evidence_used": [{"chunk_id": 10, "reason": "现金流披露"}],
         "data_limitations": ["缺少结构化财务字段"],
-        "source_chunks": [{"chunk_id": 10, "citation": "管理层讨论"}],
+        "citations": [{"evidence_id": "E1", "claim": "管理层讨论"}],
         "disclaimer": "本内容基于已接入的公开财报片段，仅供参考，不构成投资建议。",
     }
 
@@ -275,7 +275,7 @@ async def test_phase6u_rejected_review_downgrades_answer_and_marks_partial():
                     "confidence": "high",
                     "evidence_used": [],
                     "data_limitations": [],
-                    "source_chunks": [{"chunk_id": 10, "citation": "管理层讨论"}],
+                    "citations": [{"evidence_id": "E1", "claim": "管理层讨论"}],
                     "disclaimer": "本内容基于已接入的公开财报片段，仅供参考，不构成投资建议。",
                 }, ensure_ascii=False))
                 with patch("app.agent.fundamental_review_agent.FundamentalReviewAgent") as MockReview:
