@@ -106,6 +106,7 @@ async def init_db() -> None:
     from app.models import company_v2_report_rag  # noqa: F401
     from app.models import company_v2_financial_fusion_job  # noqa: F401
     from app.models import company_v2_financial_fusion_worker_observation  # noqa: F401
+    from app.models import report_analysis_trace  # noqa: F401
 
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)

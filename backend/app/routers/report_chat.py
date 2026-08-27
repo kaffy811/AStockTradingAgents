@@ -241,13 +241,27 @@ async def report_chat(
     from app.services.rate_limit_service import check_rate_limit, rate_limit_meta_dict
 
     request_id = str(uuid.uuid4())[:8]
+    from app.services.report_analysis_trace_service import (
+        ReportAnalysisTraceRecorder,
+        final_response_audit_payload,
+    )
+    trace = ReportAnalysisTraceRecorder(request_id=request_id)
+    await trace.initialize(
+        question=body.question, session_id=body.session_id, market="UNPARSED", symbol=code,
+        report_id=body.report_id, years=body.years,
+    )
+    await trace.start("S0", {
+        "request_id": request_id, "question": body.question, "force_refresh": body.force_refresh,
+        "report_id": body.report_id, "years": body.years, "top_k": body.top_k,
+    })
+    await trace.finish("S0", payload={"request_accepted": True})
 
     # ── 1. Parse stock code ───────────────────────────────────────────────────
     try:
         market, symbol = _parse_code(code)
     except Exception as e:
         log.warning("report_chat parse_error request_id=%s code=%r: %s", request_id, code, e)
-        return _disclaimer_response({
+        result = {
             "answer": f"无法解析股票代码 '{code}'，请使用标准格式（如 600519、600519.SH）。",
             "source_chunks": [],
             "review_audit": {},
@@ -260,7 +274,14 @@ async def report_chat(
             "errors": [f"代码解析失败"],
             "partial": True,
             "request_id": request_id,
-        })
+        }
+        await trace.start("S1", {"code": code})
+        await trace.finish("S1", status="failed", error_code="CODE_PARSE_FAILED", payload={"error": type(e).__name__})
+        await trace.start("S8", result)
+        _audit_result = final_response_audit_payload(result)
+        await trace.finish("S8", status="rejected", error_code=INTERNAL_ERROR, output_data=_audit_result, payload={"final_status": "rejected", "final_response": _audit_result})
+        await trace.finalize(result)
+        return _disclaimer_response(result)
 
     # ── 2. Rate limiting ──────────────────────────────────────────────────────
     client_ip = _get_client_ip(request)
@@ -291,13 +312,15 @@ async def report_chat(
         extra = dict(rl_headers)
         if rl_result.retry_after_seconds:
             extra["Retry-After"] = str(rl_result.retry_after_seconds)
+        await trace.start("S8", rate_limit_body)
+        await trace.finish("S8", status="rejected", error_code=REPORT_CHAT_RATE_LIMITED, output_data=rate_limit_body)
+        await trace.finalize(rate_limit_body)
         return _disclaimer_response(rate_limit_body, status_code=429, extra_headers=extra)
 
     # ── 3. Market gate — only CN supported ───────────────────────────────────
     if market != "CN":
         market_label = {"HK": "港股", "US": "美股"}.get(market, market)
-        return _disclaimer_response(
-            {
+        result = {
                 "answer": (
                     f"当前问财报功能仅支持 A 股（CN 市场）。"
                     f"您输入的代码 '{code}' 被识别为{market_label}，暂不支持。"
@@ -312,9 +335,12 @@ async def report_chat(
                 "errors": [f"Unsupported market: {market}"],
                 "partial": True,
                 "rate_limit_meta": rate_limit_meta_dict(rl_result),
-            },
-            extra_headers=rl_headers,
-        )
+        }
+        await trace.start("S8", result)
+        _audit_result = final_response_audit_payload(result)
+        await trace.finish("S8", status="rejected", error_code="UNSUPPORTED_MARKET", output_data=_audit_result, payload={"final_response": _audit_result})
+        await trace.finalize(result)
+        return _disclaimer_response(result, extra_headers=rl_headers)
 
     # ── 4. Delegate to ReportChatCopilotAgent ─────────────────────────────────
     try:
@@ -331,6 +357,7 @@ async def report_chat(
             force_refresh=body.force_refresh,
             session_id=body.session_id,
             use_memory=body.use_memory,
+            trace_recorder=trace,
         )
     except Exception as e:
         log.error("report_chat unhandled_error request_id=%s code=%s: %s", request_id, code, type(e).__name__, exc_info=True)
@@ -372,5 +399,18 @@ async def report_chat(
         result.get("partial", False),
         result.get("cache_meta", {}).get("hit", False),
     )
+
+    await trace.start("S8", {
+        "status": result.get("status"), "partial": result.get("partial"),
+        "errors": result.get("errors"),
+    })
+    _audit_result = final_response_audit_payload(result)
+    await trace.finish(
+        "S8", status="rejected" if result.get("status") in {"failed", "rejected"} else "completed",
+        error_code=result.get("error_code"),
+        output_data=_audit_result,
+        payload={"final_status": result.get("status"), "partial": bool(result.get("partial")), "final_response": _audit_result},
+    )
+    await trace.finalize(result)
 
     return _disclaimer_response(result, extra_headers=rl_headers)

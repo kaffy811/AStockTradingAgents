@@ -977,6 +977,7 @@ class ReportChatCopilotAgent:
         event_callback: Any = None,
         # Phase 6W-R1.1 Blocking-F: intent type for cache key separation
         intent_type: str = "analysis",
+        trace_recorder: Any = None,
     ) -> dict:
         """
         Returns structured result dict. Never raises.
@@ -1002,10 +1003,13 @@ class ReportChatCopilotAgent:
                     use_memory=use_memory,
                     event_callback=event_callback,
                     intent_type=intent_type,
+                    trace_recorder=trace_recorder,
                 ),
                 timeout=_REPORT_CHAT_OVERALL_TIMEOUT_SECONDS,
             )
         except asyncio.TimeoutError:
+            if trace_recorder is not None:
+                await trace_recorder.fail_active("REPORT_AGENT_TIMEOUT")
             log.error("ReportChatCopilotAgent timed out for %s/%s", market, symbol)
             result = _make_error_result(errors=["REPORT_AGENT_TIMEOUT"], partial=True)
             result["status"] = "failed"
@@ -1013,6 +1017,8 @@ class ReportChatCopilotAgent:
             result["answer"] = "报告数据获取或总结生成超时，请稍后重试。"
             return result
         except Exception as e:
+            if trace_recorder is not None:
+                await trace_recorder.fail_active("REPORT_AGENT_UNEXPECTED_ERROR")
             log.error("ReportChatCopilotAgent unexpected error: %s", e, exc_info=True)
             return _make_error_result(errors=[str(e)], partial=True)
 
@@ -1032,6 +1038,7 @@ class ReportChatCopilotAgent:
         use_memory: bool,
         event_callback: Any,
         intent_type: str = "analysis",
+        trace_recorder: Any = None,
     ) -> dict:
         from app.agent.report_chat_cache import (
             read_cache, write_cache, _empty_cache_meta,
@@ -1178,6 +1185,11 @@ class ReportChatCopilotAgent:
                 memory_turns = []
 
         # ── 4. Resolve report selection ──────────────────────────────────────
+        if trace_recorder is not None:
+            await trace_recorder.start("S1", {
+                "market": market, "symbol": symbol, "report_id": report_id,
+                "report_types": report_types, "years": years,
+            })
         await _emit_report_stage(event_callback, phase="report_selection", title="正在定位报告")
         memory_report_id = latest_memory_report_id(memory_turns)
         selection_key = _selection_cache_key(
@@ -1220,6 +1232,9 @@ class ReportChatCopilotAgent:
         timings["report_selection_ms"] = _ms_since(selection_start)
 
         if selection is None:
+            if trace_recorder is not None:
+                await trace_recorder.finish("S1", status="failed", error_code="REPORT_SELECTION_FAILED",
+                                            payload={"duration_ms": timings["report_selection_ms"]})
             return {
                 "answer": "无法确定本次要使用的财报，请提供明确的股票代码和 report_id 或报告年份。",
                 "source_chunks": [],
@@ -1237,6 +1252,9 @@ class ReportChatCopilotAgent:
             }
 
         if not selection.ok:
+            if trace_recorder is not None:
+                await trace_recorder.finish("S1", status="failed", error_code=str(selection.selection_reason),
+                                            output_data=selection.metadata())
             return {
                 "answer": selection.error or "无法确定本次要使用的财报。",
                 "source_chunks": [],
@@ -1263,9 +1281,19 @@ class ReportChatCopilotAgent:
         perf_meta["report_id"] = selected_report_id
         perf_meta["report_year"] = selection.report_year
         perf_meta["report_context"] = report_context
+        if trace_recorder is not None:
+            await trace_recorder.finish("S1", output_data=report_context, payload={
+                "selected_report_id": selected_report_id, "selected_report_year": selection.report_year,
+                "selected_report_type": selection.report_type,
+                "selection_source": selection.selection_reason,
+                "selection_cache": perf_meta["cache"]["selection"],
+            })
 
         # ── 4b. PDF/link fast path ───────────────────────────────────────────
         if _is_pdf_question(normalized_question):
+            if trace_recorder is not None:
+                for _stage in ("S2", "S3", "S4", "S5", "S6", "S7"):
+                    await trace_recorder.skip(_stage, "PDF_LOCATOR_FAST_PATH")
             answer = _format_pdf_answer(report_context)
             timings["total_ms"] = _ms_since(total_start)
             return {
@@ -1317,6 +1345,9 @@ class ReportChatCopilotAgent:
                     **perf_meta,
                     "stage_timings_ms": {**timings, "total_ms": _ms_since(total_start)},
                 }
+                if trace_recorder is not None:
+                    for _stage in ("S2", "S3", "S4", "S5", "S6", "S7"):
+                        await trace_recorder.skip(_stage, "FINAL_ANSWER_CACHE_HIT")
                 return cached
 
         cache_meta = _empty_cache_meta()
@@ -1325,6 +1356,11 @@ class ReportChatCopilotAgent:
         expanded_query = _expand_query(normalized_question, memory_turns)
 
         # ── 6. RAG retrieval ──────────────────────────────────────────────────
+        if trace_recorder is not None:
+            await trace_recorder.start("S2", {
+                "normalized_question": normalized_question, "expanded_query": expanded_query,
+                "report_id": selected_report_id, "top_k": top_k,
+            })
         await _emit_report_stage(event_callback, phase="report_evidence_retrieval", title="正在检索报告证据")
         chunks: list[dict] = []
         rag_result: dict = {"chunks": [], "partial": False, "errors": [], "provider": "unavailable"}
@@ -1416,6 +1452,29 @@ class ReportChatCopilotAgent:
         perf_meta["source_chunks_count"] = len(chunks)
         perf_meta["evidence_chars"] = _evidence_chars(chunks)
         perf_meta["indexed_fast_path"] = _is_indexed_report(report_context)
+        if trace_recorder is not None:
+            _retrieval_failed = not chunks and bool(errors)
+            await trace_recorder.finish(
+                "S2", status="failed" if _retrieval_failed else "completed",
+                error_code="RAG_RETRIEVAL_FAILED" if _retrieval_failed else None,
+                output_data={"provider": rag_result.get("provider"), "search_mode": rag_result.get("search_mode"), "chunk_count": len(chunks)},
+                payload={"provider": rag_result.get("provider"), "search_mode": rag_result.get("search_mode"),
+                         "retrieval_timeout": perf_meta.get("timeout_layer") == "rag_query",
+                         "cache": perf_meta["cache"]["evidence"], "errors": errors},
+            )
+            await trace_recorder.start("S3", {"chunk_count": len(chunks)})
+            await trace_recorder.finish("S3", output_data=[{
+                "chunk_id": c.get("chunk_id"), "section_title": c.get("section_title"),
+                "page_start": c.get("page_start"), "page_end": c.get("page_end"),
+                "content_hash": _hash_payload(c.get("content") or ""),
+            } for c in chunks], payload={"retrieved_evidence_ids": [c.get("chunk_id") for c in chunks]})
+            _pre_compaction = "\n".join(str(c.get("content") or "") for c in chunks)
+            await trace_recorder.start("S4", {"retrieved_evidence_ids": [c.get("chunk_id") for c in chunks]})
+            await trace_recorder.finish("S4", output_data=_pre_compaction, payload={
+                "evidence_chars": len(_pre_compaction),
+                "numeric_tokens": re.findall(r"[-+]?\d[\d,]*(?:\.\d+)?(?:%|％)?", _pre_compaction)[:500],
+                "evidence_preview": _pre_compaction,
+            })
 
         # ── 7. Build allowed chunk IDs ────────────────────────────────────────
         allowed_chunk_ids = [c["chunk_id"] for c in chunks if c.get("chunk_id") is not None]
@@ -1498,7 +1557,16 @@ class ReportChatCopilotAgent:
         # Compress evidence to ≤2000 chars before serialising for the LLM prompt.
         # financial_evidence_compactor preserves numeric / financial sentences and
         # strips PDF boilerplate, keeping synthesis prompt under ~5 000 chars total.
+        if trace_recorder is not None:
+            await trace_recorder.start("S5", {"pre_compaction_hash": _hash_payload([c.get("content") for c in chunks])})
         compacted_chunks = financial_evidence_compactor(chunks, max_chars_per_chunk=400, max_total_chars=2000)
+        if trace_recorder is not None:
+            _post_compaction = "\n".join(str(c.get("content") or "") for c in compacted_chunks)
+            await trace_recorder.finish("S5", output_data=_post_compaction, payload={
+                "evidence_chars": len(_post_compaction),
+                "numeric_tokens": re.findall(r"[-+]?\d[\d,]*(?:\.\d+)?(?:%|％)?", _post_compaction)[:500],
+                "evidence_preview": _post_compaction,
+            })
         chunks_json, evidence_map = _build_local_evidence_context(compacted_chunks)
         model_structured_financial_data = _strip_model_visible_chunk_metadata(
             structured_financial_data
@@ -1532,6 +1600,12 @@ class ReportChatCopilotAgent:
         ]
 
         # ── 9. LLM call ────────────────────────────────────────────────────────
+        if trace_recorder is not None:
+            await trace_recorder.start("S6", {
+                "evidence_ids": list(evidence_map), "prompt_hash": _hash_payload(messages),
+                "structured_financial_hash": _hash_payload(model_structured_financial_data),
+                "structured_financial_data": model_structured_financial_data,
+            })
         raw_llm_result: dict = {}
         llm_error: str | None = None
         llm_timed_out = False
@@ -1583,6 +1657,15 @@ class ReportChatCopilotAgent:
             llm_error = f"LLM 调用失败: {e}"
             log.error("ReportChatCopilot LLM error: %s", e)
             errors.append(llm_error)
+
+        if trace_recorder is not None:
+            await trace_recorder.finish(
+                "S6", status="failed" if llm_error else "completed",
+                error_code="REPORT_LLM_TIMEOUT" if llm_timed_out else "REPORT_LLM_SYNTHESIS_FAILED" if llm_error else None,
+                output_data=raw_llm_result,
+                payload={"raw_llm_result": raw_llm_result, "error": llm_error,
+                         "citation_fields": raw_llm_result.get("citations", []) if isinstance(raw_llm_result, dict) else []},
+            )
 
         # If LLM completely failed, build a graceful fallback
         if llm_error or not raw_llm_result:
@@ -1642,6 +1725,8 @@ class ReportChatCopilotAgent:
             }
 
         # Resolve LLM-local labels before the existing canonical source review.
+        if trace_recorder is not None:
+            await trace_recorder.start("S7", {"raw_llm_hash": _hash_payload(raw_llm_result)})
         resolved_citations, citation_validation = _resolve_local_citations(
             raw_llm_result.get("citations"),
             evidence_map,
@@ -1831,6 +1916,33 @@ class ReportChatCopilotAgent:
             "citation_metadata_leak": bool(citation_leaks),
             "citation_validation": citation_validation,
         }
+        if trace_recorder is not None:
+            from app.services.report_analysis_trace_service import numeric_token_provenance
+            _unsupported = [str(item) for item in (_nv.get("unsupported_tokens") or [])]
+            await trace_recorder.finish("S7", status="failed" if (not _nv["valid"] or citation_leaks or not citation_validation["valid"]) else "completed",
+                error_code=("CITATION_METADATA_LEAK" if citation_leaks else "CITATION_VALIDATION_FAILED" if not citation_validation["valid"] else "NUMERIC_VALIDATION_FAILED" if not _nv["valid"] else None),
+                output_data={"numeric_validation": _numeric_validation, "citation_validation": citation_validation},
+                payload={
+                    "unsupported_tokens": _unsupported,
+                    "token_contexts": numeric_token_provenance(answer, _unsupported, {
+                        "S0": normalized_question,
+                        "S1": report_context,
+                        "S2": expanded_query,
+                        "S3": [{"chunk_id": c.get("chunk_id"), "content": c.get("content")} for c in chunks],
+                        "S4": _evidence_text,
+                        "S5": {"evidence": [c.get("content") for c in compacted_chunks],
+                               "structured_financial_data": structured_financial_data},
+                        "S6": answer,
+                    }),
+                    "allowed_evidence_token_summary": {
+                        "evidence_hash": _hash_payload(_evidence_text),
+                        "numeric_tokens": re.findall(r"[-+]?\d[\d,]*(?:\.\d+)?(?:%|％)?", _evidence_text)[:500],
+                    },
+                    "selected_report_id": selected_report_id, "selected_report_year": selection.report_year,
+                    "retrieved_evidence_ids": allowed_chunk_ids,
+                    "citation_validation": citation_validation,
+                    "citation_metadata_leak": bool(citation_leaks),
+                })
 
         if not _nv["valid"]:
             if _nv["reason"] == "numeric_evidence_missing":
