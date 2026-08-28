@@ -1282,9 +1282,13 @@ class ReportChatCopilotAgent:
         perf_meta["report_year"] = selection.report_year
         perf_meta["report_context"] = report_context
         if trace_recorder is not None:
+            from app.services.report_analysis_trace_service import numeric_inventory
             await trace_recorder.finish("S1", output_data=report_context, payload={
                 "selected_report_id": selected_report_id, "selected_report_year": selection.report_year,
                 "selected_report_type": selection.report_type,
+                "selected_period": selection.period_end,
+                "disclosure_date": selection.disclosure_date,
+                "report_context_numeric_date_tokens": numeric_inventory(report_context),
                 "selection_source": selection.selection_reason,
                 "selection_cache": perf_meta["cache"]["selection"],
             })
@@ -1469,8 +1473,11 @@ class ReportChatCopilotAgent:
                 "content_hash": _hash_payload(c.get("content") or ""),
             } for c in chunks], payload={"retrieved_evidence_ids": [c.get("chunk_id") for c in chunks]})
             _pre_compaction = "\n".join(str(c.get("content") or "") for c in chunks)
+            from app.services.report_analysis_trace_service import numeric_inventory
             await trace_recorder.start("S4", {"retrieved_evidence_ids": [c.get("chunk_id") for c in chunks]})
             await trace_recorder.finish("S4", output_data=_pre_compaction, payload={
+                "pre_compaction_evidence_hash": _hash_payload(_pre_compaction),
+                "pre_compaction_numeric_inventory": numeric_inventory(_pre_compaction),
                 "evidence_chars": len(_pre_compaction),
                 "numeric_tokens": re.findall(r"[-+]?\d[\d,]*(?:\.\d+)?(?:%|％)?", _pre_compaction)[:500],
                 "evidence_preview": _pre_compaction,
@@ -1561,8 +1568,26 @@ class ReportChatCopilotAgent:
             await trace_recorder.start("S5", {"pre_compaction_hash": _hash_payload([c.get("content") for c in chunks])})
         compacted_chunks = financial_evidence_compactor(chunks, max_chars_per_chunk=400, max_total_chars=2000)
         if trace_recorder is not None:
+            from app.services.report_analysis_trace_service import (
+                compaction_evidence_snapshot,
+                structured_financial_snapshot,
+            )
+            from app.services.report_financial_table_extractor_tool import report_financial_table_extractor_tool
             _post_compaction = "\n".join(str(c.get("content") or "") for c in compacted_chunks)
+            _compaction_audit = compaction_evidence_snapshot(chunks, compacted_chunks)
+            _structured_audit = structured_financial_snapshot(
+                structured_financial_data,
+                report_id=selected_report_id,
+                report_year=selection.report_year,
+                source=str(structured_financial_data.get("extraction_method") or "report_financial_table_extractor"),
+                as_of=selection.disclosure_date,
+                cache_status=str(perf_meta["cache"].get("structured_financial_fields") or "unknown"),
+                expected_cache_version=report_financial_table_extractor_tool.cache_version,
+                evidence_hash=_compaction_audit["pre_compaction_evidence_hash"],
+            )
             await trace_recorder.finish("S5", output_data=_post_compaction, payload={
+                **_compaction_audit,
+                "structured_financial_fields_snapshot": _structured_audit,
                 "evidence_chars": len(_post_compaction),
                 "numeric_tokens": re.findall(r"[-+]?\d[\d,]*(?:\.\d+)?(?:%|％)?", _post_compaction)[:500],
                 "evidence_preview": _post_compaction,
@@ -1604,11 +1629,14 @@ class ReportChatCopilotAgent:
             await trace_recorder.start("S6", {
                 "evidence_ids": list(evidence_map), "prompt_hash": _hash_payload(messages),
                 "structured_financial_hash": _hash_payload(model_structured_financial_data),
-                "structured_financial_data": model_structured_financial_data,
+                "structured_financial_fields_snapshot": _structured_audit,
             })
         raw_llm_result: dict = {}
+        raw_text = ""
         llm_error: str | None = None
         llm_timed_out = False
+        llm_error_category: str | None = None
+        llm_trace_start = time.perf_counter()
 
         try:
             from app.core.config import settings
@@ -1643,27 +1671,40 @@ class ReportChatCopilotAgent:
             raw_llm_result = _normalize_llm_json_result(json.loads(cleaned_text))
 
         except json.JSONDecodeError as e:
+            llm_error_category = "invalid_json_output"
             llm_error = f"LLM 输出 JSON 解析失败: {e}"
             log.error("ReportChatCopilot JSON parse failed: %s", e)
             errors.append(llm_error)
         except asyncio.TimeoutError:
             llm_timed_out = True
+            llm_error_category = "timeout"
             llm_error = "LLM 调用超时"
             timings["llm_total_ms"] = _LLM_SYNTHESIS_TIMEOUT_SECONDS * 1000
             perf_meta["timeout_layer"] = "llm_synthesis"
             log.error("ReportChatCopilot LLM timeout")
             errors.append(llm_error)
         except Exception as e:
+            llm_error_category = "empty_output" if "LLM 返回为空" in str(e) else "provider_error"
             llm_error = f"LLM 调用失败: {e}"
             log.error("ReportChatCopilot LLM error: %s", e)
             errors.append(llm_error)
 
         if trace_recorder is not None:
+            if "llm_total_ms" not in timings:
+                timings["llm_total_ms"] = _ms_since(llm_trace_start)
+            _raw_output_present = bool(raw_text)
             await trace_recorder.finish(
                 "S6", status="failed" if llm_error else "completed",
                 error_code="REPORT_LLM_TIMEOUT" if llm_timed_out else "REPORT_LLM_SYNTHESIS_FAILED" if llm_error else None,
                 output_data=raw_llm_result,
-                payload={"raw_llm_result": raw_llm_result, "error": llm_error,
+                payload={"raw_llm_result": raw_llm_result, "raw_output_copy": raw_text,
+                         "raw_output_present": _raw_output_present,
+                         "raw_output_absent": not _raw_output_present,
+                         "output_hash": _hash_payload(raw_text) if _raw_output_present else None,
+                         "provider_error_category": llm_error_category,
+                         "timeout_layer": "llm_synthesis" if llm_timed_out else None,
+                         "duration_ms": timings.get("llm_total_ms"),
+                         "error": llm_error,
                          "citation_fields": raw_llm_result.get("citations", []) if isinstance(raw_llm_result, dict) else []},
             )
 
@@ -1925,13 +1966,10 @@ class ReportChatCopilotAgent:
                 payload={
                     "unsupported_tokens": _unsupported,
                     "token_contexts": numeric_token_provenance(answer, _unsupported, {
-                        "S0": normalized_question,
                         "S1": report_context,
-                        "S2": expanded_query,
-                        "S3": [{"chunk_id": c.get("chunk_id"), "content": c.get("content")} for c in chunks],
-                        "S4": _evidence_text,
-                        "S5": {"evidence": [c.get("content") for c in compacted_chunks],
-                               "structured_financial_data": structured_financial_data},
+                        "S4": _pre_compaction,
+                        "S5": _post_compaction,
+                        "structured_facts": _structured_audit,
                         "S6": answer,
                     }),
                     "allowed_evidence_token_summary": {

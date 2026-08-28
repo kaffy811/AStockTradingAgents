@@ -9,8 +9,11 @@ import pytest
 
 from app.services.report_analysis_trace_service import (
     ReportAnalysisTraceRecorder,
+    compaction_evidence_snapshot,
     numeric_token_contexts,
+    numeric_token_provenance,
     redact,
+    structured_financial_snapshot,
 )
 
 
@@ -29,6 +32,8 @@ class MemoryTraceRepository:
     async def upsert_stage(self, trace_id, stage_name, payload):
         if self.fail:
             raise RuntimeError("store unavailable")
+        if stage_name in self.stages and not payload.get("input_payload"):
+            payload = {**payload, "input_payload": self.stages[stage_name].get("input_payload") or {}}
         self.stages[stage_name] = payload
 
     async def finalize_trace(self, trace_id, payload):
@@ -57,7 +62,8 @@ def chunk():
 
 
 async def run_pipeline(*, llm_answer="营业收入1708.99亿元，同比增长15.38%。", citations=None,
-                       selected=True, chunks=None, llm_delay=0, repository=None):
+                       selected=True, chunks=None, llm_delay=0, repository=None,
+                       structured_result=None):
     from app.agent.report_chat_copilot_agent import ReportChatCopilotAgent
     repo = repository or MemoryTraceRepository()
     recorder = ReportAnalysisTraceRecorder(request_id="req-trace-test", repository=repo)
@@ -89,6 +95,8 @@ async def run_pipeline(*, llm_answer="营业收入1708.99亿元，同比增长15
         patch("app.agent.report_chat_copilot_agent._query_indexed_report_db_evidence", new_callable=AsyncMock,
               return_value={"chunks": rag_chunks, "partial": False, "errors": [],
                             "provider": "indexed_report_db", "search_mode": "indexed_db_lexical"}),
+        patch("app.services.report_financial_table_extractor_tool.report_financial_table_extractor_tool.extract_from_chunks",
+              return_value=structured_result or {"fields": {}, "field_count": 0, "cache_key": "report_financial_fields:17:v1"}),
         patch("app.llm.deepseek_client.DeepSeekClient") as client,
     ):
         client.return_value.chat = MagicMock(side_effect=llm_call)
@@ -185,11 +193,14 @@ def test_secret_redaction_and_text_bounding():
     cleaned = redact({
         "Authorization": "Bearer super-secret", "cookie": "sid=secret",
         "nested": "postgresql+asyncpg://user:pass@host/db", "answer": "x" * 13000,
+        "contact": "alice@example.com 13800138000",
     })
     serialized = json.dumps(cleaned)
     assert "super-secret" not in serialized
     assert "sid=secret" not in serialized
     assert "user:pass" not in serialized
+    assert "alice@example.com" not in serialized
+    assert "13800138000" not in serialized
     assert len(cleaned["answer"]) == 12000
 
 
@@ -199,3 +210,110 @@ def test_numeric_context_sentence_keeps_full_sentence():
         "token": "15.38%", "token_context_sentence": "营业收入为1708.99亿元，同比增长15.38%。",
         "first_observed_stage": "S6",
     }]
+
+
+def test_compactor_inventory_records_kept_and_removed_tokens():
+    from app.agent.report_chat_copilot_agent import financial_evidence_compactor
+    pre = [{
+        "chunk_id": 1,
+        "content": "营业收入1708.99亿元。" + ("普通说明文字" * 200) + "期末补充数字99999元。",
+    }]
+    post = financial_evidence_compactor(pre, max_chars_per_chunk=80, max_total_chars=80)
+    audit = compaction_evidence_snapshot(pre, post)
+    assert "1708.99" in audit["pre_compaction_numeric_inventory"]
+    assert audit["pre_compaction_evidence_hash"] != audit["post_compaction_evidence_hash"]
+    assert "99999" in audit["removed_numeric_tokens"]
+    assert any("99999" in ref["removed_tokens"] for ref in audit["removed_sentence_refs"])
+
+
+def test_structured_snapshot_persists_public_field_provenance_and_cache_freshness():
+    data = {
+        "cache_key": "report_financial_fields:17:v1",
+        "fields": {"revenue": {
+            "raw_value": "170,899,152,276.34", "normalized_value": 170899152276.34,
+            "unit": "元", "period_end": "2024-12-31", "source_chunk_id": 82,
+            "source_document_id": 1,
+        }},
+    }
+    current = structured_financial_snapshot(
+        data, report_id=17, report_year=2024, source="regex_table_text",
+        as_of="2025-04-02", cache_status="hit", expected_cache_version="v1",
+        evidence_hash="evidence-hash",
+    )
+    stale = structured_financial_snapshot(
+        data, report_id=17, report_year=2024, source="regex_table_text",
+        as_of="2025-04-02", cache_status="hit", expected_cache_version="v2",
+        evidence_hash="evidence-hash",
+    )
+    miss = structured_financial_snapshot(
+        data, report_id=17, report_year=2024, source="regex_table_text",
+        as_of="2025-04-02", cache_status="written", expected_cache_version="v1",
+        evidence_hash="evidence-hash",
+    )
+    assert current["structured_fields_present"] is True
+    assert current["freshness"] == "current"
+    assert stale["freshness"] == "stale_version"
+    assert miss["freshness"] == "fresh"
+    assert current["fields"][0]["linked_evidence_ids"] == [82, 1]
+    assert current["structured_data_hash"]
+
+
+@pytest.mark.asyncio
+async def test_stage_input_payload_survives_finish_for_structured_snapshot():
+    repo = MemoryTraceRepository()
+    recorder = ReportAnalysisTraceRecorder(request_id="input-retained", repository=repo)
+    await recorder.start("S6", {"structured_financial_fields_snapshot": {"schema_version": "v1"}})
+    await recorder.finish("S6", payload={"raw_output_absent": True})
+    assert repo.stages["S6"]["input_payload"]["structured_financial_fields_snapshot"]["schema_version"] == "v1"
+    assert repo.stages["S6"]["payload"]["raw_output_absent"] is True
+
+
+@pytest.mark.asyncio
+async def test_structured_financial_fields_snapshot_is_persisted_end_to_end():
+    structured = {
+        "cache_key": "report_financial_fields:17:v1", "extraction_method": "regex_table_text",
+        "field_count": 1,
+        "fields": {"revenue": {
+            "raw_value": "1708.99", "normalized_value": 170899000000.0, "unit": "亿元",
+            "period_end": "2024-12-31", "source_chunk_id": 3670, "source_document_id": 17,
+        }},
+    }
+    result, _, repo = await run_pipeline(structured_result=structured)
+    snapshot = repo.stages["S5"]["payload"]["structured_financial_fields_snapshot"]
+    assert snapshot["structured_fields_present"] is True
+    assert snapshot["report_id"] == 17
+    assert snapshot["report_year"] == 2024
+    assert snapshot["fields"][0] == {
+        "field_path": "revenue", "raw_value": "1708.99", "canonical_value": 170899000000.0,
+        "unit": "亿元", "period": "2024-12-31", "linked_evidence_ids": [3670, 17],
+    }
+    assert repo.stages["S6"]["input_payload"]["structured_financial_fields_snapshot"] == snapshot
+    assert "structured_financial_fields_snapshot" not in result
+
+
+@pytest.mark.asyncio
+async def test_s1_metadata_tokens_and_s6_timeout_context_are_durable(monkeypatch):
+    monkeypatch.setattr("app.agent.report_chat_copilot_agent._LLM_SYNTHESIS_TIMEOUT_SECONDS", 0.001)
+    result, _, repo = await run_pipeline(llm_delay=0.05)
+    s1 = repo.stages["S1"]["payload"]
+    assert s1["selected_period"] == "2024-12-31"
+    assert s1["disclosure_date"] == "2025-04-02"
+    assert "2024" in s1["report_context_numeric_date_tokens"]
+    s6 = repo.stages["S6"]
+    assert s6["status"] == "failed"
+    assert s6["payload"]["provider_error_category"] == "timeout"
+    assert s6["payload"]["timeout_layer"] == "llm_synthesis"
+    assert s6["payload"]["raw_output_absent"] is True
+    assert s6["payload"]["duration_ms"] is not None
+    assert result["status"] == "partial_success"
+
+
+def test_numeric_provenance_has_exact_source_hit_matrix_without_substring_collision():
+    contexts = numeric_token_provenance(
+        "已接入6条证据。", ["6"],
+        {"S1": {"report_id": 600519}, "S4": "", "S5": "", "structured_facts": {}, "S6": "已接入6条证据。"},
+    )
+    assert contexts[0]["first_observed_stage"] == "S6"
+    assert contexts[0]["source_hits"] == {
+        "S1": False, "S4": False, "S5": False, "structured_facts": False, "S6": True,
+    }

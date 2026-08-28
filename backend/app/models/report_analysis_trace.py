@@ -52,6 +52,7 @@ class ReportAnalysisTraceStage(Base):
     error_code = Column(String(80), nullable=True)
     input_hash = Column(String(64), nullable=True)
     output_hash = Column(String(64), nullable=True)
+    input_payload = Column(JSONB, nullable=False, default=dict)
     payload = Column(JSONB, nullable=False, default=dict)
 
     __table_args__ = (
