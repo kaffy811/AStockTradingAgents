@@ -258,11 +258,64 @@ def derived_fact_has_canonical_operands(
     return True
 
 
+def build_request_local_formula_policies(
+    derived_facts: list[dict[str, Any]],
+    canonical_evidence_map: dict[str, dict[str, Any]],
+    resolved_derived_fact_ids: list[str],
+) -> list[dict[str, Any]]:
+    """Emit formula policies only for provenance-resolved percentage ratios."""
+    resolved = set(resolved_derived_fact_ids)
+    policies: list[dict[str, Any]] = []
+    for fact in derived_facts:
+        fact_id = str(fact.get("derived_fact_id") or "")
+        if (
+            not fact_id
+            or fact_id not in resolved
+            or fact.get("formula_type") != "ratio_percentage"
+            or not derived_fact_has_canonical_operands(fact, canonical_evidence_map)
+        ):
+            continue
+        operands = list(fact.get("operands") or [])
+        policies.append({
+            "derived_fact_id": fact_id,
+            "operation": "ratio_percentage",
+            "operand_evidence_ids": list(dict.fromkeys(
+                evidence_id
+                for operand in operands
+                for evidence_id in (operand.get("evidence_ids") or [])
+            )),
+            "operand_metrics": [str(operand.get("metric") or "") for operand in operands],
+            "derived_result": str(fact.get("display_result") or ""),
+            "allowed_formula_constants": ["100", "100%"],
+        })
+    return policies
+
+
+_OPERAND_FORMULA_ALIASES = {
+    "revenue": ("营业收入", "营收"),
+    "net_profit": ("归属于上市公司股东的净利润", "归母净利润", "净利润"),
+}
+
+
+def _span_is_bound_to_formula_policy(span: str, policy: dict[str, Any]) -> bool:
+    normalized = span.replace(",", "").replace("，", "")
+    result_number = re.sub(r"[^\d.+-]", "", str(policy.get("derived_result") or ""))
+    result_bound = bool(
+        result_number
+        and re.search(rf"(?<![\d.]){re.escape(result_number)}(?![\d.])", normalized)
+    )
+    operand_metrics = list(policy.get("operand_metrics") or [])
+    operands_bound = bool(operand_metrics) and all(
+        any(alias in normalized for alias in _OPERAND_FORMULA_ALIASES.get(metric, ()))
+        for metric in operand_metrics
+    )
+    return result_bound or operands_bound
+
+
 def validate_numeric_claims_with_derived_formula_scales(
     text: str,
     evidence_text: str,
-    derived_facts: list[dict[str, Any]],
-    canonical_evidence_map: dict[str, dict[str, Any]],
+    request_local_formula_policies: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Validate numerics while allowing only bound percentage scale constants.
 
@@ -277,12 +330,14 @@ def validate_numeric_claims_with_derived_formula_scales(
     if not unsupported or any(token not in {"100", "100%"} for token in unsupported):
         return result
 
-    eligible_facts = [
-        fact for fact in derived_facts
-        if fact.get("formula_type") == "ratio_percentage"
-        and derived_fact_has_canonical_operands(fact, canonical_evidence_map)
+    eligible_policies = [
+        policy for policy in (request_local_formula_policies or [])
+        if policy.get("operation") == "ratio_percentage"
+        and policy.get("derived_fact_id")
+        and policy.get("operand_evidence_ids")
+        and policy.get("allowed_formula_constants") == ["100", "100%"]
     ]
-    if not eligible_facts:
+    if not eligible_policies:
         return result
 
     occurrences = list(re.finditer(r"(?<![\d.])100%?(?![\d.])", text))
@@ -291,14 +346,11 @@ def validate_numeric_claims_with_derived_formula_scales(
     for occurrence in occurrences:
         span = _formula_span(text, occurrence.start(), occurrence.end())
         explicit_formula = bool(
-            re.search(r"(?:每\s*100\s*元|[×xX*]\s*100\s*%?)", span)
+            re.search(r"(?:每\s*(?:实现\s*)?100\s*元|[×xX*]\s*100\s*%?)", span)
         )
         if not explicit_formula:
             return result
-        if not any(
-            any(str(token).replace(",", "") in span.replace(",", "") for token in fact.get("validation_tokens", []))
-            for fact in eligible_facts
-        ):
+        if not any(_span_is_bound_to_formula_policy(span, policy) for policy in eligible_policies):
             return result
 
     result.update(valid=True, reason="ok", unsupported_tokens=[], replaced_count=0)

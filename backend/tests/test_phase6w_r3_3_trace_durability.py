@@ -139,6 +139,38 @@ async def test_derived_fact_provenance_is_visible_in_s5_and_s7():
 
 
 @pytest.mark.asyncio
+async def test_frozen_q3_formula_constants_pass_the_final_report_chat_gate():
+    financial_chunk = {
+        "chunk_id": 4, "report_type": "annual", "report_year": 2024,
+        "section_title": "主要会计数据", "page_start": 12, "page_end": 12,
+        "content": (
+            "2024年 2023年 营业收入 170,899,152,276.34 147,693,604,994.14；"
+            "归属于上市公司股东的净利润 86,228,146,421.62 74,734,071,550.75。"
+        ), "score": 0.9,
+    }
+    frozen_answer = (
+        "2024年营业收入170,899,152,276.34元，归属于上市公司股东的净利润"
+        "86,228,146,421.62元，净利率为50.46%。"
+        "净利率=归属于上市公司股东的净利润÷营业收入×100%。"
+        "按上述数据计算，每实现100元营业收入对应约50.46元归母净利润。"
+    )
+    result, _, repo = await run_pipeline(
+        question="请根据贵州茅台2024年营业收入和归母净利润计算并解释净利率。",
+        chunks=[financial_chunk],
+        llm_answer=frozen_answer,
+        citations=[
+            {"evidence_id": "E1", "claim": "2024年营业收入170,899,152,276.34元。"},
+            {"derived_fact_id": "C1", "evidence_ids": ["E1"], "claim": "2024年净利率为50.46%。"},
+        ],
+    )
+    assert repo.stages["S5"]["payload"]["derived_facts"][0]["display_result"] == "50.46%"
+    assert repo.stages["S7"]["status"] == "completed", repo.stages["S7"]["payload"]
+    assert result["numeric_validation"]["valid"] is True
+    assert result["numeric_validation"]["citation_validation"]["valid"] is True
+    assert result["numeric_validation"]["derived_fact_validation"]["formula_policy_ids"] == ["C1"]
+
+
+@pytest.mark.asyncio
 async def test_completed_pipeline_persists_s0_through_s8_in_order():
     result, recorder, repo = await run_pipeline()
     assert result["status"] == "completed"

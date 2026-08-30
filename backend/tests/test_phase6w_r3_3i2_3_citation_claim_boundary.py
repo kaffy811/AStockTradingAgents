@@ -7,6 +7,7 @@ from app.agent.report_chat_copilot_agent import (
     _resolve_local_citations,
 )
 from app.services.report_derived_fact_service import (
+    build_request_local_formula_policies,
     build_report_derived_facts,
     validate_numeric_claims_with_derived_formula_scales,
 )
@@ -60,14 +61,46 @@ def test_c1_resolves_only_from_operand_canonical_evidence():
 def test_100_is_allowed_only_in_validated_ratio_percentage_formula_span():
     fact = _facts()[0]
     corpus = CANONICAL["content"] + " " + fact["display_result"]
+    policy = build_request_local_formula_policies([fact], {"E1": CANONICAL}, ["C1"])
     valid = "2024年净利率为50.46%，即每100元营业收入对应50.46元归母净利润。"
     independent = "2024年净利率为50.46%。另有100个项目。"
     thousand = "2024年净利率为50.46%，即每1000元营业收入对应50.46元归母净利润。"
-    no_operands_fact = {**fact, "evidence_ids": ["E9"]}
-    assert validate_numeric_claims_with_derived_formula_scales(valid, corpus, [fact], {"E1": CANONICAL})["valid"]
-    assert not validate_numeric_claims_with_derived_formula_scales(independent, corpus, [fact], {"E1": CANONICAL})["valid"]
-    assert not validate_numeric_claims_with_derived_formula_scales(thousand, corpus, [fact], {"E1": CANONICAL})["valid"]
-    assert not validate_numeric_claims_with_derived_formula_scales(valid, corpus, [no_operands_fact], {"E1": CANONICAL})["valid"]
+    assert validate_numeric_claims_with_derived_formula_scales(valid, corpus, policy)["valid"]
+    assert not validate_numeric_claims_with_derived_formula_scales(independent, corpus, policy)["valid"]
+    assert not validate_numeric_claims_with_derived_formula_scales(thousand, corpus, policy)["valid"]
+    assert not validate_numeric_claims_with_derived_formula_scales(valid, corpus)["valid"]
+
+
+def test_formula_policy_requires_resolved_c1_and_canonical_operands():
+    fact = _facts()[0]
+    assert build_request_local_formula_policies([fact], {"E1": CANONICAL}, []) == []
+    assert build_request_local_formula_policies([fact], {"E1": COMPACTED}, ["C1"]) == []
+
+
+def test_non_formula_constants_and_fabricated_numbers_remain_rejected():
+    fact = _facts()[0]
+    corpus = CANONICAL["content"] + " " + fact["display_result"]
+    policy = build_request_local_formula_policies([fact], {"E1": CANONICAL}, ["C1"])
+    rejected = [
+        "净利率为50.46%，公司完成100%经营目标。",
+        "净利率为50.46%，另有100个项目。",
+        "净利率为50.46%，计算时乘以1000。",
+        "净利率为50.46%，计算时乘以10000。",
+        "净利率为50.46%，计算时乘以101。",
+        "净利率为50.46%，完成率为99%。",
+        "净利率为50.46%，营业收入为9999.99元。",
+    ]
+    assert all(
+        not validate_numeric_claims_with_derived_formula_scales(text, corpus, policy)["valid"]
+        for text in rejected
+    )
+
+
+def test_formula_policy_parameter_defaults_to_no_behavior_change():
+    fact = _facts()[0]
+    corpus = CANONICAL["content"] + " " + fact["display_result"]
+    formula = "净利率=归母净利润÷营业收入×100%，结果为50.46%。"
+    assert not validate_numeric_claims_with_derived_formula_scales(formula, corpus)["valid"]
 
 
 def test_d3_model_and_answer_containment_does_not_regress():

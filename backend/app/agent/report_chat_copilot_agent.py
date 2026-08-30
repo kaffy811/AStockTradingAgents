@@ -824,7 +824,6 @@ def _resolve_local_citations(
             from app.services.report_derived_fact_service import validate_numeric_claims_with_derived_formula_scales
             claim_validation = validate_numeric_claims_with_derived_formula_scales(
                 claim, f"{operand_evidence} {compile_derived_fact_validation_corpus([fact])}",
-                [fact], evidence_map,
             )
             claim_years = set(re.findall(r"(?<!\d)(20\d{2})(?!\d)", claim))
             if (report_year and claim_years and claim_years != {str(report_year)}) or not derived_fact_has_canonical_operands(fact, evidence_map) or not claim_validation["valid"] or any(eid not in evidence_map for eid in expected_ids):
@@ -2074,9 +2073,17 @@ class ReportChatCopilotAgent:
         _evidence_text = " ".join(
             x for x in [_evidence_text, _sf_ev, _ctx_ev, " ".join(_yi_extras), _derived_ev] if x.strip()
         ).strip()
-        from app.services.report_derived_fact_service import validate_numeric_claims_with_derived_formula_scales
+        from app.services.report_derived_fact_service import (
+            build_request_local_formula_policies,
+            validate_numeric_claims_with_derived_formula_scales,
+        )
+        _formula_policies = build_request_local_formula_policies(
+            derived_facts,
+            evidence_map,
+            citation_validation.get("resolved_derived_fact_ids", []),
+        )
         _nv = validate_numeric_claims_with_derived_formula_scales(
-            answer, _evidence_text, derived_facts, evidence_map,
+            answer, _evidence_text, _formula_policies,
         )
         _has_artifact = has_sanitization_artifacts(answer)
 
@@ -2093,6 +2100,7 @@ class ReportChatCopilotAgent:
                 "generated_ids": [item["derived_fact_id"] for item in derived_facts],
                 "used_ids": derived_fact_usage(answer, derived_facts),
                 "citation_resolved_ids": citation_validation.get("resolved_derived_fact_ids", []),
+                "formula_policy_ids": [item["derived_fact_id"] for item in _formula_policies],
             },
         }
         if trace_recorder is not None:
