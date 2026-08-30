@@ -747,6 +747,20 @@ def _build_local_evidence_context(
     return json.dumps(model_evidence, ensure_ascii=False, indent=None), evidence_map
 
 
+def _build_canonical_validation_evidence_map(
+    model_evidence_map: dict[str, dict], canonical_chunks: list[dict],
+) -> dict[str, dict]:
+    """Map the same request-local E labels to un-compacted validation text."""
+    canonical_by_id = {
+        str(chunk.get("chunk_id") or chunk.get("id")): chunk for chunk in canonical_chunks
+    }
+    return {
+        evidence_id: canonical_by_id[str(compacted.get("chunk_id") or compacted.get("id"))]
+        for evidence_id, compacted in model_evidence_map.items()
+        if str(compacted.get("chunk_id") or compacted.get("id")) in canonical_by_id
+    }
+
+
 def _strip_model_visible_chunk_metadata(value: Any) -> Any:
     """Return a model-facing copy without raw chunk locator fields."""
     if isinstance(value, dict):
@@ -763,6 +777,8 @@ def _strip_model_visible_chunk_metadata(value: Any) -> Any:
 def _resolve_local_citations(
     citations: Any,
     evidence_map: dict[str, dict],
+    derived_facts: list[dict[str, Any]] | None = None,
+    *, report_year: int | None = None,
 ) -> tuple[list[dict], dict]:
     """Resolve request-local evidence labels into canonical source chunks."""
     if citations is None:
@@ -775,10 +791,56 @@ def _resolve_local_citations(
     invalid_claim_ids: list[str] = []
     seen: set[str] = set()
     duplicate_ids: list[str] = []
+    derived_by_id = {
+        str(item.get("derived_fact_id")): item
+        for item in (derived_facts or [])
+        if item.get("derived_fact_id")
+    }
+    resolved_derived_fact_ids: list[str] = []
     for citation in citations:
         if not isinstance(citation, dict):
             invalid_ids.append("<non-object>")
             continue
+        derived_fact_id = str(citation.get("derived_fact_id") or "").strip()
+        if derived_fact_id:
+            fact = derived_by_id.get(derived_fact_id)
+            supplied_ids = citation.get("evidence_ids")
+            expected_ids = list(fact.get("evidence_ids") or []) if fact else []
+            if not fact or not isinstance(supplied_ids, list) or supplied_ids != expected_ids:
+                invalid_ids.append(derived_fact_id)
+                continue
+            claim = str(citation.get("claim") or "").strip()[:500]
+            if not claim:
+                invalid_claim_ids.append(derived_fact_id)
+                continue
+            from app.services.report_derived_fact_service import (
+                compile_derived_fact_validation_corpus,
+                derived_fact_has_canonical_operands,
+            )
+            operand_evidence = " ".join(
+                str(evidence_map[eid].get("content") or "")
+                for eid in expected_ids if eid in evidence_map
+            )
+            from app.services.report_derived_fact_service import validate_numeric_claims_with_derived_formula_scales
+            claim_validation = validate_numeric_claims_with_derived_formula_scales(
+                claim, f"{operand_evidence} {compile_derived_fact_validation_corpus([fact])}",
+                [fact], evidence_map,
+            )
+            claim_years = set(re.findall(r"(?<!\d)(20\d{2})(?!\d)", claim))
+            if (report_year and claim_years and claim_years != {str(report_year)}) or not derived_fact_has_canonical_operands(fact, evidence_map) or not claim_validation["valid"] or any(eid not in evidence_map for eid in expected_ids):
+                invalid_claim_ids.append(derived_fact_id)
+                continue
+            resolved_derived_fact_ids.append(derived_fact_id)
+            for evidence_id in expected_ids:
+                if evidence_id in seen:
+                    continue
+                seen.add(evidence_id)
+                resolved.append({
+                    "chunk_id": evidence_map[evidence_id].get("chunk_id"),
+                    "citation": claim,
+                })
+            continue
+
         evidence_id = str(citation.get("evidence_id") or "").strip()
         if not re.fullmatch(r"E[1-9]\d*", evidence_id) or evidence_id not in evidence_map:
             invalid_ids.append(evidence_id or "<missing>")
@@ -805,7 +867,8 @@ def _resolve_local_citations(
             claim,
             claim_evidence,
         )
-        if not claim_validation["valid"]:
+        claim_years = set(re.findall(r"(?<!\d)(20\d{2})(?!\d)", claim))
+        if (report_year and claim_years and claim_years != {str(report_year)}) or not claim_validation["valid"]:
             invalid_claim_ids.append(evidence_id)
             continue
         resolved.append({
@@ -821,7 +884,13 @@ def _resolve_local_citations(
         "duplicate_ids": duplicate_ids,
         "invalid_claim_ids": invalid_claim_ids,
         "resolved_count": len(resolved),
+        "resolved_derived_fact_ids": resolved_derived_fact_ids,
     }
+
+
+def _derived_fact_label_leaks(answer: str) -> list[str]:
+    """Reject request-local calculation labels from user-visible prose."""
+    return list(dict.fromkeys(re.findall(r"(?<![A-Za-z0-9_])C[1-9]\d*(?![A-Za-z0-9_])", str(answer or ""))))
 
 
 def _citation_metadata_leaks(answer: str, retrieved_chunk_ids: list[Any]) -> list[str]:
@@ -1558,6 +1627,27 @@ class ReportChatCopilotAgent:
                 perf_meta["cache"]["structured_financial_fields"] = "error"
                 errors.append(f"结构化财报字段提取失败: {str(exc)[:120]}")
 
+        # R3.3I.2: bounded operand recovery from the active index of the
+        # already-selected annual report.  This does not alter retrieval rank,
+        # thresholds, or the indexed fast path.
+        from app.services.report_local_structured_operand_supplement import (
+            supplement_report_local_operands,
+        )
+        structured_financial_data, supplemented_chunks, supplement_audit = (
+            await supplement_report_local_operands(
+                db=db,
+                question=normalized_question,
+                report_id=selected_report_id or report_context.get("report_id"),
+                report_year=selection.report_year,
+                selected_period=str(report_context.get("period_end") or ""),
+                structured=structured_financial_data,
+            )
+        )
+        if supplemented_chunks:
+            existing_chunk_ids = {str(c.get("chunk_id")) for c in chunks}
+            chunks.extend(c for c in supplemented_chunks if str(c.get("chunk_id")) not in existing_chunk_ids)
+            allowed_chunk_ids = [c["chunk_id"] for c in chunks if c.get("chunk_id") is not None]
+
         # ── 8. Build LLM prompt (with session memory context) ─────────────────
         await _emit_report_stage(event_callback, phase="report_synthesis", title="正在生成分析")
         system_prompt = _load_system_prompt()
@@ -1567,6 +1657,23 @@ class ReportChatCopilotAgent:
         if trace_recorder is not None:
             await trace_recorder.start("S5", {"pre_compaction_hash": _hash_payload([c.get("content") for c in chunks])})
         compacted_chunks = financial_evidence_compactor(chunks, max_chars_per_chunk=400, max_total_chars=2000)
+        chunks_json, model_evidence_map = _build_local_evidence_context(compacted_chunks)
+        evidence_map = _build_canonical_validation_evidence_map(model_evidence_map, chunks)
+        from app.services.report_local_structured_operand_supplement import bind_supplement_evidence_ids
+        structured_financial_data = bind_supplement_evidence_ids(structured_financial_data, evidence_map)
+        from app.services.report_derived_fact_service import (
+            build_report_derived_facts,
+            model_visible_derived_facts,
+        )
+        derived_facts = build_report_derived_facts(
+            question=normalized_question,
+            report_id=selected_report_id,
+            report_year=selection.report_year,
+            chunks=chunks,
+            evidence_map=evidence_map,
+            structured_financial_data=structured_financial_data,
+        )
+        model_derived_facts = model_visible_derived_facts(derived_facts)
         if trace_recorder is not None:
             from app.services.report_analysis_trace_service import (
                 compaction_evidence_snapshot,
@@ -1588,11 +1695,12 @@ class ReportChatCopilotAgent:
             await trace_recorder.finish("S5", output_data=_post_compaction, payload={
                 **_compaction_audit,
                 "structured_financial_fields_snapshot": _structured_audit,
+                "derived_facts": derived_facts,
+                "structured_operand_supplement": supplement_audit,
                 "evidence_chars": len(_post_compaction),
                 "numeric_tokens": re.findall(r"[-+]?\d[\d,]*(?:\.\d+)?(?:%|％)?", _post_compaction)[:500],
                 "evidence_preview": _post_compaction,
             })
-        chunks_json, evidence_map = _build_local_evidence_context(compacted_chunks)
         model_structured_financial_data = _strip_model_visible_chunk_metadata(
             structured_financial_data
         )
@@ -1612,11 +1720,12 @@ class ReportChatCopilotAgent:
             f"用户问题：{normalized_question}\n"
             f"\n本次选定报告（report_metadata）：\n{report_metadata_json}\n"
             f"\n结构化财务字段（structured_financial_data）：\n{json.dumps(model_structured_financial_data, ensure_ascii=False, default=str)}\n"
+            f"\n后端确定性派生事实（derived_facts）：\n{json.dumps(model_derived_facts, ensure_ascii=False, default=str)}\n"
             "\nreview_audit：将在模型输出后由系统审核；模型不得假设审核通过。\n"
             f"{memory_section}"
             f"\n已接入财报证据（evidence，共 {len(compacted_chunks)} 条）：\n"
             f"{chunks_json}\n\n"
-            "请严格基于 report_metadata、structured_financial_data、source_chunks 和会话上下文回答问题，输出合法 JSON（不带代码块标记）。"
+            "请严格基于 report_metadata、structured_financial_data、derived_facts、source_chunks 和会话上下文回答问题，输出合法 JSON（不带代码块标记）。"
         )
 
         messages = [
@@ -1630,6 +1739,8 @@ class ReportChatCopilotAgent:
                 "evidence_ids": list(evidence_map), "prompt_hash": _hash_payload(messages),
                 "structured_financial_hash": _hash_payload(model_structured_financial_data),
                 "structured_financial_fields_snapshot": _structured_audit,
+                "derived_facts_hash": _hash_payload(derived_facts),
+                "derived_facts": derived_facts,
             })
         raw_llm_result: dict = {}
         raw_text = ""
@@ -1771,6 +1882,8 @@ class ReportChatCopilotAgent:
         resolved_citations, citation_validation = _resolve_local_citations(
             raw_llm_result.get("citations"),
             evidence_map,
+            derived_facts,
+            report_year=selection.report_year,
         )
         if not citation_validation["valid"]:
             errors.append("CITATION_VALIDATION_FAILED")
@@ -1893,6 +2006,18 @@ class ReportChatCopilotAgent:
         is_rejection = review_status == "rejected" or classification == "rejected"
 
         citation_leaks = _citation_metadata_leaks(answer, allowed_chunk_ids)
+        derived_fact_label_leaks = _derived_fact_label_leaks(answer)
+        if derived_fact_label_leaks:
+            errors.append("DERIVED_FACT_METADATA_LEAK")
+            answer = _format_evidence_fallback_answer(
+                question=normalized_question,
+                report_context=report_context,
+                chunks=chunks,
+                reason="自动生成结果包含内部计算标识，已安全降级",
+            )
+            confidence = "medium" if chunks else "low"
+            data_limitations = list(data_limitations or [])
+            data_limitations.insert(0, "检测到内部计算标识，原始回答未发布")
         if citation_leaks:
             errors.append("CITATION_METADATA_LEAK")
             answer = _format_evidence_fallback_answer(
@@ -1927,6 +2052,11 @@ class ReportChatCopilotAgent:
         # "2025") extracted from dates mentioned in the LLM answer are in the
         # allowed set and do not trigger UNSUPPORTED_NUMBERS.
         _ctx_ev = json.dumps(report_context, ensure_ascii=False, default=str)
+        from app.services.report_derived_fact_service import (
+            compile_derived_fact_validation_corpus,
+            derived_fact_usage,
+        )
+        _derived_ev = compile_derived_fact_validation_corpus(derived_facts)
         # Augment 3: 亿-unit equivalents of large raw yuan values.  The LLM often
         # writes "约1,708.99亿元" after seeing the raw 170,899,152,276.34元 in
         # evidence.  Dividing every large number (≥1e8) in the base corpus by 1e8
@@ -1942,9 +2072,12 @@ class ReportChatCopilotAgent:
             if abs(_yv) >= 1e8:
                 _yi_extras.append(f"{_yv / 1e8:.2f}")
         _evidence_text = " ".join(
-            x for x in [_evidence_text, _sf_ev, _ctx_ev, " ".join(_yi_extras)] if x.strip()
+            x for x in [_evidence_text, _sf_ev, _ctx_ev, " ".join(_yi_extras), _derived_ev] if x.strip()
         ).strip()
-        _nv = validate_numeric_claims(answer, _evidence_text)
+        from app.services.report_derived_fact_service import validate_numeric_claims_with_derived_formula_scales
+        _nv = validate_numeric_claims_with_derived_formula_scales(
+            answer, _evidence_text, derived_facts, evidence_map,
+        )
         _has_artifact = has_sanitization_artifacts(answer)
 
         _numeric_validation = {
@@ -1956,6 +2089,11 @@ class ReportChatCopilotAgent:
             "has_artifacts":      _has_artifact,
             "citation_metadata_leak": bool(citation_leaks),
             "citation_validation": citation_validation,
+            "derived_fact_validation": {
+                "generated_ids": [item["derived_fact_id"] for item in derived_facts],
+                "used_ids": derived_fact_usage(answer, derived_facts),
+                "citation_resolved_ids": citation_validation.get("resolved_derived_fact_ids", []),
+            },
         }
         if trace_recorder is not None:
             from app.services.report_analysis_trace_service import numeric_token_provenance
@@ -1980,6 +2118,10 @@ class ReportChatCopilotAgent:
                     "retrieved_evidence_ids": allowed_chunk_ids,
                     "citation_validation": citation_validation,
                     "citation_metadata_leak": bool(citation_leaks),
+                    "derived_fact_label_leak": bool(derived_fact_label_leaks),
+                    "derived_facts": derived_facts,
+                    "derived_fact_used_ids": derived_fact_usage(answer, derived_facts),
+                    "derived_fact_citation_ids": citation_validation.get("resolved_derived_fact_ids", []),
                 })
 
         if not _nv["valid"]:

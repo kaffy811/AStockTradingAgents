@@ -63,13 +63,13 @@ def chunk():
 
 async def run_pipeline(*, llm_answer="营业收入1708.99亿元，同比增长15.38%。", citations=None,
                        selected=True, chunks=None, llm_delay=0, repository=None,
-                       structured_result=None):
+                       structured_result=None, question="贵州茅台财报如何？"):
     from app.agent.report_chat_copilot_agent import ReportChatCopilotAgent
     repo = repository or MemoryTraceRepository()
     recorder = ReportAnalysisTraceRecorder(request_id="req-trace-test", repository=repo)
-    await recorder.initialize(question="贵州茅台财报如何？", session_id="private-session", market="CN",
+    await recorder.initialize(question=question, session_id="private-session", market="CN",
                               symbol="600519", report_id=17, years=[2024])
-    await recorder.start("S0", {"question": "贵州茅台财报如何？"})
+    await recorder.start("S0", {"question": question})
     await recorder.finish("S0", payload={"request_accepted": True})
     rag_chunks = [chunk()] if chunks is None else chunks
     payload = json.dumps({
@@ -101,7 +101,7 @@ async def run_pipeline(*, llm_answer="营业收入1708.99亿元，同比增长15
     ):
         client.return_value.chat = MagicMock(side_effect=llm_call)
         result = await ReportChatCopilotAgent().chat(
-            market="CN", symbol="600519", question="贵州茅台财报如何？", db=None,
+            market="CN", symbol="600519", question=question, db=None,
             report_id=17, years=[2024], force_refresh=True, use_memory=False,
             trace_recorder=recorder,
         )
@@ -110,6 +110,32 @@ async def run_pipeline(*, llm_answer="营业收入1708.99亿元，同比增长15
                           error_code=result.get("error_code"), output_data=result)
     await recorder.finalize(result)
     return result, recorder, repo
+
+
+@pytest.mark.asyncio
+async def test_derived_fact_provenance_is_visible_in_s5_and_s7():
+    financial_chunk = {
+        "chunk_id": 3670, "report_type": "annual", "report_year": 2024,
+        "section_title": "主要会计数据", "page_start": 12, "page_end": 12,
+        "content": (
+            "2024年 2023年 营业收入 170,899,152,276.34 147,693,604,994.14；"
+            "归属于上市公司股东的净利润 86,228,146,421.62 74,734,071,550.75。"
+        ), "score": 0.9,
+    }
+    result, _, repo = await run_pipeline(
+        question="2024年贵州茅台净利率如何？",
+        chunks=[financial_chunk],
+        llm_answer="按年报披露数据计算，2024年净利率为50.46%。",
+        citations=[{"derived_fact_id": "C1", "evidence_ids": ["E1"], "claim": "2024年净利率为50.46%"}],
+    )
+    s5_facts = repo.stages["S5"]["payload"]["derived_facts"]
+    s7 = repo.stages["S7"]["payload"]
+    assert result["numeric_validation"]["valid"] is True
+    assert s5_facts[0]["operands"]
+    assert s5_facts[0]["canonical_result"]
+    assert s7["derived_fact_used_ids"] == ["C1"]
+    assert s7["derived_fact_citation_ids"] == ["C1"]
+    assert s7["derived_fact_label_leak"] is False
 
 
 @pytest.mark.asyncio
