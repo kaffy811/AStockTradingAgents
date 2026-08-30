@@ -1,0 +1,51 @@
+{
+  "phase": "6W-R3.3I.2.7.3",
+  "status": "VECTOR_FALLBACK_READY",
+  "traffic": "HOLD_1_PERCENT",
+  "branch": "r33i-vector-fallback",
+  "base_head": "b055da8495c54bb37625f0b0e0f94b4d4a627de2",
+  "first_failure": {
+    "revision": "a2c5e8f1b4d7",
+    "cause": "failed extension DDL poisoned the outer transaction before TEXT fallback"
+  },
+  "implementation": {
+    "catalogs": ["pg_extension", "pg_available_extensions"],
+    "extension_ddl_boundary": "nested_transaction_savepoint",
+    "index_ddl_boundary": "nested_transaction_savepoint",
+    "python_package_used_as_capability": false,
+    "reason_codes": [
+      "VECTOR_ALREADY_ENABLED",
+      "VECTOR_EXTENSION_AVAILABLE",
+      "VECTOR_EXTENSION_UNAVAILABLE",
+      "VECTOR_EXTENSION_PERMISSION_DENIED",
+      "VECTOR_EXTENSION_CREATE_FAILED_RECOVERED",
+      "TEXT_FALLBACK_SELECTED"
+    ]
+  },
+  "database_matrix": [
+    {"scenario": "standard_unavailable", "container": "4c05dc9aee8fd17bcb81ac17737a4483d6e350d4d7cab6f62009f20adfbf3f81", "type": "text", "index": false, "sql_probe": true, "repeat": true},
+    {"scenario": "available_permission_denied", "container": "e0274324234d9f252c57dc68fc1969d5415fe54ac0b31b8bfd0400a5b4813ce3", "type": "text", "index": false, "sql_probe": true, "repeat": true},
+    {"scenario": "already_enabled", "container": "e0274324234d9f252c57dc68fc1969d5415fe54ac0b31b8bfd0400a5b4813ce3", "type": "vector", "index": true, "sql_probe": true, "repeat": true},
+    {"scenario": "available_creatable", "container": "e0274324234d9f252c57dc68fc1969d5415fe54ac0b31b8bfd0400a5b4813ce3", "type": "vector", "index": true, "sql_probe": true, "repeat": true}
+  ],
+  "tests": {
+    "final": {"collected": 6, "passed": 6, "failed": 0, "skipped": 0, "duration_seconds": 5.08},
+    "static": {"collected": 6, "passed": 2, "failed": 0, "skipped": 4, "duration_seconds": 0.16},
+    "intermediate_fixture_failure": {"collected": 6, "passed": 2, "failed": 4, "skipped": 0, "duration_seconds": 1.83}
+  },
+  "scope": {
+    "bootstrap_files_changed": false,
+    "agent_files_changed": false,
+    "docker_changed": false,
+    "pyproject_changed": false,
+    "lockfile_changed": false
+  },
+  "safety": {
+    "production_database_accessed": false,
+    "production_migrations": 0,
+    "pushed": false,
+    "merged": false,
+    "deployed": false,
+    "traffic_expanded": false
+  }
+}
