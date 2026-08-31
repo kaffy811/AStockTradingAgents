@@ -10,6 +10,8 @@ import sys
 
 import asyncpg
 import pytest
+from alembic.config import Config
+from alembic.script import ScriptDirectory
 
 
 BACKEND = Path(__file__).resolve().parents[1]
@@ -109,6 +111,14 @@ def _alembic(url: str, *args: str) -> subprocess.CompletedProcess[str]:
     )
 
 
+def _resolved_single_head() -> str:
+    config = Config(str(BACKEND / "alembic.ini"))
+    config.set_main_option("script_location", str(BACKEND / "alembic"))
+    heads = ScriptDirectory.from_config(config).get_heads()
+    assert len(heads) == 1, f"expected exactly one Alembic head, resolved: {heads}"
+    return heads[0]
+
+
 @pytest.mark.parametrize("env_name", ["R33I_BOOTSTRAP_STANDARD_URL", "R33I_BOOTSTRAP_VECTOR_URL"])
 def test_empty_database_reaches_head_and_repeat_is_noop(env_name: str) -> None:
     url = os.getenv(env_name)
@@ -119,8 +129,9 @@ def test_empty_database_reaches_head_and_repeat_is_noop(env_name: str) -> None:
     _alembic(url, "upgrade", "head")
     current = _alembic(url, "current").stdout
     heads = _alembic(url, "heads").stdout
-    assert "q5r6s7t8u9v0 (head)" in current
-    assert "q5r6s7t8u9v0 (head)" in heads
+    resolved_head = _resolved_single_head()
+    assert current.strip() == f"{resolved_head} (head)"
+    assert heads.strip() == f"{resolved_head} (head)"
 
 
 def test_versioned_legacy_fixture_preserves_existing_data() -> None:
