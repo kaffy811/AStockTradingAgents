@@ -1,0 +1,69 @@
+{
+  "phase": "6W-R3.3I.2.8.4",
+  "status": "PROVIDER_ERROR_MAPPING_READY",
+  "traffic": "HOLD_1_PERCENT",
+  "workspace": {
+    "path": "/private/tmp/tradingagents-r33i2-8-4-provider",
+    "branch": "r33i-provider-error-normalization",
+    "base_head": "c9072802cbccb5adf561a36574646c791d5cc560",
+    "initial_clean": true,
+    "main_workspace_modified": false
+  },
+  "normalization_contract": {
+    "fields": [
+      "category",
+      "retryable",
+      "http_status",
+      "provider_code",
+      "safe_reason_code",
+      "original_exception_type"
+    ],
+    "connection": {"http_status": null, "retryable": true, "reason": "PROVIDER_CONNECTION_FAILED"},
+    "timeout": {"http_status": null, "retryable": true, "reason": "PROVIDER_TIMEOUT"},
+    "http_401": {"http_status": 401, "retryable": false, "reason": "PROVIDER_AUTHENTICATION_FAILED"},
+    "http_429": {"http_status": 429, "retryable": true, "reason": "PROVIDER_RATE_LIMITED"},
+    "http_5xx": {"retryable": true, "reason": "PROVIDER_HTTP_ERROR"},
+    "provider_payload": {"http_status": null, "retryable": false, "reason": "PROVIDER_PAYLOAD_INVALID"},
+    "local_client": {"http_status": null, "retryable": false, "reason": "PROVIDER_CLIENT_ERROR"},
+    "connection_mapped_to_http_500": false,
+    "original_exception_kept_as_cause": true,
+    "shared_by_non_streaming_and_streaming": true
+  },
+  "security": {
+    "raw_exception_message_emitted": false,
+    "request_headers_emitted": false,
+    "request_body_emitted": false,
+    "provider_url_emitted": false,
+    "provider_code_allowlisted": true,
+    "real_provider_request_executed": false,
+    "q3_executed": false
+  },
+  "tests": [
+    {"name": "normalization unit suite", "collected": 9, "passed": 9, "failed": 0, "skipped": 0, "duration_seconds": 0.16},
+    {"name": "DeepSeek and provider-control regression selection", "collected": 184, "passed": 10, "failed": 0, "deselected": 174, "skipped": 0, "duration_seconds": 0.28},
+    {"name": "report-chat trace and S8 suite", "collected": 19, "passed": 19, "failed": 0, "skipped": 0, "duration_seconds": 0.56},
+    {"name": "combined corrected regression", "collected": 36, "passed": 36, "failed": 0, "skipped": 0, "duration_seconds": 0.55},
+    {"name": "initial combined run missing test AI key", "collected": 36, "passed": 28, "failed": 8, "skipped": 0, "duration_seconds": 0.91, "setup_issue": true},
+    {"name": "three root-directory path attempts", "collected": 0, "passed": 0, "failed": 0, "skipped": 0, "setup_issue": true},
+    {"name": "py_compile", "result": "passed"},
+    {"name": "ruff", "result": "passed_after_unused_test_import_cleanup"}
+  ],
+  "s8_regression": {
+    "s6_error_code": "REPORT_LLM_SYNTHESIS_FAILED",
+    "safe_reason_preserved": "PROVIDER_CONNECTION_FAILED",
+    "secondary_attribute_error": false,
+    "final_status": "partial_success",
+    "partial": true
+  },
+  "operations": {
+    "production_code_outside_whitelist_changed": false,
+    "production_database_modified": false,
+    "production_container_modified": false,
+    "production_redis_modified": false,
+    "push": false,
+    "merge": false,
+    "deploy": false,
+    "migration": false,
+    "traffic_expansion": false
+  }
+}

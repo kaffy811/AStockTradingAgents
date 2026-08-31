@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import json
 import time
 from unittest.mock import AsyncMock, MagicMock, patch
@@ -63,7 +62,8 @@ def chunk():
 
 async def run_pipeline(*, llm_answer="营业收入1708.99亿元，同比增长15.38%。", citations=None,
                        selected=True, chunks=None, llm_delay=0, repository=None,
-                       structured_result=None, question="贵州茅台财报如何？"):
+                       structured_result=None, question="贵州茅台财报如何？",
+                       llm_exception: BaseException | None = None):
     from app.agent.report_chat_copilot_agent import ReportChatCopilotAgent
     repo = repository or MemoryTraceRepository()
     recorder = ReportAnalysisTraceRecorder(request_id="req-trace-test", repository=repo)
@@ -81,6 +81,8 @@ async def run_pipeline(*, llm_answer="营业收入1708.99亿元，同比增长15
     def llm_call(*args, **kwargs):
         if llm_delay:
             time.sleep(llm_delay)
+        if llm_exception is not None:
+            raise llm_exception
         return payload
 
     with (
@@ -110,6 +112,27 @@ async def run_pipeline(*, llm_answer="营业收入1708.99亿元，同比增长15
                           error_code=result.get("error_code"), output_data=result)
     await recorder.finalize(result)
     return result, recorder, repo
+
+
+@pytest.mark.asyncio
+async def test_normalized_provider_error_reaches_safe_s8_without_secondary_attribute_error():
+    from app.llm.deepseek_client import NormalizedProviderError, ProviderErrorRecord
+
+    normalized = NormalizedProviderError(ProviderErrorRecord(
+        category="connection", retryable=True, http_status=None,
+        provider_code=None, safe_reason_code="PROVIDER_CONNECTION_FAILED",
+        original_exception_type="APIConnectionError",
+    ))
+    result, _, repo = await run_pipeline(llm_exception=normalized)
+
+    assert repo.stages["S6"]["status"] == "failed"
+    assert repo.stages["S6"]["error_code"] == "REPORT_LLM_SYNTHESIS_FAILED"
+    assert "PROVIDER_CONNECTION_FAILED" in repo.stages["S6"]["payload"]["error"]
+    assert "status_code" not in repo.stages["S6"]["payload"]["error"]
+    assert "AttributeError" not in repo.stages["S6"]["payload"]["error"]
+    assert result["status"] == "partial_success"
+    assert result["error_code"] == "REPORT_LLM_SYNTHESIS_FAILED"
+    assert result["partial"] is True
 
 
 @pytest.mark.asyncio
