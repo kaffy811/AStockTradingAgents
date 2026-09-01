@@ -127,12 +127,66 @@ async def test_normalized_provider_error_reaches_safe_s8_without_secondary_attri
 
     assert repo.stages["S6"]["status"] == "failed"
     assert repo.stages["S6"]["error_code"] == "REPORT_LLM_SYNTHESIS_FAILED"
+    assert repo.stages["S6"]["payload"]["provider_error_category"] == "connection"
+    assert repo.stages["S6"]["payload"]["provider_error_retryable"] is True
+    assert repo.stages["S6"]["payload"]["provider_error_http_status"] is None
     assert "PROVIDER_CONNECTION_FAILED" in repo.stages["S6"]["payload"]["error"]
     assert "status_code" not in repo.stages["S6"]["payload"]["error"]
     assert "AttributeError" not in repo.stages["S6"]["payload"]["error"]
     assert result["status"] == "partial_success"
     assert result["error_code"] == "REPORT_LLM_SYNTHESIS_FAILED"
     assert result["partial"] is True
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("category", "http_status", "retryable", "reason_code"),
+    [
+        ("http_status", 429, True, "PROVIDER_RATE_LIMITED"),
+        ("http_status", 401, False, "PROVIDER_AUTHENTICATION_FAILED"),
+        ("provider_payload", None, False, "PROVIDER_PAYLOAD_INVALID"),
+        ("local_client", None, False, "PROVIDER_CLIENT_ERROR"),
+    ],
+)
+async def test_normalized_provider_fields_are_preserved_in_s6(
+    category, http_status, retryable, reason_code,
+):
+    from app.llm.deepseek_client import NormalizedProviderError, ProviderErrorRecord
+
+    normalized = NormalizedProviderError(ProviderErrorRecord(
+        category=category, retryable=retryable, http_status=http_status,
+        provider_code="safe_code", safe_reason_code=reason_code,
+        original_exception_type="SafeMockProviderError",
+    ))
+    result, _, repo = await run_pipeline(llm_exception=normalized)
+    s6 = repo.stages["S6"]["payload"]
+
+    assert s6["provider_error_category"] == category
+    assert s6["provider_error_http_status"] == http_status
+    assert s6["provider_error_retryable"] is retryable
+    assert s6["provider_error_reason_code"] == reason_code
+    assert s6["provider_error_code"] == "safe_code"
+    assert s6["provider_error_exception_type"] == "SafeMockProviderError"
+    assert result["status"] == "partial_success"
+
+
+@pytest.mark.asyncio
+async def test_legacy_provider_fallback_is_generic_and_does_not_persist_raw_error():
+    secret = "sk-test-secret-never-persist"
+    result, _, repo = await run_pipeline(
+        llm_exception=RuntimeError(
+            f"Authorization: Bearer {secret} https://provider.invalid/private body=secret"
+        )
+    )
+    s6 = repo.stages["S6"]["payload"]
+    serialized = json.dumps(s6)
+
+    assert s6["provider_error_category"] == "provider_error"
+    assert s6["error"] == "LLM 调用失败"
+    assert secret not in serialized
+    assert "Authorization" not in serialized
+    assert "provider.invalid" not in serialized
+    assert result["status"] == "partial_success"
 
 
 @pytest.mark.asyncio

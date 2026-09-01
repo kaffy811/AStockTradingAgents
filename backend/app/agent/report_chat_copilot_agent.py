@@ -54,6 +54,9 @@ _SELECTION_CACHE_TTL_SECONDS = 45 * 60
 _MAX_EVIDENCE_CHARS = 6000
 _MAX_CHUNK_CHARS = 1200
 _REPORT_CHAT_FAST_PATH_VERSION = "d4_2_v1"
+_PROVIDER_ERROR_CATEGORIES = {
+    "connection", "http_status", "provider_payload", "local_client",
+}
 
 _SAFE_REJECTION_ANSWER: dict[str, Any] = {
     "answer": (
@@ -282,6 +285,26 @@ def _ms_since(start: float) -> int:
 def _hash_payload(payload: Any) -> str:
     raw = json.dumps(payload, ensure_ascii=False, sort_keys=True, default=str)
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]
+
+
+def _provider_error_trace_fields(exc: BaseException) -> dict[str, Any]:
+    """Copy only allowlisted facts from the normalized provider contract."""
+
+    from app.llm.deepseek_client import NormalizedProviderError
+
+    if not isinstance(exc, NormalizedProviderError):
+        return {}
+    record = exc.record
+    if record.category not in _PROVIDER_ERROR_CATEGORIES:
+        return {}
+    return {
+        "provider_error_category": record.category,
+        "provider_error_retryable": record.retryable,
+        "provider_error_http_status": record.http_status,
+        "provider_error_code": record.provider_code,
+        "provider_error_reason_code": record.safe_reason_code,
+        "provider_error_exception_type": record.original_exception_type,
+    }
 
 
 def _selection_cache_key(
@@ -1746,6 +1769,7 @@ class ReportChatCopilotAgent:
         llm_error: str | None = None
         llm_timed_out = False
         llm_error_category: str | None = None
+        llm_provider_error_trace: dict[str, Any] = {}
         llm_trace_start = time.perf_counter()
 
         try:
@@ -1794,9 +1818,21 @@ class ReportChatCopilotAgent:
             log.error("ReportChatCopilot LLM timeout")
             errors.append(llm_error)
         except Exception as e:
-            llm_error_category = "empty_output" if "LLM 返回为空" in str(e) else "provider_error"
-            llm_error = f"LLM 调用失败: {e}"
-            log.error("ReportChatCopilot LLM error: %s", e)
+            llm_provider_error_trace = _provider_error_trace_fields(e)
+            is_empty_output = "LLM 返回为空" in str(e)
+            llm_error_category = (
+                llm_provider_error_trace.get("provider_error_category")
+                or ("empty_output" if is_empty_output else "provider_error")
+            )
+            llm_error = (
+                f"LLM 调用失败: {e}"
+                if llm_provider_error_trace or is_empty_output
+                else "LLM 调用失败"
+            )
+            log.error(
+                "ReportChatCopilot LLM error category=%s type=%s",
+                llm_error_category, type(e).__name__,
+            )
             errors.append(llm_error)
 
         if trace_recorder is not None:
@@ -1812,6 +1848,7 @@ class ReportChatCopilotAgent:
                          "raw_output_absent": not _raw_output_present,
                          "output_hash": _hash_payload(raw_text) if _raw_output_present else None,
                          "provider_error_category": llm_error_category,
+                         **llm_provider_error_trace,
                          "timeout_layer": "llm_synthesis" if llm_timed_out else None,
                          "duration_ms": timings.get("llm_total_ms"),
                          "error": llm_error,
