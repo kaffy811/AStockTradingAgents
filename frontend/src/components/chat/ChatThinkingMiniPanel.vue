@@ -8,11 +8,12 @@
       :class="{ 'think-mini-header--clickable': isDone }"
       @click="isDone && (isExpanded = !isExpanded)"
     >
-      <span class="think-mini-icon">
+      <span class="think-mini-icon" :class="`think-mini-icon--${terminalTone}`">
         <span v-if="!isDone" class="dot-spin"></span>
-        <span v-else class="think-done-check">✓</span>
+        <span v-else-if="isFulfilled" class="think-done-check">✓</span>
+        <span v-else class="think-terminal-mark">{{ terminalMark }}</span>
       </span>
-      <span class="think-mini-title">{{ isDone ? t('chat_analysis_done') : thinkingTitle }}</span>
+      <span class="think-mini-title">{{ isDone ? terminalTitle : thinkingTitle }}</span>
       <span v-if="isDone" class="think-mini-toggle" :class="{ rotated: isExpanded }">›</span>
     </div>
 
@@ -76,12 +77,14 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { useI18n } from '../../utils/i18n.js'
+import { researchFulfillmentView } from '../../utils/researchFulfillment.js'
 
 const { t } = useI18n()
 
 const props = defineProps({
   isStreaming:    { type: Boolean, default: false },
   status:         { type: String,  default: '' },
+  fulfillment:    { type: String,  default: '' },
   // C31.5: new event-driven prop — prioritized over heuristic template
   thinkingEvents: { type: Array,   default: () => [] },
   // C28.x legacy props — used as fallback when thinkingEvents is empty
@@ -245,6 +248,12 @@ const hasThinkingEvents = computed(() => filteredThinkingEvents.value.length > 0
 const isDone = computed(() =>
   props.status === 'done' || (!props.isStreaming && props.status !== 'connecting' && props.status !== 'streaming')
 )
+
+const fulfillmentView = computed(() => researchFulfillmentView(props.fulfillment))
+const isFulfilled = computed(() => !fulfillmentView.value || fulfillmentView.value.completed)
+const terminalTitle = computed(() => fulfillmentView.value?.title ?? t('chat_analysis_done'))
+const terminalTone = computed(() => fulfillmentView.value?.tone ?? 'success')
+const terminalMark = computed(() => props.fulfillment === 'failed' ? '!' : '–')
 
 const shouldShow = computed(() => props.isStreaming || isDone.value)
 

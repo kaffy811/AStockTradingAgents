@@ -109,6 +109,7 @@ import { useI18n }        from '../utils/i18n.js'
 import { useAuthStore }   from '../stores/auth.js'
 import { normalizeChatEvent } from '../utils/chatEventNormalizer.js'
 import { applyChatUiEvent }   from '../utils/chatReducer.js'
+import { normalizeResearchMetadata } from '../utils/researchFulfillment.js'
 import {
   getMockResponse,
   streamToolTrace,
@@ -301,6 +302,11 @@ function pushAssistantMsg(overrides = {}) {
   return msg
 }
 
+function _researchFields(metadata) {
+  const research = normalizeResearchMetadata(metadata)
+  return research ? { research } : {}
+}
+
 // Build an assistant message object from an API response
 function _apiRespToAssistantMsg(resp, assistantMsgId) {
   return {
@@ -311,6 +317,7 @@ function _apiRespToAssistantMsg(resp, assistantMsgId) {
     resultCard:   (resp.cards ?? [])[0] ?? null,
     confirmation: null,  // set below if needed
     isStreaming:  false,
+    ..._researchFields(resp.metadata),
   }
 }
 
@@ -350,6 +357,7 @@ function _restoreMessages(sessionDetail) {
         resultCard:      (m.cards ?? [])[0] ?? null,
         confirmation:    conf,
         clarification:   clarificationFromMetadata(m.metadata),
+        ..._researchFields(m.metadata),
         isStreaming:     false,
         status:          'done',
         thinkingItems:   [],
@@ -401,6 +409,7 @@ function _startTimeouts(assistantMsg) {
         toolTrace:   [],  // clear placeholder steps
         isStreaming: false,
         resultCard:  { type: 'error', title: t('chat_timeout_hard'), action: 'retry' },
+        ..._researchFields({ fulfillment: 'failed', reason_code: 'PROVIDER_NETWORK_TIMEOUT' }),
       })
       isSending.value = false
     }
@@ -823,12 +832,17 @@ async function _sendApiStream(text, assistantMsg) {
         if (payload.clarification?.candidates?.length) {
           liveMsg.clarification = payload.clarification
         }
+        Object.assign(liveMsg, _researchFields(payload.metadata ?? payload))
         applyChatUiEvent(liveMsg, { type: 'ui_done' })
         commitAssistantMessage(liveMsg)
         return
 
       case 'agent_error':
         _clearTimeouts()
+        Object.assign(liveMsg, _researchFields({
+          fulfillment: 'failed',
+          reason_code: payload.reason_code ?? 'DATA_NOT_AVAILABLE',
+        }))
         applyChatUiEvent(liveMsg, {
           type:    'ui_error',
           message: payload.error ?? payload.message ?? t('chat_error'),
@@ -932,6 +946,7 @@ async function _sendApiSync(text, assistantMsg) {
       resultCard:   (resp.cards ?? [])[0] ?? null,
       confirmation: _wrapConfirmation(resp.confirmation),
       isStreaming:  false,
+      ..._researchFields(resp.metadata),
     })
   } catch (err) {
     _clearTimeouts()
@@ -940,6 +955,10 @@ async function _sendApiSync(text, assistantMsg) {
       content:     t('chat_error'),
       toolTrace:   [],
       isStreaming: false,
+      ..._researchFields({
+        fulfillment: 'failed',
+        reason_code: err?.response?.data?.reason_code ?? 'DATA_NOT_AVAILABLE',
+      }),
     })
   }
 }

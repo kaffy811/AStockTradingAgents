@@ -59,6 +59,7 @@
                 :toolTrace="msg.toolTrace ?? []"
                 :query="msg._query ?? ''"
                 :thinkingContent="msg.thinkingContent ?? ''"
+                :fulfillment="msg.research?.status ?? ''"
               />
 
               <!-- C29.1.1: Full reasoning panel (debug mode only) -->
@@ -152,6 +153,12 @@
                 @select="(cand) => $emit('select-candidate', msg.id, cand)"
               />
 
+              <ChatResearchStatusCard
+                v-if="msg.research"
+                :research="msg.research"
+                @retry="$emit('retry-ai', msg.id)"
+              />
+
               <!-- C29.1.6: Data quality card — debug only -->
               <DataQualityCard
                 v-if="SHOW_DATA_QUALITY && (msg.dataQuality || msg.finalAnswer?.data_quality)"
@@ -180,7 +187,7 @@
               <span v-else>{{ t('chat_copy') }}</span>
             </button>
             <button
-              v-if="msg.id === latestAssistantMsgId"
+              v-if="msg.id === latestAssistantMsgId && (!msg.research || msg.research.retryable)"
               class="msg-action-btn"
               :disabled="isSending"
               @click="$emit('retry-ai', msg.id)"
@@ -202,6 +209,7 @@ import ChatThinkingMiniPanel from './ChatThinkingMiniPanel.vue'
 import ChatReasoningPanel    from './ChatReasoningPanel.vue'
 import ChatResultCard        from './ChatResultCard.vue'
 import ChatClarificationCard from './ChatClarificationCard.vue'
+import ChatResearchStatusCard from './ChatResearchStatusCard.vue'
 import ChatConfirmationCard  from './ChatConfirmationCard.vue'
 import DataQualityCard       from './DataQualityCard.vue'
 import ChatSourceList        from './ChatSourceList.vue'
