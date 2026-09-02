@@ -61,6 +61,7 @@ from app.agents.intent_decision_agent import classify_intent
 from app.agents.central_planning_agent import CentralPlanningAgent as _CentralPlanningAgent
 from app.services.security_entity_resolver import security_entity_resolver
 from app.services.official_report_entity_hints import unambiguous_official_report_entity_hint
+from app.services.official_company_event_service import official_company_event_service
 import app.agents.chat_memory as _mem
 
 _central_planner = _CentralPlanningAgent()
@@ -89,6 +90,33 @@ _LATEST_REPORT_SETUP_PATTERN = re.compile(
     r"(最新|最近|当前|这份|那份).{0,8}(财报|报告|定期报告).{0,12}(表现|情况|如何|怎么样|解读|分析)"
     r"|(.{0,8}(财报|报告|定期报告).{0,8}(表现|情况|如何|怎么样))",
     re.IGNORECASE,
+)
+
+_OFFICIAL_EVENT_TERMS_RE = re.compile(
+    r"公告|官方披露|披露事件|"
+    r"(?:年报|年度报告|半年报|半年度报告|季报|季度报告|财报).{0,12}(?:披露|重点|官方)|"
+    r"(?:披露|官方).{0,12}(?:年报|年度报告|半年报|半年度报告|季报|季度报告|财报)|"
+    r"分红|派息|回购|增持|减持|股东变动|权益变动|并购|重组|管理层变动|监管公告|诉讼公告|风险公告"
+)
+_OFFICIAL_REPORT_ANALYSIS_RE = re.compile(
+    r"年报|年度报告|半年报|半年度报告|季报|季度报告|财报|业绩"
+)
+_UNAPPROVED_NEWS_SCOPE_RE = re.compile(
+    r"行业.{0,16}(新闻|资讯|消息|动态)|"
+    r"(新闻|资讯|消息|动态).{0,16}(行业|板块)|"
+    r"市场.{0,12}(热点|新闻|资讯|消息)|"
+    r"(热点|新闻|资讯|消息).{0,12}市场|"
+    r"产业链|供应链|直接受益|受益.{0,8}(公司|股票)|带动.{0,10}(公司|股票)|"
+    r"AI\s*热潮|新能源.{0,8}(重要新闻|行业新闻)"
+)
+_REQUESTED_OFFICIAL_EVENT_TYPES: tuple[tuple[str, re.Pattern[str]], ...] = (
+    ("分红", re.compile(r"分红|派息|利润分配|权益分派")),
+    ("回购", re.compile(r"回购")),
+    ("股东增减持", re.compile(r"增持|减持|股东变动|权益变动")),
+    ("并购重组", re.compile(r"并购|重组")),
+    ("治理与管理层", re.compile(r"治理|管理层|董事|监事|高管")),
+    ("业务进展", re.compile(r"业务进展|项目|合同|中标|投产")),
+    ("监管/诉讼/风险", re.compile(r"监管|诉讼|仲裁|风险|处罚|立案")),
 )
 # ── Build registry ─────────────────────────────────────────────────────────────
 
@@ -997,6 +1025,159 @@ async def _handle_news(msg: str, db: AsyncSession, user_id: uuid.UUID) -> Orches
     return OrchestratorResult(answer=answer, tool_events=events, cards=cards)
 
 
+def _unavailable_official_news_result(*, reason_code: str, message: str, route: str) -> OrchestratorResult:
+    answer = (
+        "## 结论摘要\n\n"
+        f"{message}\n\n"
+        "## 近期官方事件\n\n"
+        "暂无可展示事件。\n\n"
+        "## 事件可能影响与已知事实\n\n"
+        "没有已批准来源支持该问题，因此不进行影响推断。\n\n"
+        "## 数据范围与局限\n\n"
+        "仅允许使用已持久化的 CNINFO 官方披露与已索引官方报告；"
+        "未使用财经媒体、网页新闻聚合或模型记忆补充事实。\n\n"
+        "## 来源\n\n"
+        "无可用的已批准来源。"
+        + _DISCLAIMER
+    )
+    return OrchestratorResult(
+        answer=answer,
+        metadata={
+            "route": route,
+            "fulfillment": "unavailable",
+            "reason_code": reason_code,
+            "coverage": "approved_cninfo_only",
+            "quality": "unavailable",
+        },
+    )
+
+
+async def _handle_official_company_research(
+    msg: str,
+    db: AsyncSession,
+    user_id: uuid.UUID,
+) -> OrchestratorResult:
+    """Answer from persisted CNINFO metadata only; no provider or LLM call."""
+    route = "official_report_analysis" if _OFFICIAL_REPORT_ANALYSIS_RE.search(msg) else "official_company_events"
+    resolved = await security_entity_resolver.resolve(db, msg, market_hint="CN", min_confidence=0.72)
+    if resolved.get("ambiguity"):
+        return _unavailable_official_news_result(
+            reason_code="AMBIGUOUS_COMPANY",
+            message="无法唯一确认目标公司，未查询或生成官方事件。",
+            route=route,
+        )
+    entities = resolved.get("entities") or []
+    if not entities:
+        return _unavailable_official_news_result(
+            reason_code="COMPANY_NOT_RESOLVED",
+            message="无法从已持久化证券主数据确认目标公司，未查询或生成官方事件。",
+            route=route,
+        )
+
+    entity = entities[0]
+    market = str(getattr(entity, "market", "") or "CN").upper()
+    symbol = str(getattr(entity, "symbol", "") or "")
+    company_name = str(
+        getattr(entity, "short_name", "")
+        or getattr(entity, "full_name", "")
+        or symbol
+    )
+    result = await official_company_event_service.list_persisted_events(
+        db,
+        market=market,
+        symbol=symbol,
+        company_name=company_name,
+        limit=8,
+    )
+    events = result.get("events") or []
+    fulfillment = result.get("fulfillment") or "unavailable"
+    reason_code = result.get("reason_code")
+    requested_event_types = {
+        event_type
+        for event_type, pattern in _REQUESTED_OFFICIAL_EVENT_TYPES
+        if pattern.search(msg)
+    }
+    if requested_event_types and events:
+        events = [event for event in events if event.get("event_type") in requested_event_types]
+        if not events:
+            return _unavailable_official_news_result(
+                reason_code="NO_MATCHING_PERSISTED_CNINFO_EVENTS",
+                message=(
+                    f"已持久化 CNINFO 数据中未找到 {company_name} 与所询问事件类型匹配的官方披露，"
+                    "未使用其它公告或新闻替代。"
+                ),
+                route=route,
+            )
+    if not events:
+        return _unavailable_official_news_result(
+            reason_code=reason_code or "NO_PERSISTED_CNINFO_EVENTS",
+            message=f"未找到 {company_name} 可公开展示的已持久化 CNINFO 官方事件，未补充或编造事件。",
+            route=route,
+        )
+
+    event_lines = "\n".join(
+        f"- **公告标题：** {event['title']}  \n"
+        f"  **发布日期：** {event['published_at']}  \n"
+        f"  **事件类型：** {event['event_type']}  \n"
+        f"  **官方来源链接：** {event['source_url']}"
+        for event in events
+    )
+    fact_lines = "\n".join(
+        f"- {event['published_at']}：已确认 CNINFO 披露《{event['title']}》；"
+        "仅确认公告元数据，不从标题推断确定性市场影响。"
+        for event in events[:5]
+    )
+    as_of_text = result.get("as_of") or "unavailable"
+    coverage_note = (
+        "本回答仅覆盖系统中已持久化且同时具有披露日期和 CNINFO 官方链接的记录。"
+        "未触发任何实时抓取。"
+    )
+    if route == "official_report_analysis":
+        fulfillment = "partial"
+        reason_code = "REPORT_RAG_EVIDENCE_NOT_RENDERED"
+        coverage_note += (
+            " 当前确定性路径展示官方报告事件元数据；报告正文重点仅在既有 Report RAG "
+            "具备可引用证据时由原有报告分析链路提供，本回答不以标题代替正文分析。"
+        )
+
+    answer = (
+        "## 结论摘要\n\n"
+        f"找到 {company_name} {len(events)} 项可核验的近期官方披露。"
+        f"当前履约状态为 `{fulfillment}`。\n\n"
+        "## 近期官方事件\n\n"
+        f"{event_lines}\n\n"
+        "## 事件可能影响与已知事实\n\n"
+        f"{fact_lines}\n\n"
+        "## 数据范围与局限\n\n"
+        f"{coverage_note} 数据快照时间：{as_of_text}。不对事件作投资建议或确定性影响判断。\n\n"
+        "## 来源\n\n"
+        "上述每项事件均来自 CNINFO 官方来源链接，发布日期随事件逐项列示。"
+        + _DISCLAIMER
+    )
+    public_events = [dict(event) for event in events]
+    return OrchestratorResult(
+        answer=answer,
+        tool_events=[{
+            "name": route,
+            "status": "success" if fulfillment == "fulfilled" else "partial",
+            "detail": f"读取 {len(events)} 项已持久化 CNINFO 官方事件",
+            "event_type": "tool_completed",
+            "permission_level": "read_only",
+            "ok": True,
+            "source": "CNINFO",
+        }],
+        metadata={
+            "route": route,
+            "fulfillment": fulfillment,
+            "reason_code": reason_code,
+            "coverage": result.get("coverage"),
+            "quality": "partial" if route == "official_report_analysis" else result.get("quality"),
+            "as_of": result.get("as_of"),
+            "events": public_events,
+        },
+    )
+
+
 async def _handle_recent_report(msg: str, db: AsyncSession, user_id: uuid.UUID) -> OrchestratorResult:
     events: list = []
     cards:  list = []
@@ -1413,6 +1594,25 @@ async def process_message(
     if _match_trading_request(msg):
         await _emit("intent_detected", {"intent": "safety_blocked", "handler": "_handle_trading_request"})
         return await _handle_trading_request(msg, db, user_id)
+
+    # Phase 7C1 source-governance gate.  These checks run before memory,
+    # entity resolution, skills, and tools so unapproved news requests cannot
+    # fall through to AKShare/Eastmoney/Sina/Tencent-backed paths.
+    if _UNAPPROVED_NEWS_SCOPE_RE.search(content):
+        await _emit("intent_detected", {
+            "intent": "industry_news",
+            "handler": "source_governance_unavailable",
+        })
+        return _unavailable_official_news_result(
+            reason_code="NO_APPROVED_INDUSTRY_NEWS_SOURCE",
+            message="当前没有已批准的行业、市场或主题新闻来源，无法完成该问题。",
+            route="industry_news",
+        )
+
+    if _OFFICIAL_EVENT_TERMS_RE.search(content):
+        route = "official_report_analysis" if _OFFICIAL_REPORT_ANALYSIS_RE.search(content) else "official_company_events"
+        await _emit("intent_detected", {"intent": route, "handler": "_handle_official_company_research"})
+        return await _handle_official_company_research(content, db, user_id)
 
     # C31.3 — Emit problem_analysis thinking event BEFORE intent classification
     # so the frontend can show the first step immediately while we compute.

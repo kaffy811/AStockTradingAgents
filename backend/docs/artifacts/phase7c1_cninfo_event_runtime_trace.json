@@ -1,0 +1,116 @@
+{
+  "phase": "7C1",
+  "generated_at": "2026-09-01T22:36:30-04:00",
+  "execution_mode": "isolated_tests_no_live_provider",
+  "status": "CNINFO_OFFICIAL_EVENT_RESEARCH_CANDIDATE_READY",
+  "provider_calls": {
+    "cninfo_live": 0,
+    "akshare": 0,
+    "eastmoney": 0,
+    "sina": 0,
+    "tencent": 0,
+    "tushare_news": 0
+  },
+  "scenarios": [
+    {
+      "id": "official_company_events_fulfilled",
+      "query_class": "company_official_announcement",
+      "route": "official_company_events",
+      "fulfillment": "fulfilled",
+      "reason_code": null,
+      "visible_event_contract": {
+        "title": true,
+        "published_at": true,
+        "source": "CNINFO",
+        "source_url": true,
+        "event_type": true,
+        "symbol": true,
+        "company_name": true,
+        "as_of": true,
+        "coverage": true,
+        "quality": true
+      },
+      "external_call_count": 0,
+      "test": "test_official_company_event_answer_is_fulfilled_and_public",
+      "result": "passed"
+    },
+    {
+      "id": "official_report_analysis_partial",
+      "query_class": "explicit_report_disclosure_highlights",
+      "route": "official_report_analysis",
+      "fulfillment": "partial",
+      "reason_code": "INCOMPLETE_PERSISTED_CNINFO_COVERAGE",
+      "external_call_count": 0,
+      "test": "test_explicit_report_disclosure_routes_to_official_report_analysis",
+      "result": "passed"
+    },
+    {
+      "id": "no_persisted_events",
+      "query_class": "company_official_announcement",
+      "route": "official_company_events",
+      "fulfillment": "unavailable",
+      "reason_code": "NO_PERSISTED_CNINFO_EVENTS",
+      "fabricated_event_count": 0,
+      "external_call_count": 0,
+      "test": "test_no_persisted_event_returns_unavailable_without_fabrication",
+      "result": "passed"
+    },
+    {
+      "id": "industry_news_unavailable",
+      "query_class": "industry_news",
+      "route": "industry_news",
+      "fulfillment": "unavailable",
+      "reason_code": "NO_APPROVED_INDUSTRY_NEWS_SOURCE",
+      "entity_resolution_called": false,
+      "tool_call_count": 0,
+      "external_call_count": 0,
+      "result": "passed"
+    },
+    {
+      "id": "theme_supply_chain_unavailable",
+      "query_class": "theme_supply_chain",
+      "route": "industry_news",
+      "fulfillment": "unavailable",
+      "reason_code": "NO_APPROVED_INDUSTRY_NEWS_SOURCE",
+      "entity_resolution_called": false,
+      "tool_call_count": 0,
+      "external_call_count": 0,
+      "result": "passed"
+    },
+    {
+      "id": "market_news_unavailable",
+      "query_class": "market_news",
+      "route": "industry_news",
+      "fulfillment": "unavailable",
+      "reason_code": "NO_APPROVED_INDUSTRY_NEWS_SOURCE",
+      "entity_resolution_called": false,
+      "tool_call_count": 0,
+      "external_call_count": 0,
+      "result": "passed"
+    }
+  ],
+  "test_summary": {
+    "phase7c1": {"passed": 17, "failed": 0},
+    "report_rag_citation_numeric": {"passed": 50, "failed": 0},
+    "chat_report_routing": {"passed": 46, "failed": 0},
+    "total": {"passed": 113, "failed": 0}
+  },
+  "public_output_leak_checks": {
+    "token": false,
+    "database_id": false,
+    "internal_table_name": false,
+    "unapproved_source": false
+  },
+  "prohibited_changes": {
+    "tushare_gateway": false,
+    "provider_permissions": false,
+    "news_provider": false,
+    "docker": false,
+    "dependencies": false,
+    "migration": false,
+    "frontend": false,
+    "llm_prompt": false,
+    "numeric_validation": false,
+    "citation_validation": false
+  }
+}
