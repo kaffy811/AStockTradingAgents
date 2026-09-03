@@ -62,6 +62,12 @@
         加载超时，可重试。
         <button class="cv2-inline-retry" @click="load(true)">重试</button>
       </p>
+      <section v-if="historyUnavailable" class="cv2-module-notice" data-testid="history-unavailable">
+        暂缺历史财务数据
+      </section>
+      <section v-if="quoteError" class="cv2-module-notice" data-testid="quote-unavailable">
+        行情数据暂不可用，不影响公司资料与其他模块。
+      </section>
       <CompanyV2CompanyProfileCard
         :stock-basic="stockBasic"
         :symbol="symbol"
@@ -157,6 +163,8 @@ const pageTimedOut = ref(false)
 const debugData = ref({})
 const historyData = ref({})   // 全历史数据
 const stockBasic = ref({})    // 公司/股票基本信息
+const historyError = ref('')
+const quoteError = ref('')
 const includeRaw = ref(false)
 // Phase 6T-E1: 默认年度（上市以来）；季度数据懒加载（后端默认最近5年）
 const periodTab = ref('annual')
@@ -191,7 +199,15 @@ const displayHistoryModules = computed(() => {
   }
   return historyModules.value
 })
-const hasDisplayData = computed(() => Object.keys(debugData.value?.modules || {}).length > 0)
+const hasDisplayData = computed(() => (
+  Object.keys(debugData.value?.modules || {}).length > 0 ||
+  Object.keys(stockBasic.value || {}).length > 0 ||
+  Object.keys(historyData.value?.modules || {}).length > 0
+))
+const historyUnavailable = computed(() => !loading.value && (
+  !!historyError.value ||
+  !Object.values(historyData.value?.modules || {}).some(module => module?.data_success || module?.history?.length)
+))
 
 function cacheKey(period = periodTab.value || 'annual') {
   return `${market.value}:${symbol.value}:${period}:${COMPANY_V2_SCHEMA_VERSION}`
@@ -209,6 +225,8 @@ function restoreCached(period = 'annual') {
 function resetViewState({ keepCached = true } = {}) {
   error.value = ''
   refreshWarning.value = ''
+  historyError.value = ''
+  quoteError.value = ''
   quarterlyHistoryData.value = null
   quarterlyLoading.value = false
   periodTab.value = 'annual'
@@ -318,6 +336,8 @@ async function load(force = false) {
   loading.value = true
   error.value = ''
   refreshWarning.value = ''
+  historyError.value = ''
+  quoteError.value = ''
   pageTimedOut.value = false
   _timeoutTimer = setTimeout(() => {
     if (seq === _loadSeq && loading.value) pageTimedOut.value = true
@@ -339,13 +359,13 @@ async function load(force = false) {
         stockBasic.value = { ...(stockBasic.value || {}), ...(data || {}) }
       }
       return data
-    }).catch(() => ({}))
+    })
     const historyPromise = getCompanyV2History(market.value, symbol.value, { period: 'annual', force_refresh: force, signal }).then(data => {
       if (seq === _loadSeq && requestGeneration.startsWith(`${market.value}:${symbol.value}:annual:`)) {
         historyData.value = data || {}
       }
       return data
-    }).catch(() => ({}))
+    })
     const debugPromise = getCompanyV2FullDebug(market.value, symbol.value, {
         include_raw: includeRaw.value,
         force_refresh: force,
@@ -369,14 +389,19 @@ async function load(force = false) {
       if (debugResult.value?.stock_basic) {
         stockBasic.value = debugResult.value.stock_basic
       }
-    } else {
-      throw debugResult.reason
+    } else if (debugResult.reason?.name !== 'AbortError') {
+      quoteError.value = debugResult.reason?.message || '行情与财务模块暂不可用'
     }
     if (historyResult.status === 'fulfilled') {
       historyData.value = Object.keys(historyData.value || {}).length ? historyData.value : (historyResult.value || {})
+      if (!historyResult.value?.ok) historyError.value = historyResult.value?.reason_code || 'DATA_NOT_AVAILABLE'
+    } else if (historyResult.reason?.name !== 'AbortError') {
+      historyError.value = historyResult.reason?.data?.reason_code || historyResult.reason?.message || 'DATA_NOT_AVAILABLE'
     }
     if (basicResult.status === 'fulfilled') {
       stockBasic.value = { ...(stockBasic.value || {}), ...(basicResult.value || {}) }
+    } else if (!hasDisplayData.value) {
+      throw basicResult.reason
     }
     companyV2PageCache.set(cacheKey('annual'), {
       debugData: debugData.value,
@@ -475,6 +500,10 @@ onUnmounted(() => {
 }
 .cv2-refreshing { background: #eff6ff; color: #1d4ed8; }
 .cv2-refresh-warning { background: #fef3c7; color: #92400e; }
+.cv2-module-notice {
+  margin: 0 0 12px; padding: 10px 12px; border: 1px solid #e5e7eb;
+  border-radius: 8px; background: #f9fafb; color: #6b7280; font-size: 13px;
+}
 .cv2-skeleton-section {
   background: #fff;
   border: 1px solid #e5e7eb;
