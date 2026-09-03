@@ -56,6 +56,113 @@ def _json(data: Any, status_code: int = 200) -> JSONResponse:
     return JSONResponse(content=data, status_code=status_code)
 
 
+_PUBLIC_WARNING_KEYS = frozenset({"code", "message", "field", "outlier_status"})
+_PUBLIC_COVERAGE_KEYS = frozenset({
+    "periods_count", "first_period", "last_period", "coverage_pct",
+    "expected_periods", "actual_periods", "missing_periods", "status",
+})
+_PRIVATE_FINANCIAL_KEY_PARTS = (
+    "token", "secret", "password", "cookie", "authorization", "trace",
+    "raw_", "payload", "request_id", "chunk_id", "database", "local_path",
+)
+
+
+def _public_financial_record(value: Any) -> dict[str, Any]:
+    """Keep public financial values while dropping provider/debug provenance."""
+    if not isinstance(value, dict):
+        return {}
+    result: dict[str, Any] = {}
+    for key, item in value.items():
+        normalized_key = str(key).lower()
+        if any(part in normalized_key for part in _PRIVATE_FINANCIAL_KEY_PARTS):
+            continue
+        if normalized_key.startswith("raw") or normalized_key.endswith("_id"):
+            continue
+        if normalized_key in {"id", "provider", "endpoint", "ts_code", "internal_id"}:
+            continue
+        if key == "warnings":
+            result[key] = [
+                {k: warning.get(k) for k in _PUBLIC_WARNING_KEYS if warning.get(k) is not None}
+                for warning in (item or [])
+                if isinstance(warning, dict)
+            ]
+        elif item is None or isinstance(item, (str, int, float, bool)):
+            result[key] = item
+    return result
+
+
+def _public_history_payload(data: dict[str, Any], market: str, symbol: str) -> dict[str, Any]:
+    """Build the anonymous Company page contract without debug/provider internals."""
+    public_modules: dict[str, Any] = {}
+    all_fields: dict[str, bool] = {}
+    top_warnings: list[dict[str, Any]] = []
+    for module_key, module in (data.get("modules") or {}).items():
+        if not isinstance(module, dict):
+            continue
+        history = [_public_financial_record(row) for row in (module.get("history") or []) if isinstance(row, dict)]
+        latest = _public_financial_record(module.get("latest") or {})
+        fields = sorted({key for row in [*history, latest] for key, value in row.items() if key != "warnings" and value not in (None, "")})
+        availability = {field: any(row.get(field) not in (None, "") for row in [*history, latest]) for field in fields}
+        all_fields.update(availability)
+        warnings = [warning for row in [*history, latest] for warning in (row.get("warnings") or [])]
+        top_warnings.extend(warnings)
+        coverage = {
+            key: value for key, value in (module.get("history_coverage") or {}).items()
+            if key in _PUBLIC_COVERAGE_KEYS
+        }
+        source = module.get("provider") or "public_company_financials"
+        public_modules[module_key] = {
+            "history": history,
+            "latest": latest,
+            "period_type": module.get("period_type"),
+            "module_status": {
+                "data_success": bool(module.get("data_success")),
+                "completeness": module.get("completeness_status"),
+                "semantic": module.get("semantic_status"),
+                "outlier": module.get("outlier_status"),
+                "formula": module.get("formula_status"),
+            },
+            "source": source,
+            "as_of": latest.get("period") or latest.get("period_end") or data.get("generated_at"),
+            "coverage": coverage,
+            "field_availability": availability,
+            "warnings": warnings,
+            "reason_code": module.get("reason_code"),
+            "data_success": bool(module.get("data_success")),
+            "history_coverage": coverage,
+            "completeness_status": module.get("completeness_status"),
+            "semantic_status": module.get("semantic_status"),
+            "outlier_status": module.get("outlier_status"),
+            "formula_status": module.get("formula_status"),
+            "user_message": module.get("user_message") or "",
+        }
+    success_count = sum(1 for module in public_modules.values() if module["module_status"]["data_success"])
+    return {
+        "ok": success_count > 0,
+        "market": market.upper(),
+        "symbol": symbol,
+        "period": data.get("period"),
+        "start_year": data.get("start_year"),
+        "end_year": data.get("end_year"),
+        "modules": public_modules,
+        "module_status": {"available": success_count, "total": len(public_modules)},
+        "source": sorted({module["source"] for module in public_modules.values()}),
+        "as_of": data.get("generated_at"),
+        "coverage": {
+            "history_range_label": data.get("history_range_label"),
+            "history_start": data.get("history_start"),
+            "history_end": data.get("history_end"),
+            "history_truncated": data.get("history_truncated"),
+        },
+        "field_availability": all_fields,
+        "warnings": top_warnings,
+        "reason_code": None if success_count else "DATA_NOT_AVAILABLE",
+        "history_range_label": data.get("history_range_label") or "",
+        "history_truncated": bool(data.get("history_truncated")),
+        "truncation_reason": data.get("truncation_reason"),
+    }
+
+
 def _company_v2_cache_key(market: str, symbol: str, period: str, *parts: str) -> str:
     return company_v2_snapshot_cache_service.make_company_key(
         "company_v2",
@@ -1111,8 +1218,6 @@ async def get_company_history(
     - period=quarterly: 所有季度（默认）
     - period=all: 同 quarterly
     """
-    if not settings.enable_company_v2_debug_api or not _is_dev_or_admin(user):
-        return _json({"ok": False, "error_code": "AUTH_REQUIRED"}, 403)
     if market.upper() != "CN":
         return _json({"ok": False, "error_code": "UNSUPPORTED_MARKET", "message": "Only CN market supported"})
     if period not in ("annual", "quarterly", "all"):
@@ -1124,11 +1229,23 @@ async def get_company_history(
             period=period,
             start_year=start_year,
             end_year=end_year,
-            force_refresh=force_refresh,
+            force_refresh=force_refresh and user is not None and _is_dev_or_admin(user),
         )
-        return _json(data)
+        return _json(_public_history_payload(data, market, symbol))
     except Exception as exc:
-        return _json({"ok": False, "error_code": "HISTORY_ERROR", "message": str(exc)[:500]}, 200)
+        return _json({
+            "ok": False,
+            "market": market.upper(),
+            "symbol": symbol,
+            "modules": {},
+            "module_status": {"available": 0, "total": 0},
+            "source": [],
+            "as_of": None,
+            "coverage": {},
+            "field_availability": {},
+            "warnings": [],
+            "reason_code": "DATA_NOT_AVAILABLE",
+        }, 200)
 
 
 @router.get("/{market}/{symbol}/history/module/{module_key}")
