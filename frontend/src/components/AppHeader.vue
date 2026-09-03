@@ -21,31 +21,44 @@
       <RouterLink to="/me" class="nav-link" active-class="nav-link--active">
         {{ t('nav_me') }}
       </RouterLink>
+      <RouterLink
+        v-if="authStore.isAdmin"
+        to="/admin/invites"
+        class="nav-link nav-link--admin"
+        active-class="nav-link--active"
+      >
+        管理后台
+      </RouterLink>
     </nav>
 
     <div class="user-badge">
       <span>{{ displayName }}</span>
-      <button class="logout-btn" @click="authStore.logout" style="margin-left:8px">{{ t('nav_logout') }}</button>
+      <button type="button" class="logout-btn" style="margin-left:8px" @click="handleLogout">{{ t('nav_logout') }}</button>
     </div>
   </div>
 </template>
 
 <script setup>
 import { computed } from 'vue'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth.js'
 import { useI18n } from '../utils/i18n.js'
 
 const authStore = useAuthStore()
-const { t } = useI18n()
+const router    = useRouter()
+const { t }     = useI18n()
 
+// currentUser is a plain string (username) stored in the auth store
 const displayName = computed(() => {
-  const username = authStore.currentUser?.username
-  const email    = authStore.currentUser?.email
-  if (username && username !== 'string') return username
-  if (email    && email    !== 'string') return email
+  const name = authStore.currentUser
+  if (name && name !== 'string') return name
   return t('nav_default_user')
 })
+
+function handleLogout() {
+  authStore.logout()
+  router.replace('/login')
+}
 </script>
 
 <style scoped>
@@ -114,6 +127,11 @@ const displayName = computed(() => {
 }
 
 .logout-btn:hover { color: var(--danger); }
+
+.nav-link--admin {
+  color: var(--accent);
+  font-weight: 600;
+}
 
 /* ── Mobile ≤640px: BottomTabBar takes over nav, hide .app-nav ── */
 @media (max-width: 640px) {

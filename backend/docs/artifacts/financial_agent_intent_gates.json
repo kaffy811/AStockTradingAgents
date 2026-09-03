@@ -1,0 +1,97 @@
+{
+  "schema_version": "financial_agent_intent_gates.v1",
+  "generated_at": "2026-07-16T20:47:41.341411+00:00",
+  "authorized_intents": [],
+  "intents": {
+    "official_report_pdf": {
+      "passed": false,
+      "requested_samples": 11,
+      "executed_samples": 0,
+      "intent_match_rate": null,
+      "entity_match_rate": null,
+      "unsupported_facts": null,
+      "required_data_provenance": null,
+      "browser_acceptance_passed": false,
+      "p95_latency_acceptable": false,
+      "db_session_reliability_passed": false,
+      "fallback_behavior_passed": false,
+      "blockers": [
+        "live_shadow_samples_not_executed",
+        "browser_acceptance_not_recorded",
+        "live_external_suite_not_run"
+      ]
+    },
+    "quote_query": {
+      "passed": false,
+      "requested_samples": 11,
+      "executed_samples": 0,
+      "intent_match_rate": null,
+      "entity_match_rate": null,
+      "unsupported_facts": null,
+      "required_data_provenance": null,
+      "browser_acceptance_passed": false,
+      "p95_latency_acceptable": false,
+      "db_session_reliability_passed": false,
+      "fallback_behavior_passed": false,
+      "blockers": [
+        "live_shadow_samples_not_executed",
+        "browser_acceptance_not_recorded",
+        "live_external_suite_not_run"
+      ]
+    },
+    "financial_snapshot": {
+      "passed": false,
+      "requested_samples": 11,
+      "executed_samples": 0,
+      "intent_match_rate": null,
+      "entity_match_rate": null,
+      "unsupported_facts": null,
+      "required_data_provenance": null,
+      "browser_acceptance_passed": false,
+      "p95_latency_acceptable": false,
+      "db_session_reliability_passed": false,
+      "fallback_behavior_passed": false,
+      "blockers": [
+        "live_shadow_samples_not_executed",
+        "browser_acceptance_not_recorded",
+        "live_external_suite_not_run"
+      ]
+    },
+    "financial_report": {
+      "passed": false,
+      "requested_samples": 12,
+      "executed_samples": 0,
+      "intent_match_rate": null,
+      "entity_match_rate": null,
+      "unsupported_facts": null,
+      "required_data_provenance": null,
+      "browser_acceptance_passed": false,
+      "p95_latency_acceptable": false,
+      "db_session_reliability_passed": false,
+      "fallback_behavior_passed": false,
+      "blockers": [
+        "live_shadow_samples_not_executed",
+        "browser_acceptance_not_recorded",
+        "live_external_suite_not_run"
+      ]
+    },
+    "financial_comparison": {
+      "passed": false,
+      "requested_samples": 11,
+      "executed_samples": 0,
+      "intent_match_rate": null,
+      "entity_match_rate": null,
+      "unsupported_facts": null,
+      "required_data_provenance": null,
+      "browser_acceptance_passed": false,
+      "p95_latency_acceptable": false,
+      "db_session_reliability_passed": false,
+      "fallback_behavior_passed": false,
+      "blockers": [
+        "live_shadow_samples_not_executed",
+        "browser_acceptance_not_recorded",
+        "live_external_suite_not_run"
+      ]
+    }
+  }
+}

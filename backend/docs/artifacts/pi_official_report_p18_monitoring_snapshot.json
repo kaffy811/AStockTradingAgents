@@ -1,0 +1,61 @@
+{
+  "schema_version": "pi_official_report_p18_monitoring_snapshot_v1",
+  "phase": "6V-P1.8",
+  "generated_at": "2026-07-20T11:29:04.537740+00:00",
+  "eligibility": {
+    "requests_total": 50,
+    "eligible_requests": 50,
+    "ineligible_reasons": {},
+    "bucket_selected": 50,
+    "rollout_not_selected": 0
+  },
+  "execution": {
+    "pi_started": 50,
+    "pi_completed": 50,
+    "pi_failed": 0,
+    "legacy_only": 0,
+    "fallback_started": 0,
+    "fallback_completed": 0,
+    "fallback_failed": 0
+  },
+  "safety": {
+    "fabricated_url": 0,
+    "wrong_entity": 0,
+    "wrong_year": 0,
+    "wrong_report_type": 0,
+    "provenance_failure": 0,
+    "business_write": 0,
+    "double_write": 0,
+    "unknown_write": 0,
+    "trace_mismatch": 0,
+    "terminal_missing": 0
+  },
+  "reliability": {
+    "raw500": 0,
+    "raw503": 0,
+    "expected_timeout": 0,
+    "unexpected_timeout": 0,
+    "diagnostics_timeout": 0,
+    "task_leak": 0,
+    "db_leak": 0,
+    "pending_rollback_error": 0
+  },
+  "performance": {
+    "pi_p50": 2810,
+    "pi_p95": 4134,
+    "tool_p50": 2810,
+    "tool_p95": 4134,
+    "legacy_p50": 16983,
+    "legacy_p95": 21810,
+    "fallback_p50": null,
+    "fallback_p95": null
+  },
+  "product": {
+    "behavior_match": 50,
+    "safety_correct": 50,
+    "accepted": 50,
+    "safety_review": 0,
+    "capability_gap": 0
+  },
+  "label_policy": "hashes and bounded enums only"
+}

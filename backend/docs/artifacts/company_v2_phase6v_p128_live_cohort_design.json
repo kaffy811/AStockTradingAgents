@@ -1,0 +1,62 @@
+{
+  "schema_version": "pi_canary_live_cohort_design_v1",
+  "phase": "6V-P1.28",
+  "generated_at": "2026-07-25T14:00:00.000000+00:00",
+  "design_principles": [
+    "Shadow cohort (100%) and Live cohort (1%) are completely independent selections",
+    "Live cohort MUST be a strict subset of shadow cohort",
+    "Both salts are deterministic (SHA256-based stable_bucket) — no per-request randomness",
+    "Shadow eligibility is necessary but not sufficient for live eligibility",
+    "Live selection uses independent salt pi_live_v1 with 1% rollout threshold"
+  ],
+  "shadow_cohort": {
+    "salt": "pi_v1",
+    "rollout_percent": 100,
+    "selection_function": "stable_bucket(request_id, session_id, salt='pi_v1', env='staging', pct=100.0)",
+    "result": "all eligible requests selected"
+  },
+  "live_cohort": {
+    "salt": "pi_live_v1",
+    "rollout_percent": 1,
+    "selection_function": "stable_bucket(request_id, session_id, salt='pi_live_v1', env='staging', pct=1.0)",
+    "result": "~1% of eligible requests selected",
+    "independence_from_shadow": true,
+    "is_subset_of_shadow": true,
+    "proof": "live_selected(r) = bucket(r, 'pi_live_v1') < 1.0% AND shadow_selected(r) = bucket(r, 'pi_v1') < 100.0% = True always; therefore live_selected ⊆ shadow_selected"
+  },
+  "selection_invariants": {
+    "zero_percent_selects_none": true,
+    "one_percent_selection_rate_approx": "1.0% ± 0.3% statistical tolerance",
+    "same_identity_stable": "SHA256(request_id + session_id + salt) is deterministic",
+    "restart_stable": "no state dependency; recomputed from same inputs",
+    "cross_worker_stable": "salt and rollout_percent in env vars, consistent across workers",
+    "config_version_independence": "cv changes do not affect salt; selection is cv-independent",
+    "live_salt_independent_from_shadow_salt": true
+  },
+  "arbitration_policy": {
+    "deadline_ms": 5000,
+    "on_pi_approved_before_deadline": "pi_approved_visible",
+    "on_pi_timeout": "legacy_pi_timeout",
+    "on_pi_failed": "legacy_pi_failed",
+    "on_review_rejected": "legacy_review_rejected",
+    "on_safety_guard": "legacy_safety_guard",
+    "on_kill_switch": "legacy_kill_switch",
+    "invariant": "exactly one user-visible assistant result per request"
+  },
+  "provider_mode": {
+    "mode": "staging_replay",
+    "description": "Pre-recorded Pi responses replayed from staging fixture corpus. No real LLM inference calls.",
+    "provider_serving_calls": 0,
+    "replay_serving_calls": "~200 (1% of 20000 eligible requests)",
+    "cost": "zero"
+  },
+  "verification_tests": [
+    "test_live_cohort_independent_from_shadow",
+    "test_1pct_selection_rate",
+    "test_live_is_shadow_subset",
+    "test_zero_pct_selects_none",
+    "test_same_identity_stable",
+    "test_restart_stable",
+    "test_cv_independence"
+  ]
+}

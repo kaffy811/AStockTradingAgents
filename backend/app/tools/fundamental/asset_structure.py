@@ -94,8 +94,20 @@ class AssetStructureTool(BaseFundamentalTool):
                 "cash_to_assets_pct":      safe_pct(cash, ta),
             })
 
+        latest = series[0] if series else {}
         return {
             "symbol": symbol, "ts_code": ts_code,
-            "annual": self.annual, "series": series,
+            "annual": self.annual,
+            "rows": series,
+            "series": series,
+            "summary": {
+                "total_assets": latest.get("total_assets"),
+                "current_asset_ratio_pct": latest.get("current_asset_ratio_pct"),
+                "liability_ratio_pct": latest.get("liability_ratio_pct"),
+                "cash_to_assets_pct": latest.get("cash_to_assets_pct"),
+                "goodwill_to_equity_pct": latest.get("goodwill_to_equity_pct"),
+                "end_date": latest.get("end_date"),
+            },
+            "reasons": [],
             "comment": _comment(series), "source": "tushare",
         }

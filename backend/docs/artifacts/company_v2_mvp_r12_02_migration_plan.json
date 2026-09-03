@@ -1,0 +1,41 @@
+{
+  "artifact": "migration_plan",
+  "phase": "MVP-R1.2",
+  "date": "2026-07-26",
+  "current_supabase_alembic_head": "k9l0m1n2o3p4",
+  "migrations_to_apply": [
+    {
+      "revision": "l0m1n2o3p4q5",
+      "description": "phase6ts_shadow_observation_index",
+      "status": "PENDING"
+    },
+    {
+      "revision": "m1n2o3p4q5r6",
+      "description": "pi_real_provider_audit",
+      "status": "PENDING"
+    },
+    {
+      "revision": "n2o3p4q5r6s7",
+      "description": "p132_mvp_release_tables (mvp_invite, chat_feedback, mvp_analytics_event)",
+      "status": "PENDING"
+    },
+    {
+      "revision": "o3p4q5r6s7t8",
+      "description": "mvp_r12_invite_security (is_admin, code_hash, code_prefix, drop invite_code)",
+      "status": "PENDING"
+    }
+  ],
+  "apply_command": "cd backend && DATABASE_URL=$DATABASE_URL alembic upgrade head",
+  "rollback_command": "cd backend && DATABASE_URL=$DATABASE_URL alembic downgrade k9l0m1n2o3p4",
+  "pre_apply_checks": [
+    "pg_dump --schema-only for backup",
+    "Verify alembic current shows k9l0m1n2o3p4",
+    "Check no active transactions on target tables"
+  ],
+  "post_apply_checks": [
+    "SELECT table_name FROM information_schema.tables WHERE table_name IN ('mvp_invite','chat_feedback','mvp_analytics_event')",
+    "SELECT column_name FROM information_schema.columns WHERE table_name='app_users' AND column_name='is_admin'",
+    "SELECT column_name FROM information_schema.columns WHERE table_name='mvp_invite' AND column_name='code_hash'",
+    "alembic current → should show o3p4q5r6s7t8"
+  ]
+}

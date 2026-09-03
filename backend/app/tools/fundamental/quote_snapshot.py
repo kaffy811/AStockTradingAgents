@@ -99,3 +99,42 @@ class QuoteSnapshotTool(BaseFundamentalTool):
         data = await akshare_fs_client.get_real_time_quote(symbol=symbol, market=market)
         data["source"] = "akshare_fallback"
         return data
+
+    async def fetch_baostock(self, market: str, symbol: str) -> dict[str, Any]:
+        """
+        BaoStock K 线 fallback（DATA_MODE=free 或 AkShare 失败时）。
+
+        Phase 6N-7B: 除 close 外，同一 kline 请求还携带 peTTM/pbMRQ/psTTM/
+        pcfNcfTTM/turn/pctChg（零额外请求）。市值仍为 None（kline 无股本数据）。
+        source 标记为 "baostock_kline_fallback" 供前端显示「最近收盘价」标签。
+        """
+        if market.upper() != "CN":
+            raise FundamentalToolError(f"BaoStock 不支持 {market} 市场行情")
+        from app.datasource.baostock_client import baostock_client
+        from app.datasource.tushare_client import _to_ts_code
+        ts_code = _to_ts_code(market, symbol)
+        rec = await baostock_client.get_recent_close(ts_code)
+        if rec is None:
+            raise FundamentalToolError("BaoStock 最近收盘价查询失败（无数据）")
+        return {
+            "symbol":        symbol,
+            "ts_code":       ts_code,
+            "market":        market.upper(),
+            "trade_date":    rec.get("trade_date"),
+            "close":         rec.get("close"),
+            "change_pct":    rec.get("change_pct"),      # percent
+            "pe":            None,
+            "pe_ttm":        rec.get("pe_ttm"),          # Phase 6N-7B: kline peTTM
+            "pb":            rec.get("pb"),              # kline pbMRQ
+            "ps":            None,
+            "ps_ttm":        rec.get("ps_ttm"),          # kline psTTM
+            "pcf_ttm":       rec.get("pcf_ttm"),         # kline pcfNcfTTM
+            "dv_ratio":      None,
+            "dv_ttm":        None,
+            "total_mv":      None,                        # kline 无股本，市值不可得
+            "circ_mv":       None,
+            "turnover_rate": rec.get("turnover_rate"),   # kline turn (percent)
+            "turnover_rate_f": None,
+            "volume_ratio":  None,
+            "source":        "baostock_kline_fallback",
+        }

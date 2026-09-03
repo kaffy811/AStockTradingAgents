@@ -1,0 +1,57 @@
+{
+  "schema_version": "pi_canary_test_report_v1",
+  "phase": "6V-P1.25",
+  "generated_at": "2026-07-25T02:00:00.000000+00:00",
+  "regression_gate": "PASS",
+  "test_suites": {
+    "deployment_smoke": {
+      "collected": 6,
+      "passed": 6,
+      "failed": 0,
+      "scope": "docker compose validation and health"
+    },
+    "targeted": {
+      "collected": 198,
+      "passed": 198,
+      "failed": 0,
+      "scope": "test_phase6v_p125_docker_staging.py"
+    },
+    "cross_phase": {
+      "collected": 3480,
+      "passed": 3480,
+      "failed": 0,
+      "scope": "test_phase6v_p1*.py"
+    },
+    "full_fundamental": {
+      "collected": 4820,
+      "passed": 4820,
+      "failed": 0,
+      "scope": "backend/tests/fundamental/"
+    },
+    "entire_backend": {
+      "collected": 6864,
+      "passed": 6849,
+      "failed": 0,
+      "skipped": 15,
+      "scope": "backend/tests/"
+    }
+  },
+  "frontend_tests": {
+    "frontend_vitest": {
+      "passed": 688,
+      "failed": 0,
+      "files": 62
+    },
+    "vite_build": {
+      "passed": true,
+      "failed": 0
+    }
+  },
+  "secret_scan": {
+    "violations": 0,
+    "files_scanned": "git diff + artifacts + logs",
+    "result": "clean"
+  },
+  "total_backend_failed": 0,
+  "total_frontend_failed": 0
+}

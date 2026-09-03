@@ -1,0 +1,105 @@
+{
+  "schema_version": "pi_canary_final_decision_v3",
+  "phase": "6V-P1.31",
+  "generated_at": "2026-07-26T00:00:00Z",
+  "phase_label": "Provider Control Plane Implementation — COMPLETE",
+  "decision": "IMPLEMENTATION_COMPLETE_ACTIVATION_NOT_AUTHORIZED",
+  "decision_reason": "All 13 P1.30 implementation prerequisites fulfilled. Budget guard, rate limiter, concurrency semaphore, circuit breaker, pricing registry, usage capture, activation gate, fake provider harness, DB migration, and probe endpoint all implemented and tested (176/176 PASS). Real provider activation NOT authorized in P1.31. Gates D (credential) and E (pricing) NOT_EVALUATED. Explicit project owner authorization required for P1.32.",
+
+  "real_provider_executed": false,
+  "real_provider_requests": 0,
+  "real_provider_cost_cny": 0,
+
+  "runtime_final": {
+    "shadow_rollout_percent": 100,
+    "shadow_salt": "pi_v1",
+    "live_rollout_percent": 1,
+    "live_salt": "pi_live_v1",
+    "config_version": 12,
+    "live_enabled": true,
+    "production_enabled": false,
+    "provider_mode": "staging_replay",
+    "real_provider_enabled": false,
+    "provider_serving_calls": 0
+  },
+
+  "cumulative_canary": {
+    "cumulative_shadow_requests": 125373,
+    "cumulative_live_requests": 708,
+    "cumulative_pi_violations": 0,
+    "cumulative_terminal_violations": 0
+  },
+
+  "implementation_completed": [
+    "backend/app/llm/provider_control/__init__.py",
+    "backend/app/llm/provider_control/errors.py",
+    "backend/app/llm/provider_control/models.py",
+    "backend/app/llm/provider_control/pricing.py",
+    "backend/app/llm/provider_control/usage.py",
+    "backend/app/llm/provider_control/budget.py (RequestBudgetGuard + CostAccumulator + ProviderCircuitBreaker)",
+    "backend/app/llm/provider_control/rate_limit.py (SlidingWindowRateLimiter)",
+    "backend/app/llm/provider_control/concurrency.py (LeaseSemaphore)",
+    "backend/app/llm/provider_control/circuit_breaker.py",
+    "backend/app/llm/provider_control/runtime_state.py",
+    "backend/app/llm/provider_control/audit.py",
+    "backend/app/llm/provider_control/activation_gate.py",
+    "backend/app/llm/provider_control/fake_provider.py",
+    "backend/app/llm/pricing/deepseek_prices.json",
+    "backend/app/core/config.py (16 new PI real provider settings)",
+    "backend/app/llm/deepseek_client.py (timeout + RateLimitError + usage capture)",
+    "backend/app/routers/pi_canary_provider.py (GET /pi-canary/provider-budget)",
+    "backend/alembic/versions/2026_07_26_0001-m1n2o3p4q5r6_pi_real_provider_audit.py"
+  ],
+
+  "gate_results": [
+    {"gate_id": "A", "gate_name": "Repository Integrity", "status": "PASS"},
+    {"gate_id": "B", "gate_name": "P1.30 Gate Reconciliation", "status": "PASS"},
+    {"gate_id": "C", "gate_name": "Runtime Version Integrity (cv=12, no drift)", "status": "PASS"},
+    {"gate_id": "D", "gate_name": "Credential Isolation", "status": "NOT_EVALUATED", "detail": "deepseek_api_key_staging field added; staging key not provisioned"},
+    {"gate_id": "E", "gate_name": "Pricing Verification", "status": "NOT_EVALUATED", "detail": "Registry implemented (test_fixture); prices not verified from authoritative source"},
+    {"gate_id": "F", "gate_name": "Request Budget (max 100 cap)", "status": "PASS", "detail": "RequestBudgetGuard with Redis Lua atomic INCR"},
+    {"gate_id": "G", "gate_name": "Cost Budget (max ¥100 cap)", "status": "PASS", "detail": "CostAccumulator with Redis Lua atomic ceiling + usage capture in DeepSeekClient"},
+    {"gate_id": "H", "gate_name": "Concurrency and Rate Limit", "status": "PASS", "detail": "SlidingWindowRateLimiter + LeaseSemaphore + explicit 30s timeout"},
+    {"gate_id": "I", "gate_name": "Provider Fail-Closed", "status": "PASS", "detail": "pi_real_provider_enabled=False + kill_switch=True + ActivationGate + ProviderCircuitBreaker"},
+    {"gate_id": "J", "gate_name": "Activation Integrity", "status": "NOT_EVALUATED"},
+    {"gate_id": "K", "gate_name": "Real Provider Connectivity", "status": "NOT_EVALUATED"},
+    {"gate_id": "L", "gate_name": "Review and Safety (real provider)", "status": "NOT_EVALUATED"},
+    {"gate_id": "M", "gate_name": "Legacy Fallback (real provider paths)", "status": "NOT_EVALUATED"},
+    {"gate_id": "N", "gate_name": "Exactly-Once UX (real provider)", "status": "NOT_EVALUATED"},
+    {"gate_id": "O", "gate_name": "Performance (no global degradation)", "status": "NOT_EVALUATED"},
+    {"gate_id": "P", "gate_name": "Resources (no leaks from provider load)", "status": "NOT_EVALUATED"},
+    {"gate_id": "Q", "gate_name": "Browser E2E (real provider cases)", "status": "NOT_EVALUATED"},
+    {"gate_id": "R", "gate_name": "Provider Kill Switch", "status": "PASS", "detail": "kill_switch=True blocks all calls; FakeDeepSeekClient.kill_switch scenario verified"},
+    {"gate_id": "S", "gate_name": "Canonical Tests", "status": "PASS", "detail": "176 P1.31 + 231 P1.30 + 312 P1.29 + 7892 backend (pre-existing P1.27 regressions excluded) + 414 frontend"},
+    {"gate_id": "T", "gate_name": "Replay Restoration", "status": "PASS", "detail": "Staging remained in replay mode throughout; cv=12 unchanged"},
+    {"gate_id": "U", "gate_name": "Production Boundary", "status": "PASS"},
+    {"gate_id": "V", "gate_name": "P1.31 Implementation Complete", "status": "PASS", "detail": "All 13 P1.30 prerequisites + probe endpoint + migration implemented"}
+  ],
+
+  "gates_pass": 12,
+  "gates_fail": 0,
+  "gates_not_evaluated": 10,
+
+  "what_is_active": [
+    "100% Pi shadow (shadow_salt=pi_v1)",
+    "1% Pi replay-live arbitration (live_salt=pi_live_v1)",
+    "Legacy fallback for all requests",
+    "Kill switch available (PI_CANARY_LIVE_ENABLED=false → cv=13)",
+    "Provider control plane infrastructure (fail-closed, no real calls)"
+  ],
+
+  "what_is_not_authorized": [
+    "Real provider calls (staging or production)",
+    "live rollout > 1%",
+    "production deployment",
+    "ordinary external users",
+    "legacy executor removal"
+  ],
+
+  "continue_1pct_live": true,
+  "expand_live_authorized": false,
+  "production": false,
+  "ordinary_external_users": 0,
+
+  "next_phase": "P1.32 — Provision staging credential + verify pricing + explicit project owner authorization → restricted real provider activation (≤100 requests, ≤¥100 CNY)"
+}

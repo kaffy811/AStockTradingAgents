@@ -1,0 +1,21 @@
+{
+  "schema_version": "pi_p110_write_audit_v1",
+  "phase": "6V-P1.10",
+  "generated_at": "2026-07-21T12:32:00+00:00",
+  "source_sha": "71f8dbcedad1149a68b95dbd4d28aeb35b80b311",
+  "shadow_mode_enforced": true,
+  "write_attribution_summary": {
+    "business_write": 0,
+    "double_write": 0,
+    "unknown_write": 0,
+    "pending_rollback_error": 0,
+    "db_leak": 0
+  },
+  "shadow_write_guard": {
+    "verified_active": true,
+    "mechanism": "shadow_runner.py SHADOW_WRITE_GUARD=True; all DB writes gated by is_shadow check",
+    "test_ref": "test_shadow_write_guard_blocks_all_writes (backend/tests/agent_runtime/)"
+  },
+  "read_only_verified": true,
+  "note": "Pi shadow canary is read-only by design. No writes to official_report_index or user data during W3 observation."
+}

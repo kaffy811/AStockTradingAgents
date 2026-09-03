@@ -189,16 +189,15 @@ async def _run_agent(
 class TestRAGIntentDetection:
 
     @pytest.mark.parametrize("query,expected_symbol,expected_need_rag", [
-        ("请根据苹果最近财报分析是否适合长期持有", "AAPL", True),
-        ("微软年报怎么看", "MSFT", True),
+        ("请根据 AAPL 最近财报分析是否适合长期持有", "AAPL", True),
+        ("MSFT 年报怎么看", "MSFT", True),
         ("AAPL 基本面研究", "AAPL", True),
-        ("腾讯护城河如何", "00700", True),   # HK via chat_rag symbol map — not in financial_agent
-        # Note: 腾讯 is not in financial_agent's _CN_NAMES, so symbol may be None
-        ("苹果商业模式分析", "AAPL", True),
-        ("苹果公司估值", "AAPL", True),
-        ("苹果公司是否值得长期投资", "AAPL", True),
-        ("微软监管风险", "MSFT", True),
-        ("苹果公司季报怎么样", "AAPL", True),
+        ("00700 护城河如何", "00700", True),
+        ("AAPL 商业模式分析", "AAPL", True),
+        ("AAPL 估值", "AAPL", True),
+        ("AAPL 是否值得长期投资", "AAPL", True),
+        ("MSFT 监管风险", "MSFT", True),
+        ("AAPL 季报怎么样", "AAPL", True),
         ("AAPL 10-K filing review", "AAPL", True),
     ])
     def test_rag_intent_triggered(self, query, expected_symbol, expected_need_rag):
@@ -211,7 +210,7 @@ class TestRAGIntentDetection:
             assert result["symbol"] == expected_symbol or result["symbol"] is not None
 
     @pytest.mark.parametrize("query", [
-        "苹果今天股价多少",
+        "AAPL 今天股价多少",
         "AAPL K线走势",
         "MSFT 最新新闻",
         "今天A股怎么样",
@@ -232,7 +231,7 @@ class TestRAGEventSequence:
     async def test_rag_produces_tool_start_and_result_events(self):
         """When need_rag=True and RAG returns results, both SSE events are emitted."""
         events, response = await _run_agent(
-            "请根据苹果最近财报分析是否适合长期持有",
+            "请根据 AAPL 最近财报分析是否适合长期持有",
             llm=_MockLLM(),
             mock_rag={
                 "ok":     True,
@@ -263,7 +262,7 @@ class TestRAGEventSequence:
     @pytest.mark.asyncio
     async def test_rag_result_event_has_success_status(self):
         events, _ = await _run_agent(
-            "苹果公司年报分析",
+            "AAPL 年报分析",
             llm=_MockLLM(),
             mock_rag={"ok": True, "query": "苹果", "results": _MOCK_RAG_RESULTS},
         )
@@ -277,7 +276,7 @@ class TestRAGEventSequence:
     @pytest.mark.asyncio
     async def test_rag_result_summary_contains_count(self):
         events, _ = await _run_agent(
-            "苹果公司年报分析",
+            "AAPL 年报分析",
             llm=_MockLLM(),
             mock_rag={"ok": True, "query": "苹果", "results": _MOCK_RAG_RESULTS},
         )
@@ -292,7 +291,7 @@ class TestRAGEventSequence:
     @pytest.mark.asyncio
     async def test_final_answer_has_sources_when_rag_returns_results(self):
         _, response = await _run_agent(
-            "苹果公司基本面",
+            "AAPL 基本面",
             llm=_MockLLM(),
             mock_rag={"ok": True, "query": "苹果", "results": _MOCK_RAG_RESULTS},
         )
@@ -302,7 +301,7 @@ class TestRAGEventSequence:
     @pytest.mark.asyncio
     async def test_final_answer_event_payload_has_sources(self):
         events, _ = await _run_agent(
-            "苹果公司基本面",
+            "AAPL 基本面",
             llm=_MockLLM(),
             mock_rag={"ok": True, "query": "苹果", "results": _MOCK_RAG_RESULTS},
         )
@@ -318,7 +317,7 @@ class TestRAGNoResult:
     @pytest.mark.asyncio
     async def test_no_result_tool_event_success(self):
         events, _ = await _run_agent(
-            "苹果公司年报",
+            "AAPL 年报",
             llm=_MockLLM(),
             mock_rag={"ok": True, "query": "苹果", "results": []},
         )
@@ -332,7 +331,7 @@ class TestRAGNoResult:
     @pytest.mark.asyncio
     async def test_no_result_summary_says_not_found(self):
         events, _ = await _run_agent(
-            "苹果公司年报",
+            "AAPL 年报",
             llm=_MockLLM(),
             mock_rag={"ok": True, "query": "苹果", "results": []},
         )
@@ -346,7 +345,7 @@ class TestRAGNoResult:
     @pytest.mark.asyncio
     async def test_no_result_final_answer_has_empty_sources(self):
         _, response = await _run_agent(
-            "苹果公司年报",
+            "AAPL 年报",
             llm=_MockLLM(),
             mock_rag={"ok": True, "query": "苹果", "results": []},
         )
@@ -355,7 +354,7 @@ class TestRAGNoResult:
     @pytest.mark.asyncio
     async def test_no_result_final_answer_still_sent(self):
         events, _ = await _run_agent(
-            "苹果公司年报",
+            "AAPL 年报",
             llm=_MockLLM(),
             mock_rag={"ok": True, "query": "苹果", "results": []},
         )
@@ -400,7 +399,7 @@ class TestRAGTimeout:
                     async def _cb(et, p): events.append({"type": et, "payload": p})
                     agent = FinancialAgent()
                     response = await agent.run(
-                        query="苹果公司年报分析",
+                        query="AAPL 年报分析",
                         db=_make_db(),
                         tool_registry=_make_registry(),
                         event_callback=_cb,
@@ -431,7 +430,7 @@ class TestRAGTimeout:
                     events: list[dict] = []
                     async def _cb(et, p): events.append({"type": et, "payload": p})
                     await FinancialAgent().run(
-                        query="苹果公司年报分析",
+                        query="AAPL 年报分析",
                         db=_make_db(),
                         tool_registry=_make_registry(),
                         event_callback=_cb,
@@ -495,7 +494,7 @@ class TestBackwardCompat:
     async def test_non_rag_query_has_no_sources(self):
         """A quote-only query must have no sources in final_answer."""
         _, response = await _run_agent(
-            "苹果今天股价",
+            "AAPL 今天股价",
             llm=_MockLLM(),
             mock_quote={"ok": True, "symbol": "AAPL", "market": "US", "price": 200.0,
                         "change": 1.5, "change_pct": "+0.75%", "currency": "USD"},
@@ -511,7 +510,7 @@ class TestSourceDataIntegrity:
     async def test_sources_match_rag_results(self):
         """Each SourceRef must correspond to a RAG result item."""
         _, response = await _run_agent(
-            "苹果公司年报",
+            "AAPL 年报",
             llm=_MockLLM(),
             mock_rag={"ok": True, "query": "苹果", "results": _MOCK_RAG_RESULTS},
         )
@@ -527,7 +526,7 @@ class TestSourceDataIntegrity:
     async def test_source_type_label_in_result_summary(self):
         """result_summary should mention source_type in human-readable form."""
         events, _ = await _run_agent(
-            "苹果公司年报",
+            "AAPL 年报",
             llm=_MockLLM(),
             mock_rag={"ok": True, "query": "苹果", "results": _MOCK_RAG_RESULTS},
         )
@@ -550,7 +549,7 @@ class TestSourceDataIntegrity:
                 return await super().async_stream_chat(messages, **kwargs)
 
         await _run_agent(
-            "苹果公司年报",
+            "AAPL 年报",
             llm=_CaptureLLM(),
             mock_rag={"ok": True, "query": "苹果", "results": _MOCK_RAG_RESULTS},
         )
@@ -642,6 +641,6 @@ class TestConstants:
     def test_combined_rag_and_quote_intent(self):
         """A query with both RAG and quote keywords triggers both flags."""
         from app.agents.financial_agent import _detect_intent
-        result = _detect_intent("苹果今天股价以及基本面财报分析")
+        result = _detect_intent("AAPL 今天股价以及基本面财报分析")
         assert result["need_rag"]   is True
         assert result["need_quote"] is True

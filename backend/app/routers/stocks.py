@@ -345,7 +345,7 @@ async def get_fundamentals(
     summary="同行基本面对比（Phase 1）",
     description=(
         "返回目标股及其同行的基本面快照，并给出字段可用性分析。\n\n"
-        "**Phase 1 同行识别方式：** 手动 PEER_MAP，未配置的股票返回空 peers 列表。\n\n"
+        "**同行识别方式：** 基于行业分类与行业热门股快照动态发现；无可靠来源时返回空 peers 列表。\n\n"
         "**comparison_fields 结构：**\n"
         "- `available`：target 和 ≥1 peer 均有值，可用于横向对比\n"
         "- `missing_in_target`：target 本身为 null，不得对目标股该字段下结论\n"
@@ -366,8 +366,7 @@ async def get_peer_fundamentals(
     同行基本面对比（Phase 1D：动态同行）。
 
     同行来源优先级（由 PeerComparisonService.get_peer_fundamentals_dynamic 处理）：
-      1. PEER_MAP 手动配置（最高优先级，任何市场）
-      2. CN 市场：同一申万一级行业 Hot Score Top-N
+      1. CN 市场：同一申万一级行业 Hot Score Top-N
       3. 其他情况：peers=[]，data_quality 说明原因
     """
     market = market.upper()

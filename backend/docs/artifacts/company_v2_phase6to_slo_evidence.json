@@ -1,0 +1,22 @@
+{
+  "phase": "phase6to_slo_evidence",
+  "local_environment": {
+    "application_region": "United States (estimated)",
+    "database_region": "ap-northeast-2",
+    "cross_continent_rtt_likely": true
+  },
+  "observed_metrics": {
+    "select_1_p50_ms": 525.73,
+    "primary_key_select_p50_ms": 526.59,
+    "insert_commit_p50_ms": 811.43,
+    "steady_state_create_p50_ms": 1367.75,
+    "steady_state_create_p95_ms": 2097.94,
+    "cold_connection_create_ms": 12349.89
+  },
+  "decision_candidates": [
+    "Maintain 300ms only with same-region deployment and lower network floor",
+    "Adjust production SLO via separate architecture approval",
+    "Hold current rollout"
+  ],
+  "current_recommendation": "hold"
+}

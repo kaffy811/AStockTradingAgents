@@ -1,0 +1,93 @@
+{
+  "schema_version": "live_environment_preflight.v1",
+  "environment": {
+    "environment_id": "local_unverified",
+    "os": "macOS-26.3-arm64-arm-64bit",
+    "python_version": "3.12.10",
+    "region": "unknown",
+    "database_mode": "transaction_pooler",
+    "database_host_class": "supabase_pooler",
+    "dns_provider": "unknown",
+    "ipv4_available": true,
+    "ipv6_available": false
+  },
+  "dns": {
+    "supabase_pooler": {
+      "status": "passed",
+      "latency_ms": 1691,
+      "error_code": null,
+      "details": {
+        "resolved_addresses": [
+          "ipv4:masked:6543",
+          "ipv4:masked:6543"
+        ]
+      }
+    }
+  },
+  "tcp": {
+    "supabase_pooler": {
+      "status": "passed",
+      "latency_ms": 85,
+      "error_code": null,
+      "details": {}
+    }
+  },
+  "tls": {
+    "supabase_pooler": {
+      "status": "failed",
+      "latency_ms": 286,
+      "error_code": "SSLCertVerificationError",
+      "details": {
+        "message": "[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1010)"
+      }
+    }
+  },
+  "postgres": {
+    "status": "skipped",
+    "latency_ms": null,
+    "error_code": "TLS_FAILED",
+    "details": {}
+  },
+  "redis": {
+    "status": "passed",
+    "latency_ms": 3,
+    "error_code": null,
+    "details": {}
+  },
+  "cninfo": {
+    "status": "passed",
+    "latency_ms": 207,
+    "error_code": null,
+    "details": {
+      "http_status": 200
+    }
+  },
+  "baostock": {
+    "status": "passed",
+    "latency_ms": 23,
+    "error_code": null,
+    "details": {
+      "resolved_addresses": [
+        "ipv4:masked:443"
+      ]
+    }
+  },
+  "rag": {
+    "status": "skipped",
+    "latency_ms": null,
+    "error_code": "POSTGRES_NOT_READY",
+    "details": {}
+  },
+  "llm": {
+    "status": "skipped",
+    "latency_ms": null,
+    "error_code": "LLM_PREFLIGHT_DISABLED",
+    "details": {}
+  },
+  "environment_ready": false,
+  "blockers": [
+    "TLS_SSLCertVerificationError",
+    "POSTGRES_TLS_FAILED",
+    "RAG_POSTGRES_NOT_READY"
+  ]
+}

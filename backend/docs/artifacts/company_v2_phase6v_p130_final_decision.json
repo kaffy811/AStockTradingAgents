@@ -1,0 +1,126 @@
+{
+  "schema_version": "pi_canary_final_decision_v3",
+  "phase": "6V-P1.30",
+  "generated_at": "2026-07-25T20:32:00.000000+00:00",
+  "phase_label": "Restricted Real Staging Provider Activation — State B (NOT_EXECUTED)",
+  "decision": "STATE_B_REAL_PROVIDER_NOT_EXECUTED",
+  "decision_reason": "Pre-activation gates D/E/F/G/I FAIL. Budget guard infrastructure not implemented in runtime. No staging-only credential. No verified pricing. No request counter or cost accumulator. Per P1.30 specification: real provider activation = NOT_EXECUTED.",
+
+  "real_provider_executed": false,
+  "real_provider_validation_passed": false,
+  "real_provider_validation_status": "BLOCKED_BY_GATE_FAILURES",
+
+  "real_provider_requests": 0,
+  "real_provider_cost_cny": 0,
+
+  "p129_reconciliation": {
+    "evaluated_replay_live_gates": "PASS",
+    "real_provider_gate_status_before_p130": "NOT_EVALUATED",
+    "p129_cv15_proposal_corrected_to": "cv=13 (next monotonic from cv=12)",
+    "gate_b_status": "PASS"
+  },
+
+  "runtime_final": {
+    "shadow_rollout_percent": 100,
+    "shadow_salt": "pi_v1",
+    "live_rollout_percent": 1,
+    "live_salt": "pi_live_v1",
+    "config_version": 12,
+    "live_enabled": true,
+    "production_enabled": false,
+    "provider_mode": "staging_replay",
+    "real_provider_enabled": false,
+    "provider_serving_calls": 0
+  },
+
+  "cumulative_canary": {
+    "cumulative_shadow_requests": 125373,
+    "cumulative_live_requests": 708,
+    "cumulative_pi_violations": 0,
+    "cumulative_terminal_violations": 0
+  },
+
+  "gate_results": [
+    {"gate_id": "A",  "gate_name": "Repository Integrity",                    "status": "PASS"},
+    {"gate_id": "B",  "gate_name": "P1.29 Gate Reconciliation",               "status": "PASS"},
+    {"gate_id": "C",  "gate_name": "Runtime Version Integrity (cv=12, no drift)", "status": "PASS"},
+    {"gate_id": "D",  "gate_name": "Credential Isolation (staging-only key)", "status": "FAIL",
+     "reason": "No DEEPSEEK_API_KEY_STAGING exists. Cannot isolate staging credential from production."},
+    {"gate_id": "E",  "gate_name": "Pricing Verification",                    "status": "FAIL",
+     "reason": "No pricing configuration in codebase. Cannot reliably verify per-token cost."},
+    {"gate_id": "F",  "gate_name": "Request Budget (max 100 cap)",            "status": "FAIL",
+     "reason": "PI_REAL_PROVIDER_MAX_REQUESTS not implemented in runtime Settings or code."},
+    {"gate_id": "G",  "gate_name": "Cost Budget (max ¥100 cap)",              "status": "FAIL",
+     "reason": "PI_REAL_PROVIDER_MAX_COST_CNY not implemented. Token usage not captured in DeepSeekClient."},
+    {"gate_id": "H",  "gate_name": "Concurrency and Rate Limit",              "status": "NOT_EVALUATED",
+     "reason": "Blocked by Gate D/E/F/G failures."},
+    {"gate_id": "I",  "gate_name": "Provider Fail-Closed",                    "status": "FAIL",
+     "reason": "PI_REAL_PROVIDER_ENABLED flag does not exist in Settings. P1.29 design artifact only; never implemented in runtime."},
+    {"gate_id": "J",  "gate_name": "Activation Integrity",                    "status": "NOT_EVALUATED"},
+    {"gate_id": "K",  "gate_name": "Real Provider Connectivity",              "status": "NOT_EVALUATED"},
+    {"gate_id": "L",  "gate_name": "Review and Safety (real provider)",       "status": "NOT_EVALUATED"},
+    {"gate_id": "M",  "gate_name": "Legacy Fallback (real provider paths)",   "status": "NOT_EVALUATED"},
+    {"gate_id": "N",  "gate_name": "Exactly-Once UX (real provider)",         "status": "NOT_EVALUATED"},
+    {"gate_id": "O",  "gate_name": "Performance (no global degradation)",     "status": "NOT_EVALUATED"},
+    {"gate_id": "P",  "gate_name": "Resources (no leaks from provider load)", "status": "NOT_EVALUATED"},
+    {"gate_id": "Q",  "gate_name": "Browser E2E (real provider cases)",       "status": "PARTIAL",
+     "detail": "50/50 replay cases PASS; real-provider cases NOT_EXECUTED"},
+    {"gate_id": "R",  "gate_name": "Provider Kill Switch",                    "status": "NOT_EVALUATED"},
+    {"gate_id": "S",  "gate_name": "Canonical Tests",                         "status": "PASS",
+     "detail": "Backend 0 failures; frontend 414 PASS; Playwright 50/50"},
+    {"gate_id": "T",  "gate_name": "Replay Restoration",                      "status": "PASS",
+     "detail": "Staging remained in replay mode throughout; no restoration action needed"},
+    {"gate_id": "U",  "gate_name": "Production Boundary",                     "status": "PASS"}
+  ],
+
+  "gates_pass": 6,
+  "gates_fail": 5,
+  "gates_partial": 1,
+  "gates_not_evaluated": 10,
+
+  "what_is_active": [
+    "100% Pi shadow (shadow_salt=pi_v1)",
+    "1% Pi replay-live arbitration (live_salt=pi_live_v1)",
+    "Legacy fallback for all requests",
+    "Kill switch available (PI_CANARY_LIVE_ENABLED=false → cv=13)"
+  ],
+
+  "what_is_not_authorized": [
+    "live rollout > 1%",
+    "production deployment",
+    "ordinary external users",
+    "legacy executor removal",
+    "real paid provider calls (prerequisite implementation required)"
+  ],
+
+  "implementation_required_before_p131": [
+    "DEEPSEEK_API_KEY_STAGING credential provisioned and isolated",
+    "pi_real_provider_enabled setting in config.py (default: false)",
+    "pi_real_provider_max_requests setting in config.py",
+    "pi_real_provider_max_cost_cny setting in config.py",
+    "Token usage capture in DeepSeekClient",
+    "RequestBudgetGuard with Redis atomic counter",
+    "CostAccumulator with Redis INCRBYFLOAT",
+    "ProviderCircuitBreaker",
+    "Verified pricing table for deepseek-v4-flash and deepseek-v4-pro",
+    "pi_real_provider_audit DB table migration",
+    "GET /pi-canary/provider-budget probe endpoint",
+    "Explicit timeout on OpenAI client",
+    "RateLimitError → legacy_pi_failed fallback handler"
+  ],
+
+  "next_cv_path": {
+    "current": 12,
+    "real_provider_activation": "cv=13 (P1.31, requires implementation + authorization)",
+    "replay_restoration_after_p131": "cv=14",
+    "kill_switch_if_needed": "cv=15",
+    "constraint": "cv must stay monotonic; never reuse 11 or 12"
+  },
+
+  "continue_1pct_live": true,
+  "expand_live_authorized": false,
+  "production": false,
+  "ordinary_external_users": 0,
+
+  "next_phase": "P1.31 — Implement budget guard infrastructure, provision staging credentials, then re-attempt restricted real provider activation"
+}

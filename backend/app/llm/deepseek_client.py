@@ -2,14 +2,118 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import re
+from dataclasses import asdict, dataclass
 from typing import AsyncGenerator
 
-from openai import OpenAI, APIError, AuthenticationError
+from openai import (
+    APIConnectionError,
+    APIError,
+    APIResponseValidationError,
+    APIStatusError,
+    APITimeoutError,
+    AuthenticationError,
+    OpenAI,
+    RateLimitError,
+)
 
 from app.core.config import settings
 from app.llm.base import BaseLLMClient
+from app.llm.provider_control.usage import ProviderUsageResult
 
 log = logging.getLogger(__name__)
+
+_SAFE_PROVIDER_CODE_RE = re.compile(r"^[A-Za-z0-9_.-]{1,64}$")
+
+
+@dataclass(frozen=True)
+class ProviderErrorRecord:
+    """Allowlisted provider failure facts safe for request-local propagation."""
+
+    category: str
+    retryable: bool
+    http_status: int | None
+    provider_code: str | None
+    safe_reason_code: str
+    original_exception_type: str
+
+    def to_dict(self) -> dict[str, str | int | bool | None]:
+        return asdict(self)
+
+
+class NormalizedProviderError(RuntimeError):
+    """A provider failure whose public string contains no request/provider detail."""
+
+    def __init__(self, record: ProviderErrorRecord) -> None:
+        self.record = record
+        safe_summary = (
+            "DeepSeek returned an empty response or invalid payload"
+            if record.category == "provider_payload"
+            else "LLM provider request failed"
+        )
+        super().__init__(
+            f"{safe_summary} ({record.safe_reason_code}; "
+            f"category={record.category}; retryable={str(record.retryable).lower()}; "
+            f"http_status={record.http_status})"
+        )
+
+
+class ProviderPayloadError(RuntimeError):
+    """The provider response exists but does not satisfy the client contract."""
+
+
+def _safe_provider_code(exc: BaseException) -> str | None:
+    code = getattr(exc, "code", None)
+    if isinstance(code, str) and _SAFE_PROVIDER_CODE_RE.fullmatch(code):
+        return code
+    return None
+
+
+def normalize_provider_error(exc: BaseException) -> ProviderErrorRecord:
+    """Classify SDK failures without probing fields absent from their type."""
+
+    exception_type = type(exc).__name__
+    if isinstance(exc, APITimeoutError):
+        return ProviderErrorRecord(
+            category="connection", retryable=True, http_status=None,
+            provider_code=None, safe_reason_code="PROVIDER_TIMEOUT",
+            original_exception_type=exception_type,
+        )
+    if isinstance(exc, APIConnectionError):
+        return ProviderErrorRecord(
+            category="connection", retryable=True, http_status=None,
+            provider_code=None, safe_reason_code="PROVIDER_CONNECTION_FAILED",
+            original_exception_type=exception_type,
+        )
+    if isinstance(exc, APIResponseValidationError) or isinstance(exc, ProviderPayloadError):
+        return ProviderErrorRecord(
+            category="provider_payload", retryable=False, http_status=None,
+            provider_code=_safe_provider_code(exc),
+            safe_reason_code="PROVIDER_PAYLOAD_INVALID",
+            original_exception_type=exception_type,
+        )
+    if isinstance(exc, APIStatusError):
+        status = exc.status_code
+        retryable = status == 429 or status >= 500
+        reason = (
+            "PROVIDER_AUTHENTICATION_FAILED" if status == 401
+            else "PROVIDER_RATE_LIMITED" if status == 429
+            else "PROVIDER_HTTP_ERROR"
+        )
+        return ProviderErrorRecord(
+            category="http_status", retryable=retryable, http_status=status,
+            provider_code=_safe_provider_code(exc), safe_reason_code=reason,
+            original_exception_type=exception_type,
+        )
+    return ProviderErrorRecord(
+        category="local_client", retryable=False, http_status=None,
+        provider_code=None, safe_reason_code="PROVIDER_CLIENT_ERROR",
+        original_exception_type=exception_type,
+    )
+
+
+def _normalized_exception(exc: BaseException) -> NormalizedProviderError:
+    return NormalizedProviderError(normalize_provider_error(exc))
 
 
 class DeepSeekClient(BaseLLMClient):
@@ -31,10 +135,15 @@ class DeepSeekClient(BaseLLMClient):
         self._default_model  = settings.deepseek_default_model
         self._pro_model      = settings.deepseek_pro_model
         self._reasoner_model = settings.deepseek_reasoner_model  # C32
+        # P1.31: explicit timeout ≤30s (SDK default 600s is unsafe for live arbitration)
+        _timeout = getattr(settings, "pi_real_provider_timeout_seconds", 30.0)
         self._client = OpenAI(
             api_key=settings.deepseek_api_key,
             base_url=settings.deepseek_base_url,
+            timeout=_timeout,
         )
+        # P1.31: last call usage (captured from response.usage)
+        self._last_usage: ProviderUsageResult = ProviderUsageResult.not_captured()
 
     def chat(
         self,
@@ -57,15 +166,35 @@ class DeepSeekClient(BaseLLMClient):
                 messages=messages,
                 temperature=temperature,
             )
+            # P1.31: capture token usage from response
+            self._last_usage = ProviderUsageResult.from_openai_usage(
+                getattr(response, "usage", None)
+            )
+            content = response.choices[0].message.content
+            if content is None:
+                raise ProviderPayloadError("empty response content")
+            return content
         except AuthenticationError as exc:
-            raise ValueError(f"DeepSeek authentication failed: {exc}") from exc
+            self._last_usage = ProviderUsageResult.not_captured()
+            raise _normalized_exception(exc) from exc
+        except RateLimitError as exc:
+            # P1.31: rate limit → legacy_pi_failed signal
+            self._last_usage = ProviderUsageResult.not_captured()
+            raise _normalized_exception(exc) from exc
+        except APITimeoutError as exc:
+            self._last_usage = ProviderUsageResult.not_captured()
+            raise _normalized_exception(exc) from exc
         except APIError as exc:
-            raise RuntimeError(f"DeepSeek API error [{exc.status_code}]: {exc.message}") from exc
+            self._last_usage = ProviderUsageResult.not_captured()
+            raise _normalized_exception(exc) from exc
+        except Exception as exc:
+            self._last_usage = ProviderUsageResult.not_captured()
+            raise _normalized_exception(exc) from exc
 
-        content = response.choices[0].message.content
-        if content is None:
-            raise RuntimeError("DeepSeek returned an empty response (content is None).")
-        return content
+    @property
+    def last_usage(self) -> ProviderUsageResult:
+        """Return token usage from the most recent chat() call."""
+        return self._last_usage
 
     # ── Convenience shortcuts ─────────────────────────────────────────────────
 
@@ -159,17 +288,12 @@ class DeepSeekClient(BaseLLMClient):
                     if isinstance(content, str) and content:
                         loop.call_soon_threadsafe(queue.put_nowait, {"type": "answer", "content": content})
 
-            except AuthenticationError as exc:
-                loop.call_soon_threadsafe(queue.put_nowait, {
-                    "type": "error", "content": f"认证失败: {exc}"
-                })
-            except APIError as exc:
-                loop.call_soon_threadsafe(queue.put_nowait, {
-                    "type": "error", "content": f"API错误 [{exc.status_code}]: {exc.message}"
-                })
             except Exception as exc:
+                normalized = _normalized_exception(exc)
                 loop.call_soon_threadsafe(queue.put_nowait, {
-                    "type": "error", "content": str(exc)
+                    "type": "error",
+                    "content": str(normalized),
+                    "provider_error": normalized.record.to_dict(),
                 })
             finally:
                 loop.call_soon_threadsafe(queue.put_nowait, None)  # sentinel

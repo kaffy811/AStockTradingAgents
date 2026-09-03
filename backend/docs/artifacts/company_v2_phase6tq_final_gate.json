@@ -1,0 +1,27 @@
+{
+  "phase": "phase6tq_final_gate",
+  "phase6tq_passed": true,
+  "stage2_rollout_status": "passed",
+  "stage3_status": "not_authorized",
+  "auto_run": false,
+  "rollout_percent": 0,
+  "runner_region": "ap-northeast-2",
+  "http_acceptance": true,
+  "hermetic_tests": {
+    "passed": 3065,
+    "failed": 0,
+    "deselected": 9
+  },
+  "live_supabase_tests": {
+    "passed": 9,
+    "failed": 0
+  },
+  "same_region_http": {
+    "samples_total": 50,
+    "steady_state_create_p50_ms": 27.873,
+    "steady_state_create_p95_ms": 29.707,
+    "duplicate_active_jobs": 0,
+    "active_jobs_after_cleanup": 0
+  },
+  "blocking_issues": []
+}

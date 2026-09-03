@@ -1,0 +1,14 @@
+{
+  "schema_version": "pi_canary_not_executed_v1",
+  "phase": "6V-P1.30",
+  "artifact": "r3_results",
+  "generated_at": "2026-07-25T20:16:00.000000+00:00",
+  "status": "NOT_EXECUTED",
+  "reason": "Real provider activation blocked by Gate D (credential isolation), Gate E (pricing verification), Gate F (request budget), Gate G (cost budget), and Gate I (provider fail-closed) failures. See company_v2_phase6v_p130_preflight_audit.json.",
+  "real_provider_calls": 0,
+  "real_provider_cost_cny": 0,
+  "fabricated_data": false,
+  "config_version_unchanged": 12,
+  "provider_mode_unchanged": "staging_replay",
+  "note": "This artifact is intentionally empty. Per P1.30 specification: do not fill with fictitious requests, tokens, or costs when real provider is not executed."
+}

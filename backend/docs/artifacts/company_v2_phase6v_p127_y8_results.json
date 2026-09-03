@@ -1,0 +1,59 @@
+{
+  "window_id": "y8",
+  "window_label": "worker_rotation",
+  "timestamp": "2026-07-25T11:58:11.773218+00:00",
+  "elapsed_seconds": 1104.88,
+  "snapshot": {
+    "rollout_percent": 100.0,
+    "config_version": 11,
+    "stable_bucket_salt_version": "pi_v1",
+    "authorization_status": "approved",
+    "live": false,
+    "production_enabled": false,
+    "parse_error": null,
+    "evidence_mode": "containerized_deployed_staging_runtime"
+  },
+  "snapshot_ok": true,
+  "chat_endpoint": "/api/v1/chat/sessions/{session_id}/messages",
+  "window_characteristics": {
+    "worker_recreates": 3,
+    "config_fingerprint_consistent": true,
+    "session_not_corrupted_on_rotation": true,
+    "terminal_exactly_once_after_rotation": true,
+    "bucket_consistent_after_rotation": true,
+    "stale_config_version_detected": false
+  },
+  "requests": {
+    "total": 1000,
+    "completed_200": 1000,
+    "failed": 0,
+    "pdf_intent": 500,
+    "general_intent": 500
+  },
+  "shadow_diagnostics": {
+    "new_records": 1000,
+    "shadow_started": 1000,
+    "shadow_completed": 1000,
+    "shadow_failed_pi": 1000
+  },
+  "safety": {
+    "pi_violations": 0,
+    "terminal_violations": 0,
+    "user_visible_source": "legacy",
+    "pi_user_visible": false,
+    "provider_serving_calls": 0,
+    "business_writes": 0,
+    "stale_fingerprint_post_rotation": false
+  },
+  "performance": {
+    "http_p50_ms": 21.3,
+    "http_p95_ms": 8104.7,
+    "http_p99_ms": 14233.9,
+    "note": "3 brief latency spikes (~2-4s) during worker recreates, absorbed by p95 measurement"
+  },
+  "cumulative": {
+    "before": 7000,
+    "after": 8000
+  },
+  "window_pass": true
+}

@@ -1,0 +1,107 @@
+{
+  "schema_version": "pi_canary_test_report_v1",
+  "phase": "6V-P1.23",
+  "phase_title": "Deployed Runtime Probe Closure",
+  "generated_at": "2026-07-23T17:00:00.000000+00:00",
+  "base_sha": "779da4cd3f33ff6a1b21b7c36cf182b7b2c4500d",
+  "evidence_sha": "01ad00014f4e321b890094df6c931b8261c11280",
+
+  "test_suites": {
+    "targeted": {
+      "suite_id": "targeted",
+      "suite_label": "P1.23 Phase-Targeted Suite",
+      "test_file": "test_phase6v_p123_deployed_runtime_probe.py + test_phase6v_p17_canary_policy.py",
+      "command": "uv run pytest tests/fundamental/test_phase6v_p123_deployed_runtime_probe.py tests/fundamental/test_phase6v_p17_canary_policy.py -q",
+      "collected": 171,
+      "passed": 171,
+      "failed": 0,
+      "skipped": 0,
+      "duration_seconds": 0.44,
+      "exit_code": 0,
+      "suite_pass": true,
+      "breakdown": {
+        "p123_tests": 138,
+        "p17_canary_policy_tests": 33
+      }
+    },
+    "cross_phase": {
+      "suite_id": "cross_phase",
+      "suite_label": "Cross-Phase 6V P1 Regression Suite",
+      "glob": "test_phase6v_p1*.py",
+      "command": "uv run pytest tests/fundamental/test_phase6v_p1*.py -q",
+      "collected": 3141,
+      "passed": 3141,
+      "failed": 0,
+      "skipped": 0,
+      "duration_seconds": 1.63,
+      "exit_code": 0,
+      "suite_pass": true
+    },
+    "full_fundamental": {
+      "suite_id": "full_fundamental",
+      "suite_label": "Full Fundamental Tests",
+      "path": "tests/fundamental/",
+      "command": "uv run pytest tests/fundamental/ -q",
+      "collected": 4694,
+      "passed": 4679,
+      "failed": 0,
+      "skipped": 15,
+      "duration_seconds": 36.46,
+      "exit_code": 0,
+      "suite_pass": true,
+      "skip_reason": "15 tests skipped: external data source unavailable in CI environment (expected)"
+    },
+    "entire_backend": {
+      "suite_id": "entire_backend",
+      "suite_label": "Entire Backend Test Suite",
+      "path": "tests/",
+      "command": "uv run pytest tests/ -q",
+      "collected": 6525,
+      "passed": 6510,
+      "failed": 0,
+      "skipped": 15,
+      "collection_errors": 0,
+      "duration_seconds": 199.74,
+      "exit_code": 0,
+      "suite_pass": true,
+      "skip_reason": "15 tests skipped: external data source unavailable in CI environment (expected)"
+    }
+  },
+
+  "frontend_tests": {
+    "frontend_vitest": {
+      "framework": "vitest",
+      "test_files": 62,
+      "passed": 688,
+      "failed": 0,
+      "duration_seconds": 2.93,
+      "exit_code": 0,
+      "suite_pass": true
+    },
+    "frontend_build": {
+      "tool": "vite build",
+      "duration_seconds": 2.54,
+      "exit_code": 0,
+      "build_pass": true
+    }
+  },
+
+  "security": {
+    "secret_scan": {
+      "tool": "secret_scan",
+      "result": "clean",
+      "violations_found": 0,
+      "suite_pass": true
+    }
+  },
+
+  "overall_pass": true,
+  "all_suites_pass": true,
+  "total_backend_passed": 6510,
+  "total_backend_failed": 0,
+  "total_frontend_passed": 688,
+  "total_frontend_failed": 0,
+
+  "regression_gate": "PASS",
+  "regression_gate_note": "All test suites pass. Zero failures across 6510 backend and 688 frontend tests. P1.22 _backend() helper fix included and verified in cross-phase run."
+}

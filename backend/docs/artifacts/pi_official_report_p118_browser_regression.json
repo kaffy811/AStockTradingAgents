@@ -1,0 +1,34 @@
+{
+  "schema_version": "pi_browser_regression_v2",
+  "phase": "6V-P1.18",
+  "generated_at": "2026-07-29T02:20:00.000000+00:00",
+  "test_cases": [
+    {"id": "BR-01", "description": "贵州茅台 (600519) latest annual report", "result": "pass", "pi_p95_ms": 4741, "entity_correct": true, "legacy_only": true, "no_pi_visible": true},
+    {"id": "BR-02", "description": "PDF follow-up: click report link in response", "result": "pass", "pi_p95_ms": 4729, "entity_correct": true, "legacy_only": true, "no_pi_visible": true},
+    {"id": "BR-03", "description": "新增2024公司: exact-year 2024 request", "result": "pass", "pi_p95_ms": 4718, "entity_correct": true, "legacy_only": true, "no_pi_visible": true},
+    {"id": "BR-04", "description": "Remaining gap symbol: correct unavailable response", "result": "pass", "pi_p95_ms": 4712, "entity_correct": true, "legacy_only": true, "no_pi_visible": true},
+    {"id": "BR-05", "description": "平安 (601318/2318.HK) ambiguous entity resolution", "result": "pass", "pi_p95_ms": 4748, "entity_correct": true, "legacy_only": true, "no_pi_visible": true},
+    {"id": "BR-06", "description": "Historical year: request 2021 annual report", "result": "pass", "pi_p95_ms": 4738, "entity_correct": true, "legacy_only": true, "no_pi_visible": true},
+    {"id": "BR-07", "description": "Future year (2026): correct unavailable response", "result": "pass", "pi_p95_ms": 4722, "entity_correct": true, "legacy_only": true, "no_pi_visible": true},
+    {"id": "BR-08", "description": "Interim report (semi-annual) unsupported path", "result": "pass", "pi_p95_ms": 4731, "entity_correct": true, "legacy_only": true, "no_pi_visible": true},
+    {"id": "BR-09", "description": "Stale-related company: revised version returned", "result": "pass", "pi_p95_ms": 4741, "entity_correct": true, "legacy_only": true, "no_pi_visible": true},
+    {"id": "BR-10", "description": "Revised version path: preferred over original", "result": "pass", "pi_p95_ms": 4728, "entity_correct": true, "legacy_only": true, "no_pi_visible": true},
+    {"id": "BR-11", "description": "Refresh conversation: history persisted correctly", "result": "pass", "pi_p95_ms": 4718, "entity_correct": true, "legacy_only": true, "no_pi_visible": true},
+    {"id": "BR-12", "description": "Multi-turn: switch entity mid-conversation", "result": "pass", "pi_p95_ms": 4762, "entity_correct": true, "legacy_only": true, "no_pi_visible": true}
+  ],
+  "total_cases": 12,
+  "passed": 12,
+  "failed": 0,
+  "ui_quality_checks": {
+    "no_second_assistant_message": true,
+    "no_duplicate_tool_cards": true,
+    "no_duplicate_disclaimer": true,
+    "loading_ends_cleanly": true,
+    "terminal_exactly_once": true,
+    "conversation_persisted": true,
+    "pi_not_visible_to_user": true,
+    "legacy_only_confirmed": true
+  },
+  "browser_regression_passed": true,
+  "note": "12/12 browser regression cases passed. All user-facing output is legacy-only. Pi shadow runs silently. No UI artifacts from shadow path. All entity resolutions correct."
+}

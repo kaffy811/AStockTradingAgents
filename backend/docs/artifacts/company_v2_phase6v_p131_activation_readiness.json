@@ -1,0 +1,48 @@
+{
+  "schema_version": "pi_canary_activation_readiness_v1",
+  "phase": "6V-P1.31",
+  "generated_at": "2026-07-26T00:00:00Z",
+
+  "ready_for_real_provider_activation_decision": false,
+  "reason": "Gates D (credential) and E (pricing) are NOT_EVALUATED. Real provider activation requires both gates PASS plus explicit project owner authorization.",
+
+  "gate_summary": [
+    {"gate": "A", "name": "Repository Integrity", "status": "PASS"},
+    {"gate": "B", "name": "P1.30 Gate Reconciliation", "status": "PASS"},
+    {"gate": "C", "name": "Runtime Version Integrity", "status": "PASS"},
+    {"gate": "D", "name": "Credential Isolation", "status": "NOT_EVALUATED", "note": "Field added; staging key not provisioned"},
+    {"gate": "E", "name": "Pricing Verification", "status": "NOT_EVALUATED", "note": "Registry implemented; prices not verified from authoritative source"},
+    {"gate": "F", "name": "Request Budget Implementation", "status": "PASS"},
+    {"gate": "G", "name": "Cost Budget Implementation", "status": "PASS"},
+    {"gate": "H", "name": "Concurrency and Rate Limit Implementation", "status": "PASS"},
+    {"gate": "I", "name": "Provider Fail-Closed Implementation", "status": "PASS"},
+    {"gate": "J", "name": "Activation Integrity", "status": "NOT_EVALUATED"},
+    {"gate": "K", "name": "Real Provider Connectivity", "status": "NOT_EVALUATED"},
+    {"gate": "L", "name": "Review and Safety", "status": "NOT_EVALUATED"},
+    {"gate": "M", "name": "Legacy Fallback (real provider paths)", "status": "NOT_EVALUATED"},
+    {"gate": "N", "name": "Exactly-Once UX (real provider)", "status": "NOT_EVALUATED"},
+    {"gate": "O", "name": "Performance", "status": "NOT_EVALUATED"},
+    {"gate": "P", "name": "Resources", "status": "NOT_EVALUATED"},
+    {"gate": "Q", "name": "Browser E2E (real provider cases)", "status": "NOT_EVALUATED"},
+    {"gate": "R", "name": "Provider Kill Switch", "status": "PASS"},
+    {"gate": "S", "name": "Canonical Tests", "status": "PASS"},
+    {"gate": "T", "name": "Replay Restoration", "status": "PASS"},
+    {"gate": "U", "name": "Production Boundary", "status": "PASS"},
+    {"gate": "V", "name": "P1.31 Implementation Complete", "status": "PASS"}
+  ],
+
+  "gates_pass": 12,
+  "gates_fail": 0,
+  "gates_not_evaluated": 10,
+
+  "for_p132_activation": [
+    "1. Provision DEEPSEEK_API_KEY_STAGING (staging-only DeepSeek key)",
+    "2. Verify pricing from platform.deepseek.com/api-docs/pricing (record URL + date)",
+    "3. Update deepseek_prices.json: verified=true, source_url, source_retrieval_date",
+    "4. Set enabled_for_staging_real=true for target model in pricing file",
+    "5. Set pi_real_provider_enabled=True in staging env",
+    "6. Set pi_real_provider_kill_switch=False in staging env",
+    "7. Obtain EXPLICIT project owner authorization",
+    "8. Run P1.32 activation with max 100 requests, ¥100 budget, replay restore on exit"
+  ]
+}

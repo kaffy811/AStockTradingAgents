@@ -1,0 +1,29 @@
+{
+  "schema_version": "pi_official_report_p112_superseded_validation_v1",
+  "phase": "6V-P1.12",
+  "generated_at": "2026-07-22T00:45:00.000000+00:00",
+  "source_sha": "a97b0ec021c7577f6a51267c3bb311ee47db0eb9",
+  "validation_mode": "fixture_isolation",
+  "scenarios_tested": 8,
+  "scenarios": [
+    {"id": "SV1", "name": "active_url_permanent_404", "result": "correct_stale_review"},
+    {"id": "SV2", "name": "temporary_timeout", "result": "correct_no_inactive"},
+    {"id": "SV3", "name": "official_redirect_cninfo", "result": "correct_healthy"},
+    {"id": "SV4", "name": "third_party_redirect", "result": "correct_rejected"},
+    {"id": "SV5", "name": "revised_version_supersedes", "result": "correct_superseded"},
+    {"id": "SV6", "name": "provenance_conflict", "result": "correct_stale_review"},
+    {"id": "SV7", "name": "year_title_conflict", "result": "correct_rejected"},
+    {"id": "SV8", "name": "report_type_conflict", "result": "correct_rejected"}
+  ],
+  "rules_verified": {
+    "temporary_timeout_not_inactive": true,
+    "permanent_failure_triggers_stale_review": true,
+    "third_party_not_active": true,
+    "revised_correct_supersede": true,
+    "wrong_year_type_rejected": true,
+    "no_physical_delete": true,
+    "provenance_preserved": true,
+    "single_active_per_symbol_year_type": true
+  },
+  "superseded_validation_passed": true
+}

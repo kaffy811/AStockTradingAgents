@@ -1,0 +1,33 @@
+{
+  "phase": "6W-R3.3I.2.7.8",
+  "status": "FULL_PORTABLE_MIGRATION_CONTRACT_READY",
+  "traffic": "HOLD_1_PERCENT",
+  "baseline": "b055da8495c54bb37625f0b0e0f94b4d4a627de2",
+  "branch": "r33i-final-portable-migration-contract",
+  "worktree": "/private/tmp/tradingagents-r33i2-7-8-final",
+  "vector_commits": [
+    {"original": "4d366ce5bf00406b24b2a90ddeb132e4ae8c46df", "replay": "242606c"},
+    {"original": "3982f7851d95c0b762b9e7c967e8c79d8b308742", "replay": "b05d253"},
+    {"original": "33de17f6a3579dc5bd0fe6a0683c761072fe3de6", "replay": "c33131f"}
+  ],
+  "head_revision": "q5r6s7t8u9v0",
+  "legacy_tables": 8,
+  "scenarios": {
+    "standard_empty": {"root_to_head": true, "repeat_upgrade": true, "a2_type": "text", "g5_type": "text", "hnsw": false, "transaction_healthy": true},
+    "standard_fixture": {"root_to_head": true, "repeat_upgrade": true, "sentinel_preserved": true, "a2_type": "text", "g5_type": "text", "hnsw": false, "transaction_healthy": true},
+    "pgvector_empty": {"root_to_head": true, "repeat_upgrade": true, "a2_type": "vector(1536)", "g5_type": "vector(384)", "hnsw": true, "transaction_healthy": true},
+    "pgvector_fixture": {"root_to_head": true, "repeat_upgrade": true, "sentinel_preserved": true, "a2_type": "vector(1536)", "g5_type": "vector(384)", "hnsw": true, "transaction_healthy": true}
+  },
+  "tests": [
+    {"suite": "bootstrap", "collected": 9, "passed": 9, "failed": 0, "skipped": 0, "duration_seconds": 4.51},
+    {"suite": "a2", "collected": 6, "passed": 6, "failed": 0, "skipped": 0, "duration_seconds": 5.04},
+    {"suite": "f4", "collected": 6, "passed": 6, "failed": 0, "skipped": 0, "duration_seconds": 5.17},
+    {"suite": "g5", "collected": 6, "passed": 6, "failed": 0, "skipped": 0, "duration_seconds": 5.34},
+    {"suite": "combined", "collected": 27, "passed": 27, "failed": 0, "skipped": 0, "duration_seconds": 19.74}
+  ],
+  "production_changed": false,
+  "production_migrations": 0,
+  "push": false,
+  "merge": false,
+  "deploy": false
+}

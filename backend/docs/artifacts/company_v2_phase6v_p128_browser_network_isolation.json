@@ -1,0 +1,19 @@
+{
+  "schema_version": "pi_canary_browser_network_isolation_v2",
+  "phase": "6V-P1.28",
+  "generated_at": "2026-07-25T17:50:00.000000+00:00",
+  "checks": [
+    {"check": "no_pi_shadow_payload_in_sse_stream",      "result": "PASS"},
+    {"check": "no_internal_diagnostics_in_sse_stream",  "result": "PASS"},
+    {"check": "no_pi_shadow_result_in_history_api",     "result": "PASS"},
+    {"check": "no_shadow_data_in_export_api",           "result": "PASS"},
+    {"check": "no_live_salt_in_response_headers",       "result": "PASS"},
+    {"check": "no_config_version_in_response_body",     "result": "PASS"},
+    {"check": "no_runtime_snapshot_in_frontend_console","result": "PASS"},
+    {"check": "no_live_rollout_in_any_api_response",    "result": "PASS"},
+    {"check": "no_pi_replay_marker_in_response",        "result": "PASS"},
+    {"check": "no_arbitration_decision_in_response",    "result": "PASS"}
+  ],
+  "all_pass": true,
+  "gate_o_network_isolation": "PASS"
+}

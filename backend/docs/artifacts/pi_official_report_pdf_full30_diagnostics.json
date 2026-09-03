@@ -1,0 +1,24 @@
+{
+  "schema_version": "pi_official_report_pdf_full30_diagnostics_v1",
+  "generated_at": "2026-07-18T15:01:24.416659+00:00",
+  "environment": "local_live",
+  "branch": "release/demo-staging",
+  "commit_sha": "ab0d0367e7bf7f0a14cb6786adac7f58c0d79c92",
+  "planned_samples": 30,
+  "executed_samples": 0,
+  "accepted_samples": 0,
+  "rates_computed": false,
+  "abort_case_id": "A01",
+  "abort_stage": "HTTP Chat API -> SSE stream",
+  "terminal_event_received": false,
+  "legacy_assistant_completed": false,
+  "pi_diagnostics_completed": false,
+  "blockers": [
+    "formal_full30_aborted_before_case_completion",
+    "A01_sse_terminal_event_not_received",
+    "backend_db_pending_rollback_during_chat_streaming",
+    "pi_shadow_diagnostics_not_completed_for_A01_followup",
+    "browser_acceptance_not_run_due_core_http_sse_blocker"
+  ],
+  "cases": []
+}

@@ -1,0 +1,377 @@
+{
+  "eval_results": [
+    {
+      "id": "2024_annual_revenue",
+      "report_id": 1,
+      "question": "2024 年营业收入是多少？",
+      "expected": "answered",
+      "answer_status": "answered",
+      "expected_met": true,
+      "retrieved_report_ids": [
+        1
+      ],
+      "cross_report_leakage_detected": false,
+      "citation_page_correct": true,
+      "answer": {
+        "status": "answered",
+        "report_id": 1,
+        "symbol": "601686",
+        "report_year": 2024,
+        "report_type": "annual",
+        "question": "2024 年营业收入是多少？",
+        "answer": "根据所选报告披露，营业收入 54,822,111,649.52 60,918,218,181.36 -10.01 67,360,350,418.67（见第 6-7、14-15 页）。 请以引用页原文单位为准，未在回答中自行换算。",
+        "citations": [
+          {
+            "page": "6-7",
+            "chunk_id": 598,
+            "excerpt": "营业收入 54,822,111,649.52 60,918,218,181.36 -10.01 67,360,350,418.67",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+          },
+          {
+            "page": "14-15",
+            "chunk_id": 617,
+            "excerpt": "分行业 营业收入 营业成本 毛利率；分产品 营业收入 营业成本 毛利率",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+          },
+          {
+            "page": "207-208",
+            "chunk_id": 843,
+            "excerpt": "61、 营业收入和营业成本；(1).营业收入和营业成本情况",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+          }
+        ],
+        "retrieval_mode": "hybrid",
+        "confidence": 0.7182,
+        "warnings": [],
+        "latency_ms": 53,
+        "selected_report_id": 1,
+        "retrieved_report_ids": [
+          1
+        ],
+        "cross_report_leakage_detected": false
+      }
+    },
+    {
+      "id": "2024_annual_risks",
+      "report_id": 1,
+      "question": "公司披露的主要风险有哪些？",
+      "expected": "answered",
+      "answer_status": "answered",
+      "expected_met": true,
+      "retrieved_report_ids": [
+        1
+      ],
+      "cross_report_leakage_detected": false,
+      "citation_page_correct": true,
+      "answer": {
+        "status": "answered",
+        "report_id": 1,
+        "symbol": "601686",
+        "report_year": 2024,
+        "report_type": "annual",
+        "question": "公司披露的主要风险有哪些？",
+        "answer": "根据所选报告的风险相关披露，（一）识别和评估由于舞弊或错误导致的财务报表重大错报风险，设计和实施审计程序以应；对这些风险，并获取充分、适当的审计证据，作为发表审计意见的基础。；伪造、故意遗漏、虚假陈述或凌驾于内部控制之上，未能发现由于舞弊导致的重大错报的风险高（见第 105、2-4 页）。",
+        "citations": [
+          {
+            "page": 105,
+            "chunk_id": 729,
+            "excerpt": "（一）识别和评估由于舞弊或错误导致的财务报表重大错报风险，设计和实施审计程序以应；对这些风险，并获取充分、适当的审计证据，作为发表审计意见的基础。",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+          },
+          {
+            "page": "2-4",
+            "chunk_id": 594,
+            "excerpt": "十、 重大风险提示；报告期内，不存在对公司生产经营产生实质性影响的特别重大风险。",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+          },
+          {
+            "page": 104,
+            "chunk_id": 725,
+            "excerpt": "而操纵收入确认时点的固有风险，我们将友",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+          }
+        ],
+        "retrieval_mode": "hybrid",
+        "confidence": 0.6032,
+        "warnings": [],
+        "latency_ms": 55,
+        "selected_report_id": 1,
+        "retrieved_report_ids": [
+          1
+        ],
+        "cross_report_leakage_detected": false
+      }
+    },
+    {
+      "id": "2024_q3_revenue",
+      "report_id": 2,
+      "question": "前三季度营业收入是多少？",
+      "expected": "answered",
+      "answer_status": "answered",
+      "expected_met": true,
+      "retrieved_report_ids": [
+        2
+      ],
+      "cross_report_leakage_detected": false,
+      "citation_page_correct": true,
+      "answer": {
+        "status": "answered",
+        "report_id": 2,
+        "symbol": "601686",
+        "report_year": 2024,
+        "report_type": "q3",
+        "question": "前三季度营业收入是多少？",
+        "answer": "根据所选报告披露，营业收入 13,645,891,850.64 -12.22 40,070,364,989.55 -13.37（见第 1-2、3-4 页）。 请以引用页原文单位为准，未在回答中自行换算。",
+        "citations": [
+          {
+            "page": "1-2",
+            "chunk_id": 297,
+            "excerpt": "营业收入 13,645,891,850.64 -12.22 40,070,364,989.55 -13.37",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2024-10-30/1221553019.PDF"
+          },
+          {
+            "page": "3-4",
+            "chunk_id": 299,
+            "excerpt": "...信息披露解释性公告第 1；号——非经常性损益》中列举的非经常性损益项目界定为经常性损益的项目，应说明原因。",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2024-10-30/1221553019.PDF"
+          },
+          {
+            "page": 9,
+            "chunk_id": 305,
+            "excerpt": "其中：营业收入 40,070,364,989.55 46,253,373,210.06",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2024-10-30/1221553019.PDF"
+          }
+        ],
+        "retrieval_mode": "hybrid",
+        "confidence": 0.7528,
+        "warnings": [],
+        "latency_ms": 7,
+        "selected_report_id": 2,
+        "retrieved_report_ids": [
+          2
+        ],
+        "cross_report_leakage_detected": false
+      }
+    },
+    {
+      "id": "2024_q3_cashflow",
+      "report_id": 2,
+      "question": "本期经营现金流情况如何？",
+      "expected": "answered",
+      "answer_status": "answered",
+      "expected_met": true,
+      "retrieved_report_ids": [
+        2
+      ],
+      "cross_report_leakage_detected": false,
+      "citation_page_correct": true,
+      "answer": {
+        "status": "answered",
+        "report_id": 2,
+        "symbol": "601686",
+        "report_year": 2024,
+        "report_type": "q3",
+        "question": "本期经营现金流情况如何？",
+        "answer": "根据所选报告披露，二、投资活动产生的现金流量：；投资活动现金流入小计 1,831,679,876.43 1,996,077,395.59（见第 12-13、11-12 页）。",
+        "citations": [
+          {
+            "page": "12-13",
+            "chunk_id": 309,
+            "excerpt": "二、投资活动产生的现金流量：；投资活动现金流入小计 1,831,679,876.43 1,996,077,395.59",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2024-10-30/1221553019.PDF"
+          },
+          {
+            "page": "11-12",
+            "chunk_id": 308,
+            "excerpt": "合并现金流量表；一、经营活动产生的现金流量：",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2024-10-30/1221553019.PDF"
+          },
+          {
+            "page": "6-7",
+            "chunk_id": 302,
+            "excerpt": "...适用；持股 5%以上股东、前 10 名股东及前 10 名无限售流通股股东参与转融通业务出借股份情况",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2024-10-30/1221553019.PDF"
+          }
+        ],
+        "retrieval_mode": "hybrid",
+        "confidence": 0.5986,
+        "warnings": [],
+        "latency_ms": 6,
+        "selected_report_id": 2,
+        "retrieved_report_ids": [
+          2
+        ],
+        "cross_report_leakage_detected": false
+      }
+    },
+    {
+      "id": "2023_annual_np_parent",
+      "report_id": 3,
+      "question": "2023 年归母净利润是多少？",
+      "expected": "answered",
+      "answer_status": "answered",
+      "expected_met": true,
+      "retrieved_report_ids": [
+        3
+      ],
+      "cross_report_leakage_detected": false,
+      "citation_page_correct": true,
+      "answer": {
+        "status": "answered",
+        "report_id": 3,
+        "symbol": "601686",
+        "report_year": 2023,
+        "report_type": "annual",
+        "question": "2023 年归母净利润是多少？",
+        "answer": "根据所选报告披露，营业收入 净利润 综合收 经营活 营业收入 净利润 综合收 经营活（见第 209-210、7-8 页）。",
+        "citations": [
+          {
+            "page": "209-210",
+            "chunk_id": 561,
+            "excerpt": "营业收入 净利润 综合收 经营活 营业收入 净利润 综合收 经营活",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2024-04-19/1219667277.PDF"
+          },
+          {
+            "page": "7-8",
+            "chunk_id": 317,
+            "excerpt": "(二) 同时按照境外会计准则与按中国会计准则披露的财务报告中净利润和 归属于上市公司股东的；净利润",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2024-04-19/1219667277.PDF"
+          },
+          {
+            "page": "9-10",
+            "chunk_id": 319,
+            "excerpt": "归属于上市公司股东的净利润 5.70 亿元，同比增长 91.85%；",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2024-04-19/1219667277.PDF"
+          }
+        ],
+        "retrieval_mode": "hybrid",
+        "confidence": 0.6076,
+        "warnings": [],
+        "latency_ms": 53,
+        "selected_report_id": 3,
+        "retrieved_report_ids": [
+          3
+        ],
+        "cross_report_leakage_detected": false
+      }
+    },
+    {
+      "id": "2023_annual_business",
+      "report_id": 3,
+      "question": "主营业务是什么？",
+      "expected": "answered",
+      "answer_status": "answered",
+      "expected_met": true,
+      "retrieved_report_ids": [
+        3
+      ],
+      "cross_report_leakage_detected": false,
+      "citation_page_correct": true,
+      "answer": {
+        "status": "answered",
+        "report_id": 3,
+        "symbol": "601686",
+        "report_year": 2023,
+        "report_type": "annual",
+        "question": "主营业务是什么？",
+        "answer": "根据所选报告的业务相关披露，(1). 主营业务分行业、分产品、分地区、分销售模式情况；主营业务分行业情况；主营业务分产品情况（见第 15-16、30 页）。 请以引用页原文单位为准，未在回答中自行换算。",
+        "citations": [
+          {
+            "page": "15-16",
+            "chunk_id": 334,
+            "excerpt": "(1). 主营业务分行业、分产品、分地区、分销售模式情况；主营业务分行业情况",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2024-04-19/1219667277.PDF"
+          },
+          {
+            "page": 30,
+            "chunk_id": 354,
+            "excerpt": "公司主营业务包括焊接圆管、镀锌圆管、方矩焊管、方矩镀锌管、钢塑复合管、螺旋焊管、",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2024-04-19/1219667277.PDF"
+          },
+          {
+            "page": "16-17",
+            "chunk_id": 335,
+            "excerpt": "主营业务分行业、分产品、分地区、分销售模式情况的说明",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2024-04-19/1219667277.PDF"
+          }
+        ],
+        "retrieval_mode": "hybrid",
+        "confidence": 0.6095,
+        "warnings": [],
+        "latency_ms": 52,
+        "selected_report_id": 3,
+        "retrieved_report_ids": [
+          3
+        ],
+        "cross_report_leakage_detected": false
+      }
+    },
+    {
+      "id": "wrong_year_2023_selected",
+      "report_id": 3,
+      "question": "2024 年营业收入是多少？",
+      "expected": "insufficient_evidence",
+      "answer_status": "insufficient_evidence",
+      "expected_met": true,
+      "retrieved_report_ids": [],
+      "cross_report_leakage_detected": false,
+      "citation_page_correct": true,
+      "answer": {
+        "status": "insufficient_evidence",
+        "report_id": 3,
+        "symbol": "601686",
+        "report_year": 2023,
+        "report_type": "annual",
+        "question": "2024 年营业收入是多少？",
+        "answer": "当前选中的是 2023 年 annual，问题涉及 [2024]，不能跨报告或跨年度补齐。",
+        "citations": [],
+        "retrieval_mode": "guardrail",
+        "confidence": 1.0,
+        "warnings": [
+          "wrong_year_for_selected_report"
+        ],
+        "latency_ms": 0,
+        "selected_report_id": 3,
+        "retrieved_report_ids": [],
+        "cross_report_leakage_detected": false
+      }
+    },
+    {
+      "id": "q3_full_year",
+      "report_id": 2,
+      "question": "2024 年全年净利润是多少？",
+      "expected": "insufficient_evidence",
+      "answer_status": "insufficient_evidence",
+      "expected_met": true,
+      "retrieved_report_ids": [],
+      "cross_report_leakage_detected": false,
+      "citation_page_correct": true,
+      "answer": {
+        "status": "insufficient_evidence",
+        "report_id": 2,
+        "symbol": "601686",
+        "report_year": 2024,
+        "report_type": "q3",
+        "question": "2024 年全年净利润是多少？",
+        "answer": "当前选中的是季度报告，不能自动检索年度报告补齐全年问题。",
+        "citations": [],
+        "retrieval_mode": "guardrail",
+        "confidence": 1.0,
+        "warnings": [
+          "annual_question_on_quarterly_report"
+        ],
+        "latency_ms": 0,
+        "selected_report_id": 2,
+        "retrieved_report_ids": [],
+        "cross_report_leakage_detected": false
+      }
+    }
+  ],
+  "metrics": {
+    "retrieval_hit_rate": 1.0,
+    "citation_page_accuracy": 1.0,
+    "cross_report_leakage": 0,
+    "wrong_year_answer_rate": 0.0,
+    "insufficient_evidence_correctness": 1.0
+  }
+}

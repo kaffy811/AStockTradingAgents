@@ -1,0 +1,62 @@
+{
+  "schema_version": "pi_observation_window_v1",
+  "phase": "6V-P1.17",
+  "window": "K3",
+  "generated_at": "2026-07-28T11:00:00.000000+00:00",
+  "config_version": 6,
+  "rollout_percent": 25,
+  "observation_duration_minutes": 60,
+  "result": {
+    "selected": 529,
+    "unique_symbols": 81,
+    "unique_styles": 6,
+    "multi_turn_count": 39,
+    "pi_p95_ms": 4753,
+    "pi_mean_ms": 3422,
+    "pi_p50_ms": 3305,
+    "pi_p99_ms": 4976,
+    "pi_over_5s_count": 8,
+    "pi_over_5s_rate_pct": 1.51,
+    "pi_over_6s_count": 0,
+    "tool_p95_ms": 3198,
+    "tool_mean_ms": 2248,
+    "tool_p50_ms": 2179
+  },
+  "safety": {
+    "safety_correctness_rate": 1.0,
+    "zero_tolerance_violations": 0,
+    "fabricated_url": 0,
+    "wrong_entity": 0,
+    "wrong_year": 0,
+    "wrong_report_type": 0,
+    "provenance_failure": 0,
+    "stale_wrong_selection": 0,
+    "third_party_url": 0,
+    "pi_business_write": 0,
+    "double_write": 0,
+    "unknown_write": 0
+  },
+  "resources": {
+    "raw_500_count": 0,
+    "raw_503_count": 0,
+    "pool_exhaustion": 0,
+    "task_leak": 0,
+    "PendingRollbackError": 0,
+    "orphan_shadow_tasks": 0,
+    "tmp_diagnostics_files_left": 0
+  },
+  "performance_gate": {
+    "pi_p95_ms": 4753,
+    "warning_threshold_ms": 4700,
+    "review_threshold_ms": 4800,
+    "hard_rollback_ms": 5000,
+    "warning_triggered": true,
+    "review_triggered": false,
+    "hard_rollback_triggered": false,
+    "action": "record_and_monitor",
+    "note": "K3 pi_p95=4753ms. K2→K3 delta=+12ms (minor uptick, within normal variance). Review threshold not breached. Monitoring continues."
+  },
+  "window_passed": true,
+  "live_serving": false,
+  "production_enabled": false
+}

@@ -1,0 +1,2613 @@
+{
+  "stages": [
+    {
+      "stage": "stage_1",
+      "allowlist": "601686",
+      "symbols": [
+        {
+          "symbol": "601686",
+          "report_id": 1,
+          "report_year": 2024,
+          "report_type": "annual",
+          "report_title": "友发集团2024年年度报告",
+          "report_ready": true,
+          "rag_ready": true,
+          "structured_ready": true,
+          "eligibility": {
+            "enabled": true,
+            "eligible": true,
+            "reason": "ALLOWLIST",
+            "rollout_bucket": 21,
+            "rollout_percent": 0,
+            "auto_run": false,
+            "report_ready": true,
+            "rag_ready": true,
+            "structured_ready": true,
+            "supported_fields": [
+              "revenue",
+              "net_profit",
+              "net_profit_parent",
+              "operating_cashflow",
+              "total_assets",
+              "equity_parent",
+              "eps_basic",
+              "roe_weighted",
+              "total_share",
+              "float_share"
+            ],
+            "cached": false,
+            "last_run_at": null,
+            "force_enabled": false
+          },
+          "cache_hit": false,
+          "singleflight_status": "completed",
+          "final_status": "passed",
+          "summary": {
+            "fields_total": 10,
+            "verified": 1,
+            "normalized_match": 0,
+            "likely_match": 0,
+            "definition_mismatch": 3,
+            "period_basis_mismatch": 1,
+            "unit_mismatch": 0,
+            "value_conflict": 0,
+            "structured_field_missing": 4,
+            "official_field_not_found": 0,
+            "insufficient_evidence": 1,
+            "not_applicable": 0,
+            "failed": 0
+          },
+          "fields": [
+            {
+              "field_name": "revenue",
+              "fusion_status": "definition_mismatch",
+              "official_page": 6
+            },
+            {
+              "field_name": "net_profit",
+              "fusion_status": "verified",
+              "official_page": 216
+            },
+            {
+              "field_name": "net_profit_parent",
+              "fusion_status": "definition_mismatch",
+              "official_page": 6
+            },
+            {
+              "field_name": "operating_cashflow",
+              "fusion_status": "structured_field_missing",
+              "official_page": 6
+            },
+            {
+              "field_name": "total_assets",
+              "fusion_status": "structured_field_missing",
+              "official_page": 6
+            },
+            {
+              "field_name": "equity_parent",
+              "fusion_status": "structured_field_missing",
+              "official_page": 6
+            },
+            {
+              "field_name": "eps_basic",
+              "fusion_status": "structured_field_missing",
+              "official_page": 6
+            },
+            {
+              "field_name": "roe_weighted",
+              "fusion_status": "definition_mismatch",
+              "official_page": 6
+            },
+            {
+              "field_name": "total_share",
+              "fusion_status": "period_basis_mismatch",
+              "official_page": 54
+            },
+            {
+              "field_name": "float_share",
+              "fusion_status": "insufficient_evidence",
+              "official_page": null
+            }
+          ],
+          "warning": null,
+          "elapsed_ms": 44,
+          "cache_key_version": "v1",
+          "computed_at": "2026-07-11T08:40:33.181805+00:00",
+          "expires_at": "2026-07-12T08:40:33.181805+00:00",
+          "circuit": null
+        }
+      ],
+      "health": {
+        "window": "24h",
+        "requests": 0,
+        "success_rate": 1.0,
+        "cache_hit_rate": 0.0,
+        "timeout_rate": 0.0,
+        "false_conflict_suspected": 0,
+        "cross_report_leakage": 0,
+        "missing_citation_rate": 0.0,
+        "source_trace_complete_rate": 1.0,
+        "p50_latency_ms": null,
+        "p95_latency_ms": null,
+        "status": "healthy",
+        "alerts": []
+      },
+      "cache_snapshot": [
+        {
+          "cache_key": "v1:8112a383efe8a3894fbf53cd94248ef0e741a8f7dcfaf0879e11cc1099a2d14b",
+          "cache_key_version": "v1",
+          "data": {
+            "symbol": "601686",
+            "report_id": 1,
+            "report_year": 2024,
+            "report_type": "annual",
+            "summary": {
+              "fields_total": 10,
+              "verified": 1,
+              "normalized_match": 0,
+              "likely_match": 0,
+              "definition_mismatch": 3,
+              "period_basis_mismatch": 1,
+              "unit_mismatch": 0,
+              "value_conflict": 0,
+              "structured_field_missing": 4,
+              "official_field_not_found": 0,
+              "insufficient_evidence": 1,
+              "not_applicable": 0,
+              "failed": 0
+            },
+            "fields": [
+              {
+                "id": 1,
+                "market": "CN",
+                "symbol": "601686",
+                "report_id": 1,
+                "report_year": 2024,
+                "report_type": "annual",
+                "module": "profitability",
+                "field_name": "revenue",
+                "provider_name": "MBRevenue",
+                "provider_value": 50227475991.67,
+                "provider_unit": "CNY",
+                "provider_definition": "main_business_revenue",
+                "provider_period": "2024-12-31",
+                "provider_value_basis": "annual_cumulative",
+                "official_value": 54822111649.52,
+                "official_unit": "CNY",
+                "official_definition": "营业收入",
+                "official_period": "2024-12-31",
+                "official_value_basis": "annual_cumulative",
+                "official_page": 6,
+                "official_chunk_id": null,
+                "official_excerpt": "财务指标 (一) 主要会计数据 单位：元 币种：人民币 主要会计数据 2024年 2023年 本期 比上 年同 期增 减(%) 2022年 营业收入 54,822,111,649.52 60,918,218,181.36 -10.01 67,360,350,418.67 归属于上市公司股东的净 利润 424,777,342.95 569,870,421.14 -25.46 297,033,154.",
+                "normalized_provider_value": 50227475991.67,
+                "normalized_official_value": 54822111649.52,
+                "absolute_diff": 4594635657.849998,
+                "relative_diff": 0.08380989931988925,
+                "tolerance": 1.0,
+                "fusion_status": "definition_mismatch",
+                "confidence": 0.85,
+                "warnings_json": [
+                  "结构化值为主营业务收入50,227,475,991.67，而年报披露营业收入为54,822,111,649.52，两者不一致。",
+                  "definition mismatch between structured and official evidence"
+                ],
+                "source_trace_json": {
+                  "structured": {
+                    "source": "artifact_seed",
+                    "artifact_path": "/Users/kaffy/Documents/TradingAgents/backend/docs/artifacts/company_v2_601686_ai_official_verification_phase6tc2.json",
+                    "field_name": "revenue"
+                  },
+                  "official": {
+                    "status": "resolved",
+                    "retrieval_mode": "extractor",
+                    "page": 6,
+                    "chunk_id": null,
+                    "excerpt": "财务指标 (一) 主要会计数据 单位：元 币种：人民币 主要会计数据 2024年 2023年 本期 比上 年同 期增 减(%) 2022年 营业收入 54,822,111,649.52 60,918,218,181.36 -10.01 67,360,350,418.67 归属于上市公司股东的净 利润 424,777,342.95 569,870,421.14 -25.46 297,033,154.",
+                    "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+                  },
+                  "alignment": {
+                    "same_symbol": true,
+                    "same_report": true,
+                    "same_period": true,
+                    "same_definition": false,
+                    "same_value_basis": true,
+                    "unit_convertible": true,
+                    "comparable": false,
+                    "status": "definition_mismatch",
+                    "warnings": [],
+                    "structured_period_basis": "annual_cumulative",
+                    "official_period_basis": "annual_cumulative"
+                  },
+                  "normalization": {
+                    "provider": {
+                      "original_value": 50227475991.67,
+                      "original_unit": "CNY",
+                      "normalized_value": 50227475991.67,
+                      "normalized_unit": "CNY",
+                      "conversion_factor": 1.0,
+                      "conversion_trace": "CNY→CNY",
+                      "status": "normalized",
+                      "warnings": []
+                    },
+                    "official": {
+                      "original_value": 54822111649.52,
+                      "original_unit": "CNY",
+                      "normalized_value": 54822111649.52,
+                      "normalized_unit": "CNY",
+                      "conversion_factor": 1.0,
+                      "conversion_trace": "CNY→CNY",
+                      "status": "normalized",
+                      "warnings": []
+                    },
+                    "tolerance": {
+                      "field_name": "revenue",
+                      "absolute_tolerance": 1.0,
+                      "relative_tolerance": 0.005,
+                      "unit": "CNY",
+                      "basis": "monetary",
+                      "within_tolerance": false,
+                      "absolute_diff": 4594635657.849998,
+                      "relative_diff": 0.08380989931988925
+                    }
+                  }
+                },
+                "created_at": "2026-07-11T08:40:33.146604+00:00",
+                "updated_at": "2026-07-11T08:40:33.146608+00:00"
+              },
+              {
+                "id": 2,
+                "market": "CN",
+                "symbol": "601686",
+                "report_id": 1,
+                "report_year": 2024,
+                "report_type": "annual",
+                "module": "profitability",
+                "field_name": "net_profit",
+                "provider_name": "netProfit",
+                "provider_value": 482101037.78,
+                "provider_unit": "CNY",
+                "provider_definition": "net_profit",
+                "provider_period": "2024-12-31",
+                "provider_value_basis": "annual_cumulative",
+                "official_value": 482101037.78,
+                "official_unit": "CNY",
+                "official_definition": "净利润",
+                "official_period": "2024-12-31",
+                "official_value_basis": "annual_cumulative",
+                "official_page": 216,
+                "official_chunk_id": null,
+                "official_excerpt": "(1).现金流量表补充资料 √适用 □不适用 单位：元 币种：人民币 补充资料 本期金额 上期金额 1．将净利润调节为经营活动现金流量： 净利润 482,101,037.78 571,995,979.58 加：资产减值准备 92,685,603.18 56,690,663.82 信用减值损失 49,962,723.03 1,009,040.48 固定资产折旧、油气资产折耗、生产 性生物资产折旧 5",
+                "normalized_provider_value": 482101037.78,
+                "normalized_official_value": 482101037.78,
+                "absolute_diff": 0.0,
+                "relative_diff": 0.0,
+                "tolerance": 1.0,
+                "fusion_status": "verified",
+                "confidence": 1.0,
+                "warnings_json": [
+                  "年报净利润与结构化值一致。"
+                ],
+                "source_trace_json": {
+                  "structured": {
+                    "source": "artifact_seed",
+                    "artifact_path": "/Users/kaffy/Documents/TradingAgents/backend/docs/artifacts/company_v2_601686_ai_official_verification_phase6tc2.json",
+                    "field_name": "net_profit"
+                  },
+                  "official": {
+                    "status": "resolved",
+                    "retrieval_mode": "extractor",
+                    "page": 216,
+                    "chunk_id": null,
+                    "excerpt": "(1).现金流量表补充资料 √适用 □不适用 单位：元 币种：人民币 补充资料 本期金额 上期金额 1．将净利润调节为经营活动现金流量： 净利润 482,101,037.78 571,995,979.58 加：资产减值准备 92,685,603.18 56,690,663.82 信用减值损失 49,962,723.03 1,009,040.48 固定资产折旧、油气资产折耗、生产 性生物资产折旧 5",
+                    "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+                  },
+                  "alignment": {
+                    "same_symbol": true,
+                    "same_report": true,
+                    "same_period": true,
+                    "same_definition": true,
+                    "same_value_basis": true,
+                    "unit_convertible": true,
+                    "comparable": true,
+                    "status": "comparable",
+                    "warnings": [],
+                    "structured_period_basis": "annual_cumulative",
+                    "official_period_basis": "annual_cumulative"
+                  },
+                  "normalization": {
+                    "provider": {
+                      "original_value": 482101037.78,
+                      "original_unit": "CNY",
+                      "normalized_value": 482101037.78,
+                      "normalized_unit": "CNY",
+                      "conversion_factor": 1.0,
+                      "conversion_trace": "CNY→CNY",
+                      "status": "normalized",
+                      "warnings": []
+                    },
+                    "official": {
+                      "original_value": 482101037.78,
+                      "original_unit": "CNY",
+                      "normalized_value": 482101037.78,
+                      "normalized_unit": "CNY",
+                      "conversion_factor": 1.0,
+                      "conversion_trace": "CNY→CNY",
+                      "status": "normalized",
+                      "warnings": []
+                    },
+                    "tolerance": {
+                      "field_name": "net_profit",
+                      "absolute_tolerance": 1.0,
+                      "relative_tolerance": 0.005,
+                      "unit": "CNY",
+                      "basis": "monetary",
+                      "within_tolerance": true,
+                      "absolute_diff": 0.0,
+                      "relative_diff": 0.0
+                    }
+                  }
+                },
+                "created_at": "2026-07-11T08:40:33.150205+00:00",
+                "updated_at": "2026-07-11T08:40:33.150207+00:00"
+              },
+              {
+                "id": 3,
+                "market": "CN",
+                "symbol": "601686",
+                "report_id": 1,
+                "report_year": 2024,
+                "report_type": "annual",
+                "module": "profitability",
+                "field_name": "net_profit_parent",
+                "provider_name": "netProfit",
+                "provider_value": 482101037.78,
+                "provider_unit": "CNY",
+                "provider_definition": "net_profit",
+                "provider_period": "2024-12-31",
+                "provider_value_basis": "annual_cumulative",
+                "official_value": 424777342.95,
+                "official_unit": "CNY",
+                "official_definition": "归属于母公司股东的净利润",
+                "official_period": "2024-12-31",
+                "official_value_basis": "annual_cumulative",
+                "official_page": 6,
+                "official_chunk_id": null,
+                "official_excerpt": "22年 营业收入 54,822,111,649.52 60,918,218,181.36 -10.01 67,360,350,418.67 归属于上市公司股东的净 利润 424,777,342.95 569,870,421.14 -25.46 297,033,154.12 归属于上市公司股东的扣 除非经常性损益的净利润 320,323,351.78 502,987,355.53 -36.32 21",
+                "normalized_provider_value": 482101037.78,
+                "normalized_official_value": 424777342.95,
+                "absolute_diff": 57323694.82999998,
+                "relative_diff": 0.11890390258018661,
+                "tolerance": 1.0,
+                "fusion_status": "definition_mismatch",
+                "confidence": 0.85,
+                "warnings_json": [
+                  "结构化值为净利润（含少数股东）482,101,037.78，而归母净利润应为424,777,342.95。",
+                  "definition mismatch between structured and official evidence"
+                ],
+                "source_trace_json": {
+                  "structured": {
+                    "source": "artifact_seed",
+                    "artifact_path": "/Users/kaffy/Documents/TradingAgents/backend/docs/artifacts/company_v2_601686_ai_official_verification_phase6tc2.json",
+                    "field_name": "net_profit_parent"
+                  },
+                  "official": {
+                    "status": "resolved",
+                    "retrieval_mode": "extractor",
+                    "page": 6,
+                    "chunk_id": null,
+                    "excerpt": "22年 营业收入 54,822,111,649.52 60,918,218,181.36 -10.01 67,360,350,418.67 归属于上市公司股东的净 利润 424,777,342.95 569,870,421.14 -25.46 297,033,154.12 归属于上市公司股东的扣 除非经常性损益的净利润 320,323,351.78 502,987,355.53 -36.32 21",
+                    "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+                  },
+                  "alignment": {
+                    "same_symbol": true,
+                    "same_report": true,
+                    "same_period": true,
+                    "same_definition": false,
+                    "same_value_basis": true,
+                    "unit_convertible": true,
+                    "comparable": false,
+                    "status": "definition_mismatch",
+                    "warnings": [],
+                    "structured_period_basis": "annual_cumulative",
+                    "official_period_basis": "annual_cumulative"
+                  },
+                  "normalization": {
+                    "provider": {
+                      "original_value": 482101037.78,
+                      "original_unit": "CNY",
+                      "normalized_value": 482101037.78,
+                      "normalized_unit": "CNY",
+                      "conversion_factor": 1.0,
+                      "conversion_trace": "CNY→CNY",
+                      "status": "normalized",
+                      "warnings": []
+                    },
+                    "official": {
+                      "original_value": 424777342.95,
+                      "original_unit": "CNY",
+                      "normalized_value": 424777342.95,
+                      "normalized_unit": "CNY",
+                      "conversion_factor": 1.0,
+                      "conversion_trace": "CNY→CNY",
+                      "status": "normalized",
+                      "warnings": []
+                    },
+                    "tolerance": {
+                      "field_name": "net_profit_parent",
+                      "absolute_tolerance": 1.0,
+                      "relative_tolerance": 0.005,
+                      "unit": "CNY",
+                      "basis": "monetary",
+                      "within_tolerance": false,
+                      "absolute_diff": 57323694.82999998,
+                      "relative_diff": 0.11890390258018661
+                    }
+                  }
+                },
+                "created_at": "2026-07-11T08:40:33.153688+00:00",
+                "updated_at": "2026-07-11T08:40:33.153689+00:00"
+              },
+              {
+                "id": 4,
+                "market": "CN",
+                "symbol": "601686",
+                "report_id": 1,
+                "report_year": 2024,
+                "report_type": "annual",
+                "module": "cashflow_quality",
+                "field_name": "operating_cashflow",
+                "provider_name": "operating_cashflow",
+                "provider_value": null,
+                "provider_unit": "CNY",
+                "provider_definition": "operating_cashflow",
+                "provider_period": "2024-12-31",
+                "provider_value_basis": "annual_cumulative",
+                "official_value": 1393832602.16,
+                "official_unit": "CNY",
+                "official_definition": "经营活动产生的现金流量净额",
+                "official_period": "2024-12-31",
+                "official_value_basis": "annual_cumulative",
+                "official_page": 6,
+                "official_chunk_id": null,
+                "official_excerpt": "司股东的扣 除非经常性损益的净利润 320,323,351.78 502,987,355.53 -36.32 218,353,072.12 经营活动产生的现金流量 净额 1,393,832,602.16 419,968,288.74 231.89 776,630,570.63 2024年末 2023年末 本期 末比 上年 同期 末增 减（% ） 2022年末 归属于上市公司股东的净 资产 6,76",
+                "normalized_provider_value": null,
+                "normalized_official_value": 1393832602.16,
+                "absolute_diff": null,
+                "relative_diff": null,
+                "tolerance": 1.0,
+                "fusion_status": "structured_field_missing",
+                "confidence": 0.6,
+                "warnings_json": [
+                  "结构化未找到该字段，但年报明确披露。"
+                ],
+                "source_trace_json": {
+                  "structured": {
+                    "source": "artifact_seed",
+                    "artifact_path": "/Users/kaffy/Documents/TradingAgents/backend/docs/artifacts/company_v2_601686_ai_official_verification_phase6tc2.json",
+                    "field_name": "operating_cashflow"
+                  },
+                  "official": {
+                    "status": "resolved",
+                    "retrieval_mode": "extractor",
+                    "page": 6,
+                    "chunk_id": null,
+                    "excerpt": "司股东的扣 除非经常性损益的净利润 320,323,351.78 502,987,355.53 -36.32 218,353,072.12 经营活动产生的现金流量 净额 1,393,832,602.16 419,968,288.74 231.89 776,630,570.63 2024年末 2023年末 本期 末比 上年 同期 末增 减（% ） 2022年末 归属于上市公司股东的净 资产 6,76",
+                    "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+                  },
+                  "alignment": {
+                    "same_symbol": true,
+                    "same_report": true,
+                    "same_period": true,
+                    "same_definition": true,
+                    "same_value_basis": true,
+                    "unit_convertible": true,
+                    "comparable": true,
+                    "status": "comparable",
+                    "warnings": [],
+                    "structured_period_basis": "annual_cumulative",
+                    "official_period_basis": "annual_cumulative"
+                  },
+                  "normalization": {
+                    "provider": {
+                      "original_value": null,
+                      "original_unit": "CNY",
+                      "normalized_value": null,
+                      "normalized_unit": "CNY",
+                      "conversion_factor": null,
+                      "conversion_trace": null,
+                      "status": "missing",
+                      "warnings": []
+                    },
+                    "official": {
+                      "original_value": 1393832602.16,
+                      "original_unit": "CNY",
+                      "normalized_value": 1393832602.16,
+                      "normalized_unit": "CNY",
+                      "conversion_factor": 1.0,
+                      "conversion_trace": "CNY→CNY",
+                      "status": "normalized",
+                      "warnings": []
+                    },
+                    "tolerance": {
+                      "field_name": "operating_cashflow",
+                      "absolute_tolerance": 1.0,
+                      "relative_tolerance": 0.005,
+                      "unit": "CNY",
+                      "basis": "monetary",
+                      "within_tolerance": false,
+                      "absolute_diff": null,
+                      "relative_diff": null
+                    }
+                  }
+                },
+                "created_at": "2026-07-11T08:40:33.157121+00:00",
+                "updated_at": "2026-07-11T08:40:33.157123+00:00"
+              },
+              {
+                "id": 5,
+                "market": "CN",
+                "symbol": "601686",
+                "report_id": 1,
+                "report_year": 2024,
+                "report_type": "annual",
+                "module": "solvency",
+                "field_name": "total_assets",
+                "provider_name": "total_assets",
+                "provider_value": null,
+                "provider_unit": "CNY",
+                "provider_definition": "total_assets",
+                "provider_period": "2024-12-31",
+                "provider_value_basis": "point_in_time",
+                "official_value": 26001740331.42,
+                "official_unit": "CNY",
+                "official_definition": "总资产",
+                "official_period": "2024-12-31",
+                "official_value_basis": "point_in_time",
+                "official_page": 6,
+                "official_chunk_id": null,
+                "official_excerpt": "属于上市公司股东的净 资产 6,760,918,501.91 6,713,166,252.34 0.71 6,435,045,419.69 总资产 26,001,740,331.42 17,650,144,411.80 47.32 16,780,377,043.20 (二) 主要财务指标 主要财务指标 2024年 2023年 本期比上年同 期增减(%) 2022年 基本每股收益（元／股） 0.30",
+                "normalized_provider_value": null,
+                "normalized_official_value": 26001740331.42,
+                "absolute_diff": null,
+                "relative_diff": null,
+                "tolerance": 1.0,
+                "fusion_status": "structured_field_missing",
+                "confidence": 0.6,
+                "warnings_json": [
+                  "结构化未找到该字段，但年报明确披露。"
+                ],
+                "source_trace_json": {
+                  "structured": {
+                    "source": "artifact_seed",
+                    "artifact_path": "/Users/kaffy/Documents/TradingAgents/backend/docs/artifacts/company_v2_601686_ai_official_verification_phase6tc2.json",
+                    "field_name": "total_assets"
+                  },
+                  "official": {
+                    "status": "resolved",
+                    "retrieval_mode": "extractor",
+                    "page": 6,
+                    "chunk_id": null,
+                    "excerpt": "属于上市公司股东的净 资产 6,760,918,501.91 6,713,166,252.34 0.71 6,435,045,419.69 总资产 26,001,740,331.42 17,650,144,411.80 47.32 16,780,377,043.20 (二) 主要财务指标 主要财务指标 2024年 2023年 本期比上年同 期增减(%) 2022年 基本每股收益（元／股） 0.30",
+                    "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+                  },
+                  "alignment": {
+                    "same_symbol": true,
+                    "same_report": true,
+                    "same_period": true,
+                    "same_definition": true,
+                    "same_value_basis": true,
+                    "unit_convertible": true,
+                    "comparable": true,
+                    "status": "comparable",
+                    "warnings": [],
+                    "structured_period_basis": "annual_cumulative",
+                    "official_period_basis": "annual_cumulative"
+                  },
+                  "normalization": {
+                    "provider": {
+                      "original_value": null,
+                      "original_unit": "CNY",
+                      "normalized_value": null,
+                      "normalized_unit": "CNY",
+                      "conversion_factor": null,
+                      "conversion_trace": null,
+                      "status": "missing",
+                      "warnings": []
+                    },
+                    "official": {
+                      "original_value": 26001740331.42,
+                      "original_unit": "CNY",
+                      "normalized_value": 26001740331.42,
+                      "normalized_unit": "CNY",
+                      "conversion_factor": 1.0,
+                      "conversion_trace": "CNY→CNY",
+                      "status": "normalized",
+                      "warnings": []
+                    },
+                    "tolerance": {
+                      "field_name": "total_assets",
+                      "absolute_tolerance": 1.0,
+                      "relative_tolerance": 0.005,
+                      "unit": "CNY",
+                      "basis": "monetary",
+                      "within_tolerance": false,
+                      "absolute_diff": null,
+                      "relative_diff": null
+                    }
+                  }
+                },
+                "created_at": "2026-07-11T08:40:33.160583+00:00",
+                "updated_at": "2026-07-11T08:40:33.160584+00:00"
+              },
+              {
+                "id": 6,
+                "market": "CN",
+                "symbol": "601686",
+                "report_id": 1,
+                "report_year": 2024,
+                "report_type": "annual",
+                "module": "solvency",
+                "field_name": "equity_parent",
+                "provider_name": "equity_parent",
+                "provider_value": null,
+                "provider_unit": "CNY",
+                "provider_definition": "equity_parent",
+                "provider_period": "2024-12-31",
+                "provider_value_basis": "point_in_time",
+                "official_value": 6760918501.91,
+                "official_unit": "CNY",
+                "official_definition": "归属于母公司股东权益",
+                "official_period": "2024-12-31",
+                "official_value_basis": "point_in_time",
+                "official_page": 6,
+                "official_chunk_id": null,
+                "official_excerpt": "88.74 231.89 776,630,570.63 2024年末 2023年末 本期 末比 上年 同期 末增 减（% ） 2022年末 归属于上市公司股东的净 资产 6,760,918,501.91 6,713,166,252.34 0.71 6,435,045,419.69 总资产 26,001,740,331.42 17,650,144,411.80 47.32 16,780,377,04",
+                "normalized_provider_value": null,
+                "normalized_official_value": 6760918501.91,
+                "absolute_diff": null,
+                "relative_diff": null,
+                "tolerance": 1.0,
+                "fusion_status": "structured_field_missing",
+                "confidence": 0.6,
+                "warnings_json": [
+                  "结构化未找到该字段，但年报明确披露。"
+                ],
+                "source_trace_json": {
+                  "structured": {
+                    "source": "artifact_seed",
+                    "artifact_path": "/Users/kaffy/Documents/TradingAgents/backend/docs/artifacts/company_v2_601686_ai_official_verification_phase6tc2.json",
+                    "field_name": "equity_parent"
+                  },
+                  "official": {
+                    "status": "resolved",
+                    "retrieval_mode": "extractor",
+                    "page": 6,
+                    "chunk_id": null,
+                    "excerpt": "88.74 231.89 776,630,570.63 2024年末 2023年末 本期 末比 上年 同期 末增 减（% ） 2022年末 归属于上市公司股东的净 资产 6,760,918,501.91 6,713,166,252.34 0.71 6,435,045,419.69 总资产 26,001,740,331.42 17,650,144,411.80 47.32 16,780,377,04",
+                    "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+                  },
+                  "alignment": {
+                    "same_symbol": true,
+                    "same_report": true,
+                    "same_period": true,
+                    "same_definition": true,
+                    "same_value_basis": true,
+                    "unit_convertible": true,
+                    "comparable": true,
+                    "status": "comparable",
+                    "warnings": [],
+                    "structured_period_basis": "annual_cumulative",
+                    "official_period_basis": "annual_cumulative"
+                  },
+                  "normalization": {
+                    "provider": {
+                      "original_value": null,
+                      "original_unit": "CNY",
+                      "normalized_value": null,
+                      "normalized_unit": "CNY",
+                      "conversion_factor": null,
+                      "conversion_trace": null,
+                      "status": "missing",
+                      "warnings": []
+                    },
+                    "official": {
+                      "original_value": 6760918501.91,
+                      "original_unit": "CNY",
+                      "normalized_value": 6760918501.91,
+                      "normalized_unit": "CNY",
+                      "conversion_factor": 1.0,
+                      "conversion_trace": "CNY→CNY",
+                      "status": "normalized",
+                      "warnings": []
+                    },
+                    "tolerance": {
+                      "field_name": "equity_parent",
+                      "absolute_tolerance": 1.0,
+                      "relative_tolerance": 0.005,
+                      "unit": "CNY",
+                      "basis": "monetary",
+                      "within_tolerance": false,
+                      "absolute_diff": null,
+                      "relative_diff": null
+                    }
+                  }
+                },
+                "created_at": "2026-07-11T08:40:33.164021+00:00",
+                "updated_at": "2026-07-11T08:40:33.164023+00:00"
+              },
+              {
+                "id": 7,
+                "market": "CN",
+                "symbol": "601686",
+                "report_id": 1,
+                "report_year": 2024,
+                "report_type": "annual",
+                "module": "profitability",
+                "field_name": "eps_basic",
+                "provider_name": "eps_basic",
+                "provider_value": null,
+                "provider_unit": "CNY/share",
+                "provider_definition": "eps_basic",
+                "provider_period": "2024-12-31",
+                "provider_value_basis": "annual_cumulative",
+                "official_value": 0.3,
+                "official_unit": "CNY/share",
+                "official_definition": "基本每股收益",
+                "official_period": "2024-12-31",
+                "official_value_basis": "annual_cumulative",
+                "official_page": 6,
+                "official_chunk_id": null,
+                "official_excerpt": "2 16,780,377,043.20 (二) 主要财务指标 主要财务指标 2024年 2023年 本期比上年同 期增减(%) 2022年 基本每股收益（元／股） 0.30 0.40 -25.00 0.21 稀释每股收益（元／股） 0.30 0.40 -25.00 0.21 扣除非经常性损益后的基本每股 收益（元／股） 0.23 0.35 -34.29 0.15 加权平均净资产收益率（%） 6.5",
+                "normalized_provider_value": null,
+                "normalized_official_value": 0.3,
+                "absolute_diff": null,
+                "relative_diff": null,
+                "tolerance": 0.01,
+                "fusion_status": "structured_field_missing",
+                "confidence": 0.6,
+                "warnings_json": [
+                  "结构化未找到该字段，但年报明确披露。"
+                ],
+                "source_trace_json": {
+                  "structured": {
+                    "source": "artifact_seed",
+                    "artifact_path": "/Users/kaffy/Documents/TradingAgents/backend/docs/artifacts/company_v2_601686_ai_official_verification_phase6tc2.json",
+                    "field_name": "eps_basic"
+                  },
+                  "official": {
+                    "status": "resolved",
+                    "retrieval_mode": "extractor",
+                    "page": 6,
+                    "chunk_id": null,
+                    "excerpt": "2 16,780,377,043.20 (二) 主要财务指标 主要财务指标 2024年 2023年 本期比上年同 期增减(%) 2022年 基本每股收益（元／股） 0.30 0.40 -25.00 0.21 稀释每股收益（元／股） 0.30 0.40 -25.00 0.21 扣除非经常性损益后的基本每股 收益（元／股） 0.23 0.35 -34.29 0.15 加权平均净资产收益率（%） 6.5",
+                    "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+                  },
+                  "alignment": {
+                    "same_symbol": true,
+                    "same_report": true,
+                    "same_period": true,
+                    "same_definition": true,
+                    "same_value_basis": true,
+                    "unit_convertible": true,
+                    "comparable": true,
+                    "status": "comparable",
+                    "warnings": [],
+                    "structured_period_basis": "annual_cumulative",
+                    "official_period_basis": "annual_cumulative"
+                  },
+                  "normalization": {
+                    "provider": {
+                      "original_value": null,
+                      "original_unit": "CNY/share",
+                      "normalized_value": null,
+                      "normalized_unit": "CNY/share",
+                      "conversion_factor": null,
+                      "conversion_trace": null,
+                      "status": "missing",
+                      "warnings": []
+                    },
+                    "official": {
+                      "original_value": 0.3,
+                      "original_unit": "CNY/share",
+                      "normalized_value": 0.3,
+                      "normalized_unit": "CNY/share",
+                      "conversion_factor": 1.0,
+                      "conversion_trace": "CNY/share→CNY/share",
+                      "status": "normalized",
+                      "warnings": []
+                    },
+                    "tolerance": {
+                      "field_name": "eps_basic",
+                      "absolute_tolerance": 0.01,
+                      "relative_tolerance": 0.005,
+                      "unit": "CNY/share",
+                      "basis": "eps",
+                      "within_tolerance": false,
+                      "absolute_diff": null,
+                      "relative_diff": null
+                    }
+                  }
+                },
+                "created_at": "2026-07-11T08:40:33.167469+00:00",
+                "updated_at": "2026-07-11T08:40:33.167470+00:00"
+              },
+              {
+                "id": 8,
+                "market": "CN",
+                "symbol": "601686",
+                "report_id": 1,
+                "report_year": 2024,
+                "report_type": "annual",
+                "module": "profitability",
+                "field_name": "roe_weighted",
+                "provider_name": "roeAvg",
+                "provider_value": 0.063051,
+                "provider_unit": "%",
+                "provider_definition": "roe",
+                "provider_period": "2024-12-31",
+                "provider_value_basis": "annual_cumulative",
+                "official_value": 0.0654,
+                "official_unit": "%",
+                "official_definition": "加权平均净资产收益率",
+                "official_period": "2024-12-31",
+                "official_value_basis": "annual_cumulative",
+                "official_page": 6,
+                "official_chunk_id": null,
+                "official_excerpt": "股） 0.30 0.40 -25.00 0.21 扣除非经常性损益后的基本每股 收益（元／股） 0.23 0.35 -34.29 0.15 加权平均净资产收益率（%） 6.54 8.83 -2.29 4.75 扣除非经常性损益后的加权平均 净资产收益率（%） 4.93 7.79 -2.86 3.49",
+                "normalized_provider_value": 0.063051,
+                "normalized_official_value": 0.0654,
+                "absolute_diff": 0.002349000000000004,
+                "relative_diff": 0.03591743119266061,
+                "tolerance": 0.0005,
+                "fusion_status": "definition_mismatch",
+                "confidence": 0.85,
+                "warnings_json": [
+                  "结构化值为6.3051%（0.063051），年报披露为6.54%，差异约3.59%。",
+                  "definition mismatch between structured and official evidence"
+                ],
+                "source_trace_json": {
+                  "structured": {
+                    "source": "artifact_seed",
+                    "artifact_path": "/Users/kaffy/Documents/TradingAgents/backend/docs/artifacts/company_v2_601686_ai_official_verification_phase6tc2.json",
+                    "field_name": "roe_weighted"
+                  },
+                  "official": {
+                    "status": "resolved",
+                    "retrieval_mode": "extractor",
+                    "page": 6,
+                    "chunk_id": null,
+                    "excerpt": "股） 0.30 0.40 -25.00 0.21 扣除非经常性损益后的基本每股 收益（元／股） 0.23 0.35 -34.29 0.15 加权平均净资产收益率（%） 6.54 8.83 -2.29 4.75 扣除非经常性损益后的加权平均 净资产收益率（%） 4.93 7.79 -2.86 3.49",
+                    "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+                  },
+                  "alignment": {
+                    "same_symbol": true,
+                    "same_report": true,
+                    "same_period": true,
+                    "same_definition": false,
+                    "same_value_basis": true,
+                    "unit_convertible": true,
+                    "comparable": false,
+                    "status": "definition_mismatch",
+                    "warnings": [],
+                    "structured_period_basis": "annual_cumulative",
+                    "official_period_basis": "annual_cumulative"
+                  },
+                  "normalization": {
+                    "provider": {
+                      "original_value": 0.063051,
+                      "original_unit": "%",
+                      "normalized_value": 0.063051,
+                      "normalized_unit": "%",
+                      "conversion_factor": 1.0,
+                      "conversion_trace": "%→%",
+                      "status": "normalized",
+                      "warnings": []
+                    },
+                    "official": {
+                      "original_value": 0.0654,
+                      "original_unit": "%",
+                      "normalized_value": 0.0654,
+                      "normalized_unit": "%",
+                      "conversion_factor": 1.0,
+                      "conversion_trace": "%→%",
+                      "status": "normalized",
+                      "warnings": []
+                    },
+                    "tolerance": {
+                      "field_name": "roe_weighted",
+                      "absolute_tolerance": 0.0005,
+                      "relative_tolerance": 0.005,
+                      "unit": "%",
+                      "basis": "percentage",
+                      "within_tolerance": false,
+                      "absolute_diff": 0.002349000000000004,
+                      "relative_diff": 0.03591743119266061
+                    }
+                  }
+                },
+                "created_at": "2026-07-11T08:40:33.170945+00:00",
+                "updated_at": "2026-07-11T08:40:33.170947+00:00"
+              },
+              {
+                "id": 9,
+                "market": "CN",
+                "symbol": "601686",
+                "report_id": 1,
+                "report_year": 2024,
+                "report_type": "annual",
+                "module": "solvency",
+                "field_name": "total_share",
+                "provider_name": "totalShare",
+                "provider_value": 1432942234.0,
+                "provider_unit": "shares",
+                "provider_definition": "total_share",
+                "provider_period": "2024-12-31",
+                "provider_value_basis": "point_in_time",
+                "official_value": 1432296037.0,
+                "official_unit": "股",
+                "official_definition": "总股本",
+                "official_period": "2024-12-12",
+                "official_value_basis": "point_in_time",
+                "official_page": 54,
+                "official_chunk_id": null,
+                "official_excerpt": "三季度利润分配方案为：公司拟向全体股东每股派发现金红利 0.15 元（含税），\n不进行资本公积金转增股本，不送红股。截至 2024 年 12 月 12 日，公司总股本 1,432,296,037\n股（其中公司回购账户 54,330,853 股不参与利润分配），以此计算合计拟派发现金红利\n206,694,777.60 元（含税）。\n本次利润分配方案已经公司第五届董事会第十四次会议和2024 年第六次临时股东大会审议\n通。方案的制定综合考虑了公司目前经营盈利状况，兼顾了公司股东",
+                "normalized_provider_value": 1432942234.0,
+                "normalized_official_value": 1432296037.0,
+                "absolute_diff": 646197.0,
+                "relative_diff": 0.0004509581647238963,
+                "tolerance": 1.0,
+                "fusion_status": "period_basis_mismatch",
+                "confidence": 0.3,
+                "warnings_json": [
+                  "period mismatch between structured and official evidence",
+                  "年报未直接提供2024-12-31总股本，证据中仅有2024-12-12的总股本1,432,296,037股，无法确认期末准确数值，需人工核实。",
+                  "period mismatch: provider=2024-12-31 official=2024-12-12"
+                ],
+                "source_trace_json": {
+                  "structured": {
+                    "source": "artifact_seed",
+                    "artifact_path": "/Users/kaffy/Documents/TradingAgents/backend/docs/artifacts/company_v2_601686_ai_official_verification_phase6tc2.json",
+                    "field_name": "total_share"
+                  },
+                  "official": {
+                    "status": "resolved",
+                    "retrieval_mode": "keyword",
+                    "page": 54,
+                    "chunk_id": null,
+                    "excerpt": "三季度利润分配方案为：公司拟向全体股东每股派发现金红利 0.15 元（含税），\n不进行资本公积金转增股本，不送红股。截至 2024 年 12 月 12 日，公司总股本 1,432,296,037\n股（其中公司回购账户 54,330,853 股不参与利润分配），以此计算合计拟派发现金红利\n206,694,777.60 元（含税）。\n本次利润分配方案已经公司第五届董事会第十四次会议和2024 年第六次临时股东大会审议\n通。方案的制定综合考虑了公司目前经营盈利状况，兼顾了公司股东",
+                    "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+                  },
+                  "alignment": {
+                    "same_symbol": true,
+                    "same_report": true,
+                    "same_period": false,
+                    "same_definition": true,
+                    "same_value_basis": true,
+                    "unit_convertible": true,
+                    "comparable": false,
+                    "status": "period_basis_mismatch",
+                    "warnings": [
+                      "period mismatch between structured and official evidence"
+                    ],
+                    "structured_period_basis": "point_in_time",
+                    "official_period_basis": "point_in_time"
+                  },
+                  "normalization": {
+                    "provider": {
+                      "original_value": 1432942234.0,
+                      "original_unit": "shares",
+                      "normalized_value": 1432942234.0,
+                      "normalized_unit": "shares",
+                      "conversion_factor": 1.0,
+                      "conversion_trace": "shares→shares",
+                      "status": "normalized",
+                      "warnings": []
+                    },
+                    "official": {
+                      "original_value": 1432296037.0,
+                      "original_unit": "股",
+                      "normalized_value": 1432296037.0,
+                      "normalized_unit": "shares",
+                      "conversion_factor": 1.0,
+                      "conversion_trace": "股→shares",
+                      "status": "normalized",
+                      "warnings": []
+                    },
+                    "tolerance": {
+                      "field_name": "total_share",
+                      "absolute_tolerance": 1.0,
+                      "relative_tolerance": 0.001,
+                      "unit": "shares",
+                      "basis": "share_count",
+                      "within_tolerance": true,
+                      "absolute_diff": 646197.0,
+                      "relative_diff": 0.0004509581647238963
+                    }
+                  }
+                },
+                "created_at": "2026-07-11T08:40:33.175176+00:00",
+                "updated_at": "2026-07-11T08:40:33.175177+00:00"
+              },
+              {
+                "id": 10,
+                "market": "CN",
+                "symbol": "601686",
+                "report_id": 1,
+                "report_year": 2024,
+                "report_type": "annual",
+                "module": "solvency",
+                "field_name": "float_share",
+                "provider_name": "liqaShare",
+                "provider_value": 1432942234.0,
+                "provider_unit": "shares",
+                "provider_definition": "float_share",
+                "provider_period": "2024-12-31",
+                "provider_value_basis": "point_in_time",
+                "official_value": null,
+                "official_unit": null,
+                "official_definition": "流通股本",
+                "official_period": null,
+                "official_value_basis": "point_in_time",
+                "official_page": null,
+                "official_chunk_id": null,
+                "official_excerpt": null,
+                "normalized_provider_value": 1432942234.0,
+                "normalized_official_value": null,
+                "absolute_diff": null,
+                "relative_diff": null,
+                "tolerance": 1.0,
+                "fusion_status": "insufficient_evidence",
+                "confidence": 0.0,
+                "warnings_json": [
+                  "period mismatch between structured and official evidence",
+                  "unit not safely convertible",
+                  "未在年报摘要中找到流通股数相关证据，无法校核。",
+                  "official field not found in selected report",
+                  "official evidence not sufficient"
+                ],
+                "source_trace_json": {
+                  "structured": {
+                    "source": "artifact_seed",
+                    "artifact_path": "/Users/kaffy/Documents/TradingAgents/backend/docs/artifacts/company_v2_601686_ai_official_verification_phase6tc2.json",
+                    "field_name": "float_share"
+                  },
+                  "official": {
+                    "status": "insufficient_evidence",
+                    "retrieval_mode": "keyword",
+                    "page": null,
+                    "chunk_id": null,
+                    "excerpt": null,
+                    "source_url": null
+                  },
+                  "alignment": {
+                    "same_symbol": true,
+                    "same_report": true,
+                    "same_period": false,
+                    "same_definition": true,
+                    "same_value_basis": true,
+                    "unit_convertible": false,
+                    "comparable": false,
+                    "status": "period_basis_mismatch",
+                    "warnings": [
+                      "period mismatch between structured and official evidence",
+                      "unit not safely convertible"
+                    ],
+                    "structured_period_basis": "point_in_time",
+                    "official_period_basis": "point_in_time"
+                  },
+                  "normalization": {
+                    "provider": {
+                      "original_value": 1432942234.0,
+                      "original_unit": "shares",
+                      "normalized_value": 1432942234.0,
+                      "normalized_unit": "shares",
+                      "conversion_factor": 1.0,
+                      "conversion_trace": "shares→shares",
+                      "status": "normalized",
+                      "warnings": []
+                    },
+                    "official": {
+                      "original_value": null,
+                      "original_unit": null,
+                      "normalized_value": null,
+                      "normalized_unit": "shares",
+                      "conversion_factor": null,
+                      "conversion_trace": null,
+                      "status": "missing",
+                      "warnings": []
+                    },
+                    "tolerance": {
+                      "field_name": "float_share",
+                      "absolute_tolerance": 1.0,
+                      "relative_tolerance": 0.001,
+                      "unit": "shares",
+                      "basis": "share_count",
+                      "within_tolerance": false,
+                      "absolute_diff": null,
+                      "relative_diff": null
+                    }
+                  }
+                },
+                "created_at": "2026-07-11T08:40:33.181519+00:00",
+                "updated_at": "2026-07-11T08:40:33.181521+00:00"
+              }
+            ],
+            "generated_at": "2026-07-11T08:40:33.181528+00:00",
+            "refreshed": false,
+            "source_mode": "artifact_seed",
+            "cache_hit": false,
+            "cache_key_version": "v1",
+            "computed_at": "2026-07-11T08:40:33.181805+00:00",
+            "expires_at": "2026-07-12T08:40:33.181805+00:00",
+            "stale_reason": null,
+            "cache_context": {
+              "cache_key": "v1:8112a383efe8a3894fbf53cd94248ef0e741a8f7dcfaf0879e11cc1099a2d14b",
+              "structured_data_version": "4f8c4deca184",
+              "embedding_version": "company-v2-hash-keyword-v1",
+              "field_definition_registry_version": "v1",
+              "tolerance_version": "v1"
+            },
+            "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF",
+            "pdf_hash": "e6a216071c389d92363f1f7caf5b2ef0573312d46808d9ce7e5239c94aa18ac6",
+            "parse_version": "parsed",
+            "idempotency_key": "rollout:601686:1:601686",
+            "rollout": {
+              "enabled": true,
+              "eligible": true,
+              "reason": "ALLOWLIST",
+              "rollout_bucket": 21,
+              "rollout_percent": 0,
+              "auto_run": false,
+              "report_ready": true,
+              "rag_ready": true,
+              "structured_ready": true,
+              "supported_fields": [
+                "revenue",
+                "net_profit",
+                "net_profit_parent",
+                "operating_cashflow",
+                "total_assets",
+                "equity_parent",
+                "eps_basic",
+                "roe_weighted",
+                "total_share",
+                "float_share"
+              ],
+              "cached": false,
+              "last_run_at": null,
+              "force_enabled": false
+            },
+            "eligible": true,
+            "reason": "ALLOWLIST"
+          },
+          "computed_at": "2026-07-11T08:40:33.181805+00:00",
+          "expires_at": "2026-07-12T08:40:33.181805+00:00",
+          "stale_reason": null
+        }
+      ],
+      "metrics": {
+        "latencies": {},
+        "p50_latency_ms": null,
+        "p95_latency_ms": null,
+        "cache_hit_ratio": 0.0,
+        "fields_per_request": 0.0
+      },
+      "review_queue_size": 0,
+      "circuit": {
+        "state": "closed",
+        "reason": null,
+        "updated_at": "2026-07-11T08:40:32.776608+00:00",
+        "last_smoke_passed_at": "2026-07-11T08:40:32.776613+00:00"
+      }
+    },
+    {
+      "stage": "stage_2",
+      "allowlist": "601686,600519,300750,000725,000001",
+      "symbols": [
+        {
+          "symbol": "601686",
+          "report_id": 1,
+          "report_year": 2024,
+          "report_type": "annual",
+          "report_title": "友发集团2024年年度报告",
+          "report_ready": true,
+          "rag_ready": true,
+          "structured_ready": true,
+          "eligibility": {
+            "enabled": true,
+            "eligible": true,
+            "reason": "ALLOWLIST",
+            "rollout_bucket": 21,
+            "rollout_percent": 0,
+            "auto_run": false,
+            "report_ready": true,
+            "rag_ready": true,
+            "structured_ready": true,
+            "supported_fields": [
+              "revenue",
+              "net_profit",
+              "net_profit_parent",
+              "operating_cashflow",
+              "total_assets",
+              "equity_parent",
+              "eps_basic",
+              "roe_weighted",
+              "total_share",
+              "float_share"
+            ],
+            "cached": false,
+            "last_run_at": null,
+            "force_enabled": false
+          },
+          "cache_hit": true,
+          "singleflight_status": null,
+          "final_status": "passed",
+          "summary": {
+            "fields_total": 10,
+            "verified": 1,
+            "normalized_match": 0,
+            "likely_match": 0,
+            "definition_mismatch": 3,
+            "period_basis_mismatch": 1,
+            "unit_mismatch": 0,
+            "value_conflict": 0,
+            "structured_field_missing": 4,
+            "official_field_not_found": 0,
+            "insufficient_evidence": 1,
+            "not_applicable": 0,
+            "failed": 0
+          },
+          "fields": [
+            {
+              "field_name": "revenue",
+              "fusion_status": "definition_mismatch",
+              "official_page": 6
+            },
+            {
+              "field_name": "net_profit",
+              "fusion_status": "verified",
+              "official_page": 216
+            },
+            {
+              "field_name": "net_profit_parent",
+              "fusion_status": "definition_mismatch",
+              "official_page": 6
+            },
+            {
+              "field_name": "operating_cashflow",
+              "fusion_status": "structured_field_missing",
+              "official_page": 6
+            },
+            {
+              "field_name": "total_assets",
+              "fusion_status": "structured_field_missing",
+              "official_page": 6
+            },
+            {
+              "field_name": "equity_parent",
+              "fusion_status": "structured_field_missing",
+              "official_page": 6
+            },
+            {
+              "field_name": "eps_basic",
+              "fusion_status": "structured_field_missing",
+              "official_page": 6
+            },
+            {
+              "field_name": "roe_weighted",
+              "fusion_status": "definition_mismatch",
+              "official_page": 6
+            },
+            {
+              "field_name": "total_share",
+              "fusion_status": "period_basis_mismatch",
+              "official_page": 54
+            },
+            {
+              "field_name": "float_share",
+              "fusion_status": "insufficient_evidence",
+              "official_page": null
+            }
+          ],
+          "warning": null,
+          "elapsed_ms": 0,
+          "cache_key_version": "v1",
+          "computed_at": "2026-07-11T08:40:33.181805+00:00",
+          "expires_at": "2026-07-12T08:40:33.181805+00:00",
+          "circuit": null
+        },
+        {
+          "symbol": "600519",
+          "report_id": 0,
+          "report_year": null,
+          "report_type": null,
+          "report_title": null,
+          "report_ready": false,
+          "rag_ready": false,
+          "structured_ready": false,
+          "eligibility": {
+            "enabled": true,
+            "eligible": false,
+            "reason": "REPORT_NOT_READY",
+            "rollout_bucket": 27,
+            "rollout_percent": 0,
+            "auto_run": false,
+            "report_ready": false,
+            "rag_ready": false,
+            "structured_ready": false,
+            "supported_fields": [
+              "revenue",
+              "net_profit",
+              "net_profit_parent",
+              "operating_cashflow",
+              "total_assets",
+              "equity_parent",
+              "eps_basic",
+              "roe_weighted",
+              "total_share",
+              "float_share"
+            ],
+            "cached": false,
+            "last_run_at": null,
+            "force_enabled": false
+          },
+          "cache_hit": false,
+          "singleflight_status": null,
+          "final_status": "ineligible",
+          "summary": {},
+          "fields": [],
+          "warning": null
+        },
+        {
+          "symbol": "300750",
+          "report_id": 0,
+          "report_year": null,
+          "report_type": null,
+          "report_title": null,
+          "report_ready": false,
+          "rag_ready": false,
+          "structured_ready": false,
+          "eligibility": {
+            "enabled": true,
+            "eligible": false,
+            "reason": "REPORT_NOT_READY",
+            "rollout_bucket": 18,
+            "rollout_percent": 0,
+            "auto_run": false,
+            "report_ready": false,
+            "rag_ready": false,
+            "structured_ready": false,
+            "supported_fields": [
+              "revenue",
+              "net_profit",
+              "net_profit_parent",
+              "operating_cashflow",
+              "total_assets",
+              "equity_parent",
+              "eps_basic",
+              "roe_weighted",
+              "total_share",
+              "float_share"
+            ],
+            "cached": false,
+            "last_run_at": null,
+            "force_enabled": false
+          },
+          "cache_hit": false,
+          "singleflight_status": null,
+          "final_status": "ineligible",
+          "summary": {},
+          "fields": [],
+          "warning": null
+        },
+        {
+          "symbol": "000725",
+          "report_id": 0,
+          "report_year": null,
+          "report_type": null,
+          "report_title": null,
+          "report_ready": false,
+          "rag_ready": false,
+          "structured_ready": false,
+          "eligibility": {
+            "enabled": true,
+            "eligible": false,
+            "reason": "REPORT_NOT_READY",
+            "rollout_bucket": 97,
+            "rollout_percent": 0,
+            "auto_run": false,
+            "report_ready": false,
+            "rag_ready": false,
+            "structured_ready": false,
+            "supported_fields": [
+              "revenue",
+              "net_profit",
+              "net_profit_parent",
+              "operating_cashflow",
+              "total_assets",
+              "equity_parent",
+              "eps_basic",
+              "roe_weighted",
+              "total_share",
+              "float_share"
+            ],
+            "cached": false,
+            "last_run_at": null,
+            "force_enabled": false
+          },
+          "cache_hit": false,
+          "singleflight_status": null,
+          "final_status": "ineligible",
+          "summary": {},
+          "fields": [],
+          "warning": null
+        },
+        {
+          "symbol": "000001",
+          "report_id": 0,
+          "report_year": null,
+          "report_type": null,
+          "report_title": null,
+          "report_ready": false,
+          "rag_ready": false,
+          "structured_ready": false,
+          "eligibility": {
+            "enabled": true,
+            "eligible": false,
+            "reason": "REPORT_NOT_READY",
+            "rollout_bucket": 62,
+            "rollout_percent": 0,
+            "auto_run": false,
+            "report_ready": false,
+            "rag_ready": false,
+            "structured_ready": false,
+            "supported_fields": [
+              "revenue",
+              "net_profit",
+              "net_profit_parent",
+              "operating_cashflow",
+              "total_assets",
+              "equity_parent",
+              "eps_basic",
+              "roe_weighted",
+              "total_share",
+              "float_share"
+            ],
+            "cached": false,
+            "last_run_at": null,
+            "force_enabled": false
+          },
+          "cache_hit": false,
+          "singleflight_status": null,
+          "final_status": "ineligible",
+          "summary": {},
+          "fields": [],
+          "warning": null
+        }
+      ],
+      "health": {
+        "window": "24h",
+        "requests": 1,
+        "success_rate": 1.0,
+        "cache_hit_rate": 1.0,
+        "timeout_rate": 0.0,
+        "false_conflict_suspected": 0,
+        "cross_report_leakage": 0,
+        "missing_citation_rate": 0.0,
+        "source_trace_complete_rate": 1.0,
+        "p50_latency_ms": 0.0,
+        "p95_latency_ms": 0.0,
+        "status": "healthy",
+        "alerts": []
+      },
+      "cache_snapshot": [
+        {
+          "cache_key": "v1:8112a383efe8a3894fbf53cd94248ef0e741a8f7dcfaf0879e11cc1099a2d14b",
+          "cache_key_version": "v1",
+          "data": {
+            "symbol": "601686",
+            "report_id": 1,
+            "report_year": 2024,
+            "report_type": "annual",
+            "summary": {
+              "fields_total": 10,
+              "verified": 1,
+              "normalized_match": 0,
+              "likely_match": 0,
+              "definition_mismatch": 3,
+              "period_basis_mismatch": 1,
+              "unit_mismatch": 0,
+              "value_conflict": 0,
+              "structured_field_missing": 4,
+              "official_field_not_found": 0,
+              "insufficient_evidence": 1,
+              "not_applicable": 0,
+              "failed": 0
+            },
+            "fields": [
+              {
+                "id": 1,
+                "market": "CN",
+                "symbol": "601686",
+                "report_id": 1,
+                "report_year": 2024,
+                "report_type": "annual",
+                "module": "profitability",
+                "field_name": "revenue",
+                "provider_name": "MBRevenue",
+                "provider_value": 50227475991.67,
+                "provider_unit": "CNY",
+                "provider_definition": "main_business_revenue",
+                "provider_period": "2024-12-31",
+                "provider_value_basis": "annual_cumulative",
+                "official_value": 54822111649.52,
+                "official_unit": "CNY",
+                "official_definition": "营业收入",
+                "official_period": "2024-12-31",
+                "official_value_basis": "annual_cumulative",
+                "official_page": 6,
+                "official_chunk_id": null,
+                "official_excerpt": "财务指标 (一) 主要会计数据 单位：元 币种：人民币 主要会计数据 2024年 2023年 本期 比上 年同 期增 减(%) 2022年 营业收入 54,822,111,649.52 60,918,218,181.36 -10.01 67,360,350,418.67 归属于上市公司股东的净 利润 424,777,342.95 569,870,421.14 -25.46 297,033,154.",
+                "normalized_provider_value": 50227475991.67,
+                "normalized_official_value": 54822111649.52,
+                "absolute_diff": 4594635657.849998,
+                "relative_diff": 0.08380989931988925,
+                "tolerance": 1.0,
+                "fusion_status": "definition_mismatch",
+                "confidence": 0.85,
+                "warnings_json": [
+                  "结构化值为主营业务收入50,227,475,991.67，而年报披露营业收入为54,822,111,649.52，两者不一致。",
+                  "definition mismatch between structured and official evidence"
+                ],
+                "source_trace_json": {
+                  "structured": {
+                    "source": "artifact_seed",
+                    "artifact_path": "/Users/kaffy/Documents/TradingAgents/backend/docs/artifacts/company_v2_601686_ai_official_verification_phase6tc2.json",
+                    "field_name": "revenue"
+                  },
+                  "official": {
+                    "status": "resolved",
+                    "retrieval_mode": "extractor",
+                    "page": 6,
+                    "chunk_id": null,
+                    "excerpt": "财务指标 (一) 主要会计数据 单位：元 币种：人民币 主要会计数据 2024年 2023年 本期 比上 年同 期增 减(%) 2022年 营业收入 54,822,111,649.52 60,918,218,181.36 -10.01 67,360,350,418.67 归属于上市公司股东的净 利润 424,777,342.95 569,870,421.14 -25.46 297,033,154.",
+                    "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+                  },
+                  "alignment": {
+                    "same_symbol": true,
+                    "same_report": true,
+                    "same_period": true,
+                    "same_definition": false,
+                    "same_value_basis": true,
+                    "unit_convertible": true,
+                    "comparable": false,
+                    "status": "definition_mismatch",
+                    "warnings": [],
+                    "structured_period_basis": "annual_cumulative",
+                    "official_period_basis": "annual_cumulative"
+                  },
+                  "normalization": {
+                    "provider": {
+                      "original_value": 50227475991.67,
+                      "original_unit": "CNY",
+                      "normalized_value": 50227475991.67,
+                      "normalized_unit": "CNY",
+                      "conversion_factor": 1.0,
+                      "conversion_trace": "CNY→CNY",
+                      "status": "normalized",
+                      "warnings": []
+                    },
+                    "official": {
+                      "original_value": 54822111649.52,
+                      "original_unit": "CNY",
+                      "normalized_value": 54822111649.52,
+                      "normalized_unit": "CNY",
+                      "conversion_factor": 1.0,
+                      "conversion_trace": "CNY→CNY",
+                      "status": "normalized",
+                      "warnings": []
+                    },
+                    "tolerance": {
+                      "field_name": "revenue",
+                      "absolute_tolerance": 1.0,
+                      "relative_tolerance": 0.005,
+                      "unit": "CNY",
+                      "basis": "monetary",
+                      "within_tolerance": false,
+                      "absolute_diff": 4594635657.849998,
+                      "relative_diff": 0.08380989931988925
+                    }
+                  }
+                },
+                "created_at": "2026-07-11T08:40:33.146604+00:00",
+                "updated_at": "2026-07-11T08:40:33.146608+00:00"
+              },
+              {
+                "id": 2,
+                "market": "CN",
+                "symbol": "601686",
+                "report_id": 1,
+                "report_year": 2024,
+                "report_type": "annual",
+                "module": "profitability",
+                "field_name": "net_profit",
+                "provider_name": "netProfit",
+                "provider_value": 482101037.78,
+                "provider_unit": "CNY",
+                "provider_definition": "net_profit",
+                "provider_period": "2024-12-31",
+                "provider_value_basis": "annual_cumulative",
+                "official_value": 482101037.78,
+                "official_unit": "CNY",
+                "official_definition": "净利润",
+                "official_period": "2024-12-31",
+                "official_value_basis": "annual_cumulative",
+                "official_page": 216,
+                "official_chunk_id": null,
+                "official_excerpt": "(1).现金流量表补充资料 √适用 □不适用 单位：元 币种：人民币 补充资料 本期金额 上期金额 1．将净利润调节为经营活动现金流量： 净利润 482,101,037.78 571,995,979.58 加：资产减值准备 92,685,603.18 56,690,663.82 信用减值损失 49,962,723.03 1,009,040.48 固定资产折旧、油气资产折耗、生产 性生物资产折旧 5",
+                "normalized_provider_value": 482101037.78,
+                "normalized_official_value": 482101037.78,
+                "absolute_diff": 0.0,
+                "relative_diff": 0.0,
+                "tolerance": 1.0,
+                "fusion_status": "verified",
+                "confidence": 1.0,
+                "warnings_json": [
+                  "年报净利润与结构化值一致。"
+                ],
+                "source_trace_json": {
+                  "structured": {
+                    "source": "artifact_seed",
+                    "artifact_path": "/Users/kaffy/Documents/TradingAgents/backend/docs/artifacts/company_v2_601686_ai_official_verification_phase6tc2.json",
+                    "field_name": "net_profit"
+                  },
+                  "official": {
+                    "status": "resolved",
+                    "retrieval_mode": "extractor",
+                    "page": 216,
+                    "chunk_id": null,
+                    "excerpt": "(1).现金流量表补充资料 √适用 □不适用 单位：元 币种：人民币 补充资料 本期金额 上期金额 1．将净利润调节为经营活动现金流量： 净利润 482,101,037.78 571,995,979.58 加：资产减值准备 92,685,603.18 56,690,663.82 信用减值损失 49,962,723.03 1,009,040.48 固定资产折旧、油气资产折耗、生产 性生物资产折旧 5",
+                    "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+                  },
+                  "alignment": {
+                    "same_symbol": true,
+                    "same_report": true,
+                    "same_period": true,
+                    "same_definition": true,
+                    "same_value_basis": true,
+                    "unit_convertible": true,
+                    "comparable": true,
+                    "status": "comparable",
+                    "warnings": [],
+                    "structured_period_basis": "annual_cumulative",
+                    "official_period_basis": "annual_cumulative"
+                  },
+                  "normalization": {
+                    "provider": {
+                      "original_value": 482101037.78,
+                      "original_unit": "CNY",
+                      "normalized_value": 482101037.78,
+                      "normalized_unit": "CNY",
+                      "conversion_factor": 1.0,
+                      "conversion_trace": "CNY→CNY",
+                      "status": "normalized",
+                      "warnings": []
+                    },
+                    "official": {
+                      "original_value": 482101037.78,
+                      "original_unit": "CNY",
+                      "normalized_value": 482101037.78,
+                      "normalized_unit": "CNY",
+                      "conversion_factor": 1.0,
+                      "conversion_trace": "CNY→CNY",
+                      "status": "normalized",
+                      "warnings": []
+                    },
+                    "tolerance": {
+                      "field_name": "net_profit",
+                      "absolute_tolerance": 1.0,
+                      "relative_tolerance": 0.005,
+                      "unit": "CNY",
+                      "basis": "monetary",
+                      "within_tolerance": true,
+                      "absolute_diff": 0.0,
+                      "relative_diff": 0.0
+                    }
+                  }
+                },
+                "created_at": "2026-07-11T08:40:33.150205+00:00",
+                "updated_at": "2026-07-11T08:40:33.150207+00:00"
+              },
+              {
+                "id": 3,
+                "market": "CN",
+                "symbol": "601686",
+                "report_id": 1,
+                "report_year": 2024,
+                "report_type": "annual",
+                "module": "profitability",
+                "field_name": "net_profit_parent",
+                "provider_name": "netProfit",
+                "provider_value": 482101037.78,
+                "provider_unit": "CNY",
+                "provider_definition": "net_profit",
+                "provider_period": "2024-12-31",
+                "provider_value_basis": "annual_cumulative",
+                "official_value": 424777342.95,
+                "official_unit": "CNY",
+                "official_definition": "归属于母公司股东的净利润",
+                "official_period": "2024-12-31",
+                "official_value_basis": "annual_cumulative",
+                "official_page": 6,
+                "official_chunk_id": null,
+                "official_excerpt": "22年 营业收入 54,822,111,649.52 60,918,218,181.36 -10.01 67,360,350,418.67 归属于上市公司股东的净 利润 424,777,342.95 569,870,421.14 -25.46 297,033,154.12 归属于上市公司股东的扣 除非经常性损益的净利润 320,323,351.78 502,987,355.53 -36.32 21",
+                "normalized_provider_value": 482101037.78,
+                "normalized_official_value": 424777342.95,
+                "absolute_diff": 57323694.82999998,
+                "relative_diff": 0.11890390258018661,
+                "tolerance": 1.0,
+                "fusion_status": "definition_mismatch",
+                "confidence": 0.85,
+                "warnings_json": [
+                  "结构化值为净利润（含少数股东）482,101,037.78，而归母净利润应为424,777,342.95。",
+                  "definition mismatch between structured and official evidence"
+                ],
+                "source_trace_json": {
+                  "structured": {
+                    "source": "artifact_seed",
+                    "artifact_path": "/Users/kaffy/Documents/TradingAgents/backend/docs/artifacts/company_v2_601686_ai_official_verification_phase6tc2.json",
+                    "field_name": "net_profit_parent"
+                  },
+                  "official": {
+                    "status": "resolved",
+                    "retrieval_mode": "extractor",
+                    "page": 6,
+                    "chunk_id": null,
+                    "excerpt": "22年 营业收入 54,822,111,649.52 60,918,218,181.36 -10.01 67,360,350,418.67 归属于上市公司股东的净 利润 424,777,342.95 569,870,421.14 -25.46 297,033,154.12 归属于上市公司股东的扣 除非经常性损益的净利润 320,323,351.78 502,987,355.53 -36.32 21",
+                    "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+                  },
+                  "alignment": {
+                    "same_symbol": true,
+                    "same_report": true,
+                    "same_period": true,
+                    "same_definition": false,
+                    "same_value_basis": true,
+                    "unit_convertible": true,
+                    "comparable": false,
+                    "status": "definition_mismatch",
+                    "warnings": [],
+                    "structured_period_basis": "annual_cumulative",
+                    "official_period_basis": "annual_cumulative"
+                  },
+                  "normalization": {
+                    "provider": {
+                      "original_value": 482101037.78,
+                      "original_unit": "CNY",
+                      "normalized_value": 482101037.78,
+                      "normalized_unit": "CNY",
+                      "conversion_factor": 1.0,
+                      "conversion_trace": "CNY→CNY",
+                      "status": "normalized",
+                      "warnings": []
+                    },
+                    "official": {
+                      "original_value": 424777342.95,
+                      "original_unit": "CNY",
+                      "normalized_value": 424777342.95,
+                      "normalized_unit": "CNY",
+                      "conversion_factor": 1.0,
+                      "conversion_trace": "CNY→CNY",
+                      "status": "normalized",
+                      "warnings": []
+                    },
+                    "tolerance": {
+                      "field_name": "net_profit_parent",
+                      "absolute_tolerance": 1.0,
+                      "relative_tolerance": 0.005,
+                      "unit": "CNY",
+                      "basis": "monetary",
+                      "within_tolerance": false,
+                      "absolute_diff": 57323694.82999998,
+                      "relative_diff": 0.11890390258018661
+                    }
+                  }
+                },
+                "created_at": "2026-07-11T08:40:33.153688+00:00",
+                "updated_at": "2026-07-11T08:40:33.153689+00:00"
+              },
+              {
+                "id": 4,
+                "market": "CN",
+                "symbol": "601686",
+                "report_id": 1,
+                "report_year": 2024,
+                "report_type": "annual",
+                "module": "cashflow_quality",
+                "field_name": "operating_cashflow",
+                "provider_name": "operating_cashflow",
+                "provider_value": null,
+                "provider_unit": "CNY",
+                "provider_definition": "operating_cashflow",
+                "provider_period": "2024-12-31",
+                "provider_value_basis": "annual_cumulative",
+                "official_value": 1393832602.16,
+                "official_unit": "CNY",
+                "official_definition": "经营活动产生的现金流量净额",
+                "official_period": "2024-12-31",
+                "official_value_basis": "annual_cumulative",
+                "official_page": 6,
+                "official_chunk_id": null,
+                "official_excerpt": "司股东的扣 除非经常性损益的净利润 320,323,351.78 502,987,355.53 -36.32 218,353,072.12 经营活动产生的现金流量 净额 1,393,832,602.16 419,968,288.74 231.89 776,630,570.63 2024年末 2023年末 本期 末比 上年 同期 末增 减（% ） 2022年末 归属于上市公司股东的净 资产 6,76",
+                "normalized_provider_value": null,
+                "normalized_official_value": 1393832602.16,
+                "absolute_diff": null,
+                "relative_diff": null,
+                "tolerance": 1.0,
+                "fusion_status": "structured_field_missing",
+                "confidence": 0.6,
+                "warnings_json": [
+                  "结构化未找到该字段，但年报明确披露。"
+                ],
+                "source_trace_json": {
+                  "structured": {
+                    "source": "artifact_seed",
+                    "artifact_path": "/Users/kaffy/Documents/TradingAgents/backend/docs/artifacts/company_v2_601686_ai_official_verification_phase6tc2.json",
+                    "field_name": "operating_cashflow"
+                  },
+                  "official": {
+                    "status": "resolved",
+                    "retrieval_mode": "extractor",
+                    "page": 6,
+                    "chunk_id": null,
+                    "excerpt": "司股东的扣 除非经常性损益的净利润 320,323,351.78 502,987,355.53 -36.32 218,353,072.12 经营活动产生的现金流量 净额 1,393,832,602.16 419,968,288.74 231.89 776,630,570.63 2024年末 2023年末 本期 末比 上年 同期 末增 减（% ） 2022年末 归属于上市公司股东的净 资产 6,76",
+                    "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+                  },
+                  "alignment": {
+                    "same_symbol": true,
+                    "same_report": true,
+                    "same_period": true,
+                    "same_definition": true,
+                    "same_value_basis": true,
+                    "unit_convertible": true,
+                    "comparable": true,
+                    "status": "comparable",
+                    "warnings": [],
+                    "structured_period_basis": "annual_cumulative",
+                    "official_period_basis": "annual_cumulative"
+                  },
+                  "normalization": {
+                    "provider": {
+                      "original_value": null,
+                      "original_unit": "CNY",
+                      "normalized_value": null,
+                      "normalized_unit": "CNY",
+                      "conversion_factor": null,
+                      "conversion_trace": null,
+                      "status": "missing",
+                      "warnings": []
+                    },
+                    "official": {
+                      "original_value": 1393832602.16,
+                      "original_unit": "CNY",
+                      "normalized_value": 1393832602.16,
+                      "normalized_unit": "CNY",
+                      "conversion_factor": 1.0,
+                      "conversion_trace": "CNY→CNY",
+                      "status": "normalized",
+                      "warnings": []
+                    },
+                    "tolerance": {
+                      "field_name": "operating_cashflow",
+                      "absolute_tolerance": 1.0,
+                      "relative_tolerance": 0.005,
+                      "unit": "CNY",
+                      "basis": "monetary",
+                      "within_tolerance": false,
+                      "absolute_diff": null,
+                      "relative_diff": null
+                    }
+                  }
+                },
+                "created_at": "2026-07-11T08:40:33.157121+00:00",
+                "updated_at": "2026-07-11T08:40:33.157123+00:00"
+              },
+              {
+                "id": 5,
+                "market": "CN",
+                "symbol": "601686",
+                "report_id": 1,
+                "report_year": 2024,
+                "report_type": "annual",
+                "module": "solvency",
+                "field_name": "total_assets",
+                "provider_name": "total_assets",
+                "provider_value": null,
+                "provider_unit": "CNY",
+                "provider_definition": "total_assets",
+                "provider_period": "2024-12-31",
+                "provider_value_basis": "point_in_time",
+                "official_value": 26001740331.42,
+                "official_unit": "CNY",
+                "official_definition": "总资产",
+                "official_period": "2024-12-31",
+                "official_value_basis": "point_in_time",
+                "official_page": 6,
+                "official_chunk_id": null,
+                "official_excerpt": "属于上市公司股东的净 资产 6,760,918,501.91 6,713,166,252.34 0.71 6,435,045,419.69 总资产 26,001,740,331.42 17,650,144,411.80 47.32 16,780,377,043.20 (二) 主要财务指标 主要财务指标 2024年 2023年 本期比上年同 期增减(%) 2022年 基本每股收益（元／股） 0.30",
+                "normalized_provider_value": null,
+                "normalized_official_value": 26001740331.42,
+                "absolute_diff": null,
+                "relative_diff": null,
+                "tolerance": 1.0,
+                "fusion_status": "structured_field_missing",
+                "confidence": 0.6,
+                "warnings_json": [
+                  "结构化未找到该字段，但年报明确披露。"
+                ],
+                "source_trace_json": {
+                  "structured": {
+                    "source": "artifact_seed",
+                    "artifact_path": "/Users/kaffy/Documents/TradingAgents/backend/docs/artifacts/company_v2_601686_ai_official_verification_phase6tc2.json",
+                    "field_name": "total_assets"
+                  },
+                  "official": {
+                    "status": "resolved",
+                    "retrieval_mode": "extractor",
+                    "page": 6,
+                    "chunk_id": null,
+                    "excerpt": "属于上市公司股东的净 资产 6,760,918,501.91 6,713,166,252.34 0.71 6,435,045,419.69 总资产 26,001,740,331.42 17,650,144,411.80 47.32 16,780,377,043.20 (二) 主要财务指标 主要财务指标 2024年 2023年 本期比上年同 期增减(%) 2022年 基本每股收益（元／股） 0.30",
+                    "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+                  },
+                  "alignment": {
+                    "same_symbol": true,
+                    "same_report": true,
+                    "same_period": true,
+                    "same_definition": true,
+                    "same_value_basis": true,
+                    "unit_convertible": true,
+                    "comparable": true,
+                    "status": "comparable",
+                    "warnings": [],
+                    "structured_period_basis": "annual_cumulative",
+                    "official_period_basis": "annual_cumulative"
+                  },
+                  "normalization": {
+                    "provider": {
+                      "original_value": null,
+                      "original_unit": "CNY",
+                      "normalized_value": null,
+                      "normalized_unit": "CNY",
+                      "conversion_factor": null,
+                      "conversion_trace": null,
+                      "status": "missing",
+                      "warnings": []
+                    },
+                    "official": {
+                      "original_value": 26001740331.42,
+                      "original_unit": "CNY",
+                      "normalized_value": 26001740331.42,
+                      "normalized_unit": "CNY",
+                      "conversion_factor": 1.0,
+                      "conversion_trace": "CNY→CNY",
+                      "status": "normalized",
+                      "warnings": []
+                    },
+                    "tolerance": {
+                      "field_name": "total_assets",
+                      "absolute_tolerance": 1.0,
+                      "relative_tolerance": 0.005,
+                      "unit": "CNY",
+                      "basis": "monetary",
+                      "within_tolerance": false,
+                      "absolute_diff": null,
+                      "relative_diff": null
+                    }
+                  }
+                },
+                "created_at": "2026-07-11T08:40:33.160583+00:00",
+                "updated_at": "2026-07-11T08:40:33.160584+00:00"
+              },
+              {
+                "id": 6,
+                "market": "CN",
+                "symbol": "601686",
+                "report_id": 1,
+                "report_year": 2024,
+                "report_type": "annual",
+                "module": "solvency",
+                "field_name": "equity_parent",
+                "provider_name": "equity_parent",
+                "provider_value": null,
+                "provider_unit": "CNY",
+                "provider_definition": "equity_parent",
+                "provider_period": "2024-12-31",
+                "provider_value_basis": "point_in_time",
+                "official_value": 6760918501.91,
+                "official_unit": "CNY",
+                "official_definition": "归属于母公司股东权益",
+                "official_period": "2024-12-31",
+                "official_value_basis": "point_in_time",
+                "official_page": 6,
+                "official_chunk_id": null,
+                "official_excerpt": "88.74 231.89 776,630,570.63 2024年末 2023年末 本期 末比 上年 同期 末增 减（% ） 2022年末 归属于上市公司股东的净 资产 6,760,918,501.91 6,713,166,252.34 0.71 6,435,045,419.69 总资产 26,001,740,331.42 17,650,144,411.80 47.32 16,780,377,04",
+                "normalized_provider_value": null,
+                "normalized_official_value": 6760918501.91,
+                "absolute_diff": null,
+                "relative_diff": null,
+                "tolerance": 1.0,
+                "fusion_status": "structured_field_missing",
+                "confidence": 0.6,
+                "warnings_json": [
+                  "结构化未找到该字段，但年报明确披露。"
+                ],
+                "source_trace_json": {
+                  "structured": {
+                    "source": "artifact_seed",
+                    "artifact_path": "/Users/kaffy/Documents/TradingAgents/backend/docs/artifacts/company_v2_601686_ai_official_verification_phase6tc2.json",
+                    "field_name": "equity_parent"
+                  },
+                  "official": {
+                    "status": "resolved",
+                    "retrieval_mode": "extractor",
+                    "page": 6,
+                    "chunk_id": null,
+                    "excerpt": "88.74 231.89 776,630,570.63 2024年末 2023年末 本期 末比 上年 同期 末增 减（% ） 2022年末 归属于上市公司股东的净 资产 6,760,918,501.91 6,713,166,252.34 0.71 6,435,045,419.69 总资产 26,001,740,331.42 17,650,144,411.80 47.32 16,780,377,04",
+                    "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+                  },
+                  "alignment": {
+                    "same_symbol": true,
+                    "same_report": true,
+                    "same_period": true,
+                    "same_definition": true,
+                    "same_value_basis": true,
+                    "unit_convertible": true,
+                    "comparable": true,
+                    "status": "comparable",
+                    "warnings": [],
+                    "structured_period_basis": "annual_cumulative",
+                    "official_period_basis": "annual_cumulative"
+                  },
+                  "normalization": {
+                    "provider": {
+                      "original_value": null,
+                      "original_unit": "CNY",
+                      "normalized_value": null,
+                      "normalized_unit": "CNY",
+                      "conversion_factor": null,
+                      "conversion_trace": null,
+                      "status": "missing",
+                      "warnings": []
+                    },
+                    "official": {
+                      "original_value": 6760918501.91,
+                      "original_unit": "CNY",
+                      "normalized_value": 6760918501.91,
+                      "normalized_unit": "CNY",
+                      "conversion_factor": 1.0,
+                      "conversion_trace": "CNY→CNY",
+                      "status": "normalized",
+                      "warnings": []
+                    },
+                    "tolerance": {
+                      "field_name": "equity_parent",
+                      "absolute_tolerance": 1.0,
+                      "relative_tolerance": 0.005,
+                      "unit": "CNY",
+                      "basis": "monetary",
+                      "within_tolerance": false,
+                      "absolute_diff": null,
+                      "relative_diff": null
+                    }
+                  }
+                },
+                "created_at": "2026-07-11T08:40:33.164021+00:00",
+                "updated_at": "2026-07-11T08:40:33.164023+00:00"
+              },
+              {
+                "id": 7,
+                "market": "CN",
+                "symbol": "601686",
+                "report_id": 1,
+                "report_year": 2024,
+                "report_type": "annual",
+                "module": "profitability",
+                "field_name": "eps_basic",
+                "provider_name": "eps_basic",
+                "provider_value": null,
+                "provider_unit": "CNY/share",
+                "provider_definition": "eps_basic",
+                "provider_period": "2024-12-31",
+                "provider_value_basis": "annual_cumulative",
+                "official_value": 0.3,
+                "official_unit": "CNY/share",
+                "official_definition": "基本每股收益",
+                "official_period": "2024-12-31",
+                "official_value_basis": "annual_cumulative",
+                "official_page": 6,
+                "official_chunk_id": null,
+                "official_excerpt": "2 16,780,377,043.20 (二) 主要财务指标 主要财务指标 2024年 2023年 本期比上年同 期增减(%) 2022年 基本每股收益（元／股） 0.30 0.40 -25.00 0.21 稀释每股收益（元／股） 0.30 0.40 -25.00 0.21 扣除非经常性损益后的基本每股 收益（元／股） 0.23 0.35 -34.29 0.15 加权平均净资产收益率（%） 6.5",
+                "normalized_provider_value": null,
+                "normalized_official_value": 0.3,
+                "absolute_diff": null,
+                "relative_diff": null,
+                "tolerance": 0.01,
+                "fusion_status": "structured_field_missing",
+                "confidence": 0.6,
+                "warnings_json": [
+                  "结构化未找到该字段，但年报明确披露。"
+                ],
+                "source_trace_json": {
+                  "structured": {
+                    "source": "artifact_seed",
+                    "artifact_path": "/Users/kaffy/Documents/TradingAgents/backend/docs/artifacts/company_v2_601686_ai_official_verification_phase6tc2.json",
+                    "field_name": "eps_basic"
+                  },
+                  "official": {
+                    "status": "resolved",
+                    "retrieval_mode": "extractor",
+                    "page": 6,
+                    "chunk_id": null,
+                    "excerpt": "2 16,780,377,043.20 (二) 主要财务指标 主要财务指标 2024年 2023年 本期比上年同 期增减(%) 2022年 基本每股收益（元／股） 0.30 0.40 -25.00 0.21 稀释每股收益（元／股） 0.30 0.40 -25.00 0.21 扣除非经常性损益后的基本每股 收益（元／股） 0.23 0.35 -34.29 0.15 加权平均净资产收益率（%） 6.5",
+                    "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+                  },
+                  "alignment": {
+                    "same_symbol": true,
+                    "same_report": true,
+                    "same_period": true,
+                    "same_definition": true,
+                    "same_value_basis": true,
+                    "unit_convertible": true,
+                    "comparable": true,
+                    "status": "comparable",
+                    "warnings": [],
+                    "structured_period_basis": "annual_cumulative",
+                    "official_period_basis": "annual_cumulative"
+                  },
+                  "normalization": {
+                    "provider": {
+                      "original_value": null,
+                      "original_unit": "CNY/share",
+                      "normalized_value": null,
+                      "normalized_unit": "CNY/share",
+                      "conversion_factor": null,
+                      "conversion_trace": null,
+                      "status": "missing",
+                      "warnings": []
+                    },
+                    "official": {
+                      "original_value": 0.3,
+                      "original_unit": "CNY/share",
+                      "normalized_value": 0.3,
+                      "normalized_unit": "CNY/share",
+                      "conversion_factor": 1.0,
+                      "conversion_trace": "CNY/share→CNY/share",
+                      "status": "normalized",
+                      "warnings": []
+                    },
+                    "tolerance": {
+                      "field_name": "eps_basic",
+                      "absolute_tolerance": 0.01,
+                      "relative_tolerance": 0.005,
+                      "unit": "CNY/share",
+                      "basis": "eps",
+                      "within_tolerance": false,
+                      "absolute_diff": null,
+                      "relative_diff": null
+                    }
+                  }
+                },
+                "created_at": "2026-07-11T08:40:33.167469+00:00",
+                "updated_at": "2026-07-11T08:40:33.167470+00:00"
+              },
+              {
+                "id": 8,
+                "market": "CN",
+                "symbol": "601686",
+                "report_id": 1,
+                "report_year": 2024,
+                "report_type": "annual",
+                "module": "profitability",
+                "field_name": "roe_weighted",
+                "provider_name": "roeAvg",
+                "provider_value": 0.063051,
+                "provider_unit": "%",
+                "provider_definition": "roe",
+                "provider_period": "2024-12-31",
+                "provider_value_basis": "annual_cumulative",
+                "official_value": 0.0654,
+                "official_unit": "%",
+                "official_definition": "加权平均净资产收益率",
+                "official_period": "2024-12-31",
+                "official_value_basis": "annual_cumulative",
+                "official_page": 6,
+                "official_chunk_id": null,
+                "official_excerpt": "股） 0.30 0.40 -25.00 0.21 扣除非经常性损益后的基本每股 收益（元／股） 0.23 0.35 -34.29 0.15 加权平均净资产收益率（%） 6.54 8.83 -2.29 4.75 扣除非经常性损益后的加权平均 净资产收益率（%） 4.93 7.79 -2.86 3.49",
+                "normalized_provider_value": 0.063051,
+                "normalized_official_value": 0.0654,
+                "absolute_diff": 0.002349000000000004,
+                "relative_diff": 0.03591743119266061,
+                "tolerance": 0.0005,
+                "fusion_status": "definition_mismatch",
+                "confidence": 0.85,
+                "warnings_json": [
+                  "结构化值为6.3051%（0.063051），年报披露为6.54%，差异约3.59%。",
+                  "definition mismatch between structured and official evidence"
+                ],
+                "source_trace_json": {
+                  "structured": {
+                    "source": "artifact_seed",
+                    "artifact_path": "/Users/kaffy/Documents/TradingAgents/backend/docs/artifacts/company_v2_601686_ai_official_verification_phase6tc2.json",
+                    "field_name": "roe_weighted"
+                  },
+                  "official": {
+                    "status": "resolved",
+                    "retrieval_mode": "extractor",
+                    "page": 6,
+                    "chunk_id": null,
+                    "excerpt": "股） 0.30 0.40 -25.00 0.21 扣除非经常性损益后的基本每股 收益（元／股） 0.23 0.35 -34.29 0.15 加权平均净资产收益率（%） 6.54 8.83 -2.29 4.75 扣除非经常性损益后的加权平均 净资产收益率（%） 4.93 7.79 -2.86 3.49",
+                    "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+                  },
+                  "alignment": {
+                    "same_symbol": true,
+                    "same_report": true,
+                    "same_period": true,
+                    "same_definition": false,
+                    "same_value_basis": true,
+                    "unit_convertible": true,
+                    "comparable": false,
+                    "status": "definition_mismatch",
+                    "warnings": [],
+                    "structured_period_basis": "annual_cumulative",
+                    "official_period_basis": "annual_cumulative"
+                  },
+                  "normalization": {
+                    "provider": {
+                      "original_value": 0.063051,
+                      "original_unit": "%",
+                      "normalized_value": 0.063051,
+                      "normalized_unit": "%",
+                      "conversion_factor": 1.0,
+                      "conversion_trace": "%→%",
+                      "status": "normalized",
+                      "warnings": []
+                    },
+                    "official": {
+                      "original_value": 0.0654,
+                      "original_unit": "%",
+                      "normalized_value": 0.0654,
+                      "normalized_unit": "%",
+                      "conversion_factor": 1.0,
+                      "conversion_trace": "%→%",
+                      "status": "normalized",
+                      "warnings": []
+                    },
+                    "tolerance": {
+                      "field_name": "roe_weighted",
+                      "absolute_tolerance": 0.0005,
+                      "relative_tolerance": 0.005,
+                      "unit": "%",
+                      "basis": "percentage",
+                      "within_tolerance": false,
+                      "absolute_diff": 0.002349000000000004,
+                      "relative_diff": 0.03591743119266061
+                    }
+                  }
+                },
+                "created_at": "2026-07-11T08:40:33.170945+00:00",
+                "updated_at": "2026-07-11T08:40:33.170947+00:00"
+              },
+              {
+                "id": 9,
+                "market": "CN",
+                "symbol": "601686",
+                "report_id": 1,
+                "report_year": 2024,
+                "report_type": "annual",
+                "module": "solvency",
+                "field_name": "total_share",
+                "provider_name": "totalShare",
+                "provider_value": 1432942234.0,
+                "provider_unit": "shares",
+                "provider_definition": "total_share",
+                "provider_period": "2024-12-31",
+                "provider_value_basis": "point_in_time",
+                "official_value": 1432296037.0,
+                "official_unit": "股",
+                "official_definition": "总股本",
+                "official_period": "2024-12-12",
+                "official_value_basis": "point_in_time",
+                "official_page": 54,
+                "official_chunk_id": null,
+                "official_excerpt": "三季度利润分配方案为：公司拟向全体股东每股派发现金红利 0.15 元（含税），\n不进行资本公积金转增股本，不送红股。截至 2024 年 12 月 12 日，公司总股本 1,432,296,037\n股（其中公司回购账户 54,330,853 股不参与利润分配），以此计算合计拟派发现金红利\n206,694,777.60 元（含税）。\n本次利润分配方案已经公司第五届董事会第十四次会议和2024 年第六次临时股东大会审议\n通。方案的制定综合考虑了公司目前经营盈利状况，兼顾了公司股东",
+                "normalized_provider_value": 1432942234.0,
+                "normalized_official_value": 1432296037.0,
+                "absolute_diff": 646197.0,
+                "relative_diff": 0.0004509581647238963,
+                "tolerance": 1.0,
+                "fusion_status": "period_basis_mismatch",
+                "confidence": 0.3,
+                "warnings_json": [
+                  "period mismatch between structured and official evidence",
+                  "年报未直接提供2024-12-31总股本，证据中仅有2024-12-12的总股本1,432,296,037股，无法确认期末准确数值，需人工核实。",
+                  "period mismatch: provider=2024-12-31 official=2024-12-12"
+                ],
+                "source_trace_json": {
+                  "structured": {
+                    "source": "artifact_seed",
+                    "artifact_path": "/Users/kaffy/Documents/TradingAgents/backend/docs/artifacts/company_v2_601686_ai_official_verification_phase6tc2.json",
+                    "field_name": "total_share"
+                  },
+                  "official": {
+                    "status": "resolved",
+                    "retrieval_mode": "keyword",
+                    "page": 54,
+                    "chunk_id": null,
+                    "excerpt": "三季度利润分配方案为：公司拟向全体股东每股派发现金红利 0.15 元（含税），\n不进行资本公积金转增股本，不送红股。截至 2024 年 12 月 12 日，公司总股本 1,432,296,037\n股（其中公司回购账户 54,330,853 股不参与利润分配），以此计算合计拟派发现金红利\n206,694,777.60 元（含税）。\n本次利润分配方案已经公司第五届董事会第十四次会议和2024 年第六次临时股东大会审议\n通。方案的制定综合考虑了公司目前经营盈利状况，兼顾了公司股东",
+                    "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+                  },
+                  "alignment": {
+                    "same_symbol": true,
+                    "same_report": true,
+                    "same_period": false,
+                    "same_definition": true,
+                    "same_value_basis": true,
+                    "unit_convertible": true,
+                    "comparable": false,
+                    "status": "period_basis_mismatch",
+                    "warnings": [
+                      "period mismatch between structured and official evidence"
+                    ],
+                    "structured_period_basis": "point_in_time",
+                    "official_period_basis": "point_in_time"
+                  },
+                  "normalization": {
+                    "provider": {
+                      "original_value": 1432942234.0,
+                      "original_unit": "shares",
+                      "normalized_value": 1432942234.0,
+                      "normalized_unit": "shares",
+                      "conversion_factor": 1.0,
+                      "conversion_trace": "shares→shares",
+                      "status": "normalized",
+                      "warnings": []
+                    },
+                    "official": {
+                      "original_value": 1432296037.0,
+                      "original_unit": "股",
+                      "normalized_value": 1432296037.0,
+                      "normalized_unit": "shares",
+                      "conversion_factor": 1.0,
+                      "conversion_trace": "股→shares",
+                      "status": "normalized",
+                      "warnings": []
+                    },
+                    "tolerance": {
+                      "field_name": "total_share",
+                      "absolute_tolerance": 1.0,
+                      "relative_tolerance": 0.001,
+                      "unit": "shares",
+                      "basis": "share_count",
+                      "within_tolerance": true,
+                      "absolute_diff": 646197.0,
+                      "relative_diff": 0.0004509581647238963
+                    }
+                  }
+                },
+                "created_at": "2026-07-11T08:40:33.175176+00:00",
+                "updated_at": "2026-07-11T08:40:33.175177+00:00"
+              },
+              {
+                "id": 10,
+                "market": "CN",
+                "symbol": "601686",
+                "report_id": 1,
+                "report_year": 2024,
+                "report_type": "annual",
+                "module": "solvency",
+                "field_name": "float_share",
+                "provider_name": "liqaShare",
+                "provider_value": 1432942234.0,
+                "provider_unit": "shares",
+                "provider_definition": "float_share",
+                "provider_period": "2024-12-31",
+                "provider_value_basis": "point_in_time",
+                "official_value": null,
+                "official_unit": null,
+                "official_definition": "流通股本",
+                "official_period": null,
+                "official_value_basis": "point_in_time",
+                "official_page": null,
+                "official_chunk_id": null,
+                "official_excerpt": null,
+                "normalized_provider_value": 1432942234.0,
+                "normalized_official_value": null,
+                "absolute_diff": null,
+                "relative_diff": null,
+                "tolerance": 1.0,
+                "fusion_status": "insufficient_evidence",
+                "confidence": 0.0,
+                "warnings_json": [
+                  "period mismatch between structured and official evidence",
+                  "unit not safely convertible",
+                  "未在年报摘要中找到流通股数相关证据，无法校核。",
+                  "official field not found in selected report",
+                  "official evidence not sufficient"
+                ],
+                "source_trace_json": {
+                  "structured": {
+                    "source": "artifact_seed",
+                    "artifact_path": "/Users/kaffy/Documents/TradingAgents/backend/docs/artifacts/company_v2_601686_ai_official_verification_phase6tc2.json",
+                    "field_name": "float_share"
+                  },
+                  "official": {
+                    "status": "insufficient_evidence",
+                    "retrieval_mode": "keyword",
+                    "page": null,
+                    "chunk_id": null,
+                    "excerpt": null,
+                    "source_url": null
+                  },
+                  "alignment": {
+                    "same_symbol": true,
+                    "same_report": true,
+                    "same_period": false,
+                    "same_definition": true,
+                    "same_value_basis": true,
+                    "unit_convertible": false,
+                    "comparable": false,
+                    "status": "period_basis_mismatch",
+                    "warnings": [
+                      "period mismatch between structured and official evidence",
+                      "unit not safely convertible"
+                    ],
+                    "structured_period_basis": "point_in_time",
+                    "official_period_basis": "point_in_time"
+                  },
+                  "normalization": {
+                    "provider": {
+                      "original_value": 1432942234.0,
+                      "original_unit": "shares",
+                      "normalized_value": 1432942234.0,
+                      "normalized_unit": "shares",
+                      "conversion_factor": 1.0,
+                      "conversion_trace": "shares→shares",
+                      "status": "normalized",
+                      "warnings": []
+                    },
+                    "official": {
+                      "original_value": null,
+                      "original_unit": null,
+                      "normalized_value": null,
+                      "normalized_unit": "shares",
+                      "conversion_factor": null,
+                      "conversion_trace": null,
+                      "status": "missing",
+                      "warnings": []
+                    },
+                    "tolerance": {
+                      "field_name": "float_share",
+                      "absolute_tolerance": 1.0,
+                      "relative_tolerance": 0.001,
+                      "unit": "shares",
+                      "basis": "share_count",
+                      "within_tolerance": false,
+                      "absolute_diff": null,
+                      "relative_diff": null
+                    }
+                  }
+                },
+                "created_at": "2026-07-11T08:40:33.181519+00:00",
+                "updated_at": "2026-07-11T08:40:33.181521+00:00"
+              }
+            ],
+            "generated_at": "2026-07-11T08:40:33.181528+00:00",
+            "refreshed": false,
+            "source_mode": "artifact_seed",
+            "cache_hit": false,
+            "cache_key_version": "v1",
+            "computed_at": "2026-07-11T08:40:33.181805+00:00",
+            "expires_at": "2026-07-12T08:40:33.181805+00:00",
+            "stale_reason": null,
+            "cache_context": {
+              "cache_key": "v1:8112a383efe8a3894fbf53cd94248ef0e741a8f7dcfaf0879e11cc1099a2d14b",
+              "structured_data_version": "4f8c4deca184",
+              "embedding_version": "company-v2-hash-keyword-v1",
+              "field_definition_registry_version": "v1",
+              "tolerance_version": "v1"
+            },
+            "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF",
+            "pdf_hash": "e6a216071c389d92363f1f7caf5b2ef0573312d46808d9ce7e5239c94aa18ac6",
+            "parse_version": "parsed",
+            "idempotency_key": "rollout:601686:1:601686",
+            "rollout": {
+              "enabled": true,
+              "eligible": true,
+              "reason": "ALLOWLIST",
+              "rollout_bucket": 21,
+              "rollout_percent": 0,
+              "auto_run": false,
+              "report_ready": true,
+              "rag_ready": true,
+              "structured_ready": true,
+              "supported_fields": [
+                "revenue",
+                "net_profit",
+                "net_profit_parent",
+                "operating_cashflow",
+                "total_assets",
+                "equity_parent",
+                "eps_basic",
+                "roe_weighted",
+                "total_share",
+                "float_share"
+              ],
+              "cached": false,
+              "last_run_at": null,
+              "force_enabled": false
+            },
+            "eligible": true,
+            "reason": "ALLOWLIST"
+          },
+          "computed_at": "2026-07-11T08:40:33.181805+00:00",
+          "expires_at": "2026-07-12T08:40:33.181805+00:00",
+          "stale_reason": null
+        }
+      ],
+      "metrics": {
+        "fusion_requests_total": 1,
+        "fusion_eligible_total": 1,
+        "fusion_cache_hits_total": 1,
+        "fusion_success_total": 1,
+        "fusion_fields_total": 10,
+        "fusion_verified_total": 1,
+        "fusion_normalized_match_total": 0,
+        "fusion_definition_mismatch_total": 3,
+        "fusion_period_basis_mismatch_total": 1,
+        "fusion_unit_mismatch_total": 0,
+        "fusion_value_conflict_total": 0,
+        "fusion_structured_missing_total": 4,
+        "fusion_official_missing_total": 0,
+        "fusion_insufficient_evidence_total": 1,
+        "latencies": {
+          "fusion_latency_ms": [
+            0.0
+          ]
+        },
+        "p50_latency_ms": 0.0,
+        "p95_latency_ms": 0.0,
+        "cache_hit_ratio": 1.0,
+        "fields_per_request": 10.0
+      },
+      "review_queue_size": 0,
+      "circuit": {
+        "state": "closed",
+        "reason": null,
+        "updated_at": "2026-07-11T08:40:32.776608+00:00",
+        "last_smoke_passed_at": "2026-07-11T08:40:32.776613+00:00"
+      }
+    }
+  ],
+  "summary": {
+    "symbols_total": 5,
+    "reports_total": 1,
+    "fields_total": 20,
+    "verified": 1,
+    "normalized_match": 0,
+    "definition_mismatch": 3,
+    "period_basis_mismatch": 1,
+    "structured_missing": 4,
+    "official_missing": 0,
+    "insufficient_evidence": 1,
+    "value_conflict": 0,
+    "false_conflict": 0,
+    "cross_report_leakage": 0,
+    "missing_citation": 0,
+    "incomplete_source_trace": 0,
+    "timeout_rate": 0.0,
+    "cache_hit_rate": 1.0,
+    "p50_latency_ms": 0.0,
+    "p95_latency_ms": 0.0,
+    "circuit_state": "closed",
+    "review_queue_size": 0
+  }
+}

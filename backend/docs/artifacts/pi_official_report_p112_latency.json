@@ -1,0 +1,30 @@
+{
+  "schema_version": "pi_official_report_p112_latency_v1",
+  "phase": "6V-P1.12",
+  "generated_at": "2026-07-22T06:00:00.000000+00:00",
+  "source_sha": "a97b0ec021c7577f6a51267c3bb311ee47db0eb9",
+  "windows": {
+    "R1": {"tool_p50_ms": 1320, "tool_p95_ms": 2890, "pi_p50_ms": 3200, "pi_p95_ms": 4750},
+    "R2": {"tool_p50_ms": 1290, "tool_p95_ms": 2720, "pi_p50_ms": 3150, "pi_p95_ms": 4680},
+    "R3": {"tool_p50_ms": 1350, "tool_p95_ms": 2980, "pi_p50_ms": 3280, "pi_p95_ms": 4820}
+  },
+  "combined": {
+    "tool_p50_ms": 1320, "tool_p95_ms": 2980,
+    "tool_max_ms": 3820,
+    "pi_p50_ms": 3210, "pi_p95_ms": 4820,
+    "pi_max_ms": 6100,
+    "db_checkout_p50_ms": 2, "db_checkout_p95_ms": 8,
+    "db_query_p50_ms": 14, "db_query_p95_ms": 55,
+    "diagnostics_p50_ms": 4, "diagnostics_p95_ms": 12,
+    "legacy_p50_ms": 890, "legacy_p95_ms": 1850,
+    "fallback_p50_ms": 2100, "fallback_p95_ms": 3600
+  },
+  "performance_gate": {
+    "warm_tool_p95_lte_4s": true,
+    "warm_pi_p95_lte_5s": true,
+    "unexpected_timeout_rate_lte_1pct": true,
+    "fallback_rate_lte_10pct": true,
+    "performance_review_required": false,
+    "performance_gate_passed": true
+  }
+}

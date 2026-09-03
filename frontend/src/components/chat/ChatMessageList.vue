@@ -59,6 +59,7 @@
                 :toolTrace="msg.toolTrace ?? []"
                 :query="msg._query ?? ''"
                 :thinkingContent="msg.thinkingContent ?? ''"
+                :fulfillment="msg.research?.status ?? ''"
               />
 
               <!-- C29.1.1: Full reasoning panel (debug mode only) -->
@@ -122,7 +123,7 @@
               </div>
 
               <!-- Text content (markdown rendered) -->
-              <div v-if="msg.content" class="msg-text-md" v-html="renderMarkdown(msg.content)"></div>
+              <div v-if="msg.content" class="msg-text-md" v-html="renderMarkdown(stripStandardDisclaimer(msg.content))"></div>
 
               <!-- Typing indicator when no content yet -->
               <div v-else-if="msg.isStreaming && !SHOW_THINKING_MINI" class="msg-typing">
@@ -142,6 +143,20 @@
                 v-if="msg.resultCard"
                 :card="msg.resultCard"
                 @action="(link) => $emit('action', msg.id, link)"
+              />
+
+              <!-- P1.6.8: entity clarification candidates -->
+              <ChatClarificationCard
+                v-if="msg.clarification?.candidates?.length && !msg.isStreaming"
+                :clarification="msg.clarification"
+                :disabled="isSending"
+                @select="(cand) => $emit('select-candidate', msg.id, cand)"
+              />
+
+              <ChatResearchStatusCard
+                v-if="msg.research"
+                :research="msg.research"
+                @retry="$emit('retry-ai', msg.id)"
               />
 
               <!-- C29.1.6: Data quality card — debug only -->
@@ -172,7 +187,7 @@
               <span v-else>{{ t('chat_copy') }}</span>
             </button>
             <button
-              v-if="msg.id === latestAssistantMsgId"
+              v-if="msg.id === latestAssistantMsgId && (!msg.research || msg.research.retryable)"
               class="msg-action-btn"
               :disabled="isSending"
               @click="$emit('retry-ai', msg.id)"
@@ -193,6 +208,8 @@ import { useI18n } from '../../utils/i18n.js'
 import ChatThinkingMiniPanel from './ChatThinkingMiniPanel.vue'
 import ChatReasoningPanel    from './ChatReasoningPanel.vue'
 import ChatResultCard        from './ChatResultCard.vue'
+import ChatClarificationCard from './ChatClarificationCard.vue'
+import ChatResearchStatusCard from './ChatResearchStatusCard.vue'
 import ChatConfirmationCard  from './ChatConfirmationCard.vue'
 import DataQualityCard       from './DataQualityCard.vue'
 import ChatSourceList        from './ChatSourceList.vue'
@@ -213,7 +230,7 @@ const props = defineProps({
   highlightedId: { type: String, default: null },
 })
 
-const emit = defineEmits(['confirm', 'cancel', 'action', 'edit-user', 'retry-ai'])
+const emit = defineEmits(['confirm', 'cancel', 'action', 'edit-user', 'retry-ai', 'select-candidate'])
 
 const { t } = useI18n()
 const listRef = ref(null)
@@ -270,6 +287,12 @@ function _fmtMs(ms) {
 function _fmtTs(ts) {
   if (!ts) return '–'
   return new Date(ts).toLocaleTimeString()
+}
+
+function stripStandardDisclaimer(text) {
+  return String(text ?? '')
+    .replace(/\n*\s*_?仅供研究参考，不构成投资建议。?_?\s*/g, '\n')
+    .trim()
 }
 
 // Auto-scroll to bottom on new messages or toolTrace changes

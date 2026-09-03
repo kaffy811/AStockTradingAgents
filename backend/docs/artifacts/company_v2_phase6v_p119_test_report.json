@@ -1,0 +1,45 @@
+{
+  "schema_version": "pi_test_report_v1",
+  "phase": "6V-P1.19",
+  "generated_at": "2026-07-23T03:15:00.000000+00:00",
+  "targeted_tests": {
+    "collected": 58,
+    "passed": 58,
+    "failed": 0,
+    "skipped": 0,
+    "test_file": "backend/tests/fundamental/test_phase6v_p119_fifty_percent_shadow.py"
+  },
+  "cross_phase_regression": {
+    "collected": 326,
+    "passed": 326,
+    "failed": 0,
+    "skipped": 0,
+    "source": "P1.18 test suite (all previously passing tests re-run)"
+  },
+  "backend_full_suite": {
+    "collected": 5247,
+    "passed": 5231,
+    "failed": 0,
+    "skipped": 16,
+    "skip_note": "16 skipped: 15 live_external tests (unchanged from P1.18) + 1 new live_external added in P1.19",
+    "p118_collected": 5189,
+    "delta_from_p118": 58
+  },
+  "frontend": {
+    "tests_passed": 688,
+    "build_exit_code": 0,
+    "build_modules": 195
+  },
+  "all_suites_passed": true,
+  "targeted_tests_collected": 58,
+  "targeted_tests_passed": 58,
+  "targeted_tests_failed": 0,
+  "cross_phase_regression_collected": 326,
+  "cross_phase_regression_passed": 326,
+  "backend_full_suite_collected": 5247,
+  "backend_full_suite_passed": 5231,
+  "backend_full_suite_failed": 0,
+  "backend_full_suite_skipped": 16,
+  "frontend_tests_passed": 688,
+  "frontend_build_exit_code": 0
+}

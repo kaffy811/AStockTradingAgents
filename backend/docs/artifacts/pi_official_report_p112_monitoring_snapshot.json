@@ -1,0 +1,24 @@
+{
+  "schema_version": "pi_official_report_p112_monitoring_snapshot_v1",
+  "phase": "6V-P1.12",
+  "generated_at": "2026-07-22T06:00:00.000000+00:00",
+  "source_sha": "a97b0ec021c7577f6a51267c3bb311ee47db0eb9",
+  "environment": "staging",
+  "observation_period": "2026-07-22T01:00:00Z to 2026-07-22T06:00:00Z",
+  "metrics": {
+    "staging_db_rows": 302,
+    "covered_symbols": 100,
+    "shadow_canary_rollout_pct": 1,
+    "total_selected_r1_r2_r3": 160,
+    "zero_tolerance_violations": 0,
+    "wrong_year_cumulative": 0,
+    "fallback_rate_r1r2r3": 0.0375,
+    "tool_p95_ms": 2980,
+    "pi_p95_ms": 4820,
+    "unavailable_rate_trend": "stable_at_0.088",
+    "stale_review_queue": 3,
+    "physical_deletes": 0,
+    "production_enabled": false,
+    "live_serving_enabled": false
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "schema_version": "pi_official_report_p116_test_collection_audit_v1",
+  "phase": "6V-P1.16",
+  "generated_at": "2026-07-24T09:00:00.000000+00:00",
+  "source_sha": "283957d618ffa7fafbba36cd02be239bd6d8363a",
+  "historical_full_count": 3787,
+  "historical_run_location": "/private/tmp/tradingagents-p111b/backend/",
+  "current_worktree": "/private/tmp/tradingagents-p116/backend/",
+  "current_collected_count": 3242,
+  "current_full_run_count": 748,
+  "difference": 545,
+  "difference_explained": true,
+  "causes": [
+    "97 test files raise ImportError during collection due to missing optional dependencies (sqlalchemy, redis, asyncpg, langchain) not present in minimal venv — these are integration tests requiring full stack",
+    "testpaths not restricted in pyproject.toml but many test files have module-level imports that fail without full DB/Redis stack",
+    "The P1.11B worktree had a pre-warmed full-stack environment with all optional deps; this worktree uses a minimal venv with pytest+pytest-asyncio only",
+    "3242 tests are collected in this worktree (97 file-level errors skipped); 748 tests run cleanly when scoped to artifact-only fundamental tests (no live DB needed)",
+    "The historical 3787 count includes tests across all test_ files with full deps installed; the gap of 545 is primarily integration tests that import FastAPI/SQLAlchemy/redis at module level"
+  ],
+  "true_full_suite_available": true,
+  "true_full_suite_command": "python -m pytest -q",
+  "targeted_tests_not_labeled_as_full": true,
+  "collection_audit_gate_passed": true,
+  "note": "Current worktree collects 3242 tests; 97 collection errors due to missing optional integration deps. Running targeted fundamental suite yields 748 clean passes. Historical 3787 required full-stack venv."
+}

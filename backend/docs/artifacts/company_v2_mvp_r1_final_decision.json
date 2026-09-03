@@ -1,0 +1,60 @@
+{
+  "schema_version": "pi_canary_final_decision_v3",
+  "phase": "MVP-R1",
+  "generated_at": "2026-07-26T07:00:00Z",
+  "phase_label": "Invite-Only MVP Launch — State B (Real Provider NOT_EXECUTED)",
+
+  "decision": "INVITE_ONLY_LEGACY_MVP_READY",
+
+  "p0_blockers_resolved": [
+    "P0-1: ProviderControlPlane wires all 8 gate checks — RESOLVED",
+    "P0-2: PricingRegistry CNY prices corrected (official CNY, no FX) — RESOLVED"
+  ],
+
+  "p133_partial_gates_resolved": [
+    "Gate C: now 8/8 checks in formal call path — PASS",
+    "Gate G: official CNY prices, no FX conversion — PASS"
+  ],
+
+  "real_provider_validation_passed": false,
+  "real_provider_executed": false,
+  "real_provider_calls": 0,
+  "real_provider_cost_cny": "0",
+  "real_provider_cost_usd": 0.0,
+
+  "invite_only_legacy_mvp": "READY",
+  "real_provider_feature_visible": false,
+  "public_production_authorized": false,
+
+  "gate_summary": {
+    "l_gates_pass": 14,
+    "l_gates_fail": 0,
+    "rp1": "PASS",
+    "rp2": "NOT_EXECUTED",
+    "rp3": "NOT_EXECUTED",
+    "rp4": "NOT_EXECUTED",
+    "rp5": "NOT_EXECUTED",
+    "rp6": "PASS"
+  },
+
+  "runtime_final": {
+    "config_version": 12,
+    "provider_mode": "staging_replay",
+    "shadow_rollout_percent": 100,
+    "live_rollout_percent": 1,
+    "real_provider_enabled": false,
+    "real_provider_kill_switch": true,
+    "production_enabled": false
+  },
+
+  "invite_users_may_be_added": true,
+  "real_ai_provider_may_be_advertised": false,
+  "public_production_authorized_final": false,
+
+  "next_steps": [
+    "Invite 20-50 users",
+    "Monitor for 7 days",
+    "Day-7 Week-1 Review",
+    "Real provider activation (P1.33.5) when credential provisioned"
+  ]
+}

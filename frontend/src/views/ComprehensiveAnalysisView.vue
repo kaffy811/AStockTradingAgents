@@ -151,6 +151,7 @@ import { listIndustries, getIndustryHotStocks } from '../api/industries.js'
 import { addRecentSearch, getRecentSearches } from '../utils/recentSearches.js'
 import { getSettings, SETTINGS_EVENT } from '../utils/settings.js'
 import { useI18n } from '../utils/i18n.js'
+import { useAuthStore } from '../stores/auth.js'
 
 const { t } = useI18n()
 import { getCompareList, buildCompareQuery } from '../utils/compareStorage.js'
@@ -267,10 +268,14 @@ async function loadDashboardData() {
   dashRecentSearches.value = getRecentSearches()
   dashCompareList.value    = getCompareList()
 
+  const authStore = useAuthStore()
+  const isLoggedIn = !!authStore.token
+
+  // reports + watchlist are user-specific and require auth; skip when not logged in
   const [reportsRes, watchlistRes, industriesRes] = await Promise.allSettled([
-    listReports({ limit: 5 }),
-    getWatchlistEnriched(),
-    listIndustries('CN'),
+    isLoggedIn ? listReports({ limit: 5 }) : Promise.resolve(null),
+    isLoggedIn ? getWatchlistEnriched()    : Promise.resolve(null),
+    listIndustries('CN'),  // public endpoint, no auth required
   ])
 
   if (reportsRes.status === 'fulfilled') {

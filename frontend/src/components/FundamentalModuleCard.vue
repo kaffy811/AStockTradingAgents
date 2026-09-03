@@ -16,6 +16,13 @@
             title="导出 CSV"
             @click="onExportCsv"
           >↓</button>
+          <!-- Export Excel button -->
+          <button
+            v-if="!isPlanned && hasExportable"
+            class="fmc-icon-btn"
+            title="导出 Excel"
+            @click="onExportXlsx"
+          >XLS</button>
           <!-- Expand chart button (only when chart data available) -->
           <button
             v-if="!isPlanned && hasChart"
@@ -103,7 +110,7 @@ const props = defineProps({
   defaultExpanded: { type: Boolean, default: true },
 })
 
-const emit = defineEmits(['refresh', 'expand-chart', 'export-csv'])
+const emit = defineEmits(['refresh', 'expand-chart', 'export-csv', 'export-xlsx'])
 
 const moduleKey = computed(() => props.moduleMeta?.key || '')
 const isPlanned = computed(() => props.moduleMeta?.status === 'planned')
@@ -112,7 +119,7 @@ const isLegacy  = computed(() => props.moduleMeta?.status === 'legacy')
 // Source badge from envelope
 const sourceActual = computed(() => props.envelope?.source?.actual || null)
 
-// Check if data has exportable rows (without running full adapter)
+// Check if data has exportable rows (without running full adapter) — for CSV
 const hasRows = computed(() => {
   const d = props.envelope?.data
   if (!d) return false
@@ -126,6 +133,27 @@ const hasRows = computed(() => {
     d.forecast_items?.length ||
     d.items?.length
   )
+})
+
+// Broader check — covers rows AND scalar metrics — for Excel export
+const hasExportable = computed(() => {
+  const d = props.envelope?.data
+  if (!d) return false
+  const hasRowArrays = !!(
+    d.series?.length ||
+    d.records?.length ||
+    d.rankings?.length ||
+    d.periods?.length ||
+    d.top10_float_holders?.length ||
+    d.forecasts?.length ||
+    d.forecast_items?.length ||
+    d.items?.length
+  )
+  // Also exportable if there are scalar fields (metrics)
+  const hasScalars = Object.values(d).some(v =>
+    v !== null && v !== undefined && typeof v !== 'object'
+  )
+  return hasRowArrays || hasScalars
 })
 
 // Check if data has chart content
@@ -153,6 +181,10 @@ function onRefresh() {
 
 function onExportCsv() {
   emit('export-csv', { moduleKey: moduleKey.value, moduleMeta: props.moduleMeta, envelope: props.envelope })
+}
+
+function onExportXlsx() {
+  emit('export-xlsx', { moduleKey: moduleKey.value, moduleMeta: props.moduleMeta, envelope: props.envelope })
 }
 
 function onExpandChart() {

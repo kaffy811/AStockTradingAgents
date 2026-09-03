@@ -1,0 +1,45 @@
+{
+  "schema_version": "pi_official_report_p113_stale_review_v1",
+  "phase": "6V-P1.13",
+  "generated_at": "2026-07-22T18:00:00.000000+00:00",
+  "source_sha": "2f4f42ba4fb98164a2cd01b5e4b38f0026efd20c",
+  "stale_review_records_count": 3,
+  "validation_results": [
+    {
+      "record_id_hash": "hash_sr1",
+      "stale_type": "S5_long_unverified",
+      "wrongly_selected_as_healthy": false,
+      "wrongly_set_as_active_preferred": false,
+      "filtered_from_serving": true,
+      "causes_wrong_url": false,
+      "causes_wrong_year": false,
+      "physically_deleted": false,
+      "result": "correct_stale_review_not_served"
+    },
+    {
+      "record_id_hash": "hash_sr2",
+      "stale_type": "S5_long_unverified",
+      "wrongly_selected_as_healthy": false,
+      "wrongly_set_as_active_preferred": false,
+      "filtered_from_serving": true,
+      "causes_wrong_url": false,
+      "causes_wrong_year": false,
+      "physically_deleted": false,
+      "result": "correct_stale_review_not_served"
+    },
+    {
+      "record_id_hash": "hash_sr3",
+      "stale_type": "S3_provenance_incomplete",
+      "wrongly_selected_as_healthy": false,
+      "wrongly_set_as_active_preferred": false,
+      "filtered_from_serving": true,
+      "causes_wrong_url": false,
+      "causes_wrong_year": false,
+      "physically_deleted": false,
+      "result": "correct_stale_review_not_served"
+    }
+  ],
+  "stale_wrong_selection_count": 0,
+  "shadow_samples_covering_stale_symbols": 14,
+  "stale_review_gate_passed": true
+}

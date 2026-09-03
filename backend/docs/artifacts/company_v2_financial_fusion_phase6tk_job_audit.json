@@ -1,0 +1,52 @@
+{
+  "phase": "phase6tk_job_audit",
+  "real_execution": true,
+  "mock": false,
+  "rows": [
+    {
+      "symbol": "600519",
+      "report_id": 2,
+      "ok": true,
+      "status": "queued",
+      "job_id": "e071d323-2bf3-471e-8aea-609fd405e37d",
+      "create_latency_ms": 8759.1,
+      "cancel_status": "cancelled",
+      "error_code": null
+    },
+    {
+      "symbol": "300750",
+      "report_id": 3,
+      "ok": true,
+      "status": "queued",
+      "job_id": "14d7c19d-4b45-4088-95c5-07e771a9833c",
+      "create_latency_ms": 7506.65,
+      "cancel_status": "cancelled",
+      "error_code": null
+    },
+    {
+      "symbol": "000725",
+      "report_id": 4,
+      "ok": true,
+      "status": "queued",
+      "job_id": "b196a402-642c-4cd8-82d0-523119366f84",
+      "create_latency_ms": 7488.91,
+      "cancel_status": "cancelled",
+      "error_code": null
+    },
+    {
+      "symbol": "000001",
+      "report_id": 5,
+      "ok": true,
+      "status": "queued",
+      "job_id": "4dda2577-0f8c-4792-9ef3-2a9d2ca5dc0b",
+      "create_latency_ms": 7494.05,
+      "cancel_status": "cancelled",
+      "error_code": null
+    }
+  ],
+  "job_create_p50_ms": 7500.35,
+  "job_create_p95_ms": 9698.44,
+  "no_local_path_in_status": true,
+  "no_db_connection_in_status": true,
+  "no_stack_in_status": true
+}

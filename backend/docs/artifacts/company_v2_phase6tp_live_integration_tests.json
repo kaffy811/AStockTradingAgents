@@ -1,0 +1,14 @@
+{
+  "phase": "phase6tp_live_integration_tests",
+  "hermetic": {
+    "status": "passed",
+    "command": "cd backend && .venv/bin/python -m pytest -q -m \"not live_supabase\"",
+    "summary": "3048 passed, 9 deselected"
+  },
+  "live_supabase": {
+    "status": "passed",
+    "command": "cd backend && .venv/bin/python -m pytest -q -m \"live_supabase\"",
+    "summary": "9 passed",
+    "note": "network access was required to reach the configured Supabase pooler"
+  }
+}

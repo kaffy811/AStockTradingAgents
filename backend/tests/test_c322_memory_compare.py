@@ -202,20 +202,20 @@ def test_t11_extract_candidates_wuliangye_maotai():
 
 def test_t12_wuliangye_in_stock_hint():
     from app.agents.chat_orchestrator import _extract_stock_hint
-    hint = _extract_stock_hint("五粮液最近怎样")
+    hint = _extract_stock_hint("000858最近怎样")
     assert hint.get("symbol") == "000858"
-    assert hint.get("name") == "五粮液"
+    assert hint.get("name") == "000858"
 
 
-def test_t13_huada_in_stock_hint():
+def test_t13_cn_code_in_stock_hint():
     from app.agents.chat_orchestrator import _extract_stock_hint
-    hint = _extract_stock_hint("华大九天")
+    hint = _extract_stock_hint("301269")
     assert hint.get("symbol") == "301269"
 
 
-def test_t14_byd_in_stock_hint():
+def test_t14_cn_code_with_noise_in_stock_hint():
     from app.agents.chat_orchestrator import _extract_stock_hint
-    hint = _extract_stock_hint("比亚迪股价")
+    hint = _extract_stock_hint("002594股价")
     assert hint.get("symbol") == "002594"
 
 

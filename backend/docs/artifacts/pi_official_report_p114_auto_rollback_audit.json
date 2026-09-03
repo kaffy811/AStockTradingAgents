@@ -1,0 +1,27 @@
+{
+  "schema_version": "pi_official_report_p114_auto_rollback_audit_v1",
+  "phase": "6V-P1.14",
+  "generated_at": "2026-07-22T22:30:00.000000+00:00",
+  "source_sha": "19130f054ca330f2fa16e8200184af6a8b632ec0",
+  "rollback_config": {
+    "rollback_enabled": true,
+    "rollback_target_percent": 1,
+    "rollback_version": 3,
+    "emergency_rollback_target_percent": 0
+  },
+  "rollback_conditions_tested": [
+    {"condition": "fabricated_url_count_gt_0", "triggered": false, "observed_value": 0},
+    {"condition": "wrong_year_count_gt_0", "triggered": false, "observed_value": 0},
+    {"condition": "pi_business_write_count_gt_0", "triggered": false, "observed_value": 0},
+    {"condition": "raw500_rate_gt_5pct", "triggered": false, "observed_value": "0%"},
+    {"condition": "raw503_rate_gt_5pct", "triggered": false, "observed_value": "0%"},
+    {"condition": "safety_correctness_lt_1", "triggered": false, "observed_value": 1.0},
+    {"condition": "trace_mismatch_gt_0", "triggered": false, "observed_value": 0},
+    {"condition": "stale_wrong_selection_gt_0", "triggered": false, "observed_value": 0}
+  ],
+  "auto_rollback_triggered": false,
+  "current_rollout_percent": 5,
+  "subsequent_success_would_dilute_failure": false,
+  "auto_recover_to_5pct_allowed": false,
+  "audit_passed": true
+}

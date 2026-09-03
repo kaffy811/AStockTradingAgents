@@ -2,7 +2,9 @@
   <div class="app-shell">
     <AppHeader />
 
-    <div class="stock-detail-page">
+    <CompanyV2View v-if="enableCompanyV2FullPage" />
+
+    <div v-else class="stock-detail-page">
       <!-- Back button -->
       <button class="back-btn" @click="goBack">← 返回</button>
 
@@ -137,8 +139,13 @@
 
       <!-- Tab: 公司 -->
       <section v-show="activeDetailTab === 'company'" class="card company-tab-card">
+        <CompanyV2View
+          v-if="companyTabVisited && market && symbol && useCompanyV2Tab && !companyV2TabFailed"
+          :embedded="true"
+          @load-error="onCompanyV2LoadError"
+        />
         <CompanyFundamentalsPanel
-          v-if="companyTabVisited && market && symbol"
+          v-else-if="companyTabVisited && market && symbol"
           :market="market"
           :symbol="symbol"
           :stock-name="stockName"
@@ -212,13 +219,15 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, defineAsyncComponent } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { searchStocks, getStockQuote, getStockNews, getStockProfile } from '../api/stocks.js'
 import { listReports, getReport } from '../api/reports.js'
 import { listWatchlist, addWatchlist, deleteWatchlist } from '../api/watchlist.js'
 import { getStockIndustry, getIndustryHotStocks } from '../api/industries.js'
 import { addRecentSearch } from '../utils/recentSearches.js'
+import { useAuthStore } from '../stores/auth.js'
+import { isAuthError, AUTH_REQUIRED_MESSAGE } from '../utils/apiErrorClassifier.js'
 import {
   getCompareList,
   addCompareStock,
@@ -233,15 +242,25 @@ import NewsTimelinePanel        from '../components/NewsTimelinePanel.vue'
 import DataQualitySummary       from '../components/DataQualitySummary.vue'
 import EmptyState               from '../components/EmptyState.vue'
 import StockDetailResearchPanel from '../components/StockDetailResearchPanel.vue'
-import CompanyFundamentalsPanel from '../components/CompanyFundamentalsPanel.vue'
+import CompanyV2View            from './CompanyV2View.vue'
+const CompanyFundamentalsPanel = defineAsyncComponent({
+  loader: () => import('../components/CompanyFundamentalsPanel.vue'),
+  loadingComponent: { template: '<div class="tab-loading">加载中...</div>' },
+  delay: 200,
+})
 import { buildTechnicalInsightSummary } from '../utils/technicalInsights.js'
 
 const route  = useRoute()
 const router = useRouter()
+const authStore = useAuthStore()
 
 // ── Route params ──────────────────────────────────────────────────────────────
 const market = computed(() => (route.params.market || '').toUpperCase())
 const symbol = computed(() => route.params.symbol || '')
+const companyTabVersion = computed(() => import.meta.env.VITE_COMPANY_TAB_VERSION || (import.meta.env.PROD ? 'legacy' : 'v2'))
+const companyV2Query = computed(() => route.query.company_v2)
+const enableCompanyV2FullPage = computed(() => companyV2Query.value === '1' || (companyV2Query.value !== '0' && import.meta.env.VITE_ENABLE_COMPANY_V2 === 'true'))
+const useCompanyV2Tab = computed(() => companyV2Query.value !== '0' && companyTabVersion.value === 'v2')
 
 // ── Profile (首屏聚合) ────────────────────────────────────────────────────────
 const profile         = ref(null)    // StockProfileResponse | null
@@ -284,6 +303,7 @@ const watchlistLoading = ref(false)
 // ── Detail tab navigation ─────────────────────────────────────────────────────
 const activeDetailTab = ref('insight')
 const companyTabVisited = ref(false)
+const companyV2TabFailed = ref(false)
 
 const detailTabs = [
   { key: 'insight', label: '技术面解读' },
@@ -296,6 +316,10 @@ const detailTabs = [
 function onTabClick(key) {
   activeDetailTab.value = key
   if (key === 'company') companyTabVisited.value = true
+}
+
+function onCompanyV2LoadError() {
+  companyV2TabFailed.value = true
 }
 
 // ── Compare ───────────────────────────────────────────────────────────────────
@@ -498,7 +522,8 @@ async function loadNews() {
     })
     newsItems.value = sorted
   } catch (e) {
-    newsError.value = e.message || '新闻加载失败'
+    // Phase 6N-8A: 401 显示登录提示，不显示"新闻加载失败"式的数据源归因
+    newsError.value = isAuthError(e) ? AUTH_REQUIRED_MESSAGE : (e.message || '新闻加载失败')
   } finally {
     newsLoading.value = false
   }
@@ -590,6 +615,10 @@ async function loadAll() {
   const s = symbol.value
   if (!m || !s) return
 
+  // Phase 6N-8A: profile/news/reports/kline/quote/watchlist 均为受保护接口。
+  // 未登录时跳过整批请求，避免 8 个并发 401 刷屏；登录成功后由 token watch 自动重试。
+  if (!authStore.token) return
+
   _refreshCompareStatus()
   hotStocks.value  = []
   hotLoading.value = false
@@ -660,10 +689,19 @@ function onInsightData(payload) {
 watch(
   () => [route.params.market, route.params.symbol],
   () => {
-    companyTabVisited.value = false
+    companyTabVisited.value = activeDetailTab.value === 'company'
+    companyV2TabFailed.value = false
     loadAll()
   },
   { immediate: true },
+)
+
+// Phase 6N-8A: 登录成功（token 从空到有值）后自动重试当前页面关键请求
+watch(
+  () => authStore.token,
+  (t, old) => {
+    if (t && !old) loadAll()
+  },
 )
 
 // ── Watchlist toggle ──────────────────────────────────────────────────────────

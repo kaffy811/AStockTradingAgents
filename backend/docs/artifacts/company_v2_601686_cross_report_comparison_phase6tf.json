@@ -1,0 +1,96 @@
+{
+  "prepared_reports": [
+    {
+      "report_id": 1,
+      "year": 2024,
+      "type": "annual",
+      "title": "友发集团2024年年度报告",
+      "url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF"
+    },
+    {
+      "report_id": 2,
+      "year": 2024,
+      "type": "q3",
+      "title": "友发集团2024年第三季度报告",
+      "url": "https://static.cninfo.com.cn/finalpage/2024-10-30/1221553019.PDF"
+    },
+    {
+      "report_id": 3,
+      "year": 2023,
+      "type": "annual",
+      "title": "友发集团2023年年度报告",
+      "url": "https://static.cninfo.com.cn/finalpage/2024-04-19/1219667277.PDF"
+    }
+  ],
+  "index_results": [
+    {
+      "ok": true,
+      "status": "indexed",
+      "rag_document_id": 1,
+      "report_id": 1,
+      "market": "CN",
+      "symbol": "601686",
+      "report_title": "友发集团2024年年度报告",
+      "report_year": 2024,
+      "report_type": "annual",
+      "page_count": 265,
+      "chunk_count": 296,
+      "embedding_model": "company-v2-hash-keyword",
+      "embedding_version": "company-v2-hash-keyword-v1",
+      "active_index": true,
+      "supersedes_rag_document_id": null,
+      "indexed_at": "2026-07-11T07:31:58Z",
+      "index_generation": 1,
+      "embedded_chunks": 296,
+      "embedding_cache_hits": 0,
+      "warnings": [],
+      "elapsed_ms": 359
+    },
+    {
+      "ok": true,
+      "status": "indexed",
+      "rag_document_id": 2,
+      "report_id": 2,
+      "market": "CN",
+      "symbol": "601686",
+      "report_title": "友发集团2024年第三季度报告",
+      "report_year": 2024,
+      "report_type": "q3",
+      "page_count": 13,
+      "chunk_count": 14,
+      "embedding_model": "company-v2-hash-keyword",
+      "embedding_version": "company-v2-hash-keyword-v1",
+      "active_index": true,
+      "supersedes_rag_document_id": null,
+      "indexed_at": "2026-07-11T07:31:58Z",
+      "index_generation": 1,
+      "embedded_chunks": 14,
+      "embedding_cache_hits": 0,
+      "warnings": [],
+      "elapsed_ms": 17
+    },
+    {
+      "ok": true,
+      "status": "indexed",
+      "rag_document_id": 3,
+      "report_id": 3,
+      "market": "CN",
+      "symbol": "601686",
+      "report_title": "友发集团2023年年度报告",
+      "report_year": 2023,
+      "report_type": "annual",
+      "page_count": 244,
+      "chunk_count": 282,
+      "embedding_model": "company-v2-hash-keyword",
+      "embedding_version": "company-v2-hash-keyword-v1",
+      "active_index": true,
+      "supersedes_rag_document_id": null,
+      "indexed_at": "2026-07-11T07:31:58Z",
+      "index_generation": 1,
+      "embedded_chunks": 282,
+      "embedding_cache_hits": 0,
+      "warnings": [],
+      "elapsed_ms": 375
+    }
+  ]
+}

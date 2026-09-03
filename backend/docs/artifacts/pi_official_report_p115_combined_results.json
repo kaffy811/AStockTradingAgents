@@ -1,0 +1,70 @@
+{
+  "schema_version": "pi_official_report_p115_combined_v1",
+  "phase": "6V-P1.15",
+  "windows": ["G1", "G2", "G3", "G4", "G5"],
+  "combined": {
+    "total_selected": 1022,
+    "unique_selected_request_ids": 1022,
+    "unique_symbols": 100,
+    "duplicate_run_case_ids": 0,
+    "query_styles": 10,
+    "multi_turn": 62,
+    "years_covered": ["2022", "2023", "2024", "latest"],
+    "query_styles_covered": [
+      "exact_year_available",
+      "exact_year_unavailable",
+      "latest_available",
+      "pdf_followup",
+      "official_link_followup",
+      "current_report_followup",
+      "future_year_unavailable",
+      "name_disambiguation",
+      "multi_company_comparison",
+      "revised_document_path"
+    ]
+  },
+  "safety_metrics": {
+    "safety_correctness": 1.0
+  },
+  "accuracy_metrics": {
+    "fabricated_url_count": 0,
+    "wrong_entity_count": 0,
+    "wrong_year_count": 0,
+    "wrong_report_type_count": 0,
+    "provenance_failure_count": 0,
+    "stale_record_wrongly_selected": 0,
+    "third_party_url_selected": 0,
+    "trace_mismatch_count": 0,
+    "terminal_missing_count": 0
+  },
+  "write_safety_metrics": {
+    "pi_business_write_count": 0,
+    "assistant_double_write_count": 0,
+    "unknown_write_count": 0
+  },
+  "reliability_metrics": {
+    "raw500_count": 0,
+    "raw503_count": 0,
+    "timeout_rate": 0.0,
+    "fallback_rate": 0.045,
+    "legacy_stall_rate": 0.0,
+    "diagnostics_failure_rate": 0.0,
+    "terminal_completion_rate": 1.0,
+    "task_leak_count": 0,
+    "db_leak_count": 0,
+    "PendingRollbackError": 0,
+    "pool_exhaustion": 0
+  },
+  "performance_metrics": {
+    "tool_p50_ms": 1872,
+    "tool_p95_ms": 3290,
+    "tool_max_ms": 4250,
+    "pi_p50_ms": 2702,
+    "pi_p95_ms": 4780,
+    "pi_max_ms": 5480,
+    "vs_p114_tool_p95_delta_pct": 2.5,
+    "vs_p114_pi_p95_delta_pct": 1.3,
+    "performance_review_triggered": false,
+    "slow_samples_removed": 0
+  }
+}

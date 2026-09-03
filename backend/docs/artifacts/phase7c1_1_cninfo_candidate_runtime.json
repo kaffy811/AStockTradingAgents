@@ -1,0 +1,74 @@
+{
+  "phase": "7C1.1",
+  "generated_at": "2026-09-02T09:14:23-04:00",
+  "mode": "configured_database_read_only",
+  "candidate_status": "passed",
+  "application_retry_count": 0,
+  "execution_count_per_query": 1,
+  "provider_call_count": 0,
+  "queries": [
+    {
+      "query": "贵州茅台最近有什么官方公告？",
+      "route": "official_company_events",
+      "fulfillment": "fulfilled",
+      "reason_code": null,
+      "as_of": "2026-07-21T13:52:18.781873+00:00",
+      "event_count": 4,
+      "visible_event_contract_complete": true,
+      "event_types": ["财报/业绩"],
+      "source": "CNINFO",
+      "official_url_present": true,
+      "published_at_present": true
+    },
+    {
+      "query": "贵州茅台最近一期财报披露了什么重点？",
+      "route": "official_report_analysis",
+      "fulfillment": "partial",
+      "reason_code": "REPORT_RAG_EVIDENCE_NOT_RENDERED",
+      "as_of": "2026-07-21T13:52:18.781873+00:00",
+      "event_count": 4,
+      "visible_event_contract_complete": true,
+      "event_types": ["财报/业绩"],
+      "source": "CNINFO",
+      "official_url_present": true,
+      "published_at_present": true,
+      "truthfulness_note": "Official metadata is available; report-body highlights were not rendered by this deterministic route, so fulfillment is partial."
+    },
+    {
+      "query": "贵州茅台近期是否有分红、回购、股东变动或风险公告？",
+      "route": "official_company_events",
+      "fulfillment": "unavailable",
+      "reason_code": "NO_MATCHING_PERSISTED_CNINFO_EVENTS",
+      "as_of": null,
+      "event_count": 0,
+      "substitute_event_count": 0,
+      "truthfulness_note": "Persisted annual reports were not substituted for the requested event types."
+    },
+    {
+      "query": "新能源汽车行业最近有什么重要新闻？",
+      "route": "industry_news",
+      "fulfillment": "unavailable",
+      "reason_code": "NO_APPROVED_INDUSTRY_NEWS_SOURCE",
+      "as_of": null,
+      "event_count": 0,
+      "tool_call_count": 0
+    }
+  ],
+  "automated_tests": {
+    "original_related_regression_passed": 112,
+    "new_truthfulness_test_passed": 1,
+    "total_passed": 113,
+    "failed": 0,
+    "warnings": 16,
+    "warning_scope": "pre_existing_deprecation_and_async_mock_runtime_warnings"
+  },
+  "public_output_checks": {
+    "token_exposed": false,
+    "cookie_exposed": false,
+    "database_connection_string_exposed": false,
+    "database_id_exposed": false,
+    "internal_storage_name_exposed": false,
+    "raw_chunk_id_exposed": false,
+    "unapproved_source_fact_exposed": false
+  }
+}

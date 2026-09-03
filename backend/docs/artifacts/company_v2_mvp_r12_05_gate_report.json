@@ -1,0 +1,25 @@
+{
+  "artifact": "gate_report",
+  "phase": "MVP-R1.2",
+  "date": "2026-07-26",
+  "gates": [
+    {"id": "S1", "name": "Invite Code Hashing — SHA-256 no plaintext stored", "result": "PASS"},
+    {"id": "S2", "name": "POST /auth/register requires invite_code", "result": "PASS"},
+    {"id": "S3", "name": "Atomic register+redeem transaction (SELECT FOR UPDATE)", "result": "PASS"},
+    {"id": "S4", "name": "POST /mvp/invites requires is_admin=True Bearer token", "result": "PASS"},
+    {"id": "S5", "name": "GET /mvp/admin/invites — admin list endpoint", "result": "PASS"},
+    {"id": "S6", "name": "DELETE /mvp/admin/invites/{id} — admin revoke endpoint", "result": "PASS"},
+    {"id": "S7", "name": "POST /auth/login accepts email in username field", "result": "PASS"},
+    {"id": "S8", "name": "is_admin field on User model and app_users table", "result": "PASS"},
+    {"id": "S9", "name": "Migration chain n2o3p4q5r6s7 → o3p4q5r6s7t8 correct", "result": "PASS"},
+    {"id": "S10", "name": "Admin CLI create_admin.py exists and runnable", "result": "PASS"},
+    {"id": "S11", "name": "Admin frontend /admin/invites — AdminInvitesView.vue", "result": "PASS"},
+    {"id": "S12", "name": "P0 open register closed (invite required)", "result": "PASS"}
+  ],
+  "gate_totals": {"PASS": 12, "FAIL": 0, "PARTIAL": 0},
+  "pending_owner_action": {
+    "description": "Apply migrations to Supabase",
+    "command": "cd backend && DATABASE_URL=$SUPABASE_DATABASE_URL alembic upgrade head",
+    "priority": "P0 — must do before re-testing live site"
+  }
+}

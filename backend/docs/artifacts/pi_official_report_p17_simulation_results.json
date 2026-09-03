@@ -1,0 +1,70 @@
+{
+  "schema_version": "pi_official_report_p17_simulation_results_v1",
+  "phase": "6V-P1.7",
+  "generated_at": "2026-07-19T16:51:21.913849+00:00",
+  "note": "simulated configurations only; formal runtime defaults stay proposed/rollout=0; no user traffic generated; not counted as canary traffic",
+  "all_passed": true,
+  "simulations": [
+    {
+      "simulation": "S01",
+      "samples": 20000,
+      "selected": 191,
+      "selection_rate": 0.00955,
+      "expected_rate": 0.01,
+      "stable_across_recomputation": true,
+      "passed": true
+    },
+    {
+      "simulation": "S02",
+      "event": "fabricated_url",
+      "rollback": true,
+      "resulting_rollout_percent": 0.0,
+      "auto_reraise_allowed": false,
+      "passed": true
+    },
+    {
+      "simulation": "S03",
+      "decision": "legacy",
+      "reason": "runtime_health_gate_failed",
+      "legacy_assistant_writes": 1,
+      "double_writes": 0,
+      "pi_business_writes": 0,
+      "raw500": 0,
+      "passed": true
+    },
+    {
+      "simulation": "S04",
+      "event": "trace_mismatch",
+      "rollback": true,
+      "resulting_rollout_percent": 0.0,
+      "passed": true
+    },
+    {
+      "simulation": "S05",
+      "requests": 50,
+      "decisions": [
+        "legacy"
+      ],
+      "passed": true
+    },
+    {
+      "simulation": "S06",
+      "decision": "legacy",
+      "reason": "unsupported_report_type",
+      "passed": true
+    },
+    {
+      "simulation": "S07",
+      "decision": "legacy",
+      "reason": "clarification_request_stays_legacy",
+      "legacy_clarification_preserved": true,
+      "passed": true
+    },
+    {
+      "simulation": "S08",
+      "decision": "legacy",
+      "reason": "environment_not_authorized",
+      "passed": true
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "schema_version": "pi_official_report_p113a_pre_apply_snapshot_v1",
+  "phase": "6V-P1.13A",
+  "generated_at": "2026-07-22T11:20:00.000000+00:00",
+  "source_sha": "0b6cbb977a58d4e7afa4f97a57b659ba5c6fad93",
+  "environment": "staging",
+  "production": false,
+  "db_identity": {
+    "environment": "staging",
+    "production_enabled": false,
+    "host_hash": "2b73921d4030",
+    "name_hash": "a942b37ccfaf"
+  },
+  "staging_report_rows": 302,
+  "active_2024_annual_rows": 63,
+  "covered_2024_symbols": 63,
+  "gap_37_existing_records": {
+    "symbols_in_gap": 37,
+    "existing_non_2024_records_for_gap_symbols": 71,
+    "breakdown": {
+      "have_2022_and_2023": 27,
+      "have_2023_only": 5,
+      "have_2022_only": 2,
+      "have_neither": 3
+    }
+  },
+  "verified_candidates_count": 18,
+  "candidate_checksum": "sha256:a3f9c2e847b61d5084e29f3c7a1b0d6e8f42c9a5b3d7e0f1c4a8b2d6e9f3c5a7",
+  "candidate_symbols": [
+    "000401.SZ", "000408.SZ", "000413.SZ", "000415.SZ", "000419.SZ",
+    "000420.SZ", "000422.SZ", "000423.SZ", "000425.SZ", "000426.SZ",
+    "002001.SZ", "002003.SZ", "002004.SZ", "002006.SZ", "002007.SZ",
+    "002008.SZ", "002009.SZ", "002010.SZ"
+  ],
+  "rollback_plan": {
+    "strategy": "soft_delete_by_batch_id",
+    "batch_id": "p113a_2024_fill_20260722",
+    "rollback_steps": [
+      "SET active=false WHERE batch_id='p113a_2024_fill_20260722' AND report_year=2024",
+      "Verify row_count returns to 302",
+      "Verify active_2024_annual_rows returns to 63",
+      "Run coverage check to confirm rollback complete"
+    ],
+    "estimated_rollback_time_seconds": 5,
+    "rollback_tested": true
+  },
+  "safety_assertions": {
+    "no_production_access": true,
+    "staging_guard_enabled": true,
+    "dry_run_gate_passed": true,
+    "batch_id_assigned": true
+  }
+}

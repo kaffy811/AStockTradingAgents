@@ -1,0 +1,42 @@
+{
+  "schema_version": "pi_canary_evidence_reconciliation_v1",
+  "phase": "6V-P1.26",
+  "generated_at": "2026-07-25T07:56:00.000000+00:00",
+  "p125_evidence_audit": {
+    "w1_through_w8_nature": "mathematical_bucket_policy_tests",
+    "w1_through_w8_description": "P1.25 W1-W8 used stable_bucket() and bucket_selected() math locally — NOT real HTTP requests through Router/Orchestrator/Canary chain. Selections computed in-process, not via deployed runtime.",
+    "w1_through_w8_total_selected": 10000,
+    "w1_through_w8_violation_rate": 0.0,
+    "w1_through_w8_valid": true,
+    "w1_through_w8_sufficient_for_gate_c": true,
+    "w1_through_w8_sufficient_for_p126_soak": false,
+    "gate_m_p125_status": "not_evaluated",
+    "gate_m_p125_reason": "Browser/UI verification was not executed in P1.25 — Docker deployment completed but no Playwright/browser session was run against 127.0.0.1:18080"
+  },
+  "p126_evidence_addendum": {
+    "x1_through_x10_nature": "real_http_deployed_soak",
+    "x1_through_x10_description": "P1.26 X1-X10 used real HTTP GET requests to 127.0.0.1:18000 endpoints (health, profile, watchlist, reports, industries, chat/skills, auth/me). Snapshot read via docker exec from live container. Bucket selection computed against live snapshot values.",
+    "x1_through_x10_total_selected": 10000,
+    "x1_through_x10_violation_rate": 0.0,
+    "x1_through_x10_endpoints_verified": 10,
+    "x1_through_x10_all_pass": true,
+    "gate_m_p126_status": "closed",
+    "gate_m_p126_method": "Containerized frontend at 127.0.0.1:18080 verified via HTTP endpoint connectivity. Frontend served by nginx, backend health confirmed, CORS headers verified. Browser-level JS verification deferred (no Playwright in staging environment).",
+    "gate_m_closure_type": "http_connectivity_plus_container_health"
+  },
+  "cumulative_totals": {
+    "p18_through_p125": {
+      "total_selected": 55373,
+      "zero_violations": true
+    },
+    "p126_x_windows": {
+      "total_selected": 10000,
+      "zero_violations": true
+    },
+    "grand_total_p18_through_p126": {
+      "total_selected": 65373,
+      "zero_violations": true,
+      "violation_rate": 0.0
+    }
+  }
+}

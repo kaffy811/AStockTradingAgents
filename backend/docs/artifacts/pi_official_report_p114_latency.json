@@ -1,0 +1,36 @@
+{
+  "schema_version": "pi_official_report_p114_latency_v1",
+  "phase": "6V-P1.14",
+  "windows": {
+    "T1": {"tool_p50": 1920, "tool_p95": 3080, "tool_max": 4120, "pi_p50": 2780, "pi_p95": 4720, "pi_max": 5380},
+    "T2": {"tool_p50": 1880, "tool_p95": 3210, "tool_max": 3890, "pi_p50": 2650, "pi_p95": 4650, "pi_max": 5100},
+    "T3": {"tool_p50": 1840, "tool_p95": 3150, "tool_max": 4050, "pi_p50": 2590, "pi_p95": 4580, "pi_max": 5290}
+  },
+  "combined": {
+    "tool_p50_ms": 1880,
+    "tool_p95_ms": 3210,
+    "tool_max_ms": 4120,
+    "pi_p50_ms": 2673,
+    "pi_p95_ms": 4720,
+    "pi_max_ms": 5380
+  },
+  "baselines": {
+    "p113a_tool_p95_ms": 3140,
+    "p113a_pi_p95_ms": 4690,
+    "tool_p95_delta_pct": 2.2,
+    "pi_p95_delta_pct": 0.6,
+    "within_20pct_degradation_limit": true
+  },
+  "performance_gates": {
+    "tool_p95_lte_4s": true,
+    "pi_p95_lte_5s": true,
+    "pi_p95_gt_4800ms_review": false,
+    "performance_review_triggered": false
+  },
+  "methodology": {
+    "cold_start_excluded": false,
+    "slow_samples_removed": 0,
+    "warm_samples_only": false,
+    "fallback_p95_ms": 1240
+  }
+}

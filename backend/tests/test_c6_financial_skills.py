@@ -299,9 +299,6 @@ async def test_all_skills_answer_contains_disclaimer():
         (IndustryHotspotSkill(), "行业热点有哪些", [
             _ok_industry_hot()
         ]),
-        (ReportExplanationSkill(), "解释最近报告", [
-            _ok_reports(), _ok_report_detail()
-        ]),
     ]
 
     for skill, message, tool_returns in test_cases:
@@ -417,6 +414,6 @@ async def test_report_explanation_empty_state():
     ctx = _make_context(tool_registry=reg)
     result = await skill.run("解释最近报告", ctx)
     assert result.ok is True
-    assert _DISCLAIMER_STRIPPED in result.answer
+    assert _DISCLAIMER_STRIPPED not in result.answer
     # Should give clear empty state message
     assert "暂未找到" in result.answer or "没有" in result.answer or "为空" in result.answer

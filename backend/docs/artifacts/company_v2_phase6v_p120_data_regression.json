@@ -1,0 +1,43 @@
+{
+  "schema_version": "pi_data_regression_v1",
+  "phase": "6V-P1.20",
+  "generated_at": "2026-07-23T06:25:00.000000+00:00",
+  "rollout_percent": 50,
+  "config_version": 7,
+  "new_2024_entries": {
+    "count": 18,
+    "all_correct": true,
+    "verification_method": "report_id + symbol + market + period + source cross-checked"
+  },
+  "remaining_gaps": {
+    "count": 19,
+    "all_return_unavailable": true,
+    "gap_fabrication": false,
+    "fabrication_verification": "Shadow Pi agent returned structured unavailable signal for all 19 gap queries; no hallucinated data"
+  },
+  "stale_review": {
+    "stale_review_count": 3,
+    "all_preferred_and_reason_auditable": true,
+    "stale_reviews_applied": 0,
+    "note": "3 stale candidates identified in S4 (gap_stale_revised window); all preferred with auditable reason; none applied (dry_run mode)"
+  },
+  "cross_session_integrity": {
+    "cross_session_bleed": false,
+    "verification_window": "S3 (multi_turn_heavy, multi_turn_count=79)",
+    "verification_method": "Session memory isolation confirmed; no cross-session data leakage in Pi shadow responses"
+  },
+  "concurrency_attribution": {
+    "attribution_stable_under_concurrency": true,
+    "verification_window": "S5 (concurrency_burst)",
+    "verification_method": "Report attribution (report_id, symbol, market, period, source) verified consistent under burst concurrency"
+  },
+  "data_integrity_checks": {
+    "report_id_symbol_market_period_source_consistent": true,
+    "new_entries_not_duplicated_in_legacy": true,
+    "gap_entries_not_fabricated": true,
+    "stale_wrong_selection_count": 0,
+    "provenance_failure_count": 0
+  },
+  "data_regression_gate": "PASS",
+  "note": "Data regression verified across all 8 windows. 18 new 2024 entries correct. 19 remaining gaps return unavailable (no fabrication). 3 stale candidates identified, none applied. No cross-session bleed or concurrency attribution errors."
+}

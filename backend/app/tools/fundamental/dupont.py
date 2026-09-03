@@ -176,11 +176,98 @@ class DupontTool(BaseFundamentalTool):
 
         comment = _generate_comment(series)
 
+        latest = series[0] if series else {}
         return {
             "symbol":      symbol,
             "ts_code":     ts_code,
+            "rows":        series,
             "series":      series,
+            "summary": {
+                "roe_pct": latest.get("roe_pct"),
+                "net_margin_pct": latest.get("net_margin_pct"),
+                "assets_turn": latest.get("assets_turn"),
+                "equity_multiplier": latest.get("equity_multiplier"),
+                "end_date": latest.get("end_date"),
+            },
+            "reasons":     [],
             "comment":     comment,
             "disclaimer":  _DISCLAIMER,
             "source":      "tushare",
+        }
+
+    async def fetch_baostock(self, market: str, symbol: str) -> dict[str, Any]:
+        """
+        BaoStock 备用：杜邦分析。
+        实测字段: dupontROE, dupontPnitoni(净利/营业利润), dupontAssetTurn, dupontAssetStoEquity(权益乘数)
+        """
+        from app.datasource.baostock_client import baostock_client
+        from app.datasource.tushare_client import _to_ts_code as _ts
+        ts_code = _ts(market, symbol)
+        rows = await baostock_client.get_dupont_data(ts_code, n=8)
+        if not rows:
+            raise RuntimeError("BaoStock get_dupont_data 无数据")
+
+        series = []
+        for r in rows:
+            stat_date = r.get("stat_date") or ""
+            if len(stat_date) == 8 and "-" not in stat_date:
+                stat_date = f"{stat_date[:4]}-{stat_date[4:6]}-{stat_date[6:]}"
+            roe = r.get("dupont_roe")
+            # dupont_npi = dupontPnitoni (净利/营业利润，非净利率)
+            # 用 dupont_nitogr 作为净利率近似 (营业利润/营收 * 净利因子)
+            # BaoStock 无直接净利率字段，用 dupontPnitoni * dupontNitogr 近似
+            npi = r.get("dupont_npi")     # 净利/营业利润
+            nitogr = r.get("dupont_nitogr")  # 营业利润/营收
+            at = r.get("dupont_at")       # 总资产周转率
+            am = r.get("dupont_am")       # 权益乘数 (资产/权益)
+
+            # 净利率近似 = npi * nitogr (若两者均有)
+            nm = None
+            if npi is not None and nitogr is not None:
+                try:
+                    nm = round(float(npi) * float(nitogr), 6)
+                except (TypeError, ValueError):
+                    nm = None
+
+            # 将净利率乘 100 转 %（BaoStock 返回小数如 0.498 → 49.8%）
+            nm_pct = round(float(nm) * 100, 4) if nm is not None else None
+            roe_pct = round(float(roe) * 100, 4) if roe is not None else None
+
+            fp = _factor_product(nm_pct, at, am)
+
+            series.append({
+                "end_date":           stat_date,
+                "roe_pct":            roe_pct,
+                "net_margin_pct":     nm_pct,
+                "assets_turn":        at,
+                "equity_multiplier":  am,
+                "factor_product_pct": fp,
+                "debt_to_assets":     None,   # BaoStock dupont 接口不直接提供资产负债率
+            })
+
+        # 只保留年报（12-31 结尾）以与 Tushare 行为一致
+        annual_series = [s for s in series if (s.get("end_date") or "").endswith("12-31")]
+        if annual_series:
+            series = annual_series
+        series.sort(key=lambda x: x.get("end_date") or "", reverse=True)
+
+        comment = _generate_comment(series)
+        latest = series[0] if series else {}
+        return {
+            "symbol":     symbol,
+            "ts_code":    ts_code,
+            "rows":       series,
+            "series":     series,
+            "summary": {
+                "roe_pct": latest.get("roe_pct"),
+                "net_margin_pct": latest.get("net_margin_pct"),
+                "assets_turn": latest.get("assets_turn"),
+                "equity_multiplier": latest.get("equity_multiplier"),
+                "end_date": latest.get("end_date"),
+            },
+            "reasons":    [],
+            "comment":    comment,
+            "disclaimer": _DISCLAIMER,
+            "source":     "baostock",
+            "_partial_errors": ["BaoStock 备用：资产负债率字段不可用（debt_to_assets=null）"],
         }

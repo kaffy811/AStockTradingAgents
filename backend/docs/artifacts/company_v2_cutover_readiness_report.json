@@ -1,0 +1,14 @@
+{
+  "cutover_ready": true,
+  "recommended_level": "Level 3 production default v2",
+  "blocking_issues": [],
+  "warnings": [
+    "600519: semantic_warnings=2, accepted as provider/accounting definition differences",
+    "000725: semantic_warnings=2, accepted as provider/accounting definition differences",
+    "601686: semantic_warnings=2, accepted as provider/accounting definition differences",
+    "semantic_warnings=6, accepted as provider/accounting definition differences"
+  ],
+  "rollback_available": true,
+  "legacy_available": true,
+  "required_env_change": "VITE_COMPANY_TAB_VERSION=v2"
+}

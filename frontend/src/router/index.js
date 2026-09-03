@@ -3,6 +3,18 @@ import ComprehensiveAnalysisView from '../views/ComprehensiveAnalysisView.vue'
 
 const routes = [
   {
+    path: '/login',
+    name: 'Login',
+    component: () => import('../views/LoginView.vue'),
+    meta: { public: true },
+  },
+  {
+    path: '/register',
+    name: 'Register',
+    component: () => import('../views/RegisterView.vue'),
+    meta: { public: true },
+  },
+  {
     path: '/',
     name: 'ComprehensiveAnalysis',
     component: ComprehensiveAnalysisView,
@@ -44,6 +56,12 @@ const routes = [
     name: 'ChatCopilot',
     component: () => import('../views/ChatCopilotView.vue'),
   },
+  {
+    path: '/admin/invites',
+    name: 'AdminInvites',
+    component: () => import('../views/AdminInvitesView.vue'),
+    meta: { requiresAdmin: true },
+  },
 ]
 
 const router = createRouter({
@@ -52,9 +70,21 @@ const router = createRouter({
 })
 
 router.beforeEach((to) => {
-  const token = localStorage.getItem('ta_token')
-  const protectedPrefixes = ['/history', '/watchlist', '/industries', '/stocks', '/me', '/compare', '/chat']
-  if (!token && protectedPrefixes.some(p => to.path.startsWith(p))) {
+  const token   = localStorage.getItem('ta_token')
+  const isAdmin = localStorage.getItem('ta_is_admin') === 'true'
+
+  // 已登录用户访问登录/注册页面，回首页
+  if (token && to.meta.public) {
+    return { path: '/' }
+  }
+
+  // 未登录用户只能访问 public 页面
+  if (!token && !to.meta.public) {
+    return { path: '/login' }
+  }
+
+  // 管理员路由：非管理员跳回首页
+  if (to.meta.requiresAdmin && !isAdmin) {
     return { path: '/' }
   }
 })

@@ -1,0 +1,14 @@
+{
+  "provider": "akshare",
+  "interface_name": "stock_zh_a_spot_em",
+  "status": "failed",
+  "reason_code": "NETWORK_UNAVAILABLE",
+  "elapsed_ms": 5108,
+  "error": "('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+  "symbols": [
+    "600519.SH",
+    "000725.SZ",
+    "601686.SH"
+  ],
+  "recommended_action": "spot_em(push2) blocked in this network; rely on BaoStock kline + computed market_cap"
+}

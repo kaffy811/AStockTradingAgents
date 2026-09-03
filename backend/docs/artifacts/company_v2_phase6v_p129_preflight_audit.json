@@ -1,0 +1,64 @@
+{
+  "schema_version": "pi_canary_preflight_v3",
+  "phase": "6V-P1.29",
+  "generated_at": "2026-07-25T18:30:00.000000+00:00",
+  "label": "P1.29 Sustained 1% Limited Live Canary — Pre-flight Audit",
+
+  "base_state": {
+    "branch": "release/demo-staging",
+    "head_sha": "9d3d20983903eefa93f6888f2cf63ac29dbdd139",
+    "worktree": "/private/tmp/tradingagents-p129",
+    "p129_branch": "p129/sustained-live-real-provider-readiness"
+  },
+
+  "runtime_snapshot": {
+    "shadow_rollout_percent": 100,
+    "shadow_salt": "pi_v1",
+    "live_enabled": true,
+    "live_rollout_percent": 1,
+    "live_salt": "pi_live_v1",
+    "config_version": 12,
+    "production_enabled": false,
+    "provider_mode": "staging_replay",
+    "provider_serving_calls": 0,
+    "compose_project": "tradingagents-p125-staging"
+  },
+
+  "cumulative_shadow": {
+    "total_selected_all_phases": 65373,
+    "pi_violations_cumulative": 0,
+    "phases": ["P1.17", "P1.18", "P1.19", "P1.20", "P1.21", "P1.22", "P1.25", "P1.26", "P1.27"]
+  },
+
+  "live_canary_state": {
+    "total_live_requests_p128": 162,
+    "live_pi_violations": 0,
+    "fallback_success_rate": 1.0,
+    "arbitration_pi_approved_visible": 151,
+    "arbitration_legacy_kill_switch": 0,
+    "kill_switch_drill_completed": true,
+    "kill_switch_disable_time_seconds": 8.3
+  },
+
+  "checks": [
+    {"check": "shadow_rollout_at_100", "status": "PASS", "value": "100%"},
+    {"check": "live_rollout_at_1", "status": "PASS", "value": "1%"},
+    {"check": "config_version_12", "status": "PASS", "value": 12},
+    {"check": "live_salt_independent", "status": "PASS", "value": "pi_live_v1"},
+    {"check": "production_false", "status": "PASS", "value": false},
+    {"check": "provider_mode_replay", "status": "PASS", "value": "staging_replay"},
+    {"check": "zero_pi_violations_live", "status": "PASS", "value": 0},
+    {"check": "kill_switch_verified", "status": "PASS", "value": "8.3s in isolated project"},
+    {"check": "p128_evidence_closure_pending", "status": "PENDING", "note": "Gate R0 must close before soak S1"}
+  ],
+
+  "next_cv_path": {
+    "kill_switch": 13,
+    "shadow_rollback": 14,
+    "expand_live_5pct": "NOT AUTHORIZED",
+    "constraint": "cv must stay monotonic; do NOT reuse 11 or 12"
+  },
+
+  "preflight_pass": true,
+  "note": "Container healthy, runtime cv=12. Gate R0 (P1.28 evidence closure) must complete before S1 soak begins."
+}

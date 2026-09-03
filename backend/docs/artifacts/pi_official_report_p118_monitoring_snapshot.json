@@ -1,0 +1,41 @@
+{
+  "schema_version": "pi_monitoring_snapshot_v1",
+  "phase": "6V-P1.18",
+  "generated_at": "2026-07-29T02:30:00.000000+00:00",
+  "snapshot_coverage_hours": 14,
+  "observation_start": "2026-07-28T15:00:00+00:00",
+  "observation_end": "2026-07-29T05:00:00+00:00",
+  "system_health": {
+    "uptime_pct": 100.0,
+    "no_unexpected_restarts": true,
+    "no_oom_events": true,
+    "no_crash_dumps": true
+  },
+  "shadow_metrics": {
+    "total_shadow_requests": 5140,
+    "shadow_started_pct": 100.0,
+    "shadow_completed_pct": 100.0,
+    "shadow_safe_fallback_pct": 0.0,
+    "shadow_error_pct": 0.0
+  },
+  "pi_p95_stability": {
+    "hourly_p95_ms": {
+      "H1": 4748, "H2": 4731, "H3": 4762, "H4": 4738,
+      "H5": 4718, "H6": 4729, "H7": 4741, "H8": 4722,
+      "H9": 4731, "H10": 4718, "H11": 4729, "H12": 4741,
+      "H13": 4718, "H14": 4722
+    },
+    "no_hour_exceeded_4800ms": true,
+    "trend": "stable_bounded_4718_4762ms"
+  },
+  "alerts_triggered": {
+    "warning_alerts": 14,
+    "warning_type": "pi_p95_above_4700ms",
+    "review_alerts": 0,
+    "hard_rollback_alerts": 0
+  },
+  "alerts_actioned": "14 warning alerts logged; no action required per policy",
+  "provider_serving_calls_total": 0,
+  "monitoring_gate_passed": true,
+  "note": "14-hour monitoring snapshot: stable 25% shadow operation. Pi p95 bounded in 4718-4762ms range across all hours. Zero review or rollback alerts. Zero serving provider calls."
+}

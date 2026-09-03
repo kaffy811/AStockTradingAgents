@@ -42,6 +42,7 @@ from app.tools.fundamental.major_holders import MajorHoldersTool
 from app.tools.fundamental.equity_structure import EquityStructureTool
 from app.tools.fundamental.announcements import AnnouncementsTool
 from app.tools.fundamental.analyst_ratings import AnalystRatingsTool
+from app.tools.fundamental.ai_analysis import AiAnalysisTool
 
 __all__ = [
     "BaseFundamentalTool",
@@ -97,6 +98,8 @@ TOOL_REGISTRY: dict[str, type[BaseFundamentalTool]] = {
     "equity_structure":      EquityStructureTool,
     "announcements":         AnnouncementsTool,
     "analyst_ratings":       AnalystRatingsTool,
+    # ── Phase 3 AI 分析 key ───────────────────────────────────────────
+    "ai_analysis":           AiAnalysisTool,
     # ── Phase 1 遗留 key（仍可访问，status=legacy）──────────────────
     "income_statement":      IncomeStatementTool,
     "balance_sheet":         BalanceSheetTool,
@@ -152,6 +155,7 @@ MODULE_CATALOG: list[dict] = [
         },
         "description": "行情基础信息快照，含价格、市值、估值比率",
         "data_freshness": "daily", "disclaimer_type": "data_only",
+        "data_mode": "any",
     },
     {
         "seq": 2, "key": "financial_summary", "name_zh": "财报核心数据", "name_en": "Financial Summary",
@@ -635,10 +639,10 @@ MODULE_CATALOG: list[dict] = [
     {
         "seq": 27, "key": "ai_analysis", "name_zh": "AI 智能解析", "name_en": "AI Analysis",
         "phase": 3, "requires_llm": True, "cache_ttl": 86400,
-        "status": "planned", "display": True, "alias_of": None,
+        "status": "available", "display": True, "alias_of": None,
         "group": "AI分析", "group_seq": 8,
         # ── Phase 2D 渲染契约字段 ──
-        "render_type": "ai_card", "chart_type": "none",
+        "render_type": "ai_card", "chart_type": "radar",
         "table_primary_key": None, "default_limit": 0,
         "supports_period": False, "supports_export": False,
         "field_labels": {}, "unit_hints": {},
@@ -727,5 +731,52 @@ MODULE_CATALOG: list[dict] = [
     },
 ]
 
+# ── Phase 6A: data_mode 分类映射 ─────────────────────────────────────────────
+# 需要 Tushare Pro 专属 API 的模块（forecast / express），在 free 模式下不可用
+_STANDARD_ONLY_KEYS = {"announcements", "analyst_ratings", "forecast_rating", "rating", "events"}
+# 通过 BaoStock/AkShare 支持的模块
+_FREE_OK_KEYS = {
+    "profitability", "growth", "solvency", "operation_capability",
+    "cashflow_quality", "dupont",
+    # aliases
+    "profit_quality", "growth_metrics", "operating_efficiency", "cashflow", "cashflow_health",
+}
+
+for _m in MODULE_CATALOG:
+    if "data_mode" not in _m:
+        _key = _m.get("key", "")
+        if _key in _STANDARD_ONLY_KEYS:
+            _m["data_mode"] = "standard_only"
+        elif _key in _FREE_OK_KEYS:
+            _m["data_mode"] = "free_ok"
+        else:
+            _m["data_mode"] = "any"
+
 # ── 模块 key → name_zh 快速查找（包含 alias key） ─────────────────────────────
 MODULE_NAME_MAP: dict[str, str] = {m["key"]: m["name_zh"] for m in MODULE_CATALOG}
+
+
+# ── Phase 6A: 按 data_mode 过滤可用模块 ─────────────────────────────────────
+def get_available_modules(data_mode: str = "standard") -> list[dict]:
+    """
+    返回当前 data_mode 下可用的模块列表（仅 display=True 且 status != "hidden"）。
+
+    data_mode 取值：
+      "standard" — 全量模块（含 standard_only）
+      "free"     — 排除 standard_only 模块（需要 Tushare Pro 专属 API）
+
+    MODULE_CATALOG 中新增 data_mode 字段：
+      "any"           — 在所有模式下可用
+      "standard_only" — 仅在 standard 模式可用（Tushare Pro 专属）
+      "free_ok"       — 在 free 模式下通过 BaoStock/AkShare 提供
+    """
+    result = []
+    for m in MODULE_CATALOG:
+        # 跳过隐藏别名
+        if not m.get("display", True) or m.get("status") == "hidden":
+            continue
+        module_data_mode = m.get("data_mode", "any")
+        if data_mode == "free" and module_data_mode == "standard_only":
+            continue
+        result.append(m)
+    return result

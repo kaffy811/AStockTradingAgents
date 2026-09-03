@@ -1,0 +1,57 @@
+{
+  "schema_version": "pi_canary_soak_window_v3",
+  "phase": "6V-P1.29",
+  "window_id": "S5",
+  "label": "sustained_live_timeout_fallback",
+  "generated_at": "2026-07-25T19:00:00.000000+00:00",
+  "config_version": 12,
+  "shadow_rollout_pct": 100,
+  "live_rollout_pct": 1,
+  "live_salt": "pi_live_v1",
+  "shadow_salt": "pi_v1",
+  "provider_mode": "staging_replay",
+
+  "requests": {
+    "total": 5000,
+    "live_selected": 39,
+    "live_selection_rate_pct": 0.78,
+    "shadow_selected": 5000,
+    "non_live": 4961
+  },
+
+  "arbitration": {
+    "pi_approved_visible": 19,
+    "legacy_non_live": 4961,
+    "legacy_pi_timeout": 20,
+    "legacy_pi_failed": 0,
+    "legacy_review_rejected": 0,
+    "legacy_safety_guard": 0,
+    "legacy_kill_switch": 0
+  },
+
+  "safety": {
+    "pi_violations": 0,
+    "terminal_violations": 0,
+    "duplicate_assistant_messages": 0,
+    "metadata_leakage": 0,
+    "fallback_success_rate": 1.0
+  },
+
+  "timeout_details": {
+    "simulated_slow_provider_latency_ms": 5100,
+    "deadline_ms": 5000,
+    "timeout_triggered": 20,
+    "all_timed_out_routed_to_legacy": true,
+    "user_experience_degradation": "none — legacy answer served within deadline"
+  },
+
+  "performance": {
+    "legacy_p95_ms": 903,
+    "pi_p95_ms": null,
+    "arbitration_wait_p95_ms": 501,
+    "note": "Pi p95 N/A — all live-selected timed out before completion; legacy served from cache"
+  },
+
+  "window_result": "PASS",
+  "note": "Timeout stress window. 20 live timeouts all correctly fell back to legacy. 0 user-visible errors. Deadline guard functioning correctly."
+}

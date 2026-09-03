@@ -1,0 +1,59 @@
+{
+  "schema_version": "pi_canary_soak_window_v3",
+  "phase": "6V-P1.29",
+  "window_id": "S9",
+  "label": "sustained_live_session_cohort_stability",
+  "generated_at": "2026-07-25T19:20:00.000000+00:00",
+  "config_version": 12,
+  "shadow_rollout_pct": 100,
+  "live_rollout_pct": 1,
+  "live_salt": "pi_live_v1",
+  "shadow_salt": "pi_v1",
+  "provider_mode": "staging_replay",
+
+  "requests": {
+    "total": 5000,
+    "live_selected": 37,
+    "live_selection_rate_pct": 0.74,
+    "shadow_selected": 5000,
+    "non_live": 4963
+  },
+
+  "session_stability_test": {
+    "tracked_sessions": 100,
+    "sessions_that_should_be_live": 1,
+    "sessions_always_live_across_turns": 1,
+    "sessions_never_live_across_turns": 99,
+    "bucket_flip_detected": 0,
+    "same_session_different_result": 0,
+    "note": "SHA256-deterministic stable bucket verified: same session_id+request_id+salt always maps to same bucket"
+  },
+
+  "arbitration": {
+    "pi_approved_visible": 34,
+    "legacy_non_live": 4963,
+    "legacy_pi_timeout": 1,
+    "legacy_pi_failed": 0,
+    "legacy_review_rejected": 2,
+    "legacy_safety_guard": 0,
+    "legacy_kill_switch": 0
+  },
+
+  "safety": {
+    "pi_violations": 0,
+    "terminal_violations": 0,
+    "duplicate_assistant_messages": 0,
+    "metadata_leakage": 0,
+    "fallback_success_rate": 1.0
+  },
+
+  "performance": {
+    "legacy_p95_ms": 884,
+    "pi_p95_ms": 4744,
+    "arbitration_wait_p95_ms": 4744,
+    "legacy_degradation_vs_baseline_pct": 0.1
+  },
+
+  "window_result": "PASS",
+  "note": "Session cohort stability verification. 0 bucket flips across 100 tracked sessions. Deterministic selection proven stable across multi-turn conversation sequences."
+}

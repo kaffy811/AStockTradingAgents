@@ -1,0 +1,37 @@
+{
+  "schema_version": "pi_update_report_number_audit_v1",
+  "phase": "6V-P1.16A",
+  "generated_at": "2026-07-27T10:00:00.000000+00:00",
+  "audit_result": {
+    "remote_highest_committed_number": 84,
+    "remote_highest_committed_file": "HKNA/update_report/update_84.md",
+    "local_untracked_files": [
+      "update_85.md",
+      "update_86.md",
+      "update_87.md",
+      "update_88.md",
+      "update_89.md",
+      "update_90.md",
+      "update_91.md"
+    ],
+    "local_phase_assignments": {
+      "update_85.md": "P1.11B — backend full suite regression",
+      "update_86.md": "P1.12 — 5% readiness gate",
+      "update_87.md": "P1.13 — 5% shadow promotion",
+      "update_88.md": "P1.13A — 2024 gap fill",
+      "update_89.md": "P1.14 — 10% readiness gate",
+      "update_90.md": "P1.15 — 10% shadow promotion",
+      "update_91.md": "P1.16 — 10% sustained observation + 25% readiness"
+    },
+    "git_history_for_update_91": "no_committed_history",
+    "overwrite_occurred": false,
+    "overwrite_explanation": "update_91.md was created fresh in the P1.16 session; no prior git-tracked content existed at this path; the file was not in origin/release/demo-staging at c492ffe",
+    "conflict_detected": false,
+    "resolution": "No resolution required — update_91.md legitimately belongs to P1.16",
+    "p116a_report_number": 92,
+    "p116a_report_file": "HKNA/update_report/update_92.md",
+    "next_available_after_p116a": 93,
+    "uniqueness_verified": true,
+    "history_preserved": true
+  }
+}

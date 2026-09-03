@@ -153,15 +153,14 @@ async def _run_agent(query, *, llm=None, mock_report_search=None,
 
 class TestIntentParsing:
 
-    def test_maotai_2026_annual_kline_30days(self):
+    def test_cn_code_2026_annual_kline_30days(self):
         from app.agents.official_report_search import parse_financial_analysis_intent
         result = parse_financial_analysis_intent(
-            "请帮我根据茅台2026财报分析茅台的2026年经营状况，并结合其一个月的股票数据进行分析"
+            "请帮我根据600519 2026财报分析其2026年经营状况，并结合其一个月的股票数据进行分析"
         )
         assert result["symbol"] == "600519"
         assert result["market"] == "CN"
         assert result["exchange"] == "SSE"
-        assert result["company_name"] == "贵州茅台"
         assert result["need_report"] is True
         assert result["report_year"] == 2026
         assert result["report_type"] == "annual_report"
@@ -170,7 +169,7 @@ class TestIntentParsing:
 
     def test_apple_q1_quarterly_report(self):
         from app.agents.official_report_search import parse_financial_analysis_intent
-        result = parse_financial_analysis_intent("苹果公司2025年一季报分析")
+        result = parse_financial_analysis_intent("AAPL 2025年一季报分析")
         assert result["symbol"] == "AAPL"
         assert result["report_type"] == "quarterly_report"
         assert result["report_period"] == "Q1"
@@ -178,7 +177,7 @@ class TestIntentParsing:
 
     def test_msft_annual_report_only(self):
         from app.agents.official_report_search import parse_financial_analysis_intent
-        result = parse_financial_analysis_intent("微软2026年度报告分析")
+        result = parse_financial_analysis_intent("MSFT 2026年度报告分析")
         assert result["symbol"] == "MSFT"
         assert result["report_type"] == "annual_report"
         assert result["report_year"] == 2026

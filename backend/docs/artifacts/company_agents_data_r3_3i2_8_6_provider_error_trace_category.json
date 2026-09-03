@@ -1,0 +1,69 @@
+{
+  "phase": "6W-R3.3I.2.8.6",
+  "status": "PROVIDER_ERROR_TRACE_CATEGORY_READY",
+  "traffic": "HOLD_1_PERCENT",
+  "workspace": {
+    "path": "/private/tmp/tradingagents-r33i2-8-6-provider-trace",
+    "branch": "r33i-provider-error-trace-category",
+    "base_head": "d0290990ea98003d53a11a3e5b8495a42b3c1d2e",
+    "initial_clean": true,
+    "main_workspace_modified": false
+  },
+  "attribution": {
+    "normalizer": {"category": "connection", "file": "backend/app/llm/deepseek_client.py", "lines": "82-87", "correct": true},
+    "first_loss": {"category": "provider_error", "file": "backend/app/agent/report_chat_copilot_agent.py", "pre_fix_lines": "1796-1798", "correct": false},
+    "s6_builder": {"category": "provider_error", "file": "backend/app/agent/report_chat_copilot_agent.py", "pre_fix_line": 1814, "correct": false},
+    "trace_repository": {"persisted_input_faithfully": true, "file": "backend/app/services/report_analysis_trace_service.py", "lines": "160-172"}
+  },
+  "repair": {
+    "helper": "_provider_error_trace_fields",
+    "allowed_categories": ["connection", "http_status", "provider_payload", "local_client"],
+    "legacy_fallback": "provider_error",
+    "fields": [
+      "provider_error_category",
+      "provider_error_retryable",
+      "provider_error_http_status",
+      "provider_error_code",
+      "provider_error_reason_code",
+      "provider_error_exception_type"
+    ],
+    "raw_exception_persisted": false,
+    "api_status_semantics_changed": false,
+    "s8_partial_success_preserved": true
+  },
+  "mapping": [
+    {"input": "connection", "category": "connection", "http_status": null, "retryable": true},
+    {"input": "http_429", "category": "http_status", "http_status": 429, "retryable": true},
+    {"input": "http_401", "category": "http_status", "http_status": 401, "retryable": false},
+    {"input": "provider_payload", "category": "provider_payload", "http_status": null, "retryable": false},
+    {"input": "local_client", "category": "local_client", "http_status": null, "retryable": false},
+    {"input": "legacy_unnormalized", "category": "provider_error", "http_status": null, "retryable": null}
+  ],
+  "tests": [
+    {"suite": "trace_category_durability", "collected": 24, "passed": 24, "failed": 0, "skipped": 0, "duration_seconds": 0.56},
+    {"suite": "provider_stream_nonstream", "collected": 9, "passed": 9, "failed": 0, "skipped": 0, "duration_seconds": 0.16},
+    {"suite": "d3_citation_numeric_derived", "collected": 28, "passed": 28, "failed": 0, "skipped": 0, "duration_seconds": 0.20},
+    {"suite": "combined_targeted", "collected": 61, "passed": 61, "failed": 0, "skipped": 0, "duration_seconds": 0.58},
+    {"suite": "py_compile", "result": "passed"},
+    {"suite": "ruff_scoped_ignore_baseline_f401", "result": "passed"}
+  ],
+  "security": {
+    "api_key_leak": false,
+    "header_leak": false,
+    "request_body_leak": false,
+    "provider_url_leak": false,
+    "raw_provider_payload_leak": false,
+    "real_llm_request": false,
+    "real_q3_request": false
+  },
+  "operations": {
+    "production_database_modified": false,
+    "production_container_modified": false,
+    "production_redis_modified": false,
+    "push": false,
+    "merge": false,
+    "deploy": false,
+    "migration": false,
+    "traffic_expansion": false
+  }
+}

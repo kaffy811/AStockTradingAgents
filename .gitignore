@@ -25,3 +25,10 @@ build/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+
+# Claude Code temporary worktrees
+.claude/worktrees/
+.claude/scheduled_tasks.lock
+
+# Staging local override (P1.25)
+.env.staging.local

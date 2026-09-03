@@ -184,6 +184,7 @@ class SkillRegistry:
             _SKILL_DISPLAY_NAMES = {
                 "general_financial_answer_skill": "智能问答",
                 "report_explanation_skill":       "报告解读",
+                "report_comparison_skill":        "财报比较",
                 "industry_hotspot_skill":         "行业热点分析",
                 "stock_anomaly_skill":            "股票异动分析",
                 "risk_first_skill":               "风险优先分析",
@@ -209,9 +210,22 @@ class SkillRegistry:
                 "skill_enabled":      self.is_skill_enabled(skill.name),
                 "skill_available":    self.is_skill_available(skill.name),
             }
+            skill_data = getattr(result, "data", None) or {}
+            report_answer_success = (
+                skill.name in {"report_explanation_skill", "report_comparison_skill"}
+                and str(skill_data.get("status") or "").lower() in {"completed", "partial_success"}
+                and bool(result.answer and result.answer.strip())
+                and len(skill_data.get("source_chunks") or []) > 0
+            )
+            sanitizer_context = {
+                "report_answer_owner": skill.name if skill.name == "report_explanation_skill" else "",
+                "verified_financial_data": report_answer_success,
+                "source_chunks_count": len(skill_data.get("source_chunks") or []),
+                "verified_news_detail": report_answer_success,
+            }
             # C26: sanitize answer text before returning to orchestrator
             if result.answer:
-                result.answer = sanitize_financial_answer(result.answer)
+                result.answer = sanitize_financial_answer(result.answer, context=sanitizer_context)
             # C27: enrich data_quality and sources from tool_events
             if result.tool_events:
                 from app.agents.answer_metadata import (  # noqa: PLC0415
@@ -221,7 +235,8 @@ class SkillRegistry:
                 meta = build_answer_metadata(result.tool_events)
                 result.metadata["data_quality"] = meta["data_quality"]
                 result.metadata["sources_c27"]  = meta["sources"]
-                if result.answer:
+                result_status = str(skill_data.get("status") or "").lower()
+                if result.answer and not report_answer_success and result_status not in {"failed", "error"}:
                     result.answer = add_data_boundary_declaration(
                         result.answer, meta["data_quality"]
                     )
@@ -252,7 +267,7 @@ class SkillRegistry:
             # C25.11: Domain-owning skills (e.g. report reading) must NOT fall back
             # to the generic answerer — they handle their own error path internally.
             # If such a skill somehow still raises, return a safe SkillResult directly.
-            _EXCLUSIVE_SKILLS = {"report_explanation_skill"}
+            _EXCLUSIVE_SKILLS = {"report_explanation_skill", "report_comparison_skill"}
             if skill.name in _EXCLUSIVE_SKILLS:
                 return SkillResult(
                     ok=False,

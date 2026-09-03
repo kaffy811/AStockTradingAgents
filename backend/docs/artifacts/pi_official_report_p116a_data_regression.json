@@ -1,0 +1,41 @@
+{
+  "schema_version": "pi_data_regression_v1",
+  "phase": "6V-P1.16A",
+  "generated_at": "2026-07-27T21:00:00.000000+00:00",
+  "new_2024_regression": {
+    "symbols_tested": 18,
+    "exact_year_2024_passed": 18,
+    "latest_passed": 18,
+    "followup_passed": 18,
+    "total_requests": 54,
+    "wrong_year_count": 0,
+    "fabricated_url_count": 0,
+    "provider_calls_during_serving": 0,
+    "tool_calls_max": 1,
+    "regression_passed": true
+  },
+  "remaining_gap_regression": {
+    "symbols_tested": 19,
+    "correctly_unavailable": 19,
+    "wrong_year_fallback": 0,
+    "summary_returned": 0,
+    "quarterly_returned": 0,
+    "third_party_url": 0,
+    "regression_passed": true,
+    "reason_distribution": {
+      "provider_not_found": 8,
+      "officially_not_disclosed": 3,
+      "summary_only": 3,
+      "wrong_type": 2,
+      "manual_review": 3
+    }
+  },
+  "stale_review_validation": {
+    "stale_records_checked": 3,
+    "stale_wrongly_selected": 0,
+    "stale_wrongly_activated": 0,
+    "stale_physically_deleted": 0,
+    "duplicate_active_count": 0,
+    "validation_passed": true
+  }
+}

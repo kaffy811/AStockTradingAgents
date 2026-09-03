@@ -1,0 +1,83 @@
+{
+  "report_id": "601686-2024-annual",
+  "official_verification": {
+    "status": "conflict",
+    "verified_fields_count": 0,
+    "conflict_fields_count": 5,
+    "unverified_fields_count": 3,
+    "fields": {
+      "revenue": {
+        "structured_value": 50671092626.44,
+        "official_value": 54822111649.52,
+        "relative_diff_pct": 7.571797032587195,
+        "status": "conflict",
+        "tolerance_pct": 1.0,
+        "source": "cninfo_pdf",
+        "evidence_page": 6
+      },
+      "net_profit": {
+        "structured_value": 144062444.38,
+        "official_value": 320323351.78,
+        "relative_diff_pct": 55.02593127242782,
+        "status": "conflict",
+        "tolerance_pct": 1.0,
+        "source": "cninfo_pdf",
+        "evidence_page": 6
+      },
+      "net_profit_parent": {
+        "structured_value": 144062444.38,
+        "official_value": 425000000.0,
+        "relative_diff_pct": 66.10295426352941,
+        "status": "conflict",
+        "tolerance_pct": 1.0,
+        "source": "cninfo_pdf",
+        "evidence_page": 9
+      },
+      "operating_cashflow": {
+        "structured_value": null,
+        "official_value": 1393832602.16,
+        "relative_diff_pct": null,
+        "status": "unverified",
+        "tolerance_pct": 0.0,
+        "source": "cninfo_pdf",
+        "evidence_page": 14
+      },
+      "eps_basic": {
+        "structured_value": -0.050811,
+        "official_value": 0.3,
+        "relative_diff_pct": 116.937,
+        "status": "conflict",
+        "tolerance_pct": 0.5,
+        "source": "cninfo_pdf",
+        "evidence_page": 6
+      },
+      "roe": {
+        "structured_value": 0.018961,
+        "official_value": null,
+        "relative_diff_pct": null,
+        "status": "unverified",
+        "tolerance_pct": 0.0,
+        "source": null,
+        "evidence_page": null
+      },
+      "total_share": {
+        "structured_value": 1471547040.0,
+        "official_value": 1432296037.0,
+        "relative_diff_pct": 2.667329139542831,
+        "status": "conflict",
+        "tolerance_pct": 0.1,
+        "source": "cninfo_pdf",
+        "evidence_page": 2
+      },
+      "float_share": {
+        "structured_value": 1471547040.0,
+        "official_value": null,
+        "relative_diff_pct": null,
+        "status": "unverified",
+        "tolerance_pct": 0.0,
+        "source": null,
+        "evidence_page": null
+      }
+    }
+  }
+}

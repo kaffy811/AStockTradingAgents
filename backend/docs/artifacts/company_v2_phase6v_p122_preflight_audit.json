@@ -1,0 +1,56 @@
+{
+  "artifact": "company_v2_phase6v_p122_preflight_audit",
+  "phase": "6V-P1.22",
+  "generated_at": "2026-07-23T00:00:00Z",
+  "base_sha": "43130fcf8e348b6c8dbdb27accee1e304638b95d",
+  "base_phase": "P1.21",
+  "rollout_percent": 75,
+  "config_version": 8,
+  "stable_bucket_salt": "pi_v1",
+  "live": false,
+  "production_enabled": false,
+  "provider_serving_calls": 0,
+  "checks": {
+    "repository_integrity": {
+      "status": "pass",
+      "sha_verified": true,
+      "base_sha": "43130fcf8e348b6c8dbdb27accee1e304638b95d",
+      "no_uncommitted_changes": true,
+      "p121_artifacts_intact": true
+    },
+    "configuration_integrity": {
+      "status": "pass",
+      "rollout_percent": 75,
+      "config_version": 8,
+      "stable_bucket_salt": "pi_v1",
+      "live": false,
+      "production_enabled": false,
+      "dry_run_mode": true
+    },
+    "runtime_provenance": {
+      "status": "unknown",
+      "evidence_mode": "runtime_loader_integration_verified",
+      "loader_verified": true,
+      "deployed_probe_accessible": false,
+      "note": "Loader integration verified via get_effective_shadow_config_snapshot(); deployed runtime probe not accessible"
+    },
+    "test_baseline": {
+      "status": "pass",
+      "p121_suite_collected": 2756,
+      "p121_suite_passed": 2756,
+      "p121_suite_failed": 0,
+      "cross_phase_suite_collected": 2756,
+      "cross_phase_suite_passed": 2756
+    },
+    "no_p121_artifacts_overwritten": true,
+    "no_rollback_applied_artifact": true
+  },
+  "cumulative_prior": {
+    "phases": "P1.8 through P1.21",
+    "total_selected": 34836,
+    "total_violations": 0,
+    "max_rollout_reached": 75
+  },
+  "preflight_decision": "proceed_with_p122_sustained_75_shadow_soak",
+  "evidence_sha": "TBD_evidence_sha"
+}

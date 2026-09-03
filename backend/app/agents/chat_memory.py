@@ -33,7 +33,7 @@ import logging
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.attributes import flag_modified
 
@@ -100,6 +100,138 @@ async def _save(
     await db.flush()
 
 
+_UNSET = object()
+
+
+async def apply_memory_updates(
+    db: AsyncSession,
+    session_id: uuid.UUID,
+    user_id: uuid.UUID,
+    *,
+    symbols: list[dict] | None = None,
+    intent: str | None = None,
+    output_language: str | None = None,
+    last_report_id: str | None = None,
+    task_state: dict | None = None,
+    pending_confirmation_id: object = _UNSET,
+    safety_flags: list[str] | None = None,
+) -> None:
+    """Apply all per-turn memory changes in one session_metadata write."""
+    try:
+        session, memory = await _load(db, session_id, user_id)
+        if session is None:
+            return
+        original_meta = dict(session.session_metadata or {})
+
+        now_iso = datetime.now(timezone.utc).isoformat()
+
+        if symbols:
+            recent: list = list(memory.get("recent_symbols", []))
+            for symbol_info in symbols:
+                market = symbol_info.get("market", "")
+                symbol = symbol_info.get("symbol", "")
+                if not symbol:
+                    continue
+                entry = {
+                    "market": market,
+                    "symbol": symbol,
+                    "name": symbol_info.get("name", symbol),
+                    "last_seen_at": now_iso,
+                }
+                recent = [
+                    s for s in recent
+                    if not (s.get("market") == market and s.get("symbol") == symbol)
+                ]
+                recent.insert(0, entry)
+            memory["recent_symbols"] = recent[:MAX_SYMBOLS]
+
+        if intent:
+            intents: list = list(memory.get("recent_intents", []))
+            intents.insert(0, {"intent": intent, "created_at": now_iso})
+            memory["recent_intents"] = intents[:MAX_INTENTS]
+
+        if output_language:
+            memory["last_output_language"] = output_language
+
+        if last_report_id:
+            memory["last_report_id"] = last_report_id
+
+        if task_state is not None:
+            memory["task_state"] = task_state
+
+        if pending_confirmation_id is not _UNSET:
+            memory["pending_confirmation_id"] = pending_confirmation_id
+
+        if safety_flags:
+            flags: list = list(memory.get("memory_safety_flags", []))
+            for flag in safety_flags:
+                if flag and flag not in flags:
+                    flags.append(flag)
+            memory["memory_safety_flags"] = flags
+
+        memory["context_version"] = int(memory.get("context_version") or 0) + 1
+        memory["last_context_commit_at"] = now_iso
+        meta = dict(original_meta)
+        meta[MEMORY_KEY] = memory
+        stmt = (
+            update(ChatSession)
+            .where(
+                ChatSession.id == session_id,
+                ChatSession.user_id == user_id,
+                ChatSession.status != "deleted",
+                ChatSession.session_metadata == original_meta,
+            )
+            .values(session_metadata=meta)
+        )
+        result = await db.execute(stmt)
+        if getattr(result, "rowcount", 0) == 0:
+            # Optimistic concurrency conflict: merge once with the latest state.
+            latest_session, latest_memory = await _load(db, session_id, user_id)
+            if latest_session is None:
+                return
+            latest_meta = dict(latest_session.session_metadata or {})
+            latest_memory.update({
+                key: value
+                for key, value in memory.items()
+                if key not in {"recent_symbols", "recent_intents"}
+            })
+            if symbols:
+                for item in reversed(memory.get("recent_symbols", [])):
+                    market = item.get("market")
+                    symbol = item.get("symbol")
+                    latest_symbols = [
+                        s for s in latest_memory.get("recent_symbols", [])
+                        if not (s.get("market") == market and s.get("symbol") == symbol)
+                    ]
+                    latest_symbols.insert(0, item)
+                    latest_memory["recent_symbols"] = latest_symbols[:MAX_SYMBOLS]
+            if intent:
+                latest_intents = list(latest_memory.get("recent_intents", []))
+                latest_intents.insert(0, {"intent": intent, "created_at": now_iso})
+                latest_memory["recent_intents"] = latest_intents[:MAX_INTENTS]
+            latest_memory["context_version"] = int(latest_memory.get("context_version") or 0) + 1
+            latest_memory["last_context_commit_at"] = now_iso
+            latest_meta[MEMORY_KEY] = latest_memory
+            latest_session.session_metadata = latest_meta
+            flag_modified(latest_session, "session_metadata")
+            await db.flush()
+    except Exception as exc:
+        try:
+            await db.rollback()
+        except Exception as rollback_exc:  # noqa: BLE001
+            log.warning(
+                "chat_memory.apply_memory_updates: rollback failed for session %s error_class=%s",
+                session_id,
+                type(rollback_exc).__name__,
+            )
+            pass
+        log.warning(
+            "chat_memory.apply_memory_updates: failed for session %s error_class=%s",
+            session_id,
+            type(exc).__name__,
+        )
+
+
 # ── Public read ────────────────────────────────────────────────────────────────
 
 async def get_memory(
@@ -111,8 +243,21 @@ async def get_memory(
     try:
         _, memory = await _load(db, session_id, user_id)
         return memory
-    except Exception:
-        log.warning("chat_memory.get_memory: failed for session %s", session_id)
+    except Exception as exc:
+        try:
+            await db.rollback()
+        except Exception as rollback_exc:  # noqa: BLE001
+            log.warning(
+                "chat_memory.get_memory: rollback failed for session %s error_class=%s",
+                session_id,
+                type(rollback_exc).__name__,
+            )
+            pass
+        log.warning(
+            "chat_memory.get_memory: failed for session %s error_class=%s",
+            session_id,
+            type(exc).__name__,
+        )
         return _empty_memory()
 
 

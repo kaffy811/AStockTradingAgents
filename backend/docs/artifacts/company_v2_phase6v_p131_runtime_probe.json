@@ -1,0 +1,77 @@
+{
+  "schema_version": "pi_canary_runtime_probe_v1",
+  "phase": "6V-P1.31",
+  "generated_at": "2026-07-26T00:00:00Z",
+
+  "probe_endpoint": {
+    "path": "/pi-canary/provider-budget",
+    "method": "GET",
+    "router_file": "backend/app/routers/pi_canary_provider.py",
+    "registered_in_main": true,
+    "always_returns_200": true,
+    "credential_exposure": "NONE — fingerprint_prefix only (first 8 chars)"
+  },
+
+  "sample_probe_output": {
+    "ok": true,
+    "phase": "6V-P1.31",
+    "probe": {
+      "timestamp": "2026-07-26T00:00:00+00:00",
+      "credential": {
+        "present": false,
+        "fingerprint_prefix": ""
+      },
+      "provider": {
+        "real_provider_enabled": false,
+        "kill_switch_active": true,
+        "name": "deepseek",
+        "model": "deepseek-v4-flash",
+        "mode": "staging_replay",
+        "config_version": 12
+      },
+      "pricing": {
+        "version": "unverified",
+        "verified": false,
+        "mode": "test_fixture"
+      },
+      "budget": {
+        "requests_used": 0,
+        "requests_max": 100,
+        "requests_remaining": 100,
+        "cost_used_cny": "0",
+        "cost_max_cny": "100",
+        "cost_remaining_cny": "100",
+        "namespace": "pi_provider_staging"
+      },
+      "rate_limit": {
+        "requests_in_window": 0,
+        "window_seconds": 60,
+        "limit_per_window": 60,
+        "available": true
+      },
+      "concurrency": {
+        "active_slots": 0,
+        "max_slots": 2,
+        "slots_remaining": 2,
+        "available": true
+      },
+      "circuit_breaker": {
+        "status": "closed",
+        "consecutive_failures": 0,
+        "failure_threshold": 5,
+        "recovery_at_epoch": null
+      },
+      "readiness": {
+        "ready_for_real_provider": false,
+        "blocking_gates": [
+          "D: DEEPSEEK_API_KEY_STAGING not provisioned",
+          "E: Pricing not verified from authoritative source",
+          "I: Kill switch active (pi_real_provider_kill_switch=True)",
+          "I: pi_real_provider_enabled=False"
+        ]
+      }
+    }
+  },
+
+  "gate_status": "PASS — endpoint implemented and registered"
+}

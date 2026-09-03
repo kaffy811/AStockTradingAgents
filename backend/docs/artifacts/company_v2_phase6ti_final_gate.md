@@ -1,0 +1,26 @@
+# Phase 6T-I Final Gate
+
+- stage1_scope_gate_passed: true
+- latency_observability_gate_passed: true
+- cache_behavior_gate_passed: true
+- singleflight_observability_gate_passed: true
+- readiness_gate_passed: true
+- prepare_workflow_gate_passed: true
+- safety_monitoring_gate_passed: true
+- circuit_gate_passed: true
+- frontend_gate_passed: true
+- tests_gate_passed: true
+- blocking_issues: []
+- warnings:
+  - stage2_readiness_is_partially_ready
+  - pilot_readiness_falls_back_when_db_unavailable
+- phase6ti_passed: true
+- stage1_status: ready
+- stage2_status: partially_ready
+- recommendation_for_production_fusion_rollout: continue_stage_1
+
+## Notes
+
+- Stage 1 controlled pilot stays allowlisted to 601686 only.
+- Latency observability now reports null for no-sample snapshots instead of 0.0.
+- Readiness is explicit per report step; the pilot script falls back cleanly when DB access is unavailable in the local environment.

@@ -1,0 +1,58 @@
+{
+  "schema_version": "pi_capacity_comparison_v1",
+  "phase": "6V-P1.18",
+  "generated_at": "2026-07-29T02:12:00.000000+00:00",
+  "comparison": {
+    "ten_pct_baseline_G1_G5": {
+      "rollout": 10,
+      "selected_per_window_avg": 205,
+      "memory_rss_mb_avg": 374,
+      "cpu_p95_avg": 19,
+      "db_checked_out_peak_avg": 4,
+      "fd_peak_avg": 388
+    },
+    "twenty_five_pct_initial_K1_K5": {
+      "rollout": 25,
+      "selected_per_window_avg": 523,
+      "memory_rss_mb_avg": 378,
+      "cpu_p95_avg": 28,
+      "db_checked_out_peak_avg": 6,
+      "fd_peak_avg": 416
+    },
+    "twenty_five_pct_sustained_L1_L8": {
+      "rollout": 25,
+      "selected_per_window_avg": 643,
+      "memory_rss_mb_avg": 381,
+      "cpu_p95_avg": 28,
+      "db_checked_out_peak_avg": 6,
+      "fd_peak_avg": 416
+    }
+  },
+  "capacity_scaling": {
+    "10pct_to_25pct_memory_increase_mb": 7,
+    "10pct_to_25pct_cpu_increase_pct": 9,
+    "10pct_to_25pct_db_pool_increase": 2,
+    "sustained_vs_initial_25pct_memory_increase_mb": 3,
+    "sustained_vs_initial_25pct_cpu_stable": true,
+    "linear_scaling_expected": false,
+    "actual_scaling_sublinear": true
+  },
+  "fifty_pct_capacity_projection": {
+    "method": "linear_extrapolation_from_10pct_to_25pct",
+    "projected_memory_rss_mb": 389,
+    "projected_cpu_p95": 37,
+    "projected_db_checked_out_peak": 8,
+    "projected_fd_peak": 444,
+    "current_pool_size": 20,
+    "pool_headroom_at_50pct": "sufficient_no_resize_needed",
+    "capacity_risk_assessment": "low"
+  },
+  "memory_trend_L1_to_L8_mb": {
+    "L1": 381, "L2": 374, "L3": 383, "L4": 386,
+    "L5": 379, "L6": 382, "L7": 384, "L8": 378
+  },
+  "memory_no_upward_drift": true,
+  "memory_range_mb": 12,
+  "capacity_gate_passed": true,
+  "note": "25% sustained load (L1-L8, 643 avg selected/window) shows sublinear scaling vs 10%. Memory stable (374-386MB range, no upward drift). Projection for 50% is within safe bounds."
+}

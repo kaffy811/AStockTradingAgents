@@ -1,0 +1,30 @@
+{
+  "schema_version": "pi_dry_run_isolation_v1",
+  "phase": "6V-P1.21",
+  "generated_at": "2026-07-23T11:14:00.000000+00:00",
+  "window": "T6",
+  "window_type": "dry_run_parallel",
+  "rollout_percent": 75,
+  "config_version": 8,
+  "dry_run_results": {
+    "business_writes": 0,
+    "serving_calls": 0,
+    "provider_serving_calls": 0,
+    "pending_candidates_generated": 2,
+    "pending_candidates_applied": 0,
+    "etl_attribution_isolated": true,
+    "pi_attribution_isolated": true,
+    "shadow_writes": 0,
+    "db_mutations": 0,
+    "cache_pollution": 0
+  },
+  "isolation_checks": {
+    "pi_output_not_persisted_to_production_db": true,
+    "pi_output_not_served_to_user": true,
+    "pi_output_not_cached_as_canonical": true,
+    "legacy_output_unaffected_by_pi": true,
+    "no_cross_request_state_sharing": true
+  },
+  "dry_run_isolation_gate": "PASS",
+  "note": "T6 (dry_run_parallel): 0 business writes, 0 serving calls, 0 provider serving calls. 2 pending candidates generated but not applied. Pi attribution fully isolated from legacy output path. Shadow-only mode confirmed."
+}

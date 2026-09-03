@@ -1,0 +1,310 @@
+{
+  "schema_version": "pi_official_report_pdf_smoke_diagnostics_v1",
+  "planned_samples": 30,
+  "executed_samples": 30,
+  "accepted_samples": 15,
+  "smoke_passed": false,
+  "recommended_to_run_full_30": false,
+  "cases": [
+    {
+      "case_id": "A01",
+      "decision": "pass",
+      "pi_status": "success",
+      "pi_error_code": null,
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "llm_call_count": 0
+    },
+    {
+      "case_id": "A02",
+      "decision": "pass",
+      "pi_status": "success",
+      "pi_error_code": null,
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "llm_call_count": 0
+    },
+    {
+      "case_id": "A03",
+      "decision": "pass",
+      "pi_status": "success",
+      "pi_error_code": null,
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "llm_call_count": 0
+    },
+    {
+      "case_id": "B01",
+      "decision": "pass",
+      "pi_status": "success",
+      "pi_error_code": null,
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "llm_call_count": 0
+    },
+    {
+      "case_id": "B02",
+      "decision": "review",
+      "pi_status": "success",
+      "pi_error_code": null,
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "llm_call_count": 0
+    },
+    {
+      "case_id": "B03",
+      "decision": "pass",
+      "pi_status": "success",
+      "pi_error_code": null,
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "llm_call_count": 0
+    },
+    {
+      "case_id": "B04",
+      "decision": "pass",
+      "pi_status": "unavailable",
+      "pi_error_code": "REPORT_NOT_FOUND",
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "llm_call_count": 0
+    },
+    {
+      "case_id": "B05",
+      "decision": "review",
+      "pi_status": "success",
+      "pi_error_code": null,
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "llm_call_count": 0
+    },
+    {
+      "case_id": "B06",
+      "decision": "pass",
+      "pi_status": "unavailable",
+      "pi_error_code": "REPORT_NOT_FOUND",
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "llm_call_count": 0
+    },
+    {
+      "case_id": "B07",
+      "decision": "pass",
+      "pi_status": "unavailable",
+      "pi_error_code": "REPORT_NOT_FOUND",
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "llm_call_count": 0
+    },
+    {
+      "case_id": "C01",
+      "decision": "pass",
+      "pi_status": "success",
+      "pi_error_code": null,
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "llm_call_count": 0
+    },
+    {
+      "case_id": "C02",
+      "decision": "pass",
+      "pi_status": "success",
+      "pi_error_code": null,
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "llm_call_count": 0
+    },
+    {
+      "case_id": "C03",
+      "decision": "pass",
+      "pi_status": "success",
+      "pi_error_code": null,
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "llm_call_count": 0
+    },
+    {
+      "case_id": "C04",
+      "decision": "pass",
+      "pi_status": "unavailable",
+      "pi_error_code": "REPORT_NOT_FOUND",
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "llm_call_count": 0
+    },
+    {
+      "case_id": "C05",
+      "decision": "review",
+      "pi_status": "success",
+      "pi_error_code": null,
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "llm_call_count": 0
+    },
+    {
+      "case_id": "C06",
+      "decision": "pass",
+      "pi_status": "unavailable",
+      "pi_error_code": "REPORT_NOT_FOUND",
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "llm_call_count": 0
+    },
+    {
+      "case_id": "D01",
+      "decision": "review",
+      "pi_status": "unavailable",
+      "pi_error_code": "REPORT_TYPE_UNSUPPORTED",
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "llm_call_count": 0
+    },
+    {
+      "case_id": "D02",
+      "decision": "review",
+      "pi_status": "unavailable",
+      "pi_error_code": "REPORT_TYPE_UNSUPPORTED",
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "llm_call_count": 0
+    },
+    {
+      "case_id": "D03",
+      "decision": "review",
+      "pi_status": "unavailable",
+      "pi_error_code": "REPORT_TYPE_UNSUPPORTED",
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "llm_call_count": 0
+    },
+    {
+      "case_id": "D04",
+      "decision": "review",
+      "pi_status": "unavailable",
+      "pi_error_code": "REPORT_TYPE_UNSUPPORTED",
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "llm_call_count": 0
+    },
+    {
+      "case_id": "D05",
+      "decision": "review",
+      "pi_status": "unavailable",
+      "pi_error_code": "REPORT_TYPE_UNSUPPORTED",
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "llm_call_count": 0
+    },
+    {
+      "case_id": "E01",
+      "decision": "pass",
+      "pi_status": "clarification_required",
+      "pi_error_code": null,
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "llm_call_count": 0
+    },
+    {
+      "case_id": "E02",
+      "decision": "pass",
+      "pi_status": "clarification_required",
+      "pi_error_code": null,
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "llm_call_count": 0
+    },
+    {
+      "case_id": "F01",
+      "decision": "review",
+      "pi_status": "unavailable",
+      "pi_error_code": "ENTITY_NOT_RESOLVED",
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "llm_call_count": 0
+    },
+    {
+      "case_id": "F02",
+      "decision": "review",
+      "pi_status": "unavailable",
+      "pi_error_code": "REPORT_NOT_FOUND",
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "llm_call_count": 0
+    },
+    {
+      "case_id": "F03",
+      "decision": "review",
+      "pi_status": "unavailable",
+      "pi_error_code": "ENTITY_NOT_RESOLVED",
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "llm_call_count": 0
+    },
+    {
+      "case_id": "F04",
+      "decision": "review",
+      "pi_status": "unavailable",
+      "pi_error_code": "REPORT_NOT_FOUND",
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "llm_call_count": 0
+    },
+    {
+      "case_id": "F05",
+      "decision": "review",
+      "pi_status": "unavailable",
+      "pi_error_code": "REPORT_NOT_FOUND",
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "llm_call_count": 0
+    },
+    {
+      "case_id": "F06",
+      "decision": "review",
+      "pi_status": "unavailable",
+      "pi_error_code": "ENTITY_NOT_RESOLVED",
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "llm_call_count": 0
+    },
+    {
+      "case_id": "F07",
+      "decision": "review",
+      "pi_status": "success",
+      "pi_error_code": null,
+      "side_effect_count": 0,
+      "context_mutation_count": 0,
+      "double_write_count": 0,
+      "llm_call_count": 0
+    }
+  ]
+}

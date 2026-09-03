@@ -1,0 +1,22 @@
+{
+  "schema_version": "pi_canary_invite_access_v1",
+  "phase": "MVP-R1",
+  "generated_at": "2026-07-26T06:00:00Z",
+
+  "invite_system": {
+    "model": "mvp_invite (P1.32)",
+    "endpoints": ["POST /mvp/invites/check", "POST /mvp/invites/redeem", "POST /mvp/invites"],
+    "code_generation": "secrets.token_urlsafe(36)[:48]",
+    "max_uses": "configurable per invite",
+    "expiry": "configurable per invite"
+  },
+
+  "gate_s_result": "PASS",
+  "gate_l2_result": "PASS",
+
+  "first_batch_config": {
+    "max_invited_users": 50,
+    "public_registration": "CLOSED",
+    "anonymous_access": "DENIED"
+  }
+}

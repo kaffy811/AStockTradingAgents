@@ -1,0 +1,53 @@
+{
+  "schema_version": "pi_canary_activation_readiness_v1",
+  "phase": "6V-P1.32",
+  "generated_at": "2026-07-26T02:00:00Z",
+
+  "ready_for_real_provider_activation_decision": false,
+  "reason": "Gates C (model verification), D (pricing), E (credential) are NOT_EVALUATED. Real provider activation requires all three PASS plus explicit project owner authorization.",
+
+  "for_p133_activation": [
+    "1. Provision DEEPSEEK_API_KEY_STAGING (staging-only DeepSeek key, NOT the production key)",
+    "2. Call GET https://api.deepseek.com/models with staging key; record available model IDs",
+    "3. Verify pricing from platform.deepseek.com/api-docs/pricing (record URL + date)",
+    "4. Update deepseek_prices.json: verified=true, source_url, source_retrieval_date, pricing_mode='official'",
+    "5. Set enabled_for_staging_real=true for target model (deepseek-chat)",
+    "6. Set PI_REAL_PROVIDER_ENABLED=true in staging env",
+    "7. Set PI_REAL_PROVIDER_KILL_SWITCH=false in staging env",
+    "8. Obtain EXPLICIT project owner authorization",
+    "9. Run P1.33 activation: max 100 requests, ¥100 budget, replay restored on exit (cv→13→14)"
+  ],
+
+  "gate_summary": [
+    {"gate": "A", "status": "PASS"},
+    {"gate": "B", "status": "PASS"},
+    {"gate": "C", "status": "NOT_EVALUATED", "note": "Model IDs not verified — staging key needed"},
+    {"gate": "D", "status": "NOT_EVALUATED", "note": "Pricing not verified from authoritative source"},
+    {"gate": "E", "status": "NOT_EVALUATED", "note": "DEEPSEEK_API_KEY_STAGING not provisioned"},
+    {"gate": "F", "status": "PASS"},
+    {"gate": "G", "status": "PASS"},
+    {"gate": "H", "status": "NOT_EVALUATED", "note": "Real connectivity not tested"},
+    {"gate": "I", "status": "NOT_EVALUATED", "note": "Usage capture not tested with real responses"},
+    {"gate": "J", "status": "PASS"},
+    {"gate": "K", "status": "PASS"},
+    {"gate": "L", "status": "PASS"},
+    {"gate": "M", "status": "PASS"},
+    {"gate": "N", "status": "PASS"},
+    {"gate": "O", "status": "PASS"},
+    {"gate": "P", "status": "PASS"},
+    {"gate": "Q", "status": "PASS"},
+    {"gate": "R", "status": "PASS"},
+    {"gate": "S", "status": "PASS"},
+    {"gate": "T", "status": "PASS"},
+    {"gate": "U", "status": "PASS"},
+    {"gate": "V", "status": "PASS"},
+    {"gate": "W", "status": "PASS"},
+    {"gate": "X", "status": "PASS"},
+    {"gate": "Y", "status": "PASS"},
+    {"gate": "Z", "status": "PASS"}
+  ],
+
+  "gates_pass": 20,
+  "gates_fail": 0,
+  "gates_not_evaluated": 6
+}

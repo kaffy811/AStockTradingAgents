@@ -222,6 +222,19 @@ export async function sendChatMessageStream(
     authStore.logout()
     throw Object.assign(new Error('登录已过期，请重新登录'), { status: 401 })
   }
+  if (res.status === 503) {
+    const text = await res.text().catch(() => '')
+    let payload = {}
+    try { payload = text ? JSON.parse(text) : {} } catch { payload = {} }
+    throw Object.assign(
+      new Error(payload?.detail?.message || payload?.message || '连接暂时不稳定，请重试'),
+      {
+        status: 503,
+        errorCode: payload?.detail?.error_code || payload?.error_code || 'SERVICE_UNAVAILABLE',
+        retryAfter: res.headers.get('Retry-After'),
+      },
+    )
+  }
   if (!res.ok) {
     const text = await res.text().catch(() => '')
     throw Object.assign(new Error(text || `HTTP ${res.status}`), { status: res.status })

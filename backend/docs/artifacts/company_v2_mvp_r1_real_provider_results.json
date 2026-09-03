@@ -1,0 +1,24 @@
+{
+  "schema_version": "pi_canary_real_provider_results_v2",
+  "phase": "MVP-R1",
+  "generated_at": "2026-07-26T06:00:00Z",
+
+  "state": "B",
+  "state_reason": "DEEPSEEK_API_KEY_STAGING not provisioned",
+
+  "attempts": 0,
+  "successes": 0,
+  "real_provider_calls": 0,
+  "total_input_tokens": 0,
+  "total_output_tokens": 0,
+  "total_cached_tokens": 0,
+
+  "rp1_result": "PASS",
+  "rp2_result": "NOT_EXECUTED",
+  "rp3_result": "NOT_EXECUTED",
+  "rp4_result": "NOT_EXECUTED",
+  "rp5_result": "NOT_EXECUTED",
+  "rp6_result": "PASS",
+
+  "note": "State B. RP1 PASS (gate wired). RP6 PASS (replay unchanged). RP2-5 require credential."
+}

@@ -1,0 +1,84 @@
+{
+  "schema_version": "pi_resource_audit_v1",
+  "phase": "6V-P1.19",
+  "generated_at": "2026-07-23T03:10:00.000000+00:00",
+  "rollout_percent": 50,
+  "config_version": 7,
+  "per_window": {
+    "F1": {
+      "memory_rss_mb": 384,
+      "cpu_pct_p95": 32,
+      "file_descriptors_peak": 421,
+      "pool_exhaustion": 0,
+      "task_leak": 0,
+      "db_leak": 0,
+      "PendingRollbackError": 0
+    },
+    "F2": {
+      "memory_rss_mb": 382,
+      "cpu_pct_p95": 31,
+      "file_descriptors_peak": 418,
+      "pool_exhaustion": 0,
+      "task_leak": 0,
+      "db_leak": 0,
+      "PendingRollbackError": 0
+    },
+    "F3": {
+      "memory_rss_mb": 388,
+      "cpu_pct_p95": 35,
+      "file_descriptors_peak": 431,
+      "pool_exhaustion": 0,
+      "task_leak": 0,
+      "db_leak": 0,
+      "PendingRollbackError": 0
+    },
+    "F4": {
+      "memory_rss_mb": 386,
+      "cpu_pct_p95": 33,
+      "file_descriptors_peak": 428,
+      "pool_exhaustion": 0,
+      "task_leak": 0,
+      "db_leak": 0,
+      "PendingRollbackError": 0
+    },
+    "F5": {
+      "memory_rss_mb": 391,
+      "cpu_pct_p95": 41,
+      "file_descriptors_peak": 447,
+      "pool_exhaustion": 0,
+      "task_leak": 0,
+      "db_leak": 0,
+      "PendingRollbackError": 0
+    },
+    "F6": {
+      "memory_rss_mb": 384,
+      "cpu_pct_p95": 29,
+      "file_descriptors_peak": 422,
+      "pool_exhaustion": 0,
+      "task_leak": 0,
+      "db_leak": 0,
+      "PendingRollbackError": 0
+    }
+  },
+  "combined": {
+    "memory_rss_mb_range": "382-391",
+    "memory_rss_mb_mean": 386,
+    "memory_delta_vs_p118_mean_mb": 5,
+    "no_upward_drift": true,
+    "cpu_pct_p95_range": "29-41",
+    "cpu_peak_window": "F5",
+    "cpu_peak_reason": "dry_run_concurrent_load",
+    "fd_peak_range": "418-447",
+    "fd_peak_window": "F5",
+    "fd_recovered_after_f5": true,
+    "fd_f6_vs_f5_delta": -25,
+    "pool_exhaustion_total": 0,
+    "task_leak_total": 0,
+    "db_leak_total": 0,
+    "PendingRollbackError_total": 0,
+    "p118_mean_memory_rss_mb": 381,
+    "context": "Higher than 25% baseline due to 2x concurrent shadow load. No drift. FD recovers after F5 dry-run window."
+  },
+  "resource_audit_passed": true,
+  "note": "All resource metrics stable. Memory 382-391MB range (vs P1.18 mean 381MB, delta +5MB expected at 2x load). CPU peaks at F5 dry-run parallel window. FD recovers in F6. No leaks, no exhaustion, no rollback errors."
+}

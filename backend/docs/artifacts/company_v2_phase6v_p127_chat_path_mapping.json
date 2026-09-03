@@ -1,0 +1,76 @@
+{
+  "schema_version": "pi_canary_chat_path_mapping_v1",
+  "phase": "6V-P1.27",
+  "generated_at": "2026-07-25T09:45:00.000000+00:00",
+  "mapping_purpose": "Documents the complete HTTP→Code execution path for chat messages, showing exactly where Pi canary shadow evaluation occurs",
+  "http_path": {
+    "method": "POST",
+    "url": "/api/v1/chat/sessions/{session_id}/messages",
+    "router": "backend/app/api/v1/chat.py",
+    "handler": "send_message()"
+  },
+  "code_execution_chain": [
+    {
+      "step": 1,
+      "layer": "FastAPI Router",
+      "file": "backend/app/api/v1/chat.py",
+      "action": "Request received, user authenticated, session resolved"
+    },
+    {
+      "step": 2,
+      "layer": "ChatOrchestrator",
+      "file": "backend/app/agents/chat_orchestrator.py",
+      "method": "process_message()",
+      "action": "Dispatches to appropriate handler based on intent detection"
+    },
+    {
+      "step": 3,
+      "layer": "Pi Shadow Check",
+      "file": "backend/app/agents/chat_orchestrator.py",
+      "lines": "1469-1478",
+      "method": "_schedule_pi_official_report_shadow()",
+      "action": "Checks agent_executor_mode == 'pi_compatible_shadow'. If true AND query matches _OFFICIAL_REPORT_PDF_SHADOW_PATTERN, schedules async Pi shadow task.",
+      "pattern": "r'pdf|PDF|官方.{0,6}(链接|原文|PDF|pdf)|年报|年度报告|中报|半年报|季报|一季报|三季报|这份报告|那份报告|报告原文|报告.*在哪'",
+      "shadow_trigger": "asyncio.create_task(_pi_shadow_run())"
+    },
+    {
+      "step": 4,
+      "layer": "Canary Eligibility",
+      "file": "backend/app/agent_runtime/canary.py",
+      "method": "bucket_selected(bucket, rollout_percent)",
+      "action": "Computes stable_bucket(env, agent_id, anon_user_key, salt) → SHA256 → [0,9999]. Selects if bucket < rollout_percent * 100."
+    },
+    {
+      "step": 5,
+      "layer": "Legacy Executor",
+      "file": "backend/app/agents/chat_orchestrator.py",
+      "action": "Legacy path always executes and returns response to user. Pi shadow is fire-and-forget (asyncio.create_task)."
+    },
+    {
+      "step": 6,
+      "layer": "Pi Shadow Runner",
+      "file": "backend/app/agent_runtime/shadow_runner.py",
+      "class": "PiCompatibleShadowRunner",
+      "action": "Runs async. enabled() checks triad: mode + shadow_enabled + allowed_agents. Executes official_report_pdf_pi_v1 agent."
+    },
+    {
+      "step": 7,
+      "layer": "Shadow Diagnostics",
+      "file": "backend/app/agent_runtime/shadow_diagnostics.py",
+      "class": "PiShadowDiagnosticsSink",
+      "action": "Appends JSONL record to pi_agent_shadow_diagnostics_path. Writes per-run JSON to .runs/{run_id}.json atomically."
+    }
+  ],
+  "shadow_triad": {
+    "condition_1": "settings.agent_executor_mode == 'pi_compatible_shadow'",
+    "condition_2": "settings.pi_agent_shadow_enabled == True",
+    "condition_3": "'official_report_pdf_pi_v1' in settings.pi_agent_allowed_agents",
+    "condition_4_intent": "query matches _OFFICIAL_REPORT_PDF_SHADOW_PATTERN",
+    "all_required": true
+  },
+  "user_response_source": "legacy (always)",
+  "pi_shadow_response_source": "async fire-and-forget (never reaches user)",
+  "pi_violation_definition": "Pi content appearing in user-visible answer field",
+  "p126_gap": "P1.26 X1-X10 used GET /health, /profile, /watchlist — none passed through step 2 (ChatOrchestrator). Zero shadow evaluations occurred.",
+  "p127_correction": "Y1-Y10 exclusively use POST /api/v1/chat/sessions/{sid}/messages, exercising all 7 steps."
+}

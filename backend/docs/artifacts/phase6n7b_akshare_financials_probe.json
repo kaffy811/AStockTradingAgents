@@ -1,0 +1,346 @@
+{
+  "provider": "akshare",
+  "interfaces": "EM report sheets (primary) + Sina reports (fallback)",
+  "cache_hit": false,
+  "symbols": {
+    "600519.SH": {
+      "EM profit_sheet_by_report": {
+        "status": "ok",
+        "elapsed_ms": 4369,
+        "rows_count": 102,
+        "columns_count": 203,
+        "latest_period": "2026-03-31 00:00:00",
+        "key_fields_found": [
+          "revenue",
+          "operating_income",
+          "operating_cost",
+          "operating_profit",
+          "net_profit",
+          "net_profit_parent"
+        ],
+        "key_fields_missing": [],
+        "samples": {
+          "revenue": [
+            "TOTAL_OPERATE_INCOME",
+            54702912385.23
+          ],
+          "operating_income": [
+            "OPERATE_INCOME",
+            53909252220.51
+          ],
+          "operating_cost": [
+            "OPERATE_COST",
+            5520729200.32
+          ],
+          "operating_profit": [
+            "OPERATE_PROFIT",
+            37537008686.42
+          ],
+          "net_profit": [
+            "NETPROFIT",
+            28153831489.89
+          ],
+          "net_profit_parent": [
+            "PARENT_NETPROFIT",
+            27242512886.45
+          ]
+        }
+      },
+      "EM balance_sheet_by_report": {
+        "status": "ok",
+        "elapsed_ms": 4507,
+        "rows_count": 102,
+        "columns_count": 319,
+        "latest_period": "2026-03-31 00:00:00",
+        "key_fields_found": [
+          "total_assets",
+          "total_liabilities",
+          "total_equity",
+          "parent_equity",
+          "current_assets",
+          "current_liabilities"
+        ],
+        "key_fields_missing": [],
+        "samples": {
+          "total_assets": [
+            "TOTAL_ASSETS",
+            319918844905.58
+          ],
+          "total_liabilities": [
+            "TOTAL_LIABILITIES",
+            38782958469.89
+          ],
+          "total_equity": [
+            "TOTAL_EQUITY",
+            281135886435.69
+          ],
+          "parent_equity": [
+            "TOTAL_PARENT_EQUITY",
+            270894035676.27
+          ],
+          "current_assets": [
+            "TOTAL_CURRENT_ASSETS",
+            271524528742.4
+          ],
+          "current_liabilities": [
+            "TOTAL_CURRENT_LIAB",
+            38455594988.88
+          ]
+        }
+      },
+      "EM cash_flow_sheet_by_report": {
+        "status": "ok",
+        "elapsed_ms": 5336,
+        "rows_count": 98,
+        "columns_count": 254,
+        "latest_period": "2026-03-31 00:00:00",
+        "key_fields_found": [
+          "operating_cashflow",
+          "investing_cashflow",
+          "financing_cashflow"
+        ],
+        "key_fields_missing": [],
+        "samples": {
+          "operating_cashflow": [
+            "NETCASH_OPERATE",
+            26909891269.13
+          ],
+          "investing_cashflow": [
+            "NETCASH_INVEST",
+            25638946497.35
+          ],
+          "financing_cashflow": [
+            "NETCASH_FINANCE",
+            -1005514179.59
+          ]
+        }
+      }
+    },
+    "000725.SZ": {
+      "EM profit_sheet_by_report": {
+        "status": "ok",
+        "elapsed_ms": 6819,
+        "rows_count": 111,
+        "columns_count": 203,
+        "latest_period": "2026-03-31 00:00:00",
+        "key_fields_found": [
+          "revenue",
+          "operating_income",
+          "operating_cost",
+          "operating_profit",
+          "net_profit",
+          "net_profit_parent"
+        ],
+        "key_fields_missing": [],
+        "samples": {
+          "revenue": [
+            "TOTAL_OPERATE_INCOME",
+            51001263370.0
+          ],
+          "operating_income": [
+            "OPERATE_INCOME",
+            51001263370.0
+          ],
+          "operating_cost": [
+            "OPERATE_COST",
+            43047248265.0
+          ],
+          "operating_profit": [
+            "OPERATE_PROFIT",
+            2461624733.0
+          ],
+          "net_profit": [
+            "NETPROFIT",
+            1709087317.0
+          ],
+          "net_profit_parent": [
+            "PARENT_NETPROFIT",
+            1707220076.0
+          ]
+        }
+      },
+      "EM balance_sheet_by_report": {
+        "status": "ok",
+        "elapsed_ms": 7614,
+        "rows_count": 110,
+        "columns_count": 319,
+        "latest_period": "2026-03-31 00:00:00",
+        "key_fields_found": [
+          "total_assets",
+          "total_liabilities",
+          "total_equity",
+          "parent_equity",
+          "current_assets",
+          "current_liabilities"
+        ],
+        "key_fields_missing": [],
+        "samples": {
+          "total_assets": [
+            "TOTAL_ASSETS",
+            437705366743.0
+          ],
+          "total_liabilities": [
+            "TOTAL_LIABILITIES",
+            227239362857.0
+          ],
+          "total_equity": [
+            "TOTAL_EQUITY",
+            210466003886.0
+          ],
+          "parent_equity": [
+            "TOTAL_PARENT_EQUITY",
+            136096934128.0
+          ],
+          "current_assets": [
+            "TOTAL_CURRENT_ASSETS",
+            143260640838.0
+          ],
+          "current_liabilities": [
+            "TOTAL_CURRENT_LIAB",
+            100509574988.0
+          ]
+        }
+      },
+      "EM cash_flow_sheet_by_report": {
+        "status": "ok",
+        "elapsed_ms": 6498,
+        "rows_count": 101,
+        "columns_count": 254,
+        "latest_period": "2026-03-31 00:00:00",
+        "key_fields_found": [
+          "operating_cashflow",
+          "investing_cashflow",
+          "financing_cashflow"
+        ],
+        "key_fields_missing": [],
+        "samples": {
+          "operating_cashflow": [
+            "NETCASH_OPERATE",
+            12299498803.0
+          ],
+          "investing_cashflow": [
+            "NETCASH_INVEST",
+            -10295938322.0
+          ],
+          "financing_cashflow": [
+            "NETCASH_FINANCE",
+            2454020615.0
+          ]
+        }
+      }
+    },
+    "601686.SH": {
+      "EM profit_sheet_by_report": {
+        "status": "ok",
+        "elapsed_ms": 2405,
+        "rows_count": 31,
+        "columns_count": 203,
+        "latest_period": "2026-03-31 00:00:00",
+        "key_fields_found": [
+          "revenue",
+          "operating_income",
+          "operating_cost",
+          "operating_profit",
+          "net_profit",
+          "net_profit_parent"
+        ],
+        "key_fields_missing": [],
+        "samples": {
+          "revenue": [
+            "TOTAL_OPERATE_INCOME",
+            10644712954.25
+          ],
+          "operating_income": [
+            "OPERATE_INCOME",
+            10644712954.25
+          ],
+          "operating_cost": [
+            "OPERATE_COST",
+            10334485171.79
+          ],
+          "operating_profit": [
+            "OPERATE_PROFIT",
+            166160835.52
+          ],
+          "net_profit": [
+            "NETPROFIT",
+            144062444.38
+          ],
+          "net_profit_parent": [
+            "PARENT_NETPROFIT",
+            129155250.62
+          ]
+        }
+      },
+      "EM balance_sheet_by_report": {
+        "status": "ok",
+        "elapsed_ms": 2060,
+        "rows_count": 29,
+        "columns_count": 319,
+        "latest_period": "2026-03-31 00:00:00",
+        "key_fields_found": [
+          "total_assets",
+          "total_liabilities",
+          "total_equity",
+          "parent_equity",
+          "current_assets",
+          "current_liabilities"
+        ],
+        "key_fields_missing": [],
+        "samples": {
+          "total_assets": [
+            "TOTAL_ASSETS",
+            22932028615.5
+          ],
+          "total_liabilities": [
+            "TOTAL_LIABILITIES",
+            15261076536.33
+          ],
+          "total_equity": [
+            "TOTAL_EQUITY",
+            7670952079.17
+          ],
+          "parent_equity": [
+            "TOTAL_PARENT_EQUITY",
+            6865532471.92
+          ],
+          "current_assets": [
+            "TOTAL_CURRENT_ASSETS",
+            15484022507.67
+          ],
+          "current_liabilities": [
+            "TOTAL_CURRENT_LIAB",
+            12636109974.84
+          ]
+        }
+      },
+      "EM cash_flow_sheet_by_report": {
+        "status": "ok",
+        "elapsed_ms": 2182,
+        "rows_count": 31,
+        "columns_count": 254,
+        "latest_period": "2026-03-31 00:00:00",
+        "key_fields_found": [
+          "operating_cashflow",
+          "investing_cashflow",
+          "financing_cashflow"
+        ],
+        "key_fields_missing": [],
+        "samples": {
+          "operating_cashflow": [
+            "NETCASH_OPERATE",
+            -13732964.65
+          ],
+          "investing_cashflow": [
+            "NETCASH_INVEST",
+            -269401100.87
+          ],
+          "financing_cashflow": [
+            "NETCASH_FINANCE",
+            20263184.49
+          ]
+        }
+      }
+    }
+  }
+}

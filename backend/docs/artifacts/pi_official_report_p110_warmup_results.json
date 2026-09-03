@@ -1,0 +1,141 @@
+{
+  "schema_version": "pi_official_report_p110_warmup_v1",
+  "phase": "6V-P1.10",
+  "generated_at": "2026-07-21T11:30:00+00:00",
+  "source_sha": "71f8dbcedad1149a68b95dbd4d28aeb35b80b311",
+  "warmup_count": 15,
+  "pool_warming_confirmed": true,
+  "cold_start_p50_ms": 4520,
+  "warm_p50_ms": 1347,
+  "warm_p95_ms": 1777,
+  "warmup_cases": [
+    {
+      "warmup_idx": 0,
+      "symbol": "000001",
+      "latency_ms": 4520,
+      "pool_phase": "cold_start",
+      "status": "completed",
+      "counted_in_formal_metrics": false
+    },
+    {
+      "warmup_idx": 1,
+      "symbol": "000725",
+      "latency_ms": 5145,
+      "pool_phase": "cold_start",
+      "status": "completed",
+      "counted_in_formal_metrics": false
+    },
+    {
+      "warmup_idx": 2,
+      "symbol": "000858",
+      "latency_ms": 3900,
+      "pool_phase": "cold_start",
+      "status": "completed",
+      "counted_in_formal_metrics": false
+    },
+    {
+      "warmup_idx": 3,
+      "symbol": "300209",
+      "latency_ms": 2643,
+      "pool_phase": "ramp",
+      "status": "completed",
+      "counted_in_formal_metrics": false
+    },
+    {
+      "warmup_idx": 4,
+      "symbol": "300750",
+      "latency_ms": 2378,
+      "pool_phase": "ramp",
+      "status": "completed",
+      "counted_in_formal_metrics": false
+    },
+    {
+      "warmup_idx": 5,
+      "symbol": "301396",
+      "latency_ms": 2587,
+      "pool_phase": "ramp",
+      "status": "completed",
+      "counted_in_formal_metrics": false
+    },
+    {
+      "warmup_idx": 6,
+      "symbol": "600186",
+      "latency_ms": 1481,
+      "pool_phase": "warm",
+      "status": "completed",
+      "counted_in_formal_metrics": false
+    },
+    {
+      "warmup_idx": 7,
+      "symbol": "600519",
+      "latency_ms": 1338,
+      "pool_phase": "warm",
+      "status": "completed",
+      "counted_in_formal_metrics": false
+    },
+    {
+      "warmup_idx": 8,
+      "symbol": "601686",
+      "latency_ms": 1352,
+      "pool_phase": "warm",
+      "status": "completed",
+      "counted_in_formal_metrics": false
+    },
+    {
+      "warmup_idx": 9,
+      "symbol": "688146",
+      "latency_ms": 1134,
+      "pool_phase": "warm",
+      "status": "completed",
+      "counted_in_formal_metrics": false
+    },
+    {
+      "warmup_idx": 10,
+      "symbol": "688549",
+      "latency_ms": 1347,
+      "pool_phase": "warm",
+      "status": "completed",
+      "counted_in_formal_metrics": false
+    },
+    {
+      "warmup_idx": 11,
+      "symbol": "000001",
+      "latency_ms": 1777,
+      "pool_phase": "warm",
+      "status": "completed",
+      "counted_in_formal_metrics": false
+    },
+    {
+      "warmup_idx": 12,
+      "symbol": "000725",
+      "latency_ms": 1398,
+      "pool_phase": "warm",
+      "status": "completed",
+      "counted_in_formal_metrics": false
+    },
+    {
+      "warmup_idx": 13,
+      "symbol": "000858",
+      "latency_ms": 1308,
+      "pool_phase": "warm",
+      "status": "completed",
+      "counted_in_formal_metrics": false
+    },
+    {
+      "warmup_idx": 14,
+      "symbol": "300209",
+      "latency_ms": 1286,
+      "pool_phase": "warm",
+      "status": "completed",
+      "counted_in_formal_metrics": false
+    }
+  ],
+  "note": "15 warmup requests excluded from formal metrics (not counted in coverage or gate). Cold-start first 3 requests show >3.8s latency confirming pool was not yet warm. By request 7+ all completions are <1.8s confirming pool fully warm before M1 phase.",
+  "latency_ms": {
+    "p50": 1347,
+    "p95": 1777,
+    "cold_start_p50": 4520,
+    "warm_p50": 1347,
+    "warm_p95": 1777
+  }
+}

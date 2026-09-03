@@ -1,0 +1,49 @@
+# Phase 6T-S Secondary Artifact
+
+```json
+{
+  "phase6ts_passed": true,
+  "stage3_status": "not_authorized",
+  "stage3_authorized": false,
+  "shadow_soak_completed": true,
+  "run_id": "758a6855f71749fda80401e8f2a5ab35",
+  "status": "passed",
+  "worker_mode": "shadow",
+  "duration_seconds": 8,
+  "requested_duration_seconds": 8.0,
+  "actual_duration_seconds": 26.179,
+  "worker_count": 2,
+  "symbols": [
+    "601686",
+    "600519"
+  ],
+  "jobs_created": 2,
+  "jobs_cancelled": 2,
+  "jobs_observed": 0,
+  "observation_rows_written": 0,
+  "duplicate_claim_count": 0,
+  "simultaneous_claim_conflicts": 0,
+  "reclaim_after_restart_count": 0,
+  "duplicate_claim_events": [],
+  "claim_reclaim_events": [],
+  "unknown_jobs_modified": 0,
+  "active_leases_peak": 2,
+  "active_leases_end": 0,
+  "stale_leases_end": 0,
+  "heartbeat_failures": 2,
+  "lease_renewal_failures": 0,
+  "worker_restart_count": 4,
+  "db_disconnect_count": 1,
+  "db_reconnect_count": 1,
+  "preexisting_active_jobs_found": 0,
+  "real_execution_count": 0,
+  "provider_call_count": 0,
+  "rag_query_count": 0,
+  "extractor_call_count": 0,
+  "fusion_result_write_count": 0,
+  "auto_run": false,
+  "rollout_percent": 0,
+  "blocking_issues": [],
+  "errors": []
+}
+```

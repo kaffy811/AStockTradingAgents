@@ -1,0 +1,55 @@
+ts_code,probe,status,latency_ms,rows_count,renderable,error,score
+600519.SH,baostock_login,ok,1452,,,,40.0
+600519.SH,baostock_profit,ok,2504,6,True,,40.0
+600519.SH,baostock_growth,ok,1014,6,True,,40.0
+600519.SH,baostock_balance,ok,1770,6,True,,40.0
+600519.SH,baostock_operation,ok,2696,6,True,,40.0
+600519.SH,baostock_cash_flow,ok,3118,6,True,,40.0
+600519.SH,baostock_dupont,ok,1017,6,True,,40.0
+600519.SH,akshare_financial_abstract,empty,743,0,,,40.0
+600519.SH,akshare_cash_flow,empty,1157,0,,,40.0
+600519.SH,akshare_real_time_quote,failed,5741,,,"ProxyError: HTTPSConnectionPool(host='82.push2.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/clist/get?pn=1&pz=100&po=1&np=1&ut=bd1d9ddb04089700cf9c27f6f7426281&fltt=2&invt=2&fid=f12&fs=m%3A0+t%3A6%2Cm%3A0+t%3A80%2Cm%3A1+t%3A2%2Cm%3A1+t%3A23%2Cm%3A0+t%3A81+s%3A2048&fields=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6%2Cf7%2Cf8%2Cf9%2Cf10%2Cf12%2Cf13%2Cf14%2Cf15%2Cf16%2Cf17%2Cf18%2Cf20%2Cf21%2Cf23%2Cf24%2Cf25%2Cf22%2Cf11%2Cf62%2Cf128%2Cf136%2Cf115%2Cf152 (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))",40.0
+600519.SH,dns_static.cninfo.com.cn,ok,17,,,,40.0
+600519.SH,dns_www.sse.com.cn,ok,15,,,,40.0
+600519.SH,dns_disclosure.szse.cn,failed,22,,,"DNS failed: [Errno 8] nodename nor servname provided, or not known",40.0
+600519.SH,pdf_discovery_2025,empty,3520,,,,40.0
+600519.SH,pdf_discovery_2024,empty,3539,,,,40.0
+600519.SH,pdf_discovery_2023,empty,3545,,,,40.0
+600519.SH,db_report_documents,empty,7633,0,,,40.0
+600519.SH,db_report_chunks,empty,5962,0,,,40.0
+000725.SZ,baostock_login,ok,373,,,,40.0
+000725.SZ,baostock_profit,ok,1394,6,True,,40.0
+000725.SZ,baostock_growth,ok,1167,6,True,,40.0
+000725.SZ,baostock_balance,ok,1281,6,True,,40.0
+000725.SZ,baostock_operation,ok,871,6,True,,40.0
+000725.SZ,baostock_cash_flow,ok,996,6,True,,40.0
+000725.SZ,baostock_dupont,ok,3147,6,True,,40.0
+000725.SZ,akshare_financial_abstract,empty,593,0,,,40.0
+000725.SZ,akshare_cash_flow,empty,1810,0,,,40.0
+000725.SZ,akshare_real_time_quote,failed,5343,,,"ProxyError: HTTPSConnectionPool(host='82.push2.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/clist/get?pn=1&pz=100&po=1&np=1&ut=bd1d9ddb04089700cf9c27f6f7426281&fltt=2&invt=2&fid=f12&fs=m%3A0+t%3A6%2Cm%3A0+t%3A80%2Cm%3A1+t%3A2%2Cm%3A1+t%3A23%2Cm%3A0+t%3A81+s%3A2048&fields=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6%2Cf7%2Cf8%2Cf9%2Cf10%2Cf12%2Cf13%2Cf14%2Cf15%2Cf16%2Cf17%2Cf18%2Cf20%2Cf21%2Cf23%2Cf24%2Cf25%2Cf22%2Cf11%2Cf62%2Cf128%2Cf136%2Cf115%2Cf152 (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))",40.0
+000725.SZ,dns_static.cninfo.com.cn,ok,2,,,,40.0
+000725.SZ,dns_www.sse.com.cn,ok,1,,,,40.0
+000725.SZ,dns_disclosure.szse.cn,failed,1,,,"DNS failed: [Errno 8] nodename nor servname provided, or not known",40.0
+000725.SZ,pdf_discovery_2025,empty,3546,,,,40.0
+000725.SZ,pdf_discovery_2024,empty,3651,,,,40.0
+000725.SZ,pdf_discovery_2023,empty,3441,,,,40.0
+000725.SZ,db_report_documents,empty,7190,0,,,40.0
+000725.SZ,db_report_chunks,timeout,8000,0,False,PROVIDER_TIMEOUT: exceeded 8s,40.0
+601686.SH,baostock_login,ok,160,,,,40.0
+601686.SH,baostock_profit,ok,1780,6,True,,40.0
+601686.SH,baostock_growth,ok,2506,6,True,,40.0
+601686.SH,baostock_balance,ok,1582,6,True,,40.0
+601686.SH,baostock_operation,ok,4456,6,True,,40.0
+601686.SH,baostock_cash_flow,ok,1073,6,True,,40.0
+601686.SH,baostock_dupont,ok,1546,6,True,,40.0
+601686.SH,akshare_financial_abstract,empty,572,0,,,40.0
+601686.SH,akshare_cash_flow,empty,684,0,,,40.0
+601686.SH,akshare_real_time_quote,failed,5275,,,"ProxyError: HTTPSConnectionPool(host='82.push2.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/clist/get?pn=1&pz=100&po=1&np=1&ut=bd1d9ddb04089700cf9c27f6f7426281&fltt=2&invt=2&fid=f12&fs=m%3A0+t%3A6%2Cm%3A0+t%3A80%2Cm%3A1+t%3A2%2Cm%3A1+t%3A23%2Cm%3A0+t%3A81+s%3A2048&fields=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6%2Cf7%2Cf8%2Cf9%2Cf10%2Cf12%2Cf13%2Cf14%2Cf15%2Cf16%2Cf17%2Cf18%2Cf20%2Cf21%2Cf23%2Cf24%2Cf25%2Cf22%2Cf11%2Cf62%2Cf128%2Cf136%2Cf115%2Cf152 (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))",40.0
+601686.SH,dns_static.cninfo.com.cn,ok,18,,,,40.0
+601686.SH,dns_www.sse.com.cn,ok,14,,,,40.0
+601686.SH,dns_disclosure.szse.cn,failed,21,,,"DNS failed: [Errno 8] nodename nor servname provided, or not known",40.0
+601686.SH,pdf_discovery_2025,empty,3552,,,,40.0
+601686.SH,pdf_discovery_2024,empty,3506,,,,40.0
+601686.SH,pdf_discovery_2023,empty,3840,,,,40.0
+601686.SH,db_report_documents,timeout,8000,0,False,PROVIDER_TIMEOUT: exceeded 8s,40.0
+601686.SH,db_report_chunks,empty,7365,0,,,40.0

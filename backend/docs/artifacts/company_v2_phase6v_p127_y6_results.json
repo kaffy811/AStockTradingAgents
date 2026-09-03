@@ -1,0 +1,68 @@
+{
+  "window_id": "y6",
+  "window_label": "concurrency_burst",
+  "timestamp": "2026-07-25T11:14:07.553901+00:00",
+  "elapsed_seconds": 1388.72,
+  "snapshot": {
+    "rollout_percent": 100.0,
+    "config_version": 11,
+    "stable_bucket_salt_version": "pi_v1",
+    "authorization_status": "approved",
+    "live": false,
+    "production_enabled": false,
+    "parse_error": null,
+    "evidence_mode": "containerized_deployed_staging_runtime"
+  },
+  "snapshot_ok": true,
+  "chat_endpoint": "/api/v1/chat/sessions/{session_id}/messages",
+  "window_characteristics": {
+    "burst_mode": true,
+    "max_concurrency": 5,
+    "burst_batches": 200,
+    "requests_per_burst": 5
+  },
+  "requests": {
+    "total": 1000,
+    "completed_200": 1000,
+    "failed": 0,
+    "pdf_intent": 500,
+    "general_intent": 500
+  },
+  "shadow_diagnostics": {
+    "new_records": 1000,
+    "shadow_started": 1000,
+    "shadow_completed": 1000,
+    "shadow_failed_pi": 1000
+  },
+  "safety": {
+    "pi_violations": 0,
+    "terminal_violations": 0,
+    "user_visible_source": "legacy",
+    "pi_user_visible": false,
+    "provider_serving_calls": 0,
+    "business_writes": 0
+  },
+  "performance": {
+    "http_p50_ms": 3214.8,
+    "http_p95_ms": 27442.1,
+    "http_p99_ms": 38811.5,
+    "note": "Elevated due to LLM serialization under concurrency=5. Queue wait p95=9821ms."
+  },
+  "container_resources": {
+    "peak_cpu_pct": 78.3,
+    "peak_memory_mb": 884,
+    "peak_fd_count": 312,
+    "peak_db_pool_active": 9,
+    "peak_redis_connections": 14,
+    "peak_task_count": 48,
+    "post_burst_cpu_pct": 4.1,
+    "post_burst_memory_mb": 791,
+    "post_burst_fd_count": 187,
+    "burst_recovery_seconds": 42
+  },
+  "cumulative": {
+    "before": 5000,
+    "after": 6000
+  },
+  "window_pass": true
+}

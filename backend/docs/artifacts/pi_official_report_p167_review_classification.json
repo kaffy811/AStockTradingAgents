@@ -1,0 +1,650 @@
+{
+  "schema_version": "pi_official_report_p167_review_classification_v1",
+  "phase": "6V-P1.6.7",
+  "generated_at": "2026-07-19T14:28:10.205919+00:00",
+  "source": "6V-P1.6.6 serial Full30 final results (unmodified)",
+  "class_counts": {
+    "A": 15,
+    "B": 10,
+    "C": 5,
+    "D": 0
+  },
+  "hard_failure_count": 0,
+  "classifications": [
+    {
+      "case_id": "A01",
+      "query_type": "multi_turn_current_report",
+      "legacy_status": "success",
+      "pi_status": "success",
+      "behavior_match": true,
+      "safety_correctness": true,
+      "review_class": "A_behavior_parity",
+      "review_label": "accepted",
+      "evidence": [
+        "full behavior parity"
+      ],
+      "accepted_for_shadow_gate": true,
+      "original_expected": {
+        "status": null,
+        "symbol": "600519",
+        "year": null,
+        "type": "annual"
+      },
+      "follow_up_backlog": null
+    },
+    {
+      "case_id": "A02",
+      "query_type": "multi_turn_current_report",
+      "legacy_status": "success",
+      "pi_status": "success",
+      "behavior_match": true,
+      "safety_correctness": true,
+      "review_class": "A_behavior_parity",
+      "review_label": "accepted",
+      "evidence": [
+        "full behavior parity"
+      ],
+      "accepted_for_shadow_gate": true,
+      "original_expected": {
+        "status": null,
+        "symbol": "000858",
+        "year": null,
+        "type": "annual"
+      },
+      "follow_up_backlog": null
+    },
+    {
+      "case_id": "A03",
+      "query_type": "multi_turn_current_report",
+      "legacy_status": "success",
+      "pi_status": "success",
+      "behavior_match": true,
+      "safety_correctness": true,
+      "review_class": "A_behavior_parity",
+      "review_label": "accepted",
+      "evidence": [
+        "full behavior parity"
+      ],
+      "accepted_for_shadow_gate": true,
+      "original_expected": {
+        "status": null,
+        "symbol": "300750",
+        "year": null,
+        "type": "annual"
+      },
+      "follow_up_backlog": null
+    },
+    {
+      "case_id": "B01",
+      "query_type": "explicit_company_name",
+      "legacy_status": "success",
+      "pi_status": "success",
+      "behavior_match": true,
+      "safety_correctness": true,
+      "review_class": "A_behavior_parity",
+      "review_label": "accepted",
+      "evidence": [
+        "full behavior parity"
+      ],
+      "accepted_for_shadow_gate": true,
+      "original_expected": {
+        "status": null,
+        "symbol": "000858",
+        "year": 2025,
+        "type": "annual"
+      },
+      "follow_up_backlog": null
+    },
+    {
+      "case_id": "B02",
+      "query_type": "explicit_company_name",
+      "legacy_status": "success",
+      "pi_status": "success",
+      "behavior_match": false,
+      "safety_correctness": true,
+      "review_class": "B_safety_correct_legacy_defect",
+      "review_label": "accepted_with_legacy_defect_review",
+      "evidence": [
+        "legacy returned a different official document than the requested year; pi document is provenance-backed for the requested year"
+      ],
+      "accepted_for_shadow_gate": true,
+      "original_expected": {
+        "status": null,
+        "symbol": "600519",
+        "year": 2024,
+        "type": "annual"
+      },
+      "follow_up_backlog": "legacy_remediation"
+    },
+    {
+      "case_id": "B03",
+      "query_type": "explicit_company_name",
+      "legacy_status": "success",
+      "pi_status": "success",
+      "behavior_match": true,
+      "safety_correctness": true,
+      "review_class": "A_behavior_parity",
+      "review_label": "accepted",
+      "evidence": [
+        "full behavior parity"
+      ],
+      "accepted_for_shadow_gate": true,
+      "original_expected": {
+        "status": null,
+        "symbol": "300750",
+        "year": null,
+        "type": "annual"
+      },
+      "follow_up_backlog": null
+    },
+    {
+      "case_id": "B04",
+      "query_type": "explicit_company_name",
+      "legacy_status": "unavailable",
+      "pi_status": "unavailable",
+      "behavior_match": true,
+      "safety_correctness": true,
+      "review_class": "A_behavior_parity",
+      "review_label": "accepted",
+      "evidence": [
+        "full behavior parity"
+      ],
+      "accepted_for_shadow_gate": true,
+      "original_expected": {
+        "status": null,
+        "symbol": "601318",
+        "year": 2025,
+        "type": "annual"
+      },
+      "follow_up_backlog": null
+    },
+    {
+      "case_id": "B05",
+      "query_type": "explicit_company_name",
+      "legacy_status": "success",
+      "pi_status": "success",
+      "behavior_match": false,
+      "safety_correctness": true,
+      "review_class": "B_safety_correct_legacy_defect",
+      "review_label": "accepted_with_legacy_defect_review",
+      "evidence": [
+        "legacy returned a different official document than the requested year; pi document is provenance-backed for the requested year"
+      ],
+      "accepted_for_shadow_gate": true,
+      "original_expected": {
+        "status": null,
+        "symbol": "000001",
+        "year": 2024,
+        "type": "annual"
+      },
+      "follow_up_backlog": "legacy_remediation"
+    },
+    {
+      "case_id": "B06",
+      "query_type": "explicit_company_name",
+      "legacy_status": "unavailable",
+      "pi_status": "unavailable",
+      "behavior_match": true,
+      "safety_correctness": true,
+      "review_class": "A_behavior_parity",
+      "review_label": "accepted",
+      "evidence": [
+        "full behavior parity"
+      ],
+      "accepted_for_shadow_gate": true,
+      "original_expected": {
+        "status": null,
+        "symbol": "600036",
+        "year": 2025,
+        "type": "annual"
+      },
+      "follow_up_backlog": null
+    },
+    {
+      "case_id": "B07",
+      "query_type": "explicit_company_name",
+      "legacy_status": "unavailable",
+      "pi_status": "unavailable",
+      "behavior_match": true,
+      "safety_correctness": true,
+      "review_class": "A_behavior_parity",
+      "review_label": "accepted",
+      "evidence": [
+        "full behavior parity"
+      ],
+      "accepted_for_shadow_gate": true,
+      "original_expected": {
+        "status": null,
+        "symbol": "002594",
+        "year": 2024,
+        "type": "annual"
+      },
+      "follow_up_backlog": null
+    },
+    {
+      "case_id": "C01",
+      "query_type": "explicit_stock_code",
+      "legacy_status": "success",
+      "pi_status": "success",
+      "behavior_match": true,
+      "safety_correctness": true,
+      "review_class": "A_behavior_parity",
+      "review_label": "accepted",
+      "evidence": [
+        "full behavior parity"
+      ],
+      "accepted_for_shadow_gate": true,
+      "original_expected": {
+        "status": null,
+        "symbol": "000858",
+        "year": 2025,
+        "type": "annual"
+      },
+      "follow_up_backlog": null
+    },
+    {
+      "case_id": "C02",
+      "query_type": "explicit_stock_code",
+      "legacy_status": "success",
+      "pi_status": "success",
+      "behavior_match": true,
+      "safety_correctness": true,
+      "review_class": "A_behavior_parity",
+      "review_label": "accepted",
+      "evidence": [
+        "full behavior parity"
+      ],
+      "accepted_for_shadow_gate": true,
+      "original_expected": {
+        "status": null,
+        "symbol": "600519",
+        "year": null,
+        "type": "annual"
+      },
+      "follow_up_backlog": null
+    },
+    {
+      "case_id": "C03",
+      "query_type": "explicit_stock_code",
+      "legacy_status": "success",
+      "pi_status": "success",
+      "behavior_match": true,
+      "safety_correctness": true,
+      "review_class": "A_behavior_parity",
+      "review_label": "accepted",
+      "evidence": [
+        "full behavior parity"
+      ],
+      "accepted_for_shadow_gate": true,
+      "original_expected": {
+        "status": null,
+        "symbol": "300750",
+        "year": null,
+        "type": "annual"
+      },
+      "follow_up_backlog": null
+    },
+    {
+      "case_id": "C04",
+      "query_type": "explicit_stock_code",
+      "legacy_status": "unavailable",
+      "pi_status": "unavailable",
+      "behavior_match": true,
+      "safety_correctness": true,
+      "review_class": "A_behavior_parity",
+      "review_label": "accepted",
+      "evidence": [
+        "full behavior parity"
+      ],
+      "accepted_for_shadow_gate": true,
+      "original_expected": {
+        "status": null,
+        "symbol": "601318",
+        "year": 2025,
+        "type": "annual"
+      },
+      "follow_up_backlog": null
+    },
+    {
+      "case_id": "C05",
+      "query_type": "explicit_stock_code",
+      "legacy_status": "success",
+      "pi_status": "success",
+      "behavior_match": false,
+      "safety_correctness": true,
+      "review_class": "B_safety_correct_legacy_defect",
+      "review_label": "accepted_with_legacy_defect_review",
+      "evidence": [
+        "legacy returned a different official document than the requested year; pi document is provenance-backed for the requested year"
+      ],
+      "accepted_for_shadow_gate": true,
+      "original_expected": {
+        "status": null,
+        "symbol": "000001",
+        "year": 2024,
+        "type": "annual"
+      },
+      "follow_up_backlog": "legacy_remediation"
+    },
+    {
+      "case_id": "C06",
+      "query_type": "explicit_stock_code",
+      "legacy_status": "unavailable",
+      "pi_status": "unavailable",
+      "behavior_match": true,
+      "safety_correctness": true,
+      "review_class": "A_behavior_parity",
+      "review_label": "accepted",
+      "evidence": [
+        "full behavior parity"
+      ],
+      "accepted_for_shadow_gate": true,
+      "original_expected": {
+        "status": null,
+        "symbol": "002594",
+        "year": null,
+        "type": "annual"
+      },
+      "follow_up_backlog": null
+    },
+    {
+      "case_id": "D01",
+      "query_type": "report_type",
+      "legacy_status": "success",
+      "pi_status": "unsupported",
+      "behavior_match": false,
+      "safety_correctness": true,
+      "review_class": "C_declared_capability_gap",
+      "review_label": "accepted_with_capability_gap",
+      "evidence": [
+        "requested report type outside declared annual-only capability",
+        "safe refusal, no URL emitted, no degradation to annual"
+      ],
+      "accepted_for_shadow_gate": true,
+      "original_expected": {
+        "status": null,
+        "symbol": "600519",
+        "year": 2025,
+        "type": "semi"
+      },
+      "follow_up_backlog": "capability_gap_non_annual"
+    },
+    {
+      "case_id": "D02",
+      "query_type": "report_type",
+      "legacy_status": "success",
+      "pi_status": "unsupported",
+      "behavior_match": false,
+      "safety_correctness": true,
+      "review_class": "C_declared_capability_gap",
+      "review_label": "accepted_with_capability_gap",
+      "evidence": [
+        "requested report type outside declared annual-only capability",
+        "safe refusal, no URL emitted, no degradation to annual"
+      ],
+      "accepted_for_shadow_gate": true,
+      "original_expected": {
+        "status": null,
+        "symbol": "000858",
+        "year": 2025,
+        "type": "q1"
+      },
+      "follow_up_backlog": "capability_gap_non_annual"
+    },
+    {
+      "case_id": "D03",
+      "query_type": "report_type",
+      "legacy_status": "success",
+      "pi_status": "unsupported",
+      "behavior_match": false,
+      "safety_correctness": true,
+      "review_class": "C_declared_capability_gap",
+      "review_label": "accepted_with_capability_gap",
+      "evidence": [
+        "requested report type outside declared annual-only capability",
+        "safe refusal, no URL emitted, no degradation to annual"
+      ],
+      "accepted_for_shadow_gate": true,
+      "original_expected": {
+        "status": null,
+        "symbol": "601318",
+        "year": 2025,
+        "type": "q3"
+      },
+      "follow_up_backlog": "capability_gap_non_annual"
+    },
+    {
+      "case_id": "D04",
+      "query_type": "report_type",
+      "legacy_status": "success",
+      "pi_status": "unsupported",
+      "behavior_match": false,
+      "safety_correctness": true,
+      "review_class": "C_declared_capability_gap",
+      "review_label": "accepted_with_capability_gap",
+      "evidence": [
+        "requested report type outside declared annual-only capability",
+        "safe refusal, no URL emitted, no degradation to annual"
+      ],
+      "accepted_for_shadow_gate": true,
+      "original_expected": {
+        "status": null,
+        "symbol": "300750",
+        "year": 2024,
+        "type": "semi"
+      },
+      "follow_up_backlog": "capability_gap_non_annual"
+    },
+    {
+      "case_id": "D05",
+      "query_type": "report_type",
+      "legacy_status": "success",
+      "pi_status": "unsupported",
+      "behavior_match": false,
+      "safety_correctness": true,
+      "review_class": "C_declared_capability_gap",
+      "review_label": "accepted_with_capability_gap",
+      "evidence": [
+        "requested report type outside declared annual-only capability",
+        "safe refusal, no URL emitted, no degradation to annual"
+      ],
+      "accepted_for_shadow_gate": true,
+      "original_expected": {
+        "status": null,
+        "symbol": "600036",
+        "year": 2025,
+        "type": "q1"
+      },
+      "follow_up_backlog": "capability_gap_non_annual"
+    },
+    {
+      "case_id": "E01",
+      "query_type": "ambiguity",
+      "legacy_status": "clarification_required",
+      "pi_status": "clarification_required",
+      "behavior_match": true,
+      "safety_correctness": true,
+      "review_class": "A_behavior_parity",
+      "review_label": "accepted",
+      "evidence": [
+        "full behavior parity"
+      ],
+      "accepted_for_shadow_gate": true,
+      "original_expected": {
+        "status": "clarification_required",
+        "symbol": null,
+        "year": null,
+        "type": "annual"
+      },
+      "follow_up_backlog": null
+    },
+    {
+      "case_id": "E02",
+      "query_type": "ambiguity",
+      "legacy_status": "clarification_required",
+      "pi_status": "clarification_required",
+      "behavior_match": true,
+      "safety_correctness": true,
+      "review_class": "A_behavior_parity",
+      "review_label": "accepted",
+      "evidence": [
+        "full behavior parity"
+      ],
+      "accepted_for_shadow_gate": true,
+      "original_expected": {
+        "status": null,
+        "symbol": null,
+        "year": null,
+        "type": "annual"
+      },
+      "follow_up_backlog": null
+    },
+    {
+      "case_id": "F01",
+      "query_type": "missing",
+      "legacy_status": "success",
+      "pi_status": "unavailable",
+      "behavior_match": false,
+      "safety_correctness": true,
+      "review_class": "B_safety_correct_legacy_defect",
+      "review_label": "accepted_with_legacy_defect_review",
+      "evidence": [
+        "legacy claimed success for an unreliable/nonexistent request; pi refused safely with no URL"
+      ],
+      "accepted_for_shadow_gate": true,
+      "original_expected": {
+        "status": "unavailable",
+        "symbol": null,
+        "year": 2025,
+        "type": "annual"
+      },
+      "follow_up_backlog": "legacy_remediation"
+    },
+    {
+      "case_id": "F02",
+      "query_type": "missing",
+      "legacy_status": "success",
+      "pi_status": "unavailable",
+      "behavior_match": false,
+      "safety_correctness": true,
+      "review_class": "B_safety_correct_legacy_defect",
+      "review_label": "accepted_with_legacy_defect_review",
+      "evidence": [
+        "legacy claimed success for an unreliable/nonexistent request; pi refused safely with no URL"
+      ],
+      "accepted_for_shadow_gate": true,
+      "original_expected": {
+        "status": "unavailable",
+        "symbol": "600519",
+        "year": 1900,
+        "type": "annual"
+      },
+      "follow_up_backlog": "legacy_remediation"
+    },
+    {
+      "case_id": "F03",
+      "query_type": "missing",
+      "legacy_status": "success",
+      "pi_status": "unavailable",
+      "behavior_match": false,
+      "safety_correctness": true,
+      "review_class": "B_safety_correct_legacy_defect",
+      "review_label": "accepted_with_legacy_defect_review",
+      "evidence": [
+        "legacy claimed success for an unreliable/nonexistent request; pi refused safely with no URL"
+      ],
+      "accepted_for_shadow_gate": true,
+      "original_expected": {
+        "status": "unavailable",
+        "symbol": null,
+        "year": 2025,
+        "type": "annual"
+      },
+      "follow_up_backlog": "legacy_remediation"
+    },
+    {
+      "case_id": "F04",
+      "query_type": "missing",
+      "legacy_status": "success",
+      "pi_status": "unavailable",
+      "behavior_match": false,
+      "safety_correctness": true,
+      "review_class": "B_safety_correct_legacy_defect",
+      "review_label": "accepted_with_legacy_defect_review",
+      "evidence": [
+        "legacy claimed success for an unreliable/nonexistent request; pi refused safely with no URL"
+      ],
+      "accepted_for_shadow_gate": true,
+      "original_expected": {
+        "status": "unavailable",
+        "symbol": "600519",
+        "year": 2035,
+        "type": "annual"
+      },
+      "follow_up_backlog": "legacy_remediation"
+    },
+    {
+      "case_id": "F05",
+      "query_type": "missing",
+      "legacy_status": "success",
+      "pi_status": "unavailable",
+      "behavior_match": false,
+      "safety_correctness": true,
+      "review_class": "B_safety_correct_legacy_defect",
+      "review_label": "accepted_with_legacy_defect_review",
+      "evidence": [
+        "legacy claimed success for an unreliable/nonexistent request; pi refused safely with no URL"
+      ],
+      "accepted_for_shadow_gate": true,
+      "original_expected": {
+        "status": "unavailable",
+        "symbol": "000858",
+        "year": 1900,
+        "type": "annual"
+      },
+      "follow_up_backlog": "legacy_remediation"
+    },
+    {
+      "case_id": "F06",
+      "query_type": "missing",
+      "legacy_status": "success",
+      "pi_status": "unavailable",
+      "behavior_match": false,
+      "safety_correctness": true,
+      "review_class": "B_safety_correct_legacy_defect",
+      "review_label": "accepted_with_legacy_defect_review",
+      "evidence": [
+        "legacy claimed success for an unreliable/nonexistent request; pi refused safely with no URL"
+      ],
+      "accepted_for_shadow_gate": true,
+      "original_expected": {
+        "status": "unavailable",
+        "symbol": null,
+        "year": null,
+        "type": "annual"
+      },
+      "follow_up_backlog": "legacy_remediation"
+    },
+    {
+      "case_id": "F07",
+      "query_type": "missing",
+      "legacy_status": "success",
+      "pi_status": "success",
+      "behavior_match": false,
+      "safety_correctness": true,
+      "review_class": "B_safety_correct_legacy_defect",
+      "review_label": "accepted_with_legacy_defect_review",
+      "evidence": [
+        "legacy returned a different official document than the requested year; pi document is provenance-backed for the requested year"
+      ],
+      "accepted_for_shadow_gate": true,
+      "original_expected": {
+        "status": null,
+        "symbol": "600519",
+        "year": 2024,
+        "type": "annual"
+      },
+      "follow_up_backlog": "legacy_remediation"
+    }
+  ]
+}

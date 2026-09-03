@@ -1,0 +1,22 @@
+{
+  "schema_version": "pi_official_report_p113_bucket_dist_v1",
+  "phase": "6V-P1.13",
+  "generated_at": "2026-07-22T08:25:00.000000+00:00",
+  "source_sha": "2f4f42ba4fb98164a2cd01b5e4b38f0026efd20c",
+  "algorithm": "sha256(environment + agent_id + anonymized_user_key + config_version) % 10000",
+  "hit_condition": "bucket < 500",
+  "rollout_percent": 5,
+  "config_version": 4,
+  "sample_keys_tested": 50000,
+  "selected_count": 2491,
+  "selected_rate": 0.04982,
+  "expected_range": [0.047, 0.053],
+  "within_expected_range": true,
+  "deterministic": true,
+  "same_key_same_version_stable": true,
+  "config_version_change_rebuckets": true,
+  "uses_python_builtin_hash": false,
+  "uses_time_or_random": false,
+  "complete_user_id_stored": false,
+  "distribution_chi_square_pass": true
+}

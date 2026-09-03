@@ -1,0 +1,22 @@
+{
+  "schema_version": "pi_official_report_p116_p115_audit_v1",
+  "phase": "6V-P1.16",
+  "generated_at": "2026-07-24T09:05:00.000000+00:00",
+  "source_sha": "283957d618ffa7fafbba36cd02be239bd6d8363a",
+  "p115_source_sha": "69a0169979603b3d5ad40cc37bdafc3f05ac9dda",
+  "p115_final_gate_verified": true,
+  "current_rollout_percent": 10,
+  "p115_rollout_percent": 10,
+  "p115_ten_percent_shadow_passed": true,
+  "p115_selected": 1022,
+  "p115_safety_correctness": 1.0,
+  "p115_zero_tolerance_count": 0,
+  "p115_tool_p95_ms": 3290,
+  "p115_pi_p95_ms": 4780,
+  "p115_production_enabled": false,
+  "p115_live_serving": false,
+  "p115_all_gates_passed": true,
+  "baseline_consistent": true,
+  "proceed_with_observation": true,
+  "note": "P1.15 gate confirmed: rollout=10%, ten_percent_shadow_passed=true, selected=1022, safety=1.0, zero-tolerance=0, tool_p95=3290ms, pi_p95=4780ms, production=false, live=false. P1.16 proceeds with 6-window sustained observation targeting 3000+ selections."
+}

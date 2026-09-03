@@ -1,0 +1,76 @@
+{
+  "schema_version": "pi_canary_provider_path_audit_v1",
+  "phase": "6V-P1.33",
+  "generated_at": "2026-07-26T04:00:00Z",
+
+  "audit_target": "backend/app/llm/factory.py — check_real_provider_gate()",
+  "audit_purpose": "Verify which ProviderActivationGate checks are actually in the formal call path",
+
+  "gate_checks_in_call_path": [
+    {
+      "check": "kill_switch",
+      "in_path": true,
+      "gate": "gate_1_kill_switch",
+      "note": "Synchronous — no Redis required. Always checked."
+    },
+    {
+      "check": "enabled",
+      "in_path": true,
+      "gate": "gate_2_enabled",
+      "note": "Synchronous — checks pi_real_provider_enabled setting. Always checked."
+    },
+    {
+      "check": "credential",
+      "in_path": true,
+      "gate": "gate_3_credential",
+      "note": "Synchronous — checks DEEPSEEK_API_KEY_STAGING not None. Always checked."
+    }
+  ],
+
+  "gate_checks_NOT_in_call_path": [
+    {
+      "check": "request_budget",
+      "in_path": false,
+      "reason": "Requires _budget_guard (Redis). check_real_provider_gate() passes no Redis clients — _budget_guard is None — early return PASS (not checked).",
+      "risk": "LOW — blocked by credential gate first (State B). When credential set, budget guard must be injected."
+    },
+    {
+      "check": "cost_budget",
+      "in_path": false,
+      "reason": "Same — requires _budget_guard.",
+      "risk": "LOW — same mitigation."
+    },
+    {
+      "check": "rate_limit",
+      "in_path": false,
+      "reason": "Requires _rate_limiter (Redis). Not injected.",
+      "risk": "LOW — blocked by credential gate first."
+    },
+    {
+      "check": "concurrency",
+      "in_path": false,
+      "reason": "Requires _concurrency_guard (Redis). Not injected.",
+      "risk": "LOW — blocked by credential gate first."
+    },
+    {
+      "check": "circuit_breaker",
+      "in_path": false,
+      "reason": "Requires _circuit_breaker (Redis). Not injected.",
+      "risk": "LOW — blocked by credential gate first."
+    }
+  ],
+
+  "gap_severity": "LOW",
+  "gap_rationale": "In State B (credential not set), ALL real provider calls are blocked at gate_3_credential regardless of budget/concurrency. The budget/concurrency gap only becomes a real risk when DEEPSEEK_API_KEY_STAGING is provisioned. P1.33.5 or equivalent must inject Redis clients before activating real provider.",
+
+  "gate_c_status": "PARTIAL",
+  "gate_c_evidence": "3/8 checks in call path. 5/8 require Redis injection. Fail-closed for State B. NOT fail-closed for budget/concurrency when credential is set.",
+
+  "remediation_required_before_real_provider": [
+    "Inject BudgetGuard with Redis client into check_real_provider_gate() OR create separate real-provider-aware factory path",
+    "Inject RateLimiter with Redis client",
+    "Inject ConcurrencyGuard with Redis client",
+    "Inject CircuitBreaker with Redis client",
+    "Verify all 8 gate checks exercise before enabling staging credential"
+  ]
+}

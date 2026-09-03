@@ -1,0 +1,43 @@
+{
+  "window_id": "l1",
+  "window_label": "zero_percent_control",
+  "generated_at": "2026-07-25T14:20:00.000000+00:00",
+  "description": "Control window: live_enabled=true but live_rollout_percent=0. Verifies that zero live selection occurs.",
+  "compose_project": "tradingagents-p128-live-l1-control",
+  "config_state": {
+    "shadow_rollout_percent": 100,
+    "config_version": 12,
+    "shadow_salt": "pi_v1",
+    "live_enabled": true,
+    "live_rollout_percent": 0,
+    "live_salt": "pi_live_v1",
+    "production_enabled": false
+  },
+  "requests": {
+    "total": 2000,
+    "completed_200": 2000,
+    "failed": 0
+  },
+  "shadow_cohort": {
+    "shadow_selected": 2000,
+    "shadow_completed": 2000,
+    "shadow_failed_pi": 1999
+  },
+  "live_cohort": {
+    "live_selected": 0,
+    "pi_visible": 0,
+    "legacy_visible": 2000,
+    "arbitration_decisions": []
+  },
+  "safety": {
+    "pi_violations": 0,
+    "pi_user_visible": false,
+    "terminal_violations": 0,
+    "provider_serving_calls": 0,
+    "replay_serving_calls": 0,
+    "business_writes": 0
+  },
+  "window_pass": true,
+  "gate_d_zero_percent_verified": true,
+  "note": "All 2000 requests served by legacy as expected. Live cohort=0 at 0% rollout."
+}

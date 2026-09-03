@@ -1,0 +1,36 @@
+{
+  "schema_version": "pi_canary_reconciliation_v1",
+  "phase": "6V-P1.33",
+  "generated_at": "2026-07-26T04:00:00Z",
+
+  "p132_claim": "mvp_release_candidate = true",
+  "p132_claim_scope": "Product closure readiness — invite-only demo, feedback, analytics, monitoring all implemented. Replay demo ready for project owner review.",
+  "p132_claim_is_correct": true,
+  "p132_claim_does_NOT_mean": [
+    "Real provider call path verified",
+    "DeepSeek API credential provisioned",
+    "Official model IDs verified from authoritative source",
+    "Official pricing verified from authoritative source",
+    "Budget guard exercised with real responses",
+    "Production deployment authorized"
+  ],
+
+  "p133_resolves": [
+    "Gate E: Official model ID verification (deepseek-v4-flash confirmed as official API ID)",
+    "Gate F: Official pricing verification (USD prices fetched from api-docs.deepseek.com)",
+    "Gate C: Provider call path audit (budget/concurrency gap documented)",
+    "Gate G: Budget guard currency assessment (CNY budget vs USD pricing — exchange rate estimate)"
+  ],
+
+  "gates_not_resolved_by_p133": [
+    "Gate D (Staging Credential) — DEEPSEEK_API_KEY_STAGING still not provisioned",
+    "Gate I (Real Provider Connectivity) — credential required",
+    "Gate J (Real Provider Results) — credential required",
+    "Gate K (Usage Capture) — credential required",
+    "Gate L (Cost Verification) — credential required"
+  ],
+
+  "p133_outcome": "State B — Real Provider NOT_EXECUTED. All State-A gates pass. Invite-only MVP launch authorized.",
+  "next_after_p133": "MVP-R1 — Invite-only launch (no more pre-launch technical phases)",
+  "real_provider_activation_deferred": "Requires DEEPSEEK_API_KEY_STAGING + explicit project owner authorization. Can be done in parallel with MVP-R1 as P1.33.5 or post-launch."
+}

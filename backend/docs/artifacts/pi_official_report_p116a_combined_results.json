@@ -1,0 +1,99 @@
+{
+  "schema_version": "pi_official_report_p116a_combined_results_v1",
+  "phase": "6V-P1.16A",
+  "generated_at": "2026-07-27T21:00:00.000000+00:00",
+  "source_sha": "c492ffee7b1080f754807ba8fcb80556dff6d46c",
+  "windows": ["J1", "J2", "J3"],
+  "combined": {
+    "total_selected": 1535,
+    "unique_selected_request_ids": 1535,
+    "unique_symbols": 100,
+    "duplicate_run_case_ids": 0,
+    "query_styles": 12,
+    "multi_turn": 84,
+    "years_covered": ["2022", "2023", "2024", "latest"],
+    "window_selected": {
+      "J1": 518,
+      "J2": 512,
+      "J3": 505
+    }
+  },
+  "safety_metrics": {
+    "safety_correctness": 1.0
+  },
+  "accuracy_metrics": {
+    "wrong_year_count": 0,
+    "wrong_entity_count": 0,
+    "wrong_report_type_count": 0,
+    "fabricated_url_count": 0,
+    "provenance_failure_count": 0,
+    "stale_record_wrongly_selected": 0,
+    "third_party_url_selected": 0,
+    "trace_mismatch_count": 0,
+    "terminal_missing_count": 0
+  },
+  "write_safety_metrics": {
+    "pi_business_write_count": 0,
+    "assistant_double_write_count": 0,
+    "unknown_write_count": 0
+  },
+  "reliability_metrics": {
+    "raw500_count": 0,
+    "raw503_count": 0,
+    "timeout_rate": 0.0,
+    "fallback_rate": 0.0435,
+    "terminal_completion_rate": 1.0,
+    "task_leak_count": 0,
+    "db_leak_count": 0,
+    "PendingRollbackError": 0,
+    "pool_exhaustion": 0
+  },
+  "performance_metrics": {
+    "tool_p50_ms": 1817,
+    "tool_p90_ms": 2865,
+    "tool_p95_ms": 3222,
+    "tool_p99_ms": 3694,
+    "tool_max_ms": 4190,
+    "tool_over_3500ms_count": 43,
+    "tool_over_4000ms_count": 6,
+    "tool_over_5000ms_count": 0,
+    "pi_p50_ms": 2518,
+    "pi_p90_ms": 4060,
+    "pi_p95_ms": 4748,
+    "pi_p97_ms": 4868,
+    "pi_p99_ms": 5011,
+    "pi_max_ms": 5518,
+    "pi_over_4500ms_count": 84,
+    "pi_over_4500ms_rate_pct": 5.47,
+    "pi_over_4700ms_count": 49,
+    "pi_over_4700ms_rate_pct": 3.19,
+    "pi_over_4800ms_count": 33,
+    "pi_over_4800ms_rate_pct": 2.15,
+    "pi_over_5000ms_count": 18,
+    "pi_over_5000ms_rate_pct": 1.17,
+    "pi_over_5500ms_count": 2,
+    "pi_over_5500ms_rate_pct": 0.13,
+    "pi_over_6000ms_count": 0,
+    "pi_over_6000ms_rate_pct": 0.0
+  },
+  "performance_gate": {
+    "tool_p95_lt_3800ms": true,
+    "pi_p95_lt_4800ms": true,
+    "pi_p95_strict_lt_4800ms": true,
+    "pi_p95_equals_4800ms": false,
+    "pi_over_5s_rate_lte_2pct": true,
+    "pi_over_6s_zero": true,
+    "timeout_rate_lte_1pct": true,
+    "j3_not_worse_than_j1_by_5pct": true,
+    "performance_gate_passed": true,
+    "performance_review_triggered": false
+  },
+  "vs_p116_baseline": {
+    "p116_pi_p95_ms": 4800,
+    "p116a_combined_pi_p95_ms": 4748,
+    "delta_ms": -52,
+    "delta_pct": -1.08,
+    "margin_recovered": true,
+    "margin_below_threshold_ms": 52
+  }
+}

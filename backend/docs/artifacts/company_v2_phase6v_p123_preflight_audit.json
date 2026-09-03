@@ -1,0 +1,82 @@
+{
+  "schema_version": "pi_canary_preflight_audit_v1",
+  "phase": "6V-P1.23",
+  "phase_title": "Deployed Runtime Probe Closure",
+  "generated_at": "2026-07-23T17:00:00.000000+00:00",
+  "base_sha": "779da4cd3f33ff6a1b21b7c36cf182b7b2c4500d",
+  "base_sha_phase": "P1.22",
+  "current_rollout_percent": 75,
+  "current_config_version": 8,
+  "current_stable_bucket_salt": "pi_v1",
+  "intended_rollout_percent": 75,
+  "intended_config_version": 8,
+  "promotion_target_rollout_percent": 100,
+  "promotion_target_config_version": 9,
+
+  "p122_commit_audit": {
+    "commits_expected": 6,
+    "commits_verified": 6,
+    "commits": [
+      {
+        "sha_short": "bb04945",
+        "description": "P1.22 phase 6V rollout config bump to 75%",
+        "verified": true
+      },
+      {
+        "sha_short": "73d5f3e",
+        "description": "P1.22 canary config_version=8 stabilization",
+        "verified": true
+      },
+      {
+        "sha_short": "c02485f",
+        "description": "P1.22 shadow soak gate results",
+        "verified": true
+      },
+      {
+        "sha_short": "240aa1c",
+        "description": "P1.22 artifact generation and test alignment",
+        "verified": true
+      },
+      {
+        "sha_short": "ed30400",
+        "description": "P1.22 test_phase6v_p122 suite 156 PASS",
+        "verified": true
+      },
+      {
+        "sha_short": "779da4c",
+        "description": "P1.22 final preflight audit and decision artifacts",
+        "verified": true
+      }
+    ]
+  },
+
+  "p122_artifact_audit": {
+    "artifacts_expected": 27,
+    "artifacts_verified": 27,
+    "all_present": true
+  },
+
+  "gate_status_entering_p123": {
+    "gate_a": "pass",
+    "gate_b": "pass",
+    "gate_c": "unknown",
+    "gate_c_reason": "Gate C was UNKNOWN entering P1.23: no accessible deployed staging runtime probe had been executed against the live staging server. P1.22 closed Gates A and B but could not close Gate C due to absence of accessible staging service.",
+    "gates_d_through_n": "not_yet_evaluated"
+  },
+
+  "p123_objective": "Close Gate C by executing a deployed runtime probe against the running staging instance to confirm rollout=75 and authorization_status=authorized in the real staging environment.",
+
+  "preconditions_satisfied": {
+    "base_sha_confirmed": true,
+    "rollout_stable_at_75": true,
+    "config_version_stable_at_8": true,
+    "cumulative_violations_zero": true,
+    "cumulative_selected_p18_p122": 45373,
+    "zero_violations_p18_p122": 0,
+    "gate_a_pass": true,
+    "gate_b_pass": true
+  },
+
+  "preflight_outcome": "PROCEED_TO_PROBE_ATTEMPT",
+  "notes": "All preconditions satisfied. Gate C remains the sole blocker for conditional owner authorization. P1.23 will attempt to close Gate C via deployed runtime probe."
+}

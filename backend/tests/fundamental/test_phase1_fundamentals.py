@@ -350,6 +350,8 @@ class TestAggregator:
             # Phase 2C
             "main_business", "dividend_history", "major_holders",
             "equity_structure", "announcements", "analyst_ratings",
+            # Phase 3
+            "ai_analysis",
         }
         for m in modules:
             if m["key"] in implemented_keys:

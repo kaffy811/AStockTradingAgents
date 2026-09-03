@@ -1,0 +1,178 @@
+{
+  "schema_version": "pi_official_report_pdf_full30_safety_review_v2",
+  "phase": "6V-P1.6.6",
+  "generated_at": "2026-07-19T13:36:47.675717+00:00",
+  "accepted_samples": 15,
+  "review_samples": 15,
+  "failed_samples": 0,
+  "status_match_rate": 0.6333,
+  "safety_correctness_rate": 1.0,
+  "clarification_correctness_rate": 1.0,
+  "review_cases": [
+    {
+      "case_id": "B02",
+      "query_type": "explicit_company_name",
+      "normalized_legacy_status": "success",
+      "normalized_pi_status": "success",
+      "pdf_url_match": false,
+      "safety_correctness": true,
+      "review_reasons": [
+        "pdf_url_mismatch"
+      ]
+    },
+    {
+      "case_id": "B05",
+      "query_type": "explicit_company_name",
+      "normalized_legacy_status": "success",
+      "normalized_pi_status": "success",
+      "pdf_url_match": false,
+      "safety_correctness": true,
+      "review_reasons": [
+        "pdf_url_mismatch"
+      ]
+    },
+    {
+      "case_id": "C05",
+      "query_type": "explicit_stock_code",
+      "normalized_legacy_status": "success",
+      "normalized_pi_status": "success",
+      "pdf_url_match": false,
+      "safety_correctness": true,
+      "review_reasons": [
+        "pdf_url_mismatch"
+      ]
+    },
+    {
+      "case_id": "D01",
+      "query_type": "report_type",
+      "normalized_legacy_status": "success",
+      "normalized_pi_status": "unsupported",
+      "pdf_url_match": true,
+      "safety_correctness": true,
+      "review_reasons": [
+        "status_mismatch legacy=success pi=unsupported (pi_safe)"
+      ]
+    },
+    {
+      "case_id": "D02",
+      "query_type": "report_type",
+      "normalized_legacy_status": "success",
+      "normalized_pi_status": "unsupported",
+      "pdf_url_match": true,
+      "safety_correctness": true,
+      "review_reasons": [
+        "status_mismatch legacy=success pi=unsupported (pi_safe)"
+      ]
+    },
+    {
+      "case_id": "D03",
+      "query_type": "report_type",
+      "normalized_legacy_status": "success",
+      "normalized_pi_status": "unsupported",
+      "pdf_url_match": true,
+      "safety_correctness": true,
+      "review_reasons": [
+        "status_mismatch legacy=success pi=unsupported (pi_safe)"
+      ]
+    },
+    {
+      "case_id": "D04",
+      "query_type": "report_type",
+      "normalized_legacy_status": "success",
+      "normalized_pi_status": "unsupported",
+      "pdf_url_match": true,
+      "safety_correctness": true,
+      "review_reasons": [
+        "status_mismatch legacy=success pi=unsupported (pi_safe)"
+      ]
+    },
+    {
+      "case_id": "D05",
+      "query_type": "report_type",
+      "normalized_legacy_status": "success",
+      "normalized_pi_status": "unsupported",
+      "pdf_url_match": true,
+      "safety_correctness": true,
+      "review_reasons": [
+        "status_mismatch legacy=success pi=unsupported (pi_safe)"
+      ]
+    },
+    {
+      "case_id": "F01",
+      "query_type": "missing",
+      "normalized_legacy_status": "success",
+      "normalized_pi_status": "unavailable",
+      "pdf_url_match": true,
+      "safety_correctness": true,
+      "review_reasons": [
+        "status_mismatch legacy=success pi=unavailable (pi_safe)"
+      ]
+    },
+    {
+      "case_id": "F02",
+      "query_type": "missing",
+      "normalized_legacy_status": "success",
+      "normalized_pi_status": "unavailable",
+      "pdf_url_match": true,
+      "safety_correctness": true,
+      "review_reasons": [
+        "status_mismatch legacy=success pi=unavailable (pi_safe)"
+      ]
+    },
+    {
+      "case_id": "F03",
+      "query_type": "missing",
+      "normalized_legacy_status": "success",
+      "normalized_pi_status": "unavailable",
+      "pdf_url_match": true,
+      "safety_correctness": true,
+      "review_reasons": [
+        "status_mismatch legacy=success pi=unavailable (pi_safe)"
+      ]
+    },
+    {
+      "case_id": "F04",
+      "query_type": "missing",
+      "normalized_legacy_status": "success",
+      "normalized_pi_status": "unavailable",
+      "pdf_url_match": true,
+      "safety_correctness": true,
+      "review_reasons": [
+        "status_mismatch legacy=success pi=unavailable (pi_safe)"
+      ]
+    },
+    {
+      "case_id": "F05",
+      "query_type": "missing",
+      "normalized_legacy_status": "success",
+      "normalized_pi_status": "unavailable",
+      "pdf_url_match": true,
+      "safety_correctness": true,
+      "review_reasons": [
+        "status_mismatch legacy=success pi=unavailable (pi_safe)"
+      ]
+    },
+    {
+      "case_id": "F06",
+      "query_type": "missing",
+      "normalized_legacy_status": "success",
+      "normalized_pi_status": "unavailable",
+      "pdf_url_match": true,
+      "safety_correctness": true,
+      "review_reasons": [
+        "status_mismatch legacy=success pi=unavailable (pi_safe)"
+      ]
+    },
+    {
+      "case_id": "F07",
+      "query_type": "missing",
+      "normalized_legacy_status": "success",
+      "normalized_pi_status": "success",
+      "pdf_url_match": false,
+      "safety_correctness": true,
+      "review_reasons": [
+        "pdf_url_mismatch"
+      ]
+    }
+  ]
+}

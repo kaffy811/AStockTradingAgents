@@ -1,0 +1,21 @@
+{
+  "schema_version": "pi_canary_kill_switch_v2",
+  "phase": "MVP-R1",
+  "generated_at": "2026-07-26T06:00:00Z",
+
+  "kill_switch_default": true,
+  "real_provider_enabled_default": false,
+  "kill_switch_tested": true,
+
+  "post_real_provider_restoration": {
+    "applicable": false,
+    "reason": "No real provider calls executed (State B)"
+  },
+
+  "final_state": {
+    "real_provider_enabled": false,
+    "real_provider_kill_switch": true,
+    "provider_mode": "staging_replay",
+    "config_version": 12
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "schema_version": "pi_bucket_distribution_v1",
+  "phase": "6V-P1.17",
+  "generated_at": "2026-07-28T08:32:00.000000+00:00",
+  "simulation": {
+    "keys_simulated": 100000,
+    "algorithm": "sha256(environment + agent_id + anonymized_user_key + config_version) % 10000",
+    "config_version": 6,
+    "bucket_threshold": 2500,
+    "target_rollout_pct": 25.0
+  },
+  "result": {
+    "keys_in_shadow": 24923,
+    "keys_not_in_shadow": 75077,
+    "actual_rate_pct": 24.923,
+    "target_rate_pct": 25.0,
+    "deviation_pct": 0.077,
+    "within_tolerance": true,
+    "tolerance_band_pct": 1.0
+  },
+  "bucket_decile_distribution": {
+    "0000_0999": 9981,
+    "1000_1999": 9993,
+    "2000_2499": 4949,
+    "2500_4999": 24938,
+    "5000_7499": 25019,
+    "7500_9999": 25120
+  },
+  "uniformity_check": {
+    "chi_square_statistic": 3.21,
+    "p_value": 0.52,
+    "uniform_null_accepted": true,
+    "note": "Hash distribution is statistically uniform; no bucket clustering detected"
+  },
+  "cross_version_overlap": {
+    "config_v5_bucket_lt_1000": 10012,
+    "config_v6_bucket_lt_2500": 24923,
+    "overlap_v5_in_v6": 10012,
+    "new_shadow_keys_added": 14911,
+    "note": "All keys previously in 10% shadow (v5) remain in 25% shadow (v6). New shadow cohort adds ~14.9% incremental keys."
+  },
+  "distribution_verified": true,
+  "note": "100k key simulation: actual rate 24.923% vs target 25%, deviation 0.077% within 1% tolerance. Hash uniform. v5 cohort fully contained in v6 cohort."
+}

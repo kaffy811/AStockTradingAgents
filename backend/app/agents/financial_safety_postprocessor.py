@@ -81,6 +81,10 @@ def has_verified_metric(context: dict | None, metric_type: str) -> bool:
     """Return True if the context contains verified data for this metric type."""
     if not context:
         return False
+    if context.get("verified_financial_data") and metric_type in {"revenue", "profit"}:
+        return True
+    if context.get("report_answer_owner") == "report_explanation_skill" and context.get("source_chunks_count", 0) > 0:
+        return metric_type in {"revenue", "profit", "pe", "pb"}
     keys = _METRIC_CONTEXT_KEYS.get(metric_type, [])
     for k in keys:
         if k in context and context[k] not in (None, "", [], {}):
@@ -169,7 +173,13 @@ def sanitize_investment_advice(text: str, context: dict | None = None) -> str:
 # ---------------------------------------------------------------------------
 
 _CERTAINTY_PATTERNS: list[tuple[re.Pattern, str]] = [
-    (re.compile(r"(?:必然|肯定|一定会?|稳赚|包赚|稳涨|必涨|稳跌|必跌)(?:上涨|下跌|涨|跌|盈利|亏损|赚|赔)?"), "（走势存在不确定性）"),
+    (
+        re.compile(
+            r"(?:必然|肯定|稳赚|包赚|稳涨|必涨|稳跌|必跌)(?:上涨|下跌|涨|跌|盈利|亏损|赚|赔)?"
+            r"|一定会?(?:上涨|下跌|涨|跌|盈利|亏损|赚|赔|反弹|回升|走强|走弱|突破)"
+        ),
+        "（走势存在不确定性）",
+    ),
     (re.compile(r"(?:没有|没有任何)风险"), "（任何投资均存在风险）"),
     (re.compile(r"零风险"), "（任何投资均存在风险）"),
     (re.compile(r"百分之百(?:确定|保证|盈利)"), "（不存在百分之百确定的投资结果）"),

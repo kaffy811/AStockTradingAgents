@@ -1,0 +1,55 @@
+{
+  "phase": "6W-R3.3I.2.5",
+  "status": "FORMULA_CONSTANT_BOUNDARY_READY",
+  "traffic": "HOLD_1_PERCENT",
+  "base_commit": "28870a13d98f6e7bab5a2b16c6f3144411859198",
+  "attribution": {
+    "class": "F3_ANSWER_SPAN_NOT_RECOGNIZED_AS_FORMULA",
+    "first_failure_function": "validate_numeric_claims_with_derived_formula_scales",
+    "old_failure_tokens": ["100%", "100"],
+    "old_final_status": "partial_success"
+  },
+  "policy": {
+    "request_local": true,
+    "default_empty": true,
+    "requires_ratio_percentage": true,
+    "requires_resolved_derived_fact": true,
+    "requires_canonical_operands": true,
+    "allowed_formula_constants": ["100", "100%"],
+    "global_validator_changed": false,
+    "global_allowed_set_changed": false
+  },
+  "tests": {
+    "final_collected": 48,
+    "final_passed": 48,
+    "final_failed": 0,
+    "final_skipped": 0,
+    "final_duration_seconds": 0.67
+  },
+  "runtime": {
+    "issued_requests": 1,
+    "retried": false,
+    "request_id": "9cf98947",
+    "trace_id": "819c10bf-dcc6-4aaa-a817-1bef4346dae1",
+    "image_digest": "sha256:08587ed18a9c2ed59c996bb76bc2f45b5876b05f6418fafa7ce0e42466e01e42",
+    "container_id": "ee83239bb769e54b7ebaa284a05e0eb6e5e22ea72454e486a77724abcf74a26e",
+    "mounts": [],
+    "selected_report_year": 2024,
+    "selected_period": "2024-12-31",
+    "derived_fact": "C1",
+    "net_margin": "50.46%",
+    "formula_policy_ids": ["C1"],
+    "citation_validation_valid": true,
+    "numeric_validation_valid": true,
+    "unsupported_tokens": [],
+    "citation_metadata_leak": false,
+    "final_status": "completed"
+  },
+  "operations": {
+    "pushed": false,
+    "deployed": false,
+    "migration_executed": false,
+    "production_changed": false,
+    "traffic_expanded": false
+  }
+}

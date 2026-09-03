@@ -1,0 +1,11 @@
+{
+  "phase": "phase6tp_same_region_acceptance",
+  "status": "blocked",
+  "executed": false,
+  "blocker": "same_region_runner_not_provisioned",
+  "same_region": false,
+  "notes": [
+    "Live Supabase connectivity is reachable with network access and live_supabase tests passed.",
+    "No ap-northeast-2 same-region runner was provisioned in this session."
+  ]
+}

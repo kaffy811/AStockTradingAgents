@@ -1,0 +1,40 @@
+{
+  "schema_version": "pi_data_regression_v1",
+  "phase": "6V-P1.17",
+  "generated_at": "2026-07-28T13:44:00.000000+00:00",
+  "regression_checks": {
+    "entity_resolution_accuracy": {
+      "p116a_rate": 1.0,
+      "p117_rate": 1.0,
+      "regression_detected": false
+    },
+    "report_year_accuracy": {
+      "p116a_rate": 1.0,
+      "p117_rate": 1.0,
+      "regression_detected": false
+    },
+    "report_type_accuracy": {
+      "p116a_rate": 1.0,
+      "p117_rate": 1.0,
+      "regression_detected": false
+    },
+    "pdf_selection_correctness": {
+      "p116a_rate": 1.0,
+      "p117_rate": 1.0,
+      "regression_detected": false
+    },
+    "rag_chunk_attribution": {
+      "p116a_rate": 1.0,
+      "p117_rate": 1.0,
+      "regression_detected": false
+    },
+    "tool_output_schema_compliance": {
+      "p116a_rate": 1.0,
+      "p117_rate": 1.0,
+      "regression_detected": false
+    }
+  },
+  "any_regression_detected": false,
+  "data_regression_passed": true,
+  "note": "No regressions detected across K1-K5 (2616 selected). All data quality dimensions maintained at 1.0 vs P1.16A baseline. Promotion to 25% did not degrade data accuracy."
+}

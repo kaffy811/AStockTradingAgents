@@ -1,0 +1,203 @@
+{
+  "schema_version": "1.0",
+  "generated_for": "phase_6u_e1_3_3",
+  "notes": [
+    "This dictionary describes deterministic source-field semantics used by Company V2 and Chat fallback.",
+    "A field is verified only when the source system + endpoint + source_key mapping is known or persisted metadata provides the same contract.",
+    "Value-size heuristics are not allowed to mark a value verified."
+  ],
+  "fields": [
+    {
+      "canonical_metric": "revenue",
+      "source_system": "company_v2_history.baostock_profit",
+      "source_key": "revenue",
+      "raw_unit": "CNY",
+      "normalized_unit": "CNY",
+      "value_type": "flow",
+      "period_semantics": "annual_cumulative for annual rows; quarterly_cumulative for interim rows",
+      "accounting_scope": "consolidated",
+      "normalization_rule": "currency scale from source metadata; CNY remains CNY",
+      "verified": true
+    },
+    {
+      "canonical_metric": "operating_revenue",
+      "source_system": "company_v2_history.baostock_profit",
+      "source_key": "operating_revenue",
+      "raw_unit": "CNY",
+      "normalized_unit": "CNY",
+      "value_type": "flow",
+      "period_semantics": "annual_cumulative for annual rows; quarterly_cumulative for interim rows",
+      "accounting_scope": "consolidated",
+      "normalization_rule": "alias of revenue when source contract confirms operating revenue",
+      "verified": true
+    },
+    {
+      "canonical_metric": "net_profit",
+      "source_system": "company_v2_history.baostock_profit",
+      "source_key": "net_profit",
+      "raw_unit": "CNY",
+      "normalized_unit": "CNY",
+      "value_type": "flow",
+      "period_semantics": "annual_cumulative for annual rows; quarterly_cumulative for interim rows",
+      "accounting_scope": "consolidated",
+      "normalization_rule": "currency scale from source metadata",
+      "verified": true
+    },
+    {
+      "canonical_metric": "net_profit_parent",
+      "source_system": "company_v2_history.baostock_profit",
+      "source_key": "parent_net_profit",
+      "raw_unit": "CNY",
+      "normalized_unit": "CNY",
+      "value_type": "flow",
+      "period_semantics": "annual_cumulative for annual rows; quarterly_cumulative for interim rows",
+      "accounting_scope": "parent",
+      "normalization_rule": "currency scale from source metadata",
+      "verified": true
+    },
+    {
+      "canonical_metric": "deducted_net_profit",
+      "source_system": "official_report_field",
+      "source_key": "deducted_parent_net_profit",
+      "raw_unit": "table_unit",
+      "normalized_unit": "CNY",
+      "value_type": "flow",
+      "period_semantics": "same as official report table period",
+      "accounting_scope": "parent",
+      "normalization_rule": "official table unit scale",
+      "verified": true
+    },
+    {
+      "canonical_metric": "operating_cashflow",
+      "source_system": "company_v2_history.baostock_cashflow",
+      "source_key": "operating_cashflow",
+      "raw_unit": "CNY",
+      "normalized_unit": "CNY",
+      "value_type": "flow",
+      "period_semantics": "annual_cumulative for annual rows; quarterly_cumulative for interim rows",
+      "accounting_scope": "consolidated",
+      "normalization_rule": "currency scale from source metadata",
+      "verified": true
+    },
+    {
+      "canonical_metric": "total_assets",
+      "source_system": "company_v2_history.baostock_balance",
+      "source_key": "total_assets",
+      "raw_unit": "CNY",
+      "normalized_unit": "CNY",
+      "value_type": "stock",
+      "period_semantics": "point-in-time balance sheet date",
+      "accounting_scope": "consolidated",
+      "normalization_rule": "currency scale from source metadata",
+      "verified": true
+    },
+    {
+      "canonical_metric": "net_assets",
+      "source_system": "company_v2_history.baostock_balance",
+      "source_key": "equity",
+      "raw_unit": "CNY",
+      "normalized_unit": "CNY",
+      "value_type": "stock",
+      "period_semantics": "point-in-time balance sheet date",
+      "accounting_scope": "consolidated",
+      "normalization_rule": "currency scale from source metadata",
+      "verified": true
+    },
+    {
+      "canonical_metric": "net_assets_parent",
+      "source_system": "company_v2_history.baostock_balance",
+      "source_key": "parent_equity",
+      "raw_unit": "CNY",
+      "normalized_unit": "CNY",
+      "value_type": "stock",
+      "period_semantics": "point-in-time balance sheet date",
+      "accounting_scope": "parent",
+      "normalization_rule": "currency scale from source metadata",
+      "verified": true
+    },
+    {
+      "canonical_metric": "basic_eps",
+      "source_system": "company_v2_history.baostock_profit",
+      "source_key": "eps",
+      "raw_unit": "CNY/share",
+      "normalized_unit": "CNY/share",
+      "value_type": "per_share",
+      "period_semantics": "same cumulative period as profit table",
+      "accounting_scope": "consolidated",
+      "normalization_rule": "no scale conversion",
+      "verified": true
+    },
+    {
+      "canonical_metric": "diluted_eps",
+      "source_system": "official_report_field",
+      "source_key": "diluted_eps",
+      "raw_unit": "CNY/share",
+      "normalized_unit": "CNY/share",
+      "value_type": "per_share",
+      "period_semantics": "same cumulative period as official report table",
+      "accounting_scope": "consolidated",
+      "normalization_rule": "no scale conversion",
+      "verified": true
+    },
+    {
+      "canonical_metric": "roe",
+      "source_system": "company_v2_history.baostock_profitability",
+      "source_key": "roe",
+      "raw_unit": "ratio",
+      "normalized_unit": "percent",
+      "value_type": "ratio",
+      "period_semantics": "same cumulative period as profitability endpoint row",
+      "accounting_scope": "consolidated",
+      "normalization_rule": "percentage_fraction x 100",
+      "verified": true
+    },
+    {
+      "canonical_metric": "weighted_average_roe",
+      "source_system": "official_report_field",
+      "source_key": "weighted_average_roe",
+      "raw_unit": "percent",
+      "normalized_unit": "percent",
+      "value_type": "ratio",
+      "period_semantics": "same as official report table period",
+      "accounting_scope": "consolidated",
+      "normalization_rule": "percentage points remain unchanged",
+      "verified": true
+    },
+    {
+      "canonical_metric": "gross_margin",
+      "source_system": "company_v2_history.baostock_profitability",
+      "source_key": "gross_margin",
+      "raw_unit": "ratio",
+      "normalized_unit": "percent",
+      "value_type": "ratio",
+      "period_semantics": "same cumulative period as profitability endpoint row",
+      "accounting_scope": "consolidated",
+      "normalization_rule": "percentage_fraction x 100",
+      "verified": true
+    },
+    {
+      "canonical_metric": "net_margin",
+      "source_system": "company_v2_history.baostock_profitability",
+      "source_key": "net_margin",
+      "raw_unit": "ratio",
+      "normalized_unit": "percent",
+      "value_type": "ratio",
+      "period_semantics": "same cumulative period as profitability endpoint row",
+      "accounting_scope": "consolidated",
+      "normalization_rule": "percentage_fraction x 100",
+      "verified": true
+    },
+    {
+      "canonical_metric": "debt_ratio",
+      "source_system": "company_v2_history.baostock_solvency",
+      "source_key": "debt_ratio",
+      "raw_unit": "ratio",
+      "normalized_unit": "percent",
+      "value_type": "ratio",
+      "period_semantics": "point-in-time balance sheet date",
+      "accounting_scope": "consolidated",
+      "normalization_rule": "percentage_fraction x 100",
+      "verified": true
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "phase": "MVP-R1.2",
+  "title": "Invite Security Closure",
+  "date": "2026-07-26",
+  "branch": "mvp-r12/data-and-invite-closure",
+  "target_branch": "release/demo-staging",
+  "state": "B",
+  "real_provider_calls": 0,
+  "cost_cny": "0",
+  "config_version": 12,
+  "decision": "INVITE_SECURITY_CLOSED",
+  "gate_summary": {
+    "S1_invite_code_hashing": "PASS",
+    "S2_register_invite_required": "PASS",
+    "S3_atomic_register_redeem": "PASS",
+    "S4_admin_auth_enforced": "PASS",
+    "S5_admin_list_endpoint": "PASS",
+    "S6_admin_revoke_endpoint": "PASS",
+    "S7_email_login_support": "PASS",
+    "S8_is_admin_user_model": "PASS",
+    "S9_migration_chain": "PASS",
+    "S10_admin_cli": "PASS",
+    "S11_admin_frontend": "PASS",
+    "S12_p0_register_open_closed": "PASS"
+  },
+  "tests": {
+    "mvp_r12_targeted": 96,
+    "mvp_r11_regression": 74,
+    "mvp_r1_regression": 114,
+    "total_pass": 284,
+    "total_fail": 0
+  }
+}

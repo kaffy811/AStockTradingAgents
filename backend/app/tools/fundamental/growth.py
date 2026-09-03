@@ -14,7 +14,7 @@ from __future__ import annotations
 import asyncio, logging
 from typing import Any
 import pandas as pd
-from app.datasource.tushare_client import tushare_client, _to_ts_code
+from app.datasource.tushare_client import tushare_client, _to_ts_code, TushareAuthError
 from app.tools.fundamental.base import BaseFundamentalTool, FundamentalToolError
 from app.tools.fundamental._helpers import (
     safe_float, fmt_date, filter_report_type, filter_annual, row_get
@@ -59,7 +59,10 @@ class GrowthTool(BaseFundamentalTool):
 
         inc_df = pd.DataFrame()
         if isinstance(inc_result, Exception):
-            partial_errors.append(f"income 表失败: {inc_result}")
+            if isinstance(inc_result, TushareAuthError):
+                partial_errors.append("income 暂不可用（权限不足）")
+            else:
+                partial_errors.append(f"income 表失败: {inc_result}")
         else:
             inc_df = filter_report_type(inc_result)
             if self.annual: inc_df = filter_annual(inc_df)
@@ -68,7 +71,10 @@ class GrowthTool(BaseFundamentalTool):
         fi_df = pd.DataFrame()
         fi_by_date: dict[str, Any] = {}
         if isinstance(fi_result, Exception):
-            partial_errors.append(f"fina_indicator 表失败: {fi_result}")
+            if isinstance(fi_result, TushareAuthError):
+                partial_errors.append("fina_indicator 暂不可用（权限不足）")
+            else:
+                partial_errors.append(f"fina_indicator 表失败: {fi_result}")
         else:
             fi_df = fi_result.copy()
             if self.annual: fi_df = filter_annual(fi_df)
@@ -109,3 +115,56 @@ class GrowthTool(BaseFundamentalTool):
         if partial_errors:
             result["_partial_errors"] = partial_errors
         return result
+
+    async def fetch_baostock(self, market: str, symbol: str) -> dict[str, Any]:
+        """
+        BaoStock 备用：成长能力（YOYNI / YOYEPSBasic / YOYEquity）。
+        BaoStock 字段无营收/归母净利润绝对值，revenue/net_profit_parent 返回 null。
+        """
+        from app.datasource.baostock_client import baostock_client
+        from app.datasource.tushare_client import _to_ts_code as _ts
+        ts_code = _ts(market, symbol)
+        rows = await baostock_client.get_growth_data(ts_code, n=self.limit)
+        if not rows:
+            raise RuntimeError("BaoStock get_growth_data 无数据")
+
+        def _pct(v):
+            """BaoStock 成长率为小数 (0.156)，转为百分比 (15.6)。"""
+            if v is None:
+                return None
+            try:
+                return round(float(v) * 100, 4)
+            except (TypeError, ValueError):
+                return None
+
+        series = []
+        for r in rows:
+            stat_date = r.get("stat_date") or ""
+            if len(stat_date) == 8 and "-" not in stat_date:
+                stat_date = f"{stat_date[:4]}-{stat_date[4:6]}-{stat_date[6:]}"
+            # BaoStock YOYNI/YOYEPSBasic 是小数 YoY 增长率，乘 100 得百分比
+            # 注意: yoy_eps 是 EPS 同比增长率，而非绝对 EPS 值，故 eps 字段置 null
+            series.append({
+                "end_date":                stat_date,
+                "revenue":                 None,   # BaoStock 无绝对值
+                "revenue_yoy_pct":         None,   # BaoStock 无营收同比
+                "net_profit_parent":       None,
+                "net_profit_yoy_pct":      _pct(r.get("yoy_ni")),   # YOYNI → %
+                "deduct_net_profit":       None,
+                "deduct_net_profit_yoy_pct": None,
+                "roe_pct":                 None,
+                "eps":                     None,   # BaoStock growth 表无绝对 EPS
+            })
+        series.sort(key=lambda x: x.get("end_date") or "", reverse=True)
+        series = series[:self.limit]
+
+        return {
+            "symbol": symbol, "ts_code": ts_code,
+            "annual": self.annual,
+            "series": series,
+            "comment": _comment(series),
+            "source": "baostock",
+            "_partial_errors": [
+                "BaoStock 备用：营收/归母净利润绝对值不可用，营收同比/扣非净利润同比为 null"
+            ],
+        }

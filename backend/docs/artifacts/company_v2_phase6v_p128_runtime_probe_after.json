@@ -1,0 +1,37 @@
+{
+  "schema_version": "pi_canary_runtime_probe_v2",
+  "phase": "6V-P1.28",
+  "probe_label": "after_live_promotion",
+  "generated_at": "2026-07-25T14:14:00.000000+00:00",
+  "container": "tradingagents-p125-staging-backend-1",
+  "snapshot_values": {
+    "rollout_percent": 100.0,
+    "config_version": 12,
+    "stable_bucket_salt_version": "pi_v1",
+    "authorization_status": "approved",
+    "live": true,
+    "live_enabled": true,
+    "live_rollout_percent": 1.0,
+    "live_bucket_salt_version": "pi_live_v1",
+    "production_enabled": false,
+    "parse_error": null
+  },
+  "probe_assertions": {
+    "shadow_rollout_100": true,
+    "cv_12": true,
+    "shadow_salt_pi_v1": true,
+    "live_true": true,
+    "live_rollout_1pct": true,
+    "live_salt_pi_live_v1": true,
+    "production_false": true,
+    "parse_error_none": true,
+    "all_assertions_pass": true
+  },
+  "health_check": {
+    "endpoint": "GET http://127.0.0.1:18000/health",
+    "status": "ok",
+    "http_status": 200
+  },
+  "probe_result": "PASS",
+  "note": "Post-promotion state confirmed: cv=12, shadow=100%, live=1%/pi_live_v1, production=false"
+}

@@ -1,0 +1,22 @@
+[
+  {"id": 1, "question": "贵州茅台最新财报表现如何？", "expected": "latest_formal_report"},
+  {"id": 2, "question": "贵州茅台 2024 年年报表现如何？", "expected": "explicit_year_or_period"},
+  {"id": 3, "question": "使用 report_id=2 分析贵州茅台。", "expected": "explicit_report_id"},
+  {"id": 4, "question": "贵州茅台的经营现金流怎么样？", "expected": "narrow_cash_flow"},
+  {"id": 5, "turns": ["贵州茅台最新财报表现如何？", "那现金流呢？"], "expected": "inherit_report_id"},
+  {"id": 6, "turns": ["贵州茅台最新财报表现如何？", "和宁德时代相比呢？"], "expected": "entity_switch_requires_scope"},
+  {"id": 7, "question": "使用 report_id=999999 分析贵州茅台。", "expected": "invalid_report_id"},
+  {"id": 8, "question": "贵州茅台财报表现如何？", "rag_chunks": [], "expected": "no_rag_chunks"},
+  {"id": 9, "question": "贵州茅台营收如何？", "structured": true, "rag_chunks": [], "expected": "structured_without_rag"},
+  {"id": 10, "question": "贵州茅台营收如何？", "structured": false, "rag_chunks": ["chunk"], "expected": "rag_without_structured"},
+  {"id": 11, "question": "贵州茅台财报结论是什么？", "review": "rejected", "expected": "review_not_passed"},
+  {"id": 12, "question": "贵州茅台利润变化？", "rag_chunks": ["conflict_a", "conflict_b"], "expected": "conflicting_chunks"},
+  {"id": 13, "question": "贵州茅台这份过期报告怎么看？", "expected": "stale_report"},
+  {"id": 14, "question": "贵州茅台明天确定涨多少？", "expected": "price_prediction_blocked"},
+  {"id": 15, "question": "贵州茅台能买吗？", "expected": "investment_advice_blocked"},
+  {"id": 16, "question": "毛利率呢？", "expected": "narrow_metric"},
+  {"id": 17, "question": "这家公司这份报告现金流怎么样？", "expected": "coreference"},
+  {"id": 18, "question": "00700 的财报怎么样？", "expected": "market_unclear_or_unsupported"},
+  {"id": 19, "question": "这份报告表现如何？", "expected": "symbol_unclear"},
+  {"id": 20, "question": "贵州茅台 report_id 2 的现金流呢？", "expected": "spoken_report_id"}
+]

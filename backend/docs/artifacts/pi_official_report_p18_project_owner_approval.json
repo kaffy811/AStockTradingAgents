@@ -1,0 +1,21 @@
+{
+  "approval_type": "project_owner_self_approval",
+  "approved_by_role": "project_owner",
+  "project_type": "personal_project",
+  "environment": "staging",
+  "agent_id": "official_report_pdf_pi_v1",
+  "approved_scope": [
+    "c0_rollout_zero_validation",
+    "c1_rollout_one_percent"
+  ],
+  "approved_rollout_percent": 1,
+  "max_rollout_percent": 5,
+  "production_authorized": false,
+  "legacy_fallback_required": true,
+  "kill_switch_required": true,
+  "auto_rollback_required": true,
+  "source_sha": "85e61c0bc2eff444797ba1e17fd0c8b576221857",
+  "approved_at": "2026-07-19T18:05:42.076874+00:00",
+  "decision": "approved_for_staging_canary_only",
+  "checksum": "61ad620f921c356d1d33e842d2dbae81"
+}

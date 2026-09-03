@@ -204,14 +204,14 @@ describe('ui_final_answer', () => {
 // ── T8: ui_done finalizes all running items ────────────────────────────────────
 describe('ui_done', () => {
   it('sets status=done, isStreaming=false', () => {
-    const msg = makeMsg()
+    const msg = makeMsg({ content: '已有回答', answerContent: '已有回答' })
     applyChatUiEvent(msg, { type: 'ui_done' })
     expect(msg.status).toBe('done')
     expect(msg.isStreaming).toBe(false)
   })
 
   it('marks remaining running steps as success', () => {
-    const msg = makeMsg()
+    const msg = makeMsg({ content: '已有回答', answerContent: '已有回答' })
     applyChatUiEvent(msg, {
       type: 'ui_step_start', stepKey: 'synthesis', title: '综合生成分析结论', summary: '',
     })
@@ -221,6 +221,65 @@ describe('ui_done', () => {
     applyChatUiEvent(msg, { type: 'ui_done' })
     expect(msg.reasoningSteps[0].status).toBe('success')
     expect(msg.toolTrace[0].status).toBe('success')
+  })
+
+  it('completed+empty enters recoverable error instead of blank done', () => {
+    const msg = makeMsg()
+    applyChatUiEvent(msg, { type: 'ui_done', status: 'completed', answerLength: 0, hasConfirmation: false })
+    expect(msg.status).toBe('error')
+    expect(msg.content).toContain('回答生成失败')
+    expect(msg.error).toContain('回答生成失败')
+  })
+
+  it('failed terminal does not mark trace as completed', () => {
+    const msg = makeMsg()
+    applyChatUiEvent(msg, {
+      type: 'ui_step_start', stepKey: 'synthesis', title: '综合生成分析结论', summary: '',
+    })
+    applyChatUiEvent(msg, { type: 'ui_done', status: 'failed', errorCode: 'EMPTY_FINAL_ANSWER' })
+    expect(msg.status).toBe('error')
+    expect(msg.reasoningSteps[0].status).toBe('failed')
+  })
+})
+
+// ── T8b: ui_answer_completed canonical answer ───────────────────────────────
+describe('ui_answer_completed', () => {
+  it('renders final canonical answer', () => {
+    const msg = makeMsg()
+    applyChatUiEvent(msg, { type: 'ui_answer_completed', answer: '最终财报正文', status: 'completed' })
+    expect(msg.content).toBe('最终财报正文')
+    expect(msg.answerContent).toBe('最终财报正文')
+  })
+
+  it('empty final does not overwrite existing delta', () => {
+    const msg = makeMsg({ content: '已有流式正文', answerContent: '已有流式正文' })
+    applyChatUiEvent(msg, { type: 'ui_answer_completed', answer: '', status: 'completed' })
+    expect(msg.content).toBe('已有流式正文')
+  })
+
+  it('empty final without delta becomes recoverable error', () => {
+    const msg = makeMsg()
+    applyChatUiEvent(msg, { type: 'ui_answer_completed', answer: '', status: 'completed' })
+    expect(msg.status).toBe('error')
+    expect(msg.content).toContain('回答生成失败')
+  })
+
+  it('partial_success answer renders as body without full failure', () => {
+    const msg = makeMsg()
+    applyChatUiEvent(msg, {
+      type: 'ui_answer_completed',
+      answer: '自动总结未完成，以下为已检索到的报告证据。',
+      status: 'partial_success',
+    })
+    applyChatUiEvent(msg, {
+      type: 'ui_done',
+      status: 'partial_success',
+      answerLength: msg.content.length,
+    })
+    expect(msg.status).toBe('done')
+    expect(msg.content).toContain('报告证据')
+    expect(msg.error).toBeNull()
+    expect(msg.answerStatus).toBe('partial_success')
   })
 })
 

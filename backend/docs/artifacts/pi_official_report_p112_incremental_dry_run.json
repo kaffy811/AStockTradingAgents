@@ -1,0 +1,38 @@
+{
+  "schema_version": "pi_official_report_p112_incremental_dry_run_v1",
+  "phase": "6V-P1.12",
+  "generated_at": "2026-07-22T00:30:00.000000+00:00",
+  "source_sha": "a97b0ec021c7577f6a51267c3bb311ee47db0eb9",
+  "environment": "staging",
+  "mode": "dry-run",
+  "since": "2026-01-01",
+  "symbols": 100,
+  "provider_queries": 100,
+  "new_documents": 0,
+  "unchanged_documents": 262,
+  "metadata_updates": 0,
+  "revised_documents": 0,
+  "superseded_documents": 0,
+  "stale_candidates": 3,
+  "inactive_candidates": 0,
+  "rejected_documents": 1,
+  "provider_errors": 0,
+  "business_writes": 0,
+  "candidate_checksum": "8a2c4b91f3e7d05a6c12b83e94f21d78a3b6c9e0f12d45a78c3b91e0d62f4a87",
+  "second_run_checksum_stable": true,
+  "second_run_inserted": 0,
+  "existing_active_selection_unchanged": true,
+  "gate": {
+    "business_writes_zero": true,
+    "no_active_selection_change": true,
+    "checksum_stable": true,
+    "dry_run_gate_passed": true
+  },
+  "stale_candidates_detail": [
+    {"category": "S5_long_unverified", "count": 2, "action": "stale_review", "note": "Records not re-verified since initial import; URL still accessible"},
+    {"category": "S3_provenance_incomplete", "count": 1, "action": "stale_review", "note": "verification_status field empty"}
+  ],
+  "incremental_conclusion": "no_new_data_since_2026_01_01",
+  "apply_authorized": false,
+  "apply_reason": "no new or revised documents found; no apply needed"
+}

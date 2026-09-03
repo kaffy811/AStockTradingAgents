@@ -197,7 +197,31 @@ describe('final_answer', () => {
 // ── T8: terminal events ───────────────────────────────────────────────────────
 describe('terminal events', () => {
   it('agent_completed → ui_done', () => {
-    expect(normalizeChatEvent('agent_completed', {})).toEqual({ type: 'ui_done' })
+    const r = normalizeChatEvent('agent_completed', { status: 'completed', answer_length: 12, assistant_message_id: 'm1' })
+    expect(r.type).toBe('ui_done')
+    expect(r.status).toBe('completed')
+    expect(r.answerLength).toBe(12)
+    expect(r.messageId).toBe('m1')
+  })
+
+  it('answer_completed carries canonical answer', () => {
+    const r = normalizeChatEvent('answer_completed', {
+      answer: '财报回答正文',
+      answer_length: 6,
+      status: 'completed',
+    })
+    expect(r.type).toBe('ui_answer_completed')
+    expect(r.answer).toBe('财报回答正文')
+    expect(r.answerLength).toBe(6)
+  })
+
+  it('message_persisted exposes assistant message id', () => {
+    const r = normalizeChatEvent('message_persisted', {
+      assistant_message_id: 'assistant-1',
+      answer_length: 10,
+    })
+    expect(r.type).toBe('ui_message_persisted')
+    expect(r.messageId).toBe('assistant-1')
   })
 
   it('agent_error → ui_error with message', () => {

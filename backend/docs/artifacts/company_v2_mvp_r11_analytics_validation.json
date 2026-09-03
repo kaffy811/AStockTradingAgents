@@ -1,0 +1,35 @@
+{
+  "schema_version": "pi_canary_analytics_v1",
+  "phase": "MVP-R1.1",
+  "generated_at": "2026-07-26T08:00:00Z",
+
+  "analytics_endpoint": "POST /mvp/analytics/event",
+  "analytics_model": "mvp_analytics_event",
+
+  "canonical_events_validated": [
+    "invite_sent", "invite_activated", "invite_login_success", "invite_login_rejected",
+    "mvp_page_view", "stock_search", "stock_selected", "company_tab_view",
+    "chat_started", "chat_message_sent", "chat_answer_completed", "chat_answer_failed",
+    "fallback_triggered", "followup_sent", "history_opened",
+    "feedback_submitted", "quota_blocked", "user_disabled"
+  ],
+
+  "computable_metrics": [
+    "invite_activation_rate",
+    "login_success_rate",
+    "stock_search_rate",
+    "question_rate",
+    "core_flow_completion_rate",
+    "answer_success_rate",
+    "fallback_rate",
+    "multi_turn_rate",
+    "feedback_submission_rate",
+    "helpful_rate",
+    "next_day_return_rate",
+    "7_day_return_rate",
+    "avg_questions_per_user",
+    "avg_response_time_ms"
+  ],
+
+  "gate_l11_result": "PASS"
+}

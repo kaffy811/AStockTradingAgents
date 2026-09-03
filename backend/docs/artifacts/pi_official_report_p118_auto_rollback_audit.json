@@ -1,0 +1,46 @@
+{
+  "schema_version": "pi_auto_rollback_audit_v1",
+  "phase": "6V-P1.18",
+  "generated_at": "2026-07-29T02:32:00.000000+00:00",
+  "rollback_policy": {
+    "warning_condition": "any_window_pi_p95_gte_4700ms",
+    "review_condition": "any_window_pi_p95_gte_4800ms OR tool_p95_gte_3800ms OR pi_over_5s_rate_gt_2pct",
+    "hard_rollback_condition": "any_window_pi_p95_gte_5000ms OR combined_pi_p95_gte_5000ms OR tool_p95_gt_4000ms OR pi_over_6s_rate_gt_1pct OR pool_exhaustion OR zero_tolerance_violation",
+    "rollback_target_percent": 10,
+    "rollback_config_version": 5
+  },
+  "p118_observations": {
+    "any_window_pi_p95_gte_4700ms": true,
+    "any_window_pi_p95_gte_4800ms": false,
+    "combined_pi_p95_gte_4800ms": false,
+    "combined_pi_p95_gte_5000ms": false,
+    "tool_p95_gte_3800ms": false,
+    "tool_p95_gt_4000ms": false,
+    "pi_over_5s_rate_gt_2pct": false,
+    "pi_over_6s_rate_gt_1pct": false,
+    "pool_exhaustion": false,
+    "zero_tolerance_violation": false
+  },
+  "p118_rollback_triggered": false,
+  "p118_review_triggered": false,
+  "p118_warning_logged": true,
+  "single_5008ms_outlier": {
+    "occurred": true,
+    "window": "L1",
+    "pi_max_ms": 5008,
+    "is_single_occurrence": true,
+    "rate_pct": 0.02,
+    "triggers_hard_rollback": false,
+    "reason": "Hard rollback requires combined pi_p95 >= 5000ms (actual: 4739ms) or tool_p95 > 4000ms (actual: 3247ms). Single outlier does not trigger rollback per policy.",
+    "action": "logged_and_monitored"
+  },
+  "scenario_tests": [
+    {"scenario": "S1_normal", "pi_p95_ms": 4739, "action": "no_action", "result": "pass"},
+    {"scenario": "S2_warning", "pi_p95_ms": 4741, "action": "record_and_monitor", "result": "pass"},
+    {"scenario": "S3_review_hypothetical", "pi_p95_ms": 4800, "action": "pause_expansion_mark_review", "result": "pass"},
+    {"scenario": "S4_hard_rollback_hypothetical", "pi_p95_ms": 5001, "action": "rollback_to_10pct", "result": "pass"},
+    {"scenario": "S5_zero_tolerance_hypothetical", "violation": "fabricated_url", "action": "immediate_halt_rollback_to_10pct", "result": "pass"}
+  ],
+  "auto_rollback_mechanism_verified": true,
+  "rollback_audit_passed": true
+}

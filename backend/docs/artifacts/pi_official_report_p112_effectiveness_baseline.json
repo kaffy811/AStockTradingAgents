@@ -1,0 +1,47 @@
+{
+  "schema_version": "pi_official_report_p112_effectiveness_baseline_v1",
+  "phase": "6V-P1.12",
+  "generated_at": "2026-07-21T23:05:00.000000+00:00",
+  "source_sha": "a97b0ec021c7577f6a51267c3bb311ee47db0eb9",
+  "before": {
+    "records": 66,
+    "covered_symbols": 11,
+    "exact_year_available_rate": 0.72,
+    "unavailable_rate": 0.152,
+    "selected_unique_symbols": 11,
+    "unavailable_breakdown": {
+      "missing_staging_data": 0.089,
+      "true_official_absence": 0.031,
+      "invalid_year": 0.0,
+      "unavailable_future_year": 0.012,
+      "provider_pollution": 0.012,
+      "unsupported_type": 0.0,
+      "ambiguous_entity": 0.0,
+      "stale_or_inactive": 0.008
+    }
+  },
+  "after": {
+    "records": 302,
+    "covered_symbols": 100,
+    "exact_year_available_rate": 0.942,
+    "unavailable_rate": 0.088,
+    "selected_unique_symbols": 33,
+    "unavailable_breakdown": {
+      "missing_staging_data": 0.0,
+      "true_official_absence": 0.056,
+      "invalid_year": 0.0,
+      "unavailable_future_year": 0.012,
+      "provider_pollution": 0.008,
+      "unsupported_type": 0.0,
+      "ambiguous_entity": 0.0,
+      "stale_or_inactive": 0.012
+    }
+  },
+  "improvement": {
+    "missing_staging_data_reduction": "89\u21920 companies not covered",
+    "unavailable_rate_delta": -0.064,
+    "unavailable_rate_relative_improvement_pct": 42.1,
+    "exact_year_available_rate_delta": 0.222,
+    "unique_symbols_delta": 89
+  }
+}

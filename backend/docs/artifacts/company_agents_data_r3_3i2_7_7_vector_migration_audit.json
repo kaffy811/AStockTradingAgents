@@ -1,0 +1,49 @@
+{
+  "phase": "6W-R3.3I.2.7.7",
+  "status": "VECTOR_MIGRATION_COVERAGE_READY",
+  "traffic": "HOLD_1_PERCENT",
+  "branch": "r33i-g5-vector-capability",
+  "parent": "3982f7851d95c0b762b9e7c967e8c79d8b308742",
+  "inventory": [
+    {"revision": "e8f3a2c7d4b1", "classification": "SAFE_NO_VECTOR", "status": "safe_text_placeholder"},
+    {"revision": "a2c5e8f1b4d7", "classification": "SAFE_DATABASE_CATALOG", "status": "fixed_4d366ce"},
+    {"revision": "f4a5b6c7d8e9", "classification": "SAFE_DATABASE_CATALOG", "status": "fixed_3982f785"},
+    {"revision": "g5h6i7j8k9l0", "classification_before": ["UNSAFE_PYTHON_IMPORT", "UNSAFE_UNGUARDED_DDL"], "classification_after": "SAFE_DATABASE_CATALOG", "status": "fixed_this_phase"}
+  ],
+  "other_unfixed_high_risk_migrations": [],
+  "g5_contract": {
+    "extension_enabled": "vector(384)_hnsw",
+    "extension_disabled": "text_no_vector_index",
+    "text_values_preserved": true,
+    "vector_rows_preserved": true,
+    "vector_values_reset_for_dimension_change": true,
+    "creates_extension": false,
+    "repeat_safe": true
+  },
+  "scenarios": [
+    {"name": "standard_unavailable", "type": "text", "index": false, "row_preserved": true, "embedding_preserved": true, "repeat": true},
+    {"name": "permission_or_disabled", "type": "text", "index": false, "row_preserved": true, "embedding_preserved": true, "repeat": true},
+    {"name": "pgvector_enabled", "type": "vector(384)", "index": true, "row_preserved": true, "embedding_reset": true, "repeat": true},
+    {"name": "available_then_disabled", "type": "text", "index": false, "row_preserved": true, "repeat": true}
+  ],
+  "tests": [
+    {"name": "static_inventory_contract", "collected": 6, "passed": 2, "failed": 0, "skipped": 4, "duration_seconds": 0.04},
+    {"name": "isolated_database_matrix", "collected": 6, "passed": 6, "failed": 0, "skipped": 0, "duration_seconds": 5.51}
+  ],
+  "scope": {
+    "bootstrap_changed": false,
+    "a2_changed": false,
+    "f4_changed": false,
+    "agent_changed": false,
+    "docker_changed": false,
+    "dependencies_changed": false
+  },
+  "safety": {
+    "production_database_accessed": false,
+    "production_migrations": 0,
+    "pushed": false,
+    "merged": false,
+    "deployed": false,
+    "traffic_expanded": false
+  }
+}

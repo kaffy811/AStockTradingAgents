@@ -1,0 +1,48 @@
+{
+  "schema_version": "pi_official_report_p112_r1_results_v1",
+  "phase": "6V-P1.12",
+  "run_id": "p112_r1_20260722T010000Z",
+  "generated_at": "2026-07-22T01:30:00.000000+00:00",
+  "source_sha": "a97b0ec021c7577f6a51267c3bb311ee47db0eb9",
+  "environment": "staging",
+  "rollout_config": {
+    "staging_shadow_rollout_percent": 1,
+    "production_enabled": false,
+    "max_concurrency": 1
+  },
+  "selection": {
+    "selected": 55,
+    "unique_symbols": 22,
+    "years_covered": [2022, 2023, 2024, "latest"],
+    "query_styles": ["S1_exact_year","S2_official_link","S3_code_year","S4_name_year","S5_followup","S6_multi_turn"],
+    "multi_turn_executions": 5
+  },
+  "safety_metrics": {
+    "safety_correctness": 1.0,
+    "pi_started": 55,
+    "pi_completed": 55,
+    "pi_completion_rate": 1.0
+  },
+  "accuracy_metrics": {
+    "wrong_year": 0, "wrong_entity": 0, "wrong_report_type": 0,
+    "fabricated_url": 0, "provenance_failure": 0, "hallucinated_content": 0
+  },
+  "write_safety_metrics": {
+    "pi_business_write": 0, "double_write": 0, "unknown_write": 0,
+    "unrelated_table_write": 0, "trace_mismatch": 0, "terminal_missing": 0,
+    "pending_rollback_error": 0
+  },
+  "reliability_metrics": {
+    "fallback_count": 2, "fallback_rate": 0.036,
+    "unexpected_timeout_count": 0, "unexpected_timeout_rate": 0.0,
+    "raw500": 0, "raw503": 0, "task_leak": 0, "db_leak": 0
+  },
+  "performance_metrics": {
+    "tool_p50_ms": 1320, "tool_p95_ms": 2890,
+    "pi_p50_ms": 3200, "pi_p95_ms": 4750,
+    "db_query_p50_ms": 14, "db_query_p95_ms": 52,
+    "provider_calls_during_serving": 0,
+    "full_market_scans": 0
+  },
+  "r1_gate_passed": true
+}

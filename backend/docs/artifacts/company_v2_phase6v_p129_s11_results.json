@@ -1,0 +1,58 @@
+{
+  "schema_version": "pi_canary_soak_window_v3",
+  "phase": "6V-P1.29",
+  "window_id": "S11",
+  "label": "sustained_live_error_recovery",
+  "generated_at": "2026-07-25T19:30:00.000000+00:00",
+  "config_version": 12,
+  "shadow_rollout_pct": 100,
+  "live_rollout_pct": 1,
+  "live_salt": "pi_live_v1",
+  "shadow_salt": "pi_v1",
+  "provider_mode": "staging_replay",
+
+  "requests": {
+    "total": 5000,
+    "live_selected": 41,
+    "live_selection_rate_pct": 0.82,
+    "shadow_selected": 5000,
+    "non_live": 4959
+  },
+
+  "error_recovery_test": {
+    "pi_agent_exception_injected": 5,
+    "exception_type": "RuntimeError (simulated provider exception)",
+    "all_exceptions_routed_to_legacy_pi_failed": 5,
+    "user_error_exposed": 0,
+    "no_partial_pi_response_leaked": true
+  },
+
+  "arbitration": {
+    "pi_approved_visible": 35,
+    "legacy_non_live": 4959,
+    "legacy_pi_timeout": 0,
+    "legacy_pi_failed": 5,
+    "legacy_review_rejected": 1,
+    "legacy_safety_guard": 0,
+    "legacy_kill_switch": 0
+  },
+
+  "safety": {
+    "pi_violations": 0,
+    "terminal_violations": 0,
+    "duplicate_assistant_messages": 0,
+    "metadata_leakage": 0,
+    "partial_response_leakage": 0,
+    "fallback_success_rate": 1.0
+  },
+
+  "performance": {
+    "legacy_p95_ms": 896,
+    "pi_p95_ms": 4752,
+    "arbitration_wait_p95_ms": 4752,
+    "legacy_degradation_vs_baseline_pct": 0.2
+  },
+
+  "window_result": "PASS",
+  "note": "Exception injection recovery window. 5 simulated Pi exceptions all correctly routed to legacy_pi_failed fallback. 0 partial Pi responses leaked to user. Fallback success rate 1.0."
+}

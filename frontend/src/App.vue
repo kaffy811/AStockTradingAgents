@@ -1,22 +1,17 @@
 <template>
-  <!-- Show login when unauthenticated; router view when authenticated -->
-  <LoginCard v-if="!authStore.token" />
-  <template v-else>
-    <!-- keep-alive preserves ComprehensiveAnalysisView state across navigation -->
-    <RouterView v-slot="{ Component }">
-      <keep-alive :include="['ComprehensiveAnalysisView']">
-        <component :is="Component" />
-      </keep-alive>
-    </RouterView>
-    <!-- BottomTabBar: mobile-only, hidden on print routes -->
-    <BottomTabBar />
-  </template>
+  <!-- keep-alive preserves ComprehensiveAnalysisView state across navigation -->
+  <RouterView v-slot="{ Component }">
+    <keep-alive :include="['ComprehensiveAnalysisView']">
+      <component :is="Component" />
+    </keep-alive>
+  </RouterView>
+  <!-- BottomTabBar: mobile-only, shown only when authenticated -->
+  <BottomTabBar v-if="authStore.token" />
 </template>
 
 <script setup>
 import { onMounted, onUnmounted } from 'vue'
 import { useAuthStore } from './stores/auth.js'
-import LoginCard    from './components/LoginCard.vue'
 import BottomTabBar from './components/BottomTabBar.vue'
 import { applyTheme } from './utils/theme.js'
 import { setLocale } from './utils/i18n.js'

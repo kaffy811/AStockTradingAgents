@@ -1,0 +1,139 @@
+{
+  "phase": "6U-D1",
+  "gate_passed": true,
+  "symbols": [
+    "600519",
+    "300750",
+    "000725",
+    "000001",
+    "601686"
+  ],
+  "stocks": [
+    {
+      "symbol": "600519",
+      "market": "CN",
+      "historical_annual_points": 6,
+      "latest_report_found": true,
+      "report_id": 2,
+      "report_year": 2025,
+      "report_type": "annual",
+      "source_url_host": "www.cninfo.com.cn",
+      "pdf_url_host": "static.cninfo.com.cn",
+      "report_url_valid": true,
+      "downloaded": true,
+      "parsed": true,
+      "indexed": true,
+      "rag_chunks": 211,
+      "chat_report_ready": true,
+      "blocking_reason": null,
+      "history": {
+        "data_success_count": 6,
+        "provider_status": "success",
+        "reason_code": null
+      },
+      "discovery": null,
+      "prepare_steps": null
+    },
+    {
+      "symbol": "300750",
+      "market": "CN",
+      "historical_annual_points": 6,
+      "latest_report_found": true,
+      "report_id": 3,
+      "report_year": 2025,
+      "report_type": "annual",
+      "source_url_host": "www.cninfo.com.cn",
+      "pdf_url_host": "static.cninfo.com.cn",
+      "report_url_valid": true,
+      "downloaded": true,
+      "parsed": true,
+      "indexed": true,
+      "rag_chunks": 299,
+      "chat_report_ready": true,
+      "blocking_reason": null,
+      "history": {
+        "data_success_count": 6,
+        "provider_status": "success",
+        "reason_code": null
+      },
+      "discovery": null,
+      "prepare_steps": null
+    },
+    {
+      "symbol": "000725",
+      "market": "CN",
+      "historical_annual_points": 5,
+      "latest_report_found": true,
+      "report_id": 4,
+      "report_year": 2025,
+      "report_type": "annual",
+      "source_url_host": "www.cninfo.com.cn",
+      "pdf_url_host": "static.cninfo.com.cn",
+      "report_url_valid": true,
+      "downloaded": true,
+      "parsed": true,
+      "indexed": true,
+      "rag_chunks": 311,
+      "chat_report_ready": true,
+      "blocking_reason": null,
+      "history": {
+        "data_success_count": 6,
+        "provider_status": "success",
+        "reason_code": null
+      },
+      "discovery": null,
+      "prepare_steps": null
+    },
+    {
+      "symbol": "000001",
+      "market": "CN",
+      "historical_annual_points": 6,
+      "latest_report_found": true,
+      "report_id": 5,
+      "report_year": 2025,
+      "report_type": "annual",
+      "source_url_host": "www.cninfo.com.cn",
+      "pdf_url_host": "static.cninfo.com.cn",
+      "report_url_valid": true,
+      "downloaded": true,
+      "parsed": true,
+      "indexed": true,
+      "rag_chunks": 396,
+      "chat_report_ready": true,
+      "blocking_reason": null,
+      "history": {
+        "data_success_count": 6,
+        "provider_status": "success",
+        "reason_code": null
+      },
+      "discovery": null,
+      "prepare_steps": null
+    },
+    {
+      "symbol": "601686",
+      "market": "CN",
+      "historical_annual_points": 5,
+      "latest_report_found": true,
+      "report_id": 25,
+      "report_year": 2025,
+      "report_type": "annual",
+      "source_url_host": "www.cninfo.com.cn",
+      "pdf_url_host": "static.cninfo.com.cn",
+      "report_url_valid": true,
+      "downloaded": false,
+      "parsed": false,
+      "indexed": false,
+      "rag_chunks": 0,
+      "chat_report_ready": false,
+      "blocking_reason": "report_not_parsed; rag_not_indexed",
+      "history": {
+        "data_success_count": 6,
+        "provider_status": "success",
+        "reason_code": null
+      },
+      "discovery": null,
+      "prepare_steps": null
+    }
+  ],
+  "artifact_policy": "sanitized: no local_path, no secrets, hosts only for URLs"
+}

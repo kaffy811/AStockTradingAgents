@@ -1,0 +1,51 @@
+{
+  "schema_version": "pi_official_report_p114_stale_review_v1",
+  "phase": "6V-P1.14",
+  "stale_review_count": 3,
+  "records": [
+    {
+      "stale_id": "stale_s5_001",
+      "type": "S5",
+      "health_upgraded": false,
+      "wrongly_preferred": false,
+      "wrong_latest_selection": false,
+      "wrong_url": false,
+      "wrong_year": false,
+      "duplicate_active": false,
+      "physically_deleted": false,
+      "selection_reason_auditable": true,
+      "serving_allowed": false,
+      "filtered_by_repository": true
+    },
+    {
+      "stale_id": "stale_s5_002",
+      "type": "S5",
+      "health_upgraded": false,
+      "wrongly_preferred": false,
+      "wrong_latest_selection": false,
+      "wrong_url": false,
+      "wrong_year": false,
+      "duplicate_active": false,
+      "physically_deleted": false,
+      "selection_reason_auditable": true,
+      "serving_allowed": false,
+      "filtered_by_repository": true
+    },
+    {
+      "stale_id": "stale_s3_001",
+      "type": "S3",
+      "health_upgraded": false,
+      "wrongly_preferred": false,
+      "wrong_latest_selection": false,
+      "wrong_url": false,
+      "wrong_year": false,
+      "duplicate_active": false,
+      "physically_deleted": false,
+      "selection_reason_auditable": true,
+      "serving_allowed": false,
+      "filtered_by_repository": true
+    }
+  ],
+  "stale_wrong_selection_count": 0,
+  "validation_passed": true
+}

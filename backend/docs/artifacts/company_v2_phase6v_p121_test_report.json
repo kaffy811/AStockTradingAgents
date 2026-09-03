@@ -1,0 +1,53 @@
+{
+  "schema_version": "pi_test_report_v1",
+  "phase": "6V-P1.21",
+  "generated_at": "2026-07-23T11:44:00.000000+00:00",
+  "interrupt_note": "A Claude API socket interruption (UND_ERR_SOCKET) occurred after a completed 33-test backend run (test_phase6v_p17_canary_policy.py). The test process had already exited successfully with 33 passed. No repository reset or loss of work occurred. Execution resumed from the existing clean/recoverable P1.21 worktree.",
+  "api_interrupt_classification": "not_a_test_failure",
+  "targeted_suite": {
+    "command": "DATABASE_URL='postgresql+asyncpg://user:pass@localhost/test' SECRET_KEY='test-only-secret-key-min16' uv run pytest tests/fundamental/test_phase6v_p121_seventy_five_percent_shadow.py tests/fundamental/test_phase6v_p17_canary_policy.py -q",
+    "note": "Credentials above are test-only dummy values; not real database credentials or production secrets.",
+    "files": [
+      "backend/tests/fundamental/test_phase6v_p121_seventy_five_percent_shadow.py",
+      "backend/tests/fundamental/test_phase6v_p17_canary_policy.py"
+    ],
+    "scope": "P1.21 seventy-five-percent shadow gates + P1.17 canary policy (updated for stable_bucket_salt)",
+    "collected": 234,
+    "passed": 234,
+    "failed": 0,
+    "skipped": 0,
+    "duration_seconds": 0.45,
+    "exit_code": 0
+  },
+  "cross_phase_suite": {
+    "command": "DATABASE_URL='...' SECRET_KEY='...' uv run pytest tests/fundamental/test_phase6v_p1*.py -q",
+    "files": "backend/tests/fundamental/test_phase6v_p1*.py (all Phase 6V files, P1.1 through P1.21)",
+    "collected": 2756,
+    "passed": 2756,
+    "failed": 0,
+    "skipped": 0,
+    "exit_code": 0
+  },
+  "backend_full_suite": {
+    "command": "DATABASE_URL='...' SECRET_KEY='...' uv run pytest tests/fundamental/ -q",
+    "collected": 4309,
+    "passed": 4294,
+    "failed": 0,
+    "skipped": 15,
+    "exit_code": 0,
+    "duration_seconds": 41.98,
+    "note": "15 skipped are integration tests requiring live external data sources (BaoStock, Tushare) not available in CI"
+  },
+  "frontend": {
+    "vitest_command": "npx vitest run",
+    "test_files_passed": 62,
+    "passed": 688,
+    "failed": 0,
+    "duration_seconds": 3.00,
+    "build_command": "npx vite build --mode production",
+    "build_exit_code": 0,
+    "build_duration_seconds": 2.55,
+    "note": "Vue + Vitest 688 tests pass; Vite production build clean (chunk size warning is pre-existing, non-blocking)"
+  },
+  "test_report_gate": "PASS"
+}

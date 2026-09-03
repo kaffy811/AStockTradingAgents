@@ -10,6 +10,7 @@ Verifies that streaming correctly persists messages:
 6. Metadata includes streamed=True flag
 """
 
+import json
 import uuid
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch, call
@@ -30,6 +31,30 @@ async def _run_stream(session_id, user_id, content, db):
         db=db,
     ):
         pass
+
+
+def _event_types(chunks: list[str]) -> list[str]:
+    events: list[str] = []
+    for chunk in chunks:
+        for line in chunk.splitlines():
+            if line.startswith("event:"):
+                events.append(line.split(":", 1)[1].strip())
+    return events
+
+
+def _event_payloads(chunks: list[str], event_type: str) -> list[dict]:
+    payloads: list[dict] = []
+    for chunk in chunks:
+        data_lines: list[str] = []
+        current_type = ""
+        for line in chunk.splitlines():
+            if line.startswith("event:"):
+                current_type = line.split(":", 1)[1].strip()
+            elif line.startswith("data:"):
+                data_lines.append(line.split(":", 1)[1].lstrip())
+        if current_type == event_type and data_lines:
+            payloads.append(json.loads("\n".join(data_lines)).get("payload", {}))
+    return payloads
 
 
 # ── 1. User message persistence ───────────────────────────────────────────────
@@ -112,6 +137,60 @@ class TestAssistantMessagePersistence:
         assert kwargs["answer"] == "茅台今天涨了 2%。"
         assert len(kwargs["tool_events"]) == 1
         assert kwargs["confirmation"] is None
+
+    @pytest.mark.asyncio
+    async def test_stream_emits_answer_completed_before_done(self):
+        """Successful streams must explicitly complete the answer before done."""
+        from app.agents.chat_orchestrator import OrchestratorResult
+
+        mock_result = OrchestratorResult(answer="财报回答正文", tool_events=[], cards=[], confirmation=None)
+        chunks: list[str] = []
+
+        with (
+            patch("app.agents.chat_streaming.process_message", return_value=mock_result),
+            patch("app.agents.chat_streaming.save_user_message", return_value=MagicMock(id=uuid.uuid4())),
+            patch("app.agents.chat_streaming.save_assistant_message", return_value=MagicMock(id=uuid.uuid4())),
+            patch("app.agents.chat_streaming.update_session_last_message"),
+        ):
+            from app.agents.chat_streaming import stream_chat_message
+            async for chunk in stream_chat_message(uuid.uuid4(), _make_uid(), "财报问题", "zh-CN", AsyncMock()):
+                chunks.append(chunk)
+
+        events = _event_types(chunks)
+        assert "answer_completed" in events
+        assert "message_persisted" in events
+        assert events.index("answer_completed") < events.index("agent_completed")
+        assert events.index("message_persisted") < events.index("agent_completed")
+        assert "final_answer" not in events[events.index("agent_completed") + 1:]
+        completed = _event_payloads(chunks, "agent_completed")[-1]
+        assert completed["status"] == "completed"
+        assert completed["answer_length"] == len("财报回答正文")
+
+    @pytest.mark.asyncio
+    async def test_empty_final_answer_is_not_persisted_as_completed_empty(self):
+        """Empty orchestrator answers are downgraded to failed with non-empty content."""
+        from app.agents.chat_orchestrator import OrchestratorResult
+
+        mock_result = OrchestratorResult(answer="", tool_events=[], cards=[], confirmation=None)
+        mock_save_asst = AsyncMock(return_value=MagicMock(id=uuid.uuid4()))
+        chunks: list[str] = []
+
+        with (
+            patch("app.agents.chat_streaming.process_message", return_value=mock_result),
+            patch("app.agents.chat_streaming.save_user_message", return_value=MagicMock(id=uuid.uuid4())),
+            patch("app.agents.chat_streaming.save_assistant_message", mock_save_asst),
+            patch("app.agents.chat_streaming.update_session_last_message"),
+        ):
+            from app.agents.chat_streaming import stream_chat_message
+            async for chunk in stream_chat_message(uuid.uuid4(), _make_uid(), "财报问题", "zh-CN", AsyncMock()):
+                chunks.append(chunk)
+
+        saved_answer = mock_save_asst.call_args.kwargs["answer"]
+        assert saved_answer.strip()
+        assert "生成失败" in saved_answer
+        answer_completed = _event_payloads(chunks, "answer_completed")[-1]
+        assert answer_completed["status"] == "failed"
+        assert answer_completed["error_code"] == "EMPTY_FINAL_ANSWER"
 
     @pytest.mark.asyncio
     async def test_assistant_message_metadata_includes_streamed_flag(self):
@@ -201,6 +280,81 @@ class TestAssistantMessagePersistence:
 
         kwargs = mock_save_asst.call_args.kwargs
         assert kwargs["confirmation"] == conf
+
+
+class TestStreamingTransactionIsolation:
+
+    @pytest.mark.asyncio
+    async def test_short_db_operation_failure_rolls_back(self):
+        from app.agents.chat_streaming import _run_short_db_operation
+
+        db = AsyncMock()
+
+        async def _fail(_db):
+            raise RuntimeError("first db exception")
+
+        with pytest.raises(RuntimeError, match="first db exception"):
+            await _run_short_db_operation("test.owner", _fail, db_override=db)
+
+        db.rollback.assert_awaited_once()
+        db.commit.assert_not_awaited()
+
+    @pytest.mark.asyncio
+    async def test_rollback_failure_does_not_mask_first_exception(self):
+        from app.agents.chat_streaming import _run_short_db_operation
+
+        db = AsyncMock()
+        db.rollback = AsyncMock(side_effect=RuntimeError("rollback failed"))
+
+        async def _fail(_db):
+            raise ValueError("first db exception")
+
+        with pytest.raises(ValueError, match="first db exception"):
+            await _run_short_db_operation("test.owner", _fail, db_override=db)
+
+        db.rollback.assert_awaited_once()
+        db.commit.assert_not_awaited()
+
+    @pytest.mark.asyncio
+    async def test_downstream_agent_completed_is_not_reemitted(self):
+        from app.agents.chat_orchestrator import OrchestratorResult
+        from app.agents.chat_streaming import stream_chat_message
+
+        async def fake_process(*_args, **kwargs):
+            await kwargs["event_callback"]("agent_completed", {"status": "completed"})
+            return OrchestratorResult(answer="ok", tool_events=[], cards=[], confirmation=None)
+
+        chunks: list[str] = []
+        with (
+            patch("app.agents.chat_streaming.process_message", fake_process),
+            patch("app.agents.chat_streaming.save_user_message", return_value=MagicMock(id=uuid.uuid4())),
+            patch("app.agents.chat_streaming.save_assistant_message", return_value=MagicMock(id=uuid.uuid4())),
+            patch("app.agents.chat_streaming.update_session_last_message"),
+        ):
+            async for chunk in stream_chat_message(uuid.uuid4(), _make_uid(), "test", "zh-CN", AsyncMock()):
+                chunks.append(chunk)
+
+        events = _event_types(chunks)
+        assert events.count("agent_completed") == 1
+
+    @pytest.mark.asyncio
+    async def test_no_yield_after_terminal_event(self):
+        from app.agents.chat_orchestrator import OrchestratorResult
+        from app.agents.chat_streaming import stream_chat_message
+
+        chunks: list[str] = []
+        with (
+            patch("app.agents.chat_streaming.process_message", return_value=OrchestratorResult(answer="ok", tool_events=[], cards=[], confirmation=None)),
+            patch("app.agents.chat_streaming.save_user_message", return_value=MagicMock(id=uuid.uuid4())),
+            patch("app.agents.chat_streaming.save_assistant_message", return_value=MagicMock(id=uuid.uuid4())),
+            patch("app.agents.chat_streaming.update_session_last_message"),
+        ):
+            async for chunk in stream_chat_message(uuid.uuid4(), _make_uid(), "test", "zh-CN", AsyncMock()):
+                chunks.append(chunk)
+
+        events = _event_types(chunks)
+        terminal_index = events.index("agent_completed")
+        assert events[terminal_index + 1:] == []
 
 
 # ── 3. Session restore after streaming ────────────────────────────────────────

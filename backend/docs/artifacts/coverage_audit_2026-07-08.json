@@ -1,0 +1,2567 @@
+[
+  {
+    "ts_code": "600519.SH",
+    "trade_date": "2026-07-08",
+    "generated_at": "2026-07-08T09:42:02.678913",
+    "overall_completeness": 0.8837,
+    "overall_without_rag": 0.9744,
+    "rag_status": "empty",
+    "quote_completeness": 1.0,
+    "valuation_completeness": 0.9,
+    "valuation_p0_completeness": 1.0,
+    "valuation_p1_completeness": 0.8571,
+    "financial_statement_completeness": 1.0,
+    "financial_indicator_completeness": 1.0,
+    "financial_completeness": 1.0,
+    "rag_completeness": 0.0,
+    "categories": {
+      "quote": {
+        "category": "quote",
+        "total_fields": 5,
+        "ok_fields": 5,
+        "completeness": 1.0,
+        "fields": [
+          {
+            "field_name": "latest_price",
+            "value": 1199.3,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          },
+          {
+            "field_name": "change_pct",
+            "value": 0.008832,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          },
+          {
+            "field_name": "volume",
+            "value": 2577602.0,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          },
+          {
+            "field_name": "amount",
+            "value": 3071933497.8,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          },
+          {
+            "field_name": "trade_date",
+            "value": "2026-07-08",
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          }
+        ]
+      },
+      "valuation": {
+        "category": "valuation",
+        "total_fields": 10,
+        "ok_fields": 9,
+        "completeness": 0.9,
+        "fields": [
+          {
+            "field_name": "pe_ttm",
+            "value": 18.12514,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null,
+            "priority": "P0"
+          },
+          {
+            "field_name": "pb",
+            "value": 5.534352,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null,
+            "priority": "P0"
+          },
+          {
+            "field_name": "market_cap",
+            "value": 1501847668849.5,
+            "status": "ok",
+            "source": "computed",
+            "reason_code": null,
+            "priority": "P0",
+            "formula": "close × total_share",
+            "dependencies": [
+              "close",
+              "total_share"
+            ]
+          },
+          {
+            "field_name": "circ_mv",
+            "value": 1501847668849.5,
+            "status": "ok",
+            "source": "computed",
+            "reason_code": null,
+            "priority": "P1",
+            "formula": "close × float_share",
+            "dependencies": [
+              "close",
+              "float_share"
+            ]
+          },
+          {
+            "field_name": "total_share",
+            "value": 1252270215.0,
+            "status": "ok",
+            "source": "baostock",
+            "reason_code": null,
+            "priority": "P1"
+          },
+          {
+            "field_name": "float_share",
+            "value": 1252270215.0,
+            "status": "ok",
+            "source": "baostock",
+            "reason_code": null,
+            "priority": "P1"
+          },
+          {
+            "field_name": "turnover_rate",
+            "value": 0.2062,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null,
+            "priority": "P1"
+          },
+          {
+            "field_name": "dividend_yield",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED",
+            "priority": "P1"
+          },
+          {
+            "field_name": "ps_ttm",
+            "value": 8.551662,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null,
+            "priority": "P1"
+          },
+          {
+            "field_name": "pcf_ttm",
+            "value": 1055.924548,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null,
+            "priority": "P1"
+          }
+        ],
+        "p0_completeness": 1.0,
+        "p1_completeness": 0.8571,
+        "p0_total": 3,
+        "p0_ok": 3,
+        "p1_total": 7,
+        "p1_ok": 6
+      },
+      "income": {
+        "category": "income",
+        "total_fields": 5,
+        "ok_fields": 5,
+        "completeness": 1.0,
+        "fields": [
+          {
+            "field_name": "revenue",
+            "value": 54702912385.23,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "gross_profit",
+            "value": 48388523020.19,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "operating_profit",
+            "value": 37537008686.42,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "net_profit",
+            "value": 28153831489.89,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "net_profit_parent",
+            "value": 27242512886.45,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          }
+        ]
+      },
+      "balance": {
+        "category": "balance",
+        "total_fields": 5,
+        "ok_fields": 5,
+        "completeness": 1.0,
+        "fields": [
+          {
+            "field_name": "total_assets",
+            "value": 319918844905.58,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "total_liabilities",
+            "value": 38782958469.89,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "total_equity",
+            "value": 281135886435.69,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "current_assets",
+            "value": 271524528742.4,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "current_liabilities",
+            "value": 38455594988.88,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          }
+        ]
+      },
+      "cashflow": {
+        "category": "cashflow",
+        "total_fields": 3,
+        "ok_fields": 3,
+        "completeness": 1.0,
+        "fields": [
+          {
+            "field_name": "operating_cashflow",
+            "value": 26909891269.13,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "investing_cashflow",
+            "value": 25638946497.35,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "financing_cashflow",
+            "value": -1005514179.59,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          }
+        ]
+      },
+      "indicators": {
+        "category": "indicators",
+        "total_fields": 11,
+        "ok_fields": 11,
+        "completeness": 1.0,
+        "fields": [
+          {
+            "field_name": "roe",
+            "value": 0.10060000000000001,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "roa",
+            "value": 0.090272,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "gross_margin",
+            "value": 0.897592,
+            "status": "ok",
+            "source": "baostock",
+            "reason_code": null
+          },
+          {
+            "field_name": "net_margin",
+            "value": 0.522245,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "revenue_growth",
+            "value": 0.06538000000000001,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "net_profit_growth",
+            "value": 0.013653,
+            "status": "ok",
+            "source": "baostock",
+            "reason_code": null
+          },
+          {
+            "field_name": "debt_ratio",
+            "value": 0.121227,
+            "status": "ok",
+            "source": "baostock",
+            "reason_code": null
+          },
+          {
+            "field_name": "current_ratio",
+            "value": 7.0607,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "asset_turnover",
+            "value": 0.1729,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "inventory_turnover",
+            "value": 0.0904,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "ocf_to_np",
+            "value": 0.9558,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          }
+        ]
+      },
+      "rag": {
+        "category": "rag",
+        "total_fields": 4,
+        "ok_fields": 0,
+        "completeness": 0.0,
+        "fields": [
+          {
+            "field_name": "documents_count",
+            "value": 0,
+            "status": "ok",
+            "source": "report_documents",
+            "reason_code": null
+          },
+          {
+            "field_name": "chunks_count",
+            "value": 0,
+            "status": "ok",
+            "source": "report_chunks",
+            "reason_code": null
+          },
+          {
+            "field_name": "embedding_count",
+            "value": 0,
+            "status": "ok",
+            "source": "report_chunks",
+            "reason_code": null
+          },
+          {
+            "field_name": "rag_status",
+            "value": "empty",
+            "status": "ok",
+            "source": "report_chunks",
+            "reason_code": null
+          }
+        ],
+        "diagnostic_status": "ok",
+        "data_status": "empty",
+        "documents_count": 0,
+        "chunks_count": 0,
+        "embedding_count": 0,
+        "reason_code": "REPORT_NOT_INGESTED"
+      }
+    },
+    "missing_fields": [
+      {
+        "field_name": "dividend_yield",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED",
+        "priority": "P1"
+      }
+    ]
+  },
+  {
+    "ts_code": "000725.SZ",
+    "trade_date": "2026-07-08",
+    "generated_at": "2026-07-08T09:42:41.956457",
+    "overall_completeness": 0.8837,
+    "overall_without_rag": 0.9744,
+    "rag_status": "empty",
+    "quote_completeness": 1.0,
+    "valuation_completeness": 0.9,
+    "valuation_p0_completeness": 1.0,
+    "valuation_p1_completeness": 0.8571,
+    "financial_statement_completeness": 1.0,
+    "financial_indicator_completeness": 1.0,
+    "financial_completeness": 1.0,
+    "rag_completeness": 0.0,
+    "categories": {
+      "quote": {
+        "category": "quote",
+        "total_fields": 5,
+        "ok_fields": 5,
+        "completeness": 1.0,
+        "fields": [
+          {
+            "field_name": "latest_price",
+            "value": 7.63,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          },
+          {
+            "field_name": "change_pct",
+            "value": 0.006595999999999999,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          },
+          {
+            "field_name": "volume",
+            "value": 3322287793.0,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          },
+          {
+            "field_name": "amount",
+            "value": 25344613436.08,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          },
+          {
+            "field_name": "trade_date",
+            "value": "2026-07-08",
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          }
+        ]
+      },
+      "valuation": {
+        "category": "valuation",
+        "total_fields": 10,
+        "ok_fields": 9,
+        "completeness": 0.9,
+        "fields": [
+          {
+            "field_name": "pe_ttm",
+            "value": 47.502407,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null,
+            "priority": "P0"
+          },
+          {
+            "field_name": "pb",
+            "value": 2.076816,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null,
+            "priority": "P0"
+          },
+          {
+            "field_name": "market_cap",
+            "value": 282648223128.32,
+            "status": "ok",
+            "source": "computed",
+            "reason_code": null,
+            "priority": "P0",
+            "formula": "close × total_share",
+            "dependencies": [
+              "close",
+              "total_share"
+            ]
+          },
+          {
+            "field_name": "circ_mv",
+            "value": 277286893969.96,
+            "status": "ok",
+            "source": "computed",
+            "reason_code": null,
+            "priority": "P1",
+            "formula": "close × float_share",
+            "dependencies": [
+              "close",
+              "float_share"
+            ]
+          },
+          {
+            "field_name": "total_share",
+            "value": 37044328064.0,
+            "status": "ok",
+            "source": "baostock",
+            "reason_code": null,
+            "priority": "P1"
+          },
+          {
+            "field_name": "float_share",
+            "value": 36341663692.0,
+            "status": "ok",
+            "source": "baostock",
+            "reason_code": null,
+            "priority": "P1"
+          },
+          {
+            "field_name": "turnover_rate",
+            "value": 9.3937,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null,
+            "priority": "P1"
+          },
+          {
+            "field_name": "dividend_yield",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED",
+            "priority": "P1"
+          },
+          {
+            "field_name": "ps_ttm",
+            "value": 1.378822,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null,
+            "priority": "P1"
+          },
+          {
+            "field_name": "pcf_ttm",
+            "value": 77.069342,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null,
+            "priority": "P1"
+          }
+        ],
+        "p0_completeness": 1.0,
+        "p1_completeness": 0.8571,
+        "p0_total": 3,
+        "p0_ok": 3,
+        "p1_total": 7,
+        "p1_ok": 6
+      },
+      "income": {
+        "category": "income",
+        "total_fields": 5,
+        "ok_fields": 5,
+        "completeness": 1.0,
+        "fields": [
+          {
+            "field_name": "revenue",
+            "value": 51001263370.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "gross_profit",
+            "value": 7954015105.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "operating_profit",
+            "value": 2461624733.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "net_profit",
+            "value": 1709087317.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "net_profit_parent",
+            "value": 1707220076.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          }
+        ]
+      },
+      "balance": {
+        "category": "balance",
+        "total_fields": 5,
+        "ok_fields": 5,
+        "completeness": 1.0,
+        "fields": [
+          {
+            "field_name": "total_assets",
+            "value": 437705366743.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "total_liabilities",
+            "value": 227239362857.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "total_equity",
+            "value": 210466003886.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "current_assets",
+            "value": 143260640838.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "current_liabilities",
+            "value": 100509574988.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          }
+        ]
+      },
+      "cashflow": {
+        "category": "cashflow",
+        "total_fields": 3,
+        "ok_fields": 3,
+        "completeness": 1.0,
+        "fields": [
+          {
+            "field_name": "operating_cashflow",
+            "value": 12299498803.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "investing_cashflow",
+            "value": -10295938322.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "financing_cashflow",
+            "value": 2454020615.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          }
+        ]
+      },
+      "indicators": {
+        "category": "indicators",
+        "total_fields": 11,
+        "ok_fields": 11,
+        "completeness": 1.0,
+        "fields": [
+          {
+            "field_name": "roe",
+            "value": 0.0125,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "roa",
+            "value": 0.003911,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "gross_margin",
+            "value": 0.155957,
+            "status": "ok",
+            "source": "baostock",
+            "reason_code": null
+          },
+          {
+            "field_name": "net_margin",
+            "value": 0.033511,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "revenue_growth",
+            "value": 0.007951,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "net_profit_growth",
+            "value": -0.117708,
+            "status": "ok",
+            "source": "baostock",
+            "reason_code": null
+          },
+          {
+            "field_name": "debt_ratio",
+            "value": 0.519161,
+            "status": "ok",
+            "source": "baostock",
+            "reason_code": null
+          },
+          {
+            "field_name": "current_ratio",
+            "value": 1.4253,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "asset_turnover",
+            "value": 0.1167,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "inventory_turnover",
+            "value": 1.6161,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "ocf_to_np",
+            "value": 7.1965,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          }
+        ]
+      },
+      "rag": {
+        "category": "rag",
+        "total_fields": 4,
+        "ok_fields": 0,
+        "completeness": 0.0,
+        "fields": [
+          {
+            "field_name": "documents_count",
+            "value": 0,
+            "status": "ok",
+            "source": "report_documents",
+            "reason_code": null
+          },
+          {
+            "field_name": "chunks_count",
+            "value": 0,
+            "status": "ok",
+            "source": "report_chunks",
+            "reason_code": null
+          },
+          {
+            "field_name": "embedding_count",
+            "value": 0,
+            "status": "ok",
+            "source": "report_chunks",
+            "reason_code": null
+          },
+          {
+            "field_name": "rag_status",
+            "value": "empty",
+            "status": "ok",
+            "source": "report_chunks",
+            "reason_code": null
+          }
+        ],
+        "diagnostic_status": "ok",
+        "data_status": "empty",
+        "documents_count": 0,
+        "chunks_count": 0,
+        "embedding_count": 0,
+        "reason_code": "REPORT_NOT_INGESTED"
+      }
+    },
+    "missing_fields": [
+      {
+        "field_name": "dividend_yield",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED",
+        "priority": "P1"
+      }
+    ]
+  },
+  {
+    "ts_code": "601686.SH",
+    "trade_date": "2026-07-08",
+    "generated_at": "2026-07-08T09:43:09.282335",
+    "overall_completeness": 0.8837,
+    "overall_without_rag": 0.9744,
+    "rag_status": "empty",
+    "quote_completeness": 1.0,
+    "valuation_completeness": 0.9,
+    "valuation_p0_completeness": 1.0,
+    "valuation_p1_completeness": 0.8571,
+    "financial_statement_completeness": 1.0,
+    "financial_indicator_completeness": 1.0,
+    "financial_completeness": 1.0,
+    "rag_completeness": 0.0,
+    "categories": {
+      "quote": {
+        "category": "quote",
+        "total_fields": 5,
+        "ok_fields": 5,
+        "completeness": 1.0,
+        "fields": [
+          {
+            "field_name": "latest_price",
+            "value": 5.05,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          },
+          {
+            "field_name": "change_pct",
+            "value": 0.012024,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          },
+          {
+            "field_name": "volume",
+            "value": 4604085.0,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          },
+          {
+            "field_name": "amount",
+            "value": 23157169.25,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          },
+          {
+            "field_name": "trade_date",
+            "value": "2026-07-08",
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          }
+        ]
+      },
+      "valuation": {
+        "category": "valuation",
+        "total_fields": 10,
+        "ok_fields": 9,
+        "completeness": 0.9,
+        "fields": [
+          {
+            "field_name": "pe_ttm",
+            "value": 11.046528,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null,
+            "priority": "P0"
+          },
+          {
+            "field_name": "pb",
+            "value": 1.118482,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null,
+            "priority": "P0"
+          },
+          {
+            "field_name": "market_cap",
+            "value": 7431312552.0,
+            "status": "ok",
+            "source": "computed",
+            "reason_code": null,
+            "priority": "P0",
+            "formula": "close × total_share",
+            "dependencies": [
+              "close",
+              "total_share"
+            ]
+          },
+          {
+            "field_name": "circ_mv",
+            "value": 7431312552.0,
+            "status": "ok",
+            "source": "computed",
+            "reason_code": null,
+            "priority": "P1",
+            "formula": "close × float_share",
+            "dependencies": [
+              "close",
+              "float_share"
+            ]
+          },
+          {
+            "field_name": "total_share",
+            "value": 1471547040.0,
+            "status": "ok",
+            "source": "baostock",
+            "reason_code": null,
+            "priority": "P1"
+          },
+          {
+            "field_name": "float_share",
+            "value": 1471547040.0,
+            "status": "ok",
+            "source": "baostock",
+            "reason_code": null,
+            "priority": "P1"
+          },
+          {
+            "field_name": "turnover_rate",
+            "value": 0.3112,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null,
+            "priority": "P1"
+          },
+          {
+            "field_name": "dividend_yield",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED",
+            "priority": "P1"
+          },
+          {
+            "field_name": "ps_ttm",
+            "value": 0.149673,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null,
+            "priority": "P1"
+          },
+          {
+            "field_name": "pcf_ttm",
+            "value": -23.709597,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null,
+            "priority": "P1"
+          }
+        ],
+        "p0_completeness": 1.0,
+        "p1_completeness": 0.8571,
+        "p0_total": 3,
+        "p0_ok": 3,
+        "p1_total": 7,
+        "p1_ok": 6
+      },
+      "income": {
+        "category": "income",
+        "total_fields": 5,
+        "ok_fields": 5,
+        "completeness": 1.0,
+        "fields": [
+          {
+            "field_name": "revenue",
+            "value": 10644712954.25,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "gross_profit",
+            "value": 310227782.4599991,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "operating_profit",
+            "value": 166160835.52,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "net_profit",
+            "value": 144062444.38,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "net_profit_parent",
+            "value": 129155250.62,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          }
+        ]
+      },
+      "balance": {
+        "category": "balance",
+        "total_fields": 5,
+        "ok_fields": 5,
+        "completeness": 1.0,
+        "fields": [
+          {
+            "field_name": "total_assets",
+            "value": 22932028615.5,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "total_liabilities",
+            "value": 15261076536.33,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "total_equity",
+            "value": 7670952079.17,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "current_assets",
+            "value": 15484022507.67,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "current_liabilities",
+            "value": 12636109974.84,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          }
+        ]
+      },
+      "cashflow": {
+        "category": "cashflow",
+        "total_fields": 3,
+        "ok_fields": 3,
+        "completeness": 1.0,
+        "fields": [
+          {
+            "field_name": "operating_cashflow",
+            "value": -13732964.65,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "investing_cashflow",
+            "value": -269401100.87,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "financing_cashflow",
+            "value": 20263184.49,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          }
+        ]
+      },
+      "indicators": {
+        "category": "indicators",
+        "total_fields": 11,
+        "ok_fields": 11,
+        "completeness": 1.0,
+        "fields": [
+          {
+            "field_name": "roe",
+            "value": 0.018799999999999997,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "roa",
+            "value": 0.0060750000000000005,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "gross_margin",
+            "value": 0.029144,
+            "status": "ok",
+            "source": "baostock",
+            "reason_code": null
+          },
+          {
+            "field_name": "net_margin",
+            "value": 0.013534,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "revenue_growth",
+            "value": -0.066449,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "net_profit_growth",
+            "value": -0.031798,
+            "status": "ok",
+            "source": "baostock",
+            "reason_code": null
+          },
+          {
+            "field_name": "debt_ratio",
+            "value": 0.665492,
+            "status": "ok",
+            "source": "baostock",
+            "reason_code": null
+          },
+          {
+            "field_name": "current_ratio",
+            "value": 1.2254,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "asset_turnover",
+            "value": 0.4489,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "inventory_turnover",
+            "value": 2.8827,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "ocf_to_np",
+            "value": -0.0953,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          }
+        ]
+      },
+      "rag": {
+        "category": "rag",
+        "total_fields": 4,
+        "ok_fields": 0,
+        "completeness": 0.0,
+        "fields": [
+          {
+            "field_name": "documents_count",
+            "value": 0,
+            "status": "ok",
+            "source": "report_documents",
+            "reason_code": null
+          },
+          {
+            "field_name": "chunks_count",
+            "value": 0,
+            "status": "ok",
+            "source": "report_chunks",
+            "reason_code": null
+          },
+          {
+            "field_name": "embedding_count",
+            "value": 0,
+            "status": "ok",
+            "source": "report_chunks",
+            "reason_code": null
+          },
+          {
+            "field_name": "rag_status",
+            "value": "empty",
+            "status": "ok",
+            "source": "report_chunks",
+            "reason_code": null
+          }
+        ],
+        "diagnostic_status": "ok",
+        "data_status": "empty",
+        "documents_count": 0,
+        "chunks_count": 0,
+        "embedding_count": 0,
+        "reason_code": "REPORT_NOT_INGESTED"
+      }
+    },
+    "missing_fields": [
+      {
+        "field_name": "dividend_yield",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED",
+        "priority": "P1"
+      }
+    ]
+  },
+  {
+    "ts_code": "300750.SZ",
+    "trade_date": "2026-07-08",
+    "generated_at": "2026-07-08T09:43:37.098803",
+    "overall_completeness": 0.8837,
+    "overall_without_rag": 0.9744,
+    "rag_status": "empty",
+    "quote_completeness": 1.0,
+    "valuation_completeness": 0.9,
+    "valuation_p0_completeness": 1.0,
+    "valuation_p1_completeness": 0.8571,
+    "financial_statement_completeness": 1.0,
+    "financial_indicator_completeness": 1.0,
+    "financial_completeness": 1.0,
+    "rag_completeness": 0.0,
+    "categories": {
+      "quote": {
+        "category": "quote",
+        "total_fields": 5,
+        "ok_fields": 5,
+        "completeness": 1.0,
+        "fields": [
+          {
+            "field_name": "latest_price",
+            "value": 361.0,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          },
+          {
+            "field_name": "change_pct",
+            "value": -0.030846,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          },
+          {
+            "field_name": "volume",
+            "value": 27051874.0,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          },
+          {
+            "field_name": "amount",
+            "value": 9902742689.32,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          },
+          {
+            "field_name": "trade_date",
+            "value": "2026-07-08",
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          }
+        ]
+      },
+      "valuation": {
+        "category": "valuation",
+        "total_fields": 10,
+        "ok_fields": 9,
+        "completeness": 0.9,
+        "fields": [
+          {
+            "field_name": "pe_ttm",
+            "value": 21.148346,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null,
+            "priority": "P0"
+          },
+          {
+            "field_name": "pb",
+            "value": 4.675051,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null,
+            "priority": "P0"
+          },
+          {
+            "field_name": "market_cap",
+            "value": 1647626825669.0,
+            "status": "ok",
+            "source": "computed",
+            "reason_code": null,
+            "priority": "P0",
+            "formula": "close × total_share",
+            "dependencies": [
+              "close",
+              "total_share"
+            ]
+          },
+          {
+            "field_name": "circ_mv",
+            "value": 1536716748739.0,
+            "status": "ok",
+            "source": "computed",
+            "reason_code": null,
+            "priority": "P1",
+            "formula": "close × float_share",
+            "dependencies": [
+              "close",
+              "float_share"
+            ]
+          },
+          {
+            "field_name": "total_share",
+            "value": 4564063229.0,
+            "status": "ok",
+            "source": "baostock",
+            "reason_code": null,
+            "priority": "P1"
+          },
+          {
+            "field_name": "float_share",
+            "value": 4256833099.0,
+            "status": "ok",
+            "source": "baostock",
+            "reason_code": null,
+            "priority": "P1"
+          },
+          {
+            "field_name": "turnover_rate",
+            "value": 0.6355,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null,
+            "priority": "P1"
+          },
+          {
+            "field_name": "dividend_yield",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED",
+            "priority": "P1"
+          },
+          {
+            "field_name": "ps_ttm",
+            "value": 3.56787,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null,
+            "priority": "P1"
+          },
+          {
+            "field_name": "pcf_ttm",
+            "value": 43.891362,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null,
+            "priority": "P1"
+          }
+        ],
+        "p0_completeness": 1.0,
+        "p1_completeness": 0.8571,
+        "p0_total": 3,
+        "p0_ok": 3,
+        "p1_total": 7,
+        "p1_ok": 6
+      },
+      "income": {
+        "category": "income",
+        "total_fields": 5,
+        "ok_fields": 5,
+        "completeness": 1.0,
+        "fields": [
+          {
+            "field_name": "revenue",
+            "value": 129131041000.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "gross_profit",
+            "value": 32044671000.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "operating_profit",
+            "value": 26651291000.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "net_profit",
+            "value": 22737254000.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "net_profit_parent",
+            "value": 20737710000.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          }
+        ]
+      },
+      "balance": {
+        "category": "balance",
+        "total_fields": 5,
+        "ok_fields": 5,
+        "completeness": 1.0,
+        "fields": [
+          {
+            "field_name": "total_assets",
+            "value": 1046329036000.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "total_liabilities",
+            "value": 652096744000.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "total_equity",
+            "value": 394232291000.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "current_assets",
+            "value": 692498192000.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "current_liabilities",
+            "value": 434010194000.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          }
+        ]
+      },
+      "cashflow": {
+        "category": "cashflow",
+        "total_fields": 3,
+        "ok_fields": 3,
+        "completeness": 1.0,
+        "fields": [
+          {
+            "field_name": "operating_cashflow",
+            "value": 33680852000.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "investing_cashflow",
+            "value": -14623616000.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "financing_cashflow",
+            "value": 8762324000.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          }
+        ]
+      },
+      "indicators": {
+        "category": "indicators",
+        "total_fields": 11,
+        "ok_fields": 11,
+        "completeness": 1.0,
+        "fields": [
+          {
+            "field_name": "roe",
+            "value": 0.057999999999999996,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "roa",
+            "value": 0.022498999999999998,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "gross_margin",
+            "value": 0.248156,
+            "status": "ok",
+            "source": "baostock",
+            "reason_code": null
+          },
+          {
+            "field_name": "net_margin",
+            "value": 0.176079,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "revenue_growth",
+            "value": 0.524487,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "net_profit_growth",
+            "value": 0.52993,
+            "status": "ok",
+            "source": "baostock",
+            "reason_code": null
+          },
+          {
+            "field_name": "debt_ratio",
+            "value": 0.623223,
+            "status": "ok",
+            "source": "baostock",
+            "reason_code": null
+          },
+          {
+            "field_name": "current_ratio",
+            "value": 1.5956,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "asset_turnover",
+            "value": 0.1278,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "inventory_turnover",
+            "value": 0.9543,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "ocf_to_np",
+            "value": 1.4813,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          }
+        ]
+      },
+      "rag": {
+        "category": "rag",
+        "total_fields": 4,
+        "ok_fields": 0,
+        "completeness": 0.0,
+        "fields": [
+          {
+            "field_name": "documents_count",
+            "value": 0,
+            "status": "ok",
+            "source": "report_documents",
+            "reason_code": null
+          },
+          {
+            "field_name": "chunks_count",
+            "value": 0,
+            "status": "ok",
+            "source": "report_chunks",
+            "reason_code": null
+          },
+          {
+            "field_name": "embedding_count",
+            "value": 0,
+            "status": "ok",
+            "source": "report_chunks",
+            "reason_code": null
+          },
+          {
+            "field_name": "rag_status",
+            "value": "empty",
+            "status": "ok",
+            "source": "report_chunks",
+            "reason_code": null
+          }
+        ],
+        "diagnostic_status": "ok",
+        "data_status": "empty",
+        "documents_count": 0,
+        "chunks_count": 0,
+        "embedding_count": 0,
+        "reason_code": "REPORT_NOT_INGESTED"
+      }
+    },
+    "missing_fields": [
+      {
+        "field_name": "dividend_yield",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED",
+        "priority": "P1"
+      }
+    ]
+  },
+  {
+    "ts_code": "601318.SH",
+    "trade_date": "2026-07-08",
+    "generated_at": "2026-07-08T09:44:22.444992",
+    "overall_completeness": 0.6744,
+    "overall_without_rag": 0.7436,
+    "rag_status": "empty",
+    "quote_completeness": 1.0,
+    "valuation_completeness": 0.9,
+    "valuation_p0_completeness": 1.0,
+    "valuation_p1_completeness": 0.8571,
+    "financial_statement_completeness": 0.7333,
+    "financial_indicator_completeness": 0.5455,
+    "financial_completeness": 0.6864,
+    "rag_completeness": 0.0,
+    "categories": {
+      "quote": {
+        "category": "quote",
+        "total_fields": 5,
+        "ok_fields": 5,
+        "completeness": 1.0,
+        "fields": [
+          {
+            "field_name": "latest_price",
+            "value": 49.54,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          },
+          {
+            "field_name": "change_pct",
+            "value": 0.005072,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          },
+          {
+            "field_name": "volume",
+            "value": 54099529.0,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          },
+          {
+            "field_name": "amount",
+            "value": 2678589603.75,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          },
+          {
+            "field_name": "trade_date",
+            "value": "2026-07-08",
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          }
+        ]
+      },
+      "valuation": {
+        "category": "valuation",
+        "total_fields": 10,
+        "ok_fields": 9,
+        "completeness": 0.9,
+        "fields": [
+          {
+            "field_name": "pe_ttm",
+            "value": 6.755728,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null,
+            "priority": "P0"
+          },
+          {
+            "field_name": "pb",
+            "value": 0.880923,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null,
+            "priority": "P0"
+          },
+          {
+            "field_name": "market_cap",
+            "value": 897052584432.2999,
+            "status": "ok",
+            "source": "computed",
+            "reason_code": null,
+            "priority": "P0",
+            "formula": "close × total_share",
+            "dependencies": [
+              "close",
+              "total_share"
+            ]
+          },
+          {
+            "field_name": "circ_mv",
+            "value": 528099624211.82,
+            "status": "ok",
+            "source": "computed",
+            "reason_code": null,
+            "priority": "P1",
+            "formula": "close × float_share",
+            "dependencies": [
+              "close",
+              "float_share"
+            ]
+          },
+          {
+            "field_name": "total_share",
+            "value": 18107641995.0,
+            "status": "ok",
+            "source": "baostock",
+            "reason_code": null,
+            "priority": "P1"
+          },
+          {
+            "field_name": "float_share",
+            "value": 10660065083.0,
+            "status": "ok",
+            "source": "baostock",
+            "reason_code": null,
+            "priority": "P1"
+          },
+          {
+            "field_name": "turnover_rate",
+            "value": 0.5075,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null,
+            "priority": "P1"
+          },
+          {
+            "field_name": "dividend_yield",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED",
+            "priority": "P1"
+          },
+          {
+            "field_name": "ps_ttm",
+            "value": 0.865789,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null,
+            "priority": "P1"
+          },
+          {
+            "field_name": "pcf_ttm",
+            "value": 8.670023,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null,
+            "priority": "P1"
+          }
+        ],
+        "p0_completeness": 1.0,
+        "p1_completeness": 0.8571,
+        "p0_total": 3,
+        "p0_ok": 3,
+        "p1_total": 7,
+        "p1_ok": 6
+      },
+      "income": {
+        "category": "income",
+        "total_fields": 5,
+        "ok_fields": 3,
+        "completeness": 0.6,
+        "fields": [
+          {
+            "field_name": "revenue",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "gross_profit",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "operating_profit",
+            "value": 35177000000.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "net_profit",
+            "value": 33263000000.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "net_profit_parent",
+            "value": 25022000000.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          }
+        ]
+      },
+      "balance": {
+        "category": "balance",
+        "total_fields": 5,
+        "ok_fields": 3,
+        "completeness": 0.6,
+        "fields": [
+          {
+            "field_name": "total_assets",
+            "value": 14169947000000.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "total_liabilities",
+            "value": 12735657000000.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "total_equity",
+            "value": 1434290000000.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "current_assets",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "current_liabilities",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          }
+        ]
+      },
+      "cashflow": {
+        "category": "cashflow",
+        "total_fields": 3,
+        "ok_fields": 3,
+        "completeness": 1.0,
+        "fields": [
+          {
+            "field_name": "operating_cashflow",
+            "value": 131064000000.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "investing_cashflow",
+            "value": -122934000000.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "financing_cashflow",
+            "value": -58811000000.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          }
+        ]
+      },
+      "indicators": {
+        "category": "indicators",
+        "total_fields": 11,
+        "ok_fields": 6,
+        "completeness": 0.5455,
+        "fields": [
+          {
+            "field_name": "roe",
+            "value": 0.0246,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "roa",
+            "value": 0.0023699999999999997,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "gross_margin",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "net_margin",
+            "value": 0.1523,
+            "status": "ok",
+            "source": "baostock",
+            "reason_code": null
+          },
+          {
+            "field_name": "revenue_growth",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "net_profit_growth",
+            "value": -0.053926,
+            "status": "ok",
+            "source": "baostock",
+            "reason_code": null
+          },
+          {
+            "field_name": "debt_ratio",
+            "value": 0.898779,
+            "status": "ok",
+            "source": "baostock",
+            "reason_code": null
+          },
+          {
+            "field_name": "current_ratio",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "asset_turnover",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "inventory_turnover",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED"
+          },
+          {
+            "field_name": "ocf_to_np",
+            "value": 3.9402,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          }
+        ]
+      },
+      "rag": {
+        "category": "rag",
+        "total_fields": 4,
+        "ok_fields": 0,
+        "completeness": 0.0,
+        "fields": [
+          {
+            "field_name": "documents_count",
+            "value": 0,
+            "status": "ok",
+            "source": "report_documents",
+            "reason_code": null
+          },
+          {
+            "field_name": "chunks_count",
+            "value": 0,
+            "status": "ok",
+            "source": "report_chunks",
+            "reason_code": null
+          },
+          {
+            "field_name": "embedding_count",
+            "value": 0,
+            "status": "ok",
+            "source": "report_chunks",
+            "reason_code": null
+          },
+          {
+            "field_name": "rag_status",
+            "value": "empty",
+            "status": "ok",
+            "source": "report_chunks",
+            "reason_code": null
+          }
+        ],
+        "diagnostic_status": "ok",
+        "data_status": "empty",
+        "documents_count": 0,
+        "chunks_count": 0,
+        "embedding_count": 0,
+        "reason_code": "REPORT_NOT_INGESTED"
+      }
+    },
+    "missing_fields": [
+      {
+        "field_name": "dividend_yield",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED",
+        "priority": "P1"
+      },
+      {
+        "field_name": "revenue",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "gross_profit",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "current_assets",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "current_liabilities",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "gross_margin",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "revenue_growth",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "current_ratio",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "asset_turnover",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      },
+      {
+        "field_name": "inventory_turnover",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED"
+      }
+    ]
+  },
+  {
+    "ts_code": "600186.SH",
+    "trade_date": "2026-07-08",
+    "generated_at": "2026-07-08T09:45:00.433377",
+    "overall_completeness": 0.8837,
+    "overall_without_rag": 0.9744,
+    "rag_status": "empty",
+    "quote_completeness": 1.0,
+    "valuation_completeness": 0.9,
+    "valuation_p0_completeness": 1.0,
+    "valuation_p1_completeness": 0.8571,
+    "financial_statement_completeness": 1.0,
+    "financial_indicator_completeness": 1.0,
+    "financial_completeness": 1.0,
+    "rag_completeness": 0.0,
+    "categories": {
+      "quote": {
+        "category": "quote",
+        "total_fields": 5,
+        "ok_fields": 5,
+        "completeness": 1.0,
+        "fields": [
+          {
+            "field_name": "latest_price",
+            "value": 10.89,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          },
+          {
+            "field_name": "change_pct",
+            "value": -0.018919,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          },
+          {
+            "field_name": "volume",
+            "value": 130012477.0,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          },
+          {
+            "field_name": "amount",
+            "value": 1433316210.39,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          },
+          {
+            "field_name": "trade_date",
+            "value": "2026-07-08",
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null
+          }
+        ]
+      },
+      "valuation": {
+        "category": "valuation",
+        "total_fields": 10,
+        "ok_fields": 9,
+        "completeness": 0.9,
+        "fields": [
+          {
+            "field_name": "pe_ttm",
+            "value": 55.526618,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null,
+            "priority": "P0"
+          },
+          {
+            "field_name": "pb",
+            "value": 10.341022,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null,
+            "priority": "P0"
+          },
+          {
+            "field_name": "market_cap",
+            "value": 19523206940.49,
+            "status": "ok",
+            "source": "computed",
+            "reason_code": null,
+            "priority": "P0",
+            "formula": "close × total_share",
+            "dependencies": [
+              "close",
+              "total_share"
+            ]
+          },
+          {
+            "field_name": "circ_mv",
+            "value": 19387339488.99,
+            "status": "ok",
+            "source": "computed",
+            "reason_code": null,
+            "priority": "P1",
+            "formula": "close × float_share",
+            "dependencies": [
+              "close",
+              "float_share"
+            ]
+          },
+          {
+            "field_name": "total_share",
+            "value": 1792764641.0,
+            "status": "ok",
+            "source": "baostock",
+            "reason_code": null,
+            "priority": "P1"
+          },
+          {
+            "field_name": "float_share",
+            "value": 1780288291.0,
+            "status": "ok",
+            "source": "baostock",
+            "reason_code": null,
+            "priority": "P1"
+          },
+          {
+            "field_name": "turnover_rate",
+            "value": 7.2668,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null,
+            "priority": "P1"
+          },
+          {
+            "field_name": "dividend_yield",
+            "value": null,
+            "status": "missing",
+            "source": "",
+            "reason_code": "PERMISSION_DENIED",
+            "priority": "P1"
+          },
+          {
+            "field_name": "ps_ttm",
+            "value": 5.312778,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null,
+            "priority": "P1"
+          },
+          {
+            "field_name": "pcf_ttm",
+            "value": 73.457117,
+            "status": "ok",
+            "source": "baostock_kline",
+            "reason_code": null,
+            "priority": "P1"
+          }
+        ],
+        "p0_completeness": 1.0,
+        "p1_completeness": 0.8571,
+        "p0_total": 3,
+        "p0_ok": 3,
+        "p1_total": 7,
+        "p1_ok": 6
+      },
+      "income": {
+        "category": "income",
+        "total_fields": 5,
+        "ok_fields": 5,
+        "completeness": 1.0,
+        "fields": [
+          {
+            "field_name": "revenue",
+            "value": 1016453929.34,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "gross_profit",
+            "value": 319509383.20000005,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "operating_profit",
+            "value": 180380602.94,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "net_profit",
+            "value": 146155583.72,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "net_profit_parent",
+            "value": 143481980.23,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          }
+        ]
+      },
+      "balance": {
+        "category": "balance",
+        "total_fields": 5,
+        "ok_fields": 5,
+        "completeness": 1.0,
+        "fields": [
+          {
+            "field_name": "total_assets",
+            "value": 3563060800.65,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "total_liabilities",
+            "value": 1616693463.33,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "total_equity",
+            "value": 1946367337.32,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "current_assets",
+            "value": 2553995293.28,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "current_liabilities",
+            "value": 1345328308.53,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          }
+        ]
+      },
+      "cashflow": {
+        "category": "cashflow",
+        "total_fields": 3,
+        "ok_fields": 3,
+        "completeness": 1.0,
+        "fields": [
+          {
+            "field_name": "operating_cashflow",
+            "value": -152439747.37,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "investing_cashflow",
+            "value": 15379452.0,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          },
+          {
+            "field_name": "financing_cashflow",
+            "value": -67899380.02,
+            "status": "ok",
+            "source": "akshare_em_report",
+            "reason_code": null
+          }
+        ]
+      },
+      "indicators": {
+        "category": "indicators",
+        "total_fields": 11,
+        "ok_fields": 11,
+        "completeness": 1.0,
+        "fields": [
+          {
+            "field_name": "roe",
+            "value": 0.076,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "roa",
+            "value": 0.040674999999999996,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "gross_margin",
+            "value": 0.314337,
+            "status": "ok",
+            "source": "baostock",
+            "reason_code": null
+          },
+          {
+            "field_name": "net_margin",
+            "value": 0.14379,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "revenue_growth",
+            "value": 0.280121,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "net_profit_growth",
+            "value": 0.364107,
+            "status": "ok",
+            "source": "baostock",
+            "reason_code": null
+          },
+          {
+            "field_name": "debt_ratio",
+            "value": 0.453737,
+            "status": "ok",
+            "source": "baostock",
+            "reason_code": null
+          },
+          {
+            "field_name": "current_ratio",
+            "value": 1.8984,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "asset_turnover",
+            "value": 0.2829,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "inventory_turnover",
+            "value": 1.6071,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          },
+          {
+            "field_name": "ocf_to_np",
+            "value": -1.043,
+            "status": "ok",
+            "source": "akshare_sina_indicator",
+            "reason_code": null
+          }
+        ]
+      },
+      "rag": {
+        "category": "rag",
+        "total_fields": 4,
+        "ok_fields": 0,
+        "completeness": 0.0,
+        "fields": [
+          {
+            "field_name": "documents_count",
+            "value": 0,
+            "status": "ok",
+            "source": "report_documents",
+            "reason_code": null
+          },
+          {
+            "field_name": "chunks_count",
+            "value": 0,
+            "status": "ok",
+            "source": "report_chunks",
+            "reason_code": null
+          },
+          {
+            "field_name": "embedding_count",
+            "value": 0,
+            "status": "ok",
+            "source": "report_chunks",
+            "reason_code": null
+          },
+          {
+            "field_name": "rag_status",
+            "value": "empty",
+            "status": "ok",
+            "source": "report_chunks",
+            "reason_code": null
+          }
+        ],
+        "diagnostic_status": "ok",
+        "data_status": "empty",
+        "documents_count": 0,
+        "chunks_count": 0,
+        "embedding_count": 0,
+        "reason_code": "REPORT_NOT_INGESTED"
+      }
+    },
+    "missing_fields": [
+      {
+        "field_name": "dividend_yield",
+        "value": null,
+        "status": "missing",
+        "source": "",
+        "reason_code": "PERMISSION_DENIED",
+        "priority": "P1"
+      }
+    ]
+  }
+]

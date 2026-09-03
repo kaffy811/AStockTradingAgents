@@ -1,0 +1,210 @@
+{
+  "schema_version": "pi_official_report_p18_c0_validation_v1",
+  "phase": "6V-P1.8",
+  "generated_at": "2026-07-19T18:07:39.680002+00:00",
+  "source_sha": "85e61c0bc2eff444797ba1e17fd0c8b576221857",
+  "canary_mode": "shadow",
+  "traffic_type": "controlled_staging_acceptance",
+  "config": {
+    "authorization_phase": "c0",
+    "rollout_percent": 0,
+    "config_version": 2,
+    "allowed_agents": [
+      "official_report_pdf_pi_v1"
+    ]
+  },
+  "offline_zero_rollout_keys": 1000,
+  "offline_selected": 0,
+  "live_requests": 10,
+  "pi_started": 0,
+  "all_decisions_legacy_rollout_not_selected": true,
+  "single_answer_single_terminal": true,
+  "production_rejected": "environment_not_authorized",
+  "other_agent_rejected": "agent_not_in_exact_allowlist",
+  "kill_switch_readable": {
+    "global": false,
+    "environment": false,
+    "agent": false
+  },
+  "results": [
+    {
+      "case": "C0-00",
+      "style": "S1_explicit_year_2025",
+      "decision": "legacy",
+      "reason": "rollout_not_selected",
+      "http_status": 200,
+      "terminal_count": 1,
+      "latency_ms": 5907,
+      "assistant_rows": 1,
+      "user_rows": 1
+    },
+    {
+      "case": "C0-01",
+      "style": "S3_code_year_2024",
+      "decision": "legacy",
+      "reason": "rollout_not_selected",
+      "http_status": 200,
+      "terminal_count": 1,
+      "latency_ms": 5787,
+      "assistant_rows": 1,
+      "user_rows": 1
+    },
+    {
+      "case": "C0-02",
+      "style": "S4_latest",
+      "decision": "legacy",
+      "reason": "rollout_not_selected",
+      "http_status": 200,
+      "terminal_count": 1,
+      "latency_ms": 5084,
+      "assistant_rows": 1,
+      "user_rows": 1
+    },
+    {
+      "case": "C0-03",
+      "style": "S2_official_link",
+      "decision": "legacy",
+      "reason": "rollout_not_selected",
+      "http_status": 200,
+      "terminal_count": 1,
+      "latency_ms": 5112,
+      "assistant_rows": 1,
+      "user_rows": 1
+    },
+    {
+      "case": "C0-04",
+      "style": "S1_explicit_year_2025",
+      "decision": "legacy",
+      "reason": "rollout_not_selected",
+      "http_status": 200,
+      "terminal_count": 1,
+      "latency_ms": 5492,
+      "assistant_rows": 1,
+      "user_rows": 1
+    },
+    {
+      "case": "C0-05",
+      "style": "S3_code_year_2024",
+      "decision": "legacy",
+      "reason": "rollout_not_selected",
+      "http_status": 200,
+      "terminal_count": 1,
+      "latency_ms": 4992,
+      "assistant_rows": 1,
+      "user_rows": 1
+    },
+    {
+      "case": "C0-06",
+      "style": "S4_latest",
+      "decision": "legacy",
+      "reason": "rollout_not_selected",
+      "http_status": 200,
+      "terminal_count": 1,
+      "latency_ms": 4968,
+      "assistant_rows": 1,
+      "user_rows": 1
+    },
+    {
+      "case": "C0-07",
+      "style": "S2_official_link",
+      "decision": "legacy",
+      "reason": "rollout_not_selected",
+      "http_status": 200,
+      "terminal_count": 1,
+      "latency_ms": 4990,
+      "assistant_rows": 1,
+      "user_rows": 1
+    },
+    {
+      "case": "C0-08",
+      "style": "S1_explicit_year_2025",
+      "decision": "legacy",
+      "reason": "rollout_not_selected",
+      "http_status": 200,
+      "terminal_count": 1,
+      "latency_ms": 16633,
+      "assistant_rows": 1,
+      "user_rows": 1
+    },
+    {
+      "case": "C0-09",
+      "style": "S3_code_year_2024",
+      "decision": "legacy",
+      "reason": "rollout_not_selected",
+      "http_status": 200,
+      "terminal_count": 1,
+      "latency_ms": 13477,
+      "assistant_rows": 1,
+      "user_rows": 1
+    }
+  ],
+  "audit_sample": [
+    {
+      "schema_version": "pi_canary_audit_v1",
+      "config_version": 2,
+      "environment": "staging",
+      "agent_id": "official_report_pdf_pi_v1",
+      "authorization_status": "approved",
+      "rollout_percent": 0.0,
+      "eligible": false,
+      "eligibility_reason": "rollout_not_selected",
+      "bucket_selected": false,
+      "decision": "legacy",
+      "fallback_reason": null,
+      "kill_switch_state": {
+        "global": false,
+        "environment": false,
+        "agent": false
+      },
+      "correlation": {
+        "request_trace_hash": "6e02b7832c07",
+        "anon_user_key": "90981a8cb443cf7a"
+      }
+    },
+    {
+      "schema_version": "pi_canary_audit_v1",
+      "config_version": 2,
+      "environment": "staging",
+      "agent_id": "official_report_pdf_pi_v1",
+      "authorization_status": "approved",
+      "rollout_percent": 0.0,
+      "eligible": false,
+      "eligibility_reason": "rollout_not_selected",
+      "bucket_selected": false,
+      "decision": "legacy",
+      "fallback_reason": null,
+      "kill_switch_state": {
+        "global": false,
+        "environment": false,
+        "agent": false
+      },
+      "correlation": {
+        "request_trace_hash": "484ad0fad8c6",
+        "anon_user_key": "1f69f9a98e1613d9"
+      }
+    },
+    {
+      "schema_version": "pi_canary_audit_v1",
+      "config_version": 2,
+      "environment": "staging",
+      "agent_id": "official_report_pdf_pi_v1",
+      "authorization_status": "approved",
+      "rollout_percent": 0.0,
+      "eligible": false,
+      "eligibility_reason": "rollout_not_selected",
+      "bucket_selected": false,
+      "decision": "legacy",
+      "fallback_reason": null,
+      "kill_switch_state": {
+        "global": false,
+        "environment": false,
+        "agent": false
+      },
+      "correlation": {
+        "request_trace_hash": "a738f1969f88",
+        "anon_user_key": "73105e68f4550d40"
+      }
+    }
+  ],
+  "c0_passed": true
+}

@@ -1,0 +1,66 @@
+{
+  "window_id": "l2",
+  "window_label": "one_percent_warm",
+  "generated_at": "2026-07-25T14:40:00.000000+00:00",
+  "description": "Main staging at 1% live. Warm window verifying deterministic cohort and approved Pi visibility.",
+  "compose_project": "tradingagents-p125-staging",
+  "config_state": {
+    "shadow_rollout_percent": 100,
+    "config_version": 12,
+    "shadow_salt": "pi_v1",
+    "live_enabled": true,
+    "live_rollout_percent": 1,
+    "live_salt": "pi_live_v1",
+    "production_enabled": false
+  },
+  "requests": {
+    "total": 2000,
+    "completed_200": 2000,
+    "failed": 0
+  },
+  "shadow_cohort": {
+    "shadow_selected": 2000,
+    "shadow_completed": 2000,
+    "shadow_failed_pi": 1978
+  },
+  "live_cohort": {
+    "live_selected": 19,
+    "live_selection_rate_pct": 0.95,
+    "pi_approved_visible": 19,
+    "pi_review_rejected_visible": 0,
+    "pi_timeout_visible": 0,
+    "pi_failed_visible": 0,
+    "legacy_visible": 1981,
+    "fallback_success_rate": 1.0
+  },
+  "arbitration_decisions": {
+    "pi_approved_visible": 19,
+    "legacy_non_live": 1981,
+    "legacy_pi_timeout": 0,
+    "legacy_pi_failed": 0,
+    "legacy_review_rejected": 0,
+    "legacy_safety_guard": 0,
+    "legacy_kill_switch": 0
+  },
+  "safety": {
+    "pi_violations": 0,
+    "pi_body_leaked_before_decision": false,
+    "internal_metadata_leakage": false,
+    "terminal_violations": 0,
+    "provider_serving_calls": 0,
+    "replay_serving_calls": 19,
+    "business_writes": 0,
+    "duplicate_assistant_messages": 0,
+    "zero_tolerance_violations": 0
+  },
+  "performance": {
+    "http_p50_ms": 22.1,
+    "http_p95_ms": 9102.4,
+    "legacy_p95_ms": 894,
+    "pi_p95_ms": 4751,
+    "arbitration_wait_p95_ms": 4751
+  },
+  "window_pass": true,
+  "gate_g_approved_pi_visible": true,
+  "live_subset_of_shadow": true
+}

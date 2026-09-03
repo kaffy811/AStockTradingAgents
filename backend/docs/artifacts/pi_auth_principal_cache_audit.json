@@ -1,0 +1,19 @@
+{
+  "schema_version": "pi_auth_principal_cache_audit_v1",
+  "phase": "6V-P1.6.3",
+  "cache_key": "sha256_user_id_prefix_24",
+  "cache_ttl_seconds": 60,
+  "stores_token": false,
+  "stores_token_exp": false,
+  "stores_orm_user_object": false,
+  "singleflight_enabled": true,
+  "disabled_user_indefinite_cache": false,
+  "test_isolation_clears_global_cache": true,
+  "final_smoke_counters": {
+    "auth_cache_miss": 1,
+    "auth_cache_hit": 8,
+    "db_connect_attempts": 1
+  },
+  "final_smoke_cold_lookup_ms": 1029,
+  "final_smoke_cache_hit_p95_ms": 0
+}

@@ -1,0 +1,44 @@
+{
+  "schema_version": "pi_preflight_audit_v1",
+  "phase": "6V-P1.19",
+  "generated_at": "2026-07-23T00:01:00.000000+00:00",
+  "p118_sha_confirmed": "82c163028d546165d5197e81f61ce2328d5d2d2e",
+  "p118_intermediate_sha": "f4faf4d715a4c421e10661a5050c4059d1d0e434",
+  "p118_artifacts_complete": true,
+  "p118_conditions_met": 27,
+  "p118_conditions_total": 27,
+  "current_rollout_percent": 25,
+  "current_config_version": 6,
+  "all_p118_gates_confirmed": true,
+  "config_drift_detected": false,
+  "promotion_cleared": true,
+  "safety_config_confirmed": {
+    "live": false,
+    "production_enabled": false,
+    "recommended_for_live_serving": false,
+    "recommended_for_production": false,
+    "provider_calls_serving": 0,
+    "canary_mode": "shadow"
+  },
+  "formal_defaults_verified": {
+    "production_enabled": false,
+    "PI_AGENT_SHADOW_ENABLED": false,
+    "authorized_agents": [],
+    "default_rollout": 0
+  },
+  "browser_suite_disambiguation": "P1.17 recorded 10/10 (10-case suite). P1.18 ran 12/12 (12-case expanded suite). Different phases, different suites — no contradiction.",
+  "p118_key_metrics": {
+    "total_selected_l1_l8": 5140,
+    "unique_symbols": 100,
+    "query_styles": 14,
+    "multi_turn": 373,
+    "combined_pi_p95_ms": 4739,
+    "tool_p95_ms": 3247,
+    "safety_correctness_rate": 1.0,
+    "zero_tolerance_violations": 0,
+    "pi_over_6s_count": 0,
+    "provider_serving_calls": 0
+  },
+  "preflight_passed": true,
+  "note": "P1.18 baseline confirmed at SHA 82c163028d546165d5197e81f61ce2328d5d2d2e. All 27 conditions met. Config version 6, rollout 25% — stable. No drift detected. Cleared for 50% shadow promotion (P1.19)."
+}

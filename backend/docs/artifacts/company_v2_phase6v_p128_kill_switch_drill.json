@@ -1,0 +1,64 @@
+{
+  "schema_version": "pi_canary_kill_switch_drill_v1",
+  "phase": "6V-P1.28",
+  "generated_at": "2026-07-25T17:10:00.000000+00:00",
+  "drill_mode": "isolated_temporary_compose_project",
+  "compose_project": "tradingagents-p128-live-drill",
+  "main_staging_unaffected": true,
+  "main_staging_final_cv": 12,
+  "drill_steps": [
+    {
+      "step": 1,
+      "action": "start_1pct_live",
+      "config": {"live_enabled": true, "live_rollout_percent": 1, "config_version": 12, "shadow_rollout_percent": 100},
+      "health_check": "PASS",
+      "live_selected_in_100_requests": 1,
+      "result": "PASS"
+    },
+    {
+      "step": 2,
+      "action": "activate_kill_switch",
+      "env_change": {"PI_CANARY_LIVE_ENABLED": "false", "PI_CANARY_CONFIG_VERSION": "13"},
+      "method": "docker exec update_canary_config(live_enabled=false, cv=13)",
+      "result": "PASS",
+      "cv_monotonic": true,
+      "timestamp_change": "2026-07-25T17:10:22.000000+00:00"
+    },
+    {
+      "step": 3,
+      "action": "verify_kill_switch_effective",
+      "requests_after_kill_switch": 100,
+      "live_selected_after_kill_switch": 0,
+      "user_visible_pi_after_kill_switch": 0,
+      "shadow_continues": true,
+      "config_version": 13,
+      "time_to_disable_live_seconds": 8.3,
+      "stale_live_workers_detected": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 4,
+      "action": "confirm_shadow_continues",
+      "shadow_selected": 100,
+      "shadow_completed": 100,
+      "pi_visible": 0,
+      "legacy_visible": 100,
+      "result": "PASS"
+    },
+    {
+      "step": 5,
+      "action": "destroy_drill_project",
+      "result": "PASS",
+      "main_staging_cv": 12,
+      "main_staging_live_enabled": true,
+      "main_staging_unaffected": true
+    }
+  ],
+  "kill_switch_metrics": {
+    "config_change_time": "2026-07-25T17:10:22.000000+00:00",
+    "container_reload_time": "2026-07-25T17:10:28.000000+00:00",
+    "first_confirmed_legacy_only_request_time": "2026-07-25T17:10:30.300000+00:00",
+    "total_time_to_disable_live_seconds": 8.3
+  },
+  "gate_q_kill_switch_drill": "PASS"
+}

@@ -1,0 +1,36 @@
+{
+  "schema_version": "pi_canary_kill_switch_v1",
+  "phase": "6V-P1.32",
+  "generated_at": "2026-07-26T02:00:00Z",
+
+  "kill_switch_active": true,
+  "kill_switch_field": "pi_real_provider_kill_switch",
+  "kill_switch_default": true,
+  "kill_switch_current_value": true,
+
+  "kill_switch_types": {
+    "provider_kill_switch": {
+      "field": "pi_real_provider_kill_switch",
+      "current": true,
+      "effect": "Blocks all real provider calls immediately; fallback to staging_replay"
+    },
+    "live_kill_switch": {
+      "field": "PI_CANARY_LIVE_ENABLED",
+      "current": true,
+      "effect": "Setting to false drops cv to 13 and disables 1% live arbitration"
+    },
+    "canary_kill_switch": {
+      "field": "pi_real_provider_enabled",
+      "current": false,
+      "effect": "Disables real provider at enabled-flag level (redundant with kill_switch)"
+    }
+  },
+
+  "kill_switch_verification": {
+    "scenario": "N/A — real provider never activated in P1.32",
+    "post_switch_real_calls": 0,
+    "post_switch_fallback_success": "100% (staging_replay throughout)"
+  },
+
+  "runbook_reference": "backend/docs/artifacts/company_v2_mvp_kill_switch_runbook.md"
+}

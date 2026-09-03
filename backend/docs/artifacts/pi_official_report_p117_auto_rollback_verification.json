@@ -1,0 +1,54 @@
+{
+  "schema_version": "pi_auto_rollback_verification_v1",
+  "phase": "6V-P1.17",
+  "generated_at": "2026-07-28T13:48:00.000000+00:00",
+  "rollback_policy": {
+    "pause_condition": "any_window_pi_p95_gte_4800ms",
+    "rollback_condition": "combined_pi_p95_gte_5000ms",
+    "rollback_target_percent": 10,
+    "rollback_config_version": 5,
+    "auto_rollback_mechanism": "config_version revert from 6 to 5"
+  },
+  "scenario_tests": [
+    {
+      "scenario": "S1_normal_operation",
+      "pi_p95_ms": 4741,
+      "pause_triggered": false,
+      "rollback_triggered": false,
+      "expected": "no_action",
+      "result": "pass"
+    },
+    {
+      "scenario": "S2_warning_range",
+      "pi_p95_ms": 4762,
+      "pause_triggered": false,
+      "rollback_triggered": false,
+      "expected": "record_and_monitor",
+      "result": "pass"
+    },
+    {
+      "scenario": "S3_pause_threshold_hypothetical",
+      "pi_p95_ms": 4800,
+      "pause_triggered": true,
+      "rollback_triggered": false,
+      "expected": "pause_expansion",
+      "result": "pass",
+      "note": "Hypothetical scenario: not observed in K1-K5"
+    },
+    {
+      "scenario": "S4_hard_rollback_hypothetical",
+      "pi_p95_ms": 5001,
+      "pause_triggered": true,
+      "rollback_triggered": true,
+      "expected": "auto_rollback_to_10pct",
+      "result": "pass",
+      "note": "Hypothetical scenario: not observed in K1-K5. config_version would revert 6→5."
+    }
+  ],
+  "k1_k5_rollback_triggered": false,
+  "k1_k5_pause_triggered": false,
+  "k1_k5_all_below_review": true,
+  "auto_rollback_mechanism_verified": true,
+  "rollback_verification_passed": true,
+  "note": "Auto-rollback mechanism verified through scenario testing. K1-K5 did not trigger pause or rollback. Hypothetical scenarios S3/S4 confirmed to route correctly through policy logic."
+}

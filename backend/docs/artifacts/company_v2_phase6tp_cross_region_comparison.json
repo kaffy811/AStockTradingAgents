@@ -1,0 +1,24 @@
+{
+  "phase": "phase6tp_cross_region_comparison",
+  "local_cross_region": {
+    "environment": "estimated United States workstation",
+    "dns_success_rate": 0.0,
+    "select_1_p50_ms": 525.73,
+    "select_1_p95_ms": 1824.29,
+    "insert_commit_p50_ms": 811.43,
+    "insert_commit_p95_ms": 1290.98,
+    "steady_state_create_p50_ms": 1367.75,
+    "steady_state_create_p95_ms": 2097.94
+  },
+  "same_region": {
+    "environment": null,
+    "dns_success_rate": null,
+    "select_1_p50_ms": null,
+    "select_1_p95_ms": null,
+    "insert_commit_p50_ms": null,
+    "insert_commit_p95_ms": null,
+    "steady_state_create_p50_ms": null,
+    "steady_state_create_p95_ms": null
+  },
+  "comparison_status": "incomplete"
+}

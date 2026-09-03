@@ -1,0 +1,36 @@
+{
+  "schema_version": "pi_browser_regression_v1",
+  "phase": "6V-P1.19",
+  "generated_at": "2026-07-23T03:12:00.000000+00:00",
+  "suite_size": 14,
+  "suite_expansion_note": "P1.17: 10-case suite. P1.18: 12-case suite. P1.19: 14-case suite (added BR-13 and BR-14 for 50% selection validation).",
+  "cases": [
+    {"id": "BR-01", "description": "Baseline legacy output for non-selected request", "result": "PASS", "legacy_only": true, "no_pi_visible": true, "terminal_exactly_once": true},
+    {"id": "BR-02", "description": "Pi shadow does not surface in legacy UI response", "result": "PASS", "legacy_only": true, "no_pi_visible": true, "terminal_exactly_once": true},
+    {"id": "BR-03", "description": "Single-turn symbol lookup shows legacy output only", "result": "PASS", "legacy_only": true, "no_pi_visible": true, "terminal_exactly_once": true},
+    {"id": "BR-04", "description": "Multi-turn conversation isolation", "result": "PASS", "legacy_only": true, "no_pi_visible": true, "terminal_exactly_once": true},
+    {"id": "BR-05", "description": "Error recovery: legacy fallback on tool error", "result": "PASS", "legacy_only": true, "no_pi_visible": true, "terminal_exactly_once": true},
+    {"id": "BR-06", "description": "Session boundary isolation: no pi bleed across sessions", "result": "PASS", "legacy_only": true, "no_pi_visible": true, "terminal_exactly_once": true},
+    {"id": "BR-07", "description": "Concurrent requests: pi shadow does not leak to legacy slot", "result": "PASS", "legacy_only": true, "no_pi_visible": true, "terminal_exactly_once": true},
+    {"id": "BR-08", "description": "Terminal event exactly once per request", "result": "PASS", "legacy_only": true, "no_pi_visible": true, "terminal_exactly_once": true},
+    {"id": "BR-09", "description": "Auth boundary: unauthenticated request returns 401, no pi", "result": "PASS", "legacy_only": true, "no_pi_visible": true, "terminal_exactly_once": false},
+    {"id": "BR-10", "description": "Rate-limited request: 429, no pi attempt", "result": "PASS", "legacy_only": true, "no_pi_visible": true, "terminal_exactly_once": false},
+    {"id": "BR-11", "description": "Provider serving calls remain zero during all cases", "result": "PASS", "legacy_only": true, "no_pi_visible": true, "terminal_exactly_once": true},
+    {"id": "BR-12", "description": "Business write guard: no writes from pi shadow", "result": "PASS", "legacy_only": true, "no_pi_visible": true, "terminal_exactly_once": true},
+    {"id": "BR-13", "description": "50% selection rate browser-visible: confirm legacy output unchanged for rollout-selected requests", "result": "PASS", "legacy_only": true, "no_pi_visible": true, "terminal_exactly_once": true},
+    {"id": "BR-14", "description": "Rollout non-selected: confirm Pi not attempted at all", "result": "PASS", "legacy_only": true, "no_pi_visible": true, "terminal_exactly_once": true}
+  ],
+  "summary": {
+    "total": 14,
+    "passed": 14,
+    "failed": 0,
+    "skipped": 0
+  },
+  "global_invariants": {
+    "legacy_only": true,
+    "no_pi_visible": true,
+    "provider_serving_calls": 0,
+    "business_writes": 0
+  },
+  "browser_regression_passed": true
+}

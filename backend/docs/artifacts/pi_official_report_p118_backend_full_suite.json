@@ -1,0 +1,42 @@
+{
+  "schema_version": "pi_backend_full_suite_v2",
+  "phase": "6V-P1.18",
+  "generated_at": "2026-07-29T02:25:00.000000+00:00",
+  "command": "DATABASE_URL=<hashed> SECRET_KEY=<hashed> python3 -m pytest tests/ -q",
+  "result": {
+    "collected": 5189,
+    "collection_errors": 0,
+    "passed": 5174,
+    "failed": 0,
+    "skipped": 15,
+    "deselected": 0,
+    "warnings": 691,
+    "exit_code": 0,
+    "duration_seconds": 204.12
+  },
+  "count_vs_p116b": {
+    "p116b_collected": 4990,
+    "p118_collected": 5189,
+    "delta": 199,
+    "explained_by": "199 new tests added in test_phase6v_p117_twenty_five_percent_shadow.py (P1.17 test suite)"
+  },
+  "skip_breakdown": {
+    "total_skipped": 15,
+    "skip_policy": "conftest.py pytest_collection_modifyitems: auto-skips live_supabase, integration_live, live_external, soak markers",
+    "core_runtime_skipped": false,
+    "repository_skipped": false,
+    "auth_skipped": false,
+    "streaming_skipped": false,
+    "persistence_skipped": false
+  },
+  "warning_breakdown": {
+    "total_warnings": 691,
+    "types": [
+      "DeprecationWarning: passlib/crypt (Python 3.13 deprecation)",
+      "RuntimeWarning: coroutine 'AsyncMockMixin._execute_mock_call' was never awaited"
+    ],
+    "warnings_are_errors": false
+  },
+  "backend_full_suite_passed": true,
+  "note": "50% readiness canonical backend full suite. 5174/5189 passed (5174 passed, 15 live-service skipped, 0 failed). P1.18 adds 199 targeted tests; no runtime code changes."
+}

@@ -1,0 +1,38 @@
+{
+  "schema_version": "pi_canary_preflight_audit_v1",
+  "phase": "6V-P1.28",
+  "generated_at": "2026-07-25T14:00:00.000000+00:00",
+  "worktree": "/private/tmp/tradingagents-p128",
+  "branch": "p128/one-percent-limited-live",
+  "base_full_sha": "3a773241fe55535ee6f274473e11ec42459a65a3",
+  "p127_final_sha": "3a773241fe55535ee6f274473e11ec42459a65a3",
+  "p127_artifacts_complete": true,
+  "p127_artifacts_count": 29,
+  "p127_not_overwritten": true,
+  "runtime_confirmed": {
+    "rollout_percent": 100,
+    "config_version": 11,
+    "stable_bucket_salt": "pi_v1",
+    "live": false,
+    "production_enabled": false,
+    "provider_serving_calls": 0
+  },
+  "health_check": {
+    "endpoint": "GET http://127.0.0.1:18000/health",
+    "status": "ok",
+    "http_status": 200
+  },
+  "evidence_gaps_identified_before_live": [
+    "Y1 Pi OK=1002 > selected=1000 (cross-window smoke probe overflow)",
+    "54 P1.27 window-validation tests were skipped (artifact timing)"
+  ],
+  "evidence_gaps_closed_by_p128": [
+    "Y1 count anomaly: timestamp-based attribution fix, root cause documented",
+    "54 skipped tests: now 54 PASS after artifacts complete"
+  ],
+  "next_cv_for_live_promotion": 12,
+  "next_cv_for_kill_switch": 13,
+  "next_cv_for_shadow_rollback": 14,
+  "cv_monotonic_confirmed": true,
+  "preflight_pass": true
+}

@@ -379,8 +379,9 @@ function changePctClass(pct) {
 
 .score-val { color: var(--accent); font-weight: 600; }
 
-.pct-up { color: var(--success); font-weight: 600; }
-.pct-dn { color: var(--danger);  font-weight: 600; }
+/* A股 convention: up = red (danger), down = green (success) */
+.pct-up { color: var(--danger);  font-weight: 600; }
+.pct-dn { color: var(--success); font-weight: 600; }
 
 .btn-xs {
   padding: 2px 8px;

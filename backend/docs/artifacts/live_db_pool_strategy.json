@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-07-17T06:52:18.253422+00:00",
+  "executed": false,
+  "blocked": true,
+  "reason": "TLS certificate verification failed before Postgres connection mode benchmark.",
+  "connection_mode": "transaction_pooler",
+  "port": 6543,
+  "pool_strategy": "not_selected",
+  "requirements": {
+    "tls_verified": false,
+    "postgres_select_1": false,
+    "rag_minimal_query": false
+  }
+}

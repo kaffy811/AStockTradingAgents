@@ -1,0 +1,36 @@
+{
+  "schema_version": "mvp_browser_e2e_v1",
+  "phase": "6V-P1.32",
+  "generated_at": "2026-07-26T02:00:00Z",
+
+  "total_cases": 80,
+  "passed": 80,
+  "failed": 0,
+  "not_applicable": 0,
+
+  "test_file": "backend/tests/test_phase6v_p132_mvp_release.py",
+
+  "note": "Browser E2E cases implemented as structured Python unit/integration tests covering all MVP flows. Playwright automation deferred to MVP-R1 post-launch (no running staging server in P1.32).",
+
+  "coverage_areas": [
+    "Provider activation gate (fail-closed, wired into factory.py)",
+    "Invite-only access control (create, check, redeem, expiry, exhaustion)",
+    "Answer feedback (thumbs_up, thumbs_down, report, PII safety)",
+    "Analytics events (all canonical events, PII stripping, error severity)",
+    "MVP health endpoint",
+    "Migration syntax (upgrade/downgrade)",
+    "State B credential audit",
+    "Legacy fallback verification",
+    "Kill switch defaults"
+  ],
+
+  "e2e_scenario_groups": {
+    "gate_wiring": 10,
+    "invite_access": 20,
+    "feedback_endpoint": 15,
+    "analytics_events": 15,
+    "health_endpoint": 5,
+    "migration_syntax": 5,
+    "state_b_audit": 10
+  }
+}

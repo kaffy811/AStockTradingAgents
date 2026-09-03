@@ -1,0 +1,102 @@
+{
+  "schema_version": "pi_canary_soak_summary_v1",
+  "phase": "6V-P126",
+  "generated_at": "2026-07-25T07:54:21.272690+00:00",
+  "base_url": "http://127.0.0.1:18000",
+  "windows_executed": 10,
+  "eligible_per_window": 1000,
+  "total_eligible": 10000,
+  "cumulative_selected": 10000,
+  "all_windows_pass": true,
+  "expected_config": {
+    "rollout_percent": 100.0,
+    "config_version": 9,
+    "salt": "pi_v1",
+    "status": "approved",
+    "live": false,
+    "production_enabled": false
+  },
+  "window_summary": [
+    {
+      "id": "x1",
+      "pass": true,
+      "selected": 1000,
+      "violations": 0,
+      "snapshot_ok": true,
+      "all_http_ok": true
+    },
+    {
+      "id": "x2",
+      "pass": true,
+      "selected": 1000,
+      "violations": 0,
+      "snapshot_ok": true,
+      "all_http_ok": true
+    },
+    {
+      "id": "x3",
+      "pass": true,
+      "selected": 1000,
+      "violations": 0,
+      "snapshot_ok": true,
+      "all_http_ok": true
+    },
+    {
+      "id": "x4",
+      "pass": true,
+      "selected": 1000,
+      "violations": 0,
+      "snapshot_ok": true,
+      "all_http_ok": true
+    },
+    {
+      "id": "x5",
+      "pass": true,
+      "selected": 1000,
+      "violations": 0,
+      "snapshot_ok": true,
+      "all_http_ok": true
+    },
+    {
+      "id": "x6",
+      "pass": true,
+      "selected": 1000,
+      "violations": 0,
+      "snapshot_ok": true,
+      "all_http_ok": true
+    },
+    {
+      "id": "x7",
+      "pass": true,
+      "selected": 1000,
+      "violations": 0,
+      "snapshot_ok": true,
+      "all_http_ok": true
+    },
+    {
+      "id": "x8",
+      "pass": true,
+      "selected": 1000,
+      "violations": 0,
+      "snapshot_ok": true,
+      "all_http_ok": true
+    },
+    {
+      "id": "x9",
+      "pass": true,
+      "selected": 1000,
+      "violations": 0,
+      "snapshot_ok": true,
+      "all_http_ok": true
+    },
+    {
+      "id": "x10",
+      "pass": true,
+      "selected": 1000,
+      "violations": 0,
+      "snapshot_ok": true,
+      "all_http_ok": true
+    }
+  ],
+  "soak_health": "excellent"
+}

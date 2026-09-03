@@ -9,6 +9,8 @@ scripts/refresh_industry_hot_stocks.py 负责。
 
 from __future__ import annotations
 
+import asyncio
+import logging
 from datetime import date
 
 from sqlalchemy import case, func, select
@@ -16,11 +18,88 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.industry import StockIndustryMap
 from app.models.industry_hot_stock import IndustryHotStockSnapshot
+from app.services.company_v2_snapshot_cache_service import company_v2_snapshot_cache_service
+
+log = logging.getLogger(__name__)
 
 
 class IndustryHotStockService:
 
     async def get_latest_hot_stocks(
+        self,
+        db:            AsyncSession,
+        market:        str,
+        industry_code: str,
+        limit:         int = 20,
+    ) -> dict:
+        cache_key = company_v2_snapshot_cache_service.make_company_key(
+            "industry_hot",
+            market.upper(),
+            industry_code,
+            f"limit:{limit}",
+            version="v2",
+        )
+        cached, swr_status, _cache_status = await company_v2_snapshot_cache_service.get_swr(cache_key)
+        if swr_status in {"fresh", "stale"} and isinstance(cached, dict):
+            out = dict(cached)
+            out["cache_status"] = swr_status
+            if swr_status == "stale":
+                token = await company_v2_snapshot_cache_service.acquire_refresh_lock(cache_key, ttl=15)
+                if token:
+                    asyncio.create_task(self._refresh_latest_hot_stocks_cache(cache_key, token, market, industry_code, limit))
+            return out
+        token = await company_v2_snapshot_cache_service.acquire_refresh_lock(cache_key, ttl=15)
+        if not token and isinstance(cached, dict):
+            out = dict(cached)
+            out["cache_status"] = "stale"
+            return out
+        try:
+            result = await self._get_latest_hot_stocks_uncached(db, market, industry_code, limit)
+            ttl = 5 * 60 if result.get("items") else 60
+            await company_v2_snapshot_cache_service.set_swr(cache_key, result, fresh_ttl=ttl, stale_ttl=5 * 60)
+            result["cache_status"] = "miss"
+            return result
+        except Exception as exc:
+            if isinstance(cached, dict):
+                out = dict(cached)
+                out["cache_status"] = "stale"
+                return out
+            log.warning("industry hot cache miss query failed [%s/%s]: %s", market, industry_code, exc)
+            return {
+                "market": market.upper(),
+                "industry_code": industry_code,
+                "industry_name": None,
+                "trade_date": None,
+                "score_version": "v1",
+                "total": 0,
+                "items": [],
+                "data_quality": {"message": "Industry hot data temporarily unavailable"},
+            }
+        finally:
+            await company_v2_snapshot_cache_service.release_refresh_lock(cache_key, token)
+
+    async def _refresh_latest_hot_stocks_cache(
+        self,
+        cache_key: str,
+        token: str,
+        market: str,
+        industry_code: str,
+        limit: int,
+    ) -> None:
+        from app.core.database import get_db
+
+        try:
+            async for db in get_db():
+                result = await self._get_latest_hot_stocks_uncached(db, market, industry_code, limit)
+                ttl = 5 * 60 if result.get("items") else 60
+                await company_v2_snapshot_cache_service.set_swr(cache_key, result, fresh_ttl=ttl, stale_ttl=5 * 60)
+                break
+        except Exception as exc:
+            log.debug("industry hot stale refresh failed [%s/%s]: %s", market, industry_code, exc)
+        finally:
+            await company_v2_snapshot_cache_service.release_refresh_lock(cache_key, token)
+
+    async def _get_latest_hot_stocks_uncached(
         self,
         db:            AsyncSession,
         market:        str,

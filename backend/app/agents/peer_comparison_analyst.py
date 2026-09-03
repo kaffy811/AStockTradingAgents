@@ -30,6 +30,15 @@ from app.services.peer_comparison_service import (
     peer_comparison_service as _default_service,
 )
 from app.agents.language_utils import build_output_language_instruction
+from app.agents.specialist_analysis_utils import (
+    build_boundary_instruction,
+    detect_focus,
+    format_money_cny,
+    format_number,
+    format_percent,
+    is_missing,
+    sanitize_specialist_output,
+)
 
 log = logging.getLogger(__name__)
 
@@ -62,7 +71,7 @@ _SYSTEM_PROMPT = """\
    - 行业分类 / 主营业务 / 护城河 / 管理层
    - 同行公司名单（只能使用用户提供的 peers 列表）
    - 任何未在输入数据中出现的财务数字
-4. 禁止将手动 PEER_MAP 当成严格行业分类。对港股（HK）或业务形态差异大的 peer set，必须在报告开头声明「同行口径较粗，仅供参考」。
+4. 禁止将动态同行样本当成严格行业分类。对港股（HK）或业务形态差异大的 peer set，必须在报告开头声明「同行口径较粗，仅供参考」。
 5. 禁止给出买入/卖出/持有建议。严禁使用：必涨、必跌、稳赚、强烈买入、满仓、梭哈、保证收益、抄底、清仓。
 6. 禁止使用「明显低估」或「明显高估」表达。估值比较只能使用：
    「估值水平相对偏高」「估值水平相对偏低」「仍需结合行业和基本面进一步判断」。
@@ -93,34 +102,32 @@ _SYSTEM_PROMPT = """\
 - operating_cashflow：已换算为亿元展示
 
 【输出格式】
-输出完整 Markdown，严格按以下结构，标题名称不得更改。
-子章节统一使用三级标题（###）。
+宽问题使用以下二级标题：
+## 结论摘要
+## 对比样本与口径
+## 可比字段概览
+## 盈利能力对比
+## 成长表现对比
+## 现金流与财务安全
+## 估值对比
+## 不可比项与数据缺口
+## 观察要点
+## 风险提示
 
-报告第一节必须是"摘要结论"，随后才是各详细章节：
+窄问题只输出相关章节，例如只问 ROE 时仅输出：
+## 结论摘要
+## 对比样本与口径
+## 盈利能力对比
+## 不可比项与数据缺口
+## 观察要点
+## 风险提示
 
-### 摘要结论
-- **本面结论**：偏强 / 偏弱 / 分歧 / 数据不足 / 需观察（从同行对比角度选择最符合的一项；peers 为空或可比字段为空时选"数据不足"）
-- **一句话结果**：用一句话说明本次同行对比分析最重要的发现；peers 为空时写"当前暂无可用同行数据"。
-- **正面信号**：1. ... 2. ...（列举 1-2 个目标公司相对同行的优势指标；无则写"当前无明显正面信号"）
-- **风险信号**：1. ... 2. ...（列举 1-2 个目标公司相对同行的劣势或风险点；无则写"当前无明显风险信号"）
-- **后续观察**：1. ... 2. ...（列举 1-2 个后续值得追踪的对比指标或事件）
-- **数据可信度**：高 / 中 / 低，并简要说明原因（如可比字段数量、同行样本来源、口径严格性等）
+每个结论段落需体现 observed_facts / analysis / limitations / watch_items 四层边界。
+所有比较必须基于同一或可比报告期；报告期不一致时不得直接排序。
+缺字段的公司不得默认排在最后，样本不足时写"无法形成稳定同行结论"。
+不得根据单一指标给综合优劣结论，不得生成未提供的行业平均值。
 
-### 一、对比样本说明
-
-### 二、可比字段概览
-
-### 三、盈利能力对比
-
-### 四、成长能力对比
-
-### 五、财务安全与现金流对比
-
-### 六、估值对比与缺失字段
-
-### 七、观察要点
-
-### 风险提示
+## 风险提示
 仅供研究参考，不构成投资建议。\
 """
 
@@ -138,16 +145,16 @@ def _get_nested(snapshot: dict, path: str):
 
 def _fmt_value(path: str, v) -> str:
     """将字段值格式化为带单位的字符串。"""
-    if v is None:
+    if is_missing(v):
         return "[缺失]"
     _, unit = _FIELD_META.get(path, ("", ""))
     if path == "financial_health.operating_cashflow":
-        return f"{v / 1e8:.2f} 亿元"
+        return format_money_cny(v)
     if unit == "%":
-        return f"{v}%"
+        return format_percent(v)
     if unit:
-        return f"{v} {unit}"
-    return str(v)
+        return f"{format_number(v)} {unit}"
+    return format_number(v) if isinstance(v, (int, float)) else str(v)
 
 
 # ── Agent ─────────────────────────────────────────────────────────────────────
@@ -175,6 +182,7 @@ class PeerComparisonAnalystAgent:
         market:          str,
         symbol:          str,
         output_language: str = "zh-CN",
+        question:        str | None = None,
     ) -> str:
         """
         生成 Markdown 同行基本面对比报告。
@@ -201,14 +209,15 @@ class PeerComparisonAnalystAgent:
                 f"peer_comparison_service 返回结构异常 [{market}/{symbol}]"
             )
 
-        user_content = self._build_user_prompt(market, symbol, snapshot, output_language)
+        user_content = self._build_user_prompt(market, symbol, snapshot, output_language, question=question)
 
         log.info("PeerComparisonAnalystAgent: calling LLM [%s/%s]", market, symbol)
         messages = [
             {"role": "system", "content": _SYSTEM_PROMPT},
             {"role": "user",   "content": user_content},
         ]
-        return self._llm.chat(messages, temperature=0.3)
+        report = self._llm.chat(messages, temperature=0.3)
+        return sanitize_specialist_output(report, evidence_text=user_content)
 
     async def analyze_async(
         self,
@@ -216,9 +225,10 @@ class PeerComparisonAnalystAgent:
         market:          str,
         symbol:          str,
         output_language: str = "zh-CN",
+        question:        str | None = None,
     ) -> str:
         """
-        Async 版同行对比分析。使用 DynamicPeerDiscoveryService 获取同行（PEER_MAP > dynamic_hot）。
+        Async 版同行对比分析。使用 DynamicPeerDiscoveryService 获取动态行业同行。
 
         供支持 AsyncSession 的 router 调用。
 
@@ -244,7 +254,7 @@ class PeerComparisonAnalystAgent:
                 f"get_peer_fundamentals_dynamic 返回结构异常 [{market}/{symbol}]"
             )
 
-        user_content = self._build_user_prompt(market, symbol, snapshot, output_language)
+        user_content = self._build_user_prompt(market, symbol, snapshot, output_language, question=question)
 
         log.info("PeerComparisonAnalystAgent.analyze_async: calling LLM [%s/%s]", market, symbol)
         messages = [
@@ -252,7 +262,8 @@ class PeerComparisonAnalystAgent:
             {"role": "user",   "content": user_content},
         ]
         # LLM.chat 是同步方法，在线程池里运行避免阻塞 event loop
-        return await asyncio.to_thread(self._llm.chat, messages, temperature=0.3)
+        report = await asyncio.to_thread(self._llm.chat, messages, temperature=0.3)
+        return sanitize_specialist_output(report, evidence_text=user_content)
 
     # ── 内部：构造用户 Prompt ─────────────────────────────────────────────────
 
@@ -262,6 +273,7 @@ class PeerComparisonAnalystAgent:
         symbol: str,
         snapshot: dict,
         output_language: str = "zh-CN",
+        question: str | None = None,
     ) -> str:
         cf       = snapshot.get("comparison_fields", {})
         dq       = snapshot.get("data_quality", {})
@@ -280,7 +292,7 @@ class PeerComparisonAnalystAgent:
         # ── 特殊场景标志 ─────────────────────────────────────────────────────
         no_peers       = len(peers) == 0
         no_available   = len(available) == 0
-        # HK 或 peers 业务差异大（PEER_MAP 注释中已标注"粗略对比"）
+        # HK 或 peers 业务差异大时需要更保守提示。
         is_hk          = market == "HK"
 
         # dynamic_hot 相关字段
@@ -309,6 +321,8 @@ class PeerComparisonAnalystAgent:
 
         # ── 报告期信息 ────────────────────────────────────────────────────────
         lrd_map = dq.get("latest_report_dates") or {}
+        period_values = {k: v for k, v in lrd_map.items() if v}
+        period_mismatch = len(set(period_values.values())) > 1
         lrd_lines = []
         for k, v in lrd_map.items():
             if v:
@@ -390,8 +404,8 @@ class PeerComparisonAnalystAgent:
                 )
             else:
                 warnings.append(
-                    "【暂无同行配置警告】当前股票未在 PEER_MAP 中配置同行，"
-                    "peers 列表为空。请生成「暂无同行配置」型报告，"
+                    "【暂无同行数据警告】当前股票未找到可用动态同行，"
+                    "peers 列表为空。请生成「暂无同行」型报告，"
                     "不得编造任何同行公司，不得虚构对比数据。"
                 )
 
@@ -406,8 +420,7 @@ class PeerComparisonAnalystAgent:
         if is_hk:
             warnings.append(
                 "【港股对比口径警告】当前为港股（HK）分析，"
-                "PEER_MAP 中的同行是互联网/科技龙头的粗略对比口径，"
-                "业务形态差异较大。报告必须在「对比样本说明」中声明：「同行口径较粗，仅供参考」，"
+                "当前同行样本可能存在业务形态差异。报告必须在「对比样本说明」中声明：「同行口径较粗，仅供参考」，"
                 "不应做过强的横向估值或经营结论。"
             )
 
@@ -425,6 +438,17 @@ class PeerComparisonAnalystAgent:
                 "不得将 Hot Score 排名高解读为「基本面更强」或「更有投资价值」。"
             )
 
+        if period_mismatch:
+            warnings.append(
+                "【报告期不一致警告】目标公司和同行的 latest_report_dates 不完全一致。"
+                "不得直接排序，不得写综合排名，只能说明可比性受限并分别描述已提供字段。"
+            )
+
+        if len(peers) < 2:
+            warnings.append(
+                "【样本不足警告】同行样本少于 2 家，无法形成稳定同行结论。"
+            )
+
         warning_block = "\n\n".join(warnings) if warnings else ""
 
         # ── data_quality 说明 ─────────────────────────────────────────────────
@@ -432,10 +456,17 @@ class PeerComparisonAnalystAgent:
         missing_peers_str = "、".join(dq.get("missing_peers") or []) or "无"
 
         lang_instruction = build_output_language_instruction(output_language)
+        focus = detect_focus(question)
+        boundary_instruction = build_boundary_instruction(focus)
 
         return f"""\
 请对以下同行基本面数据进行分析，严格遵守系统提示中的所有禁止事项。
 {warning_block}
+{boundary_instruction}
+
+【用户问题与范围】
+  question: {question or "未提供，按宽问题处理"}
+  focus: {focus}
 
 【对比样本】
   目标股：{target_name}（{market_cn} {market}/{symbol}）

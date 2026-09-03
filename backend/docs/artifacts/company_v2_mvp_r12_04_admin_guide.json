@@ -1,0 +1,47 @@
+{
+  "artifact": "admin_operations_guide",
+  "phase": "MVP-R1.2",
+  "date": "2026-07-26",
+  "first_admin_bootstrap": {
+    "method": "CLI",
+    "command": "cd backend && python -m app.cli.create_admin --username admin --email admin@yourcompany.com --password STRONGPASSWORD",
+    "note": "Run server-side (SSH) or locally with DATABASE_URL pointed at Supabase",
+    "promote_existing": "python -m app.cli.create_admin --promote --email existing@user.com"
+  },
+  "admin_login": {
+    "endpoint": "POST /auth/login",
+    "body": {"username": "admin", "password": "STRONGPASSWORD"},
+    "returns": "access_token (use as Bearer in admin API calls)"
+  },
+  "create_invite": {
+    "endpoint": "POST /mvp/invites",
+    "headers": {"Authorization": "Bearer {admin_access_token}"},
+    "body_example": {"email": "user@example.com", "max_uses": 1, "note": "Wave 1 — beta tester"},
+    "response_contains": "invite_code (shown once — copy immediately)",
+    "deliver_to_user": "Out-of-band only (WeChat/email/DM)"
+  },
+  "list_invites": {
+    "endpoint": "GET /mvp/admin/invites",
+    "headers": {"Authorization": "Bearer {admin_access_token}"},
+    "note": "Shows code_prefix only, never plaintext code"
+  },
+  "revoke_invite": {
+    "endpoint": "DELETE /mvp/admin/invites/{invite_id}",
+    "headers": {"Authorization": "Bearer {admin_access_token}"},
+    "note": "Permanently deletes the invite. Already-registered users are not affected."
+  },
+  "admin_frontend": {
+    "url": "/admin/invites",
+    "note": "Login first at the main app, then navigate to /admin/invites",
+    "requirement": "localStorage access_token must be set with an admin-account token"
+  },
+  "wave1_checklist": [
+    "1. Apply migrations: alembic upgrade head",
+    "2. Create admin: python -m app.cli.create_admin ...",
+    "3. Login as admin, get access_token",
+    "4. Create Wave 1 invites (max 10 per mvp_wave1_max_users=10)",
+    "5. Send codes out-of-band to selected users",
+    "6. Monitor: GET /mvp/wave/status, GET /mvp/admin/invites",
+    "7. Day 7: review week1_review.md metrics"
+  ]
+}

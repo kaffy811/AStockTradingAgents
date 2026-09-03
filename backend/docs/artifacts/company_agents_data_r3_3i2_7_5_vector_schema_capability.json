@@ -1,0 +1,47 @@
+{
+  "phase": "6W-R3.3I.2.7.5",
+  "status": "VECTOR_SCHEMA_CAPABILITY_READY",
+  "traffic": "HOLD_1_PERCENT",
+  "branch": "r33i-vector-schema-capability",
+  "parent": "4d366ce5bf00406b24b2a90ddeb132e4ae8c46df",
+  "revision": "f4a5b6c7d8e9",
+  "capability_source": "pg_extension",
+  "creates_extension": false,
+  "python_package_determines_schema": false,
+  "contracts": {
+    "extension_enabled": {"type": "vector(1536)", "hnsw_index": true},
+    "extension_disabled": {"type": "text", "hnsw_index": false}
+  },
+  "reason_codes": [
+    "VECTOR_ALREADY_ENABLED",
+    "VECTOR_EXTENSION_UNAVAILABLE",
+    "TEXT_FALLBACK_SELECTED",
+    "VECTOR_SCHEMA_SELECTED"
+  ],
+  "scenarios": [
+    {"name": "standard_unavailable", "type": "text", "index": false, "select": true, "insert_select": true, "repeat": true},
+    {"name": "available_permission_limited", "type": "text", "index": false, "select": true, "insert_select": true, "repeat": true},
+    {"name": "already_enabled", "type": "vector(1536)", "index": true, "select": true, "insert_select": true, "repeat": true},
+    {"name": "available_but_disabled", "type": "text", "index": false, "select": true, "insert_select": true, "repeat": true}
+  ],
+  "tests": [
+    {"name": "static", "collected": 6, "passed": 2, "failed": 0, "skipped": 4, "duration_seconds": 0.04},
+    {"name": "database_matrix", "collected": 6, "passed": 6, "failed": 0, "skipped": 0, "duration_seconds": 5.51},
+    {"name": "final", "collected": 6, "passed": 6, "failed": 0, "skipped": 0, "duration_seconds": 5.36}
+  ],
+  "scope": {
+    "bootstrap_changed": false,
+    "a2_changed": false,
+    "agent_changed": false,
+    "docker_changed": false,
+    "dependencies_changed": false
+  },
+  "safety": {
+    "production_database_accessed": false,
+    "production_migrations": 0,
+    "pushed": false,
+    "merged": false,
+    "deployed": false,
+    "traffic_expanded": false
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-07-17T06:52:18.253422+00:00",
+  "status": "blocked",
+  "reason": "Persistence reload and page/Chat live consistency require Postgres/RAG gate to pass before apply.",
+  "scope": {
+    "market": "CN",
+    "symbol": "000858",
+    "report_year": 2025
+  },
+  "company_page_api": {
+    "verified_live": false
+  },
+  "company_chat_data_service": {
+    "verified_live": false
+  },
+  "report_comparison_skill": {
+    "verified_live": false
+  },
+  "dry_run_revenue_provenance": {
+    "status": "verified",
+    "raw_value": 40528509770.23,
+    "raw_unit": "CNY",
+    "period_end": "2025-12-31",
+    "period_type": "annual",
+    "normalized_value": 40528509770.23,
+    "normalized_unit": "CNY",
+    "source_key": "revenue"
+  },
+  "roe_status": {
+    "status": "unverified",
+    "reason_codes": [
+      "TARGET_PERIOD_UNAVAILABLE"
+    ],
+    "raw_value": null,
+    "raw_unit": null,
+    "period_end": null,
+    "period_type": null
+  },
+  "chain": [
+    "Persistence",
+    "build_company_history_dashboard",
+    "Company API",
+    "CompanyChatDataService",
+    "ReportComparisonSkill"
+  ]
+}

@@ -26,6 +26,7 @@ dependencies = [
     "alembic>=1.18.4",
     "bcrypt==4.0.1",
     "akshare>=1.18.62",
+    "baostock",
     "tushare>=1.4.20",
     "pandas>=3.0.3",
     "numpy>=2.4.6",
@@ -33,6 +34,7 @@ dependencies = [
     "pypdf>=3.17.0",
     "httpx>=0.27.0",
     "beautifulsoup4>=4.12.3",
+    "pdfminer.six>=20221105",
 ]
 
 [dependency-groups]
@@ -45,3 +47,11 @@ dev = [
 asyncio_mode = "auto"
 pythonpath = ["."]
 testpaths = ["tests"]
+markers = [
+    "live_supabase: tests that require the live Supabase endpoint",
+    "unit: hermetic unit tests with no external services",
+    "integration_local: local integration tests using fakes, in-memory stores, or local-only resources",
+    "integration_live: tests requiring configured live services",
+    "live_external: tests requiring external network, DNS, Supabase, CNINFO, BaoStock, or live RAG worker",
+    "soak: long-running soak/stress tests",
+]

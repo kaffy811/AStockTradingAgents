@@ -1,0 +1,66 @@
+{
+  "schema_version": "pi_canary_deployment_mapping_v1",
+  "phase": "6V-P1.24",
+  "generated_at": "2026-07-24T00:00:00.000000+00:00",
+
+  "deployment_design": {
+    "compose_project_name": "tradingagents-p124-staging",
+    "base_compose": "docker-compose.yml",
+    "staging_override": "docker-compose.staging.yml",
+    "env_file_template": ".env.staging.example",
+    "env_file_local": ".env.staging.local",
+    "env_file_local_gitignored": true,
+    "backend_host_binding": "127.0.0.1:18000",
+    "frontend_host_binding": "127.0.0.1:18080",
+    "network": "staging-internal",
+    "database_isolation": "dedicated staging DATABASE_URL (not production)",
+    "redis_isolation": "redis service within staging-internal network",
+    "public_exposure": false
+  },
+
+  "docker_availability_assessment": {
+    "docker_command": "not found",
+    "docker_socket": "/var/run/docker.sock — not present",
+    "docker_desktop": "not installed",
+    "orbstack": "not installed",
+    "podman": "not found",
+    "colima": "not found",
+    "homebrew_available": true,
+    "docker_desktop_brew_cask": "docker-desktop 4.83.0 (available but not installed)",
+    "docker_installed": false,
+    "assessment": "Docker runtime is not installed on this machine"
+  },
+
+  "deployment_blockers": [
+    {
+      "blocker": "Docker not installed",
+      "severity": "HARD_BLOCKER",
+      "detail": "No Docker Engine, Docker Desktop, OrbStack, Podman, or Colima found. Cannot run docker compose commands.",
+      "resolution": "Install Docker Desktop via 'brew install --cask docker-desktop' (requires user action and system restart)"
+    }
+  ],
+
+  "deployment_status": "NOT_ESTABLISHED",
+  "deployment_running": false,
+  "gate_c_closeable": false,
+
+  "files_created": [
+    "docker-compose.staging.yml",
+    ".env.staging.example"
+  ],
+
+  "code_changes_made": [
+    {
+      "file": "backend/app/core/config.py",
+      "change": "Added pi_canary_snapshot_path field (default empty string)"
+    },
+    {
+      "file": "backend/app/agent_runtime/canary_policy.py",
+      "change": "Upgraded get_effective_shadow_config_snapshot() to v2: adds process_id, deployment_sha, deployment_mode, config_fingerprint, process_started_at, evidence_mode=containerized_deployed_staging_runtime when DEPLOYMENT_MODE=containerized_staging"
+    },
+    {
+      "file": "backend/app/main.py",
+      "change": "Lifespan now persists snapshot JSON to pi_canary_snapshot_path when configured; expanded log to include pid and deployment_sha"
+    }
+  ]
+}

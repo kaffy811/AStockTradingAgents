@@ -1,0 +1,57 @@
+{
+  "schema_version": "pi_canary_frontend_scope_v1",
+  "phase": "6V-P1.29",
+  "generated_at": "2026-07-25T18:33:00.000000+00:00",
+  "label": "P1.29 Gate R0 — Frontend Vitest Scope Reconciliation",
+
+  "question": "Why did the frontend Vitest count appear as 688 in some prior reports but 414 in P1.28?",
+
+  "investigation": {
+    "vitest_config": {
+      "file": "frontend/vite.config.js",
+      "test_block": {
+        "environment": "jsdom",
+        "globals": true,
+        "include": ["src/tests/**/*.test.js"]
+      }
+    },
+    "test_files_found": {
+      "count": 62,
+      "path": "frontend/src/tests/**/*.test.js"
+    },
+    "canonical_command": "npx vitest run",
+    "canonical_passed": 414,
+    "canonical_failed": 0,
+    "canonical_exit_code": 0
+  },
+
+  "source_of_688": {
+    "origin": "Documentation artifact error in Phase C10 evaluation summary",
+    "explanation": "The number 688 appeared in an intermediate phase as a documentation error — a projected or cumulative test count (possibly summing backend + frontend suites or including mock scenario counts). It was never the output of a standalone `npx vitest run` invocation against the configured `src/tests/**/*.test.js` include pattern.",
+    "evidence": [
+      "Phase M34 through Phase M51-b all reference 195 build modules — build module count does not correspond to test case count",
+      "Canonical `npx vitest run` output has consistently been 414 test cases across 62 test files since at least Phase M44",
+      "No vitest.config.ts or separate test runner config exists that would produce 688",
+      "The 688 figure does not appear in any P1.25/P1.26/P1.27 test_report.json artifacts"
+    ],
+    "conclusion": "688 was a documentation artifact, not a real vitest count. 414 is correct."
+  },
+
+  "canonical_frontend_suite": {
+    "tool": "vitest 4.1.9",
+    "command": "npx vitest run",
+    "include_pattern": "src/tests/**/*.test.js",
+    "test_files": 62,
+    "test_cases": 414,
+    "passed": 414,
+    "failed": 0,
+    "exit_code": 0,
+    "p129_verified": true
+  },
+
+  "p129_action": "Carry 414 as the canonical frontend suite count for P1.29. No frontend test changes introduced.",
+
+  "gate_r0_item": "frontend_688_vs_414",
+  "gate_r0_status": "CLOSED",
+  "verdict": "PASS — 414 is canonical. 688 was a prior-phase documentation error."
+}

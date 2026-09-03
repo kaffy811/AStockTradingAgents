@@ -1,0 +1,28 @@
+{
+  "market": "CN",
+  "symbol": "601686",
+  "source": "cninfo",
+  "discovery_date": "2026-07-10",
+  "report_year": 2024,
+  "documents_count": 2,
+  "annual_reports_count": 1,
+  "quarterly_reports_count": 1,
+  "timeline": [
+    {
+      "report_year": 2024,
+      "report_type": "annual",
+      "title": "友发集团：友发集团：2024年年度报告",
+      "announcement_date": "2025-04-24",
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/2025-04-25/1223277982.PDF",
+      "discovery_method": "cninfo_fulltext_search"
+    },
+    {
+      "report_year": 2024,
+      "report_type": "q3",
+      "title": "友发集团：2024年第三季度报告",
+      "announcement_date": "2024-10-29",
+      "pdf_url": "https://static.cninfo.com.cn/finalpage/2024-10-30/1221553019.PDF",
+      "discovery_method": "cninfo_fulltext_search"
+    }
+  ]
+}

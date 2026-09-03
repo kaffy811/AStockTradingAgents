@@ -1,0 +1,44 @@
+{
+  "phase": "6W-R3.3I.2.8.1",
+  "status": "BOOTSTRAP_TEST_HEAD_ALIGNMENT_READY",
+  "traffic": "HOLD_1_PERCENT",
+  "change_scope": "test_only",
+  "head_resolution": "alembic.script.ScriptDirectory.get_heads",
+  "single_head_required": true,
+  "graphs": [
+    {
+      "name": "bootstrap_vector_compatibility",
+      "resolved_head": "q5r6s7t8u9v0",
+      "database_current": "q5r6s7t8u9v0",
+      "collected": 9,
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0,
+      "duration_seconds": 4.81,
+      "standard_type": "text",
+      "standard_hnsw": false,
+      "pgvector_types": ["vector(1536)", "vector(384)"],
+      "pgvector_hnsw": true
+    },
+    {
+      "name": "integrated_with_trace_provenance",
+      "resolved_head": "r6s7t8u9v0w1",
+      "database_current": "r6s7t8u9v0w1",
+      "collected": 9,
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0,
+      "duration_seconds": 4.72,
+      "standard_type": "text",
+      "standard_hnsw": false,
+      "pgvector_types": ["vector(1536)", "vector(384)"],
+      "pgvector_hnsw": true
+    }
+  ],
+  "migration_implementation_changed": false,
+  "business_code_changed": false,
+  "production_changed": false,
+  "push": false,
+  "merge": false,
+  "deploy": false
+}

@@ -1,0 +1,79 @@
+{
+  "phase": "6W-R3.3I.2.3",
+  "status": "CITATION_CLAIM_BOUNDARY_NOT_READY",
+  "traffic_decision": "HOLD_1_PERCENT",
+  "workspace": {
+    "head": "b055da8495c54bb37625f0b0e0f94b4d4a627de2",
+    "branch": "release/demo-staging",
+    "historical_dirty_preserved": true,
+    "diff_check": "clean"
+  },
+  "repair": {
+    "llm_visible_view": "compacted request-local E-label evidence",
+    "validation_view": "same-label un-compacted canonical request evidence",
+    "global_numeric_validator_modified": false,
+    "derived_formula_type": "ratio_percentage",
+    "canonical_operand_required": true,
+    "scale_constant": {
+      "values": ["100", "100%"],
+      "global_exception": false,
+      "requires_ratio_percentage_fact": true,
+      "requires_canonical_operands": true,
+      "requires_explicit_formula_span": true,
+      "requires_derived_result_in_span": true
+    }
+  },
+  "tests": [
+    {"suite": "existing plus frozen diagnosis", "collected": 37, "passed": 37, "failed": 0, "skipped": 0, "duration_seconds": 0.74},
+    {"suite": "initial phase-specific", "collected": 40, "passed": 39, "failed": 1, "skipped": 0, "duration_seconds": 0.82},
+    {"suite": "final phase-specific", "collected": 40, "passed": 40, "failed": 0, "skipped": 0, "duration_seconds": 0.55}
+  ],
+  "candidate": {
+    "image": "tradingagents-backend:rc-r33i2-3-runtime",
+    "digest": "sha256:791ff71c4c37b62484ad8683b1f1a48e13ef0a4579812a5a739395e9b574f63c",
+    "oci_revision": "r33i2-3-canonical-boundary",
+    "container_id": "96abc5e7f49bec16c0eaef4a2969994ca9faacc9bd7b1f43bd5b1d20fd8e76a6",
+    "source_bind_mount": false,
+    "isolated": true
+  },
+  "serial_harness": {
+    "verified": true,
+    "conditions": ["api_terminal", "s8_persisted", "backend_completed", "health_ok"],
+    "q1_completed_at": "2026-08-30T01:02:15.800889Z",
+    "q3_started_at": "2026-08-30T01:02:30.828335Z",
+    "post_completion_gap_seconds": 15.027446
+  },
+  "runtime": [
+    {
+      "label": "Q1",
+      "request_id": "d9161951",
+      "trace_id": "2bc706bf-eee1-47a1-bfb7-dfe7382efaf7",
+      "report_year": 2024,
+      "period": "2024-12-31",
+      "derived_fact": {"id": "C1", "metric": "net_margin", "result": "50.46%", "evidence_ids": ["E7"], "formula_type": "ratio_percentage"},
+      "failure_endpoint": "S6",
+      "error_code": "REPORT_LLM_TIMEOUT",
+      "citation_validation": null,
+      "numeric_validation": null,
+      "final_status": "partial_success",
+      "gate": {"api_terminal": true, "s8_persisted": true, "backend_completed": true, "health_ok": true}
+    },
+    {
+      "label": "Q3",
+      "request_id": "3d3b4035",
+      "trace_id": "1569e841-c383-42e8-844f-c1b127e2e0bc",
+      "report_year": 2024,
+      "period": "2024-12-31",
+      "derived_fact": {"id": "C1", "metric": "net_margin", "result": "50.46%", "evidence_ids": ["E1"], "formula_type": "ratio_percentage"},
+      "formula_scale_occurrences": ["100%", "100"],
+      "citation_validation": {"valid": true, "resolved_derived_fact_ids": ["C1"]},
+      "numeric_validation": {"valid": true, "reason": "ok", "unsupported_count": 0},
+      "citation_metadata_leak": false,
+      "raw_chunk_id_leak": false,
+      "final_status": "completed",
+      "gate": {"api_terminal": true, "s8_persisted": true, "backend_completed": true, "health_ok": true}
+    }
+  ],
+  "commit": {"created": false, "sha": null, "files": [], "reason": "Q1 did not complete S7 due unchanged LLM timeout"},
+  "operations": {"pushed": false, "deployed": false, "migration_run": false, "production_modified": false, "traffic_expanded": false}
+}

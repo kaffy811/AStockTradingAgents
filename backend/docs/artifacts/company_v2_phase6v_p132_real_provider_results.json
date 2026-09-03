@@ -1,0 +1,26 @@
+{
+  "schema_version": "pi_canary_real_provider_results_v1",
+  "phase": "6V-P1.32",
+  "generated_at": "2026-07-26T02:00:00Z",
+
+  "state": "B",
+  "state_label": "NOT_EXECUTED",
+
+  "real_provider_calls": 0,
+  "success": 0,
+  "failed": 0,
+  "timeouts": 0,
+  "rate_limits": 0,
+  "budget_blocks": 0,
+
+  "total_input_tokens": 0,
+  "total_output_tokens": 0,
+  "total_cached_tokens": 0,
+  "total_reasoning_tokens": 0,
+  "total_cost_cny": "0",
+
+  "budget_remaining_requests": 100,
+  "budget_remaining_cny": "100.00",
+
+  "reason": "DEEPSEEK_API_KEY_STAGING not provisioned; ProviderActivationGate blocks at kill switch + credential gates"
+}
