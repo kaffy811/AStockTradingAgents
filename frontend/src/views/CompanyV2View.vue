@@ -76,6 +76,24 @@
         data-testid="company-profile-card"
       />
 
+      <section class="cv2-eod-section" data-testid="company-eod-summary">
+        <header class="cv2-eod-head">
+          <h2>最近交易日盘后数据</h2>
+          <span v-if="eodData.as_of">数据截至 {{ eodData.as_of }}</span>
+        </header>
+        <p class="cv2-eod-note">盘后数据可能延迟，不代表实时行情。</p>
+        <div v-if="eodFacts.length" class="cv2-eod-grid">
+          <div v-for="fact in eodFacts" :key="fact.key" class="cv2-eod-item">
+            <span>{{ fact.label }}</span>
+            <strong>{{ fact.value }}<small v-if="fact.unit"> {{ fact.unit }}</small></strong>
+            <small>截至 {{ fact.asOf }} · Tushare</small>
+          </div>
+        </div>
+        <p v-else-if="!loading" class="cv2-module-notice" data-testid="eod-unavailable">
+          暂缺已验证的盘后数据<span v-if="eodReason">（{{ eodReason }}）</span>
+        </p>
+      </section>
+
       <section v-if="loading && !Object.keys(stockBasic || {}).length" class="cv2-skeleton-section" data-testid="profile-skeleton">
         <div class="cv2-skeleton-line wide"></div>
         <div class="cv2-skeleton-line"></div>
@@ -143,7 +161,7 @@
 <script setup>
 import { computed, onActivated, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getCompanyV2FullDebug, refreshCompanyV2Debug, getCompanyV2History, getCompanyV2Profile } from '../api/companyV2.js'
+import { getCompanyV2Eod, getCompanyV2FullDebug, refreshCompanyV2Debug, getCompanyV2History, getCompanyV2Profile } from '../api/companyV2.js'
 import CompanyV2DebugPanel from '../components/company-v2/CompanyV2DebugPanel.vue'
 import CompanyV2Section from '../components/company-v2/CompanyV2Section.vue'
 import CompanyV2FallbackTable from '../components/company-v2/CompanyV2FallbackTable.vue'
@@ -163,6 +181,7 @@ const pageTimedOut = ref(false)
 const debugData = ref({})
 const historyData = ref({})   // 全历史数据
 const stockBasic = ref({})    // 公司/股票基本信息
+const eodData = ref({})
 const historyError = ref('')
 const quoteError = ref('')
 const includeRaw = ref(false)
@@ -208,6 +227,30 @@ const historyUnavailable = computed(() => !loading.value && (
   !!historyError.value ||
   !Object.values(historyData.value?.modules || {}).some(module => module?.data_success || module?.history?.length)
 ))
+const eodReason = computed(() => eodData.value?.reason_code || '')
+const eodFacts = computed(() => {
+  const modules = eodData.value?.modules || {}
+  const selected = [
+    ['quote', 'close', '最近收盘'],
+    ['quote', 'pct_chg', '涨跌幅'],
+    ['valuation', 'pe_ttm', '市盈率 TTM'],
+    ['valuation', 'pb', '市净率'],
+    ['valuation', 'turnover_rate', '换手率'],
+    ['financial', 'roe', 'ROE'],
+    ['financial', 'grossprofit_margin', '毛利率'],
+    ['financial', 'netprofit_margin', '净利率'],
+  ]
+  return selected.flatMap(([moduleKey, fieldKey, label]) => {
+    const fact = modules[moduleKey]?.fields?.[fieldKey]
+    return fact?.value === undefined || fact?.value === null ? [] : [{
+      key: `${moduleKey}:${fieldKey}`,
+      label,
+      value: fact.value,
+      unit: fact.unit,
+      asOf: fact.as_of,
+    }]
+  })
+})
 
 function cacheKey(period = periodTab.value || 'annual') {
   return `${market.value}:${symbol.value}:${period}:${COMPANY_V2_SCHEMA_VERSION}`
@@ -219,6 +262,7 @@ function restoreCached(period = 'annual') {
   debugData.value = cached.debugData || {}
   historyData.value = cached.historyData || {}
   stockBasic.value = cached.stockBasic || {}
+  eodData.value = cached.eodData || {}
   return true
 }
 
@@ -227,6 +271,7 @@ function resetViewState({ keepCached = true } = {}) {
   refreshWarning.value = ''
   historyError.value = ''
   quoteError.value = ''
+  eodData.value = {}
   quarterlyHistoryData.value = null
   quarterlyLoading.value = false
   periodTab.value = 'annual'
@@ -347,6 +392,7 @@ async function load(force = false) {
       debugData.value = {}
       historyData.value = {}
       stockBasic.value = {}
+      eodData.value = {}
     }
     quarterlyHistoryData.value = null
     quarterlyLoading.value = false
@@ -366,7 +412,7 @@ async function load(force = false) {
       }
       return data
     })
-    const debugPromise = getCompanyV2FullDebug(market.value, symbol.value, {
+    const debugPromise = debugMode.value ? getCompanyV2FullDebug(market.value, symbol.value, {
         include_raw: includeRaw.value,
         force_refresh: force,
         max_raw_chars: 20000,
@@ -374,11 +420,24 @@ async function load(force = false) {
         period: 'annual',
         profile: includeRaw.value ? 'debug' : 'page',
         signal,
-      })
-    const [debugResult, historyResult, basicResult] = await Promise.allSettled([
+      }) : Promise.resolve({})
+    const eodPromise = getCompanyV2Eod(market.value, symbol.value, { signal }).then(data => {
+      if (seq === _loadSeq && requestGeneration.startsWith(`${market.value}:${symbol.value}:annual:`)) {
+        eodData.value = data || {}
+        const profileFields = data?.modules?.profile?.fields || {}
+        const additions = Object.fromEntries(
+          ['name', 'fullname', 'exchange', 'industry', 'list_date', 'list_status']
+            .flatMap(key => profileFields[key]?.value == null ? [] : [[key === 'name' ? 'company_name' : key, profileFields[key].value]])
+        )
+        stockBasic.value = { ...additions, ...(stockBasic.value || {}) }
+      }
+      return data
+    })
+    const [debugResult, historyResult, basicResult, eodResult] = await Promise.allSettled([
       debugPromise,
       historyPromise,
       basicPromise,
+      eodPromise,
     ])
     if (seq !== _loadSeq || !requestGeneration.startsWith(`${market.value}:${symbol.value}:annual:`)) return
     if (debugResult.status === 'fulfilled') {
@@ -403,10 +462,14 @@ async function load(force = false) {
     } else if (!hasDisplayData.value) {
       throw basicResult.reason
     }
+    if (eodResult.status === 'rejected' && eodResult.reason?.name !== 'AbortError') {
+      eodData.value = { fulfillment: 'unavailable', reason_code: eodResult.reason?.data?.reason_code || 'DATA_NOT_AVAILABLE' }
+    }
     companyV2PageCache.set(cacheKey('annual'), {
       debugData: debugData.value,
       historyData: historyData.value,
       stockBasic: stockBasic.value,
+      eodData: eodData.value,
     })
   } catch (e) {
     if (e?.name === 'AbortError' || seq !== _loadSeq) return
@@ -504,6 +567,15 @@ onUnmounted(() => {
   margin: 0 0 12px; padding: 10px 12px; border: 1px solid #e5e7eb;
   border-radius: 8px; background: #f9fafb; color: #6b7280; font-size: 13px;
 }
+.cv2-eod-section { margin: 0 0 16px; padding: 14px 16px; border: 1px solid #e5e7eb; border-radius: 10px; background: #fff; }
+.cv2-eod-head { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+.cv2-eod-head h2 { margin: 0; font-size: 16px; }
+.cv2-eod-head span, .cv2-eod-note { color: #6b7280; font-size: 12px; }
+.cv2-eod-note { margin: 5px 0 12px; }
+.cv2-eod-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)); gap: 10px; }
+.cv2-eod-item { display: grid; gap: 3px; padding: 10px; background: #f9fafb; border-radius: 8px; }
+.cv2-eod-item span, .cv2-eod-item small { color: #6b7280; font-size: 11px; }
+.cv2-eod-item strong { font-size: 16px; color: #111827; }
 .cv2-skeleton-section {
   background: #fff;
   border: 1px solid #e5e7eb;

@@ -227,3 +227,7 @@ export function getCompanyV2StockBasic(market, symbol) {
 export function getCompanyV2Profile(market, symbol, options = {}) {
   return v2Fetch(`/api/v2/company/${market}/${symbol}/profile`, { signal: options.signal })
 }
+
+export function getCompanyV2Eod(market, symbol, options = {}) {
+  return v2Fetch(`/api/v2/company/${market}/${symbol}/eod`, { signal: options.signal })
+}

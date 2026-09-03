@@ -150,8 +150,7 @@ class TushareClient:
         ts.set_token(token)
         self._pro = ts.pro_api()
         log.info(
-            "TushareClient 初始化完成：token=%s*** rate=%d/min",
-            token[:6],
+            "TushareClient 初始化完成：credential configured, rate=%d/min",
             rate_per_min,
         )
 
@@ -217,6 +216,26 @@ class TushareClient:
         return df
 
     # ── 业务方法 ──────────────────────────────────────────────────────────────
+
+    async def get_daily(self, ts_code: str, trade_date: str | None = None) -> pd.DataFrame:
+        """Latest or specified EOD daily bar. Values are never real-time."""
+        kwargs: dict[str, Any] = {
+            "ts_code": ts_code,
+            "fields": "ts_code,trade_date,open,high,low,close,pre_close,change,pct_chg,vol,amount",
+        }
+        if trade_date:
+            kwargs["trade_date"] = trade_date
+        return await self._call("daily", **kwargs)
+
+    async def get_index_daily(self, ts_code: str, trade_date: str | None = None) -> pd.DataFrame:
+        """Latest or specified index EOD bar for an explicitly mapped index."""
+        kwargs: dict[str, Any] = {
+            "ts_code": ts_code,
+            "fields": "ts_code,trade_date,open,high,low,close,pre_close,change,pct_chg,vol,amount",
+        }
+        if trade_date:
+            kwargs["trade_date"] = trade_date
+        return await self._call("index_daily", **kwargs)
 
     async def get_daily_basic_range(
         self,

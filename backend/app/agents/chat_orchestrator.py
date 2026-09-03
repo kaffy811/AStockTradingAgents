@@ -62,6 +62,7 @@ from app.agents.central_planning_agent import CentralPlanningAgent as _CentralPl
 from app.services.security_entity_resolver import security_entity_resolver
 from app.services.official_report_entity_hints import unambiguous_official_report_entity_hint
 from app.services.official_company_event_service import official_company_event_service
+from app.services.tushare_eod_gateway import tushare_eod_gateway
 import app.agents.chat_memory as _mem
 
 _central_planner = _CentralPlanningAgent()
@@ -108,6 +109,10 @@ _UNAPPROVED_NEWS_SCOPE_RE = re.compile(
     r"(热点|新闻|资讯|消息).{0,12}市场|"
     r"产业链|供应链|直接受益|受益.{0,8}(公司|股票)|带动.{0,10}(公司|股票)|"
     r"AI\s*热潮|新能源.{0,8}(重要新闻|行业新闻)"
+)
+_STOCK_EOD_RESEARCH_RE = re.compile(
+    r"近期情况|最近情况|近期表现|最近表现|近期估值|最近估值|"
+    r"财务指标|ROE|roe|盘后|收盘|交易日|估值与财务"
 )
 _REQUESTED_OFFICIAL_EVENT_TYPES: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("分红", re.compile(r"分红|派息|利润分配|权益分派")),
@@ -1178,6 +1183,103 @@ async def _handle_official_company_research(
     )
 
 
+def _format_grounded_fact(label: str, fact: dict, *, report_period: bool = False) -> str | None:
+    value = fact.get("value")
+    if value is None or value == "":
+        return None
+    unit = fact.get("unit") or ""
+    as_of = fact.get("as_of") or "unavailable"
+    period_label = "报告期" if report_period else "数据日期"
+    return f"- **{label}：** {value}{unit}（{period_label}：{as_of}；来源：Tushare）"
+
+
+async def _handle_stock_eod_research(
+    msg: str,
+    db: AsyncSession,
+    user_id: uuid.UUID,
+) -> OrchestratorResult:
+    """Deterministic EOD research; no LLM numeric completion or news fallback."""
+    resolved = await security_entity_resolver.resolve(db, msg, market_hint="CN", min_confidence=0.72)
+    if resolved.get("ambiguity"):
+        return OrchestratorResult(
+            answer="无法唯一确认目标公司，未查询或生成盘后事实。" + _DISCLAIMER,
+            metadata={"route": "stock_eod_research", "fulfillment": "unavailable", "reason_code": "AMBIGUOUS_COMPANY"},
+        )
+    entities = resolved.get("entities") or []
+    if not entities:
+        return OrchestratorResult(
+            answer="无法从证券主数据可靠确认目标公司，未查询或生成盘后事实。" + _DISCLAIMER,
+            metadata={"route": "stock_eod_research", "fulfillment": "unavailable", "reason_code": "COMPANY_NOT_RESOLVED"},
+        )
+    entity = entities[0]
+    market = str(getattr(entity, "market", "") or "CN").upper()
+    symbol = str(getattr(entity, "symbol", "") or "")
+    company_name = str(getattr(entity, "short_name", "") or getattr(entity, "full_name", "") or symbol)
+    snapshot = await tushare_eod_gateway.get_company_snapshot(market, symbol)
+    modules = snapshot.get("modules") or {}
+    quote = modules.get("quote") or {}
+    valuation = modules.get("valuation") or {}
+    financial = modules.get("financial") or {}
+
+    quote_labels = {
+        "close": "最近交易日收盘", "change": "涨跌额", "pct_chg": "涨跌幅",
+        "vol": "成交量", "amount": "成交额",
+    }
+    valuation_labels = {
+        "pe_ttm": "市盈率 TTM", "pb": "市净率", "ps_ttm": "市销率 TTM",
+        "turnover_rate": "换手率", "total_mv": "总市值", "circ_mv": "流通市值",
+    }
+    financial_labels = {
+        "roe": "ROE", "roe_waa": "加权 ROE", "roa": "ROA",
+        "grossprofit_margin": "毛利率", "netprofit_margin": "净利率",
+        "debt_to_assets": "资产负债率", "netprofit_yoy": "净利润同比",
+    }
+    quote_lines = [line for key, label in quote_labels.items() if (line := _format_grounded_fact(label, (quote.get("fields") or {}).get(key, {})))]
+    valuation_lines = [line for key, label in valuation_labels.items() if (line := _format_grounded_fact(label, (valuation.get("fields") or {}).get(key, {})))]
+    financial_lines = [line for key, label in financial_labels.items() if (line := _format_grounded_fact(label, (financial.get("fields") or {}).get(key, {}), report_period=True))]
+
+    official = await official_company_event_service.list_persisted_events(
+        db, market=market, symbol=symbol, company_name=company_name, limit=5
+    )
+    event_lines = [
+        f"- {event['published_at']}：《{event['title']}》（[CNINFO 官方来源]({event['source_url']}））"
+        for event in (official.get("events") or [])
+    ]
+    eod_fact_lines = quote_lines + valuation_lines + financial_lines
+    factual_sections = eod_fact_lines + event_lines
+    fulfillment = snapshot.get("fulfillment") if eod_fact_lines else ("partial" if event_lines else "unavailable")
+    reason_code = snapshot.get("reason_code") if fulfillment == "unavailable" else (
+        "PARTIAL_EOD_COVERAGE" if fulfillment == "partial" else None
+    )
+    answer = (
+        "## 结论摘要\n\n"
+        + (f"{company_name}（{symbol}）已取得可追溯的最近交易日或财务披露数据；当前状态为 `{fulfillment}`。"
+           if factual_sections else f"{company_name}（{symbol}）当前没有已验证的盘后或财务事实。")
+        + "\n\n## 最近交易日表现\n\n" + ("\n".join(quote_lines) or "暂缺已验证的最近交易日行情。")
+        + "\n\n## 估值与交易活跃度（仅可用字段）\n\n" + ("\n".join(valuation_lines) or "暂缺已验证的估值与交易活跃度数据。")
+        + "\n\n## 最近已披露财务指标\n\n" + ("\n".join(financial_lines) or "暂缺已验证的财务指标。")
+        + "\n\n## 近期官方公告/报告事实\n\n" + ("\n".join(event_lines) or "已持久化 CNINFO 数据中暂无可展示事件。")
+        + "\n\n## 数据范围与限制\n\n数据为最近可取得的盘后 EOD 或已披露报告期数据，不是实时行情；"
+          "未调用 Tushare news、公开网页新闻源或模型记忆补充数字。"
+        + f"\n\n## 来源与 as_of\n\nTushare EOD 数据截至 {snapshot.get('as_of') or 'unavailable'}；"
+          f"CNINFO 快照截至 {official.get('as_of') or 'unavailable'}。"
+        + _DISCLAIMER
+    )
+    return OrchestratorResult(
+        answer=answer,
+        tool_events=[{
+            "name": "stock_eod_research", "status": fulfillment, "event_type": "tool_completed",
+            "permission_level": "read_only", "ok": fulfillment in {"fulfilled", "partial"}, "source": "tushare+CNINFO",
+        }],
+        metadata={
+            "route": "stock_eod_research", "fulfillment": fulfillment, "reason_code": reason_code,
+            "market": market, "symbol": symbol, "company_name": company_name,
+            "as_of": snapshot.get("as_of"), "source": ["tushare", "CNINFO"],
+            "eod": snapshot, "official_events": official.get("events") or [],
+        },
+    )
+
+
 async def _handle_recent_report(msg: str, db: AsyncSession, user_id: uuid.UUID) -> OrchestratorResult:
     events: list = []
     cards:  list = []
@@ -1613,6 +1715,10 @@ async def process_message(
         route = "official_report_analysis" if _OFFICIAL_REPORT_ANALYSIS_RE.search(content) else "official_company_events"
         await _emit("intent_detected", {"intent": route, "handler": "_handle_official_company_research"})
         return await _handle_official_company_research(content, db, user_id)
+
+    if _STOCK_EOD_RESEARCH_RE.search(content):
+        await _emit("intent_detected", {"intent": "stock_eod_research", "handler": "_handle_stock_eod_research"})
+        return await _handle_stock_eod_research(content, db, user_id)
 
     # C31.3 — Emit problem_analysis thinking event BEFORE intent classification
     # so the frontend can show the first step immediately while we compute.

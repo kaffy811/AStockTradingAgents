@@ -1321,3 +1321,24 @@ async def get_company_profile(
         })
     except Exception as exc:
         return _json({"ok": False, "error_code": "COMPANY_PROFILE_ERROR", "message": str(exc)[:500]}, 200)
+
+
+@router.get("/{market}/{symbol}/eod")
+async def get_company_eod(
+    market: str = Path(...),
+    symbol: str = Path(...),
+) -> JSONResponse:
+    """Public, display-safe Tushare EOD modules; never a real-time quote."""
+    from app.services.tushare_eod_gateway import tushare_eod_gateway
+
+    try:
+        data = await tushare_eod_gateway.get_company_snapshot(market, symbol)
+    except Exception:
+        data = {
+            "ok": False, "market": market.upper(), "symbol": symbol,
+            "fulfillment": "failed", "reason_code": "EOD_GATEWAY_INTERNAL_ERROR",
+            "source": "tushare", "as_of": None, "freshness": "unavailable",
+            "modules": {}, "field_availability": {}, "warnings": [],
+            "fallback_providers_used": [],
+        }
+    return _json(data)
