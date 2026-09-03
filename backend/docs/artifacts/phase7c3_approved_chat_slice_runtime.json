@@ -1,0 +1,121 @@
+{
+  "phase": "7C3",
+  "generated_at": "2026-09-02T16:52:00-04:00",
+  "status": "passed",
+  "isolation": {
+    "worktree": "/private/tmp/TradingAgents-phase7c3",
+    "branch": "phase7c3-approved-chat-candidate",
+    "main_worktree_dirty_files_used": false,
+    "bind_mount_used": false
+  },
+  "git": {
+    "release_baseline_sha": "e8985471d62ce74e5cd99b61b9eadf27a13878ce",
+    "source_commits": [
+      "17431aa081a823afc044c9ec145054b76fa24114",
+      "386e27fb35e1ea8ffb7b08a572c768b2ba9b6593"
+    ],
+    "replayed_commits": [
+      "6f81665",
+      "a55ba6f"
+    ],
+    "code_candidate_sha": "a55ba6f768de9515f972db6c561966a1b7d3792a",
+    "merge_base_source_commits": "17431aa081a823afc044c9ec145054b76fa24114",
+    "merge_base_with_baseline": "e8985471d62ce74e5cd99b61b9eadf27a13878ce",
+    "cherry_pick_conflicts": 0
+  },
+  "image": {
+    "name": "tradingagents-phase7c3:a55ba6f",
+    "digest": "sha256:41b41e7feb7e05d78a8678e2f47acdaca1674de917c8046bd33eeba89a7e11be",
+    "oci_revision": "a55ba6f2efab8840d77d69886c72d423b31e96f0",
+    "mounts": [],
+    "container_started": false,
+    "inspection_container_removed": true
+  },
+  "source_hashes_sha256": {
+    "backend/app/agents/chat_orchestrator.py": "0432bca9ec5523e47036908d3512f652d82c60e08effe0b70dd9ff7a3d173534",
+    "backend/app/services/official_company_event_service.py": "864b6ee5d0c81a2ebc1998a4f792f4f8475fd8438819f5d5e65bf4eb58fe6ddc",
+    "frontend/src/utils/researchFulfillment.js": "775901e74e429f4b3d38b0d604279549df91e3eeaf08251ddd49638eed398055",
+    "frontend/src/components/chat/ChatResearchStatusCard.vue": "beb7d347355190178f996d6ed3b362c876174a6e06ae8371bfb064b17c64132f",
+    "frontend/src/views/ChatCopilotView.vue": "22a909dfc8d7bb326209e374e6d07d4d0597331f0d38d783e1129e934689f140"
+  },
+  "tests": {
+    "phase7c1_cninfo": {"passed": 17, "failed": 0},
+    "report_rag_citation_numeric": {"passed": 50, "failed": 0},
+    "chat_report_routing": {"passed": 46, "failed": 0},
+    "backend_related_total": {"passed": 113, "failed": 0},
+    "frontend": {"files_passed": 67, "tests_passed": 756, "failed": 0},
+    "frontend_build": {"passed": true, "modules_transformed": 971},
+    "live_provider_calls": 0
+  },
+  "queries": [
+    {
+      "id": "Q1",
+      "query": "贵州茅台最近有什么官方公告？",
+      "route": "official_company_events",
+      "fulfillment": "fulfilled",
+      "reason_code": null,
+      "event_count": 4,
+      "source": "CNINFO",
+      "source_url_present": true,
+      "published_at_present": true,
+      "event_type_present": true,
+      "as_of": "2026-07-21T13:52:18.781873+00:00"
+    },
+    {
+      "id": "Q2",
+      "query": "贵州茅台最近一期财报披露了什么重点？",
+      "route": "official_report_analysis",
+      "fulfillment": "partial",
+      "reason_code": "REPORT_RAG_EVIDENCE_NOT_RENDERED",
+      "event_count": 4,
+      "source": "CNINFO",
+      "source_url_present": true,
+      "published_at_present": true,
+      "event_type_present": true,
+      "as_of": "2026-07-21T13:52:18.781873+00:00"
+    },
+    {
+      "id": "Q3",
+      "query": "贵州茅台近期是否有分红、回购、股东变动或风险公告？",
+      "route": "official_company_events",
+      "fulfillment": "unavailable",
+      "reason_code": "NO_MATCHING_PERSISTED_CNINFO_EVENTS",
+      "event_count": 0,
+      "unrelated_report_substitution_count": 0
+    },
+    {
+      "id": "Q4",
+      "query": "新能源汽车行业最近有什么重要新闻？",
+      "route": "industry_news",
+      "fulfillment": "unavailable",
+      "reason_code": "NO_APPROVED_INDUSTRY_NEWS_SOURCE",
+      "tool_call_count": 0,
+      "provider_call_count": 0,
+      "frontend_title": "当前缺少所需数据",
+      "frontend_completed": false,
+      "frontend_retryable": false
+    }
+  ],
+  "public_output_checks": {
+    "stock_code_clarification_for_q4": false,
+    "completion_check_for_q4": false,
+    "token_exposed": false,
+    "cookie_exposed": false,
+    "database_connection_string_exposed": false,
+    "internal_table_name_exposed": false,
+    "raw_chunk_id_exposed": false,
+    "debug_field_exposed": false,
+    "unapproved_provider_fact_exposed": false
+  },
+  "forbidden_increment_checks": {
+    "tushare_gateway": false,
+    "tushare_config_or_token": false,
+    "akshare_eastmoney_sina_tencent_provider": false,
+    "unapproved_news_retrieval": false,
+    "docker_change": false,
+    "dependency_or_lockfile_change": false,
+    "migration": false,
+    "company_v2": false,
+    "historical_dirty_change": false
+  }
+}
