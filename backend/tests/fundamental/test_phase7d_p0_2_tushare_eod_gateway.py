@@ -141,13 +141,23 @@ async def test_public_company_eod_route_has_no_auth_or_raw_payload(monkeypatch):
     from app.services import tushare_eod_gateway as module
 
     payload = await TushareEodGateway(FakeClient()).get_company_snapshot("CN", "000725", use_cache=False)
+    payload["provider_debug"] = "must-not-be-public"
+    payload["modules"]["quote"]["provider_message"] = "private provider body"
+    payload["modules"]["quote"]["fields"]["raw_code"] = {
+        "value": "private", "source": "tushare", "as_of": "2026-08-31",
+    }
     monkeypatch.setattr(module.tushare_eod_gateway, "get_company_snapshot", AsyncMock(return_value=payload))
     response = await route.get_company_eod("CN", "000725")
     body = json.loads(response.body)
     assert response.status_code == 200
     assert body["modules"]["quote"]["status"] == "fulfilled"
     serialized = response.body.decode().lower()
-    for forbidden in ("auth_required", "eastmoney", "akshare", "raw_payload", "trace_id", "token"):
+    for module in body["modules"].values():
+        assert "endpoint" not in module
+    for forbidden in (
+        "auth_required", "eastmoney", "akshare", "raw_payload", "trace_id", "token",
+        "provider_debug", "provider_message", "private provider body", "raw_code",
+    ):
         assert forbidden not in serialized
 
 
