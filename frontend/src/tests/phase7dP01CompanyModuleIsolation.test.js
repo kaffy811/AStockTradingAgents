@@ -29,4 +29,33 @@ describe('Phase 7D-P0.1 company page module isolation', () => {
     expect(detail.default).toContain(':error="newsError"')
     expect(detail.default).toContain('Promise.allSettled')
   })
+
+  it('renders allowlisted history fields and keeps module unavailable states independent', async () => {
+    const publicHistory = {
+      ok: true,
+      modules: {
+        profitability: {
+          history: [{ period: '2025-12-31', roe: 0.12, gross_margin: null }],
+          latest: { period: '2025-12-31', roe: 0.12, gross_margin: null },
+          field_availability: { period: true, roe: true },
+          data_success: true,
+        },
+        cashflow_quality: {
+          history: [],
+          latest: {},
+          field_availability: {},
+          data_success: false,
+          reason_code: 'DATA_NOT_AVAILABLE',
+        },
+      },
+    }
+    expect(publicHistory.modules.profitability.latest.roe).toBe(0.12)
+    expect(publicHistory.modules.cashflow_quality.data_success).toBe(false)
+    expect(publicHistory.modules.cashflow_quality.reason_code).toBe('DATA_NOT_AVAILABLE')
+
+    const section = await import('../components/company-v2/CompanyV2Section.vue?raw')
+    expect(section.default).toContain('props.historyData?.latest')
+    expect(section.default).toContain('props.historyData?.data_success')
+    expect(section.default).toContain("return { text: '暂无数据', class: 'warn' }")
+  })
 })

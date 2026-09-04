@@ -1,0 +1,98 @@
+{
+  "phase": "7D-P0.4",
+  "baseline": "d5cab4aae988847fedb43483762f056b30e9416f",
+  "status": "CANDIDATE_READY",
+  "live_provider_calls": 0,
+  "history": {
+    "policy": "module_specific_positive_allowlist",
+    "unknown_fields": "deny",
+    "unknown_modules": "deny",
+    "nested_values": "deny_unless_explicit_dto",
+    "modules": {
+      "profitability": ["period", "roe", "gross_margin", "net_margin", "net_profit"],
+      "growth": ["period", "main_business_revenue", "net_profit", "net_profit_yoy", "parent_net_profit_yoy", "equity_yoy", "asset_yoy", "eps_yoy"],
+      "cashflow_quality": ["period", "ocf_to_np", "ocf_to_revenue"],
+      "solvency": ["period", "current_ratio", "quick_ratio", "cash_ratio", "debt_ratio", "equity_multiplier"],
+      "operation_capability": ["period", "asset_turnover", "inventory_turnover", "receivable_turnover"],
+      "dupont": ["period", "roe", "net_margin", "asset_turnover", "equity_multiplier", "dupont_formula_status"]
+    }
+  },
+  "warnings": {
+    "message_source": "local_fixed_mapping_only",
+    "allowed_codes": [
+      "CFO_TO_NP_DENOMINATOR_SENSITIVE",
+      "DUPONT_FORMULA_MISMATCH",
+      "FIELD_CONFLICT",
+      "OUTLIER_REQUIRES_REVIEW"
+    ],
+    "allowed_outlier_status": ["normal", "extreme"],
+    "field_must_be_public": true,
+    "upstream_message_copied": false
+  },
+  "negative_tests": [
+    {"input": "api_key", "expected": "denied", "result": "passed"},
+    {"input": "token", "expected": "denied", "result": "passed"},
+    {"input": "secret", "expected": "denied", "result": "passed"},
+    {"input": "password", "expected": "denied", "result": "passed"},
+    {"input": "debug_detail", "expected": "denied", "result": "passed"},
+    {"input": "trace", "expected": "denied", "result": "passed"},
+    {"input": "raw_payload", "expected": "denied", "result": "passed"},
+    {"input": "unknown_string", "expected": "denied", "result": "passed"},
+    {"input": "unknown_number", "expected": "denied", "result": "passed"},
+    {"input": "unknown_boolean", "expected": "denied", "result": "passed"},
+    {"input": "unknown_none", "expected": "denied", "result": "passed"},
+    {"input": "unknown_dict", "expected": "denied", "result": "passed"},
+    {"input": "unknown_list", "expected": "denied", "result": "passed"},
+    {"input": "warning_provider_url_exception_path_body", "expected": "replaced_by_local_message", "result": "passed"},
+    {"input": "eod_endpoint", "expected": "denied", "result": "passed"},
+    {"input": "eod_provider_debug_message_and_raw_fact", "expected": "denied", "result": "passed"},
+    {"input": "profile_exception_text", "expected": "denied", "result": "passed"}
+  ],
+  "public_eod": {
+    "endpoint_exposed": false,
+    "raw_provider_code_or_message_exposed": false,
+    "request_metadata_exposed": false,
+    "unknown_fields_exposed": false,
+    "gateway_data_logic_changed": false
+  },
+  "public_profile": {
+    "success_contract_changed": false,
+    "error_code": "PUBLIC_PROFILE_UNAVAILABLE",
+    "exception_text_exposed": false
+  },
+  "verification": {
+    "direct_backend_security_tests": {"passed": 33, "failed": 0},
+    "expanded_backend_related_tests": {"passed": 97, "failed": 0},
+    "frontend_full_release_gate": {
+      "files": 69,
+      "passed": 764,
+      "failed": 0,
+      "worker_startup_timeouts": 0,
+      "duration_seconds": 20.67
+    },
+    "frontend_production_build": {"passed": true, "modules_transformed": 971, "duration_seconds": 2.72},
+    "python_compile": "passed",
+    "json_validation": "passed",
+    "secret_scan_matches": 0,
+    "git_diff_check": "passed"
+  },
+  "provider_calls": {
+    "tushare_eod": 0,
+    "tushare_news": 0,
+    "akshare": 0,
+    "eastmoney": 0,
+    "sina": 0,
+    "tencent": 0
+  },
+  "prohibited_changes": {
+    "docker": false,
+    "dependencies_or_lockfiles": false,
+    "migration": false,
+    "token_or_env": false,
+    "global_auth": false,
+    "tushare_data_logic": false,
+    "market_calculation": false,
+    "news": false,
+    "rag": false
+  }
+}

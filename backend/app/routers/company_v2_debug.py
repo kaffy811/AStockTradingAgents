@@ -56,39 +56,114 @@ def _json(data: Any, status_code: int = 200) -> JSONResponse:
     return JSONResponse(content=data, status_code=status_code)
 
 
-_PUBLIC_WARNING_KEYS = frozenset({"code", "message", "field", "outlier_status"})
-_PUBLIC_COVERAGE_KEYS = frozenset({
-    "periods_count", "first_period", "last_period", "coverage_pct",
-    "expected_periods", "actual_periods", "missing_periods", "status",
+_PUBLIC_PERIOD_TYPES = frozenset({"annual", "quarterly", "point_in_time", "unknown"})
+_PUBLIC_HISTORY_SOURCES = frozenset({"baostock", "tushare", "cninfo"})
+_PUBLIC_TRUNCATION_REASONS = frozenset({
+    "", "PROVIDER_EMPTY", "LIST_DATE_UNKNOWN", "PROVIDER_HISTORY_LIMIT",
 })
-_PRIVATE_FINANCIAL_KEY_PARTS = (
-    "token", "secret", "password", "cookie", "authorization", "trace",
-    "raw_", "payload", "request_id", "chunk_id", "database", "local_path",
-)
+_PUBLIC_HISTORY_FIELDS_BY_MODULE = {
+    "profitability": frozenset({"period", "roe", "gross_margin", "net_margin", "net_profit"}),
+    "growth": frozenset({
+        "period", "main_business_revenue", "net_profit", "net_profit_yoy",
+        "parent_net_profit_yoy", "equity_yoy", "asset_yoy", "eps_yoy",
+    }),
+    "cashflow_quality": frozenset({"period", "ocf_to_np", "ocf_to_revenue"}),
+    "solvency": frozenset({
+        "period", "current_ratio", "quick_ratio", "cash_ratio", "debt_ratio",
+        "equity_multiplier",
+    }),
+    "operation_capability": frozenset({
+        "period", "asset_turnover", "inventory_turnover", "receivable_turnover",
+    }),
+    "dupont": frozenset({
+        "period", "roe", "net_margin", "asset_turnover", "equity_multiplier",
+        "dupont_formula_status",
+    }),
+}
+_PUBLIC_WARNING_MESSAGES = {
+    "CFO_TO_NP_DENOMINATOR_SENSITIVE": "经营现金流与净利润比值可能受低基数或符号变化影响。",
+    "DUPONT_FORMULA_MISMATCH": "指标口径或期间不一致，暂不进行杜邦拆解。",
+    "FIELD_CONFLICT": "不同公开来源的指标口径存在差异。",
+    "OUTLIER_REQUIRES_REVIEW": "部分历史指标超出常见范围，需核对披露口径。",
+}
+_PUBLIC_OUTLIER_STATUSES = frozenset({"normal", "extreme"})
+_PUBLIC_MODULE_STATUSES = {
+    "completeness": frozenset({"complete", "partial", "unavailable", "not_applicable"}),
+    "semantic": frozenset({"normal", "warning", "conflict"}),
+    "outlier": _PUBLIC_OUTLIER_STATUSES,
+    "formula": frozenset({"match", "mismatch", "not_checked", "not_applicable"}),
+}
+_PUBLIC_HISTORY_REASON_CODES = frozenset({
+    "DATA_NOT_AVAILABLE", "PROVIDER_EMPTY", "PROVIDER_TIMEOUT",
+    "PROVIDER_PERMISSION_DENIED", "PROVIDER_SCHEMA_ERROR",
+})
+
+_PUBLIC_EOD_FIELDS_BY_MODULE = {
+    "profile": frozenset({"name", "fullname", "exchange", "industry", "list_date", "list_status"}),
+    "quote": frozenset({"open", "high", "low", "close", "pre_close", "change", "pct_chg", "vol", "amount"}),
+    "valuation": frozenset({
+        "close", "pe", "pe_ttm", "pb", "ps", "ps_ttm", "dv_ratio", "dv_ttm",
+        "turnover_rate", "turnover_rate_f", "volume_ratio", "total_mv", "circ_mv",
+    }),
+    "financial": frozenset({
+        "eps", "bps", "roe", "roe_waa", "roa", "roic", "grossprofit_margin",
+        "netprofit_margin", "current_ratio", "quick_ratio", "debt_to_assets",
+        "assets_turn", "inv_turn", "ar_turn", "netprofit_yoy", "tr_yoy", "or_yoy",
+    }),
+    "index_comparison": frozenset({"close", "change", "pct_chg"}),
+}
 
 
-def _public_financial_record(value: Any) -> dict[str, Any]:
-    """Keep public financial values while dropping provider/debug provenance."""
+def _public_warning(value: Any, allowed_fields: frozenset[str]) -> dict[str, Any] | None:
+    """Return only locally-authored public warning text and approved enum values."""
+    if not isinstance(value, dict):
+        return None
+    code = str(value.get("code") or "")
+    message = _PUBLIC_WARNING_MESSAGES.get(code)
+    if message is None:
+        return None
+    result: dict[str, Any] = {"code": code, "message": message}
+    field = value.get("field")
+    if isinstance(field, str) and field in allowed_fields:
+        result["field"] = field
+    outlier_status = value.get("outlier_status")
+    if outlier_status in _PUBLIC_OUTLIER_STATUSES:
+        result["outlier_status"] = outlier_status
+    return result
+
+
+def _public_financial_record(value: Any, module_key: str) -> dict[str, Any]:
+    """Project one history row through a module-specific positive allowlist."""
     if not isinstance(value, dict):
         return {}
-    result: dict[str, Any] = {}
-    for key, item in value.items():
-        normalized_key = str(key).lower()
-        if any(part in normalized_key for part in _PRIVATE_FINANCIAL_KEY_PARTS):
-            continue
-        if normalized_key.startswith("raw") or normalized_key.endswith("_id"):
-            continue
-        if normalized_key in {"id", "provider", "endpoint", "ts_code", "internal_id"}:
-            continue
-        if key == "warnings":
-            result[key] = [
-                {k: warning.get(k) for k in _PUBLIC_WARNING_KEYS if warning.get(k) is not None}
-                for warning in (item or [])
-                if isinstance(warning, dict)
-            ]
-        elif item is None or isinstance(item, (str, int, float, bool)):
-            result[key] = item
+    allowed_fields = _PUBLIC_HISTORY_FIELDS_BY_MODULE.get(module_key, frozenset())
+    result = {
+        key: value[key]
+        for key in allowed_fields
+        if key in value and (value[key] is None or isinstance(value[key], (str, int, float, bool)))
+    }
+    warnings = [
+        warning
+        for item in (value.get("warnings") or [])
+        if (warning := _public_warning(item, allowed_fields)) is not None
+    ] if isinstance(value.get("warnings"), list) else []
+    if warnings:
+        result["warnings"] = warnings
     return result
+
+
+def _public_status(value: Any, kind: str) -> str | None:
+    return value if value in _PUBLIC_MODULE_STATUSES[kind] else None
+
+
+def _public_module_message(module: dict[str, Any]) -> str:
+    if _public_status(module.get("formula_status"), "formula") == "mismatch":
+        return _PUBLIC_WARNING_MESSAGES["DUPONT_FORMULA_MISMATCH"]
+    if _public_status(module.get("semantic_status"), "semantic") == "conflict":
+        return _PUBLIC_WARNING_MESSAGES["FIELD_CONFLICT"]
+    if _public_status(module.get("outlier_status"), "outlier") == "extreme":
+        return _PUBLIC_WARNING_MESSAGES["OUTLIER_REQUIRES_REVIEW"]
+    return ""
 
 
 def _public_history_payload(data: dict[str, Any], market: str, symbol: str) -> dict[str, Any]:
@@ -97,53 +172,56 @@ def _public_history_payload(data: dict[str, Any], market: str, symbol: str) -> d
     all_fields: dict[str, bool] = {}
     top_warnings: list[dict[str, Any]] = []
     for module_key, module in (data.get("modules") or {}).items():
-        if not isinstance(module, dict):
+        if not isinstance(module, dict) or module_key not in _PUBLIC_HISTORY_FIELDS_BY_MODULE:
             continue
-        history = [_public_financial_record(row) for row in (module.get("history") or []) if isinstance(row, dict)]
-        latest = _public_financial_record(module.get("latest") or {})
+        history = [_public_financial_record(row, module_key) for row in (module.get("history") or []) if isinstance(row, dict)]
+        latest = _public_financial_record(module.get("latest") or {}, module_key)
         fields = sorted({key for row in [*history, latest] for key, value in row.items() if key != "warnings" and value not in (None, "")})
         availability = {field: any(row.get(field) not in (None, "") for row in [*history, latest]) for field in fields}
         all_fields.update(availability)
         warnings = [warning for row in [*history, latest] for warning in (row.get("warnings") or [])]
         top_warnings.extend(warnings)
-        coverage = {
-            key: value for key, value in (module.get("history_coverage") or {}).items()
-            if key in _PUBLIC_COVERAGE_KEYS
-        }
-        source = module.get("provider") or "public_company_financials"
+        periods_count = (module.get("history_coverage") or {}).get("periods_count")
+        coverage = {"periods_count": periods_count if isinstance(periods_count, int) else len(history)}
+        source = module.get("provider")
+        if source not in _PUBLIC_HISTORY_SOURCES:
+            source = "public_company_financials"
+        reason_code = module.get("reason_code")
+        if reason_code not in _PUBLIC_HISTORY_REASON_CODES:
+            reason_code = None
         public_modules[module_key] = {
             "history": history,
             "latest": latest,
-            "period_type": module.get("period_type"),
+            "period_type": module.get("period_type") if module.get("period_type") in _PUBLIC_PERIOD_TYPES else "unknown",
             "module_status": {
                 "data_success": bool(module.get("data_success")),
-                "completeness": module.get("completeness_status"),
-                "semantic": module.get("semantic_status"),
-                "outlier": module.get("outlier_status"),
-                "formula": module.get("formula_status"),
+                "completeness": _public_status(module.get("completeness_status"), "completeness"),
+                "semantic": _public_status(module.get("semantic_status"), "semantic"),
+                "outlier": _public_status(module.get("outlier_status"), "outlier"),
+                "formula": _public_status(module.get("formula_status"), "formula"),
             },
             "source": source,
             "as_of": latest.get("period") or latest.get("period_end") or data.get("generated_at"),
             "coverage": coverage,
             "field_availability": availability,
             "warnings": warnings,
-            "reason_code": module.get("reason_code"),
+            "reason_code": reason_code,
             "data_success": bool(module.get("data_success")),
             "history_coverage": coverage,
-            "completeness_status": module.get("completeness_status"),
-            "semantic_status": module.get("semantic_status"),
-            "outlier_status": module.get("outlier_status"),
-            "formula_status": module.get("formula_status"),
-            "user_message": module.get("user_message") or "",
+            "completeness_status": _public_status(module.get("completeness_status"), "completeness"),
+            "semantic_status": _public_status(module.get("semantic_status"), "semantic"),
+            "outlier_status": _public_status(module.get("outlier_status"), "outlier"),
+            "formula_status": _public_status(module.get("formula_status"), "formula"),
+            "user_message": _public_module_message(module),
         }
     success_count = sum(1 for module in public_modules.values() if module["module_status"]["data_success"])
     return {
         "ok": success_count > 0,
         "market": market.upper(),
         "symbol": symbol,
-        "period": data.get("period"),
-        "start_year": data.get("start_year"),
-        "end_year": data.get("end_year"),
+        "period": data.get("period") if data.get("period") in {"annual", "quarterly", "all"} else None,
+        "start_year": data.get("start_year") if isinstance(data.get("start_year"), int) else None,
+        "end_year": data.get("end_year") if isinstance(data.get("end_year"), int) else None,
         "modules": public_modules,
         "module_status": {"available": success_count, "total": len(public_modules)},
         "source": sorted({module["source"] for module in public_modules.values()}),
@@ -159,7 +237,69 @@ def _public_history_payload(data: dict[str, Any], market: str, symbol: str) -> d
         "reason_code": None if success_count else "DATA_NOT_AVAILABLE",
         "history_range_label": data.get("history_range_label") or "",
         "history_truncated": bool(data.get("history_truncated")),
-        "truncation_reason": data.get("truncation_reason"),
+        "truncation_reason": data.get("truncation_reason") if data.get("truncation_reason") in _PUBLIC_TRUNCATION_REASONS else None,
+    }
+
+
+def _public_eod_fact(value: Any) -> dict[str, Any] | None:
+    if not isinstance(value, dict) or not isinstance(value.get("value"), (str, int, float, bool)):
+        return None
+    return {
+        "value": value["value"],
+        "unit": value.get("unit") if isinstance(value.get("unit"), str) or value.get("unit") is None else None,
+        "as_of": value.get("as_of") if isinstance(value.get("as_of"), str) or value.get("as_of") is None else None,
+        "source": "tushare",
+        "source_status": "verified",
+        "freshness": value.get("freshness") if isinstance(value.get("freshness"), str) else "unavailable",
+        "field_availability": "available",
+        "reason_code": None,
+    }
+
+
+def _public_eod_payload(value: Any, market: str, symbol: str) -> dict[str, Any]:
+    """Project the gateway result into the anonymous EOD response DTO."""
+    data = value if isinstance(value, dict) else {}
+    public_modules: dict[str, Any] = {}
+    for module_key, allowed_fields in _PUBLIC_EOD_FIELDS_BY_MODULE.items():
+        module = (data.get("modules") or {}).get(module_key)
+        if not isinstance(module, dict):
+            continue
+        facts = {
+            field: fact
+            for field in allowed_fields
+            if (fact := _public_eod_fact((module.get("fields") or {}).get(field))) is not None
+        }
+        status = module.get("status") if module.get("status") in {"fulfilled", "unavailable"} else "unavailable"
+        public_modules[module_key] = {
+            "status": status,
+            "source": "tushare",
+            "source_status": module.get("source_status") if module.get("source_status") in {
+                "verified", "credential", "permission", "network", "http", "schema", "empty_result",
+            } else "unavailable",
+            "as_of": module.get("as_of") if isinstance(module.get("as_of"), str) or module.get("as_of") is None else None,
+            "freshness": module.get("freshness") if isinstance(module.get("freshness"), str) else "unavailable",
+            "fields": facts,
+            "field_availability": {field: field in facts for field in allowed_fields},
+            "reason_code": module.get("reason_code") if module.get("reason_code") in {
+                None, "RATE_LIMITED", "PROVIDER_PERMISSION_DENIED", "PROVIDER_CREDENTIAL_ERROR",
+                "PROVIDER_NETWORK_ERROR", "PROVIDER_HTTP_ERROR", "PROVIDER_SCHEMA_ERROR", "DATA_NOT_AVAILABLE",
+            } else "DATA_NOT_AVAILABLE",
+            "warnings": [],
+        }
+    available = sum(module["status"] == "fulfilled" for module in public_modules.values())
+    fulfillment = "fulfilled" if public_modules and available == len(public_modules) else ("partial" if available else "unavailable")
+    return {
+        "ok": bool(available),
+        "market": market.upper(),
+        "symbol": symbol,
+        "fulfillment": fulfillment,
+        "reason_code": None if available else "DATA_NOT_AVAILABLE",
+        "source": "tushare",
+        "as_of": data.get("as_of") if isinstance(data.get("as_of"), str) or data.get("as_of") is None else None,
+        "freshness": "latest_available_eod_not_realtime",
+        "modules": public_modules,
+        "field_availability": {key: module["status"] == "fulfilled" for key, module in public_modules.items()},
+        "warnings": ["盘后数据可能延迟；本响应不包含实时或分钟行情。"],
     }
 
 
@@ -1232,7 +1372,7 @@ async def get_company_history(
             force_refresh=force_refresh and user is not None and _is_dev_or_admin(user),
         )
         return _json(_public_history_payload(data, market, symbol))
-    except Exception as exc:
+    except Exception:
         return _json({
             "ok": False,
             "market": market.upper(),
@@ -1319,8 +1459,12 @@ async def get_company_profile(
             **data,
             "as_of_date": data.get("updated_at"),
         })
-    except Exception as exc:
-        return _json({"ok": False, "error_code": "COMPANY_PROFILE_ERROR", "message": str(exc)[:500]}, 200)
+    except Exception:
+        return _json({
+            "ok": False,
+            "error_code": "PUBLIC_PROFILE_UNAVAILABLE",
+            "message": "公司资料暂不可用，请稍后重试。",
+        }, 200)
 
 
 @router.get("/{market}/{symbol}/eod")
@@ -1341,4 +1485,4 @@ async def get_company_eod(
             "modules": {}, "field_availability": {}, "warnings": [],
             "fallback_providers_used": [],
         }
-    return _json(data)
+    return _json(_public_eod_payload(data, market, symbol))
