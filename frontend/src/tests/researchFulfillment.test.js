@@ -66,10 +66,16 @@ describe('five acceptance response shapes', () => {
     const result = normalizeResearchMetadata({
       fulfillment: 'unavailable',
       reason_code: 'NO_APPROVED_INDUSTRY_NEWS_SOURCE',
+      scope: 'unapproved_industry_theme_research',
+      sources: [],
+      as_of: null,
+      limitations: ['当前没有已批准的行业、市场或主题新闻来源。'],
+      requires_symbol: false,
       provider: 'eastmoney',
       stack_trace: 'must-not-leak',
     })
     expect(result).toMatchObject({ status: 'unavailable', completed: false, retryable: false })
+    expect(result.title).toBe('当前缺少所需数据')
     expect(result.sources).toEqual([])
     expect(result.reason).toContain('行业新闻来源')
     expect(JSON.stringify(result)).not.toMatch(/eastmoney|stack_trace|must-not-leak/i)

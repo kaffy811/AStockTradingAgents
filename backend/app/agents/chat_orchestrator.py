@@ -115,6 +115,13 @@ _UNAPPROVED_NEWS_SCOPE_RE = re.compile(
     r"产业链|供应链|直接受益|受益.{0,8}(公司|股票)|带动.{0,10}(公司|股票)|"
     r"AI\s*热潮|新能源.{0,8}(重要新闻|行业新闻)"
 )
+_UNAPPROVED_THEME_SCOPE_RE = re.compile(
+    r"(?:行业|主题|概念|板块|产业链|供应链).{0,16}(?:问题|影响|新闻|资讯|消息|动态|"
+    r"公司|股票|上市公司|标的|机会|有哪些|是什么)|"
+    r"(?:哪些|什么|相关|受益|影响).{0,12}(?:行业|主题|概念|板块|产业链|供应链|上市公司)|"
+    r"(?:AI|人工智能|半导体设备|算力|机器人|新能源).{0,12}(?:主题|概念|产业链|受益公司|"
+    r"相关公司|上市公司|行业消息|行业新闻)"
+)
 _STOCK_EOD_RESEARCH_RE = re.compile(
     r"近期情况|最近情况|近期表现|最近表现|近期估值|最近估值|"
     r"财务指标|ROE|roe|盘后|收盘|交易日|估值与财务"
@@ -1056,6 +1063,11 @@ def _unavailable_official_news_result(*, reason_code: str, message: str, route: 
             "route": route,
             "fulfillment": "unavailable",
             "reason_code": reason_code,
+            "scope": "unapproved_industry_theme_research" if route == "industry_news" else route,
+            "sources": [],
+            "as_of": None,
+            "limitations": ["当前没有已批准的行业、市场或主题新闻来源。"],
+            "requires_symbol": False,
             "coverage": "approved_cninfo_only",
             "quality": "unavailable",
         },
@@ -1748,7 +1760,7 @@ async def process_message(
     # Phase 7C1 source-governance gate.  These checks run before memory,
     # entity resolution, skills, and tools so unapproved news requests cannot
     # fall through to AKShare/Eastmoney/Sina/Tencent-backed paths.
-    if _UNAPPROVED_NEWS_SCOPE_RE.search(content):
+    if _UNAPPROVED_NEWS_SCOPE_RE.search(content) or _UNAPPROVED_THEME_SCOPE_RE.search(content):
         await _emit("intent_detected", {
             "intent": "industry_news",
             "handler": "source_governance_unavailable",
