@@ -63,6 +63,11 @@ from app.services.security_entity_resolver import security_entity_resolver
 from app.services.official_report_entity_hints import unambiguous_official_report_entity_hint
 from app.services.official_company_event_service import official_company_event_service
 from app.services.tushare_eod_gateway import tushare_eod_gateway
+from app.services.stock_eod_numeric_validation import (
+    claim_from_evidence,
+    make_request_local_evidence,
+    validate_stock_eod_numeric_claims,
+)
 import app.agents.chat_memory as _mem
 
 _central_planner = _CentralPlanningAgent()
@@ -1183,14 +1188,25 @@ async def _handle_official_company_research(
     )
 
 
-def _format_grounded_fact(label: str, fact: dict, *, report_period: bool = False) -> str | None:
-    value = fact.get("value")
-    if value is None or value == "":
+def _format_grounded_fact(
+    label: str,
+    fact: dict,
+    *,
+    module: str,
+    metric: str,
+) -> tuple[str, dict, dict] | None:
+    evidence = make_request_local_evidence(module=module, metric=metric, fact=fact)
+    if evidence is None:
         return None
-    unit = fact.get("unit") or ""
-    as_of = fact.get("as_of") or "unavailable"
+    unit = evidence.get("unit") or ""
+    as_of = evidence["as_of"]
+    display_value = evidence["display_value"]
+    report_period = module == "financial"
     period_label = "报告期" if report_period else "数据日期"
-    return f"- **{label}：** {value}{unit}（{period_label}：{as_of}；来源：Tushare）"
+    line = f"- **{label}：** {display_value}{unit}（{period_label}：{as_of}；来源：Tushare）"
+    claim = claim_from_evidence(evidence)
+    claim["rendered_text"] = line
+    return line, evidence, claim
 
 
 async def _handle_stock_eod_research(
@@ -1234,9 +1250,23 @@ async def _handle_stock_eod_research(
         "grossprofit_margin": "毛利率", "netprofit_margin": "净利率",
         "debt_to_assets": "资产负债率", "netprofit_yoy": "净利润同比",
     }
-    quote_lines = [line for key, label in quote_labels.items() if (line := _format_grounded_fact(label, (quote.get("fields") or {}).get(key, {})))]
-    valuation_lines = [line for key, label in valuation_labels.items() if (line := _format_grounded_fact(label, (valuation.get("fields") or {}).get(key, {})))]
-    financial_lines = [line for key, label in financial_labels.items() if (line := _format_grounded_fact(label, (financial.get("fields") or {}).get(key, {}), report_period=True))]
+    rendered = []
+    for module_key, module_data, labels in (
+        ("quote", quote, quote_labels),
+        ("valuation", valuation, valuation_labels),
+        ("financial", financial, financial_labels),
+    ):
+        for key, label in labels.items():
+            item = _format_grounded_fact(
+                label, (module_data.get("fields") or {}).get(key, {}), module=module_key, metric=key
+            )
+            if item is not None:
+                rendered.append((module_key, *item))
+    quote_lines = [line for module_key, line, _, _ in rendered if module_key == "quote"]
+    valuation_lines = [line for module_key, line, _, _ in rendered if module_key == "valuation"]
+    financial_lines = [line for module_key, line, _, _ in rendered if module_key == "financial"]
+    evidence_basis = [evidence for _, _, evidence, _ in rendered]
+    checked_claims = [claim for _, _, _, claim in rendered]
 
     official = await official_company_event_service.list_persisted_events(
         db, market=market, symbol=symbol, company_name=company_name, limit=5
@@ -1265,6 +1295,23 @@ async def _handle_stock_eod_research(
           f"CNINFO 快照截至 {official.get('as_of') or 'unavailable'}。"
         + _DISCLAIMER
     )
+    numeric_validation = validate_stock_eod_numeric_claims(
+        answer,
+        evidence_basis,
+        checked_claims,
+        symbol=symbol,
+        allowed_metadata_dates=[
+            value for value in (snapshot.get("as_of"), official.get("as_of")) if isinstance(value, str)
+        ],
+    )
+    if not numeric_validation["valid"]:
+        fulfillment = "partial"
+        reason_code = "NUMERIC_EVIDENCE_VALIDATION_FAILED"
+        answer = (
+            f"## 结论摘要\n\n{company_name}（{symbol}）的部分结构化数据未通过本次请求的数值证据校验，"
+            "未经验证的数字未展示。\n\n## 数据范围与限制\n\n当前仅保留安全降级结果，请稍后重试。"
+            + _DISCLAIMER
+        )
     return OrchestratorResult(
         answer=answer,
         tool_events=[{
@@ -1276,6 +1323,7 @@ async def _handle_stock_eod_research(
             "market": market, "symbol": symbol, "company_name": company_name,
             "as_of": snapshot.get("as_of"), "source": ["tushare", "CNINFO"],
             "eod": snapshot, "official_events": official.get("events") or [],
+            "numeric_validation": numeric_validation,
         },
     )
 
