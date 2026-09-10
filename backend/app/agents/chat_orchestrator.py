@@ -1280,31 +1280,22 @@ async def _handle_stock_eod_research(
     evidence_basis = [evidence for _, _, evidence, _ in rendered]
     checked_claims = [claim for _, _, _, claim in rendered]
 
-    official = await official_company_event_service.list_persisted_events(
-        db, market=market, symbol=symbol, company_name=company_name, limit=5
-    )
-    event_lines = [
-        f"- {event['published_at']}：《{event['title']}》（[CNINFO 官方来源]({event['source_url']}））"
-        for event in (official.get("events") or [])
-    ]
     eod_fact_lines = quote_lines + valuation_lines + financial_lines
-    factual_sections = eod_fact_lines + event_lines
-    fulfillment = snapshot.get("fulfillment") if eod_fact_lines else ("partial" if event_lines else "unavailable")
+    fulfillment = snapshot.get("fulfillment") if eod_fact_lines else "unavailable"
     reason_code = snapshot.get("reason_code") if fulfillment == "unavailable" else (
         "PARTIAL_EOD_COVERAGE" if fulfillment == "partial" else None
     )
     answer = (
         "## 结论摘要\n\n"
         + (f"{company_name}（{symbol}）已取得可追溯的最近交易日或财务披露数据；当前状态为 `{fulfillment}`。"
-           if factual_sections else f"{company_name}（{symbol}）当前没有已验证的盘后或财务事实。")
+           if eod_fact_lines else f"{company_name}（{symbol}）当前没有已验证的盘后或财务事实。")
         + "\n\n## 最近交易日表现\n\n" + ("\n".join(quote_lines) or "暂缺已验证的最近交易日行情。")
         + "\n\n## 估值与交易活跃度（仅可用字段）\n\n" + ("\n".join(valuation_lines) or "暂缺已验证的估值与交易活跃度数据。")
         + "\n\n## 最近已披露财务指标\n\n" + ("\n".join(financial_lines) or "暂缺已验证的财务指标。")
-        + "\n\n## 近期官方公告/报告事实\n\n" + ("\n".join(event_lines) or "已持久化 CNINFO 数据中暂无可展示事件。")
         + "\n\n## 数据范围与限制\n\n数据为最近可取得的盘后 EOD 或已披露报告期数据，不是实时行情；"
-          "未调用 Tushare news、公开网页新闻源或模型记忆补充数字。"
+          "本路由不混入公告标题、Report RAG、Tushare news、公开网页新闻源或模型记忆补充数字。"
         + f"\n\n## 来源与 as_of\n\nTushare EOD 数据截至 {snapshot.get('as_of') or 'unavailable'}；"
-          f"CNINFO 快照截至 {official.get('as_of') or 'unavailable'}。"
+          "财务指标的报告期随各项证据单独列示。"
         + _DISCLAIMER
     )
     numeric_validation = validate_stock_eod_numeric_claims(
@@ -1312,9 +1303,7 @@ async def _handle_stock_eod_research(
         evidence_basis,
         checked_claims,
         symbol=symbol,
-        allowed_metadata_dates=[
-            value for value in (snapshot.get("as_of"), official.get("as_of")) if isinstance(value, str)
-        ],
+        allowed_metadata_dates=[snapshot["as_of"]] if isinstance(snapshot.get("as_of"), str) else [],
     )
     if not numeric_validation["valid"]:
         fulfillment = "partial"
@@ -1328,13 +1317,13 @@ async def _handle_stock_eod_research(
         answer=answer,
         tool_events=[{
             "name": "stock_eod_research", "status": fulfillment, "event_type": "tool_completed",
-            "permission_level": "read_only", "ok": fulfillment in {"fulfilled", "partial"}, "source": "tushare+CNINFO",
+            "permission_level": "read_only", "ok": fulfillment in {"fulfilled", "partial"}, "source": "tushare",
         }],
         metadata={
             "route": "stock_eod_research", "fulfillment": fulfillment, "reason_code": reason_code,
             "market": market, "symbol": symbol, "company_name": company_name,
-            "as_of": snapshot.get("as_of"), "source": ["tushare", "CNINFO"],
-            "eod": snapshot, "official_events": official.get("events") or [],
+            "as_of": snapshot.get("as_of"), "source": ["tushare"],
+            "eod": snapshot,
             "numeric_validation": numeric_validation,
         },
     )

@@ -1,0 +1,110 @@
+{
+  "phase": "Phase 7E-P0.1",
+  "baseline": "98c111b684cb19de0e0e92cb46e1d675ef3e8d0a",
+  "probe": {
+    "mode": "single_live_tushare_probe_then_same-response-controlled-replay",
+    "retry_count": 0,
+    "token_or_headers_recorded": false,
+    "raw_provider_body_recorded": false,
+    "provider_calls": {
+      "stock_basic": 1,
+      "daily": 1,
+      "daily_basic": 1,
+      "fina_indicator": 1,
+      "tushare_news": 0,
+      "akshare": 0,
+      "eastmoney": 0,
+      "sina": 0,
+      "tencent": 0,
+      "llm": 0
+    },
+    "security": {
+      "market": "CN",
+      "symbol": "600519",
+      "provider_symbol": "600519.SH"
+    },
+    "snapshot": {
+      "fulfillment": "fulfilled",
+      "reason_code": null,
+      "source": "tushare",
+      "as_of": "2026-09-09",
+      "freshness": "latest_available_eod_not_realtime",
+      "quote": {
+        "as_of": "2026-09-09",
+        "close": {"value": 1290.88, "unit": "CNY"},
+        "change": {"value": -18.42, "unit": "CNY"},
+        "pct_chg": {"value": -1.4069, "unit": "%"}
+      },
+      "valuation": {
+        "as_of": "2026-09-09",
+        "pe_ttm": {"value": 19.8161, "unit": "multiple"},
+        "pb": {"value": 6.4226, "unit": "multiple"},
+        "ps_ttm": {"value": 9.4839, "unit": "multiple"}
+      },
+      "financial": {
+        "as_of": "2026-06-30",
+        "report_period": "2026-06-30",
+        "roe": {"value": 17.9543, "unit": "%"},
+        "roe_waa": {"value": 16.75, "unit": "%"},
+        "roa": {"value": 19.9688, "unit": "%"}
+      }
+    }
+  },
+  "pre_fix_trace": {
+    "intent": "stock_eod_research",
+    "resolved_symbol": "600519",
+    "provider_symbol": "600519.SH",
+    "eod_evidence_count": 18,
+    "checked_claim_count": 18,
+    "first_unsupported_token": "2026",
+    "unsupported_origin": "numeric year in a CNINFO event title appended to the EOD answer without a stock-EOD evidence ID",
+    "numeric_validation_valid": false,
+    "final_fulfillment": "partial",
+    "final_reason_code": "NUMERIC_EVIDENCE_VALIDATION_FAILED"
+  },
+  "post_fix_queries": [
+    {
+      "query": "贵州茅台近期情况",
+      "intent": "stock_eod_research",
+      "resolved_symbol": "600519",
+      "provider_symbol": "600519.SH",
+      "fulfillment": "fulfilled",
+      "reason_code": null,
+      "source": ["tushare"],
+      "as_of": "2026-09-09",
+      "numeric_validation": {
+        "valid": true,
+        "checked_claims": 18,
+        "evidence_basis": 18,
+        "unsupported_tokens": [],
+        "key_evidence": [
+          {"metric": "close", "canonical_value": "1290.88", "display_value": "1290.88", "unit": "CNY", "as_of": "2026-09-09", "report_period": null, "source": "tushare", "request_local_evidence_id": "stock-eod:quote:close"},
+          {"metric": "pe_ttm", "canonical_value": "19.8161", "display_value": "19.8161", "unit": "multiple", "as_of": "2026-09-09", "report_period": null, "source": "tushare", "request_local_evidence_id": "stock-eod:valuation:pe_ttm"},
+          {"metric": "pb", "canonical_value": "6.4226", "display_value": "6.4226", "unit": "multiple", "as_of": "2026-09-09", "report_period": null, "source": "tushare", "request_local_evidence_id": "stock-eod:valuation:pb"},
+          {"metric": "roe", "canonical_value": "17.9543", "display_value": "17.9543", "unit": "%", "as_of": "2026-06-30", "report_period": "2026-06-30", "source": "tushare", "request_local_evidence_id": "stock-eod:financial:roe"}
+        ]
+      },
+      "controlled_replay_calls": {"fixture_gateway": 1, "live_tushare": 0, "cninfo": 0, "llm": 0, "unapproved_providers": 0}
+    },
+    {
+      "query": "600519 财务指标、ROE、估值",
+      "intent": "stock_eod_research",
+      "resolved_symbol": "600519",
+      "provider_symbol": "600519.SH",
+      "fulfillment": "fulfilled",
+      "reason_code": null,
+      "source": ["tushare"],
+      "as_of": "2026-09-09",
+      "numeric_validation": {"valid": true, "checked_claims": 18, "evidence_basis": 18, "unsupported_tokens": []},
+      "controlled_replay_calls": {"fixture_gateway": 1, "live_tushare": 0, "cninfo": 0, "llm": 0, "unapproved_providers": 0}
+    },
+    {
+      "query": "AI 半导体设备主题问题",
+      "intent": "industry_news",
+      "fulfillment": "unavailable",
+      "reason_code": "NO_APPROVED_INDUSTRY_NEWS_SOURCE",
+      "scope": "unapproved_industry_theme_research",
+      "calls": {"resolver": 0, "tushare": 0, "tushare_news": 0, "cninfo": 0, "llm": 0, "akshare": 0, "eastmoney": 0, "sina": 0, "tencent": 0}
+    }
+  ]
+}

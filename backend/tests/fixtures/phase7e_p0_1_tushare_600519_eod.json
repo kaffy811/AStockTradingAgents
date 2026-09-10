@@ -1,0 +1,48 @@
+{
+  "market": "CN",
+  "symbol": "600519",
+  "ts_code": "600519.SH",
+  "fulfillment": "fulfilled",
+  "reason_code": null,
+  "source": "tushare",
+  "as_of": "2026-09-09",
+  "freshness": "latest_available_eod_not_realtime",
+  "modules": {
+    "quote": {
+      "status": "fulfilled",
+      "as_of": "2026-09-09",
+      "fields": {
+        "close": {"value": 1290.88, "unit": "CNY", "as_of": "2026-09-09", "source": "tushare"},
+        "change": {"value": -18.42, "unit": "CNY", "as_of": "2026-09-09", "source": "tushare"},
+        "pct_chg": {"value": -1.4069, "unit": "%", "as_of": "2026-09-09", "source": "tushare"},
+        "vol": {"value": 32226.11, "unit": "lot", "as_of": "2026-09-09", "source": "tushare"},
+        "amount": {"value": 4168500.462, "unit": "CNY_thousand", "as_of": "2026-09-09", "source": "tushare"}
+      }
+    },
+    "valuation": {
+      "status": "fulfilled",
+      "as_of": "2026-09-09",
+      "fields": {
+        "pe_ttm": {"value": 19.8161, "unit": "multiple", "as_of": "2026-09-09", "source": "tushare"},
+        "pb": {"value": 6.4226, "unit": "multiple", "as_of": "2026-09-09", "source": "tushare"},
+        "ps_ttm": {"value": 9.4839, "unit": "multiple", "as_of": "2026-09-09", "source": "tushare"},
+        "turnover_rate": {"value": 0.2578, "unit": "%", "as_of": "2026-09-09", "source": "tushare"},
+        "total_mv": {"value": 161370533.5808, "unit": "CNY_10k", "as_of": "2026-09-09", "source": "tushare"},
+        "circ_mv": {"value": 161370533.5808, "unit": "CNY_10k", "as_of": "2026-09-09", "source": "tushare"}
+      }
+    },
+    "financial": {
+      "status": "fulfilled",
+      "as_of": "2026-06-30",
+      "fields": {
+        "roe": {"value": 17.9543, "unit": "%", "as_of": "2026-06-30", "source": "tushare"},
+        "roe_waa": {"value": 16.75, "unit": "%", "as_of": "2026-06-30", "source": "tushare"},
+        "roa": {"value": 19.9688, "unit": "%", "as_of": "2026-06-30", "source": "tushare"},
+        "grossprofit_margin": {"value": 89.5552, "unit": "%", "as_of": "2026-06-30", "source": "tushare"},
+        "netprofit_margin": {"value": 50.7516, "unit": "%", "as_of": "2026-06-30", "source": "tushare"},
+        "debt_to_assets": {"value": 15.1931, "unit": "%", "as_of": "2026-06-30", "source": "tushare"},
+        "netprofit_yoy": {"value": -1.9516, "unit": "%", "as_of": "2026-06-30", "source": "tushare"}
+      }
+    }
+  }
+}

@@ -15,6 +15,26 @@ _NUMBER_RE = re.compile(r"[-+]?\d+(?:\.\d+)?%?")
 _MARKDOWN_URL_RE = re.compile(r"\]\([^)]*\)")
 _APPROVED_SOURCES = frozenset({"tushare", "CNINFO"})
 _FINANCIAL_MODULE = "financial"
+_EXPECTED_UNITS: dict[tuple[str, str], str] = {
+    ("quote", "close"): "CNY",
+    ("quote", "change"): "CNY",
+    ("quote", "pct_chg"): "%",
+    ("quote", "vol"): "lot",
+    ("quote", "amount"): "CNY_thousand",
+    ("valuation", "pe_ttm"): "multiple",
+    ("valuation", "pb"): "multiple",
+    ("valuation", "ps_ttm"): "multiple",
+    ("valuation", "turnover_rate"): "%",
+    ("valuation", "total_mv"): "CNY_10k",
+    ("valuation", "circ_mv"): "CNY_10k",
+    ("financial", "roe"): "%",
+    ("financial", "roe_waa"): "%",
+    ("financial", "roa"): "%",
+    ("financial", "grossprofit_margin"): "%",
+    ("financial", "netprofit_margin"): "%",
+    ("financial", "debt_to_assets"): "%",
+    ("financial", "netprofit_yoy"): "%",
+}
 _UNIT_CONVERSIONS: dict[tuple[str, str], Decimal] = {
     ("CNY", "CNY_100M"): Decimal("0.00000001"),
     ("CNY_10k", "CNY_100M"): Decimal("0.0001"),
@@ -53,6 +73,8 @@ def make_request_local_evidence(
     source = fact.get("source")
     as_of = fact.get("as_of")
     canonical_unit = fact.get("unit")
+    if _EXPECTED_UNITS.get((module, metric)) != canonical_unit:
+        return None
     if canonical is None or source not in _APPROVED_SOURCES or not isinstance(as_of, str) or not as_of:
         return None
     target_unit = display_unit or canonical_unit
