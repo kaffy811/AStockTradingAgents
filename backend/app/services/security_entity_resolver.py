@@ -672,8 +672,12 @@ class SecurityEntityResolver:
         candidates_by_key: dict[tuple[str, str, str], SecurityEntity] = {}
         candidate_rank: dict[tuple[str, str, str], int] = {}
         candidate_position: dict[tuple[str, str, str], int] = {}
-        code_tokens = set(_CN_CODE_RE.findall(text))
         ts_tokens = {(m.group(1), m.group(2).upper()) for m in _TS_CODE_RE.finditer(text)}
+        # A code that is part of an exchange-qualified token must be validated
+        # together with its suffix.  Otherwise an exchange-qualified token
+        # would also be accepted as its bare code and bypass mismatch checks.
+        qualified_codes = {code for code, _suffix in ts_tokens}
+        code_tokens = set(_CN_CODE_RE.findall(text)) - qualified_codes
         hk_tokens = {token for token in _HK_CODE_RE.findall(text) if token.isdigit()}
         us_tokens = {
             token for token in _US_TICKER_RE.findall(text.upper())

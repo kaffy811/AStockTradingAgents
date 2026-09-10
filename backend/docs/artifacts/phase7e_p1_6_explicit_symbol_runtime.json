@@ -1,0 +1,70 @@
+{
+  "phase": "7E-P1.6",
+  "baseline_commit": "184dcadb47b52245b2ffe3a4b56418f9a30fc8d6",
+  "candidate_commit": "containing_commit",
+  "environment": "isolated_worktree_controlled_fixtures",
+  "live_provider_probe": false,
+  "root_cause": "The EOD intent gate omitted company-profile and EOD terms, so the exact current-turn symbol request reached memory and general skill routing; qualified exchange tokens were also reconsidered as bare codes.",
+  "priority": [
+    "current_turn_explicit_security",
+    "validated_current_turn_company_name",
+    "validated_session_context_only_when_no_current_turn_identifier"
+  ],
+  "queries": [
+    {
+      "id": "Q1",
+      "query": "CN/000725 公司资料 + EOD",
+      "route": "stock_eod_research",
+      "fulfillment": "fulfilled",
+      "reason_code": null,
+      "ts_code": "000725.SZ",
+      "source": ["tushare"],
+      "as_of": "2026-09-09",
+      "report_period": "2026-06-30",
+      "numeric_validation": {"valid": true, "unsupported_tokens": []},
+      "calls": {"controlled_gateway": 1, "live_tushare": 0, "llm": 0, "general_skill_or_tools": 0, "akshare": 0, "eastmoney": 0, "sina": 0, "tencent": 0}
+    },
+    {
+      "id": "Q2",
+      "query": "贵州茅台近期情况",
+      "route": "stock_eod_research",
+      "fulfillment": "fulfilled",
+      "reason_code": null,
+      "ts_code": "600519.SH",
+      "source": ["tushare"],
+      "numeric_validation": {"valid": true, "unsupported_tokens": []},
+      "calls": {"controlled_gateway": 1, "live_tushare": 0, "llm": 0, "general_skill_or_tools": 0, "akshare": 0, "eastmoney": 0, "sina": 0, "tencent": 0}
+    },
+    {
+      "id": "Q3",
+      "query": "600519 财务指标、ROE、估值",
+      "route": "stock_eod_research",
+      "fulfillment": "fulfilled",
+      "reason_code": null,
+      "ts_code": "600519.SH",
+      "source": ["tushare"],
+      "numeric_validation": {"valid": true, "unsupported_tokens": []},
+      "calls": {"controlled_gateway": 1, "live_tushare": 0, "llm": 0, "general_skill_or_tools": 0, "akshare": 0, "eastmoney": 0, "sina": 0, "tencent": 0}
+    },
+    {
+      "id": "Q4",
+      "query": "AI 半导体设备主题问题",
+      "route": "industry_news",
+      "fulfillment": "unavailable",
+      "reason_code": "NO_APPROVED_INDUSTRY_NEWS_SOURCE",
+      "scope": "unapproved_industry_theme_research",
+      "calls": {"controlled_gateway": 0, "live_tushare": 0, "llm": 0, "general_skill_or_tools": 0, "akshare": 0, "eastmoney": 0, "sina": 0, "tencent": 0}
+    }
+  ],
+  "tests": {
+    "backend_related": {"passed": 90, "failed": 0},
+    "frontend_targeted": {"passed": 24, "failed": 0},
+    "frontend_full": {"passed": 769, "failed": 0},
+    "frontend_production_build": "passed",
+    "python_compile": "passed",
+    "json_validation": "passed",
+    "secret_scan": "passed_no_secret_patterns_in_code_or_fixture_diff",
+    "git_diff_check": "passed"
+  },
+  "owner_review": "ready"
+}

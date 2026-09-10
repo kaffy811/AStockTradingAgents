@@ -1,0 +1,51 @@
+{
+  "ok": true,
+  "market": "CN",
+  "symbol": "000725",
+  "ts_code": "000725.SZ",
+  "source": "tushare",
+  "as_of": "2026-09-09",
+  "freshness": "latest_available_eod_not_realtime",
+  "fulfillment": "fulfilled",
+  "reason_code": null,
+  "warnings": ["盘后数据可能延迟；本响应不包含实时或分钟行情。"],
+  "modules": {
+    "profile": {
+      "status": "fulfilled",
+      "source": "tushare",
+      "as_of": "2001-01-12",
+      "fields": {
+        "name": {"value": "京东方A", "unit": null, "as_of": "2001-01-12", "source": "tushare"},
+        "fullname": {"value": "京东方科技集团股份有限公司", "unit": null, "as_of": "2001-01-12", "source": "tushare"},
+        "industry": {"value": "元器件", "unit": null, "as_of": "2001-01-12", "source": "tushare"},
+        "exchange": {"value": "SZSE", "unit": null, "as_of": "2001-01-12", "source": "tushare"}
+      }
+    },
+    "quote": {
+      "status": "fulfilled",
+      "source": "tushare",
+      "as_of": "2026-09-09",
+      "fields": {
+        "close": {"value": 5.55, "unit": "CNY", "as_of": "2026-09-09", "source": "tushare"},
+        "pct_chg": {"value": -0.1799, "unit": "%", "as_of": "2026-09-09", "source": "tushare"}
+      }
+    },
+    "valuation": {
+      "status": "fulfilled",
+      "source": "tushare",
+      "as_of": "2026-09-09",
+      "fields": {
+        "pe_ttm": {"value": 26.1648, "unit": "multiple", "as_of": "2026-09-09", "source": "tushare"},
+        "pb": {"value": 1.5442, "unit": "multiple", "as_of": "2026-09-09", "source": "tushare"}
+      }
+    },
+    "financial": {
+      "status": "fulfilled",
+      "source": "tushare",
+      "as_of": "2026-06-30",
+      "fields": {
+        "roe": {"value": 3.9218, "unit": "%", "as_of": "2026-06-30", "source": "tushare"}
+      }
+    }
+  }
+}

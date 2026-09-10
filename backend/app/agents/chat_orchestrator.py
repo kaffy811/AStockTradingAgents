@@ -59,7 +59,7 @@ from app.agents.chat_planner.rule_based_planner import RuleBasedPlanner
 from app.agents.chat_planner.executor import PlannerExecutor
 from app.agents.intent_decision_agent import classify_intent
 from app.agents.central_planning_agent import CentralPlanningAgent as _CentralPlanningAgent
-from app.services.security_entity_resolver import security_entity_resolver
+from app.services.security_entity_resolver import security_entity_resolver, ts_code_for
 from app.services.official_report_entity_hints import unambiguous_official_report_entity_hint
 from app.services.official_company_event_service import official_company_event_service
 from app.services.tushare_eod_gateway import tushare_eod_gateway
@@ -123,8 +123,14 @@ _UNAPPROVED_THEME_SCOPE_RE = re.compile(
     r"相关公司|上市公司|行业消息|行业新闻)"
 )
 _STOCK_EOD_RESEARCH_RE = re.compile(
+    r"公司资料|公司概况|基本资料|EOD|eod|"
     r"近期情况|最近情况|近期表现|最近表现|近期估值|最近估值|"
-    r"财务指标|ROE|roe|盘后|收盘|交易日|估值与财务"
+    r"财务指标|ROE|roe|盘后|收盘价|收盘|交易日|行情|估值与财务|"
+    r"(?:^|[^A-Za-z])(?:PE|PB)(?:[^A-Za-z]|$)"
+)
+_EXPLICIT_CN_SECURITY_RE = re.compile(
+    r"(?<![A-Za-z0-9])(?:CN\s*/\s*)?\d{6}(?:\.(?:SH|SZ|BJ))?(?![A-Za-z0-9])",
+    re.IGNORECASE,
 )
 _REQUESTED_OFFICIAL_EVENT_TYPES: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("分红", re.compile(r"分红|派息|利润分配|权益分派")),
@@ -1242,9 +1248,15 @@ async def _handle_stock_eod_research(
     entity = entities[0]
     market = str(getattr(entity, "market", "") or "CN").upper()
     symbol = str(getattr(entity, "symbol", "") or "")
+    canonical_ts_code = str(
+        getattr(entity, "ts_code", "")
+        or ts_code_for(market, symbol, str(getattr(entity, "exchange", "") or ""))
+    )
     company_name = str(getattr(entity, "short_name", "") or getattr(entity, "full_name", "") or symbol)
     snapshot = await tushare_eod_gateway.get_company_snapshot(market, symbol)
+    canonical_ts_code = str(snapshot.get("ts_code") or canonical_ts_code)
     modules = snapshot.get("modules") or {}
+    profile = modules.get("profile") or {}
     quote = modules.get("quote") or {}
     valuation = modules.get("valuation") or {}
     financial = modules.get("financial") or {}
@@ -1262,6 +1274,15 @@ async def _handle_stock_eod_research(
         "grossprofit_margin": "毛利率", "netprofit_margin": "净利率",
         "debt_to_assets": "资产负债率", "netprofit_yoy": "净利润同比",
     }
+    profile_labels = {
+        "name": "公司简称", "fullname": "公司全称", "industry": "所属行业", "exchange": "交易所",
+    }
+    profile_lines = []
+    for key, label in profile_labels.items():
+        fact = (profile.get("fields") or {}).get(key) or {}
+        value = fact.get("value")
+        if value not in (None, ""):
+            profile_lines.append(f"- **{label}：** {value}（来源：Tushare）")
     rendered = []
     for module_key, module_data, labels in (
         ("quote", quote, quote_labels),
@@ -1279,6 +1300,11 @@ async def _handle_stock_eod_research(
     financial_lines = [line for module_key, line, _, _ in rendered if module_key == "financial"]
     evidence_basis = [evidence for _, _, evidence, _ in rendered]
     checked_claims = [claim for _, _, _, claim in rendered]
+    report_periods = sorted({
+        evidence["report_period"]
+        for evidence in evidence_basis
+        if isinstance(evidence.get("report_period"), str) and evidence["report_period"]
+    })
 
     eod_fact_lines = quote_lines + valuation_lines + financial_lines
     fulfillment = snapshot.get("fulfillment") if eod_fact_lines else "unavailable"
@@ -1289,6 +1315,7 @@ async def _handle_stock_eod_research(
         "## 结论摘要\n\n"
         + (f"{company_name}（{symbol}）已取得可追溯的最近交易日或财务披露数据；当前状态为 `{fulfillment}`。"
            if eod_fact_lines else f"{company_name}（{symbol}）当前没有已验证的盘后或财务事实。")
+        + "\n\n## 公司资料\n\n" + ("\n".join(profile_lines) or "暂缺已验证的公司资料。")
         + "\n\n## 最近交易日表现\n\n" + ("\n".join(quote_lines) or "暂缺已验证的最近交易日行情。")
         + "\n\n## 估值与交易活跃度（仅可用字段）\n\n" + ("\n".join(valuation_lines) or "暂缺已验证的估值与交易活跃度数据。")
         + "\n\n## 最近已披露财务指标\n\n" + ("\n".join(financial_lines) or "暂缺已验证的财务指标。")
@@ -1321,8 +1348,9 @@ async def _handle_stock_eod_research(
         }],
         metadata={
             "route": "stock_eod_research", "fulfillment": fulfillment, "reason_code": reason_code,
-            "market": market, "symbol": symbol, "company_name": company_name,
-            "as_of": snapshot.get("as_of"), "source": ["tushare"],
+            "market": market, "symbol": symbol, "ts_code": canonical_ts_code, "company_name": company_name,
+            "as_of": snapshot.get("as_of"), "report_period": report_periods[-1] if report_periods else None,
+            "source": ["tushare"],
             "eod": snapshot,
             "numeric_validation": numeric_validation,
         },
@@ -1749,6 +1777,25 @@ async def process_message(
     # Phase 7C1 source-governance gate.  These checks run before memory,
     # entity resolution, skills, and tools so unapproved news requests cannot
     # fall through to AKShare/Eastmoney/Sina/Tencent-backed paths.
+    # Explicit security identifiers in the current turn outrank memory, page
+    # context, cached entities, skills and tools for deterministic EOD intents.
+    # The handler still validates the identifier against security master data;
+    # an unknown six-digit token fails closed and never reaches an LLM/tool path.
+    _is_stock_eod_request = bool(_STOCK_EOD_RESEARCH_RE.search(content))
+    _has_current_turn_security = bool(_EXPLICIT_CN_SECURITY_RE.search(content))
+
+    if (
+        _is_stock_eod_request
+        and _has_current_turn_security
+        and not _OFFICIAL_EVENT_TERMS_RE.search(content)
+    ):
+        await _emit("intent_detected", {
+            "intent": "stock_eod_research",
+            "handler": "_handle_stock_eod_research",
+            "entity_precedence": "current_turn_explicit_security",
+        })
+        return await _handle_stock_eod_research(content, db, user_id)
+
     if _UNAPPROVED_NEWS_SCOPE_RE.search(content) or _UNAPPROVED_THEME_SCOPE_RE.search(content):
         await _emit("intent_detected", {
             "intent": "industry_news",
@@ -1765,7 +1812,7 @@ async def process_message(
         await _emit("intent_detected", {"intent": route, "handler": "_handle_official_company_research"})
         return await _handle_official_company_research(content, db, user_id)
 
-    if _STOCK_EOD_RESEARCH_RE.search(content):
+    if _is_stock_eod_request:
         await _emit("intent_detected", {"intent": "stock_eod_research", "handler": "_handle_stock_eod_research"})
         return await _handle_stock_eod_research(content, db, user_id)
 
