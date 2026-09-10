@@ -1,0 +1,61 @@
+{
+  "phase": "Phase 7E-P1.4",
+  "baseline_commit": "fdcdc264e9178f7bb432f9101092b08c78af1ee6",
+  "baseline_tree": "071dae43392770fcfa7da5b8a6fbba3c205b4a9c",
+  "data_mode": "controlled_mock_only",
+  "live_data_used": false,
+  "production_token_used": false,
+  "frontend_image": {
+    "tag": "tradingagents-frontend:phase7e-p1-4-api-proxy-contract",
+    "image_id": "sha256:55a533d74711e0c038847d01ca91dc650ca618aa3f4669d92875ad9f331b945e",
+    "os": "linux",
+    "architecture": "amd64",
+    "oci_revision": "fdcdc264e9178f7bb432f9101092b08c78af1ee6",
+    "mounts": [],
+    "nginx_config_test": "passed"
+  },
+  "tests": {
+    "targeted_vitest": {"files_passed": 1, "tests_passed": 5, "failed": 0},
+    "full_frontend": {"files_passed": 70, "tests_passed": 769, "failed": 0, "worker_timeouts": 0},
+    "production_build": "passed_in_docker_build",
+    "python_compile": "passed",
+    "http_contract": {"passed": 11, "failed": 0}
+  },
+  "http_matrix": [
+    {"path": "/api/v1/ping", "status": 200, "content_type": "application/json", "request_id": "fixture-200", "spa_html": false},
+    {"path": "/api/v2/company/CN/000725/profile", "status": 200, "content_type": "application/json", "request_id": "fixture-200", "spa_html": false},
+    {"path": "/api/v2/company/CN/000725/history?period=annual", "status": 200, "content_type": "application/json", "request_id": "fixture-200", "spa_html": false},
+    {"path": "/api/v1/unauthorized", "status": 401, "content_type": "application/json", "request_id": "fixture-401", "spa_html": false},
+    {"path": "/api/v1/forbidden", "status": 403, "content_type": "application/json", "request_id": "fixture-403", "spa_html": false},
+    {"path": "/api/v2/missing", "status": 404, "content_type": "application/json", "request_id": "fixture-404", "spa_html": false},
+    {"path": "/api/v2/invalid", "status": 422, "content_type": "application/json", "request_id": "fixture-422", "spa_html": false},
+    {"path": "/api/v2/failure", "status": 500, "content_type": "application/json", "request_id": "fixture-500", "spa_html": false},
+    {"path": "/health", "status": 200, "content_type": "application/json", "request_id": "fixture-200", "spa_html": false},
+    {"path": "/health/missing", "status": 404, "content_type": "application/json", "request_id": "fixture-404", "spa_html": false},
+    {"path": "/stocks/CN/000725", "status": 200, "content_type": "text/html", "request_id": null, "spa_html": true}
+  ],
+  "scope": {
+    "changed": [
+      "frontend/nginx.conf",
+      "frontend/src/tests/phase7eP14ApiProxyContract.test.js",
+      "frontend/tests/nginx_proxy_contract_harness.py",
+      "backend/docs/artifacts/phase7e_p1_4_api_proxy_contract.md",
+      "backend/docs/artifacts/phase7e_p1_4_api_proxy_contract_runtime.json",
+      "HKNA/update_report/update_161.md"
+    ],
+    "explicitly_unchanged": [
+      "backend routes",
+      "Tushare",
+      "CNINFO",
+      "database",
+      "Docker Compose",
+      "dependencies and lockfiles",
+      "Token and environment configuration",
+      "migrations",
+      "news providers",
+      "stock identifier routing"
+    ]
+  },
+  "conclusion": "OWNER_RELEASE_REVIEW_READY",
+  "commit_sha_note": "The commit is created after this artifact is serialized; the authoritative SHA is reported in the final handoff."
+}
