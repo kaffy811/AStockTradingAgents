@@ -65,9 +65,9 @@ from app.services.official_company_event_service import official_company_event_s
 from app.services.tushare_eod_gateway import tushare_eod_gateway
 from app.services.stock_eod_numeric_validation import (
     claim_from_evidence,
-    make_request_local_evidence,
     validate_stock_eod_numeric_claims,
 )
+from app.services.stock_eod_display import project_stock_eod_display
 import app.agents.chat_memory as _mem
 
 _central_planner = _CentralPlanningAgent()
@@ -1213,10 +1213,11 @@ def _format_grounded_fact(
     module: str,
     metric: str,
 ) -> tuple[str, dict, dict] | None:
-    evidence = make_request_local_evidence(module=module, metric=metric, fact=fact)
-    if evidence is None:
+    projection = project_stock_eod_display(module=module, metric=metric, fact=fact)
+    evidence = projection.get("evidence")
+    if projection.get("status") != "fulfilled" or evidence is None:
         return None
-    unit = evidence.get("unit") or ""
+    unit = evidence.get("display_unit") or ""
     as_of = evidence["as_of"]
     display_value = evidence["display_value"]
     report_period = module == "financial"
@@ -1284,17 +1285,21 @@ async def _handle_stock_eod_research(
         if value not in (None, ""):
             profile_lines.append(f"- **{label}：** {value}（来源：Tushare）")
     rendered = []
+    display_rejections = []
     for module_key, module_data, labels in (
         ("quote", quote, quote_labels),
         ("valuation", valuation, valuation_labels),
         ("financial", financial, financial_labels),
     ):
         for key, label in labels.items():
+            fact = (module_data.get("fields") or {}).get(key, {})
             item = _format_grounded_fact(
-                label, (module_data.get("fields") or {}).get(key, {}), module=module_key, metric=key
+                label, fact, module=module_key, metric=key
             )
             if item is not None:
                 rendered.append((module_key, *item))
+            elif fact.get("value") not in (None, ""):
+                display_rejections.append(f"{module_key}:{key}")
     quote_lines = [line for module_key, line, _, _ in rendered if module_key == "quote"]
     valuation_lines = [line for module_key, line, _, _ in rendered if module_key == "valuation"]
     financial_lines = [line for module_key, line, _, _ in rendered if module_key == "financial"]
@@ -1311,6 +1316,9 @@ async def _handle_stock_eod_research(
     reason_code = snapshot.get("reason_code") if fulfillment == "unavailable" else (
         "PARTIAL_EOD_COVERAGE" if fulfillment == "partial" else None
     )
+    if display_rejections:
+        fulfillment = "partial" if eod_fact_lines else "unavailable"
+        reason_code = "EOD_DISPLAY_NORMALIZATION_UNAVAILABLE"
     answer = (
         "## 结论摘要\n\n"
         + (f"{company_name}（{symbol}）已取得可追溯的最近交易日或财务披露数据；当前状态为 `{fulfillment}`。"
@@ -1351,6 +1359,11 @@ async def _handle_stock_eod_research(
             "market": market, "symbol": symbol, "ts_code": canonical_ts_code, "company_name": company_name,
             "as_of": snapshot.get("as_of"), "report_period": report_periods[-1] if report_periods else None,
             "source": ["tushare"],
+            "display_normalization": {
+                "status": "fulfilled" if not display_rejections else fulfillment,
+                "reason_code": None if not display_rejections else "EOD_DISPLAY_NORMALIZATION_UNAVAILABLE",
+                "rejected_metrics": display_rejections,
+            },
             "eod": snapshot,
             "numeric_validation": numeric_validation,
         },

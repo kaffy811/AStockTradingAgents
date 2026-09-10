@@ -1,0 +1,50 @@
+{
+  "phase": "7E-P1.9",
+  "baseline": "1ec336dbea817627ce49ef54da3dedfa84a7aef9",
+  "candidate_commit": "containing_commit",
+  "conclusion": "EOD_DISPLAY_NORMALIZATION_READY",
+  "live_provider_calls": 0,
+  "display_policy": {
+    "rounding": "ROUND_HALF_UP",
+    "decimal_places": 2,
+    "price": {"canonical_unit": "CNY", "display_unit": "元", "factor": "1"},
+    "ratio": {"canonical_unit": "%", "display_unit": "%", "factor": "1"},
+    "valuation_multiple": {"canonical_unit": "multiple", "display_unit": "倍", "factor": "1"},
+    "amount": {"canonical_unit": "CNY_thousand", "display_unit": "亿元", "factor": "0.00001"},
+    "market_value": {"canonical_unit": "CNY_10k", "display_unit": "亿元", "factor": "0.0001"},
+    "volume": {"canonical_unit": "lot", "display_unit": "万手", "factor": "0.0001"}
+  },
+  "examples": [
+    {"canonical_value":"4169035.35291","canonical_unit":"CNY_thousand","display_value":"41.69","display_unit":"亿元"},
+    {"canonical_value":"20226203.088","canonical_unit":"CNY_10k","display_value":"2,022.62","display_unit":"亿元"},
+    {"canonical_value":"7616584.07","canonical_unit":"lot","display_value":"761.66","display_unit":"万手"},
+    {"canonical_value":"25.7405","canonical_unit":"multiple","display_value":"25.74","display_unit":"倍"},
+    {"canonical_value":"5.46","canonical_unit":"CNY","display_value":"5.46","display_unit":"元"}
+  ],
+  "controlled_queries": [
+    {"query":"CN/000725 公司资料 + EOD","fulfillment":"fulfilled","numeric_validation_valid":true,"unsupported_tokens":[],"llm_calls":0,"unapproved_provider_calls":0},
+    {"query":"贵州茅台近期情况","fulfillment":"fulfilled","numeric_validation_valid":true,"unsupported_tokens":[],"llm_calls":0,"unapproved_provider_calls":0},
+    {"query":"600519 财务指标、ROE、估值","fulfillment":"fulfilled","numeric_validation_valid":true,"unsupported_tokens":[],"llm_calls":0,"unapproved_provider_calls":0}
+  ],
+  "negative_cases": {
+    "unknown_unit": "controlled_partial_or_unavailable_raw_value_not_rendered",
+    "wrong_unit": "rejected",
+    "wrong_rounding": "numeric_validation_invalid",
+    "wrong_magnitude": "numeric_validation_invalid",
+    "lot_to_share_conversion": "prohibited"
+  },
+  "tests": {
+    "backend_related": {"passed":108,"failed":0},
+    "frontend_targeted": {"passed":24,"failed":0},
+    "frontend_full": {"passed":769,"failed":0},
+    "frontend_production_build": "passed",
+    "python_compile": "passed",
+    "json_validation": "passed",
+    "secret_scan": "passed",
+    "git_diff_check": "passed"
+  },
+  "forbidden_scope_changed": false,
+  "push_performed": false,
+  "merge_performed": false,
+  "deployment_performed": false
+}

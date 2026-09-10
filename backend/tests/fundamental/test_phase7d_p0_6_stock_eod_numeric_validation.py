@@ -194,9 +194,9 @@ async def test_live_tushare_shape_is_fully_grounded_without_report_or_event_numb
     assert validation["unsupported_tokens"] == []
     assert len(validation["checked_claims"]) == len(validation["evidence_basis"]) == 18
     assert {item["source"] for item in validation["evidence_basis"]} == {"tushare"}
-    assert any(item["metric"] == "close" and item["display_value"] == "1290.88" for item in validation["evidence_basis"])
-    assert any(item["metric"] == "pe_ttm" and item["display_value"] == "19.8161" for item in validation["evidence_basis"])
-    assert any(item["metric"] == "pb" and item["display_value"] == "6.4226" for item in validation["evidence_basis"])
+    assert any(item["metric"] == "close" and item["display_value"] == "1,290.88" for item in validation["evidence_basis"])
+    assert any(item["metric"] == "pe_ttm" and item["display_value"] == "19.82" for item in validation["evidence_basis"])
+    assert any(item["metric"] == "pb" and item["display_value"] == "6.42" for item in validation["evidence_basis"])
     assert any(item["metric"] == "roe" and item["report_period"] == "2026-06-30" for item in validation["evidence_basis"])
     assert "不是实时行情" in result.answer
     assert "Report RAG" in result.answer
