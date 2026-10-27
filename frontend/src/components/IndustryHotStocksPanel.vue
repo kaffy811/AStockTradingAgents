@@ -42,16 +42,17 @@
 
     <!-- ── dynamic_hot ─────────────────────────────────────────────────────── -->
     <template v-else-if="peerSource === 'dynamic_hot' && peers.length > 0">
+      <p class="industry-subtitle">行业热度快照 · {{ snapshotDate || '统计日期未提供' }} · 非实时报价</p>
       <div class="table-wrap">
         <table class="hot-table">
           <thead>
             <tr>
               <th class="col-rank">排名</th>
               <th class="col-name">股票</th>
-              <th class="col-score">Hot Score</th>
+              <th class="col-score">热度</th>
               <th class="col-amount">成交额</th>
               <th class="col-change">涨跌幅</th>
-              <th class="col-action"></th>
+              <th class="col-action">操作</th>
             </tr>
           </thead>
           <tbody>
@@ -70,14 +71,14 @@
               <td class="col-change" :class="changePctClass(item.score_factors?.change_pct)">
                 {{ formatChangePct(item.score_factors?.change_pct) }}
               </td>
-              <td class="col-action">
+              <td class="col-action"><div class="action-buttons">
                 <button class="btn btn-secondary btn-xs" @click="goDetail(item)">
                   详情
                 </button>
                 <button class="btn btn-secondary btn-xs" @click="goAnalyze(item)">
                   分析
                 </button>
-              </td>
+              </div></td>
             </tr>
           </tbody>
         </table>
@@ -138,6 +139,7 @@ const router = useRouter()
 // ── State ─────────────────────────────────────────────────────────────────────
 const loading       = ref(false)
 const errorMsg      = ref('')
+const snapshotDate = ref('')
 const peers         = ref([])
 const industryInfo  = ref(null)   // { industry_code, industry_name, ... }
 const peerSource    = ref('')     // 'dynamic_hot' | 'manual_map' | 'none' | 'unsupported'
@@ -184,12 +186,14 @@ async function fetchDynamicPeers() {
     return
   }
 
+  snapshotDate.value = ''
   loading.value      = true
   errorMsg.value     = ''
   peerSource.value   = ''
 
   try {
     const res = await getDynamicPeers(props.market, props.symbol, { limit: 5 })
+    snapshotDate.value = res.data_quality?.hot_stock_date || ''
     industryInfo.value   = res.industry   || null
     peers.value          = res.peers      || []
     peerSource.value     = res.data_quality?.peer_source || 'none'
@@ -324,6 +328,7 @@ function changePctClass(pct) {
 .hot-table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 590px;
   font-size: 13px;
 }
 
@@ -357,7 +362,8 @@ function changePctClass(pct) {
 .col-score  { width: 80px;  text-align: right; }
 .col-amount { width: 80px;  text-align: right; }
 .col-change { width: 76px;  text-align: right; }
-.col-action { width: 100px; text-align: center; display: flex; gap: 4px; align-items: center; }
+.col-action { width: 112px; text-align: center; vertical-align: middle; }
+.action-buttons { display: flex; justify-content: center; gap: 6px; align-items: center; }
 
 .rank-num {
   font-weight: 700;

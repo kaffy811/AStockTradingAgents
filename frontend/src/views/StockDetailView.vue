@@ -18,6 +18,9 @@
         :quote-change-text="quoteChangeText"
         :quote-change-class="quoteChangeClass"
         :quote-error="quoteError"
+        :quote-stale="profile?.quote?.stale || quote?.stale || false"
+        :quote-provider="profile?.quote?.provider || quote?.provider || ''"
+        :quote-message="profile?.quote?.message || quote?.message || ''"
         :technical-insight="technicalInsight"
         :news-items="newsItems"
         :latest-report="latestReport"
@@ -107,6 +110,7 @@
           :compact="true"
         />
         <div v-else class="hot-stocks">
+          <p class="hot-industry-label">行业快照 · {{ hotTradeDate || '统计日期未提供' }} · 非实时报价，与当前行情可能不属于同一交易日。</p>
           <div v-if="industryName" class="hot-industry-label">
             申万一级行业：{{ industryName }}
           </div>
@@ -289,6 +293,7 @@ const latestFullReport = ref(null)
 const fullReportLoading = ref(false)
 
 // ── Hot stocks ────────────────────────────────────────────────────────────────
+const hotTradeDate = ref('')
 const hotStocks  = ref([])
 const hotLoading = ref(false)
 
@@ -566,6 +571,7 @@ async function loadReports() {
  */
 async function loadHotStocks() {
   hotStocks.value  = []
+  hotTradeDate.value = ''
   const m = market.value
   if (!m || m !== 'CN') return   // HK: no Shenwan hot stocks
   if (!industryCode.value) return
@@ -574,6 +580,7 @@ async function loadHotStocks() {
   try {
     const hotRes = await getIndustryHotStocks(m, industryCode.value, { limit: 5 })
     hotStocks.value = hotRes.items || []
+    hotTradeDate.value = hotRes.trade_date || ''
   } catch (_) {
     // EmptyState shown
   } finally {

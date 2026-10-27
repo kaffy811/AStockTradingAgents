@@ -67,7 +67,7 @@
     </template>
 
     <p v-if="showSseSlowHint" class="app-slow-hint">
-      15 秒内未收到进度更新，可能是网络较慢或服务繁忙，系统仍在后台处理中。
+      暂未收到新的分析进展，尚不能确认任务是否仍在运行。可停止等待后在历史记录中查看结果。
     </p>
     <p v-else-if="elapsedSeconds >= 40" class="app-slow-hint">
       大模型正在整合多维度信息，可能需要较长时间，请保持页面打开。
@@ -306,6 +306,7 @@ const EVENT_LABELS = {
 const latestEventLabel = computed(() => {
   if (!props.latestEvent) return '正在连接分析服务...'
   const evt = props.latestEvent
+  if (evt.event === 'synthesis_completed' && evt.degraded) return '综合生成失败，已保留分项报告'
   // agent events: show agent name
   if (evt.event === 'agent_started' && evt.agent) {
     const agentLabel = AGENT_LIST.find(a => a.key === evt.agent)?.label || evt.agent

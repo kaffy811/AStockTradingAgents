@@ -18,7 +18,7 @@ symbol 转换：
   [3]  当前价格
   [4]  今日最高价
   [5]  今日最低价
-  [8]  成交数量（手，100股/手）
+  [8]  成交数量（股）
   [9]  成交额（元）
   [30] 日期 YYYY-MM-DD
   [31] 时间 HH:MM:SS
@@ -126,9 +126,9 @@ class SinaQuoteProvider(BaseStockDataProvider):
             change = round(price - prev_close, 3)
             change_pct = round((price - prev_close) / prev_close * 100, 3)
 
-        # 成交量：新浪单位为"手"（100 股），转为股数
+        # 成交数量原始单位已为股；不能按腾讯的手数口径再次乘 100。
         raw_vol = _safe_float(fields, 8)
-        volume = int(raw_vol * 100) if raw_vol is not None else None
+        volume = int(raw_vol) if raw_vol is not None else None
 
         trade_date = _safe_str(fields, 30)
         trade_time = _safe_str(fields, 31)

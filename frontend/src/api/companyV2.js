@@ -1,3 +1,4 @@
+import { readJsonResponse } from './response.js'
 import { useAuthStore } from '../stores/auth.js'
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8000/api/v1'
@@ -12,8 +13,7 @@ async function v2Fetch(path, options = {}) {
   if (authStore.token) headers.Authorization = `Bearer ${authStore.token}`
   // Phase 6T-E: 支持 AbortSignal（股票快速切换时取消旧请求）
   const res = await fetch(`${API_ROOT}${path}`, { ...options, headers })
-  const contentType = res.headers.get('content-type') || ''
-  const data = contentType.includes('application/json') ? await res.json() : { ok: false, error_code: 'RENDER_ERROR', message: await res.text() }
+  const data = await readJsonResponse(res)
   if (!res.ok) {
     const err = new Error(data.message || data.detail || `HTTP ${res.status}`)
     err.status = res.status

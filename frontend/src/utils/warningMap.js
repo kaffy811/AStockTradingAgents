@@ -37,6 +37,8 @@ export const EXAMPLES = [
 
 /** Translate a warning key to Chinese. Returns original if not in map. */
 export function translateWarning(w) {
+  const match = String(w).match(/^(technical|fundamental|peer_comparison|news) agent (failed|timeout)\.$/)
+  if (match) return `${agentLabel(match[1])}分析${match[2] === 'timeout' ? '超时' : '未完成'}，不代表原始数据缺失。`
   return WARNING_MAP[w] || w
 }
 
@@ -64,4 +66,9 @@ export function formatTime(iso) {
   } catch {
     return iso
   }
+}
+
+export function agentStatusLabel(status) {
+  return ({ success: '已完成', failed: '未完成', timeout: '超时', skipped: '未纳入',
+    running: '分析中', degraded: '部分完成', unknown: '待确认' })[status] || '待确认'
 }

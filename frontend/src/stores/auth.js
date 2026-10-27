@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { loginApi, registerApi, meApi, requestEmailVerificationApi } from '../api/auth.js'
+import { meApi, googleLoginApi, refreshApi } from '../api/auth.js'
 
 export const useAuthStore = defineStore('auth', () => {
   const token        = ref(localStorage.getItem('ta_token')         || '')
@@ -34,12 +34,21 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  /**
-   * Login and persist tokens + username to localStorage.
-   * Throws on failure — caller handles the error.
-   */
-  async function login(username, password) {
-    const data = await loginApi(username, password)
+  async function loginGoogle(credential, options = {}) {
+    const data = await googleLoginApi(credential, options)
+    if (options.signal?.aborted) throw new DOMException('Cancelled', 'AbortError')
+    await acceptSession(data, '')
+  }
+
+  async function refreshSession() {
+    if (!refreshToken.value) return
+    const data = await refreshApi(refreshToken.value)
+    await acceptSession(data, currentUser.value)
+  }
+
+  async function acceptSession(data, username) {
+    isAdmin.value = false
+    localStorage.removeItem('ta_is_admin')
     token.value        = data.access_token
     refreshToken.value = data.refresh_token || ''
     currentUser.value  = username
@@ -48,23 +57,6 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.setItem('ta_refresh_token', data.refresh_token || '')
     localStorage.setItem('ta_user',          username)
     await fetchMe()
-  }
-
-  /**
-   * Register a new user with an invite code and optional email verification code.
-   * Throws on failure — caller handles the error.
-   */
-  async function register(username, email, password, inviteCode, emailVerificationCode) {
-    await registerApi(username, email, password, inviteCode, emailVerificationCode)
-  }
-
-  /**
-   * Request a 6-digit email verification code.
-   * Validates the invite code server-side without consuming it.
-   * Throws on failure — caller handles the error.
-   */
-  async function requestEmailVerification(email, inviteCode) {
-    return await requestEmailVerificationApi(email, inviteCode)
   }
 
   /** Clear session state and localStorage.
@@ -79,11 +71,13 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('ta_refresh_token')
     localStorage.removeItem('ta_user')
     localStorage.removeItem('ta_is_admin')
+    // Sign out of this app without revoking the user's Google consent.
+    try { window.google?.accounts?.id?.disableAutoSelect() } catch { /* SDK optional */ }
   }
 
   return {
     token, refreshToken, currentUser, isAdmin,
     sessionExpired, authReady, isAuthenticated,
-    login, register, requestEmailVerification, fetchMe, logout,
+    loginGoogle, refreshSession, fetchMe, logout,
   }
 })

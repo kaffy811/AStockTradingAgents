@@ -1,0 +1,331 @@
+{
+  "schema_version": "1.0",
+  "audit_id": "e0_20260915T013926Z",
+  "observed_at": "2026-09-15T01:39:26Z",
+  "workspace_path": "/Users/kaffy/Documents/TradingAgents",
+  "current_workspace": {
+    "branch": "release/demo-staging",
+    "head": "98c111b684cb19de0e0e92cb46e1d675ef3e8d0a",
+    "tree": "24a9961639dd7d8388fe8353a6e2e7eb8b955f03",
+    "tracked_changes": [
+      {
+        "status": " M",
+        "path": "HKNA/update_report/update_142.md"
+      },
+      {
+        "status": " M",
+        "path": "backend/Dockerfile"
+      },
+      {
+        "status": " M",
+        "path": "backend/app/main.py"
+      },
+      {
+        "status": " M",
+        "path": "backend/app/services/report_embedding_provider.py"
+      },
+      {
+        "status": " M",
+        "path": "backend/pyproject.toml"
+      },
+      {
+        "status": " M",
+        "path": "backend/uv.lock"
+      }
+    ],
+    "tracked_change_count": 6,
+    "untracked_files": [
+      "HKNA/docs/suggestion/suggest10.md",
+      "HKNA/docs/suggestion/suggest2.md",
+      "HKNA/docs/suggestion/suggest3.md",
+      "HKNA/docs/suggestion/suggest4.md",
+      "HKNA/docs/suggestion/suggest5.md",
+      "HKNA/docs/suggestion/suggest6.md",
+      "HKNA/docs/suggestion/suggest7.md",
+      "HKNA/docs/suggestion/suggest8.md",
+      "HKNA/docs/suggestion/suggest9.md",
+      "HKNA/update_report/update_100.md",
+      "HKNA/update_report/update_102.md",
+      "HKNA/update_report/update_104.md",
+      "HKNA/update_report/update_115.md",
+      "HKNA/update_report/update_127.md",
+      "HKNA/update_report/update_134.md",
+      "HKNA/update_report/update_135.md",
+      "HKNA/update_report/update_136.md",
+      "HKNA/update_report/update_139.md",
+      "HKNA/update_report/update_141.md",
+      "HKNA/update_report/update_143.md",
+      "HKNA/update_report/update_144.md",
+      "HKNA/update_report/update_145.md",
+      "HKNA/update_report/update_147.md",
+      "HKNA/update_report/update_148.md",
+      "HKNA/update_report/update_149.md",
+      "HKNA/update_report/update_150.md",
+      "HKNA/update_report/update_151.md",
+      "HKNA/update_report/update_152.md",
+      "HKNA/update_report/update_160.md",
+      "HKNA/update_report/update_167.md",
+      "HKNA/update_report/update_168.md",
+      "HKNA/update_report/update_170.md",
+      "HKNA/update_report/update_96.md",
+      "HKNA/update_report/update_99.md",
+      "backend/docs/artifacts/company_agents_data_r1_7_production_preflight.md",
+      "backend/docs/artifacts/company_agents_data_r1_8_env_audit.md",
+      "backend/docs/artifacts/company_agents_data_r1_8_preflight_plan.md",
+      "backend/docs/artifacts/company_agents_data_r1_8_production_readiness.md",
+      "backend/docs/artifacts/company_agents_data_r1_8_provider_matrix.md",
+      "backend/docs/artifacts/company_agents_data_r2_1_embedding_config.md",
+      "backend/docs/artifacts/company_agents_data_r2_1_final_go_gate.md",
+      "backend/docs/artifacts/company_agents_data_r2_2_database_recovery.md",
+      "backend/docs/artifacts/company_agents_data_r2_2_e2e_financial_query.md",
+      "backend/docs/artifacts/company_agents_data_r2_2_migration_verification.md",
+      "backend/docs/artifacts/company_agents_data_r2_2_production_go_gate.md",
+      "backend/docs/artifacts/company_agents_data_r2_2_report_ingestion.md",
+      "backend/docs/artifacts/company_agents_data_r2_3_production_security_remediation.md",
+      "backend/docs/artifacts/company_agents_data_r2_3_runtime_restart.md",
+      "backend/docs/artifacts/company_agents_data_r2_4_final_go_gate.md",
+      "backend/docs/artifacts/company_agents_data_r2_5_final_go_gate.md",
+      "backend/docs/artifacts/company_agents_data_r2_browser_validation.md",
+      "backend/docs/artifacts/company_agents_data_r2_database_readiness.md",
+      "backend/docs/artifacts/company_agents_data_r2_env_alignment.md",
+      "backend/docs/artifacts/company_agents_data_r2_final_go_gate.md",
+      "backend/docs/artifacts/company_agents_data_r2_provider_validation.md",
+      "backend/docs/artifacts/company_agents_data_r2_rag_readiness.md",
+      "backend/docs/artifacts/company_agents_data_r3_0_production_canary.md",
+      "backend/docs/artifacts/company_agents_data_r3_0_release_integrity.md",
+      "backend/docs/artifacts/company_agents_data_r3_1_canary_observation.md",
+      "backend/docs/artifacts/company_agents_data_r3_2_canary_observation.md",
+      "backend/docs/artifacts/company_agents_data_r3_2_dependency_remediation.md",
+      "backend/docs/artifacts/company_agents_data_r3_2_fix_decision.md",
+      "backend/docs/artifacts/company_agents_data_r3_2_numeric_provenance.md",
+      "backend/docs/artifacts/company_agents_data_r3_2_s0_s8_trace.json",
+      "backend/docs/artifacts/company_agents_data_r3_2c_q2_runtime_closure.md",
+      "backend/docs/artifacts/company_agents_data_r3_2d_rebaseline_observation.md",
+      "backend/docs/artifacts/company_agents_data_r3_2d_runtime_causality.md",
+      "backend/docs/artifacts/company_agents_data_r3_3_numeric_failure_matrix.json",
+      "backend/docs/artifacts/company_agents_data_r3_3_numeric_failure_provenance.md",
+      "backend/docs/artifacts/company_agents_data_r3_3c_release_image_provenance.md",
+      "backend/docs/artifacts/company_agents_data_r3_3d_candidate_environment.md",
+      "backend/docs/artifacts/company_agents_data_r3_3d_candidate_numeric_attribution.md",
+      "backend/docs/artifacts/company_agents_data_r3_3d_candidate_numeric_matrix.json",
+      "backend/docs/artifacts/company_agents_data_r3_3e_empty_db_bootstrap.md",
+      "backend/docs/artifacts/company_agents_data_r3_3f_candidate_numeric_attribution.md",
+      "backend/docs/artifacts/company_agents_data_r3_3f_candidate_numeric_matrix.json",
+      "backend/docs/artifacts/company_agents_data_r3_3i1_derived_fact_emission_diagnosis.md",
+      "backend/docs/artifacts/company_agents_data_r3_3i1_derived_fact_emission_matrix.json",
+      "backend/docs/artifacts/company_agents_data_r3_3i2_1_runtime_closure.md",
+      "backend/docs/artifacts/company_agents_data_r3_3i2_1_runtime_matrix.json",
+      "backend/docs/artifacts/company_agents_data_r3_3i2_2_q3_validation_attribution.md",
+      "backend/docs/artifacts/company_agents_data_r3_3i2_2_q3_validation_matrix.json",
+      "backend/docs/artifacts/company_agents_data_r3_3i2_4_commit_candidate.json",
+      "backend/docs/artifacts/company_agents_data_r3_3i2_4_commit_candidate.md",
+      "backend/docs/artifacts/company_agents_data_r3_3i2_6_1_pure_image_runtime.json",
+      "backend/docs/artifacts/company_agents_data_r3_3i2_6_1_pure_image_runtime.md",
+      "backend/docs/artifacts/company_agents_data_r3_3i2_6_release_integration.json",
+      "backend/docs/artifacts/company_agents_data_r3_3i2_6_release_integration.md",
+      "backend/docs/artifacts/company_agents_data_r3_3i2_7_1_migration_bootstrap_audit.json",
+      "backend/docs/artifacts/company_agents_data_r3_3i2_7_1_migration_bootstrap_audit.md",
+      "backend/docs/artifacts/company_agents_data_r3_3i2_7_2_portable_bootstrap.json",
+      "backend/docs/artifacts/company_agents_data_r3_3i2_7_2_portable_bootstrap.md",
+      "backend/docs/artifacts/company_agents_data_r3_3i2_7_release_candidate.json",
+      "backend/docs/artifacts/company_agents_data_r3_3i2_7_release_candidate.md",
+      "backend/docs/artifacts/company_agents_data_r3_3i2_structured_operand_coverage.json",
+      "backend/docs/artifacts/company_agents_data_r3_3i2_structured_operand_coverage.md",
+      "backend/docs/artifacts/company_agents_data_r3_4_1_local_release_merge.md",
+      "backend/docs/artifacts/phase7c0_agent_news_reuse_decision.md",
+      "backend/docs/artifacts/phase7c0_existing_news_lineage_audit.md",
+      "backend/docs/artifacts/phase7c0_existing_news_source_matrix.json",
+      "backend/docs/artifacts/phase7c4_1_approved_chat_local_merge_record.json",
+      "backend/docs/artifacts/phase7c4_1_approved_chat_local_merge_record.md",
+      "backend/docs/artifacts/phase7c5_frontend_test_infra_recheck.json",
+      "backend/docs/artifacts/phase7c5_frontend_test_infra_recheck.md",
+      "backend/docs/artifacts/phase7c6_approved_chat_production_deployment.json",
+      "backend/docs/artifacts/phase7c6_approved_chat_production_deployment.md",
+      "backend/docs/artifacts/phase7d_p0_10_commercial_and_deploy_manifest.json",
+      "backend/docs/artifacts/phase7d_p0_10_commercial_and_deploy_review.md",
+      "backend/docs/artifacts/phase7d_p0_11_deployment_record.json",
+      "backend/docs/artifacts/phase7d_p0_11_deployment_record.md",
+      "backend/docs/artifacts/phase7d_p0_12_production_smoke.json",
+      "backend/docs/artifacts/phase7d_p0_12_production_smoke.md",
+      "backend/docs/artifacts/phase7d_p0_5_company_data_owner_release_manifest.json",
+      "backend/docs/artifacts/phase7d_p0_5_company_data_owner_release_review.md",
+      "backend/docs/artifacts/phase7d_p0_7_1_pure_image_runtime.json",
+      "backend/docs/artifacts/phase7d_p0_7_1_pure_image_runtime.md",
+      "backend/docs/artifacts/phase7d_p0_7_2_harness_independence.md",
+      "backend/docs/artifacts/phase7d_p0_7_2_pure_image_runtime.json",
+      "backend/docs/artifacts/phase7d_p0_7_report_rag_mock_attribution.md",
+      "backend/docs/artifacts/phase7d_p0_7_report_rag_mock_matrix.json",
+      "backend/docs/artifacts/phase7d_p0_7_theme_fail_closed.md",
+      "backend/docs/artifacts/phase7d_p0_7_theme_runtime.json",
+      "backend/docs/artifacts/phase7d_p0_8_company_data_owner_release_manifest.json",
+      "backend/docs/artifacts/phase7d_p0_8_company_data_owner_release_review.md",
+      "backend/docs/artifacts/phase7d_p0_9_1_local_merge_attribution.json",
+      "backend/docs/artifacts/phase7d_p0_9_1_local_merge_attribution.md",
+      "backend/docs/artifacts/phase7d_p0_9_2_isolated_local_merge.json",
+      "backend/docs/artifacts/phase7d_p0_9_2_isolated_local_merge.md",
+      "backend/docs/artifacts/phase7d_p0_9_3_merge_commit_acceptance.json",
+      "backend/docs/artifacts/phase7d_p0_9_3_merge_commit_acceptance.md",
+      "backend/docs/artifacts/phase7d_p0_9_local_release_integration.md",
+      "backend/docs/artifacts/phase7d_p0_9_local_release_manifest.json",
+      "backend/docs/artifacts/phase7e_p1_10_eod_display_pure_image.json",
+      "backend/docs/artifacts/phase7e_p1_10_eod_display_pure_image.md",
+      "backend/docs/artifacts/phase7e_p1_11_eod_display_owner_manifest.json",
+      "backend/docs/artifacts/phase7e_p1_11_eod_display_owner_review.md",
+      "backend/docs/artifacts/phase7e_p1_3_production_bug_inventory.json",
+      "backend/docs/artifacts/phase7e_p1_3_production_bug_inventory.md",
+      "backend/docs/artifacts/phase8b_control_plane_owner_manifest.json",
+      "backend/docs/artifacts/phase8b_control_plane_owner_review.md",
+      "memory/project_phase6w_r14_staging_smoke.md"
+    ],
+    "untracked_file_count": 141,
+    "note": "Snapshot excludes the four E0 audit files created by this audit. No pre-existing path was staged, moved, deleted, or modified."
+  },
+  "inspected_candidates": [
+    {
+      "sha": "c197e19fe1dd88cacab430c2813398ca336830c0",
+      "available": true,
+      "parent": "72ba13ca093cd86fe370d269a6e2079aa3df07b7",
+      "tree": "904c1a360d22a4555351bd86a624150d2ccf73de",
+      "relation_to_current_head": "current HEAD is ancestor; candidate is 10 commits ahead within the inspected chain",
+      "diff_summary": "65 files changed, 5273 insertions, 78 deletions",
+      "evidence": "local Git object only"
+    },
+    {
+      "sha": "9d05b0772639dbcf4fd38d645b38b24935c14cce",
+      "available": true,
+      "parent": "c197e19fe1dd88cacab430c2813398ca336830c0",
+      "tree": "5237e280a34475e0b4486c3e745e0f27c446730e",
+      "relation_to_current_head": "current HEAD is ancestor; candidate includes c197e19 and one Phase 8K commit",
+      "diff_summary": "68 files changed, 5663 insertions, 79 deletions",
+      "evidence": "local Git object and /private/tmp Phase 8K artifacts"
+    }
+  ],
+  "production_reported_revision": {
+    "sha": "dbf2073eb06a4206dea604a7156acae461c6bb35",
+    "source": "historical Phase 8J.1 production preflight report",
+    "production_live_verified": false,
+    "reason": "E0 explicitly forbids production access"
+  },
+  "release_layers": {
+    "current_local_release": "98c111b684cb19de0e0e92cb46e1d675ef3e8d0a",
+    "later_eod_display_candidate": "dbf2073eb06a4206dea604a7156acae461c6bb35",
+    "persistent_action_candidate": "c197e19fe1dd88cacab430c2813398ca336830c0",
+    "safe_enablement_candidate": "9d05b0772639dbcf4fd38d645b38b24935c14cce",
+    "warning": "Code, tests, images and runtime evidence from these layers are not combined into one passed candidate."
+  },
+  "evidence_sources": [
+    {
+      "source": "user-supplied E0 Engineering Prompt",
+      "environment": "audit contract",
+      "time": "2026-09-14/15 session"
+    },
+    {
+      "source": "current Git object database and working tree",
+      "environment": "local",
+      "time": "2026-09-15T01:39:26Z"
+    },
+    {
+      "source": "backend/app/main.py; backend/app/routers; backend/app/models; backend/app/services",
+      "environment": "current working tree static inspection",
+      "time": "2026-09-15"
+    },
+    {
+      "source": "frontend/src/api; frontend/src/views; frontend/src/components; frontend/nginx.conf",
+      "environment": "current working tree static inspection",
+      "time": "2026-09-15"
+    },
+    {
+      "source": "backend/docs/artifacts/phase7e_p1_3_production_bug_inventory.md",
+      "environment": "historical production report for fdcdc264",
+      "time": "historical; not reverified"
+    },
+    {
+      "source": "backend/docs/artifacts/phase7d_p0_12_production_smoke.md",
+      "environment": "historical production report for 98c111b",
+      "time": "historical; not reverified"
+    },
+    {
+      "source": "/private/tmp/phase8j_preflight/backend/docs/artifacts/phase8j_1_production_readonly_preflight.md",
+      "environment": "historical production read-only report",
+      "time": "2026-09-13 historical"
+    },
+    {
+      "source": "/private/tmp/phase8k_safe_enablement/backend/docs/artifacts/phase8k_production_safe_enablement.md",
+      "environment": "local isolated Phase 8K evidence",
+      "time": "historical local"
+    }
+  ],
+  "unknowns": [
+    {
+      "field": "current_production_revision",
+      "value": null,
+      "reason": "production access prohibited in E0"
+    },
+    {
+      "field": "current_production_alembic_revision",
+      "value": null,
+      "reason": "r6s7t8u9v0w1 is historical report value only"
+    },
+    {
+      "field": "current_production_data_freshness",
+      "value": null,
+      "reason": "no Provider, cache, scheduler or production access"
+    },
+    {
+      "field": "browser_runtime_behavior",
+      "value": null,
+      "reason": "static audit; browser tests not run"
+    },
+    {
+      "field": "six_report_file_references",
+      "value": null,
+      "reason": "prompt supplied as historical clue; authoritative matching report not located"
+    },
+    {
+      "field": "production_backup_restore_verification",
+      "value": null,
+      "reason": "outside E0 and not inferred from local key/environment preparation"
+    },
+    {
+      "field": "frontend_research_home_starters_draft_mobile_increment",
+      "value": null,
+      "reason": "individual current components exist, but no authoritative named increment/runtime evidence was located; not claimed deployed"
+    },
+    {
+      "field": "E1_schema_need_for_client_request_id",
+      "value": null,
+      "reason": "requires retry reproduction and persistence design decision"
+    }
+  ],
+  "authorization_scope": {
+    "allowed": [
+      "read local source and Git objects",
+      "read existing sanitized artifacts",
+      "create four E0 audit files",
+      "validate document formatting"
+    ],
+    "prohibited": [
+      "business code/test/config/dependency changes",
+      "checkout/reset/stash/clean/stage/commit",
+      "production access",
+      "Provider or LLM calls",
+      "backup/restore/migration/role changes",
+      "fetch/push/merge/image build/deploy/restart/feature enablement"
+    ]
+  },
+  "test_evidence": {
+    "executed_in_e0": [],
+    "status": "NOT_TESTED",
+    "historical_only": [
+      "Phase 7E P1.10 fixture: three EOD scenarios numeric valid",
+      "Phase 8K local: 56 related backend, 17 PostgreSQL persistent-action, 794 frontend",
+      "Phase 7E P1.3: 55 historical production checks with 27 PASS/11 FAIL/11 PARTIAL/6 NOT_TESTED"
+    ]
+  },
+  "audit_created_files": [
+    "backend/docs/artifacts/beta_v1/e0/e0_20260915T013926Z/baseline_manifest.json",
+    "backend/docs/artifacts/beta_v1/e0/e0_20260915T013926Z/capability_matrix.md",
+    "backend/docs/artifacts/beta_v1/e0/e0_20260915T013926Z/api_contract_inventory.json",
+    "backend/docs/artifacts/beta_v1/e0/e0_20260915T013926Z/bug_inventory.json"
+  ]
+}

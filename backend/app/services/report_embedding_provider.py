@@ -128,8 +128,9 @@ class LocalSentenceTransformerProvider(BaseReportEmbeddingProvider):
     Local embedding using sentence-transformers library.
 
     Recommended models (native 384-dim, matches default schema):
-      BAAI/bge-small-zh-v1.5      — Chinese-optimised, ~95MB
-      intfloat/multilingual-e5-small — multilingual, ~120MB
+      intfloat/multilingual-e5-small — multilingual incl. Chinese, ~120MB, 384-dim
+    Not compatible with vector(384) schema (outputs 512-dim):
+      BAAI/bge-small-zh-v1.5      — Chinese-optimised, ~95MB, 512-dim output
 
     Other dims require a schema migration:
       768-dim: BAAI/bge-base-zh-v1.5, intfloat/multilingual-e5-base

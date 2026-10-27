@@ -120,7 +120,7 @@ class DeepSeekClient(BaseLLMClient):
     """
     LLM client for DeepSeek, using the OpenAI-compatible API.
 
-    Default model : deepseek-v4-flash  (low-latency, everyday analysis)
+    Default model : deepseek-flash  (low-latency, everyday analysis)
     Pro model     : deepseek-v4-pro    (complex agent reasoning, deep analysis)
 
     This class is intentionally free of any financial or agent logic.
@@ -141,6 +141,8 @@ class DeepSeekClient(BaseLLMClient):
             api_key=settings.deepseek_api_key,
             base_url=settings.deepseek_base_url,
             timeout=_timeout,
+            # SDK retries otherwise multiply the configured request deadline.
+            max_retries=0,
         )
         # P1.31: last call usage (captured from response.usage)
         self._last_usage: ProviderUsageResult = ProviderUsageResult.not_captured()
@@ -156,7 +158,7 @@ class DeepSeekClient(BaseLLMClient):
         Send messages to DeepSeek and return the reply text.
 
         Pass model="deepseek-v4-pro" to use the pro model for this call.
-        Omit model (or pass None) to use the configured default (deepseek-v4-flash).
+        Omit model (or pass None) to use the configured default (deepseek-flash).
         """
         target_model = model or self._default_model
 
@@ -165,11 +167,16 @@ class DeepSeekClient(BaseLLMClient):
                 model=target_model,
                 messages=messages,
                 temperature=temperature,
+                max_tokens=settings.deepseek_analysis_max_tokens,
+                # Specialist reports need concise answers, not hidden reasoning budgets.
+                extra_body={"thinking": {"type": "disabled"}},
             )
             # P1.31: capture token usage from response
             self._last_usage = ProviderUsageResult.from_openai_usage(
                 getattr(response, "usage", None)
             )
+            if getattr(response.choices[0], "finish_reason", None) == "length":
+                raise ProviderPayloadError("response exceeded output limit")
             content = response.choices[0].message.content
             if content is None:
                 raise ProviderPayloadError("empty response content")
@@ -199,7 +206,7 @@ class DeepSeekClient(BaseLLMClient):
     # ── Convenience shortcuts ─────────────────────────────────────────────────
 
     def chat_flash(self, messages: list[dict], *, temperature: float = 0.3) -> str:
-        """Explicitly call deepseek-v4-flash regardless of configured default."""
+        """Explicitly call deepseek-flash regardless of configured default."""
         return self.chat(messages, temperature=temperature, model=self._default_model)
 
     def chat_pro(self, messages: list[dict], *, temperature: float = 0.3) -> str:
@@ -273,6 +280,7 @@ class DeepSeekClient(BaseLLMClient):
                 }
                 if temperature is not None:
                     create_kwargs["temperature"] = temperature
+                    create_kwargs["extra_body"] = {"thinking": {"type": "disabled"}}
                 stream = self._client.chat.completions.create(**create_kwargs)
                 for chunk in stream:
                     if not chunk.choices:

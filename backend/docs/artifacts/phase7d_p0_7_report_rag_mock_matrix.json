@@ -1,0 +1,28 @@
+{
+  "phase": "7D-P0.7-B",
+  "classification": "PRE_EXISTING_TEST_INFRA",
+  "mechanism": "FIXTURE_CONTRACT_DRIFT",
+  "test_file": "backend/tests/test_phase6w_r1_2_numeric_pipeline.py",
+  "environments": [
+    {"sha": "5dad7228bb7b54338a946b49daeee5eae58348f9", "passed": 15, "failed": 7},
+    {"sha": "c812d4d2e572ffd08cfd56b8110c0ba87b0cab05", "passed": 15, "failed": 7},
+    {"sha": "4434fc60feb652a7806d286f54c2175b979cbb4b", "passed": 15, "failed": 7}
+  ],
+  "test_patch_target": "app.llm.deepseek_client.DeepSeekClient",
+  "production_import_target": "app.llm.deepseek_client.DeepSeekClient",
+  "patch_target_drift": false,
+  "production_call_order": [
+    "import settings and DeepSeekClient",
+    "check settings.ai_enabled",
+    "check settings.ai_api_key",
+    "construct DeepSeekClient",
+    "call client.chat"
+  ],
+  "root_evidence": "fixture does not provide settings.ai_api_key; RuntimeError occurs before mocked client construction",
+  "observed_log": "ReportChatCopilot LLM error category=provider_error type=RuntimeError",
+  "live_llm_calls": 0,
+  "live_tushare_calls": 0,
+  "other_live_provider_calls": 0,
+  "business_code_modified_in_b": false,
+  "test_assertions_modified_in_b": false
+}

@@ -1,0 +1,85 @@
+{
+  "phase": "Phase 6W-R3.3F",
+  "generated_at": "2026-08-28T17:58:00-04:00",
+  "candidate": {
+    "commit": "79323b7ff7665b556bb7eed038f56f167f5dd788",
+    "branch": "r33e-pgvector-portability",
+    "image": "tradingagents-backend:rc-79323b7",
+    "image_digest": "sha256:39b440b6a68c658b9a9ac03dda1afa73913fef35f90b2ca453b247c5be817542",
+    "oci_revision": "79323b7ff7665b556bb7eed038f56f167f5dd788",
+    "migration_head": "q5r6s7t8u9v0"
+  },
+  "run_contract": {
+    "request_count": 15,
+    "unique_question_count": 15,
+    "unique_session_count": 15,
+    "serial_overlap_count": 0,
+    "minimum_gap_after_previous_completion_seconds": 10.005034,
+    "automatic_retry_count": 0,
+    "force_refresh_requested": true,
+    "force_refresh_durable_proof": "S0 completion overwrote its start payload; S2 records cache=written for all 15, but durable trace alone does not retain the force_refresh flag",
+    "traffic": "HOLD_1_PERCENT"
+  },
+  "trace_coverage": {
+    "headers": "15/15",
+    "stage_rows": 128,
+    "possible_stage_rows": 135,
+    "S0": "15/15",
+    "S1": "15/15",
+    "S2": "15/15",
+    "S3": "15/15",
+    "S4": "15/15",
+    "S5": "15/15",
+    "S6": "15/15",
+    "S7": "8/15",
+    "S8": "15/15",
+    "complete_S0_through_S8": "8/15",
+    "explicit_S6_failure_then_S8": "7/15",
+    "trace_persistence_failed": "0/15",
+    "structured_financial_fields": "NOT_DURABLY_PERSISTED: the S6 finish payload replaces the S6 start payload containing structured_financial_data"
+  },
+  "requests": [
+    {"request_id":"2ef547d7","question":"2024年贵州茅台营业收入和同比增速表现如何？","final_status":"completed","stages":"S0-S8","S6":"completed","S7":"completed","numeric_validation":"valid","unsupported_tokens":[],"citation":"valid","leak":false,"evidence_ids":[4,3,12,42,82,205]},
+    {"request_id":"2f143a3c","question":"2024年贵州茅台归母净利润及增长情况如何？","final_status":"completed","stages":"S0-S8","S6":"completed","S7":"completed","numeric_validation":"valid","unsupported_tokens":[],"citation":"valid","leak":false,"evidence_ids":[9,8,26,83,1,87]},
+    {"request_id":"a15bd034","question":"2024年贵州茅台经营活动现金流表现如何？","final_status":"partial_success","stages":"S0-S6,S8","S6":"REPORT_LLM_SYNTHESIS_FAILED","S7":"not_created","numeric_validation":null,"unsupported_tokens":[],"citation":"skipped_after_synthesis_failure","leak":null,"evidence_ids":[101,98,10,165,175,100]},
+    {"request_id":"b8d8c581","question":"2024年贵州茅台加权平均净资产收益率ROE如何变化？","final_status":"partial_success","stages":"S0-S6,S8","S6":"REPORT_LLM_TIMEOUT","S7":"not_created","numeric_validation":null,"unsupported_tokens":[],"citation":"skipped_after_synthesis_failure","leak":null,"evidence_ids":[82,126,4,9,36,64]},
+    {"request_id":"6c84c0b5","question":"2024年贵州茅台基本每股收益是多少？","final_status":"partial_success","stages":"S0-S8","S6":"completed","S7":"NUMERIC_VALIDATION_FAILED","numeric_validation":"invalid","unsupported_tokens":["6"],"citation":"valid","leak":false,"evidence_ids":[88,39,3,190,189,185]},
+    {"request_id":"14176618","question":"2024年贵州茅台毛利率与净利率表现如何？","final_status":"partial_success","stages":"S0-S8","S6":"completed","S7":"NUMERIC_VALIDATION_FAILED","numeric_validation":"invalid","unsupported_tokens":["6"],"citation":"valid","leak":false,"evidence_ids":[183,190,185,3,194,35]},
+    {"request_id":"91ef7054","question":"2024年贵州茅台资产和负债结构有何变化？","final_status":"partial_success","stages":"S0-S8","S6":"completed","S7":"NUMERIC_VALIDATION_FAILED","numeric_validation":"invalid","unsupported_tokens":["6"],"citation":"valid","leak":false,"evidence_ids":[190,73,193,39,38,74]},
+    {"request_id":"29ec92da","question":"2024年贵州茅台销售费用和管理费用表现如何？","final_status":"partial_success","stages":"S0-S6,S8","S6":"REPORT_LLM_SYNTHESIS_FAILED","S7":"not_created","numeric_validation":null,"unsupported_tokens":[],"citation":"skipped_after_synthesis_failure","leak":null,"evidence_ids":[187,38,190,195,186,39]},
+    {"request_id":"8b9c3e7d","question":"2024年贵州茅台分红方案与股东回报如何？","final_status":"partial_success","stages":"S0-S6,S8","S6":"REPORT_LLM_TIMEOUT","S7":"not_created","numeric_validation":null,"unsupported_tokens":[],"citation":"skipped_after_synthesis_failure","leak":null,"evidence_ids":[50,190,192,49,38,182]},
+    {"request_id":"d17a92d2","question":"2024年贵州茅台利润与经营现金流是否匹配，盈利质量如何？","final_status":"partial_success","stages":"S0-S6,S8","S6":"REPORT_LLM_TIMEOUT","S7":"not_created","numeric_validation":null,"unsupported_tokens":[],"citation":"skipped_after_synthesis_failure","leak":null,"evidence_ids":[101,10,98,82,8,102]},
+    {"request_id":"bd1271d0","question":"2024年贵州茅台营收增长质量如何？","final_status":"completed","stages":"S0-S8","S6":"completed","S7":"completed","numeric_validation":"valid","unsupported_tokens":[],"citation":"valid","leak":false,"evidence_ids":[193,196,190,74,191,185]},
+    {"request_id":"dab052e3","question":"2024年贵州茅台投资活动现金流表现如何？","final_status":"partial_success","stages":"S0-S6,S8","S6":"REPORT_LLM_TIMEOUT","S7":"not_created","numeric_validation":null,"unsupported_tokens":[],"citation":"skipped_after_synthesis_failure","leak":null,"evidence_ids":[101,98,99,100,10,102]},
+    {"request_id":"2c1b6d77","question":"2024年贵州茅台筹资活动现金流表现如何？","final_status":"partial_success","stages":"S0-S8","S6":"completed","S7":"NUMERIC_VALIDATION_FAILED","numeric_validation":"invalid","unsupported_tokens":["121.78","20.7%"],"citation":"valid","leak":false,"evidence_ids":[101,100,98,99,102,10]},
+    {"request_id":"38130dd3","question":"贵州茅台2024年年报反映的核心经营风险有哪些？","final_status":"partial_success","stages":"S0-S8","S6":"completed","S7":"CITATION_VALIDATION_FAILED","numeric_validation":"invalid","unsupported_tokens":["37.98%"],"citation":"invalid: duplicate E2","leak":false,"evidence_ids":[82,18,91,77,78,158]},
+    {"request_id":"894d5b5f","question":"请综合总结贵州茅台2024年营收、利润、现金流、盈利能力和风险。","final_status":"partial_success","stages":"S0-S6,S8","S6":"REPORT_LLM_TIMEOUT","S7":"not_created","numeric_validation":null,"unsupported_tokens":[],"citation":"skipped_after_synthesis_failure","leak":null,"evidence_ids":[177,176,117,82,101,102]}
+  ],
+  "token_attribution": [
+    {"request_id":"6c84c0b5","token":"6","sentence":"- 已接入的6条年报证据片段中未包含EPS数据。","first_observed_stage":"S1","report_id":1,"report_year":2024,"classification":"D7_OTHER_NON_FINANCIAL_METADATA","basis":"The number counts retrieved evidence snippets, not a financial fact; the prompt contract uses len(compacted_chunks). The S1 provenance is substring-based and is not reliable causal staging."},
+    {"request_id":"14176618","token":"6","sentence":"但本次结构化财务字段为空，已接入的6条证据片段主要涉及子公司关系、关联交易、术语释义及内部控制等内容，未包含利润表相关财务指标。","first_observed_stage":"S1","report_id":1,"report_year":2024,"classification":"D7_OTHER_NON_FINANCIAL_METADATA","basis":"The number is retrieval-set cardinality, not a financial claim; structured fields were empty according to the S6 raw result."},
+    {"request_id":"91ef7054","token":"6","sentence":"- 已接入的 6 条财报片段主要涉及关联交易、存贷款业务、董监高人员信息及报酬说明，未包含资产总额、负债总额、流动资产、流动负债等资产负债表结构信息。","first_observed_stage":"S1","report_id":1,"report_year":2024,"classification":"D7_OTHER_NON_FINANCIAL_METADATA","basis":"The number is retrieval-set cardinality, not a financial claim; structured fields were empty according to the S6 raw result."},
+    {"request_id":"2c1b6d77","token":"121.78","sentence":"- 净流出变动额：约增加121.78亿元","first_observed_stage":"S6","report_id":1,"report_year":2024,"classification":"D4_UNSUPPORTED_FINANCIAL_CLAIM","basis":"The official chunk gives -71,067,506,484.81 and -58,889,101,991.94 yuan, but not the derived 121.78亿元 difference."},
+    {"request_id":"2c1b6d77","token":"20.7%","sentence":"按绝对值计算，净流出扩大约20.7%","first_observed_stage":"S6","report_id":1,"report_year":2024,"classification":"D4_UNSUPPORTED_FINANCIAL_CLAIM","basis":"The official table explicitly labels the change ratio 不适用; 20.7% is model-derived arithmetic and is not present in any indexed chunk."},
+    {"request_id":"38130dd3","token":"37.98%","sentence":"- 交易性金融资产期末余额248,513,280.00元，较上年下降37.98%，主要因控股子公司财务公司上期债务工具投资到期收回。","first_observed_stage":"S6","report_id":1,"report_year":2024,"classification":"D5_DATE_PERIOD_UNIT_OR_FORMAT_MISMATCH","basis":"Retrieved chunk 18 has a table header 变动比例（%） and value -37.98; the answer expresses semantic decline as unsigned 37.98%, causing sign/percent formatting mismatch."}
+  ],
+  "classification_counts": {
+    "D1_COMPACTOR_OMISSION": 0,
+    "D2_RETRIEVAL_COVERAGE_GAP": 0,
+    "D3_CITATION_METADATA_LEAK": 0,
+    "D4_UNSUPPORTED_FINANCIAL_CLAIM": 2,
+    "D5_DATE_PERIOD_UNIT_OR_FORMAT_MISMATCH": 1,
+    "D6_STRUCTURED_FACTS_EVIDENCE_VERSION_MISMATCH": 0,
+    "D7_OTHER_NON_FINANCIAL_METADATA": 3,
+    "UNCONFIRMED": 0
+  },
+  "d3_regression": {
+    "citation_metadata_leak_true": 0,
+    "citation_metadata_leak_false": 8,
+    "not_evaluated_after_s6_failure": 7,
+    "citation_validation_failures": 1,
+    "note": "Duplicate E2 is a citation-validity failure, not an internal chunk-id metadata leak."
+  },
+  "root_cause_decision": "ROOT_CAUSE_NOT_READY",
+  "traffic_decision": "HOLD_1_PERCENT"
+}

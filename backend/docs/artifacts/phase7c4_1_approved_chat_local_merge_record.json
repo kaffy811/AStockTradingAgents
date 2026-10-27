@@ -1,0 +1,39 @@
+{
+  "phase": "7C4.1",
+  "operation": "local_merge",
+  "status": "completed",
+  "target_branch": "release/demo-staging",
+  "release_baseline": "e8985471d62ce74e5cd99b61b9eadf27a13878ce",
+  "pre_merge_head": "386e27fb35e1ea8ffb7b08a572c768b2ba9b6593",
+  "approved_candidate": "54339d556c21985a15f5aed8040e65fc7690dd4c",
+  "merge_commit": "5dad7228bb7b54338a946b49daeee5eae58348f9",
+  "merge_parents": [
+    "386e27fb35e1ea8ffb7b08a572c768b2ba9b6593",
+    "54339d556c21985a15f5aed8040e65fc7690dd4c"
+  ],
+  "merge_tree": "0981783304376eed46a6a3276950aa95511f3b69",
+  "candidate_tree": "0981783304376eed46a6a3276950aa95511f3b69",
+  "candidate_to_merge_head_diff_empty": true,
+  "fast_forward_possible": false,
+  "merge_strategy": "ort_no_ff",
+  "conflicts": 0,
+  "candidate_file_count": 21,
+  "staged_files_after_merge": [],
+  "pre_existing_dirty_files_in_merge_commit": false,
+  "prohibited_actions": {
+    "push": false,
+    "deploy": false,
+    "production_migration": false,
+    "traffic_expansion": false
+  },
+  "pre_deploy_blockers": [
+    {
+      "code": "BLOCKING_PRE_DEPLOY_TEST_INFRA_RECHECK",
+      "description": "Re-run the complete frontend suite with zero Vitest worker startup timeouts",
+      "previous_assertions_passed": 615,
+      "previous_worker_start_timeouts": 12,
+      "complete_suite_recorded_as_passed": false,
+      "required_before_deploy": true
+    }
+  ]
+}

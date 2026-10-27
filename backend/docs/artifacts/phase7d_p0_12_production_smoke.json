@@ -1,0 +1,122 @@
+{
+  "phase": "Phase 7D-P0.12",
+  "recorded_at_utc": "2026-09-10T00:59:53Z",
+  "conclusion": "PRODUCTION_MONITORING_REQUIRED",
+  "read_only": true,
+  "server": {
+    "git_head": "98c111b684cb19de0e0e92cb46e1d675ef3e8d0a",
+    "git_tree": "24a9961639dd7d8388fe8353a6e2e7eb8b955f03",
+    "preserved_status": [
+      " M docker-compose.staging.yml",
+      "?? .env.staging.local.backup.20260728-130419"
+    ],
+    "backend": {
+      "container_id": "8243d6fe795acce9df496674adc29dd60964bc4c7b1387baccf755834feb7508",
+      "image_id": "sha256:6e21f29a3e542847126408b98242df371681934b29c996ed94e8ae65e85a315d",
+      "status": "running",
+      "health": "healthy",
+      "restart_count": 0,
+      "oom_killed": false
+    },
+    "frontend": {
+      "container_id": "386aa1b3caf399468c8433f39be57776f11d808e62f184e515bf4519d657cbf1",
+      "image_id": "sha256:03120502202495dafad2eaca059d3665cf91ebfb2f653bcaa15d1dd155da170d",
+      "status": "running",
+      "restart_count": 0,
+      "oom_killed": false
+    },
+    "resources": {
+      "memory_total": "1.6Gi",
+      "memory_available": "856Mi",
+      "swap_total": "4.0Gi",
+      "swap_used": "0B",
+      "root_disk_size": "40G",
+      "root_disk_used": "16G",
+      "root_disk_available": "22G",
+      "root_disk_use_percent": "43%"
+    }
+  },
+  "http_smoke": {
+    "health": 200,
+    "company_profile": {
+      "http": 200,
+      "ok": true,
+      "company_name": "京东方科技集团股份有限公司",
+      "nonempty": true
+    },
+    "company_history_annual": {
+      "http": 200,
+      "ok": true,
+      "reason_code": null,
+      "module_status": {
+        "available": 6,
+        "total": 6
+      },
+      "auth_required": false,
+      "allowlist_violations": [],
+      "forbidden_field_matches": {
+        "AUTH_REQUIRED": 0,
+        "token": 0,
+        "api_key": 0,
+        "authorization": 0,
+        "raw_payload": 0,
+        "raw_body": 0,
+        "trace_id": 0,
+        "performance_summary": 0,
+        "calls_by_endpoint": 0,
+        "provider_url": 0,
+        "endpoint_url": 0,
+        "request_metadata": 0,
+        "RuntimeError": 0,
+        "Traceback": 0,
+        "internal_path_markers": 0
+      }
+    },
+    "local_frontend": 200,
+    "public_frontend": 200
+  },
+  "browser_validation": {
+    "status": "BLOCKED_BY_BROWSER_AVAILABILITY",
+    "original_error": "No browser is available",
+    "available_browsers": [],
+    "boe_company_page": "not visually verified",
+    "maotai_eod_label_and_source": "not visually verified",
+    "theme_fail_closed_user_visible_state": "not visually verified",
+    "curl_or_api_substituted_for_visual_acceptance": false
+  },
+  "sanitized_log_counts_since_deployment": {
+    "http_5xx": 0,
+    "health_failure": 0,
+    "oom": 0,
+    "disk_io": 0,
+    "auth_required": 0,
+    "tushare_failure": 0,
+    "tushare_timeout": 0,
+    "unapproved_provider": 0,
+    "public_leak_marker": 0,
+    "kernel_oom": 0,
+    "kernel_disk_io": 0
+  },
+  "observation_window": {
+    "start_utc": "2026-09-10T00:59:53Z",
+    "end_utc": "2026-09-11T00:59:53Z",
+    "scheduled_task_created": false,
+    "mode": "registration only; no automated polling task",
+    "record_only": [
+      "HTTP 5xx, failed health checks, or container restarts",
+      "Tushare failure rate and timeouts",
+      "Company profile/history empty-data ratio",
+      "abnormal memory, swap, or disk use",
+      "user-visible errors"
+    ]
+  },
+  "prohibited_actions": {
+    "code_change": false,
+    "container_restart": false,
+    "migration": false,
+    "traffic_expansion": false,
+    "scheduled_scraper": false,
+    "tushare_news_enabled": false,
+    "theme_fail_closed_changed": false
+  }
+}

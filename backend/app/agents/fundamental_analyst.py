@@ -22,6 +22,8 @@ from __future__ import annotations
 
 import logging
 
+from app.core.config import settings
+from app.agents.reader_report import SPECIALIST_SYSTEM, has_financial_evidence
 from app.llm.base import BaseLLMClient
 from app.services.fundamental_data_service import (
     FundamentalDataService,
@@ -183,6 +185,11 @@ class FundamentalAnalystAgent:
                 f"fundamentals 返回结构异常 [{market}/{symbol}]"
             )
 
+        if settings.report_reader_mode == "beginner" and not has_financial_evidence(snapshot):
+            return ""
+        from app.agents.report_visual_evidence import capture_growth
+        capture_growth(snapshot)
+
         # ── Step 2: 组装用户 Prompt ───────────────────────────────────────────
         user_content = self._build_user_prompt(
             market,
@@ -196,7 +203,7 @@ class FundamentalAnalystAgent:
         # ── Step 3: 调用 LLM ──────────────────────────────────────────────────
         log.info("FundamentalAnalystAgent: calling LLM [%s/%s]", market, symbol)
         messages = [
-            {"role": "system", "content": _SYSTEM_PROMPT},
+            {"role": "system", "content": (SPECIALIST_SYSTEM + "\n本次只分析：公司经营。" if settings.report_reader_mode == "beginner" else _SYSTEM_PROMPT)},
             {"role": "user",   "content": user_content},
         ]
         report = self._llm.chat(messages, temperature=0.3)

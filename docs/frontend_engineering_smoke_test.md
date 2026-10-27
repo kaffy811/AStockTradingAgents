@@ -1,5 +1,7 @@
 # Frontend Engineering Smoke Test
 
+> 账户机制已更新为仅 Google 登录；下文旧密码/邀请码注册及管理示例仅为历史记录，现已停用，不应执行。当前配置、测试与发布/回滚请使用 [Google-only 说明](GOOGLE_LOGIN.md) 和 [发布步骤](GOOGLE_ONLY_DEPLOYMENT.md)。
+
 **测试日期：** 2026-05-26（浏览器 smoke test 完成）  
 **文档更新：** 2026-05-30（Phase P1-a / P1-a.1 / P1-b 专项测试章节新增）  
 **版本：** Vue 3 + Vite 工程化迁移（index.legacy.html → src/ 组件化结构）  

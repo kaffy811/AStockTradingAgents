@@ -132,7 +132,10 @@ async def get_watchlist_enriched(
                     "latest_price": d.get("price"),
                     "change_pct":   d.get("change_pct"),
                     "quote_status": "ok",
-                    "quote_message": None,
+                    "quote_provider": result.provider,
+                    "quote_cached": result.cached,
+                    "quote_stale": result.stale,
+                    "quote_message": result.message,
                 }
         except Exception:
             pass
@@ -164,6 +167,9 @@ async def get_watchlist_enriched(
             change_pct    = qdata["change_pct"],
             industry_code = ind.get("industry_code"),
             industry_name = ind.get("industry_name"),
+            quote_provider = qdata.get("quote_provider"),
+            quote_cached   = qdata.get("quote_cached", False),
+            quote_stale    = qdata.get("quote_stale", False),
             quote_status  = qdata["quote_status"],
             quote_message = qdata["quote_message"],
             latest_report = latest_map.get((row.market, row.symbol)),

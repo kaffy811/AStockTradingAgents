@@ -60,7 +60,11 @@ export async function getReport(reportId) {
     output_language: data.output_language || 'zh-CN',
     report:          data.report_md,          // ← remap
     sections:        data.sections,
-    metadata:        data.report_metadata,    // ← remap
+    metadata: {
+      ...(data.report_metadata || {}),
+      agents: data.agents || data.report_metadata?.agents || {},
+      warnings: data.warnings || data.report_metadata?.warnings || [],
+    },
     warnings:        data.warnings,
     agents:          data.agents,
     created_at:      data.created_at,

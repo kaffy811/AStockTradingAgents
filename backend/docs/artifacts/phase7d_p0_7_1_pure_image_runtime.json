@@ -1,0 +1,127 @@
+{
+  "phase": "7D-P0.7.1",
+  "decision": "HOLD_WITH_EVIDENCE",
+  "candidate_sha": "4434fc60feb652a7806d286f54c2175b979cbb4b",
+  "candidate_tree": "24a9961639dd7d8388fe8353a6e2e7eb8b955f03",
+  "images": {
+    "backend": "sha256:2a7984bc6785285249e2d7343c8f86225a54c8eb7302583283419d63d52717b1",
+    "frontend": "sha256:02dbad039d46b4ae7e632190a83c9c10e0681a2620346bebe771f8c997650228",
+    "oci_revision": "4434fc60feb652a7806d286f54c2175b979cbb4b",
+    "mounts": []
+  },
+  "harness": {
+    "path": "/private/tmp/phase7d_p0_7_1_harness.py",
+    "sha256": "bd5611720a46551a3949410d486453d8376b470a41d669c78081b1e1d328d94d",
+    "py_compile": "pass",
+    "fixture_path": "/private/tmp/phase7d_p0_7_1_fixture.json",
+    "fixture_sha256": "fde89fdd2e1272bed5a44013e043d55684d6e3321e1685b7e655bcc3b4ae714b",
+    "json_tool": "pass",
+    "candidate_commit_modified": false
+  },
+  "pre_session_harness_error": {
+    "status": "HARNESS_ERROR",
+    "stage": "pre_request_import",
+    "queries_executed": 0,
+    "error": "ModuleNotFoundError: No module named 'app'"
+  },
+  "superseded_session": {
+    "session_id": "50fe39cc-2d9c-4df7-b4ed-1360e4e8b8ff",
+    "started_at": "2026-09-08T04:24:20.599080+00:00",
+    "completed_at": "2026-09-08T04:24:20.826726+00:00",
+    "status": "superseded_not_accepted",
+    "atomic_result_sha256": "246fdbaf1f92b48ac8005aed5dbeb1651820752ff4840fe0455a66574f59c28f"
+  },
+  "superseded_queries": [
+    {
+      "id": "Q1",
+      "request_id": "4953cac6-367a-4488-a868-536b825630b0",
+      "started_at": "2026-09-08T04:24:20.599086+00:00",
+      "completed_at": "2026-09-08T04:24:20.822298+00:00",
+      "fulfillment": "fulfilled",
+      "reason_code": null,
+      "source": "tushare",
+      "as_of": "2026-08-31",
+      "report_period": "2026-06-30",
+      "numeric_validation": null,
+      "profile_nonempty": true,
+      "history_auth_required": false,
+      "module_statuses": {"profile": "fulfilled", "quote": "fulfilled", "valuation": "fulfilled", "financial": "fulfilled"},
+      "llm_call_count": 0,
+      "tushare_call_count": 4,
+      "akshare_call_count": 0,
+      "eastmoney_call_count": 0,
+      "sina_call_count": 0,
+      "tencent_call_count": 0
+    },
+    {
+      "id": "Q2",
+      "request_id": "850baf25-26e9-4dfe-84df-e100f5544fb9",
+      "started_at": "2026-09-08T04:24:20.823402+00:00",
+      "completed_at": "2026-09-08T04:24:20.823886+00:00",
+      "fulfillment": "fulfilled",
+      "reason_code": null,
+      "symbol": "600519.SH",
+      "source": ["tushare", "CNINFO"],
+      "as_of": "2026-08-31",
+      "report_period": ["2026-06-30"],
+      "numeric_validation": {"valid": true, "checked_claims": 5, "unsupported_tokens": [], "evidence_basis": 5},
+      "eod_wording": true,
+      "llm_call_count": 0,
+      "tushare_call_count": 1,
+      "akshare_call_count": 0,
+      "eastmoney_call_count": 0,
+      "sina_call_count": 0,
+      "tencent_call_count": 0
+    },
+    {
+      "id": "Q3",
+      "request_id": "ebc87108-e652-4368-9a02-cc87196bd165",
+      "started_at": "2026-09-08T04:24:20.824531+00:00",
+      "completed_at": "2026-09-08T04:24:20.824882+00:00",
+      "fulfillment": "fulfilled",
+      "reason_code": null,
+      "symbol": "600519.SH",
+      "source": ["tushare", "CNINFO"],
+      "as_of": "2026-08-31",
+      "report_period": ["2026-06-30"],
+      "numeric_validation": {"valid": true, "checked_claims": 5, "unsupported_tokens": [], "evidence_basis": 5},
+      "llm_call_count": 0,
+      "tushare_call_count": 1,
+      "akshare_call_count": 0,
+      "eastmoney_call_count": 0,
+      "sina_call_count": 0,
+      "tencent_call_count": 0
+    },
+    {
+      "id": "Q4",
+      "request_id": "e8163dd9-e191-4090-9e02-b0427c308afb",
+      "started_at": "2026-09-08T04:24:20.826079+00:00",
+      "completed_at": "2026-09-08T04:24:20.826199+00:00",
+      "fulfillment": "unavailable",
+      "reason_code": "NO_APPROVED_INDUSTRY_NEWS_SOURCE",
+      "source": [],
+      "as_of": null,
+      "report_period": null,
+      "numeric_validation": null,
+      "llm_call_count": 0,
+      "tushare_call_count": 0,
+      "akshare_call_count": 0,
+      "eastmoney_call_count": 0,
+      "sina_call_count": 0,
+      "tencent_call_count": 0
+    }
+  ],
+  "current_session": {
+    "container": "phase7d-p0-7-1-runtime-session3",
+    "status": "HARNESS_ERROR",
+    "failed_before_query": "Q1",
+    "error": "ModuleNotFoundError: No module named 'pandas'",
+    "queries": {
+      "Q1": "NOT_EXECUTED",
+      "Q2": "NOT_EXECUTED",
+      "Q3": "NOT_EXECUTED",
+      "Q4": "NOT_EXECUTED"
+    }
+  },
+  "live_provider_call_count": 0
+}

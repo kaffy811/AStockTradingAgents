@@ -107,13 +107,14 @@ def get_quote_cache(market: str, symbol: str) -> tuple[Any, bool]:
     redis_val = cache_service.sync_get_json(key)
     if redis_val is not None:
         log.info("quote Redis HIT [%s/%s]", m, symbol)
+        _stale_store[key] = redis_val  # keep shared-cache hits for outage fallback
         return redis_val, True
 
     # L2: 内存
     mem_val, hit = _get(key)
     if hit:
         # 回写 Redis（跨进程共享）
-        cache_service.sync_set_json(key, mem_val, _QUOTE_TTL)
+        cache_service.sync_set_json(key, mem_val, max(1, int(_store[key][1] - time.monotonic())))
         return mem_val, True
 
     return None, False
@@ -166,12 +167,13 @@ def get_kline_cache(
     redis_val = cache_service.sync_get_json(key)
     if redis_val is not None:
         log.info("kline Redis HIT [%s/%s %s %s limit=%d]", m, symbol, period, adjust, limit)
+        _stale_store[key] = redis_val  # keep shared-cache hits for outage fallback
         return redis_val, True
 
     # L2: 内存
     mem_val, hit = _get(key)
     if hit:
-        cache_service.sync_set_json(key, mem_val, _KLINE_TTL)
+        cache_service.sync_set_json(key, mem_val, max(1, int(_store[key][1] - time.monotonic())))
         return mem_val, True
 
     return None, False

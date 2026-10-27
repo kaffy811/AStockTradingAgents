@@ -1,0 +1,114 @@
+{
+  "phase": "Phase 7D-P0.11",
+  "generated_at_utc": "2026-09-10T00:46:00Z",
+  "conclusion": "DEPLOYMENT_COMPLETE",
+  "authorization": {
+    "owner_authorized_push": true,
+    "owner_authorized_deployment": true,
+    "tushare_commercial_display_cache_ai_summary_confirmed_by_owner": true,
+    "credentials_or_private_support_information_recorded": false
+  },
+  "git": {
+    "local_release_sha": "98c111b684cb19de0e0e92cb46e1d675ef3e8d0a",
+    "remote_release_sha": "98c111b684cb19de0e0e92cb46e1d675ef3e8d0a",
+    "server_final_sha": "98c111b684cb19de0e0e92cb46e1d675ef3e8d0a",
+    "tree": "24a9961639dd7d8388fe8353a6e2e7eb8b955f03",
+    "push": "non-force; Everything up-to-date",
+    "server_merge": "already at target after prior fast-forward-only update",
+    "isolated_worktree": "/private/tmp/phase7d_p0_11_retry.mBNgDx/worktree",
+    "isolated_worktree_clean_after_build": true,
+    "main_worktree_used_as_deployment_input": false,
+    "main_worktree_recorded_only": {
+      "tracked_changes": 6,
+      "untracked": 125,
+      "staged": 0
+    }
+  },
+  "images": {
+    "backend": {
+      "tag": "tradingagents-backend:phase7d-p0-11-r2-98c111b-amd64",
+      "image_id_and_digest": "sha256:6e21f29a3e542847126408b98242df371681934b29c996ed94e8ae65e85a315d",
+      "platform": "linux/amd64",
+      "oci_revision": "98c111b684cb19de0e0e92cb46e1d675ef3e8d0a",
+      "source_tree": "24a9961639dd7d8388fe8353a6e2e7eb8b955f03",
+      "archive_sha256": "eb216e2d5cd0e3a753dc1dcf53c9bfadb27697eafeddb0c956ae3c772e3f609b",
+      "server_checksum_match": true,
+      "credential_pattern_matches_in_config_and_history": 0
+    },
+    "frontend": {
+      "tag": "tradingagents-frontend:phase7d-p0-11-r2-98c111b-amd64",
+      "image_id_and_digest": "sha256:03120502202495dafad2eaca059d3665cf91ebfb2f653bcaa15d1dd155da170d",
+      "platform": "linux/amd64",
+      "oci_revision": "98c111b684cb19de0e0e92cb46e1d675ef3e8d0a",
+      "source_tree": "24a9961639dd7d8388fe8353a6e2e7eb8b955f03",
+      "archive_sha256": "39f445f42698ac86961e7251ec47f1b4447f0be77379f76c7e6601368cdf3ac2",
+      "server_checksum_match": true,
+      "credential_pattern_matches_in_config_and_history": 0
+    }
+  },
+  "server_preflight": {
+    "repository": "/opt/tradingagents",
+    "head": "98c111b684cb19de0e0e92cb46e1d675ef3e8d0a",
+    "tree": "24a9961639dd7d8388fe8353a6e2e7eb8b955f03",
+    "backend_health_http": 200,
+    "memory_total": "1.6Gi",
+    "memory_available": "854Mi",
+    "disk_available_root": "22G",
+    "preserved_dirty_state": [
+      " M docker-compose.staging.yml",
+      "?? .env.staging.local.backup.20260728-130419"
+    ],
+    "dirty_release_diff_overlap": [],
+    "staged_files": []
+  },
+  "switch": {
+    "backend": {
+      "before_image": "sha256:de3377b3081876400226ef1e817574122083be83eeb8fcfb1206d1118c95d790",
+      "before_rollback_tag": "aastock-mvp-backend:rollback-pre-phase7d-p0-11-r2-de3377b",
+      "after_container_id": "8243d6fe795acce9df496674adc29dd60964bc4c7b1387baccf755834feb7508",
+      "after_image": "sha256:6e21f29a3e542847126408b98242df371681934b29c996ed94e8ae65e85a315d",
+      "health": "healthy",
+      "health_http": 200
+    },
+    "company_api": {
+      "profile": {
+        "path": "/api/v2/company/CN/000725/profile",
+        "http": 200,
+        "curl_exit_code": 0,
+        "auth_required": false,
+        "response_nonempty": true
+      },
+      "history": {
+        "path": "/api/v2/company/CN/000725/history?period=annual",
+        "http": 200,
+        "curl_exit_code": 0,
+        "auth_required": false
+      }
+    },
+    "frontend": {
+      "before_image": "sha256:d89780ae4b5ec49e8ff8fd1b58e92141b357e07920e9f37de2cf8e6a1d10baad",
+      "before_rollback_tag": "aastock-mvp-frontend:rollback-pre-phase7d-p0-11-r2-d89780a",
+      "after_container_id": "386aa1b3caf399468c8433f39be57776f11d808e62f184e515bf4519d657cbf1",
+      "after_image": "sha256:03120502202495dafad2eaca059d3665cf91ebfb2f653bcaa15d1dd155da170d",
+      "local_http": 200,
+      "public_http": 200
+    },
+    "rollback_triggered_in_final_attempt": false,
+    "prior_attempt_note": "An earlier attempt automatically restored the old backend after its Company API evidence session did not complete; the final attempt used server-persisted logs and passed all gates."
+  },
+  "server_final_resources": {
+    "memory_available": "848Mi",
+    "disk_available_root": "22G",
+    "disk_use_percent": "43%"
+  },
+  "prohibited_actions": {
+    "migration": false,
+    "compose_down": false,
+    "remove_orphans": false,
+    "server_docker_build": false,
+    "force_push": false,
+    "parallel_build": false,
+    "traffic_expansion": false,
+    "image_volume_or_container_cleanup": false
+  }
+}

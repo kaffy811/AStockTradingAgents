@@ -22,6 +22,8 @@ from __future__ import annotations
 import logging
 import re
 
+from app.core.config import settings
+from app.agents.reader_report import SPECIALIST_SYSTEM
 from app.llm.base import BaseLLMClient
 from app.services.news_data_service import news_data_service
 from app.agents.language_utils import build_output_language_instruction
@@ -267,6 +269,9 @@ class NewsAnalystAgent:
             market, symbol,
         )
 
+        if settings.report_reader_mode == "beginner" and not snapshot.get("items"):
+            return ""
+
         # ── Step 2: 构建 User Prompt ─────────────────────────────────────
         user_prompt = _build_user_prompt(
             market, symbol, hours_back, limit, snapshot,
@@ -276,7 +281,7 @@ class NewsAnalystAgent:
 
         # ── Step 3: LLM 调用 ──────────────────────────────────────────────
         messages = [
-            {"role": "system", "content": _SYSTEM_PROMPT},
+            {"role": "system", "content": (SPECIALIST_SYSTEM + "\n本次只分析：公司新闻。" if settings.report_reader_mode == "beginner" else _SYSTEM_PROMPT)},
             {"role": "user",   "content": user_prompt},
         ]
         log.info("NewsAnalystAgent: calling LLM [%s/%s]", market, symbol)

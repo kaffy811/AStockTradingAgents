@@ -10,6 +10,7 @@ Financial safety: no 买入/卖出/持有/目标价 in outputs.
 """
 from __future__ import annotations
 
+import asyncio
 import logging
 from typing import Any
 
@@ -109,7 +110,7 @@ class GetQuoteTool(BaseTool):
         if not symbol:
             return ToolResult(ok=False, tool_name=self.name, summary="缺少股票代码", error="symbol is empty")
 
-        quote = stock_data_service.get_quote_optional(market, symbol)
+        quote = await asyncio.to_thread(stock_data_service.get_quote_optional, market, symbol)
         if quote is None:
             return ToolResult(
                 ok=False, tool_name=self.name,
@@ -168,7 +169,7 @@ class GetKlineSummaryTool(BaseTool):
             return ToolResult(ok=False, tool_name=self.name, summary="缺少股票代码", error="symbol is empty")
 
         try:
-            bars = stock_data_service.get_kline_for_agent(market, symbol, limit=limit)
+            bars = await asyncio.to_thread(stock_data_service.get_kline_for_agent, market, symbol, limit=limit)
         except Exception as exc:
             log.warning("get_kline_summary_tool: failed [%s/%s]: %s", market, symbol, exc)
             return ToolResult(ok=False, tool_name=self.name, summary="K线数据暂不可用", error=str(exc))
@@ -225,7 +226,7 @@ class GetLatestNewsTool(BaseTool):
             return ToolResult(ok=False, tool_name=self.name, summary="缺少股票代码", error="symbol is empty")
 
         try:
-            result = news_data_service.get_stock_news(market, symbol, hours_back=hours_back, limit=limit)
+            result = await asyncio.to_thread(news_data_service.get_stock_news, market, symbol, hours_back=hours_back, limit=limit)
         except Exception as exc:
             log.warning("get_latest_news_tool: failed [%s/%s]: %s", market, symbol, exc)
             return ToolResult(ok=False, tool_name=self.name, summary="新闻数据暂不可用", error=str(exc))

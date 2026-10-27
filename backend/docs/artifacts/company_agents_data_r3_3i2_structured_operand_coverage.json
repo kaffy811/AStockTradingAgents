@@ -1,0 +1,63 @@
+{
+  "phase": "6W-R3.3I.2",
+  "status": "STRUCTURED_FACT_COVERAGE_NOT_READY",
+  "traffic_decision": "HOLD_1_PERCENT",
+  "workspace": {
+    "head": "b055da8495c54bb37625f0b0e0f94b4d4a627de2",
+    "branch": "release/demo-staging",
+    "historical_dirty_preserved": true,
+    "candidate_tree": "/private/tmp/tradingagents-r33e1.IfXFWV",
+    "diff_check": "clean"
+  },
+  "evidence": {
+    "report_id": 1,
+    "company": "600519.SH",
+    "report_year": 2024,
+    "report_type": "annual",
+    "period": "2024-12-31",
+    "source": "cninfo",
+    "source_url": "https://static.cninfo.com.cn/finalpage/2025-04-03/1222993920.PDF",
+    "source_chunk_internal": 4,
+    "pages": [5, 6],
+    "request_local_evidence_id": "E7",
+    "unit": "元",
+    "currency": "人民币",
+    "operands": {
+      "revenue": "170899152276.34",
+      "net_profit": "86228146421.62"
+    }
+  },
+  "implementation": {
+    "implemented": true,
+    "scope": ["revenue", "net_profit", "net_margin"],
+    "files": [
+      "/private/tmp/tradingagents-r33e1.IfXFWV/backend/app/services/report_local_structured_operand_supplement.py",
+      "/private/tmp/tradingagents-r33e1.IfXFWV/backend/app/services/report_derived_fact_service.py",
+      "/private/tmp/tradingagents-r33e1.IfXFWV/backend/app/agent/report_chat_copilot_agent.py",
+      "/private/tmp/tradingagents-r33e1.IfXFWV/backend/tests/test_phase6w_r3_3i2_structured_operand_coverage.py"
+    ]
+  },
+  "q1": {
+    "request_id": "85f64702",
+    "selected_report_id": 1,
+    "selected_period": "2024-12-31",
+    "original_structured_field_count": 1,
+    "supplemented_field_count": 1,
+    "supplemented": ["parent_net_profit"],
+    "derived_fact": {"metric": "net_margin", "display_result": "50.46%", "evidence_ids": ["E7"]},
+    "prompt_contains_derived_fact": true,
+    "citation_validation": null,
+    "numeric_validation": null,
+    "raw_chunk_id_leakage": false,
+    "failure_endpoint": "S6",
+    "error_code": "REPORT_LLM_TIMEOUT",
+    "final_status": "partial_success",
+    "passed": false
+  },
+  "q2": {"request_id": "146efe3d", "stages": "S0-S8", "final_status": "partial_success", "numeric_validation_valid": false},
+  "q3": {"request_id": "ea528f60", "stages": "S0-S6,S8", "failure_endpoint": "S6", "error_code": "REPORT_LLM_TIMEOUT", "final_status": "partial_success"},
+  "tests": [{"collected": 34, "passed": 34, "failed": 0, "skipped": 0, "duration_seconds": 0.58}],
+  "d3_regression": {"passed": true, "citation_metadata_leak": false},
+  "minimal_commit_ready": false,
+  "operations": {"committed": false, "pushed": false, "migration_run": false, "production_deployed": false, "traffic_expanded": false}
+}

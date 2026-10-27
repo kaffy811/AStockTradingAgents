@@ -35,7 +35,7 @@ describe('CompanyV2 Phase 6U-D4 cache and progressive loading', () => {
     expect(view.default).toContain('quote-skeleton')
     expect(view.default).toContain('financial-module-skeletons')
     expect(view.default).toContain('pageTimedOut')
-    expect(view.default).toContain('加载超时，可重试')
+    expect(view.default).toContain('部分数据加载超时，已保留已取得的资料')
     expect(view.default).toContain('setTimeout')
   })
 

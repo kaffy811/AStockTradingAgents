@@ -1,0 +1,217 @@
+{
+  "status": "candidate_server_baseline_not_verified",
+  "local_head": "98c111b684cb19de0e0e92cb46e1d675ef3e8d0a",
+  "patch_sha256": "141ed3a0d70ab8b2ea0eb6cdcdf85ad9c168d5a98ab889936efbdc94ed0e6626",
+  "files": [
+    {
+      "path": "backend/app/agents/chat_tools/stock_tools.py",
+      "before_sha256": [
+        "5490e29773c405143226580756f624c47642ac8ebf0e586cc95e357e67112161"
+      ],
+      "new_file": false,
+      "after_sha256": [
+        "a226889fdcc06c720947c76a262a23bf76ec90c7a21a7532b7911976e0fc1f5f"
+      ]
+    },
+    {
+      "path": "backend/app/agents/financial_runtime/tool_runtime.py",
+      "before_sha256": [
+        "9cd5e89f8cb192284fb80e306e490ba4256d881eb4f49124e44f50467285f8a8"
+      ],
+      "new_file": false,
+      "after_sha256": [
+        "ffa588a5b4a3d46ef273fa3d2840f7b2577956e4543402e09f7ad94da403ed72"
+      ]
+    },
+    {
+      "path": "backend/app/core/config.py",
+      "before_sha256": [
+        "60276623be70a3ba479f5cb7bb48f106751004ec77136f86987d946eac7c4241",
+        "c303bb8ab5ce83650f6b87762c68e633e9b978a48e1e20a6d6795e6919c41999"
+      ],
+      "new_file": false,
+      "after_sha256": [
+        "47bec11d20392e7b643aef1bae2d9e1886e9edc3fcb7ba087e8f4f3deeaf2547",
+        "7990ffd2263bb9c600913e9e40f8cbd7a8852cafc9f12ec6616fb12721b89eac"
+      ]
+    },
+    {
+      "path": "backend/app/core/database.py",
+      "before_sha256": [
+        "f1e26047b3cf3b82b4bbc65d096e3dcb4e42a9a93870233b0ed8382be0a68f94"
+      ],
+      "new_file": false,
+      "after_sha256": [
+        "b8a0819982dd3540f1ed667439dbafc4185b9a6e8d2f510cfda5784524c683ca"
+      ]
+    },
+    {
+      "path": "backend/app/data/providers/eastmoney_provider.py",
+      "before_sha256": [
+        "5c38775a7100a078622f09704e4747ec39c128a50882e8e7f898c3ef7f5cad2e"
+      ],
+      "new_file": false,
+      "after_sha256": [
+        "2d4f4262359cb7404b9ae97149afaa0c779058bdd15e06180c4e5468d465b573"
+      ]
+    },
+    {
+      "path": "backend/app/main.py",
+      "before_sha256": [
+        "57d25ff1af5d3ef232270547ab9f5dd817d7dc67dfc2607613f5e3a70bb4a0a9",
+        "b2d83bb84a95528640e56f166d69d9f49eba1245a8995bd852b9c3aa5253be7c"
+      ],
+      "new_file": false,
+      "after_sha256": [
+        "3ef7935e7ed07081e9657f69041aebd02979bb54cb0cfc5b119e25480563c6bb",
+        "7be08f6f11b61f8d61804084f6609eb451b9f0be5668182a19ee4be6f855becf"
+      ]
+    },
+    {
+      "path": "backend/app/models/watchlist_item.py",
+      "before_sha256": [
+        "4068ee62f318d9eec479a559f61b69f8d56e47bf6defaabec775dafb18e92999"
+      ],
+      "new_file": false,
+      "after_sha256": [
+        "c2af39256daf4aafab05b9a482c75f30e2c616b2cdc07ecc0388de1c0d03b60c"
+      ]
+    },
+    {
+      "path": "backend/app/routers/stocks.py",
+      "before_sha256": [
+        "819d98d0269fcb009ec2ba490f1de0403a56df69e514df2912e03621786dd494"
+      ],
+      "new_file": false,
+      "after_sha256": [
+        "3ba4f6285a89266595cb1afb7cdc032b87653bb572344dd4fa15e306f55d6907"
+      ]
+    },
+    {
+      "path": "backend/app/routers/watchlist.py",
+      "before_sha256": [
+        "477d83377a73c05b295b36ae6b6543a87f7f7147b34ae7d7aaf5b1f7fd6d16b2"
+      ],
+      "new_file": false,
+      "after_sha256": [
+        "52e3100add65c82c9d5898d98213a92cd2ad2e018db170d67de07cdc480a9e0b"
+      ]
+    },
+    {
+      "path": "backend/app/services/cache_service.py",
+      "before_sha256": [
+        "3d900bf23af44847981688d975b8f923db6afd0de3ed328b827188e29a6fccf7"
+      ],
+      "new_file": false,
+      "after_sha256": [
+        "47ea223ab0332a26d754d62851962f28931ceaff6f7ccbf88c782589e7dce763"
+      ]
+    },
+    {
+      "path": "backend/app/services/stock_cache_service.py",
+      "before_sha256": [
+        "e2bc7bd4f136707bec9724020a488dbebada1535376c1ae1439b452bb6d1f29d"
+      ],
+      "new_file": false,
+      "after_sha256": [
+        "2be7cbcb8615199ba29737b46f88227f14566e2c9ca2ce476a2fae7e7e84ada7"
+      ]
+    },
+    {
+      "path": "backend/app/services/stock_data_service.py",
+      "before_sha256": [
+        "54e712b6746744854828d6d3146e265f8cfb8953d0453b269b079211b48e6bab"
+      ],
+      "new_file": false,
+      "after_sha256": [
+        "6342ee957849ff9205f86efff809e6285adaaef35ce6cc85bab7ec861a9c9cdb"
+      ]
+    },
+    {
+      "path": "frontend/src/api/auth.js",
+      "before_sha256": [
+        "5276735170837c6c8a98ed4175ddd79e15e058b662212e908e593b5b5edf2b3c",
+        "8d1849612503373443a1335c8faff755e02e23aaf4f497121229ec0a401c945d"
+      ],
+      "new_file": false,
+      "after_sha256": [
+        "18fa3c38df759a5d11a10e6c2ad2c5b61c1354fc18a69617dcba65b9c55d0fb0",
+        "e887b154830945685aa0494882fae20e72511b9b128685dd1e3a815de63978ac"
+      ]
+    },
+    {
+      "path": "frontend/src/api/companyV2.js",
+      "before_sha256": [
+        "2f7eb53fa3f288fdb0f0ca9da0d416df0bee438839d0391b2b25df7185ea3bec"
+      ],
+      "new_file": false,
+      "after_sha256": [
+        "76443601b79def07c3a2012ec58a6ad2f4438243e13d053504a06fc103e7913f"
+      ]
+    },
+    {
+      "path": "frontend/src/api/http.js",
+      "before_sha256": [
+        "a64f3455d74bc9b4f0b19b941ef98dacbf2acfdac75a1bd9f4b50809de7641dd"
+      ],
+      "new_file": false,
+      "after_sha256": [
+        "68626869d7cf74a3683fb0c6704768d54a5f69c48a60fc4b44f258edcaf09145"
+      ]
+    },
+    {
+      "path": "frontend/src/api/response.js",
+      "before_sha256": [],
+      "new_file": true,
+      "after_sha256": [
+        "f0a53096a306d828b7bbcb38b48b57a2a94a231b64764b182ced0cc8fcd5a359"
+      ]
+    },
+    {
+      "path": "frontend/src/components/StockDashboardPanel.vue",
+      "before_sha256": [
+        "e6382c240788f5b5801a9aa9cdd18ecb0d132cf6d168b6efc14d77788f2a7c75"
+      ],
+      "new_file": false,
+      "after_sha256": [
+        "7833b2c7d2e0e87a338f3669981155db77805e680132e8f210b51f8b18b1e905"
+      ]
+    },
+    {
+      "path": "frontend/src/components/WatchlistStockCard.vue",
+      "before_sha256": [
+        "909517d7765186a8d35d59a7127ef32936b7acd560224a13f5871f36f5332456"
+      ],
+      "new_file": false,
+      "after_sha256": [
+        "f8a99b6d1abaf68fb4c3968faee7302324bcb109645b1408c5746a1f75bb62c1"
+      ]
+    },
+    {
+      "path": "frontend/src/views/StockDetailView.vue",
+      "before_sha256": [
+        "3c0c77fc1ddc1a9026bf9f6f97abc79bb08a5890b60273007fe8352fd208f0d7"
+      ],
+      "new_file": false,
+      "after_sha256": [
+        "0d4230137ebe0024297b103d1320753a022cc17b344fa797c5ff02049c8fa18d"
+      ]
+    },
+    {
+      "path": "backend/tests/test_market_io_resilience.py",
+      "before_sha256": [],
+      "new_file": true,
+      "after_sha256": [
+        "731e544cdbe6d32d5d16c4ceca34ee2e37d87065ba3b408ae8019e92414f142c"
+      ]
+    },
+    {
+      "path": "frontend/src/tests/marketApiErrors.test.js",
+      "before_sha256": [],
+      "new_file": true,
+      "after_sha256": [
+        "a8de8b2db29cc3499ebb4677eb97d35761ad3e4853ae8947778c862e4bbcdd30"
+      ]
+    }
+  ]
+}

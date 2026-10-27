@@ -1,3 +1,4 @@
+import { readJsonResponse } from './response.js'
 import { useAuthStore } from '../stores/auth.js'
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8000/api/v1'
@@ -35,7 +36,7 @@ export async function baseFetch(path, options = {}) {
   }
 
   if (res.status === 503) {
-    const data = await res.json().catch(() => ({}))
+    const data = await readJsonResponse(res)
     const err = new Error(
       data?.detail?.message || data?.message || '连接暂时不稳定，请重试'
     )
@@ -49,7 +50,7 @@ export async function baseFetch(path, options = {}) {
     return null
   }
 
-  const data = await res.json()
+  const data = await readJsonResponse(res)
 
   if (!res.ok) {
     const err = new Error(

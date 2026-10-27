@@ -1,0 +1,91 @@
+{
+  "phase": "6W-R3.3I.2.2",
+  "status": "Q3_VALIDATION_FAILURE_EXPLAINED",
+  "traffic_decision": "HOLD_1_PERCENT",
+  "workspace": {
+    "head": "b055da8495c54bb37625f0b0e0f94b4d4a627de2",
+    "branch": "release/demo-staging",
+    "historical_dirty_preserved": true,
+    "production_code_modified": false,
+    "diff_check": "clean"
+  },
+  "frozen_q3": {
+    "request_id": "ba464706",
+    "trace_id": "28a5a5e2-6e7d-440f-8857-94dcce7cb788",
+    "question": "请根据贵州茅台2024年营业收入和归母净利润计算并解释净利率。",
+    "selected_report_id": 1,
+    "selected_report_year": 2024,
+    "selected_report_type": "annual",
+    "selected_period": "2024-12-31",
+    "stages": {
+      "S0": "completed",
+      "S1": "completed",
+      "S2": "completed",
+      "S3": "completed",
+      "S4": "completed",
+      "S5": "completed",
+      "S6": "completed",
+      "S7": "failed:CITATION_VALIDATION_FAILED",
+      "S8": "completed:partial_success"
+    },
+    "operands": {
+      "revenue": {"value": "170899152276.34", "unit": "CNY", "period": "2024", "evidence_id": "E1"},
+      "net_profit": {"value": "86228146421.62", "unit": "CNY", "period": "2024", "evidence_id": "E1"}
+    },
+    "derived_fact": {"id": "C1", "metric": "net_margin", "display_result": "50.46%", "evidence_ids": ["E1"]},
+    "citation_payload": [
+      {"evidence_id": "E1", "claim": "年报主要会计数据中列示2024年营业收入170,899,152,276.34元、归母净利润86,228,146,421.62元。"},
+      {"derived_fact_id": "C1", "evidence_ids": ["E1"], "claim": "按归母净利润除以营业收入计算，2024年净利率为50.46%。"}
+    ],
+    "citation_validation": {
+      "valid": false,
+      "reason": "invalid_evidence_reference",
+      "invalid_ids": [],
+      "duplicate_ids": [],
+      "invalid_claim_ids": ["E1", "C1"],
+      "resolved_derived_fact_ids": []
+    },
+    "numeric_validation": {
+      "valid": false,
+      "reason": "unsupported_numbers_found",
+      "unsupported_tokens": ["100", "100"],
+      "first_observed_stage": "S6",
+      "derived_corpus_contains_result": true,
+      "derived_corpus_contains_operands": true
+    },
+    "final_status": "partial_success",
+    "citation_metadata_leak": false
+  },
+  "classification": {
+    "primary": "Q3-C CITATION_CLAIM_NOT_SUPPORTED_BY_EVIDENCE",
+    "secondary": "Q3-F LLM_EMITTED_UNSUPPORTED_NUMBER",
+    "first_failure_function": "app.agent.report_chat_copilot_agent._resolve_local_citations",
+    "first_failure_lines": "847-852",
+    "explanation": "The legal E1 direct citation is the first item processed. Its numeric claim is not supported by the compacted E1 content, so it is appended to invalid_claim_ids before full-answer numeric validation. C1 provenance matches, but its claim support also fails against the same compacted E1. The later full-answer gate independently rejects two LLM-created 100 tokens."
+  },
+  "comparison": {
+    "Q1": {"derived_evidence_id": "E7", "citation_valid": true, "numeric_valid": true, "unsupported_tokens": [], "final_status": "completed"},
+    "Q2": {"derived_evidence_id": "E7", "citation_valid": true, "numeric_valid": true, "unsupported_tokens": [], "final_status": "completed"},
+    "Q3": {"derived_evidence_id": "E1", "citation_valid": false, "numeric_valid": false, "unsupported_tokens": ["100", "100"], "final_status": "partial_success"}
+  },
+  "runner_audit": {
+    "classification": "RUNNER_E_OTHER",
+    "q2_launch": "2026-08-30T00:28:24.147271Z",
+    "q2_backend_terminal_s8": "2026-08-30T00:29:21.222987Z",
+    "q3_launch": "2026-08-30T00:29:13.919678Z",
+    "overlap_seconds": 7.303309,
+    "root_cause": "The 30-second nested execution yield returned a live session handle. The orchestration discarded that handle and treated the yield as client completion while the HTTP request continued.",
+    "future_gate": ["terminal HTTP response received", "S8 persisted", "backend request completion recorded", "health check passed"]
+  },
+  "tests": [
+    {"run": 1, "collected": 3, "passed": 2, "failed": 1, "skipped": 0, "duration_seconds": 0.03, "reason": "diagnostic fixture had one 100 occurrence instead of frozen answer's two"},
+    {"run": 2, "collected": 3, "passed": 3, "failed": 0, "skipped": 0, "duration_seconds": 0.01}
+  ],
+  "next_actions": {
+    "production_business_fix_required_for_explanation": false,
+    "future_business_review_possible": true,
+    "diagnostic_harness_fix_required": true,
+    "implemented_this_turn": false
+  },
+  "operations": {"runtime_requests": 0, "committed": false, "pushed": false, "deployed": false, "migration_run": false, "traffic_expanded": false}
+}

@@ -62,6 +62,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import { translateWarning } from '../utils/warningMap.js'
 
 const props = defineProps({
   report: { type: Object, default: null },
@@ -99,12 +100,13 @@ const coverageDims = computed(() => {
   const sections = props.report?.sections
   if (!sections || typeof sections !== 'object') return []
   return Object.keys(sections)
-    .filter(k => _DIM_LABELS[k] && sections[k])
+    .filter(k => _DIM_LABELS[k] && sections[k] && !['failed', 'timeout', 'skipped'].includes(props.report?.metadata?.agents?.[k]?.status))
     .map(k => ({ key: k, label: _DIM_LABELS[k] }))
 })
 
 // ── Agent list from metadata.agents ──────────────────────────────────────────
 const _AGENT_LABELS = {
+  technical: '技术面', fundamental: '基本面', peer_comparison: '同行对比', news: '新闻面',
   technical_agent:    '技术面 Agent',
   fundamental_agent:  '基本面 Agent',
   peer_agent:         '同行 Agent',
@@ -138,7 +140,7 @@ function agentStatusLabel(status) {
 const warnings = computed(() => {
   const ws = props.report?.metadata?.warnings
   if (!Array.isArray(ws) || ws.length === 0) return []
-  return ws.slice(0, 3)
+  return ws.slice(0, 3).map(translateWarning)
 })
 </script>
 

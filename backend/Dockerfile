@@ -29,6 +29,19 @@ COPY pyproject.toml uv.lock ./
 # --no-cache: keep image lean; CI/CD layer caching is done at the Docker level
 RUN uv sync --frozen --no-cache
 
+# ── Pre-download embedding model ─────────────────────────────────────────────
+# Bake the sentence-transformers model into the image so containers start
+# without network access and with zero cold-start download latency.
+# Model: intfloat/multilingual-e5-small — native 384-dim, matches vector(384) schema.
+# Note: BAAI/bge-small-zh-v1.5 outputs 512-dim and is incompatible with the 384-dim schema.
+ENV HF_HOME=/app/.cache/huggingface
+RUN uv run python -c \
+    "from sentence_transformers import SentenceTransformer; \
+     m = SentenceTransformer('intfloat/multilingual-e5-small'); \
+     dim = m.get_embedding_dimension(); \
+     assert dim == 384, f'dim={dim} != 384'; \
+     print(f'MODEL_PRELOADED intfloat/multilingual-e5-small dim={dim} OK')"
+
 # ── Application code ─────────────────────────────────────────────────────────
 COPY app/ ./app/
 

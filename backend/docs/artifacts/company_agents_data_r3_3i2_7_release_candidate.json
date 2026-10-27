@@ -1,0 +1,72 @@
+{
+  "phase": "6W-R3.3I.2.7",
+  "status": "RELEASE_MIGRATION_CONTRACT_NOT_READY",
+  "traffic": "HOLD_1_PERCENT",
+  "main_workspace": {
+    "head": "b055da8495c54bb37625f0b0e0f94b4d4a627de2",
+    "branch": "release/demo-staging",
+    "historical_dirty_changes_preserved": true
+  },
+  "integration_candidate": {
+    "worktree": "/private/tmp/tradingagents-r33i2-7-rc.r5I4uS",
+    "branch": "r33i-release-integration-candidate",
+    "head": "9f4b516b7c9282bb7ae68d282a262d68cfd21c02",
+    "clean": true,
+    "diff_check": "passed",
+    "conflicts": 0,
+    "replay": [
+      {"source": "5e9977a", "result": "cecea67", "required": true},
+      {"source": "28870a", "result": "fb6610c", "required": true},
+      {"source": "154c65c", "result": "9f4b516", "required": true}
+    ],
+    "excluded_commits": ["79323b7"],
+    "excluded_file_classes": ["Dockerfile", "dependency files", "embedding provider", "warmup", "vector migration"]
+  },
+  "migration_contract": {
+    "result": "failed",
+    "first_failure_revision": "3a2f8b4c1d9e",
+    "first_failure_function": "Alembic upgrade operation",
+    "error": "asyncpg.exceptions.UndefinedTableError: relation analysis_reports does not exist",
+    "sql": "ALTER TABLE analysis_reports ADD COLUMN stock_name VARCHAR(128)",
+    "paths": [
+      {
+        "name": "release_baseline_to_candidate",
+        "container_id": "e57be907e53172057f04b678b0a0720cc00b7d6e328f85324a6f5a29d2b959db",
+        "database": "integration_a",
+        "start_revision": null,
+        "release_head": "q5r6s7t8u9v0",
+        "target_revision": "r6s7t8u9v0w1",
+        "upgrade": "failed_before_release_head",
+        "repeat_upgrade": "not_run_after_fail_stop"
+      },
+      {
+        "name": "empty_database_to_candidate_head",
+        "container_id": "beeafd1b1748f92e4ecb79032df8b13e5ff4d1b516a19ab68d101a513e996209",
+        "database": "integration_b",
+        "start_revision": null,
+        "target_revision": "r6s7t8u9v0w1",
+        "alembic_current_after_failure": null,
+        "alembic_heads": ["r6s7t8u9v0w1"],
+        "upgrade": "failed_before_candidate_head",
+        "repeat_upgrade": "not_run_after_fail_stop"
+      }
+    ]
+  },
+  "downstream": {
+    "credibility_tests": "not_run_due_migration_gate",
+    "static_checks": "not_run_due_migration_gate",
+    "image_built": false,
+    "q3_run": false
+  },
+  "safety": {
+    "production_backend_container": "c9567bfdfec4",
+    "production_container_changed": false,
+    "production_database_used": false,
+    "production_redis_used": false,
+    "production_migrations": 0,
+    "pushed": false,
+    "merged": false,
+    "deployed": false,
+    "traffic_expanded": false
+  }
+}

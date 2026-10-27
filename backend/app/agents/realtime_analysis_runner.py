@@ -33,6 +33,11 @@ from datetime import datetime, timezone
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
+from app.llm.deepseek_client import NormalizedProviderError
+from app.agents.specialist_analysis_utils import sanitize_specialist_output
+from app.agents.reader_report import beginner_messages, beginner_fallback, clean_evidence, supported_reader_report
+from app.agents.report_visual_evidence import run_with_visuals
 from app.llm.base import BaseLLMClient
 from app.agents.technical_analyst import TechnicalAnalystAgent
 from app.agents.fundamental_analyst import FundamentalAnalystAgent
@@ -55,6 +60,22 @@ log = logging.getLogger(__name__)
 # ── Progress distribution ─────────────────────────────────────────────────────
 _AGENT_PROGRESS_START = 18
 _AGENT_PROGRESS_END   = 75
+
+
+def _public_failure_message(exc: Exception, language: str = "zh-CN") -> str:
+    """Expose an actionable cause, without SDK internals or provider payloads."""
+    reason = exc.record.safe_reason_code if isinstance(exc, NormalizedProviderError) else ""
+    timeout = isinstance(exc, TimeoutError) or reason == "PROVIDER_TIMEOUT"
+    if language.startswith("zh"):
+        if timeout:
+            return "模型或分析服务响应超时，本维度暂未生成；这不代表原始行情数据缺失。"
+        if reason == "PROVIDER_RATE_LIMITED":
+            return "模型服务请求受限，本维度暂未生成，请稍后重试。"
+        if reason == "PROVIDER_AUTHENTICATION_FAILED":
+            return "模型服务配置异常，请联系管理员检查。"
+        return "分析服务暂不可用，本维度未生成，请稍后重试。"
+    return ("The model or analysis service timed out; this does not establish missing market data."
+            if timeout else "The analysis service is unavailable. Please retry later.")
 
 
 def _agent_done_progress(agent_index: int, total_agents: int) -> int:
@@ -152,6 +173,7 @@ class RealtimeAnalysisRunner:
         # Step 3: parallel agents with as_completed emit
         agents_to_run = SCOPE_AGENTS.get(analysis_scope, SCOPE_AGENTS["comprehensive"])
         sections: dict  = {}
+        report_visuals: dict = {}
         statuses: dict  = {}
 
         all_agents = ["technical", "fundamental", "peer_comparison", "news"]
@@ -182,8 +204,12 @@ class RealtimeAnalysisRunner:
             completed_count += 1
             progress = _agent_done_progress(completed_count - 1, len(agents_to_run))
 
+            if isinstance(agent_result, str) and not agent_result.strip():
+                statuses[agent_name] = {"status": "skipped", "message": None}
+                await self._emit(run_ref, registry, "agent_completed", agent=agent_name, progress=progress, skipped=True)
+                continue
             if isinstance(agent_result, Exception):
-                err_msg = str(agent_result)
+                err_msg = _public_failure_message(agent_result, output_language)
                 log.error("RealtimeAnalysisRunner: agent '%s' failed [%s]: %s",
                           agent_name, run_ref.run_id, err_msg)
                 sections[agent_name] = f"[{agent_name} 模块暂时不可用：{err_msg}]"
@@ -191,7 +217,8 @@ class RealtimeAnalysisRunner:
                 await self._emit(run_ref, registry, "agent_failed", agent=agent_name,
                                  progress=progress, error=err_msg)
             else:
-                sections[agent_name] = agent_result
+                report_visuals.update(getattr(agent_result, "visuals", {}))
+                sections[agent_name] = str(agent_result)
                 statuses[agent_name] = {"status": "success", "message": None}
                 await self._emit(run_ref, registry, "agent_completed", agent=agent_name,
                                  progress=progress, chars=len(agent_result))
@@ -204,17 +231,33 @@ class RealtimeAnalysisRunner:
         await self._emit(run_ref, registry, "synthesis_started", progress=80,
                          message="正在整合多维度分析，调用大模型生成综合报告")
 
+        synthesis_error = None
         _single_scopes = {"technical_only", "fundamental_only", "peer_only", "news_only"}
         try:
-            if analysis_scope in _single_scopes:
+            if not any(info.get("status") == "success" for info in statuses.values()):
+                synthesis_error = ("所有分项分析均未完成，本次没有可用于综合判断的分析证据，请稍后重试。"
+                                   if output_language.startswith("zh") else
+                                   "All analysis dimensions failed; no evidence is available for a synthesis. Please retry later.")
+                report = _fallback_report(market, symbol, sections, RuntimeError(synthesis_error),
+                                          stock_identity, output_language=output_language)
+            elif settings.report_reader_mode == "beginner":
+                messages = beginner_messages(sections, stock_identity, output_language)
+                if not messages:
+                    raise RuntimeError("No supported report evidence")
+                report = await self._await_synthesis(asyncio.to_thread(self._llm.chat, messages, temperature=0.3))
+                report = supported_reader_report(report, sections)
+            elif analysis_scope in _single_scopes:
                 agent_key = agents_to_run[0]
                 report = _build_single_agent_report(
                     stock_identity, analysis_scope, sections.get(agent_key, ""),
                     output_language=output_language,
                 )
             elif analysis_scope == "technical_fundamental":
-                report = await self._coordinator._synthesize_tech_fundamental(
-                    market, stock_identity, sections, output_language=output_language,
+                report = await self._await_synthesis(
+                    self._coordinator._synthesize_tech_fundamental(
+                        market, stock_identity, sections, output_language=output_language,
+                        propagate_failure=True,
+                    )
                 )
             else:
                 synthesis_user = self._coordinator._build_synthesis_prompt(
@@ -226,21 +269,29 @@ class RealtimeAnalysisRunner:
                     {"role": "user",   "content": synthesis_user},
                 ]
                 try:
-                    report = await asyncio.to_thread(
+                    report = await self._await_synthesis(asyncio.to_thread(
                         self._llm.chat, messages, temperature=0.3
-                    )
+                    ))
                 except Exception as exc:
+                    synthesis_error = _public_failure_message(exc, output_language)
                     log.error("RealtimeAnalysisRunner: synthesis LLM failed [%s]: %s",
                               run_ref.run_id, exc)
-                    report = _fallback_report(market, symbol, sections, exc, stock_identity,
+                    report = _fallback_report(market, symbol, sections,
+                                              _public_failure_message(exc, output_language), stock_identity,
                                               output_language=output_language)
         except Exception as exc:
+            synthesis_error = _public_failure_message(exc, output_language)
             log.error("RealtimeAnalysisRunner: synthesis phase failed [%s]: %s",
                       run_ref.run_id, exc)
-            report = _fallback_report(market, symbol, sections, exc, stock_identity,
+            report = _fallback_report(market, symbol, sections,
+                                              _public_failure_message(exc, output_language), stock_identity,
                                       output_language=output_language)
 
-        await self._emit(run_ref, registry, "synthesis_completed", progress=95)
+        if synthesis_error and settings.report_reader_mode == "beginner":
+            report = beginner_fallback(sections, stock_identity, output_language)
+
+        await self._emit(run_ref, registry, "synthesis_completed", progress=95,
+                         degraded=synthesis_error is not None)
 
         # ── CANCEL CHECK: after synthesis, before writing completed ───────────
         if await self._check_cancelled(run_ref, registry):
@@ -248,6 +299,17 @@ class RealtimeAnalysisRunner:
 
         # Step 5: result
         metadata = _build_metadata(market, sections, statuses)
+        if synthesis_error:
+            metadata["partial"] = True
+            metadata["warnings"].append("综合摘要生成失败，已保留分项报告；请结合各维度限制阅读。")
+        metadata["reader_mode"] = settings.report_reader_mode
+        metadata["visuals"] = report_visuals
+        metadata["synthesis"] = {"status": "degraded" if synthesis_error else "success",
+                                 "message": synthesis_error}
+        successes = sum(info.get("status") == "success" for info in statuses.values())
+        metadata["report_status"] = ("unavailable" if successes == 0 else
+                                     "partial" if synthesis_error or successes < len(agents_to_run) else "complete")
+        metadata["partial"] = metadata["report_status"] != "complete"
         metadata["analysis_scope"]   = analysis_scope
         metadata["workflow_engine"]  = "custom_coordinator"
         metadata["output_language"]  = output_language
@@ -290,6 +352,12 @@ class RealtimeAnalysisRunner:
                          result=full_result, report_id=report_id)
         await registry.push_event(run_ref.run_id, None)  # sentinel
 
+    async def _await_synthesis(self, work):
+        """Bound user-visible waiting; an existing sync SDK call may finish later."""
+        return await asyncio.wait_for(
+            work, timeout=settings.analysis_synthesis_timeout_seconds,
+        )
+
     # ── Named agent wrapper ────────────────────────────────────────────────────
 
     async def _run_named_agent(
@@ -303,12 +371,12 @@ class RealtimeAnalysisRunner:
         try:
             if agent_name == "technical":
                 result = await asyncio.wait_for(
-                    asyncio.to_thread(self._technical.analyze, market, symbol, output_language),
+                    asyncio.to_thread(run_with_visuals, self._technical.analyze, market, symbol, output_language),
                     timeout=_AGENT_TIMEOUT,
                 )
             elif agent_name == "fundamental":
                 result = await asyncio.wait_for(
-                    asyncio.to_thread(self._fundamental.analyze, market, symbol, output_language),
+                    asyncio.to_thread(run_with_visuals, self._fundamental.analyze, market, symbol, output_language),
                     timeout=_AGENT_TIMEOUT,
                 )
             elif agent_name == "peer_comparison":

@@ -1,0 +1,590 @@
+diff --git a/backend/app/core/config.py b/backend/app/core/config.py
+index 03b3c8a..6da26a4 100644
+--- a/backend/app/core/config.py
++++ b/backend/app/core/config.py
+@@ -29,6 +29,9 @@ class Settings(BaseSettings):
+         "http://127.0.0.1:5174",
+     ]
+ 
++    # Google Identity Services (Web OAuth client ID; no client secret needed).
++    google_client_id: str = ""
++
+     # LLM
+     llm_provider: str = "deepseek"
+     deepseek_api_key: str | None = None
+diff --git a/backend/app/models/user.py b/backend/app/models/user.py
+index fe27b2e..1c51cb3 100644
+--- a/backend/app/models/user.py
++++ b/backend/app/models/user.py
+@@ -20,6 +20,7 @@ class User(Base):
+     )
+     username: Mapped[str] = mapped_column(String(32), unique=True, nullable=False, index=True)
+     email: Mapped[str] = mapped_column(String(254), unique=True, nullable=False, index=True)
++    google_sub: Mapped[Optional[str]] = mapped_column(String(255), unique=True, nullable=True)
+     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
+     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+     is_admin: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False, server_default="false")
+diff --git a/backend/app/routers/auth.py b/backend/app/routers/auth.py
+index 3c9251d..42ec722 100644
+--- a/backend/app/routers/auth.py
++++ b/backend/app/routers/auth.py
+@@ -11,7 +11,7 @@ from __future__ import annotations
+ from datetime import datetime, timezone
+ from typing import Optional
+ 
+-from fastapi import APIRouter, Depends, HTTPException, Request, status
++from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+ from jose import JWTError
+ from pydantic import BaseModel, EmailStr, Field
+ from sqlalchemy import or_, select
+@@ -368,3 +368,94 @@ async def me(current_user=Depends(get_current_user)):
+         email_verified=getattr(current_user, "email_verified", False),
+         created_at=getattr(current_user, "created_at", None) or datetime.utcnow(),
+     )
++
++
++class GoogleLoginRequest(BaseModel):
++    credential: str = Field(min_length=1, max_length=16384)
++    invite_code: str = Field(default="", max_length=64)
++    password: str | None = Field(default=None, max_length=1024)
++
++
++@router.get("/google/config")
++async def google_config(response: Response):
++    import secrets
++    from app.core.database import get_redis
++
++    response.headers["Cache-Control"] = "no-store"
++    if not settings.google_client_id:
++        return {"enabled": False}
++    nonce = secrets.token_urlsafe(32)
++    try:
++        redis = get_redis()
++        if redis is None:
++            raise RuntimeError()
++        await redis.set(f"auth:google:nonce:{nonce}", "1", ex=300)
++    except Exception:
++        raise HTTPException(503, "登录服务暂不可用，请稍后重试。")
++    response.set_cookie("ta_google_nonce", nonce, max_age=300, httponly=True,
++                        secure=settings.app_env != "development", samesite="lax",
++                        path="/api/v1/auth/google")
++    return {"enabled": True, "client_id": settings.google_client_id, "nonce": nonce}
++
++
++@router.post("/google", response_model=TokenResponse)
++async def google_login(request: Request, body: GoogleLoginRequest, db: AsyncSession = Depends(get_db)):
++    import secrets
++    from sqlalchemy import func
++    from sqlalchemy.exc import IntegrityError
++    from app.core.database import get_redis
++    from app.services.google_identity import verify_google_token
++
++    nonce = request.cookies.get("ta_google_nonce")
++    if not nonce:
++        raise HTTPException(401, "登录会话已过期，请刷新页面。")
++    claims = await verify_google_token(body.credential, nonce)
++    try:
++        redis = get_redis()
++        if redis is None:
++            raise RuntimeError()
++        valid_nonce = await redis.getdel(f"auth:google:nonce:{nonce}")
++    except Exception:
++        raise HTTPException(503, "登录服务暂不可用，请稍后重试。")
++    if not valid_nonce:
++        raise HTTPException(401, "登录会话已使用或过期，请刷新页面。")
++
++    result = await db.execute(select(User).where(User.google_sub == claims["sub"]).with_for_update())
++    user = result.scalar_one_or_none()
++    email = claims["email"].strip().lower()
++    if user is None:
++        result = await db.execute(select(User).where(func.lower(User.email) == email).with_for_update())
++        user = result.scalar_one_or_none()
++        if user:
++            # Linking a legacy account requires its password, even for verified Google email.
++            if user.google_sub or not body.password or not verify_password(body.password, user.hashed_password):
++                raise HTTPException(409, "该邮箱已有账户，首次绑定 Google 请同时填写原账户密码。")
++        else:
++            result = await db.execute(select(MvpInvite).where(
++                MvpInvite.code_hash == _hash_invite_code(normalize_invite_code(body.invite_code))
++            ).with_for_update())
++            invite = result.scalar_one_or_none()
++            if (not invite or invite.use_count >= invite.max_uses
++                    or (invite.expires_at and invite.expires_at < datetime.utcnow())
++                    or (invite.email and invite.email.lower() != email)):
++                raise HTTPException(400, "首次使用 Google 注册需要有效且匹配邮箱的邀请码。")
++            user = User(username=f"google_{secrets.token_hex(10)}", email=email,
++                        hashed_password=hash_password(secrets.token_urlsafe(32)),
++                        email_verified_at=datetime.now(timezone.utc))
++            db.add(user)
++            await db.flush()
++            invite.use_count += 1
++            invite.redeemed_by_user_id = user.id
++            if invite.use_count >= invite.max_uses:
++                invite.redeemed = True
++                invite.redeemed_at = datetime.utcnow()
++        user.google_sub = claims["sub"]
++    if not user.is_active:
++        raise HTTPException(403, "账户已停用。")
++    try:
++        await db.commit()
++    except IntegrityError:
++        await db.rollback()
++        raise HTTPException(409, "账户信息已更新，请重新登录。")
++    return TokenResponse(access_token=create_access_token(str(user.id)),
++                         refresh_token=create_refresh_token(str(user.id)))
+diff --git a/frontend/src/api/auth.js b/frontend/src/api/auth.js
+index f105cdb..c77fb4d 100644
+--- a/frontend/src/api/auth.js
++++ b/frontend/src/api/auth.js
+@@ -95,3 +95,21 @@ export async function meApi(accessToken) {
+ 
+   return data
+ }
++
++export async function googleConfigApi() {
++  const res = await fetch(`${API_BASE}/auth/google/config`, { credentials: 'include', cache: 'no-store' })
++  const data = await res.json()
++  if (!res.ok) throw new Error(data.detail || 'Google 登录服务暂不可用')
++  return data
++}
++
++export async function googleLoginApi(credential, inviteCode, password) {
++  const res = await fetch(`${API_BASE}/auth/google`, {
++    method: 'POST', credentials: 'include',
++    headers: { 'Content-Type': 'application/json' },
++    body: JSON.stringify({ credential, invite_code: inviteCode, password: password || null }),
++  })
++  const data = await res.json()
++  if (!res.ok) throw new Error(data.detail || 'Google 登录失败')
++  return data
++}
+diff --git a/frontend/src/stores/auth.js b/frontend/src/stores/auth.js
+index c6f6880..7362b0b 100644
+--- a/frontend/src/stores/auth.js
++++ b/frontend/src/stores/auth.js
+@@ -1,6 +1,6 @@
+ import { defineStore } from 'pinia'
+ import { ref, computed } from 'vue'
+-import { loginApi, registerApi, meApi, requestEmailVerificationApi } from '../api/auth.js'
++import { loginApi, registerApi, meApi, requestEmailVerificationApi, googleLoginApi } from '../api/auth.js'
+ 
+ export const useAuthStore = defineStore('auth', () => {
+   const token        = ref(localStorage.getItem('ta_token')         || '')
+@@ -40,6 +40,17 @@ export const useAuthStore = defineStore('auth', () => {
+    */
+   async function login(username, password) {
+     const data = await loginApi(username, password)
++    await acceptSession(data, username)
++  }
++
++  async function loginGoogle(credential, inviteCode, password) {
++    const data = await googleLoginApi(credential, inviteCode, password)
++    await acceptSession(data, '')
++  }
++
++  async function acceptSession(data, username) {
++    isAdmin.value = false
++    localStorage.removeItem('ta_is_admin')
+     token.value        = data.access_token
+     refreshToken.value = data.refresh_token || ''
+     currentUser.value  = username
+@@ -84,6 +95,6 @@ export const useAuthStore = defineStore('auth', () => {
+   return {
+     token, refreshToken, currentUser, isAdmin,
+     sessionExpired, authReady, isAuthenticated,
+-    login, register, requestEmailVerification, fetchMe, logout,
++    login, loginGoogle, register, requestEmailVerification, fetchMe, logout,
+   }
+ })
+diff --git a/frontend/src/views/LoginView.vue b/frontend/src/views/LoginView.vue
+index b8f78ea..e8dde51 100644
+--- a/frontend/src/views/LoginView.vue
++++ b/frontend/src/views/LoginView.vue
+@@ -2,27 +2,27 @@
+   <div class="auth-page">
+     <div class="auth-card card">
+       <h1 class="card-title">TradingAgents</h1>
+-      <p class="auth-subtitle">AI-Powered Financial Research</p>
++      <p class="auth-subtitle">AI 股票研究工作台</p>
+ 
+       <div v-if="authStore.sessionExpired" class="auth-alert">
+-        Session expired — please log in again.
++        登录已过期，请重新登录。
+       </div>
+ 
+       <form @submit.prevent="handleLogin" class="auth-form">
+         <div class="form-group">
+-          <label for="username">Username or Email</label>
++          <label for="username">用户名或邮箱</label>
+           <input
+             id="username"
+             v-model="username"
+             type="text"
+             autocomplete="username"
+-            placeholder="username or email"
++            placeholder="请输入用户名或邮箱"
+             required
+           />
+         </div>
+ 
+         <div class="form-group">
+-          <label for="password">Password</label>
++          <label for="password">密码</label>
+           <input
+             id="password"
+             v-model="password"
+@@ -33,24 +33,34 @@
+           />
+         </div>
+ 
+-        <div v-if="errorMsg" class="auth-error">{{ errorMsg }}</div>
++        <div v-if="errorMsg" class="auth-error" role="alert">{{ errorMsg }}</div>
+ 
+         <button type="submit" class="btn btn-primary auth-submit" :disabled="loading">
+           <span v-if="loading" class="spinner" />
+-          <span v-else>Log In</span>
++          <span v-else>登录</span>
+         </button>
+       </form>
+ 
++      <section v-if="googleEnabled" class="google-section" aria-label="Google 登录">
++        <p class="auth-subtitle">或使用 Google 登录</p>
++        <label for="google-invite">邀请码（首次注册时填写）</label>
++        <input id="google-invite" v-model="inviteCode" autocomplete="off" maxlength="64" placeholder="已有账户无需邀请码" />
++        <p class="auth-subtitle">已有账户首次绑定，请先在上方填写原密码。</p>
++        <div ref="googleButton" :inert="loading || undefined" />
++        <p v-if="loading" role="status">正在登录…</p>
++      </section>
++      <p v-if="googleError" class="auth-error" role="alert">{{ googleError }}</p>
+       <p class="auth-footer">
+-        Don't have an account?
+-        <RouterLink to="/register">Register with invite</RouterLink>
++        还没有账户？
++        <RouterLink to="/register">使用邀请码注册</RouterLink>
+       </p>
+     </div>
+   </div>
+ </template>
+ 
+ <script setup>
+-import { ref } from 'vue'
++import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
++import { googleConfigApi } from '../api/auth.js'
+ import { useRouter } from 'vue-router'
+ import { useAuthStore } from '../stores/auth.js'
+ 
+@@ -61,6 +71,59 @@ const username = ref('')
+ const password = ref('')
+ const loading  = ref(false)
+ const errorMsg = ref('')
++const inviteCode = ref('')
++const googleEnabled = ref(false)
++const googleError = ref('')
++const googleButton = ref(null)
++let disposed = false
++let googleNonce = ''
++
++async function renderGoogle(config = null) {
++  config ||= await googleConfigApi()
++  if (disposed || !config.enabled) return
++  googleNonce = config.nonce
++  googleEnabled.value = true
++  await nextTick()
++  window.google.accounts.id.initialize({
++    client_id: config.client_id, nonce: googleNonce, auto_select: false,
++    callback: async ({ credential }) => {
++      if (disposed || loading.value) return
++      loading.value = true
++      errorMsg.value = ''
++      try {
++        await authStore.loginGoogle(credential, inviteCode.value.trim(), password.value)
++        router.push('/')
++      } catch (err) {
++        errorMsg.value = err.message || 'Google 登录失败'
++        try { await renderGoogle() } catch { googleError.value = '请刷新页面后重试 Google 登录。' }
++      } finally { loading.value = false }
++    },
++  })
++  googleButton.value.replaceChildren()
++  window.google.accounts.id.renderButton(googleButton.value, { theme: 'outline', size: 'large', locale: 'zh_CN' })
++}
++
++onMounted(async () => {
++  try {
++    // Only load Google's script when the server enables this sign-in method.
++    const config = await googleConfigApi()
++    if (!config.enabled || disposed) return
++    if (!window.google?.accounts?.id) {
++      await new Promise((resolve, reject) => {
++        const script = document.createElement('script')
++        script.src = 'https://accounts.google.com/gsi/client'
++        script.async = true
++        const timer = setTimeout(() => reject(new Error('加载 Google 登录超时，可继续使用密码登录。')), 12000)
++        script.onload = () => { clearTimeout(timer); resolve() }
++        script.onerror = () => { clearTimeout(timer); reject(new Error('无法加载 Google 登录，可继续使用密码登录。')) }
++        document.head.appendChild(script)
++      })
++    }
++    await renderGoogle(config)
++  } catch (err) { if (!disposed) googleError.value = err.message }
++})
++onBeforeUnmount(() => { disposed = true })
++
+ 
+ async function handleLogin() {
+   errorMsg.value = ''
+@@ -141,6 +204,16 @@ async function handleLogin() {
+   min-height: 2.6rem;
+ }
+ 
++.google-section {
++  display: grid;
++  gap: 0.75rem;
++  margin-top: 1.5rem;
++  border-top: 1px solid var(--border-color, #444);
++  padding-top: 1rem;
++}
++.google-section label { font-size: 0.85rem; }
++.google-section .auth-subtitle { margin: 0; line-height: 1.6; }
++
+ .auth-footer {
+   margin: 1.25rem 0 0;
+   text-align: center;
+diff --git a/backend/app/services/google_identity.py b/backend/app/services/google_identity.py
+new file mode 100644
+index 0000000..84df6f2
+--- /dev/null
++++ b/backend/app/services/google_identity.py
+@@ -0,0 +1,48 @@
++"""Verify Google ID tokens with pinned JWKS URL and RS256 only."""
++import asyncio
++import time
++
++import httpx
++from fastapi import HTTPException
++from jose import JWTError, jwt
++
++from app.core.config import settings
++
++_keys: dict = {}
++_expires = 0.0
++_lock = asyncio.Lock()
++
++
++async def verify_google_token(credential: str, nonce: str) -> dict:
++    global _keys, _expires
++    if not settings.google_client_id:
++        raise HTTPException(503, "Google 登录尚未配置。")
++    try:
++        header = jwt.get_unverified_header(credential)
++        if header.get("alg") != "RS256" or not header.get("kid"):
++            raise ValueError("Invalid signing header")
++        async with _lock:
++            if time.monotonic() >= _expires:
++                async with httpx.AsyncClient(timeout=8) as client:
++                    response = await client.get("https://www.googleapis.com/oauth2/v3/certs")
++                    response.raise_for_status()
++                    _keys = {key["kid"]: key for key in response.json()["keys"]}
++                _expires = time.monotonic() + 300
++        key = _keys.get(header["kid"])
++        if key is None:
++            raise ValueError("Unknown signing key")
++        claims = jwt.decode(
++            credential, key, algorithms=["RS256"], audience=settings.google_client_id,
++            options={"require_exp": True, "require_sub": True, "require_iat": True},
++        )
++        if claims.get("iss") not in ("accounts.google.com", "https://accounts.google.com"):
++            raise ValueError("Invalid issuer")
++        if claims.get("nonce") != nonce or claims.get("email_verified") is not True:
++            raise ValueError("Invalid identity")
++        if not claims.get("email") or len(claims["sub"]) > 255:
++            raise ValueError("Missing identity")
++        return claims
++    except httpx.HTTPError:
++        raise HTTPException(503, "暂时无法连接 Google，请稍后重试或使用密码登录。")
++    except (JWTError, ValueError, KeyError, TypeError):
++        raise HTTPException(401, "Google 登录凭证无效或已过期，请重试。")
+diff --git a/backend/alembic/versions/2026_10_25_0001_google_identity.py b/backend/alembic/versions/2026_10_25_0001_google_identity.py
+new file mode 100644
+index 0000000..cc55181
+--- /dev/null
++++ b/backend/alembic/versions/2026_10_25_0001_google_identity.py
+@@ -0,0 +1,15 @@
++"""Persist stable Google subject identifiers."""
++from alembic import op
++import sqlalchemy as sa
++revision = "s7t8u9v0w1x2"
++down_revision = "r6s7t8u9v0w1"
++branch_labels = None
++depends_on = None
++
++def upgrade():
++    op.add_column("app_users", sa.Column("google_sub", sa.String(255), nullable=True))
++    op.create_unique_constraint("uq_app_users_google_sub", "app_users", ["google_sub"])
++
++def downgrade():
++    op.drop_constraint("uq_app_users_google_sub", "app_users", type_="unique")
++    op.drop_column("app_users", "google_sub")
+diff --git a/backend/tests/test_google_identity.py b/backend/tests/test_google_identity.py
+new file mode 100644
+index 0000000..0980dc8
+--- /dev/null
++++ b/backend/tests/test_google_identity.py
+@@ -0,0 +1,105 @@
++import time
++from unittest.mock import AsyncMock
++import pytest
++from cryptography.hazmat.primitives.asymmetric import rsa
++from fastapi import HTTPException, Response
++from jose import jwt
++from app.services import google_identity as identity
++from app.routers import auth
++
++@pytest.fixture
++def issuer(monkeypatch):
++    key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
++    monkeypatch.setattr(identity.settings, 'google_client_id', 'test-client')
++    monkeypatch.setattr(identity, '_keys', {'test': key.public_key()})
++    monkeypatch.setattr(identity, '_expires', time.monotonic() + 300)
++    claims = dict(sub='google-subject', email='person@gmail.com', email_verified=True,
++                  iss='https://accounts.google.com', aud='test-client', nonce='browser-nonce',
++                  iat=int(time.time()), exp=int(time.time()) + 300)
++    def issue(**changes):
++        return jwt.encode(claims | changes, key, algorithm='RS256', headers={'kid': 'test'})
++    return issue
++
++@pytest.mark.asyncio
++async def test_valid_google_identity(issuer):
++    assert (await identity.verify_google_token(issuer(), 'browser-nonce'))['sub'] == 'google-subject'
++
++@pytest.mark.asyncio
++@pytest.mark.parametrize('changes', [
++    {'aud': 'attacker-client'}, {'iss': 'https://attacker.invalid'},
++    {'nonce': 'other-browser'}, {'email_verified': False},
++    {'exp': int(time.time()) - 300}, {'email': ''},
++])
++async def test_reject_invalid_claims(issuer, changes):
++    with pytest.raises(HTTPException) as exc:
++        await identity.verify_google_token(issuer(**changes), 'browser-nonce')
++    assert exc.value.status_code == 401
++
++@pytest.mark.asyncio
++async def test_disabled_config(monkeypatch):
++    monkeypatch.setattr(auth.settings, 'google_client_id', '')
++    response = Response()
++    assert await auth.google_config(response) == {'enabled': False}
++    assert 'set-cookie' not in response.headers
++
++@pytest.mark.asyncio
++async def test_nonce_cookie(monkeypatch):
++    from app.core import database
++    redis = AsyncMock()
++    monkeypatch.setattr(database, 'get_redis', lambda: redis)
++    monkeypatch.setattr(auth.settings, 'google_client_id', 'test-client')
++    monkeypatch.setattr(auth.settings, 'app_env', 'production')
++    response = Response()
++    result = await auth.google_config(response)
++    assert result['enabled']
++    assert 'HttpOnly' in response.headers['set-cookie']
++    assert 'Secure' in response.headers['set-cookie']
++    assert response.headers['cache-control'] == 'no-store'
++    redis.set.assert_awaited_once_with('auth:google:nonce:' + result['nonce'], '1', ex=300)
++
++@pytest.mark.asyncio
++async def test_missing_cookie():
++    from starlette.requests import Request
++    request = Request({'type': 'http', 'headers': []})
++    db = AsyncMock()
++    with pytest.raises(HTTPException) as exc:
++        await auth.google_login(request, auth.GoogleLoginRequest(credential='fake'), db)
++    assert exc.value.status_code == 401
++    db.execute.assert_not_called()
++
++@pytest.mark.asyncio
++async def test_nonce_cannot_be_replayed(monkeypatch):
++    from app.core import database
++    from starlette.requests import Request
++    redis = AsyncMock()
++    redis.getdel.return_value = None
++    monkeypatch.setattr(database, 'get_redis', lambda: redis)
++    monkeypatch.setattr(identity, 'verify_google_token', AsyncMock(return_value={'sub': 'stable'}))
++    request = Request({'type': 'http', 'headers': [(b'cookie', b'ta_google_nonce=used')]})
++    db = AsyncMock()
++    with pytest.raises(HTTPException) as exc:
++        await auth.google_login(request, auth.GoogleLoginRequest(credential='fake'), db)
++    assert exc.value.status_code == 401
++    db.execute.assert_not_called()
++
++@pytest.mark.asyncio
++async def test_existing_email_requires_password_before_linking(monkeypatch):
++    from app.core import database
++    from starlette.requests import Request
++    from types import SimpleNamespace
++    from unittest.mock import MagicMock
++    redis = AsyncMock()
++    redis.getdel.return_value = '1'
++    monkeypatch.setattr(database, 'get_redis', lambda: redis)
++    monkeypatch.setattr(identity, 'verify_google_token', AsyncMock(return_value={
++        'sub': 'stable', 'email': 'person@gmail.com'}))
++    db = AsyncMock()
++    absent, existing = MagicMock(), MagicMock()
++    absent.scalar_one_or_none.return_value = None
++    existing.scalar_one_or_none.return_value = SimpleNamespace(google_sub=None)
++    db.execute.side_effect = [absent, existing]
++    request = Request({'type': 'http', 'headers': [(b'cookie', b'ta_google_nonce=fresh')]})
++    with pytest.raises(HTTPException) as exc:
++        await auth.google_login(request, auth.GoogleLoginRequest(credential='fake'), db)
++    assert exc.value.status_code == 409
++    db.commit.assert_not_called()
+diff --git a/docs/GOOGLE_LOGIN.md b/docs/GOOGLE_LOGIN.md
+new file mode 100644
+index 0000000..28ba4b5
+--- /dev/null
++++ b/docs/GOOGLE_LOGIN.md
+@@ -0,0 +1,46 @@
++# Google 登录接入与部署
++
++本次实现使用 Google Identity Services 的 OpenID Connect ID token 登录。后端校验 RS256 签名、Google issuer、Web Client ID audience、到期时间、已验证邮箱及 nonce，再签发本项目原有 access/refresh token。无需 Google Client Secret，也不申请 Drive/Gmail 权限。
++
++## 配置
++
++1. 在 Google Cloud Console 创建或选择项目，配置 OAuth 同意屏幕和受众。测试状态下添加测试用户。
++2. 创建 **Web application** 类型 OAuth client。在 Authorized JavaScript origins 中添加实际访问来源，例如 `http://localhost:3000` 和 `https://research.example.com`。这里填写协议、域名及端口，不带路径。此实现使用 JavaScript callback，不需要 redirect URI。
++3. 后端环境变量设置 `GOOGLE_CLIENT_ID=你的客户端ID.apps.googleusercontent.com`。空值时前端隐藏 Google 入口；无需重新编译前端来更换 Client ID。
++4. 本地使用 `APP_ENV=development`。线上使用 `APP_ENV=production`，配置 HTTPS，前后端通过同一域名的 `/api/v1` 反向代理。前端 `VITE_API_BASE=/api/v1`。跨站 API 域名不属于本实现支持的部署方式（SameSite cookie）。
++5. Redis 必须可用，保存五分钟有效、原子消费的 nonce。Google 服务无法连接时可继续使用密码登录。
++
++## 更新服务器
++
++在项目目录执行：
++
++```sh
++docker compose build
++docker compose up -d redis
++docker compose run --rm migrate
++docker compose up -d backend frontend
++```
++
++迁移新增 `app_users.google_sub` 唯一字段。上线前备份数据库，确认迁移成功，再启动新版后端。截图里的公网 IP 不能直接作为正式 Google 登录的 HTTP 来源；请将域名指向服务器并配置 HTTPS。截图无法提供 SSH 登录权限或 Google 配置信息，本次未远程部署。
++
++## 账户行为
++
++- 首次 Google 注册：在登录页 Google 区域填有效邀请码，邀请码邮箱绑定及使用次数规则继续生效。
++- 已有邮箱账户首次绑定：在上方密码框填原账户密码，然后点击 Google 按钮。不会仅凭同名邮箱自动合并账户。
++- 后续登录：按 Google `sub` 查找账户，邮箱变更不会切换账户；停用账户不能登录。
++- Google 新建账户的本地密码为随机值，不向用户提供。后续使用 Google 登录。
++- 失败后重新生成 nonce，可修改邀请码或密码再次点击。刷新页面也会生成新会话。
++
++## 验收
++
++```sh
++cd backend
++.venv/bin/python -m pytest tests/test_google_identity.py -q
++cd ../frontend
++npm test
++npm run build
++```
++
++还需使用真实 Google Client ID 在配置来源完成：新邀请码注册、老账户密码绑定、二次登录、取消授权、退出重登、停用账户、过期/重复 nonce 测试。本地自动测试不替代真实 Google 弹窗与生产数据库迁移验证。
++
++Google 官方参考：[服务端 ID token 验证](https://developers.google.com/identity/gsi/web/guides/verify-google-id-token)、[JavaScript API](https://developers.google.com/identity/gsi/web/reference/js-reference)。

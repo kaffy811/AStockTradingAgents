@@ -297,20 +297,22 @@ class StockDataService:
         """
         # Try common kline cache keys (daily, qfq, various limits)
         for period in ("daily",):
-            for adjust in ("qfq", "none"):
-                for limit in (90, 30, 10):
+            for adjust in ("qfq", "", "none"):
+                for limit in (120, 90, 30, 10):
                     payload, found = cache.get_kline_stale(market, symbol, period, adjust, limit)
                     if found and payload:
                         bars = payload.get("bars") or []
                         if bars:
                             bar = bars[-1]   # most recent bar
                             return {
+                                "price":      bar.get("close"),
                                 "current":    bar.get("close"),
                                 "close":      bar.get("close"),
                                 "open":       bar.get("open"),
                                 "high":       bar.get("high"),
                                 "low":        bar.get("low"),
-                                "volume":     bar.get("volume"),
+                                "volume":     (bar.get("volume") * 100 if market.upper() == "CN"
+                                               and bar.get("volume") is not None else bar.get("volume")),
                                 "trade_date": bar.get("date") or bar.get("trade_date"),
                                 "source":     "kline_proxy",
                             }

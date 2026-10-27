@@ -1,0 +1,212 @@
+{
+  "status": "candidate_server_baseline_not_verified",
+  "base_kind": "pre-task-uncommitted-google-implementation",
+  "reference_head": "98c111b684cb19de0e0e92cb46e1d675ef3e8d0a",
+  "patch_sha256": "a272f9e0123532a329a30f35efeb734c3578e1e87527812fecffc29f2959b515",
+  "prerequisites": [
+    {
+      "path": "backend/app/models/user.py",
+      "sha256": "895332707821ae5980d8715a55909f54f294d778d5c5d0508dbb18e2cfbcb748"
+    },
+    {
+      "path": "backend/alembic/versions/2026_10_25_0001_google_identity.py",
+      "sha256": "e3df3634bf80a14338f24bb6438a2a79ec641dda506d2ddbbab9e6ca280dafc1"
+    },
+    {
+      "path": "frontend/src/api/response.js",
+      "sha256": "f0a53096a306d828b7bbcb38b48b57a2a94a231b64764b182ced0cc8fcd5a359"
+    }
+  ],
+  "files": [
+    {
+      "path": "backend/app/routers/auth.py",
+      "before_sha256": "28d1f05bfe1372f56ad6cfe95e66668b8a99fa84205758c91641afff0dbcf395",
+      "after_sha256": "1655c5ad2104f89e7501cdb5fea4cff10b678697d1a3d3a800f6cb45d3bd1032"
+    },
+    {
+      "path": "backend/app/routers/admin_invites.py",
+      "before_sha256": "a0233a74202e3f0abec74c71cd36ba3542072cbe725ad17fd688516709c8d094",
+      "after_sha256": "5b76cfed4b40fbe0f10b577ccff1e1ed29c17d9f15346c15a60d7e7539aa0850"
+    },
+    {
+      "path": "backend/app/routers/mvp.py",
+      "before_sha256": "7a968a489fc9286f8bebbea94f5a573580eb06c2a05d435cad262011a05ddad5",
+      "after_sha256": "4febabf79fc32a7ecfaadc5419e8aded0695266daed4ee256e67c631667f9237"
+    },
+    {
+      "path": "backend/app/services/google_identity.py",
+      "before_sha256": "8ad382ffd724013dd440f5a401d07a85437b79515c56476e6ebd3160784df09d",
+      "after_sha256": "a890f7c91236b039ff9c4270596f2b7880433af246a20d12fd3ef3a3b74a4bab"
+    },
+    {
+      "path": "backend/app/services/google_accounts.py",
+      "before_sha256": null,
+      "after_sha256": "613b34a1d1ec6568e55078e79f41428993623aea9ecd84d01039cc12a93575cb"
+    },
+    {
+      "path": "backend/app/services/auth_rate_limit.py",
+      "before_sha256": null,
+      "after_sha256": "256696ea2ad34d07e3b0641f657b4e11d84dee9f0ddcaa14cf784cdea24a2ea7"
+    },
+    {
+      "path": "backend/app/core/config.py",
+      "before_sha256": "7990ffd2263bb9c600913e9e40f8cbd7a8852cafc9f12ec6616fb12721b89eac",
+      "after_sha256": "f9918c19938a19df98e60c951c9232a4a4229438379ed67ebe2234022a96353a"
+    },
+    {
+      "path": "backend/app/core/startup_validation.py",
+      "before_sha256": "f8faaf5495827c5469000922b3d9fe45d78caff83d6281dbcecf5b1648260d15",
+      "after_sha256": "32bc4a95a86d980714c3de1b376280b31856768fe8a54cd187a91835c00b3459"
+    },
+    {
+      "path": "frontend/src/api/auth.js",
+      "before_sha256": "bd12278548bd455c8fbd25c92016cdfb191d90226fa00318eb8bf6b1be9f6044",
+      "after_sha256": "1eb44cce7a534135c020a415b29846ccf0a8fdaf92af44d39238b919974fac5e"
+    },
+    {
+      "path": "frontend/src/stores/auth.js",
+      "before_sha256": "7a5de6cb007a190e43cd324141f309dce31d6ba753c64c163a384c21cb9ee06d",
+      "after_sha256": "70a43ad7e9e7abddafac38ced350708738a06eeed7c86ecda471a27d08b9771e"
+    },
+    {
+      "path": "frontend/src/router/index.js",
+      "before_sha256": "4e25da2a8ee554cd054dfdc0ff69af70e2146952de2fd6a02696b5e1fa60aeb4",
+      "after_sha256": "a560dc0e1216f421643b6cb92739eb550df681dc06485eef568fb46fdf72959b"
+    },
+    {
+      "path": "frontend/src/views/LoginView.vue",
+      "before_sha256": "03041c6cad045ed2567efe8e292930d37e27c9e394f343e02fb019ed0a359d84",
+      "after_sha256": "9fd75cedae370e33396c1536b258738dc70394516e727fed95d9bf56dae1fcbb"
+    },
+    {
+      "path": "frontend/src/views/RegisterView.vue",
+      "before_sha256": "86741b44c9c415a7869a8976f31e5bf3c7a256ad60748385e3f881a441660fd5",
+      "after_sha256": "f1e6615e19afe03d7bcf2eaec773a8b124eafb854b009b5d82111a2b60b3af1a"
+    },
+    {
+      "path": "frontend/src/views/AdminInvitesView.vue",
+      "before_sha256": "290ef67d670c3d80f1fd224360882db94c6dffe6468e870b5dbb4433b28bbaea",
+      "after_sha256": "8d7961c179dc5f8c94f315399397404e3ebfd8a3c1f32333098f535614ebcbcb"
+    },
+    {
+      "path": "frontend/src/components/LoginCard.vue",
+      "before_sha256": "7c11c170e1c3403b791e8b0768d2f61dcc19dadc78ff51e092730303fa285b45",
+      "after_sha256": "9e9d0300ab17352e6ed10ec95a9367f3fa38f3eb370c703ae857bc2e671d4a5a"
+    },
+    {
+      "path": "frontend/src/components/AppHeader.vue",
+      "before_sha256": "6f4298441138ebb1591be4882adf88b38505d383475ba02a6e3f6581dc2893e0",
+      "after_sha256": "e6619d2c7cf262f1483fe2bf31e5ad5149c6ab05cc04e4831b07d28601da64d5"
+    },
+    {
+      "path": "frontend/src/utils/googleIdentity.js",
+      "before_sha256": null,
+      "after_sha256": "ed1057ceb6c189daaa8d30081abdaa94c119a1c1aa362c5215bc97f65d0caeb0"
+    },
+    {
+      "path": "backend/tests/test_google_identity.py",
+      "before_sha256": "f7b3e1686b299713d72db2fd4c940968d414154c2d50f1f07ffb4eae9c483d13",
+      "after_sha256": "137922616427b064ec67e8e4115eaa48554bde5a9873c0839980932770c7ff12"
+    },
+    {
+      "path": "backend/tests/test_google_only_auth.py",
+      "before_sha256": null,
+      "after_sha256": "6e5aeee5ae704332802215faf91f44d89a869bdc155e634361d065e9275b0ea4"
+    },
+    {
+      "path": "backend/tests/test_admin_invites.py",
+      "before_sha256": "b18c971e2e555be2b352ce351efd7492ec8f01ecddb9c9a7b8ca813cebd391b6",
+      "after_sha256": "0c7bae2636b2149d2a484805642b2a00d1ccf7fdb014c7e17979573208b74679"
+    },
+    {
+      "path": "backend/tests/test_email_verification.py",
+      "before_sha256": "052fc066138709abc47e127992b1dc3fddd647f6690d667326b0ec39791af8d4",
+      "after_sha256": "43b316a094874242ac409bed2a9e0845f62cfa8891a231230d4ca640b4adb476"
+    },
+    {
+      "path": "backend/tests/test_invite_hasher.py",
+      "before_sha256": "4bfafb735001a8241cc019448eeef13a8364e9a1b08d8e91bb2c3bc789863e16",
+      "after_sha256": "78e6e3a03ae20e7d42fbc6c65ba5050f3647503aef7baaf82c2333aafcdcec72"
+    },
+    {
+      "path": "backend/tests/test_mvp_r12_invite_security.py",
+      "before_sha256": "7a28cd312600b9f0dd16327c818ee6ea4fd405b9f32f7b58482c248313850360",
+      "after_sha256": "6900d36f86b075de57a44402ecc30198b048e6adef1418fff7c9a3cad8ecf069"
+    },
+    {
+      "path": "backend/tests/test_mvp_r12b_invite_code_format.py",
+      "before_sha256": "f3aa54837c56564769cb6331517efe2825637e38135ec174b1d929c7c4df82fe",
+      "after_sha256": "6d30a805a419137943e0d51488be24acad291208afc402e9a7ba11a65b9309a2"
+    },
+    {
+      "path": "frontend/src/tests/marketApiErrors.test.js",
+      "before_sha256": "a8de8b2db29cc3499ebb4677eb97d35761ad3e4853ae8947778c862e4bbcdd30",
+      "after_sha256": "f2b41b0604ff54c0a0214e37f8d3316cae3f325dc0be84b7f029dd3ca7e0d025"
+    },
+    {
+      "path": "frontend/src/tests/googleOnlyLogin.test.js",
+      "before_sha256": null,
+      "after_sha256": "e632a24f83ccbe0656d17cae58f173fbe6c5993b2da7d447102e4af32f6fe632"
+    },
+    {
+      "path": "frontend/src/tests/googleAuthSession.test.js",
+      "before_sha256": null,
+      "after_sha256": "c0f92c1d9bd36b6f1af836aed8cf3cf5a992ddc709a3c409eb0204f95ab20e9c"
+    },
+    {
+      "path": "README.md",
+      "before_sha256": "8634b762dc8c4066bff3a17d65abb2c6a6f477d0263b2cbaa62d6af519dcef11",
+      "after_sha256": "f16fe5f02f9ce6da4f96fe23b6dad0e908484ec0aa486ee4d3c7e1fd45d882b2"
+    },
+    {
+      "path": ".env.example",
+      "before_sha256": "0c3a7eb809732ab73186bf90686edd330a86f62650cab15f5e0fda2850fc669a",
+      "after_sha256": "5e179720e2c6cb4ec1779376b47337302dda78bcd750368e164eff4964fe88db"
+    },
+    {
+      "path": "backend/.env.example",
+      "before_sha256": "285a092f7b4aae783eafcb7b2e23d48fa7930eb838cb31adcda34271efc26603",
+      "after_sha256": "db10684818a107d53afa1b6a4cfa42ceaf1d3bb72517e6cc95495d149577a012"
+    },
+    {
+      "path": "docs/GOOGLE_LOGIN.md",
+      "before_sha256": "7ea3abef1d3737db8b5fa4b933801e24764c374b2881268725fab1589cc2d404",
+      "after_sha256": "2fba2d565d4bec2a1487d376e1bb68ff352163ae0d2991b0849df06598c5fe79"
+    },
+    {
+      "path": "docs/GOOGLE_ACCOUNT_MIGRATION.md",
+      "before_sha256": null,
+      "after_sha256": "0df4f46a9a85a9b2fb7257e12b0c97200d30786a8ccec010645b40a42eb2d0cd"
+    },
+    {
+      "path": "docs/GOOGLE_ACCOUNT_MIGRATION_REVIEW.sql",
+      "before_sha256": null,
+      "after_sha256": "32d516c9123186bb19a2ceac965590f302aee13f7d1fc844f78ea2f77ab1c4e5"
+    },
+    {
+      "path": "docs/GOOGLE_ONLY_DEPLOYMENT.md",
+      "before_sha256": null,
+      "after_sha256": "affdb8bf8ce7e5c5dbbd63fb19992862b2998ebfafdb2cad853f58a7decdf06c"
+    },
+    {
+      "path": "docs/server_deployment_guide.md",
+      "before_sha256": "d5e4f897fb7c2763cb5e9ee6f5cc7049f32f3bed51f394deb45d7cf396afe765",
+      "after_sha256": "c8c0afdf1ec5b2292da11cc9eda02c9b4373023e2041f4ecb958ba7b17a0fddc"
+    },
+    {
+      "path": "docs/manual_product_test_guide.md",
+      "before_sha256": "d3a73cb32530743281ce5510296c3c4a15f9f6f8a90a602cf510337799a85a07",
+      "after_sha256": "56ba78f3328b9af3c8599bdf1eb18ecb1ae7f81b14f5f734af2368394514609f"
+    },
+    {
+      "path": "docs/frontend_engineering_smoke_test.md",
+      "before_sha256": "b19b8c68cb59f16f7f51e8f99592e612ec96e71dc0e6b6075f2ba7b043b82782",
+      "after_sha256": "5db61b577164e8e54923517f3cd9cb02b96052b92c8b19d8f94f9ee0c2884b40"
+    },
+    {
+      "path": "docs/api_smoke_test_plan.md",
+      "before_sha256": "d7010bb01af0047aef4760e8b0a6285fbe20e8938e91a88172fc2d3f67cd2934",
+      "after_sha256": "f720b5e43aea9316df2275fa52f8558230aeafa4cb3a0f1372063b0ac94db4d2"
+    }
+  ]
+}

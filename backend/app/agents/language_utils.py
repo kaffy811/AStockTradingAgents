@@ -12,7 +12,7 @@ language_utils — Agent-level 输出语言支持工具。
 
 注意：
   - 该模块不 import 任何 app.agents 子模块，避免循环依赖。
-  - zh-CN 返回空指令（保持原有行为，不注入任何额外 token）。
+  - 所有语言（含默认中文）均显式要求输出语言。
 """
 
 from __future__ import annotations
@@ -84,6 +84,8 @@ REPORT_SECTION_LABELS: dict[str, dict[str, str]] = {
         "section_fundamental":         "基本面分析",
         "section_peer_comparison":     "同行对比分析",
         "section_news":                "新闻面分析",
+        "status_generated":            "正常生成",
+        "status_unavailable":          "暂不可用",
         "agent_status":                "Agent 执行状态",
         "data_quality":                "数据质量提示",
         "no_warnings":                 "暂无数据质量提示。",
@@ -112,6 +114,8 @@ REPORT_SECTION_LABELS: dict[str, dict[str, str]] = {
         "section_fundamental":         "Fundamental Analysis",
         "section_peer_comparison":     "Peer Comparison",
         "section_news":                "News Analysis",
+        "status_generated":            "Generated",
+        "status_unavailable":          "Unavailable",
         "agent_status":                "Agent Execution Status",
         "data_quality":                "Data Quality Notes",
         "no_warnings":                 "No data quality issues.",
@@ -140,6 +144,8 @@ REPORT_SECTION_LABELS: dict[str, dict[str, str]] = {
         "section_fundamental":         "基本面分析",
         "section_peer_comparison":     "同行對比分析",
         "section_news":                "新聞面分析",
+        "status_generated":            "正常生成",
+        "status_unavailable":          "暫不可用",
         "agent_status":                "Agent 執行狀態",
         "data_quality":                "數據質量提示",
         "no_warnings":                 "暫無數據質量提示。",
@@ -168,6 +174,8 @@ REPORT_SECTION_LABELS: dict[str, dict[str, str]] = {
         "section_fundamental":         "ファンダメンタル分析",
         "section_peer_comparison":     "同業比較",
         "section_news":                "ニュース分析",
+        "status_generated":            "生成済み",
+        "status_unavailable":          "利用不可",
         "agent_status":                "エージェント実行状況",
         "data_quality":                "データ品質メモ",
         "no_warnings":                 "データ品質の問題はありません。",
@@ -196,6 +204,8 @@ REPORT_SECTION_LABELS: dict[str, dict[str, str]] = {
         "section_fundamental":         "기본 분석",
         "section_peer_comparison":     "동종 비교",
         "section_news":                "뉴스 분석",
+        "status_generated":            "생성 완료",
+        "status_unavailable":          "이용 불가",
         "agent_status":                "에이전트 실행 상태",
         "data_quality":                "데이터 품질 메모",
         "no_warnings":                 "데이터 품질 문제 없음.",
@@ -224,6 +234,8 @@ REPORT_SECTION_LABELS: dict[str, dict[str, str]] = {
         "section_fundamental":         "Análisis Fundamental",
         "section_peer_comparison":     "Comparación entre Pares",
         "section_news":                "Análisis de Noticias",
+        "status_generated":            "Generado",
+        "status_unavailable":          "No disponible",
         "agent_status":                "Estado de los Agentes",
         "data_quality":                "Notas de Calidad de Datos",
         "no_warnings":                 "Sin problemas de calidad de datos.",
@@ -265,7 +277,7 @@ def build_output_language_instruction(output_language: str | None) -> str:
     """
     构建追加到 Agent user prompt 末尾的语言指令。
 
-    - zh-CN 返回空字符串，不注入任何指令（保持原有 token 量）。
+    - 默认中文同样显式要求输出语言。
     - 其余语言返回【输出语言要求】块，说明目标语言。
     - 股票名称、股票代码、公司专有名词、新闻标题、财务指标缩写
       （PE、PB、ROE、MACD、RSI、MA5、MA10、MA20、MA60）允许保留原文。
@@ -273,11 +285,9 @@ def build_output_language_instruction(output_language: str | None) -> str:
     - 严禁投资建议性措辞，仅供研究参考。
 
     Returns:
-        str — 空字符串（zh-CN）或语言指令块（其他语言）。
+        str — 目标语言指令块。
     """
     lang = normalize_output_language(output_language)
-    if lang == "zh-CN":
-        return ""
     label = OUTPUT_LANGUAGE_LABELS[lang]
     return (
         f"\n\n【输出语言要求】\n"
@@ -285,5 +295,7 @@ def build_output_language_instruction(output_language: str | None) -> str:
         f"以下内容允许保留原文：股票名称、股票代码、公司专有名词、新闻标题、"
         f"财务指标缩写（如 PE、PB、ROE、MACD、RSI、MA5、MA10、MA20、MA60）。\n"
         f"其余解释、章节标题、摘要、数据说明、风险提示均应使用 {label}。\n"
+        f"事实、分析、局限和观察项的标签也必须使用 {label}，不得直接输出英文内部字段名。\n"
+        f"不得自行换算单位或计算输入未提供的差值；缺失项写明不可评价，不输出带缺失占位符的定量结论。\n"
         f"本报告仅供研究参考，不构成投资建议。"
     )

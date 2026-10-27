@@ -14,14 +14,14 @@
     >
       <span class="dot"></span>
       {{ agentLabel(name) }}
-      <span style="opacity:0.7;font-weight:400">({{ info.status }})</span>
+      <span style="opacity:0.7;font-weight:400">{{ agentStatusLabel(info.status) }}</span>
       <span v-if="info.message" :title="info.message" style="cursor:help">ⓘ</span>
     </span>
   </div>
 </template>
 
 <script setup>
-import { agentLabel, badgeClass, formatTime } from '../utils/warningMap.js'
+import { agentLabel, badgeClass, formatTime, agentStatusLabel } from '../utils/warningMap.js'
 
 defineProps({
   metadata: { type: Object, required: true },

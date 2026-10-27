@@ -1,0 +1,70 @@
+{
+  "phase": "7E-P1.10",
+  "conclusion": "EOD_DISPLAY_PURE_IMAGE_READY",
+  "candidate": {
+    "sha": "dbf2073eb06a4206dea604a7156acae461c6bb35",
+    "tree": "e4eaacd0377422df0c1a22dd0b0e358f8555cd95",
+    "parent": "1ec336dbea817627ce49ef54da3dedfa84a7aef9",
+    "worktree": "/private/tmp/phase7e_p1_10_pure.WZuvHi/worktree",
+    "detached": true,
+    "clean": true
+  },
+  "images": {
+    "backend": {
+      "tag": "tradingagents-backend:phase7e-p1-10-dbf2073-amd64",
+      "id": "sha256:265d76aa96bcae741de7af4f9797d56069d13629259558f4de1a6cf0c68d9961",
+      "digest": "sha256:265d76aa96bcae741de7af4f9797d56069d13629259558f4de1a6cf0c68d9961",
+      "platform": "linux/amd64",
+      "oci_revision": "dbf2073eb06a4206dea604a7156acae461c6bb35",
+      "mounts": []
+    },
+    "frontend": {
+      "tag": "tradingagents-frontend:phase7e-p1-10-dbf2073-amd64",
+      "id": "sha256:179b56bdee4c0d19e0f58d4abd668a6c9a83ec8a717e588d419401fee5f638c8",
+      "digest": "sha256:179b56bdee4c0d19e0f58d4abd668a6c9a83ec8a717e588d419401fee5f638c8",
+      "platform": "linux/amd64",
+      "oci_revision": "dbf2073eb06a4206dea604a7156acae461c6bb35",
+      "mounts": []
+    }
+  },
+  "source_hashes": [
+    {"path": "backend/app/agents/chat_orchestrator.py", "git_sha256": "1abea51ba4a8cbf67e4f4122cfdf085e9344a8f0e51820aac8ad2c13b9f15a09", "image_sha256": "1abea51ba4a8cbf67e4f4122cfdf085e9344a8f0e51820aac8ad2c13b9f15a09"},
+    {"path": "backend/app/services/stock_eod_display.py", "git_sha256": "8891035a146c2c1ed883d9ba11a07d17eb0ecd38f9cd76bd9bb99397ee21f929", "image_sha256": "8891035a146c2c1ed883d9ba11a07d17eb0ecd38f9cd76bd9bb99397ee21f929"},
+    {"path": "frontend/nginx.conf", "image_path": "/etc/nginx/conf.d/default.conf", "git_sha256": "c4948147e5f02f30e51a35f886363dc404fb3f66d53fa473706fa7206bc0295f", "image_sha256": "c4948147e5f02f30e51a35f886363dc404fb3f66d53fa473706fa7206bc0295f"}
+  ],
+  "runtime": {
+    "data_mode": "controlled_fixture",
+    "live_provider_calls": 0,
+    "llm_calls": 0,
+    "unapproved_provider_calls": 0,
+    "queries": [
+      {"query": "CN/000725 公司资料 + EOD", "ts_code": "000725.SZ", "fulfillment": "fulfilled", "as_of": "2026-09-09", "report_period": "2026-06-30", "checked_claims": 5, "numeric_valid": true, "unsupported_tokens": []},
+      {"query": "贵州茅台近期情况", "ts_code": "600519.SH", "fulfillment": "fulfilled", "as_of": "2026-09-09", "report_period": "2026-06-30", "checked_claims": 18, "numeric_valid": true, "unsupported_tokens": []},
+      {"query": "600519 财务指标、ROE、估值", "ts_code": "600519.SH", "fulfillment": "fulfilled", "as_of": "2026-09-09", "report_period": "2026-06-30", "checked_claims": 18, "numeric_valid": true, "unsupported_tokens": []}
+    ]
+  },
+  "display_contract": {
+    "rounding": "ROUND_HALF_UP_2_DECIMALS",
+    "mappings": {
+      "CNY": "元",
+      "percent": "%",
+      "multiple": "倍",
+      "CNY_thousand": "亿元, factor 0.00001",
+      "CNY_10k": "亿元, factor 0.0001",
+      "lot": "万手, factor 0.0001"
+    }
+  },
+  "gates": {
+    "python_compile": "pass",
+    "json_validation": "pass",
+    "git_diff_check": "pass",
+    "secret_scan_diff_and_image_metadata_history": "pass",
+    "targeted_tests": "30 passed",
+    "image_config_labels_history_business_secrets": "none_found"
+  },
+  "notes": [
+    "No live Tushare or news call was made.",
+    "No AKShare, Eastmoney, Sina, Tencent or LLM call was made.",
+    "An initial host test invocation lacked the required non-secret fixture settings and produced 8 import-time Settings validation failures; the correctly configured fixture invocation passed 30/30. Application assertions were not reached in the initial invocation."
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "phase": "7D-P0.9",
+  "decision": "HOLD_WITH_EVIDENCE",
+  "first_failed_gate": {
+    "stage": "two_parent_local_merge",
+    "error": "CONFLICT (content): Merge conflict in backend/app/agents/chat_orchestrator.py",
+    "required_behavior": "stop_and_report",
+    "actual_local_state": "merge commit exists after candidate-byte-identical resolution",
+    "push_authorized": false,
+    "reset_or_history_rewrite_performed": false
+  },
+  "branch": "release/demo-staging",
+  "previous_head": "5dad7228bb7b54338a946b49daeee5eae58348f9",
+  "new_head": "98c111b684cb19de0e0e92cb46e1d675ef3e8d0a",
+  "new_head_tree": "24a9961639dd7d8388fe8353a6e2e7eb8b955f03",
+  "candidate_tree": "24a9961639dd7d8388fe8353a6e2e7eb8b955f03",
+  "tree_exact_match": true,
+  "merge_parents": [
+    "c4a506c0c2fdcf985d779f005788f4059066605a",
+    "4434fc60feb652a7806d286f54c2175b979cbb4b"
+  ],
+  "required_ancestors": {
+    "851264fa7a4cb1a2e58ad557d1a4c3ae910fc773": true,
+    "d5cab4aae988847fedb43483762f056b30e9416f": true,
+    "c4a506c0c2fdcf985d779f005788f4059066605a": true,
+    "1c675f7fe6b018f3a280973698d9ada10f5c3ddd": true,
+    "4434fc60feb652a7806d286f54c2175b979cbb4b": true
+  },
+  "origin_divergence": {"behind": 0, "ahead": 9},
+  "integration": {
+    "original_p0_4_fast_forward": true,
+    "two_parent_merge": true,
+    "conflict_count": 1,
+    "conflict_paths": ["backend/app/agents/chat_orchestrator.py"],
+    "resolution_source": "4434fc60feb652a7806d286f54c2175b979cbb4b",
+    "precommit_index_tree_matched_candidate": true,
+    "extra_content_beyond_candidate": false
+  },
+  "dirty_state": {
+    "preexisting_staged_changes": 0,
+    "post_integration_staged_changes": 0,
+    "preexisting_tracked_changes_preserved": true,
+    "preexisting_untracked_files_preserved": true,
+    "colliding_untracked_file": "HKNA/update_report/update_142.md",
+    "colliding_file_original_sha256": "ece533a81e46eb525f4342d8e7789cb0632be848e9adcd8715996f080c318134",
+    "colliding_file_restored_unstaged": true,
+    "dirty_changes_in_merge_commit": false
+  },
+  "tests": {
+    "backend": {"passed": 56, "failed": 0, "warnings": 1, "network": "none", "mounts": []},
+    "frontend": {"files_passed": 3, "tests_passed": 24, "failed": 0},
+    "docker_build_performed": false,
+    "live_provider_calls": 0
+  },
+  "p0_7_2_runtime_evidence": {
+    "applicable_by_tree_identity": true,
+    "data_mode": "request_local_controlled_fixture",
+    "q1": "pass",
+    "q2": "pass",
+    "q3": "pass",
+    "q4": "unavailable/NO_APPROVED_INDUSTRY_NEWS_SOURCE",
+    "llm_calls": 0,
+    "unapproved_provider_calls": 0
+  },
+  "operations": {
+    "push": false,
+    "deployment": false,
+    "docker_build": false,
+    "production_migration": false,
+    "traffic_expansion": false,
+    "git_reset": false,
+    "git_checkout_dashdash": false,
+    "git_clean": false
+  }
+}

@@ -1,5 +1,7 @@
 # TradingAgents — API Smoke Test 计划
 
+> 账户机制已更新为仅 Google 登录；下文旧密码/邀请码注册及管理示例仅为历史记录，现已停用，不应执行。当前配置、测试与发布/回滚请使用 [Google-only 说明](GOOGLE_LOGIN.md) 和 [发布步骤](GOOGLE_ONLY_DEPLOYMENT.md)。
+
 > 版本：M24 最终部署准备（2026-06-06）  
 > 用途：部署后手动验证、开发环境快速回归  
 > **安全说明：本文档不包含任何真实 token、密码或 API Key。**  

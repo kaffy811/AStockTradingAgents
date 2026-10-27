@@ -1,0 +1,80 @@
+{
+  "phase": "6W-R3.3I.2.4",
+  "status": "CANDIDATE_REGRESSION_DETECTED",
+  "traffic": "HOLD_1_PERCENT",
+  "workspace": {
+    "main_head_before": "b055da8495c54bb37625f0b0e0f94b4d4a627de2",
+    "main_head_after": "b055da8495c54bb37625f0b0e0f94b4d4a627de2",
+    "main_branch": "release/demo-staging",
+    "candidate_parent": "5e9977a3d43fd64d75a09156e800889483404458",
+    "candidate_branch": "r33e-pgvector-portability",
+    "historical_dirty_preserved": true,
+    "excluded_tracked_files": [
+      "backend/Dockerfile",
+      "backend/app/main.py",
+      "backend/app/services/report_embedding_provider.py",
+      "backend/pyproject.toml",
+      "backend/uv.lock"
+    ]
+  },
+  "commit": {
+    "created": true,
+    "sha": "28870a13d98f6e7bab5a2b16c6f3144411859198",
+    "message": "fix(report-agent): preserve claim provenance for derived facts",
+    "file_count": 14,
+    "staging_empty_after": true,
+    "pushed": false
+  },
+  "tests": {
+    "collected": 44,
+    "passed": 44,
+    "failed": 0,
+    "skipped": 0,
+    "duration_seconds": 0.67
+  },
+  "candidate": {
+    "image": "tradingagents-backend:rc-r33i2-4-28870a1",
+    "digest": "sha256:2be2ca15711eb5ff96076c5c9d95a9b2f53c7979da16220a12d727ebcac1cccb",
+    "oci_revision": "28870a13d98f6e7bab5a2b16c6f3144411859198",
+    "container_id": "c3d80e3640a4083a92b93266d62510f610cdb27357401d5a10bf3105515d03e4",
+    "mounts": [],
+    "isolated_postgres": "r33i-run-postgres",
+    "isolated_redis": "r33i-run-redis",
+    "health_ok": true,
+    "source_hashes_match": true
+  },
+  "q3": {
+    "request_id": "ab337d23",
+    "trace_id": "fbd038bc-d047-4905-aa4a-20a22a29f1bc",
+    "issued_count": 1,
+    "retried": false,
+    "selected_report_id": 1,
+    "selected_report_year": 2024,
+    "selected_period": "2024-12-31",
+    "derived_fact": {
+      "id": "C1",
+      "metric": "net_margin",
+      "display_result": "50.46%",
+      "formula_type": "ratio_percentage",
+      "evidence_ids": ["E1"]
+    },
+    "citation_validation_valid": true,
+    "derived_fact_resolved": true,
+    "numeric_validation_valid": false,
+    "unsupported_tokens": ["100%", "100"],
+    "citation_metadata_leak": false,
+    "final_status": "partial_success",
+    "gate": {
+      "api_terminal": true,
+      "s8_persisted": true,
+      "backend_completed": true,
+      "health_ok": true
+    }
+  },
+  "operations": {
+    "deployed": false,
+    "migration_executed": false,
+    "production_changed": false,
+    "traffic_expanded": false
+  }
+}

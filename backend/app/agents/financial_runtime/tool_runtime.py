@@ -177,7 +177,7 @@ class FinancialToolRegistry:
         market = str(data.get("market") or "CN").upper()
         if not symbol:
             return _failure(req, "ENTITY_NOT_RESOLVED", "缺少证券实体", latency_ms=int((time.perf_counter() - started) * 1000))
-        quote = stock_data_service.get_quote_optional(market, symbol)
+        quote = await asyncio.to_thread(stock_data_service.get_quote_optional, market, symbol)
         if not quote:
             return _failure(req, "QUOTE_UNAVAILABLE", "行情数据暂不可用", latency_ms=int((time.perf_counter() - started) * 1000))
         return _success(

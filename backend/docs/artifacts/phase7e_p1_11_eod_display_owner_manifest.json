@@ -1,0 +1,80 @@
+{
+  "phase": "7E-P1.11",
+  "conclusion": "OWNER_RELEASE_APPROVAL_READY",
+  "review_mode": "read_only",
+  "identity": {
+    "baseline": "1ec336dbea817627ce49ef54da3dedfa84a7aef9",
+    "candidate": "dbf2073eb06a4206dea604a7156acae461c6bb35",
+    "candidate_parent": "1ec336dbea817627ce49ef54da3dedfa84a7aef9",
+    "candidate_tree": "e4eaacd0377422df0c1a22dd0b0e358f8555cd95",
+    "baseline_is_ancestor": true
+  },
+  "diff": {
+    "files": 7,
+    "insertions": 442,
+    "deletions": 8,
+    "paths": [
+      "HKNA/update_report/update_166.md",
+      "backend/app/agents/chat_orchestrator.py",
+      "backend/app/services/stock_eod_display.py",
+      "backend/docs/artifacts/phase7e_p1_9_eod_display_normalization.md",
+      "backend/docs/artifacts/phase7e_p1_9_eod_display_runtime.json",
+      "backend/tests/fundamental/test_phase7d_p0_6_stock_eod_numeric_validation.py",
+      "backend/tests/test_phase7e_p1_9_eod_display_normalization.py"
+    ],
+    "scope_allowed": true,
+    "forbidden_scope_changes": []
+  },
+  "unchanged_blob_checks": {
+    "tushare_eod_gateway": "6f79f8e41ad859e0e973a3bcac859af3ea5bef5b",
+    "stock_eod_numeric_validation": "f62deb0eba8cc12bd092549636beb0714bb12260",
+    "security_entity_resolver": "dcf8d77deee5ce1ae93685c3df0e7e08dae63d48",
+    "frontend_nginx": "64937abecc3d9352c96bc031b2d540a7ed39a763",
+    "frontend_lockfile": "71ca8ff7684ebd7d3ef1efb3b46d84325315cc3d",
+    "backend_lockfile": "f87fbe3859de855261f25e4822f199fd94821225"
+  },
+  "display_contract": {
+    "implementation": "backend Decimal multiplication followed by quantize",
+    "rounding": "ROUND_HALF_UP",
+    "decimal_places": 2,
+    "mappings": [
+      {"canonical_unit": "CNY", "display_unit": "元", "factor": "1"},
+      {"canonical_unit": "%", "display_unit": "%", "factor": "1"},
+      {"canonical_unit": "multiple", "display_unit": "倍", "factor": "1"},
+      {"canonical_unit": "CNY_thousand", "display_unit": "亿元", "factor": "0.00001"},
+      {"canonical_unit": "CNY_10k", "display_unit": "亿元", "factor": "0.0001"},
+      {"canonical_unit": "lot", "display_unit": "万手", "factor": "0.0001"}
+    ],
+    "volume_boundary": "7616584.07 lot -> 761.66 万手; never shares",
+    "trace_fields": ["canonical_value", "canonical_unit", "display_value", "display_unit", "rounding_policy", "evidence_id", "request_local_evidence_id", "source", "as_of", "report_period"],
+    "answer_excludes_internal_ids_and_machine_units": true
+  },
+  "verification": {
+    "backend_related_recorded": "108 passed",
+    "backend_independent_subset": "30 passed",
+    "frontend_targeted_recorded": "24 passed",
+    "frontend_independent_fulfillment_subset": "16 passed",
+    "frontend_full_independent": "70 files, 769 passed, maxWorkers=1, zero worker timeout",
+    "frontend_production_build_independent": "passed",
+    "python_compile": "passed",
+    "json_validation": "passed",
+    "secret_scan": "passed",
+    "git_diff_check": "passed"
+  },
+  "fixture_runtime": [
+    {"query": "CN/000725 公司资料 + EOD", "checked_claims": 5, "numeric_validation_valid": true, "unsupported_tokens": [], "llm_calls": 0, "unapproved_provider_calls": 0},
+    {"query": "贵州茅台近期情况", "checked_claims": 18, "numeric_validation_valid": true, "unsupported_tokens": [], "llm_calls": 0, "unapproved_provider_calls": 0},
+    {"query": "600519 财务指标、ROE、估值", "checked_claims": 18, "numeric_validation_valid": true, "unsupported_tokens": [], "llm_calls": 0, "unapproved_provider_calls": 0}
+  ],
+  "pure_images": {
+    "backend": {"digest": "sha256:265d76aa96bcae741de7af4f9797d56069d13629259558f4de1a6cf0c68d9961", "platform": "linux/amd64", "oci_revision": "dbf2073eb06a4206dea604a7156acae461c6bb35", "mounts": []},
+    "frontend": {"digest": "sha256:179b56bdee4c0d19e0f58d4abd668a6c9a83ec8a717e588d419401fee5f638c8", "platform": "linux/amd64", "oci_revision": "dbf2073eb06a4206dea604a7156acae461c6bb35", "mounts": []},
+    "source_hashes_match": true,
+    "business_secrets_in_config_labels_history": false
+  },
+  "harness_notes": [
+    "An initial backend test invocation omitted required non-secret fixture settings and stopped at Settings import; the corrected run passed 30/30.",
+    "An initial copied-frontend run omitted the sibling backend source path required by five source-inspection tests; after adding a read-only candidate backend link, the full suite passed 769/769 with no worker timeout."
+  ],
+  "operations": {"code_modified": false, "commit_modified": false, "push": false, "merge": false, "deploy": false, "restart": false, "migration": false}
+}

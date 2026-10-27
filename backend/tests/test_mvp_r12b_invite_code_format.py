@@ -197,7 +197,7 @@ class TestHashStorage:
 class TestLowercaseNormalization:
     def test_lowercase_8char_normalizes_to_uppercase(self):
         """Registration should accept '7kmr9x2p' and match '7KMR9X2P'."""
-        from app.routers.auth import _hash_invite_code
+        from app.routers.mvp import _hash_invite_code
         upper = "7KMR9X2P"
         lower = "7kmr9x2p"
 
@@ -209,7 +209,7 @@ class TestLowercaseNormalization:
             "Lowercase 8-char code must hash identically to its uppercase form"
 
     def test_mixed_case_8char_normalizes(self):
-        from app.routers.auth import _hash_invite_code
+        from app.routers.mvp import _hash_invite_code
         mixed = "7Kmr9X2p"
         upper = "7KMR9X2P"
 
@@ -219,7 +219,7 @@ class TestLowercaseNormalization:
         assert _hash_invite_code(normalized) == _hash_invite_code(upper)
 
     def test_whitespace_stripped_before_hash(self):
-        from app.routers.auth import _hash_invite_code
+        from app.routers.mvp import _hash_invite_code
         padded = "  7KMR9X2P  "
         clean  = "7KMR9X2P"
 
@@ -251,7 +251,7 @@ class TestLegacyCodeCompatibility:
     def test_legacy_code_hash_differs_from_uppercased(self):
         """Confirm case-sensitivity matters for legacy codes."""
         import secrets as _secrets
-        from app.routers.auth import _hash_invite_code
+        from app.routers.mvp import _hash_invite_code
         # Use a code with known mixed-case content
         code = "aBcDeFgHiJkLmNoPqRsTuVwXyZ1234567890ABCDEFGH"[:48]
         assert _hash_invite_code(code) != _hash_invite_code(code.upper()), \
@@ -261,66 +261,3 @@ class TestLegacyCodeCompatibility:
 # ===========================================================================
 # 8. Invalid invite code returns 400 with clear message
 # ===========================================================================
-
-class TestInvalidInviteError:
-    @pytest.mark.asyncio
-    async def test_hash_mismatch_gives_invalid_message(self):
-        """An unrecognized code_hash → 'Invalid invite code.'"""
-        from unittest.mock import AsyncMock, MagicMock
-        from fastapi import HTTPException
-        from app.models.user import RegisterRequest
-        from app.routers.auth import register as register_endpoint
-
-        body = RegisterRequest(
-            username="newuser",
-            email="newuser@test.com",
-            password="password123",
-            invite_code="BADCODE1",
-        )
-
-        mock_result = MagicMock()
-        mock_result.scalar_one_or_none.return_value = None
-
-        mock_db = AsyncMock()
-        mock_db.execute.return_value = mock_result
-
-        with pytest.raises(HTTPException) as exc_info:
-            await _do_register(body, mock_db)
-
-        assert exc_info.value.status_code == 400
-        assert "Invalid invite code" in str(exc_info.value.detail)
-
-    @pytest.mark.asyncio
-    async def test_used_invite_gives_already_used_message(self):
-        """A fully-consumed invite → 'already been used'"""
-        from unittest.mock import AsyncMock, MagicMock
-        from fastapi import HTTPException
-        from app.models.user import RegisterRequest
-        from app.models.mvp import MvpInvite
-        from app.routers.auth import register as register_endpoint
-
-        body = RegisterRequest(
-            username="newuser",
-            email="newuser@test.com",
-            password="password123",
-            invite_code="USEDCODE",
-        )
-
-        # Fully consumed invite
-        invite = MagicMock(spec=MvpInvite)
-        invite.expires_at = None
-        invite.use_count  = 1
-        invite.max_uses   = 1
-        invite.email      = None
-
-        mock_result = MagicMock()
-        mock_result.scalar_one_or_none.return_value = invite
-
-        mock_db = AsyncMock()
-        mock_db.execute.return_value = mock_result
-
-        with pytest.raises(HTTPException) as exc_info:
-            await _do_register(body, mock_db)
-
-        assert exc_info.value.status_code == 400
-        assert "already been used" in str(exc_info.value.detail)

@@ -1,0 +1,145 @@
+{
+  "schema_version": "1.0",
+  "audit_id": "e0_20260915T013926Z",
+  "observed_at": "2026-09-15T01:39:26Z",
+  "scope": "beta-relevant HTTP and SSE contracts; static inspection only",
+  "base_mounts": {
+    "v1": "/api/v1",
+    "company_v2": "/api/v2/company",
+    "health_direct": "/health"
+  },
+  "contracts": [
+    {
+      "method": "GET", "path": "/health", "router": "backend/app/main.py", "handler": "health", "frontend_call": null,
+      "auth": "none", "ownership": "none", "request": {}, "success_fields": ["status"], "partial_fields": [], "failure_fields": [],
+      "fulfillment": null, "reason_code": null, "request_id": "middleware may add header; body contract absent", "sse": null,
+      "persistence": "none", "side_effects": "none", "tests": ["historical deployment smoke only"],
+      "risks": ["current frontend Nginx HEAD does not proxy /health; later candidate does"]
+    },
+    {
+      "method": "POST", "path": "/api/v1/auth/login", "router": "backend/app/routers/auth.py", "handler": "login", "frontend_call": "frontend/src/api/auth.js",
+      "auth": "credentials in request", "ownership": "authenticated subject issued by server", "request": {"fields": ["username", "password"], "limits": "Pydantic schema"},
+      "success_fields": ["access_token", "refresh_token", "token_type"], "partial_fields": [], "failure_fields": ["detail", "error_code", "message"],
+      "fulfillment": null, "reason_code": null, "request_id": "header only", "sse": null, "persistence": "login metadata may be updated", "side_effects": "token issuance",
+      "tests": ["backend auth tests; not executed in E0"], "risks": ["browser stores tokens in localStorage"]
+    },
+    {
+      "method": "GET", "path": "/api/v1/auth/me", "router": "backend/app/routers/auth.py", "handler": "get_me", "frontend_call": "frontend/src/api/auth.js",
+      "auth": "Bearer JWT", "ownership": "JWT user", "request": {}, "success_fields": ["user public schema"], "partial_fields": [], "failure_fields": ["AUTH_REQUIRED", "FORBIDDEN"],
+      "fulfillment": null, "reason_code": null, "request_id": "header only", "sse": null, "persistence": "none", "side_effects": "none", "tests": ["not run in E0"], "risks": []
+    },
+    {
+      "method": "GET", "path": "/api/v1/stocks/search", "router": "backend/app/routers/stocks.py", "handler": "search_stocks", "frontend_call": "frontend/src/api/stocks.js",
+      "auth": "Bearer JWT", "ownership": "JWT user, no user-owned resource", "request": {"query": ["q", "market", "limit"]}, "success_fields": ["items", "total"], "partial_fields": [], "failure_fields": ["AUTH_REQUIRED", "validation detail"],
+      "fulfillment": null, "reason_code": null, "request_id": "header only", "sse": null, "persistence": "none", "side_effects": "none", "tests": ["stock route tests; not run"], "risks": ["search availability depends on stock_master data"]
+    },
+    {
+      "method": "GET", "path": "/api/v1/stocks/{market}/{symbol}/profile", "router": "backend/app/routers/stocks.py", "handler": "get_stock_profile", "frontend_call": "frontend/src/api/stocks.js",
+      "auth": "Bearer JWT", "ownership": "watchlist/report joins scoped to JWT user", "request": {"path": ["market", "symbol"]}, "success_fields": ["identity", "quote", "watchlist", "latest_report"], "partial_fields": ["nullable modules"], "failure_fields": ["AUTH_REQUIRED", "provider error"],
+      "fulfillment": null, "reason_code": "not uniform", "request_id": "header only", "sse": null, "persistence": "read", "side_effects": "may call configured providers/cache", "tests": ["frontend stock tests; not run"], "risks": ["not the anonymous Company V2 contract"]
+    },
+    {
+      "method": "GET", "path": "/api/v2/company/{market}/{symbol}/profile", "router": "backend/app/routers/company_v2_debug.py", "handler": "get_company_profile", "frontend_call": "frontend/src/api/companyV2.js:getCompanyV2Profile",
+      "auth": "optional; public projection", "ownership": "none", "request": {"path": ["market", "symbol"], "market": "CN supported"},
+      "success_fields": ["ok", "market", "symbol", "profile fields", "as_of_date"], "partial_fields": ["field_availability"], "failure_fields": ["ok=false", "error_code=PUBLIC_PROFILE_UNAVAILABLE", "message"],
+      "fulfillment": "not explicit", "reason_code": "error_code on failure", "request_id": "response header middleware", "sse": null, "persistence": "none", "side_effects": "provider/cache read",
+      "tests": ["backend/tests/fundamental/test_phase7d_p0_1_public_company_history.py", "frontend/src/tests/phase7dP01CompanyModuleIsolation.test.js"],
+      "risks": ["current HEAD Nginx does not proxy /api/v2", "profile uses ok rather than common fulfillment"]
+    },
+    {
+      "method": "GET", "path": "/api/v2/company/{market}/{symbol}/history", "router": "backend/app/routers/company_v2_debug.py", "handler": "get_company_history", "frontend_call": "frontend/src/api/companyV2.js:getCompanyV2History",
+      "auth": "optional; public allowlisted projection", "ownership": "none", "request": {"path": ["market", "symbol"], "query": ["period=annual|quarterly|all", "start_year", "end_year", "force_refresh"]},
+      "success_fields": ["ok", "market", "symbol", "modules", "module_status", "source", "as_of", "coverage", "warnings"], "partial_fields": ["per-module availability and status"], "failure_fields": ["ok=false", "reason_code=DATA_NOT_AVAILABLE", "empty modules"],
+      "fulfillment": "derived by ok/module_status; not a uniform top-level field", "reason_code": "DATA_NOT_AVAILABLE on catch", "request_id": "header middleware", "sse": null, "persistence": "none", "side_effects": "cache/provider read; force refresh only for authenticated dev/admin",
+      "tests": ["backend/tests/fundamental/test_phase7d_p0_1_public_company_history.py", "frontend/src/tests/phase7dP01CompanyModuleIsolation.test.js"], "risks": ["quarterly coverage historically absent for 000725", "current Nginx HEAD"]
+    },
+    {
+      "method": "GET", "path": "/api/v2/company/{market}/{symbol}/eod", "router": "backend/app/routers/company_v2_debug.py", "handler": "get_company_eod", "frontend_call": "frontend/src/api/companyV2.js:getCompanyV2Eod",
+      "auth": "none", "ownership": "none", "request": {"path": ["market", "symbol"]},
+      "success_fields": ["fulfillment", "modules", "field_availability", "source", "as_of", "freshness", "warnings"], "partial_fields": ["fulfillment=partial", "module statuses"], "failure_fields": ["fulfillment=failed|unavailable", "reason_code"],
+      "fulfillment": "fulfilled|partial|unavailable|failed", "reason_code": "stable gateway/public reason", "request_id": "header middleware", "sse": null, "persistence": "cache only", "side_effects": "approved Tushare EOD calls when needed",
+      "tests": ["backend/tests/fundamental/test_phase7d_p0_6_stock_eod_numeric_validation.py", "candidate fixture tests"], "risks": ["current HEAD predates explicit suffix routing and display normalization"]
+    },
+    {
+      "method": "POST", "path": "/api/v1/chat/sessions", "router": "backend/app/routers/chat.py", "handler": "create_chat_session", "frontend_call": "frontend/src/api/chat.js:createChatSession",
+      "auth": "Bearer JWT", "ownership": "server assigns JWT user_id", "request": {"fields": ["title<=100"]}, "success_fields": ["session_id", "title", "status", "created_at"], "partial_fields": [], "failure_fields": ["AUTH_REQUIRED", "validation detail"],
+      "fulfillment": null, "reason_code": null, "request_id": "header only", "sse": null, "persistence": "creates chat_sessions row", "side_effects": "database write", "tests": ["chat router/service tests; not run"], "risks": ["frontend failure activates hardcoded mock mode"]
+    },
+    {
+      "method": "GET", "path": "/api/v1/chat/sessions", "router": "backend/app/routers/chat.py", "handler": "list_chat_sessions", "frontend_call": "frontend/src/api/chat.js:listChatSessions",
+      "auth": "Bearer JWT", "ownership": "query filtered by JWT user", "request": {"query": ["limit 1..100", "offset>=0"]}, "success_fields": ["items", "total"], "partial_fields": [], "failure_fields": ["AUTH_REQUIRED"],
+      "fulfillment": null, "reason_code": null, "request_id": "header only", "sse": null, "persistence": "read", "side_effects": "none", "tests": ["not run"], "risks": []
+    },
+    {
+      "method": "GET", "path": "/api/v1/chat/sessions/{session_id}", "router": "backend/app/routers/chat.py", "handler": "get_chat_session", "frontend_call": "frontend/src/api/chat.js:getChatSession",
+      "auth": "Bearer JWT", "ownership": "session_id + JWT user; mismatch returns 404", "request": {"path": ["session_id UUID"]}, "success_fields": ["session_id", "title", "status", "messages"], "partial_fields": [], "failure_fields": ["404", "AUTH_REQUIRED"],
+      "fulfillment": "stored message metadata may contain research fulfillment", "reason_code": "stored metadata only", "request_id": "header only", "sse": null, "persistence": "read", "side_effects": "none", "tests": ["not run"], "risks": ["history and live terminal semantics are not represented by one envelope"]
+    },
+    {
+      "method": "POST", "path": "/api/v1/chat/sessions/{session_id}/messages", "router": "backend/app/routers/chat.py", "handler": "send_chat_message", "frontend_call": "frontend/src/api/chat.js:sendChatMessage",
+      "auth": "Bearer JWT", "ownership": "session verified with JWT user", "request": {"fields": ["content 1..4000", "output_language allowlist"], "missing": ["client_request_id"]},
+      "success_fields": ["message_id", "assistant_message_id", "status", "answer", "tool_events", "cards", "confirmation", "metadata subset"], "partial_fields": ["metadata.fulfillment if orchestrator supplies it"], "failure_fields": ["HTTP errors; no common failure envelope"],
+      "fulfillment": "metadata-dependent while status is always completed on handler completion", "reason_code": "metadata-dependent", "request_id": "not in response body", "sse": null,
+      "persistence": "saves user and assistant messages", "side_effects": "tools/LLM/providers may execute; legacy confirmation actions possible", "tests": ["multiple chat tests; not run"],
+      "risks": ["completed means handler completed, not research fulfilled", "no request id/body idempotency contract"]
+    },
+    {
+      "method": "POST", "path": "/api/v1/chat/sessions/{session_id}/messages/stream", "router": "backend/app/routers/chat.py", "handler": "send_chat_message_stream", "frontend_call": "frontend/src/api/chat.js:sendChatMessageStream",
+      "auth": "Bearer JWT", "ownership": "short DB ownership check before stream", "request": {"fields": ["content", "output_language"], "missing": ["client_request_id", "Last-Event-ID request contract"]},
+      "success_fields": ["text/event-stream"], "partial_fields": ["events may carry fulfillment metadata"], "failure_fields": ["structured 503 only for session verification DB failure", "agent_error event"],
+      "fulfillment": "terminal payload dependent", "reason_code": "terminal payload dependent", "request_id": "not a uniform event field", "sse": {"event_fields": ["event_type", "sequence", "message_id", "payload", "created_at"], "terminal": ["agent_completed", "agent_error"], "keepalive_seconds": 15},
+      "persistence": "streaming service saves messages/events", "side_effects": "orchestrator calls", "tests": ["chat streaming/reducer tests; not run"],
+      "risks": ["frontend falls back to sync after stream connection failure", "no explicit replay endpoint or Last-Event-ID contract in current router"]
+    },
+    {
+      "method": "GET", "path": "/api/v1/chat/sessions/{session_id}/memory", "router": "backend/app/routers/chat.py", "handler": "get_session_memory", "frontend_call": "frontend/src/api/chat.js:getChatSessionMemory",
+      "auth": "Bearer JWT", "ownership": "session + user", "request": {"path": ["session_id"]}, "success_fields": ["session_id", "memory"], "partial_fields": [], "failure_fields": ["404", "AUTH_REQUIRED"],
+      "fulfillment": null, "reason_code": null, "request_id": "header only", "sse": null, "persistence": "reads session_metadata.memory_v1", "side_effects": "none", "tests": ["memory tests; not run"], "risks": ["context priority contract differs by candidate generation"]
+    },
+    {
+      "method": "GET", "path": "/api/v1/reports/", "router": "backend/app/routers/reports.py", "handler": "list_reports", "frontend_call": "frontend/src/api/reports.js:listReports",
+      "auth": "Bearer JWT", "ownership": "filtered by JWT user", "request": {"query": ["market", "symbol", "limit", "offset"]}, "success_fields": ["items", "total"], "partial_fields": [], "failure_fields": ["AUTH_REQUIRED"],
+      "fulfillment": null, "reason_code": null, "request_id": "header only", "sse": null, "persistence": "read analysis_reports", "side_effects": "none", "tests": ["report API tests; not run"], "risks": ["saved analysis report is distinct from official filing"]
+    },
+    {
+      "method": "GET", "path": "/api/v1/watchlist/", "router": "backend/app/routers/watchlist.py", "handler": "list_watchlist_items", "frontend_call": "frontend/src/api/watchlist.js:listWatchlist",
+      "auth": "Bearer JWT", "ownership": "filtered by JWT user", "request": {}, "success_fields": ["items", "total"], "partial_fields": [], "failure_fields": ["AUTH_REQUIRED"],
+      "fulfillment": null, "reason_code": null, "request_id": "header only", "sse": null, "persistence": "read watchlist_items", "side_effects": "none", "tests": ["watchlist tests; not run"], "risks": []
+    },
+    {
+      "method": "POST", "path": "/api/v1/watchlist/", "router": "backend/app/routers/watchlist.py", "handler": "add_watchlist_item", "frontend_call": "frontend/src/api/watchlist.js:addWatchlist",
+      "auth": "Bearer JWT", "ownership": "server uses JWT user", "request": {"fields": ["market", "symbol", "note"]}, "success_fields": ["watchlist item"], "partial_fields": [], "failure_fields": ["409 duplicate", "AUTH_REQUIRED", "validation detail"],
+      "fulfillment": null, "reason_code": "not uniform", "request_id": "header only", "sse": null, "persistence": "inserts watchlist_items", "side_effects": "database write", "tests": ["watchlist tests; not run"],
+      "risks": ["this existing REST write is separate from Phase 8 Chat action ledger"]
+    },
+    {
+      "method": "POST", "path": "/api/v1/stocks/{market}/{code}/reports/discover", "router": "backend/app/routers/report_discovery.py", "handler": "discover_reports", "frontend_call": "frontend/src/api/companyV2.js uses separate v2 discovery",
+      "auth": "dependency inspection required per handler; DB session present", "ownership": "stock resource, discovered records persisted", "request": {"path": ["market", "code"], "query/body": "year/type options"},
+      "success_fields": ["report metadata", "disclaimer"], "partial_fields": ["discovery attempts"], "failure_fields": ["provider/discovery status"], "fulfillment": "not uniform", "reason_code": "provider-specific normalized codes", "request_id": "header only", "sse": null,
+      "persistence": "may persist report_documents", "side_effects": "CNINFO/approved disclosure discovery", "tests": ["backend/tests/fundamental/test_phase6d_report_discovery.py"], "risks": ["title found does not prove PDF/index availability"]
+    },
+    {
+      "method": "POST", "path": "/api/v1/stock/{code}/report-chat", "router": "backend/app/routers/report_chat.py", "handler": "report_chat", "frontend_call": "frontend/src/components/fundamentals/ReportChatPanel.vue",
+      "auth": "current handler dependency requires inspection; request uses DB", "ownership": "report selection must bind accessible report", "request": {"fields": ["question", "report selection/options"]},
+      "success_fields": ["answer", "citations", "source metadata", "numeric_validation where available"], "partial_fields": ["partial_success", "limitations"], "failure_fields": ["provider_error", "insufficient evidence"],
+      "fulfillment": "report-specific status, not common beta envelope", "reason_code": "multiple report pipeline codes", "request_id": "trace metadata varies", "sse": null, "persistence": "may read/write RAG/cache/memory", "side_effects": "LLM when enabled",
+      "tests": ["backend/tests/fundamental/test_phase6j_report_chat_copilot.py", "test_phase6w_r1_2_numeric_pipeline.py historical fixture drift"], "risks": ["runtime historically disabled/mock", "source file presence not proven"]
+    },
+    {
+      "method": "POST", "path": "/api/v1/chat/sessions/{session_id}/actions/{plan_id}/confirm", "router": "candidate 9d05b077:backend/app/routers/chat.py", "handler": "confirm_persistent_watchlist_action", "frontend_call": "candidate frontend/src/api/chat.js",
+      "present_in_current_workspace": false, "auth": "Bearer JWT + owned session + eligibility", "ownership": "trusted user/session/workspace and server-side plan", "request": {"path": ["session_id", "opaque plan_id"], "fields": ["confirmed intent only"]},
+      "success_fields": ["plan/action status", "receipt display fields"], "partial_fields": ["pending_verification"], "failure_fields": ["stable ACTION_* codes"], "fulfillment": "action status", "reason_code": "failure_code", "request_id": "trace bound server-side", "sse": null,
+      "persistence": "candidate action ledger + watchlist in one transaction", "side_effects": "watchlist.add only when enabled/allowlisted", "tests": ["candidate test_phase8h_persistent_watchlist_postgres.py", "test_phase8k_safe_enablement.py"],
+      "risks": ["production-reported ledger absent", "migration/roles/feature enablement separately unauthorized"]
+    },
+    {
+      "method": "POST", "path": "/api/v1/chat/sessions/{session_id}/actions/{action_id}/undo", "router": "candidate 9d05b077:backend/app/routers/chat.py", "handler": "undo_persistent_watchlist_action_route", "frontend_call": "candidate frontend action recovery wrapper",
+      "present_in_current_workspace": false, "auth": "Bearer JWT + owned session", "ownership": "original actor/workspace/session/action effect", "request": {"path": ["session_id", "action_id"]},
+      "success_fields": ["rolled_back receipt"], "partial_fields": ["pending_verification"], "failure_fields": ["ACTION_UNDO_CONFLICT", "ACTION_*"], "fulfillment": "action status", "reason_code": "failure_code", "request_id": "trace-bound", "sse": null,
+      "persistence": "transactional ledger/watchlist update", "side_effects": "removes only item created by original action", "tests": ["candidate PostgreSQL fault/concurrency tests"],
+      "risks": ["candidate only and feature remains off"]
+    }
+  ],
+  "not_inventoried_as_available": ["alerts API", "portfolio API", "trading/order/funds API"],
+  "validation": {"application_started": false, "tests_executed": false, "external_calls": 0}
+}

@@ -158,60 +158,27 @@ class TestLowercaseNormalization:
 # 12. startup_validation rejects missing INVITE_CODE_HMAC_SECRET in staging
 # ===========================================================================
 
-class TestStartupValidationInviteHmac:
-    def _make_settings_stub(self, **kwargs):
-        """Build a minimal settings stub for startup_validation tests."""
-        base = {
-            "app_env": "staging",
-            "email_verification_hmac_secret": "a" * 32,
-            "email_verification_required": True,
-            "email_provider": "resend",
-            "email_api_key": "key",
-            "email_from": "no-reply@example.com",
-            "invite_code_hmac_secret": "",
-            "secret_key": "jwt-secret-" + "x" * 32,
-        }
-        base.update(kwargs)
-        s = MagicMock()
-        for k, v in base.items():
-            setattr(s, k, v)
-        return s
 
-    def test_missing_invite_hmac_raises(self):
-        from app.core.startup_validation import validate_startup_config
-        s = self._make_settings_stub(invite_code_hmac_secret="")
-        with pytest.raises(ValueError, match="INVITE_CODE_HMAC_SECRET"):
-            validate_startup_config(s)
+class TestGoogleOnlyStartupValidation:
+    def settings(self, **changes):
+        from types import SimpleNamespace
+        return SimpleNamespace(**({'app_env': 'production', 'google_client_id': 'test.apps.googleusercontent.com',
+                                  'secret_key': 'x' * 32} | changes))
 
-    def test_short_invite_hmac_raises(self):
+    def test_google_auth_does_not_require_invite_or_mail_configuration(self):
         from app.core.startup_validation import validate_startup_config
-        s = self._make_settings_stub(invite_code_hmac_secret="short")
-        with pytest.raises(ValueError, match="too short"):
-            validate_startup_config(s)
+        validate_startup_config(self.settings())
 
-    def test_invite_hmac_equal_to_jwt_secret_raises(self):
+    @pytest.mark.parametrize('client', ['', 'not-a-web-client'])
+    def test_missing_or_invalid_google_configuration_blocks_startup(self, client):
         from app.core.startup_validation import validate_startup_config
-        shared = "a" * 32
-        s = self._make_settings_stub(invite_code_hmac_secret=shared, secret_key=shared)
-        with pytest.raises(ValueError, match="SECRET_KEY"):
-            validate_startup_config(s)
+        with pytest.raises(ValueError, match='GOOGLE_CLIENT_ID'):
+            validate_startup_config(self.settings(google_client_id=client))
 
-    def test_invite_hmac_equal_to_email_hmac_raises(self):
+    def test_switching_auth_does_not_require_session_key_rotation(self):
         from app.core.startup_validation import validate_startup_config
-        shared = "a" * 32
-        s = self._make_settings_stub(
-            invite_code_hmac_secret=shared,
-            email_verification_hmac_secret=shared,
-        )
-        with pytest.raises(ValueError, match="EMAIL_VERIFICATION_HMAC_SECRET"):
-            validate_startup_config(s)
+        validate_startup_config(self.settings(secret_key='existing-key'))
 
-    def test_valid_invite_hmac_passes(self):
+    def test_development_can_start_before_google_is_configured(self):
         from app.core.startup_validation import validate_startup_config
-        s = self._make_settings_stub(
-            invite_code_hmac_secret="b" * 32,
-            secret_key="c" * 32,
-            email_verification_hmac_secret="d" * 32,
-        )
-        # Should not raise
-        validate_startup_config(s)
+        validate_startup_config(self.settings(app_env='development', google_client_id=''))

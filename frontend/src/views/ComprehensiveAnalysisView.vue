@@ -513,7 +513,7 @@ function _handleSseEvent(evt) {
   if (evt.event === 'agent_started' && evt.agent) {
     agentStatuses.value = { ...agentStatuses.value, [evt.agent]: 'running' }
   } else if (evt.event === 'agent_completed' && evt.agent) {
-    agentStatuses.value = { ...agentStatuses.value, [evt.agent]: 'success' }
+    agentStatuses.value = { ...agentStatuses.value, [evt.agent]: evt.skipped ? 'skipped' : 'success' }
   } else if (evt.event === 'agent_failed' && evt.agent) {
     agentStatuses.value = { ...agentStatuses.value, [evt.agent]: 'failed' }
   } else if (evt.event === 'synthesis_started') {

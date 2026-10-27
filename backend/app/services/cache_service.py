@@ -173,11 +173,14 @@ class RedisCacheService:
         fk = _full_key(key)
         try:
             raw = await redis.get(fk)
+            _cb_record_success()
             if raw is None:
                 return None
             return _loads(raw)
         except Exception as exc:
-            log.warning("cache get_json error [%s]: %s", key, exc)
+            _cb_record_failure()
+            if _should_warn(key):
+                log.warning("cache get_json error [%s] %s: %r", key, type(exc).__name__, exc)
             return None
 
     async def set_json(self, key: str, value: Any, ttl: int) -> bool:
@@ -188,10 +191,13 @@ class RedisCacheService:
         fk = _full_key(key)
         try:
             await redis.setex(fk, ttl, _dumps(value))
+            _cb_record_success()
             log.debug("cache set_json OK [%s] ttl=%ds", key, ttl)
             return True
         except Exception as exc:
-            log.warning("cache set_json error [%s]: %s", key, exc)
+            _cb_record_failure()
+            if _should_warn(key):
+                log.warning("cache set_json error [%s] %s: %r", key, type(exc).__name__, exc)
             return False
 
     async def delete(self, key: str) -> bool:
@@ -255,9 +261,13 @@ class RedisCacheService:
         if redis is None:
             return False
         try:
-            return bool(await redis.exists(_full_key(key)))
+            result = bool(await redis.exists(_full_key(key)))
+            _cb_record_success()
+            return result
         except Exception as exc:
-            log.warning("cache exists error [%s]: %s", key, exc)
+            _cb_record_failure()
+            if _should_warn(key):
+                log.warning("cache exists error [%s] %s: %r", key, type(exc).__name__, exc)
             return False
 
     async def get_or_set_json(
@@ -270,7 +280,7 @@ class RedisCacheService:
         cached = await self.get_json(key)
         if cached is not None:
             return cached
-        value = await loader() if asyncio.iscoroutinefunction(loader) else loader()
+        value = await loader() if asyncio.iscoroutinefunction(loader) else await asyncio.to_thread(loader)
         if value is not None:
             await self.set_json(key, value, ttl)
         return value
@@ -279,8 +289,14 @@ class RedisCacheService:
 
     @staticmethod
     def _loop_ready() -> bool:
-        """检查 _loop 是否可用：非 None、未关闭、正在运行。"""
-        return _loop is not None and not _loop.is_closed() and _loop.is_running()
+        """目标循环须运行中，且调用者不能正在该循环上执行。"""
+        if _loop is None or _loop.is_closed() or not _loop.is_running():
+            return False
+        try:
+            # Waiting here would prevent this very loop from running Redis I/O.
+            return asyncio.get_running_loop() is not _loop
+        except RuntimeError:
+            return True
 
     def sync_get_json(self, key: str, timeout: float = 1.5) -> Any | None:
         """
@@ -296,12 +312,17 @@ class RedisCacheService:
             return None  # circuit open — skip Redis silently
         if not self._loop_ready():
             return None
+        future = None
+        coro = None
         try:
-            future = asyncio.run_coroutine_threadsafe(self.get_json(key), _loop)
-            result = future.result(timeout=timeout)
-            _cb_record_success()
-            return result
+            coro = self.get_json(key)
+            future = asyncio.run_coroutine_threadsafe(coro, _loop)
+            return future.result(timeout=timeout)
         except Exception as exc:
+            if future is not None:
+                future.cancel()  # propagates cancellation to the Redis coroutine
+            elif coro is not None:
+                coro.close()  # scheduling can race loop shutdown
             _cb_record_failure()
             if _should_warn(key):
                 log.warning(
@@ -321,14 +342,17 @@ class RedisCacheService:
             return False  # circuit open — skip Redis write silently
         if not self._loop_ready():
             return False
+        future = None
+        coro = None
         try:
-            future = asyncio.run_coroutine_threadsafe(
-                self.set_json(key, value, ttl), _loop
-            )
-            result = future.result(timeout=timeout)
-            _cb_record_success()
-            return result
+            coro = self.set_json(key, value, ttl)
+            future = asyncio.run_coroutine_threadsafe(coro, _loop)
+            return future.result(timeout=timeout)
         except Exception as exc:
+            if future is not None:
+                future.cancel()  # propagates cancellation to the Redis coroutine
+            elif coro is not None:
+                coro.close()  # scheduling can race loop shutdown
             _cb_record_failure()
             if _should_warn(key):
                 log.warning(
@@ -346,12 +370,17 @@ class RedisCacheService:
             return False
         if not self._loop_ready():
             return False
+        future = None
+        coro = None
         try:
-            future = asyncio.run_coroutine_threadsafe(self.exists(key), _loop)
-            result = future.result(timeout=timeout)
-            _cb_record_success()
-            return result
+            coro = self.exists(key)
+            future = asyncio.run_coroutine_threadsafe(coro, _loop)
+            return future.result(timeout=timeout)
         except Exception as exc:
+            if future is not None:
+                future.cancel()  # propagates cancellation to the Redis coroutine
+            elif coro is not None:
+                coro.close()  # scheduling can race loop shutdown
             _cb_record_failure()
             if _should_warn(key):
                 log.warning(

@@ -1,0 +1,33 @@
+{
+  "shared_supabase_modified": false,
+  "deployed": false,
+  "backend_related": {
+    "passed": 646,
+    "warnings": 33,
+    "seconds": 13.67
+  },
+  "isolated_auth_core": {
+    "passed": 62,
+    "warnings": 1,
+    "seconds": 2.54
+  },
+  "frontend": {
+    "files": 73,
+    "passed": 799,
+    "seconds": 6.83
+  },
+  "production_build": {
+    "passed": true,
+    "api_base": "/api/v1"
+  },
+  "candidate": {
+    "scoped_files": 38,
+    "server_baseline_verified": false
+  },
+  "not_verified": [
+    "real Google popup and audience policy",
+    "production PostgreSQL/Redis ACL",
+    "server source and effective Compose",
+    "production Docker image builds"
+  ]
+}

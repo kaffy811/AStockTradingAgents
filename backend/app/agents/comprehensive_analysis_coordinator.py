@@ -32,11 +32,14 @@ from datetime import datetime, timezone
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
+from app.agents.reader_report import BEGINNER_SYSTEM, beginner_messages, beginner_fallback, clean_evidence, supported_reader_report
 from app.llm.base import BaseLLMClient
 from app.agents.technical_analyst import TechnicalAnalystAgent
 from app.agents.fundamental_analyst import FundamentalAnalystAgent
 from app.agents.peer_comparison_analyst import PeerComparisonAnalystAgent
 from app.agents.news_analyst import NewsAnalystAgent
+from app.agents.language_utils import report_label
 
 log = logging.getLogger(__name__)
 
@@ -301,7 +304,7 @@ class ComprehensiveAnalysisCoordinator:
         # ── Step 3: 综合 LLM 调用 ────────────────────────────────────────
         log.info("ComprehensiveCoordinator: calling synthesis LLM [%s/%s]", market, symbol)
         messages = [
-            {"role": "system", "content": _SYSTEM_PROMPT},
+            {"role": "system", "content": BEGINNER_SYSTEM if settings.report_reader_mode == "beginner" else _SYSTEM_PROMPT},
             {"role": "user",   "content": synthesis_user},
         ]
         try:
@@ -310,7 +313,7 @@ class ComprehensiveAnalysisCoordinator:
             log.error("ComprehensiveCoordinator: synthesis LLM failed [%s/%s]: %s",
                       market, symbol, exc)
             report = _fallback_report(market, symbol, sections, exc)
-        report, validation = _finalize_synthesis_report(
+        report, validation = _finalize_for_audience(
             report, sections, market, symbol, stock_identity
         )
 
@@ -405,7 +408,7 @@ class ComprehensiveAnalysisCoordinator:
 
         synthesis_user = self._build_synthesis_prompt(market, symbol, sections, stock_identity)
         messages = [
-            {"role": "system", "content": _SYSTEM_PROMPT},
+            {"role": "system", "content": BEGINNER_SYSTEM if settings.report_reader_mode == "beginner" else _SYSTEM_PROMPT},
             {"role": "user",   "content": synthesis_user},
         ]
 
@@ -419,7 +422,7 @@ class ComprehensiveAnalysisCoordinator:
                 market, symbol, exc,
             )
             report = _fallback_report(market, symbol, sections, exc, stock_identity)
-        report, validation = _finalize_synthesis_report(
+        report, validation = _finalize_for_audience(
             report, sections, market, symbol, stock_identity, stock_name=stock_name
         )
 
@@ -587,9 +590,11 @@ class ComprehensiveAnalysisCoordinator:
                     market, symbol, sections, stock_identity, output_language=output_language,
                 )
                 messages = [
-                    {"role": "system", "content": _SYSTEM_PROMPT},
+                    {"role": "system", "content": BEGINNER_SYSTEM if settings.report_reader_mode == "beginner" else _SYSTEM_PROMPT},
                     {"role": "user",   "content": synthesis_user},
                 ]
+                if settings.report_reader_mode == "beginner":
+                    messages = beginner_messages(sections, stock_identity, output_language)
                 log.info(
                     "ComprehensiveCoordinator.analyze_scoped: calling synthesis LLM [%s/%s]",
                     market, symbol,
@@ -603,7 +608,7 @@ class ComprehensiveAnalysisCoordinator:
                     )
                     report = _fallback_report(market, symbol, sections, exc, stock_identity,
                                               output_language=output_language)
-            report, validation = _finalize_synthesis_report(
+            report, validation = _finalize_for_audience(
                 report, sections, market, symbol, stock_identity, stock_name=stock_name
             )
 
@@ -707,11 +712,24 @@ class ComprehensiveAnalysisCoordinator:
         stock_identity:  str,
         sections:        dict[str, str],
         output_language: str = "zh-CN",
+        *,
+        propagate_failure: bool = False,
     ) -> str:
         """
         技术面 + 基本面的轻量合成报告（无需 full synthesis prompt）。
-        如果 LLM 调用失败，返回降级报告。
+        默认在 LLM 失败时返回降级报告；实时 runner 可接管失败及降级元数据。
         """
+        if settings.report_reader_mode == "beginner":
+            messages = beginner_messages(sections, stock_identity, output_language)
+            if not messages:
+                return ""
+            try:
+                return await asyncio.to_thread(self._llm.chat, messages, temperature=0.3)
+            except Exception:
+                if propagate_failure:
+                    raise
+                return beginner_fallback(sections, stock_identity, output_language)
+
         tech_text = _trunc(sections.get("technical",   ""), "技术面", _SECTION_MAX_CHARS)
         fund_text = _trunc(sections.get("fundamental", ""), "基本面", _SECTION_MAX_CHARS)
 
@@ -724,7 +742,7 @@ class ComprehensiveAnalysisCoordinator:
         lang_instruction = (
             f"\n【输出语言】请使用 {lang_label} 撰写报告，"
             "除股票名称、代码、专有名词、财务字段名称可保留原文外，其余均应使用该语言。\n"
-        ) if output_language != "zh-CN" else ""
+        )
 
         prompt = f"""\
 请基于以下技术面与基本面子报告，生成简洁的整合分析摘要报告。{hk_note}
@@ -760,6 +778,8 @@ class ComprehensiveAnalysisCoordinator:
             log.error(
                 "ComprehensiveCoordinator._synthesize_tech_fundamental failed: %s", exc
             )
+            if propagate_failure:
+                raise
             return _fallback_report(
                 market, "", sections, exc, stock_identity,
                 title_override="技术面与基本面分析报告",
@@ -847,6 +867,10 @@ class ComprehensiveAnalysisCoordinator:
         if stock_identity is None:
             stock_identity = f"{market}/{symbol}"
 
+        if settings.report_reader_mode == "beginner":
+            messages = beginner_messages(sections, stock_identity, output_language)
+            return messages[-1]["content"] if messages else "不生成解读，不补充事实。"
+
         summaries = {
             "technical": _build_section_summary(
                 "technical", sections.get("technical", ""), _SECTION_MAX_CHARS
@@ -885,7 +909,7 @@ class ComprehensiveAnalysisCoordinator:
             f"请使用 {lang_label} 撰写本次分析报告。"
             f"除股票名称、代码、公司专有名词、新闻标题、财务字段名称可保留原文外，"
             f"其余解释、章节标题、摘要、风险提示均应使用 {lang_label}。\n"
-        ) if output_language != "zh-CN" else ""
+        )
 
         prompt = f"""\
 请基于以下四份子报告，生成综合分析摘要报告。
@@ -1425,6 +1449,17 @@ def _ensure_limitations(report: str, sections: dict[str, str]) -> tuple[str, int
     return report.replace("## 数据限制", f"## 数据限制\n{insertion}", 1), len(missing)
 
 
+def _finalize_for_audience(report, sections, market, symbol, stock_identity, stock_name=None):
+    if settings.report_reader_mode != "beginner":
+        return _finalize_synthesis_report(report, sections, market, symbol, stock_identity, stock_name)
+    text, safety = _sanitize_forbidden_content(report or "")
+    text, sources = _remove_out_of_scope_sources(text, sections)
+    text = supported_reader_report(text, sections)
+    return text, {"shape_coerced": False, "reader_evidence_guard": True,
+                  "safety_violation_count": safety, "out_of_scope_source_count": sources,
+                  "has_sanitization_artifacts": False}
+
+
 def _finalize_synthesis_report(
     report: str,
     sections: dict[str, str],
@@ -1587,6 +1622,9 @@ def _build_single_agent_report(
     用于 technical_only / fundamental_only / peer_only / news_only / technical_fundamental。
     output_language 控制包装文本的语言。
     """
+    if settings.report_reader_mode == "beginner":
+        content = clean_evidence(agent_content)
+        return f"# {stock_identity}\n\n{content}" if content else ""
     title   = _SCOPE_REPORT_TITLES.get(analysis_scope, "分析报告")
     desc    = _SCOPE_DESCRIPTIONS.get(analysis_scope, "单维度分析")
     dim     = _SCOPE_SUMMARY_DIMS.get(analysis_scope, desc)
@@ -1820,7 +1858,8 @@ def _fallback_report(
     strs = _FALLBACK_STRINGS.get(output_language, _FALLBACK_STRINGS["zh-CN"])
     title = title_override or strs["title"]
     section_summary = "\n".join(
-        f"- **{name}**：{'正常生成' if not text.startswith('[') else '暂不可用'}"
+        f"- **{report_label(output_language, 'section_' + name)}**："
+        f"{report_label(output_language, 'status_unavailable' if text.startswith('[') else 'status_generated')}"
         for name, text in sections.items()
     )
     return f"""\

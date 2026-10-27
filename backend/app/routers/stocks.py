@@ -242,7 +242,7 @@ async def get_quote(
     """
     market = market.upper()
     try:
-        r = stock_data_service.get_quote(market, symbol)
+        r = await asyncio.to_thread(stock_data_service.get_quote, market, symbol)
     except ValueError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, str(exc))
 
@@ -278,7 +278,9 @@ async def get_kline(
     adjust = _normalize_adjust(adjust)
 
     try:
-        r = stock_data_service.get_kline(market, symbol, period, adjust, limit)
+        r = await asyncio.to_thread(
+            stock_data_service.get_kline, market, symbol, period, adjust, limit
+        )
     except ValueError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, str(exc))
 
@@ -456,6 +458,9 @@ async def get_stock_news(
 # ── Profile response schemas ──────────────────────────────────────────────────
 
 class ProfileQuote(BaseModel):
+    provider: str | None = None
+    cached: bool = False
+    stale: bool = False
     latest_price: float | None = None
     change_pct:   float | None = None
     open:         float | None = None
@@ -598,6 +603,10 @@ async def get_stock_profile(
                     amount       = d.get("amount"),
                     trade_time   = str(d["trade_time"]) if d.get("trade_time") else None,
                     status       = "success",
+                    provider     = r.provider,
+                    cached       = r.cached,
+                    stale        = r.stale,
+                    message      = r.message,
                 )
             return ProfileQuote(status="failed", message=getattr(r, "message", None))
         except Exception as exc:
@@ -701,6 +710,9 @@ async def get_stock_profile(
     profile_quote = await quote_task
     if profile_quote.status != "success":
         dq.quote_status = "failed"
+    elif profile_quote.stale:
+        dq.quote_status = "stale"
+        dq.message = profile_quote.message
 
     return StockProfileResponse(
         market        = market_upper,

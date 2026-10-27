@@ -18,14 +18,17 @@
               :class="['agent-badge', badgeClass(agents[sec.key]?.status)]"
               style="padding:2px 8px;font-size:11px"
             >
-              {{ agents[sec.key]?.status || 'unknown' }}
+              {{ agentStatusLabel(agents[sec.key]?.status) }}
             </span>
             <span :class="['section-chevron', openSections[sec.key] ? 'open' : '']">▼</span>
           </div>
         </div>
 
         <div v-if="openSections[sec.key]" class="section-body">
-          <MarkdownReport :content="sections[sec.key] || '（无内容）'" />
+          <p v-if="['failed', 'timeout'].includes(agents[sec.key]?.status)" role="status" class="section-empty">
+            {{ sec.label }}本次未完成，请稍后重试；不能据此判断原始数据缺失。
+          </p>
+          <MarkdownReport v-else :content="sections[sec.key] || '（无内容）'" />
         </div>
 
       </div>
@@ -35,7 +38,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { SECTION_DEFS, badgeClass } from '../utils/warningMap.js'
+import { SECTION_DEFS, badgeClass, agentStatusLabel } from '../utils/warningMap.js'
 import MarkdownReport from './MarkdownReport.vue'
 
 const props = defineProps({

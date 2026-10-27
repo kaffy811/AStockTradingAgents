@@ -32,43 +32,24 @@
       </div>
     </div>
 
-    <!-- ── 技术走势 ────────────────────────────────────────────────────────── -->
-    <div id="rl-chart" class="result-section">
-      <div class="section-label">
-        技术图表
-        <span v-if="result.market || result.symbol" class="section-label-sub">
-          {{ result.market }}/{{ result.symbol }}<template v-if="result.stock_name"> · {{ result.stock_name }}</template> · 可查看价格走势与均线指标
-        </span>
-      </div>
-      <TechnicalChartPanel
-        :market="result.market"
-        :symbol="result.symbol"
-        :visible="true"
-        :height="340"
-      />
-    </div>
-
-    <!-- ── 行业热度与动态同行 ──────────────────────────────────────────────── -->
-    <div id="rl-industry" class="result-section">
-      <div class="section-label">行业热度与动态同行</div>
-      <IndustryHotStocksPanel
-        :market="result.market"
-        :symbol="result.symbol"
-        :stock-name="result.stock_name || ''"
-        :visible="true"
-      />
-    </div>
-
     <!-- ── 综合结论 ────────────────────────────────────────────────────────── -->
     <div id="rl-report" class="result-section">
-      <div class="section-label">综合结论</div>
+      <div class="section-label">这只股票，先看懂这些</div>
       <div class="card">
+        <div v-if="allDimensionsFailed" class="analysis-unavailable" role="alert">
+          <strong>本次未生成有效分析报告</strong>
+          <p>各分析模块均未完成，以下仅保留执行状态。行情、公司资料可独立查看，请稍后重新分析。</p>
+          <button class="btn btn-secondary" @click="emit('reanalyze')">重新分析</button>
+        </div>
+        <details class="report-records">
+          <summary>查看生成记录</summary>
         <AgentStatusBar
           :metadata="result.metadata"
           :market="result.market"
           :symbol="result.symbol"
         />
         <WarningPanel :warnings="result.metadata?.warnings || []" />
+        </details>
         <hr class="divider" />
         <div class="report-identity-bar">
           <span class="rib-label">当前报告对象：</span>
@@ -80,7 +61,7 @@
             <span v-for="badge in activeBadges" :key="badge" class="rib-badge">{{ badge }}</span>
           </div>
         </div>
-        <DataQualitySummary :result="result" />
+        <ReportVisualSummary v-if="!allDimensionsFailed" :visuals="result.metadata?.visuals || {}" :market="result.market" />
         <ResearchActionPanel
           :result="result"
           :saved="saved"
@@ -88,31 +69,61 @@
           @save="emit('save')"
           @reanalyze="emit('reanalyze')"
         />
-        <MarkdownReport :content="result.report" />
+        <MarkdownReport v-if="!allDimensionsFailed" :content="result.report" />
       </div>
     </div>
 
+    <!-- ── 技术走势 ────────────────────────────────────────────────────────── -->
+    <details id="rl-chart" class="result-section" @toggle="chartExpanded = $event.target.open">
+      <summary>查看完整股价图</summary>
+      <div class="section-label">
+        技术图表
+        <span v-if="result.market || result.symbol" class="section-label-sub">
+          {{ result.market }}/{{ result.symbol }}<template v-if="result.stock_name"> · {{ result.stock_name }}</template> · 可查看价格走势与均线指标
+        </span>
+      </div>
+      <TechnicalChartPanel
+        :market="result.market"
+        :symbol="result.symbol"
+        :visible="chartExpanded"
+        :height="340"
+      />
+    </details>
+
+    <!-- ── 行业热度与动态同行 ──────────────────────────────────────────────── -->
+    <details id="rl-industry" class="result-section" @toggle="peerExpanded = $event.target.open">
+      <summary>查看行业热度快照</summary>
+      <div class="section-label">行业热度与动态同行</div>
+      <IndustryHotStocksPanel
+        :market="result.market"
+        :symbol="result.symbol"
+        :stock-name="result.stock_name || ''"
+        :visible="peerExpanded"
+      />
+    </details>
+
     <!-- ── 分项分析 ────────────────────────────────────────────────────────── -->
-    <div id="rl-sections" class="result-section result-section--last">
+    <details id="rl-sections" class="result-section result-section--last">
+      <summary>想了解更多？查看分项解读</summary>
       <div class="section-label">分项分析</div>
       <SectionAccordion
         :sections="result.sections"
         :agents="result.metadata?.agents || {}"
       />
-    </div>
+    </details>
 
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import TechnicalChartPanel    from './TechnicalChartPanel.vue'
 import IndustryHotStocksPanel from './IndustryHotStocksPanel.vue'
 import AgentStatusBar         from './AgentStatusBar.vue'
 import WarningPanel           from './WarningPanel.vue'
 import MarkdownReport         from './MarkdownReport.vue'
 import SectionAccordion       from './SectionAccordion.vue'
-import DataQualitySummary     from './DataQualitySummary.vue'
+import ReportVisualSummary from './ReportVisualSummary.vue'
 import ResearchActionPanel    from './ResearchActionPanel.vue'
 
 const props = defineProps({
@@ -121,10 +132,21 @@ const props = defineProps({
   saving: { type: Boolean, default: false },
 })
 
+const allDimensionsFailed = computed(() => {
+  if (props.result.metadata?.report_status === 'unavailable') return true
+  const active = Object.values(props.result.metadata?.agents || {}).filter(info => info.status !== 'skipped')
+  return active.length > 0 && active.every(info => ['failed', 'timeout'].includes(info.status))
+})
+
+const chartExpanded = ref(false)
+const peerExpanded = ref(false)
+
 const emit = defineEmits(['save', 'reanalyze', 'new-analysis'])
 
 function scrollTo(id) {
-  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  const element = document.getElementById(id)
+  if (element?.tagName === 'DETAILS') element.open = true
+  element?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
 // ── Scope helpers ─────────────────────────────────────────────────────────────
@@ -173,6 +195,13 @@ const activeBadges = computed(() => {
 </script>
 
 <style scoped>
+.analysis-unavailable { padding: 16px; margin-bottom: 16px; border: 1px solid var(--status-warn-ring); border-radius: 10px; background: var(--status-warn-bg); }
+.analysis-unavailable p { margin: 8px 0 12px; color: var(--muted); line-height: 1.6; }
+
+.report-records { margin-bottom:12px; }
+.report-records summary, .result-section > summary { color:var(--muted); cursor:pointer; font-size:13px; padding:8px 0; }
+.report-records[open] summary { margin-bottom:12px; }
+
 .result-layout {
   display: flex;
   flex-direction: column;

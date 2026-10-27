@@ -22,8 +22,11 @@ Kline 字段解析（fields2=f51..f61）：
 from __future__ import annotations
 
 import logging
+import threading
+import time
 
 import requests
+from urllib3.util import Timeout
 
 from app.data.providers.base import BaseStockDataProvider
 
@@ -95,6 +98,48 @@ def _make_session() -> requests.Session:
     return s
 
 
+# A failed endpoint is skipped briefly across symbols. Never queue callers here:
+# the service already has independent backup sources and stale-cache fallback.
+_MAX_INFLIGHT = threading.BoundedSemaphore(4)
+_STATE_LOCK = threading.Lock()
+_OPEN_UNTIL: dict[str, float] = {}
+_COOLDOWN_SECONDS = 15.0
+
+
+def _fetch_json(url: str, params: dict, budget: float) -> dict:
+    with _STATE_LOCK:
+        if time.monotonic() < _OPEN_UNTIL.get(url, 0):
+            raise RuntimeError("Eastmoney endpoint temporarily unavailable (cooldown)")
+    if not _MAX_INFLIGHT.acquire(blocking=False):
+        raise RuntimeError("Eastmoney concurrency capacity reached")
+    try:
+        # Recheck after admission in case a concurrent request just failed.
+        with _STATE_LOCK:
+            if time.monotonic() < _OPEN_UNTIL.get(url, 0):
+                raise RuntimeError("Eastmoney endpoint temporarily unavailable (cooldown)")
+        # Exactly one attempt, no adapter retries or redirect chain. Budget caps
+        # connect + initial read; requests is not a hard wall-clock deadline for
+        # DNS or a server which keeps streaming bytes (see deployment notes).
+        with _make_session() as session:
+            resp = session.get(
+                url, params=params, timeout=Timeout(total=budget, connect=2, read=budget - 2),
+                allow_redirects=False,
+            )
+            try:
+                resp.raise_for_status()
+                if 300 <= resp.status_code < 400:
+                    raise RuntimeError("Unexpected Eastmoney redirect")
+                return resp.json()
+            finally:
+                resp.close()
+    except Exception:
+        with _STATE_LOCK:
+            _OPEN_UNTIL[url] = time.monotonic() + _COOLDOWN_SECONDS
+        raise
+    finally:
+        _MAX_INFLIGHT.release()
+
+
 # ── EastmoneyDirectProvider（Quote）─────────────────────────────────────────
 
 class EastmoneyDirectProvider(BaseStockDataProvider):
@@ -109,16 +154,10 @@ class EastmoneyDirectProvider(BaseStockDataProvider):
             raise ValueError("symbol 不能为空。")
 
         secid = _to_secid(symbol)
-        session = _make_session()
-
         try:
-            resp = session.get(
-                _QUOTE_URL,
-                params={"secid": secid, "fields": _QUOTE_FIELDS},
-                timeout=8,
+            body = _fetch_json(
+                _QUOTE_URL, {"secid": secid, "fields": _QUOTE_FIELDS}, budget=6,
             )
-            resp.raise_for_status()
-            body = resp.json()
         except Exception as exc:
             raise RuntimeError(
                 f"EastmoneyDirect quote 请求失败 [{symbol}]: {exc}"
@@ -205,11 +244,8 @@ class EastmoneyKlineProvider(BaseStockDataProvider):
             "fields2": "f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61",
         }
 
-        session = _make_session()
         try:
-            resp = session.get(_KLINE_URL, params=params, timeout=12)
-            resp.raise_for_status()
-            body = resp.json()
+            body = _fetch_json(_KLINE_URL, params, budget=8)
         except Exception as exc:
             raise RuntimeError(
                 f"EastmoneyKline 请求失败 [{symbol}]: {exc}"

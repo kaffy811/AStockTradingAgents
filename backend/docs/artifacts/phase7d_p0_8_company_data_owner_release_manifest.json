@@ -1,0 +1,65 @@
+{
+  "phase": "7D-P0.8",
+  "decision": "OWNER_RELEASE_APPROVAL_READY",
+  "candidate": {
+    "sha": "4434fc60feb652a7806d286f54c2175b979cbb4b",
+    "tree": "24a9961639dd7d8388fe8353a6e2e7eb8b955f03",
+    "baseline_sha": "5dad7228bb7b54338a946b49daeee5eae58348f9",
+    "baseline_tree": "0981783304376eed46a6a3276950aa95511f3b69"
+  },
+  "chain": [
+    {"phase": "P0.1-original", "sha": "851264fa7a4cb1a2e58ad557d1a4c3ae910fc773", "tree": "2e9e659cfb48a116dd3f7d621183e9d308fe6350"},
+    {"phase": "P0.2-original", "sha": "d5cab4aae988847fedb43483762f056b30e9416f", "tree": "244ef8509153349ff9ac20c1e87198e6a1563710"},
+    {"phase": "P0.4-original", "sha": "c4a506c0c2fdcf985d779f005788f4059066605a", "tree": "d821f6804a4a57dace95664e2249024e3d48b717"},
+    {"phase": "P0.5-clean-replay", "sha": "c812d4d2e572ffd08cfd56b8110c0ba87b0cab05", "tree": "d821f6804a4a57dace95664e2249024e3d48b717", "content_equivalent_to_original_p0_4": true},
+    {"phase": "P0.6", "sha": "1c675f7fe6b018f3a280973698d9ada10f5c3ddd", "tree": "1a7daa109e066b0c79d7f411b9db15615640b4e7"},
+    {"phase": "P0.7", "sha": "4434fc60feb652a7806d286f54c2175b979cbb4b", "tree": "24a9961639dd7d8388fe8353a6e2e7eb8b955f03"}
+  ],
+  "diff": {"files": 23, "insertions": 2153, "deletions": 20, "diff_check": "pass"},
+  "excluded_changes": {
+    "docker": true,
+    "dependencies": true,
+    "lockfiles": true,
+    "migrations": true,
+    "env_or_credential_values": true,
+    "tushare_news": true,
+    "unapproved_provider_production_calls": true,
+    "global_auth": true,
+    "global_report_rag_numeric_validator": true,
+    "primary_worktree_dirty_changes": true
+  },
+  "images": {
+    "backend": "sha256:2a7984bc6785285249e2d7343c8f86225a54c8eb7302583283419d63d52717b1",
+    "frontend": "sha256:02dbad039d46b4ae7e632190a83c9c10e0681a2620346bebe771f8c997650228",
+    "oci_revision": "4434fc60feb652a7806d286f54c2175b979cbb4b",
+    "mounts": [],
+    "sensitive_config_or_history_matches": 0,
+    "critical_backend_source_hashes_match_git": true
+  },
+  "p0_7_2_runtime": {
+    "session_id": "72ba95bf-03b4-479a-93e0-3f7f998be7f1",
+    "data_mode": "request_local_controlled_fixture",
+    "live_provider_calls": 0,
+    "queries": [
+      {"id": "Q1", "fulfillment": "fulfilled", "reason_code": null, "scope": "company_profile_and_eod", "as_of": "2026-08-31", "llm": 0, "tushare_fake_boundary": 4, "akshare": 0, "eastmoney": 0, "sina": 0, "tencent": 0},
+      {"id": "Q2", "fulfillment": "fulfilled", "reason_code": null, "scope": "stock_eod_research", "as_of": "2026-08-31", "numeric_valid": true, "llm": 0, "tushare_fake_boundary": 1, "akshare": 0, "eastmoney": 0, "sina": 0, "tencent": 0},
+      {"id": "Q3", "fulfillment": "fulfilled", "reason_code": null, "scope": "stock_eod_research", "as_of": "2026-08-31", "report_period": "2026-06-30", "numeric_valid": true, "unsupported_tokens": [], "llm": 0, "tushare_fake_boundary": 1, "akshare": 0, "eastmoney": 0, "sina": 0, "tencent": 0},
+      {"id": "Q4", "fulfillment": "unavailable", "reason_code": "NO_APPROVED_INDUSTRY_NEWS_SOURCE", "scope": "unapproved_industry_theme_research", "as_of": null, "llm": 0, "tushare_fake_boundary": 0, "akshare": 0, "eastmoney": 0, "sina": 0, "tencent": 0}
+    ]
+  },
+  "targeted_regression": {"passed": 56, "failed": 0, "warnings": 1, "container_mounts": [], "network": "none"},
+  "independent_follow_up": {
+    "test": "backend/tests/test_phase6w_r1_2_numeric_pipeline.py",
+    "baseline": "7 failed, 15 passed",
+    "candidate": "7 failed, 15 passed",
+    "classification": "PRE_EXISTING_TEST_INFRA",
+    "mechanism": "FIXTURE_CONTRACT_DRIFT",
+    "candidate_regression": false,
+    "global_numeric_validator_change_authorized": false
+  },
+  "non_code_prerequisites": [
+    "Written Tushare authorization for commercial display, caching, redistribution, and AI summaries",
+    "Explicit deployment authorization with sequential backend/frontend deployment and verified-image import on low-memory hosts"
+  ],
+  "operations_performed": {"commit": false, "push": false, "merge": false, "deploy": false, "migration": false, "rollout": false}
+}

@@ -1,0 +1,54 @@
+{
+  "phase": "6W-R3.3D",
+  "generated_at": "2026-08-27",
+  "candidate": {
+    "tag": "tradingagents-backend:rc-b055da8",
+    "image_id": "sha256:fb9b69812eec90fd280eaf36c2a2d557a129f4ff25afa62e67f9787f969fba29",
+    "revision": "b055da8495c54bb37625f0b0e0f94b4d4a627de2",
+    "container_id": null,
+    "runtime_started": false
+  },
+  "preflight": {
+    "status": "blocked",
+    "blocking_gate": "isolated_database_migration_version",
+    "database_container": "tradingagents-p125-staging-postgres-1",
+    "database_identity": "isolated_local_staging",
+    "database_health": "healthy",
+    "required_revision": "q5r6s7t8u9v0",
+    "observed_revision": null,
+    "direct_evidence": "relation alembic_version does not exist",
+    "migration_executed": false,
+    "production_database_connected": false
+  },
+  "population": {
+    "required_queries": 15,
+    "executed_queries": 0,
+    "traces_created": 0,
+    "s0_s8_complete": 0,
+    "stopped_before_stage": "S0"
+  },
+  "requests": [],
+  "tokens": [],
+  "classification_counts": {
+    "D1_COMPACTOR_OMISSION": 0,
+    "D2_RETRIEVAL_COVERAGE_GAP": 0,
+    "D3_CITATION_METADATA_LEAK": 0,
+    "D4_UNSUPPORTED_FINANCIAL_CLAIM": 0,
+    "D5_DATE_PERIOD_UNIT_OR_FORMAT_MISMATCH": 0,
+    "D6_STRUCTURED_FACTS_EVIDENCE_VERSION_MISMATCH": 0,
+    "D7_OTHER_NON_FINANCIAL_METADATA": 0,
+    "UNCONFIRMED": 0
+  },
+  "safety": {
+    "d3_runtime_regression_check": "not_run_preflight_blocked",
+    "production_container_changed": false,
+    "production_traffic_exposed": false,
+    "secret_values_output": false,
+    "code_changed": false,
+    "commit_created": false,
+    "push_performed": false,
+    "deployment_performed": false
+  },
+  "root_cause_decision": "ROOT_CAUSE_NOT_READY",
+  "traffic_decision": "HOLD_1_PERCENT"
+}

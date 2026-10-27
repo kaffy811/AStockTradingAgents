@@ -120,6 +120,9 @@ class WatchlistEnrichedItemResponse(BaseModel):
     change_pct:    float | None = None
     industry_code: str | None = None
     industry_name: str | None = None
+    quote_provider: str | None = None
+    quote_cached: bool = False
+    quote_stale: bool = False
     quote_status:  str = "ok"    # "ok" | "failed"
     quote_message: str | None = None
     latest_report: WatchlistLatestReport | None = None

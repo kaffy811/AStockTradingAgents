@@ -1,0 +1,80 @@
+{
+  "phase": "6W-R3.3I.2.6.1",
+  "status": "PURE_IMAGE_RUNTIME_PROVENANCE_READY",
+  "traffic": "HOLD_1_PERCENT",
+  "image": {
+    "tag": "tradingagents-backend:rc-r33i2-5-154c65c",
+    "digest": "sha256:911cf927b7255f920cacadc750af7ffce6632a5b73f8dfb87caa961aed3b0383",
+    "oci_revision": "154c65c7df236db74fd37ea8167ca15e72241f0a",
+    "oci_source": "pure-detached-worktree",
+    "created": "2026-08-30T02:24:07.098131667Z",
+    "key_source_hashes_match_git": true,
+    "snapshot_digest_excluded": "sha256:08587ed18a9c2ed59c996bb76bc2f45b5876b05f6418fafa7ce0e42466e01e42"
+  },
+  "runtime": {
+    "container_id": "e614cea5775072f21cd71ab2d0a1a5fc959df5465e3c71f2b857bb18797a6994",
+    "container_name": "r33i2-6-1-pure-backend",
+    "container_image_digest": "sha256:911cf927b7255f920cacadc750af7ffce6632a5b73f8dfb87caa961aed3b0383",
+    "mounts": [],
+    "network_id": "ada68a4f92dfc6f5fe4150a5bee2faa1a246f8450f92254b853401cdd876180c",
+    "database": "tradingagents_r33i_run",
+    "database_host": "r33i-run-postgres",
+    "postgres_container_id": "0c513420c58202462f9eb50a0eab6c2eaff6a8f27bcad61229f8a4b2e8535d41",
+    "redis_namespace": "r33i-run-redis:6379/0",
+    "redis_container_id": "f4b5dc55b5a4e67a53fa942707119c930341f3205b73fc2ed7e22fd2a45fceab",
+    "health_ok": true
+  },
+  "data_gate": {
+    "migration_head": "r6s7t8u9v0w1",
+    "trace_tables_available": true,
+    "report_id": 1,
+    "symbol": "600519",
+    "report_year": 2024,
+    "report_type": "annual",
+    "source": "official_cninfo",
+    "indexed": true,
+    "chunks": 208
+  },
+  "q3": {
+    "issued_count": 1,
+    "retried": false,
+    "request_id": "f06c4525",
+    "trace_id": "b3699eeb-4c12-4a75-9e35-9c5f67bf1998",
+    "trace_git_sha": "154c65c7df236db74fd37ea8167ca15e72241f0a",
+    "trace_image_identity": "sha256:911cf927b7255f920cacadc750af7ffce6632a5b73f8dfb87caa961aed3b0383",
+    "force_refresh": true,
+    "final_answer_cache": "bypass",
+    "selected_report_year": 2024,
+    "selected_period": "2024-12-31",
+    "derived_fact_id": "C1",
+    "net_margin": "50.46%",
+    "citation_validation_valid": true,
+    "numeric_validation_valid": true,
+    "formula_policy_ids": ["C1"],
+    "citation_metadata_leak": false,
+    "unsupported_tokens": [],
+    "final_status": "completed",
+    "partial": false,
+    "stages": {
+      "S0": "completed",
+      "S1": "completed",
+      "S2": "completed",
+      "S3": "completed",
+      "S4": "completed",
+      "S5": "completed",
+      "S6": "completed",
+      "S7": "completed",
+      "S8": "completed"
+    }
+  },
+  "operations": {
+    "new_source_image_built": false,
+    "production_migrations": 0,
+    "production_data_writes": 0,
+    "production_changed": false,
+    "pushed": false,
+    "merged": false,
+    "deployed": false,
+    "traffic_expanded": false
+  }
+}

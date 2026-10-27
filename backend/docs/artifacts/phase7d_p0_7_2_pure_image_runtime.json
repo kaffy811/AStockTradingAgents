@@ -1,0 +1,42 @@
+{
+  "phase": "7D-P0.7.2",
+  "decision": "RUNTIME_GATE_READY",
+  "candidate_sha": "4434fc60feb652a7806d286f54c2175b979cbb4b",
+  "candidate_tree": "24a9961639dd7d8388fe8353a6e2e7eb8b955f03",
+  "images": {
+    "backend": "sha256:2a7984bc6785285249e2d7343c8f86225a54c8eb7302583283419d63d52717b1",
+    "frontend": "sha256:02dbad039d46b4ae7e632190a83c9c10e0681a2620346bebe771f8c997650228",
+    "oci_revision": "4434fc60feb652a7806d286f54c2175b979cbb4b",
+    "mounts": [],
+    "network": "none"
+  },
+  "harness": {
+    "path": "/private/tmp/phase7d_p0_7_2_harness.py",
+    "sha256": "136b2e206300b506210370740e447ea4992ae190cb4f9d2831f94815dcdaf5bf",
+    "py_compile": "pass",
+    "pandas_import": false,
+    "fixture_path": "/private/tmp/phase7d_p0_7_2_fixture.json",
+    "fixture_sha256": "3516ac46dd8f0b82232ad38b2a76a5ece708a861a97c3db7325a600c360dce36",
+    "json_tool": "pass",
+    "candidate_modified": false
+  },
+  "p0_7_1_root_cause": {
+    "classification": "HARNESS_INTERPRETER_ENVIRONMENT_ERROR",
+    "error": "ModuleNotFoundError: No module named 'pandas'",
+    "cause": "The temporary harness was invoked with system python instead of the image-declared uv run environment; the harness also had an unnecessary direct pandas import.",
+    "remediation": "Removed direct pandas use and used a standard-library request-local table adapter; executed with uv run python."
+  },
+  "session": {
+    "session_id": "72ba95bf-03b4-479a-93e0-3f7f998be7f1",
+    "started_at": "2026-09-09T00:56:46.863734+00:00",
+    "completed_at": "2026-09-09T00:56:47.099069+00:00",
+    "status": "passed",
+    "atomic_session_sha256": "ad2b19d0ff4e5c889b267de9d2034e2097411cfd5f1e05b3839ff4695d592fdc"
+  },
+  "queries": [
+    {"order": 1, "id": "Q1", "query": "CN/000725 公司资料 + EOD", "request_id": "8f5b4792-474f-40e2-9e7e-f99e10b6efe0", "fulfillment": "fulfilled", "reason_code": null, "scope": "company_profile_and_eod", "sources": ["tushare"], "as_of": "2026-08-31", "profile_nonempty": true, "history_auth_required": false, "llm_calls": 0, "tushare_calls": 4, "akshare_calls": 0, "eastmoney_calls": 0, "sina_calls": 0, "tencent_calls": 0, "data_mode": "request_local_controlled_fixture", "live_provider_calls": 0, "record_persisted": true},
+    {"order": 2, "id": "Q2", "query": "贵州茅台近期情况", "request_id": "e97bde70-da6f-4726-b7be-ad35d2e18201", "fulfillment": "fulfilled", "reason_code": null, "scope": "stock_eod_research", "sources": ["tushare", "CNINFO"], "as_of": "2026-08-31", "report_period": ["2026-06-30"], "eod_not_realtime": true, "numeric_validation": {"valid": true, "checked_claims": 5, "unsupported_tokens": [], "evidence_basis": 5}, "llm_calls": 0, "tushare_calls": 1, "akshare_calls": 0, "eastmoney_calls": 0, "sina_calls": 0, "tencent_calls": 0, "data_mode": "request_local_controlled_fixture", "live_provider_calls": 0, "record_persisted": true},
+    {"order": 3, "id": "Q3", "query": "600519 财务指标、ROE、估值", "request_id": "43a96fc3-e5a2-45b4-a777-66e458f94741", "fulfillment": "fulfilled", "reason_code": null, "scope": "stock_eod_research", "sources": ["tushare", "CNINFO"], "as_of": "2026-08-31", "report_period": ["2026-06-30"], "numeric_validation": {"valid": true, "checked_claims": 5, "unsupported_tokens": [], "evidence_basis": 5}, "llm_calls": 0, "tushare_calls": 1, "akshare_calls": 0, "eastmoney_calls": 0, "sina_calls": 0, "tencent_calls": 0, "data_mode": "request_local_controlled_fixture", "live_provider_calls": 0, "record_persisted": true},
+    {"order": 4, "id": "Q4", "query": "AI 半导体设备主题问题", "request_id": "16acc354-395c-4f25-91dd-543580414981", "fulfillment": "unavailable", "reason_code": "NO_APPROVED_INDUSTRY_NEWS_SOURCE", "scope": "unapproved_industry_theme_research", "sources": [], "as_of": null, "llm_calls": 0, "tushare_calls": 0, "akshare_calls": 0, "eastmoney_calls": 0, "sina_calls": 0, "tencent_calls": 0, "data_mode": "request_local_controlled_fixture", "live_provider_calls": 0, "record_persisted": true}
+  ]
+}

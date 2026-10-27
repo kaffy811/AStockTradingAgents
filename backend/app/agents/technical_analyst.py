@@ -21,6 +21,8 @@ from __future__ import annotations
 
 import logging
 
+from app.core.config import settings
+from app.agents.reader_report import SPECIALIST_SYSTEM
 from app.llm.base import BaseLLMClient
 from app.services.stock_data_service import stock_data_service
 from app.services.technical_indicator_service import technical_indicator_service
@@ -152,6 +154,8 @@ class TechnicalAnalystAgent:
             )
 
         # ── Step 3: 计算技术指标 ─────────────────────────────────────────────
+        from app.agents.report_visual_evidence import capture_prices
+        capture_prices(bars)
         indicators = technical_indicator_service.calculate(bars)
 
         # ── Step 4: 组装用户 Prompt ──────────────────────────────────────────
@@ -164,7 +168,7 @@ class TechnicalAnalystAgent:
         # ── Step 5: 调用 LLM ─────────────────────────────────────────────────
         log.info("TechnicalAnalystAgent: calling LLM [%s/%s]", market, symbol)
         messages = [
-            {"role": "system", "content": _SYSTEM_PROMPT},
+            {"role": "system", "content": (SPECIALIST_SYSTEM + "\n本次只分析：股价走势。" if settings.report_reader_mode == "beginner" else _SYSTEM_PROMPT)},
             {"role": "user",   "content": user_content},
         ]
         report = self._llm.chat(messages, temperature=0.3)

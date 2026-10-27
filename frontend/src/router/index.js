@@ -11,7 +11,7 @@ const routes = [
   {
     path: '/register',
     name: 'Register',
-    component: () => import('../views/RegisterView.vue'),
+    redirect: '/login',
     meta: { public: true },
   },
   {
@@ -59,7 +59,7 @@ const routes = [
   {
     path: '/admin/invites',
     name: 'AdminInvites',
-    component: () => import('../views/AdminInvitesView.vue'),
+    redirect: '/me',
     meta: { requiresAdmin: true },
   },
 ]
@@ -73,7 +73,7 @@ router.beforeEach((to) => {
   const token   = localStorage.getItem('ta_token')
   const isAdmin = localStorage.getItem('ta_is_admin') === 'true'
 
-  // 已登录用户访问登录/注册页面，回首页
+  // 已登录用户访问公开登录页面，回首页
   if (token && to.meta.public) {
     return { path: '/' }
   }

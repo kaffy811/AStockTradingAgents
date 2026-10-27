@@ -18,7 +18,10 @@
     />
 
     <!-- ── Meta summary ─────────────────────────────────────────────────────── -->
-    <ReportMetaSummary v-if="result" :report="result" />
+    <details v-if="result" class="history-records">
+      <summary>查看报告记录</summary>
+      <ReportMetaSummary :report="result" />
+    </details>
 
     <!-- Error -->
     <ErrorBox :message="errorMsg" />

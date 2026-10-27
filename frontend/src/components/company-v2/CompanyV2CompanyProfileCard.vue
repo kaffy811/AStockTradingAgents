@@ -72,6 +72,7 @@
 
 <script setup>
 import { computed, ref } from 'vue'
+import { companyWebsite } from '../../utils/companyPagePresentation.js'
 
 const props = defineProps({
   stockBasic: { type: Object, default: () => ({}) },
@@ -94,7 +95,7 @@ const introduction = computed(() => props.stockBasic?.introduction || props.stoc
 const businessScope = computed(() => props.stockBasic?.business_scope || props.stockBasic?.core_products || '')
 const registeredAddress = computed(() => props.stockBasic?.registered_address || '')
 const officeAddress = computed(() => props.stockBasic?.office_address || '')
-const website = computed(() => props.stockBasic?.website || '')
+const website = computed(() => companyWebsite(props.stockBasic?.website))
 const chairman = computed(() => props.stockBasic?.chairman || '')
 const updatedAt = computed(() => props.stockBasic?.updated_at || '')
 

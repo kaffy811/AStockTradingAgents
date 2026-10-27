@@ -3,7 +3,7 @@
     <!-- ── Summary bar ── -->
     <div class="dqs-bar">
       <div class="dqs-overall">
-        <span class="dqs-label">数据完整度：</span>
+        <span class="dqs-label" title="根据分项报告状态和缺失提示估算，不代表原始数据质量或结论准确率。">报告覆盖度：</span>
         <span :class="['dqs-grade', gradeClass]">{{ gradeName }}</span>
         <span class="dqs-score">{{ scores.overall }}/100</span>
       </div>
@@ -202,18 +202,26 @@ const descriptions = computed(() => {
   const s = scores.value
 
   let techDesc = ''
-  if (s.technical === 0)    techDesc = 'K 线或技术指标数据不可用。'
+  const technicalFailure = props.result?.metadata?.agents?.technical
+  if (['failed', 'timeout'].includes(technicalFailure?.status)) {
+    const reason = technicalFailure?.message || textOf('technical')
+    techDesc = /PROVIDER_TIMEOUT|响应超时|timed out/i.test(reason)
+      ? '技术面分析服务响应超时，报告暂未生成；不能据此判断 K 线数据缺失。'
+      : '技术面分析未完成，原始行情数据是否可用需另行确认。'
+  } else if (s.technical === 0) techDesc = '技术面报告不可用，尚不能确认原始数据是否缺失。'
   else if (s.technical < 70) techDesc = 'K 线数据为缓存或降级来源，技术指标可能不完整。'
   else                       techDesc = 'K 线数据可用，技术指标完整。'
 
   let fundDesc = ''
-  if (s.fundamental === 0)      fundDesc = '基本面数据不可用。'
+  if (['failed', 'timeout'].includes(agentStatus('fundamental'))) fundDesc = '基本面分析未完成，原始财务数据是否可用需另行确认。'
+  else if (s.fundamental === 0) fundDesc = '本次无可用基本面报告。'
   else if (s.fundamental < 50)  fundDesc = `多项估值与盈利字段缺失${market === 'HK' ? '（港股基本面覆盖有限）' : ''}，当前基本面分析覆盖有限。`
   else if (s.fundamental < 70)  fundDesc = `部分字段缺失（如 PE/PB 等估值指标）${market === 'HK' ? '，港股基本面覆盖有限' : ''}，判断时请结合数据局限说明。`
   else                           fundDesc = '基本面字段基本可用，可支撑常规分析。'
 
   let peerDesc = ''
-  if (s.peer === 0)         peerDesc = '同行对比数据不可用。'
+  if (['failed', 'timeout'].includes(agentStatus('peer_comparison'))) peerDesc = '同行对比分析未完成，不能据此判断同行数据缺失。'
+  else if (s.peer === 0) peerDesc = '本次无可用同行对比报告。'
   else if (s.peer <= 30)    peerDesc = market === 'HK'
       ? '港股暂不使用申万行业体系，同行与行业热门股数据可能缺失，行业对比覆盖有限。'
       : '暂无同行样本，当前不支持横向行业对比。'
@@ -221,7 +229,7 @@ const descriptions = computed(() => {
   else                       peerDesc = '同行样本可用，横向对比结果仅供参考（样本基于热门股或手动配置）。'
 
   let newsDesc = ''
-  if (s.news === 0)        newsDesc = '新闻数据不可用。'
+  if (s.news === 0)        newsDesc = ['failed', 'timeout'].includes(agentStatus('news')) ? '新闻分析未完成，不能据此判断没有相关新闻。' : '本次无可用新闻报告。'
   else if (s.news <= 20)   newsDesc = '新闻模块异常，新闻面分析不可用。'
   else if (s.news <= 40)   newsDesc = '近 72 小时暂无相关新闻，无法形成事件驱动判断，不代表该股长期无新闻。'
   else if (s.news < 70)    newsDesc = market === 'HK'

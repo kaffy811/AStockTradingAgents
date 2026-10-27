@@ -1,0 +1,62 @@
+{
+  "phase": "7D-P0.5",
+  "decision": "HOLD_WITH_EVIDENCE",
+  "reviewed_at": "2026-09-07T22:30:00-04:00",
+  "baseline_sha": "5dad7228bb7b54338a946b49daeee5eae58348f9",
+  "source_commits": [
+    "851264fa7a4cb1a2e58ad557d1a4c3ae910fc773",
+    "d5cab4aae988847fedb43483762f056b30e9416f",
+    "c4a506c0c2fdcf985d779f005788f4059066605a"
+  ],
+  "integrated_candidate_sha": "c812d4d2e572ffd08cfd56b8110c0ba87b0cab05",
+  "integrated_tree_sha": "d821f6804a4a57dace95664e2249024e3d48b717",
+  "source_tip_tree_sha": "d821f6804a4a57dace95664e2249024e3d48b717",
+  "tree_equivalent_to_source_tip": true,
+  "worktree": "/private/tmp/tradingagents-phase7d-p0-5-review-20260907",
+  "branch": "audit/phase7d-p0.5-rc-review-20260907",
+  "replay_conflicts": 0,
+  "diff": {
+    "files": 18,
+    "insertions": 1685,
+    "deletions": 19,
+    "scope_allowed": true,
+    "forbidden_categories_changed": []
+  },
+  "public_contract": {
+    "history_unknown_fields_default_deny": true,
+    "warnings_local_controlled_only": true,
+    "eod_internal_metadata_exposed": false,
+    "profile_exception_string_exposed": false,
+    "anonymous_debug_or_raw_route_added": false
+  },
+  "gates": {
+    "backend_related_regression": {"status": "pass", "passed": 106, "warnings": 1},
+    "frontend_release_gate": {"status": "pass", "files": 69, "tests": 764, "worker_timeouts": 0},
+    "frontend_production_build": {"status": "pass"},
+    "python_compile": {"status": "pass"},
+    "json_validation": {"status": "pass"},
+    "secret_scan": {"status": "pass", "scope": "baseline_to_candidate_diff"},
+    "git_diff_check": {"status": "pass"},
+    "backend_image_build": {"status": "blocked", "reason": "DOCKER_DAEMON_UNAVAILABLE"},
+    "frontend_image_build": {"status": "not_run", "reason": "BACKEND_BUILD_CHAIN_STOPPED"},
+    "image_provenance_and_secret_review": {"status": "not_run", "reason": "NO_FRESH_IMAGES"}
+  },
+  "queries": {
+    "Q1": {"status": "pass", "mode": "hermetic_fixture", "attempts": 1},
+    "Q2": {"status": "pass", "mode": "hermetic_fixture", "attempts": 1, "resolved_symbol": "600519.SH", "realtime_claimed": false},
+    "Q3": {"status": "fail", "mode": "hermetic_fixture", "attempts": 1, "report_period": "2026-06-30", "source_present": true, "as_of_present": true, "numeric_validation": null},
+    "Q4": {"status": "pass", "mode": "hermetic_fixture", "attempts": 1, "fulfillment": "unavailable", "reason_code": "NO_APPROVED_INDUSTRY_NEWS_SOURCE", "unapproved_provider_calls": 0}
+  },
+  "critical_source_sha256": {
+    "backend/app/routers/company_v2_debug.py": "2a190ab710e60f8f5284c3d145c1e0e33c3f275d85939fe55acb555da3426017",
+    "backend/app/services/tushare_eod_gateway.py": "7a944ea72938fa27ee0dce01c0c392f1981cbd16453e3c9278ffa8cd1a337e3c",
+    "backend/app/agents/chat_orchestrator.py": "4c4f7eb0a113ff4762637032c35b0211fbb5c39abed1869e6116ec11fa7dd376",
+    "backend/app/datasource/tushare_client.py": "891353fcae05bf00e71020747b79c9941413c70badb7dd88d5af2efa69571923",
+    "frontend/src/api/companyV2.js": "2f7eb53fa3f288fdb0f0ca9da0d416df0bee438839d0391b2b25df7185ea3bec",
+    "frontend/src/views/CompanyV2View.vue": "e8c606fd3fad6d3ab84704612b13cf5183d456357e9cf92285f31cd6be6c47b7"
+  },
+  "owner_rights_confirmation": {
+    "required_before_public_deployment": true,
+    "topics": ["Tushare commercial display", "caching", "AI summary usage"]
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "phase": "6W-R3.3I.2.6",
+  "status": "PURE_IMAGE_PROVENANCE_NOT_READY",
+  "traffic": "HOLD_1_PERCENT",
+  "workspace": {
+    "release_branch": "release/demo-staging",
+    "release_head": "b055da8495c54bb37625f0b0e0f94b4d4a627de2",
+    "fix_branch": "r33e-pgvector-portability",
+    "fix_head": "154c65c7df236db74fd37ea8167ca15e72241f0a",
+    "merge_base": "b055da8495c54bb37625f0b0e0f94b4d4a627de2",
+    "main_dirty_preserved": true
+  },
+  "final_pure_image": {
+    "tag": "tradingagents-backend:rc-r33i2-5-154c65c",
+    "digest": "sha256:911cf927b7255f920cacadc750af7ffce6632a5b73f8dfb87caa961aed3b0383",
+    "oci_revision": "154c65c7df236db74fd37ea8167ca15e72241f0a",
+    "source_hashes_match_git": true,
+    "q3_trace_proven": false
+  },
+  "successful_q3": {
+    "request_id": "9cf98947",
+    "trace_id": "819c10bf-dcc6-4aaa-a817-1bef4346dae1",
+    "recorded_git_sha": "r33i2-5-snapshot-36f67bc69e9f",
+    "recorded_image_digest": "sha256:08587ed18a9c2ed59c996bb76bc2f45b5876b05f6418fafa7ce0e42466e01e42",
+    "container_id": "ee83239bb769e54b7ebaa284a05e0eb6e5e22ea72454e486a77724abcf74a26e",
+    "mounts": [],
+    "isolated_postgres": "r33i-run-postgres",
+    "isolated_redis": "r33i-run-redis",
+    "final_status": "completed",
+    "eligible_as_final_pure_image_release_evidence": false
+  },
+  "commit_chain": [
+    {
+      "commit": "79323b7ff7665b556bb7eed038f56f167f5dd788",
+      "purpose": "vector migration portability",
+      "required_for_feature": false,
+      "scope_violation_if_whole_branch_merged": true
+    },
+    {
+      "commit": "5e9977a3d43fd64d75a09156e800889483404458",
+      "purpose": "structured trace evidence provenance",
+      "required_by_28870a_as_authored": true,
+      "contains_migration": true
+    },
+    {
+      "commit": "28870a13d98f6e7bab5a2b16c6f3144411859198",
+      "purpose": "derived operands and canonical citation validation",
+      "required_for_feature": true,
+      "contains_forbidden_file_in_own_diff": false
+    },
+    {
+      "commit": "154c65c7df236db74fd37ea8167ca15e72241f0a",
+      "purpose": "request-local formula constant validation",
+      "required_for_feature": true,
+      "contains_forbidden_file_in_own_diff": false
+    }
+  ],
+  "integration": {
+    "branch_created": false,
+    "replay_attempted": false,
+    "conflict_status": "not_tested_after_provenance_gate_failure",
+    "tests_run": false,
+    "image_built": false,
+    "runtime_request_issued": false,
+    "commit_created": false
+  },
+  "operations": {
+    "pushed": false,
+    "merged_to_release": false,
+    "deployed": false,
+    "migration_executed": false,
+    "production_changed": false,
+    "traffic_expanded": false
+  }
+}

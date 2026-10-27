@@ -1,0 +1,133 @@
+{
+  "phase": "7C5",
+  "status": "FRONTEND_PRE_DEPLOY_TEST_GATE_READY",
+  "branch": "release/demo-staging",
+  "head": "5dad7228bb7b54338a946b49daeee5eae58348f9",
+  "candidate_tree": "0981783304376eed46a6a3276950aa95511f3b69",
+  "diagnostic_worktree": "/private/tmp/TradingAgents-phase7c5",
+  "environment": {
+    "node": "v22.15.0",
+    "npm": "10.9.2",
+    "vitest": "4.1.9",
+    "platform": "darwin",
+    "arch": "arm64",
+    "logical_cpu_cores": 14,
+    "total_memory_bytes": 25769803776
+  },
+  "existing_config": {
+    "test_script": "vitest run",
+    "environment": "jsdom",
+    "pool": "forks (Vitest default)",
+    "file_parallelism": true,
+    "explicit_worker_limit": false,
+    "test_timeout_ms": 5000,
+    "hook_timeout_ms": 10000
+  },
+  "runs": [
+    {
+      "name": "default_full_suite",
+      "command": "npm test",
+      "pool": "forks",
+      "workers": "auto",
+      "file_parallelism": true,
+      "collected_files": 67,
+      "collected_tests": 756,
+      "passed": 756,
+      "failed": 0,
+      "worker_startup_timeouts": 0,
+      "forced_termination": false,
+      "duration_seconds": 5.41,
+      "free_memory_before_bytes": 195346432
+    },
+    {
+      "name": "low_concurrency_full_suite_1",
+      "command": "npm test -- --pool=forks --maxWorkers=1 --no-file-parallelism",
+      "pool": "forks",
+      "workers": 1,
+      "file_parallelism": false,
+      "collected_files": 67,
+      "collected_tests": 756,
+      "passed": 756,
+      "failed": 0,
+      "worker_startup_timeouts": 0,
+      "forced_termination": false,
+      "duration_seconds": 20.07,
+      "free_memory_before_bytes": 1244921856
+    },
+    {
+      "name": "chat_research_ui",
+      "command": "vitest run src/tests/researchFulfillment.test.js --pool=forks --maxWorkers=1 --no-file-parallelism",
+      "pool": "forks",
+      "workers": 1,
+      "file_parallelism": false,
+      "collected_files": 1,
+      "collected_tests": 16,
+      "passed": 16,
+      "failed": 0,
+      "worker_startup_timeouts": 0,
+      "forced_termination": false,
+      "duration_seconds": 0.315,
+      "free_memory_before_bytes": 1037025280
+    },
+    {
+      "name": "frontend_production_build",
+      "command": "npm run build",
+      "modules_transformed": 971,
+      "passed": true,
+      "failed": 0,
+      "forced_termination": false,
+      "duration_seconds": 2.67,
+      "free_memory_before_bytes": 1007009792
+    },
+    {
+      "name": "low_concurrency_full_suite_2",
+      "command": "npm test -- --pool=forks --maxWorkers=1 --no-file-parallelism",
+      "pool": "forks",
+      "workers": 1,
+      "file_parallelism": false,
+      "collected_files": 67,
+      "collected_tests": 756,
+      "passed": 756,
+      "failed": 0,
+      "worker_startup_timeouts": 0,
+      "forced_termination": false,
+      "duration_seconds": 20.08,
+      "free_memory_before_bytes": 979632128
+    }
+  ],
+  "diagnosis": {
+    "classification": "environment_resource_contention",
+    "evidence": "Previous timeouts occurred before test execution while frontend tests/build and three backend suites ran concurrently; isolated serial execution passes, and the single-worker full suite passes twice.",
+    "vitest_config_fault_found": false,
+    "test_setup_fault_found": false,
+    "environment_variable_fault_found": false,
+    "module_import_fault_found": false,
+    "test_leak_fault_found": false,
+    "test_infra_code_change_required": false
+  },
+  "release_gate": {
+    "standard_command": "npm test -- --pool=forks --maxWorkers=1 --no-file-parallelism",
+    "run_serially_without_competing_builds_or_suites": true,
+    "required_test_files": 67,
+    "required_tests": 756,
+    "allowed_failures": 0,
+    "allowed_worker_startup_timeouts": 0,
+    "default_high_concurrency_command_is_stable_release_gate": false
+  },
+  "gates": {
+    "complete_frontend_suite_zero_failed": true,
+    "complete_frontend_suite_zero_worker_startup_timeout": true,
+    "chat_research_ui_passed": true,
+    "frontend_production_build_passed": true,
+    "git_diff_check_passed": true
+  },
+  "mutations": {
+    "business_code": false,
+    "test_infrastructure_code": false,
+    "dependencies": false,
+    "push": false,
+    "deploy": false,
+    "production_migration": false,
+    "traffic_expansion": false
+  }
+}

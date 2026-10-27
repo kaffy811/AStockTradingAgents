@@ -1,0 +1,1080 @@
+diff --git a/backend/app/agents/chat_tools/stock_tools.py b/backend/app/agents/chat_tools/stock_tools.py
+--- a/backend/app/agents/chat_tools/stock_tools.py
++++ b/backend/app/agents/chat_tools/stock_tools.py
+@@ -10,6 +10,7 @@
+ """
+ from __future__ import annotations
+ 
++import asyncio
+ import logging
+ from typing import Any
+ 
+@@ -109,7 +110,7 @@
+         if not symbol:
+             return ToolResult(ok=False, tool_name=self.name, summary="缺少股票代码", error="symbol is empty")
+ 
+-        quote = stock_data_service.get_quote_optional(market, symbol)
++        quote = await asyncio.to_thread(stock_data_service.get_quote_optional, market, symbol)
+         if quote is None:
+             return ToolResult(
+                 ok=False, tool_name=self.name,
+@@ -168,7 +169,7 @@
+             return ToolResult(ok=False, tool_name=self.name, summary="缺少股票代码", error="symbol is empty")
+ 
+         try:
+-            bars = stock_data_service.get_kline_for_agent(market, symbol, limit=limit)
++            bars = await asyncio.to_thread(stock_data_service.get_kline_for_agent, market, symbol, limit=limit)
+         except Exception as exc:
+             log.warning("get_kline_summary_tool: failed [%s/%s]: %s", market, symbol, exc)
+             return ToolResult(ok=False, tool_name=self.name, summary="K线数据暂不可用", error=str(exc))
+@@ -225,7 +226,7 @@
+             return ToolResult(ok=False, tool_name=self.name, summary="缺少股票代码", error="symbol is empty")
+ 
+         try:
+-            result = news_data_service.get_stock_news(market, symbol, hours_back=hours_back, limit=limit)
++            result = await asyncio.to_thread(news_data_service.get_stock_news, market, symbol, hours_back=hours_back, limit=limit)
+         except Exception as exc:
+             log.warning("get_latest_news_tool: failed [%s/%s]: %s", market, symbol, exc)
+             return ToolResult(ok=False, tool_name=self.name, summary="新闻数据暂不可用", error=str(exc))
+diff --git a/backend/app/agents/financial_runtime/tool_runtime.py b/backend/app/agents/financial_runtime/tool_runtime.py
+--- a/backend/app/agents/financial_runtime/tool_runtime.py
++++ b/backend/app/agents/financial_runtime/tool_runtime.py
+@@ -177,7 +177,7 @@
+         market = str(data.get("market") or "CN").upper()
+         if not symbol:
+             return _failure(req, "ENTITY_NOT_RESOLVED", "缺少证券实体", latency_ms=int((time.perf_counter() - started) * 1000))
+-        quote = stock_data_service.get_quote_optional(market, symbol)
++        quote = await asyncio.to_thread(stock_data_service.get_quote_optional, market, symbol)
+         if not quote:
+             return _failure(req, "QUOTE_UNAVAILABLE", "行情数据暂不可用", latency_ms=int((time.perf_counter() - started) * 1000))
+         return _success(
+diff --git a/backend/app/core/config.py b/backend/app/core/config.py
+--- a/backend/app/core/config.py
++++ b/backend/app/core/config.py
+@@ -15,7 +15,7 @@
+     app_env: str = "development"
+     app_title: str = "TradingAgents API"
+     app_version: str = "1.1.0-free-rc1"
+-    debug: bool = True
++    debug: bool = False
+     cors_origins: list[str] = [
+         "http://localhost:3000",
+         "http://localhost:3001",
+diff --git a/backend/app/core/database.py b/backend/app/core/database.py
+--- a/backend/app/core/database.py
++++ b/backend/app/core/database.py
+@@ -2,6 +2,8 @@
+ import logging
+ 
+ from redis.asyncio import Redis, from_url
++from redis.asyncio.retry import Retry
++from redis.backoff import NoBackoff
+ from sqlalchemy.engine import make_url
+ from sqlalchemy.ext.asyncio import (
+     AsyncSession,
+@@ -119,11 +121,18 @@
+ 
+ async def connect_redis() -> None:
+     global _redis_client
++    client = None
+     try:
+-        client = from_url(settings.redis_url, decode_responses=True)
++        client = from_url(
++            settings.redis_url, decode_responses=True,
++            socket_connect_timeout=1.0, socket_timeout=1.0,
++            max_connections=32, retry=Retry(NoBackoff(), 0),
++        )
+         await client.ping()
+         _redis_client = client
+     except Exception as exc:
++        if client is not None:
++            await client.aclose()
+         # Redis is optional — log but don't block startup.
+         import logging
+         logging.getLogger(__name__).warning("Redis unavailable: %s", exc)
+diff --git a/backend/app/data/providers/eastmoney_provider.py b/backend/app/data/providers/eastmoney_provider.py
+--- a/backend/app/data/providers/eastmoney_provider.py
++++ b/backend/app/data/providers/eastmoney_provider.py
+@@ -22,8 +22,11 @@
+ from __future__ import annotations
+ 
+ import logging
++import threading
++import time
+ 
+ import requests
++from urllib3.util import Timeout
+ 
+ from app.data.providers.base import BaseStockDataProvider
+ 
+@@ -95,6 +98,48 @@
+     return s
+ 
+ 
++# A failed endpoint is skipped briefly across symbols. Never queue callers here:
++# the service already has independent backup sources and stale-cache fallback.
++_MAX_INFLIGHT = threading.BoundedSemaphore(4)
++_STATE_LOCK = threading.Lock()
++_OPEN_UNTIL: dict[str, float] = {}
++_COOLDOWN_SECONDS = 15.0
++
++
++def _fetch_json(url: str, params: dict, budget: float) -> dict:
++    with _STATE_LOCK:
++        if time.monotonic() < _OPEN_UNTIL.get(url, 0):
++            raise RuntimeError("Eastmoney endpoint temporarily unavailable (cooldown)")
++    if not _MAX_INFLIGHT.acquire(blocking=False):
++        raise RuntimeError("Eastmoney concurrency capacity reached")
++    try:
++        # Recheck after admission in case a concurrent request just failed.
++        with _STATE_LOCK:
++            if time.monotonic() < _OPEN_UNTIL.get(url, 0):
++                raise RuntimeError("Eastmoney endpoint temporarily unavailable (cooldown)")
++        # Exactly one attempt, no adapter retries or redirect chain. Budget caps
++        # connect + initial read; requests is not a hard wall-clock deadline for
++        # DNS or a server which keeps streaming bytes (see deployment notes).
++        with _make_session() as session:
++            resp = session.get(
++                url, params=params, timeout=Timeout(total=budget, connect=2, read=budget - 2),
++                allow_redirects=False,
++            )
++            try:
++                resp.raise_for_status()
++                if 300 <= resp.status_code < 400:
++                    raise RuntimeError("Unexpected Eastmoney redirect")
++                return resp.json()
++            finally:
++                resp.close()
++    except Exception:
++        with _STATE_LOCK:
++            _OPEN_UNTIL[url] = time.monotonic() + _COOLDOWN_SECONDS
++        raise
++    finally:
++        _MAX_INFLIGHT.release()
++
++
+ # ── EastmoneyDirectProvider（Quote）─────────────────────────────────────────
+ 
+ class EastmoneyDirectProvider(BaseStockDataProvider):
+@@ -109,16 +154,10 @@
+             raise ValueError("symbol 不能为空。")
+ 
+         secid = _to_secid(symbol)
+-        session = _make_session()
+-
+         try:
+-            resp = session.get(
+-                _QUOTE_URL,
+-                params={"secid": secid, "fields": _QUOTE_FIELDS},
+-                timeout=8,
+-            )
+-            resp.raise_for_status()
+-            body = resp.json()
++            body = _fetch_json(
++                _QUOTE_URL, {"secid": secid, "fields": _QUOTE_FIELDS}, budget=6,
++            )
+         except Exception as exc:
+             raise RuntimeError(
+                 f"EastmoneyDirect quote 请求失败 [{symbol}]: {exc}"
+@@ -205,11 +244,8 @@
+             "fields2": "f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61",
+         }
+ 
+-        session = _make_session()
+         try:
+-            resp = session.get(_KLINE_URL, params=params, timeout=12)
+-            resp.raise_for_status()
+-            body = resp.json()
++            body = _fetch_json(_KLINE_URL, params, budget=8)
+         except Exception as exc:
+             raise RuntimeError(
+                 f"EastmoneyKline 请求失败 [{symbol}]: {exc}"
+diff --git a/backend/app/main.py b/backend/app/main.py
+--- a/backend/app/main.py
++++ b/backend/app/main.py
+@@ -88,7 +88,7 @@
+ app = FastAPI(
+     title=settings.app_title,
+     version=settings.app_version,
+-    debug=settings.debug,
++    debug=(settings.debug and settings.app_env.lower() in {"dev", "development", "local"}),
+     lifespan=lifespan,
+ )
+ 
+@@ -127,6 +127,16 @@
+         payload = exc.detail
+     return JSONResponse(payload, status_code=exc.status_code, headers=exc.headers)
+ 
++@app.exception_handler(Exception)
++async def _unexpected_exception_handler(request, exc: Exception):
++    import logging
++    logging.getLogger(__name__).error("Unhandled API error", exc_info=exc)
++    return JSONResponse(
++        {"detail": "服务暂时不可用，请稍后重试", "error_code": "INTERNAL_ERROR"},
++        status_code=500,
++    )
++
++
+ # ── Phase 6V-P1.25: lightweight health endpoint for container healthcheck ─────
+ @app.get("/health", include_in_schema=False)
+ async def health():
+diff --git a/backend/app/models/watchlist_item.py b/backend/app/models/watchlist_item.py
+--- a/backend/app/models/watchlist_item.py
++++ b/backend/app/models/watchlist_item.py
+@@ -120,6 +120,9 @@
+     change_pct:    float | None = None
+     industry_code: str | None = None
+     industry_name: str | None = None
++    quote_provider: str | None = None
++    quote_cached: bool = False
++    quote_stale: bool = False
+     quote_status:  str = "ok"    # "ok" | "failed"
+     quote_message: str | None = None
+     latest_report: WatchlistLatestReport | None = None
+diff --git a/backend/app/routers/stocks.py b/backend/app/routers/stocks.py
+--- a/backend/app/routers/stocks.py
++++ b/backend/app/routers/stocks.py
+@@ -242,7 +242,7 @@
+     """
+     market = market.upper()
+     try:
+-        r = stock_data_service.get_quote(market, symbol)
++        r = await asyncio.to_thread(stock_data_service.get_quote, market, symbol)
+     except ValueError as exc:
+         raise HTTPException(status.HTTP_400_BAD_REQUEST, str(exc))
+ 
+@@ -278,7 +278,9 @@
+     adjust = _normalize_adjust(adjust)
+ 
+     try:
+-        r = stock_data_service.get_kline(market, symbol, period, adjust, limit)
++        r = await asyncio.to_thread(
++            stock_data_service.get_kline, market, symbol, period, adjust, limit
++        )
+     except ValueError as exc:
+         raise HTTPException(status.HTTP_400_BAD_REQUEST, str(exc))
+ 
+@@ -456,6 +458,9 @@
+ # ── Profile response schemas ──────────────────────────────────────────────────
+ 
+ class ProfileQuote(BaseModel):
++    provider: str | None = None
++    cached: bool = False
++    stale: bool = False
+     latest_price: float | None = None
+     change_pct:   float | None = None
+     open:         float | None = None
+@@ -598,6 +603,10 @@
+                     amount       = d.get("amount"),
+                     trade_time   = str(d["trade_time"]) if d.get("trade_time") else None,
+                     status       = "success",
++                    provider     = r.provider,
++                    cached       = r.cached,
++                    stale        = r.stale,
++                    message      = r.message,
+                 )
+             return ProfileQuote(status="failed", message=getattr(r, "message", None))
+         except Exception as exc:
+@@ -701,6 +710,9 @@
+     profile_quote = await quote_task
+     if profile_quote.status != "success":
+         dq.quote_status = "failed"
++    elif profile_quote.stale:
++        dq.quote_status = "stale"
++        dq.message = profile_quote.message
+ 
+     return StockProfileResponse(
+         market        = market_upper,
+diff --git a/backend/app/routers/watchlist.py b/backend/app/routers/watchlist.py
+--- a/backend/app/routers/watchlist.py
++++ b/backend/app/routers/watchlist.py
+@@ -132,7 +132,10 @@
+                     "latest_price": d.get("price"),
+                     "change_pct":   d.get("change_pct"),
+                     "quote_status": "ok",
+-                    "quote_message": None,
++                    "quote_provider": result.provider,
++                    "quote_cached": result.cached,
++                    "quote_stale": result.stale,
++                    "quote_message": result.message,
+                 }
+         except Exception:
+             pass
+@@ -164,6 +167,9 @@
+             change_pct    = qdata["change_pct"],
+             industry_code = ind.get("industry_code"),
+             industry_name = ind.get("industry_name"),
++            quote_provider = qdata.get("quote_provider"),
++            quote_cached   = qdata.get("quote_cached", False),
++            quote_stale    = qdata.get("quote_stale", False),
+             quote_status  = qdata["quote_status"],
+             quote_message = qdata["quote_message"],
+             latest_report = latest_map.get((row.market, row.symbol)),
+diff --git a/backend/app/services/cache_service.py b/backend/app/services/cache_service.py
+--- a/backend/app/services/cache_service.py
++++ b/backend/app/services/cache_service.py
+@@ -173,11 +173,14 @@
+         fk = _full_key(key)
+         try:
+             raw = await redis.get(fk)
++            _cb_record_success()
+             if raw is None:
+                 return None
+             return _loads(raw)
+         except Exception as exc:
+-            log.warning("cache get_json error [%s]: %s", key, exc)
++            _cb_record_failure()
++            if _should_warn(key):
++                log.warning("cache get_json error [%s] %s: %r", key, type(exc).__name__, exc)
+             return None
+ 
+     async def set_json(self, key: str, value: Any, ttl: int) -> bool:
+@@ -188,10 +191,13 @@
+         fk = _full_key(key)
+         try:
+             await redis.setex(fk, ttl, _dumps(value))
++            _cb_record_success()
+             log.debug("cache set_json OK [%s] ttl=%ds", key, ttl)
+             return True
+         except Exception as exc:
+-            log.warning("cache set_json error [%s]: %s", key, exc)
++            _cb_record_failure()
++            if _should_warn(key):
++                log.warning("cache set_json error [%s] %s: %r", key, type(exc).__name__, exc)
+             return False
+ 
+     async def delete(self, key: str) -> bool:
+@@ -255,9 +261,13 @@
+         if redis is None:
+             return False
+         try:
+-            return bool(await redis.exists(_full_key(key)))
+-        except Exception as exc:
+-            log.warning("cache exists error [%s]: %s", key, exc)
++            result = bool(await redis.exists(_full_key(key)))
++            _cb_record_success()
++            return result
++        except Exception as exc:
++            _cb_record_failure()
++            if _should_warn(key):
++                log.warning("cache exists error [%s] %s: %r", key, type(exc).__name__, exc)
+             return False
+ 
+     async def get_or_set_json(
+@@ -270,7 +280,7 @@
+         cached = await self.get_json(key)
+         if cached is not None:
+             return cached
+-        value = await loader() if asyncio.iscoroutinefunction(loader) else loader()
++        value = await loader() if asyncio.iscoroutinefunction(loader) else await asyncio.to_thread(loader)
+         if value is not None:
+             await self.set_json(key, value, ttl)
+         return value
+@@ -279,8 +289,14 @@
+ 
+     @staticmethod
+     def _loop_ready() -> bool:
+-        """检查 _loop 是否可用：非 None、未关闭、正在运行。"""
+-        return _loop is not None and not _loop.is_closed() and _loop.is_running()
++        """目标循环须运行中，且调用者不能正在该循环上执行。"""
++        if _loop is None or _loop.is_closed() or not _loop.is_running():
++            return False
++        try:
++            # Waiting here would prevent this very loop from running Redis I/O.
++            return asyncio.get_running_loop() is not _loop
++        except RuntimeError:
++            return True
+ 
+     def sync_get_json(self, key: str, timeout: float = 1.5) -> Any | None:
+         """
+@@ -296,12 +312,17 @@
+             return None  # circuit open — skip Redis silently
+         if not self._loop_ready():
+             return None
+-        try:
+-            future = asyncio.run_coroutine_threadsafe(self.get_json(key), _loop)
+-            result = future.result(timeout=timeout)
+-            _cb_record_success()
+-            return result
+-        except Exception as exc:
++        future = None
++        coro = None
++        try:
++            coro = self.get_json(key)
++            future = asyncio.run_coroutine_threadsafe(coro, _loop)
++            return future.result(timeout=timeout)
++        except Exception as exc:
++            if future is not None:
++                future.cancel()  # propagates cancellation to the Redis coroutine
++            elif coro is not None:
++                coro.close()  # scheduling can race loop shutdown
+             _cb_record_failure()
+             if _should_warn(key):
+                 log.warning(
+@@ -321,14 +342,17 @@
+             return False  # circuit open — skip Redis write silently
+         if not self._loop_ready():
+             return False
+-        try:
+-            future = asyncio.run_coroutine_threadsafe(
+-                self.set_json(key, value, ttl), _loop
+-            )
+-            result = future.result(timeout=timeout)
+-            _cb_record_success()
+-            return result
+-        except Exception as exc:
++        future = None
++        coro = None
++        try:
++            coro = self.set_json(key, value, ttl)
++            future = asyncio.run_coroutine_threadsafe(coro, _loop)
++            return future.result(timeout=timeout)
++        except Exception as exc:
++            if future is not None:
++                future.cancel()  # propagates cancellation to the Redis coroutine
++            elif coro is not None:
++                coro.close()  # scheduling can race loop shutdown
+             _cb_record_failure()
+             if _should_warn(key):
+                 log.warning(
+@@ -346,12 +370,17 @@
+             return False
+         if not self._loop_ready():
+             return False
+-        try:
+-            future = asyncio.run_coroutine_threadsafe(self.exists(key), _loop)
+-            result = future.result(timeout=timeout)
+-            _cb_record_success()
+-            return result
+-        except Exception as exc:
++        future = None
++        coro = None
++        try:
++            coro = self.exists(key)
++            future = asyncio.run_coroutine_threadsafe(coro, _loop)
++            return future.result(timeout=timeout)
++        except Exception as exc:
++            if future is not None:
++                future.cancel()  # propagates cancellation to the Redis coroutine
++            elif coro is not None:
++                coro.close()  # scheduling can race loop shutdown
+             _cb_record_failure()
+             if _should_warn(key):
+                 log.warning(
+diff --git a/backend/app/services/stock_cache_service.py b/backend/app/services/stock_cache_service.py
+--- a/backend/app/services/stock_cache_service.py
++++ b/backend/app/services/stock_cache_service.py
+@@ -107,13 +107,14 @@
+     redis_val = cache_service.sync_get_json(key)
+     if redis_val is not None:
+         log.info("quote Redis HIT [%s/%s]", m, symbol)
++        _stale_store[key] = redis_val  # keep shared-cache hits for outage fallback
+         return redis_val, True
+ 
+     # L2: 内存
+     mem_val, hit = _get(key)
+     if hit:
+         # 回写 Redis（跨进程共享）
+-        cache_service.sync_set_json(key, mem_val, _QUOTE_TTL)
++        cache_service.sync_set_json(key, mem_val, max(1, int(_store[key][1] - time.monotonic())))
+         return mem_val, True
+ 
+     return None, False
+@@ -166,12 +167,13 @@
+     redis_val = cache_service.sync_get_json(key)
+     if redis_val is not None:
+         log.info("kline Redis HIT [%s/%s %s %s limit=%d]", m, symbol, period, adjust, limit)
++        _stale_store[key] = redis_val  # keep shared-cache hits for outage fallback
+         return redis_val, True
+ 
+     # L2: 内存
+     mem_val, hit = _get(key)
+     if hit:
+-        cache_service.sync_set_json(key, mem_val, _KLINE_TTL)
++        cache_service.sync_set_json(key, mem_val, max(1, int(_store[key][1] - time.monotonic())))
+         return mem_val, True
+ 
+     return None, False
+diff --git a/backend/app/services/stock_data_service.py b/backend/app/services/stock_data_service.py
+--- a/backend/app/services/stock_data_service.py
++++ b/backend/app/services/stock_data_service.py
+@@ -297,14 +297,15 @@
+         """
+         # Try common kline cache keys (daily, qfq, various limits)
+         for period in ("daily",):
+-            for adjust in ("qfq", "none"):
+-                for limit in (90, 30, 10):
++            for adjust in ("qfq", "", "none"):
++                for limit in (120, 90, 30, 10):
+                     payload, found = cache.get_kline_stale(market, symbol, period, adjust, limit)
+                     if found and payload:
+                         bars = payload.get("bars") or []
+                         if bars:
+                             bar = bars[-1]   # most recent bar
+                             return {
++                                "price":      bar.get("close"),
+                                 "current":    bar.get("close"),
+                                 "close":      bar.get("close"),
+                                 "open":       bar.get("open"),
+diff --git a/frontend/src/api/auth.js b/frontend/src/api/auth.js
+--- a/frontend/src/api/auth.js
++++ b/frontend/src/api/auth.js
+@@ -1,3 +1,4 @@
++import { readJsonResponse } from './response.js'
+ const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8000/api/v1'
+ 
+ /**
+@@ -15,7 +16,7 @@
+     body: JSON.stringify({ username, password }),
+   })
+ 
+-  const data = await res.json()
++  const data = await readJsonResponse(res)
+ 
+   if (!res.ok) {
+     throw new Error(data.detail || `HTTP ${res.status}`)
+@@ -43,7 +44,7 @@
+     body: JSON.stringify(body),
+   })
+ 
+-  const data = await res.json()
++  const data = await readJsonResponse(res)
+ 
+   if (!res.ok) {
+     throw new Error(data.detail || `HTTP ${res.status}`)
+@@ -66,7 +67,7 @@
+     headers: { 'Content-Type': 'application/json' },
+     body: JSON.stringify({ email, invite_code: inviteCode }),
+   })
+-  const data = await res.json()
++  const data = await readJsonResponse(res)
+   if (!res.ok) {
+     throw new Error(data.detail || `HTTP ${res.status}`)
+   }
+@@ -87,7 +88,7 @@
+     },
+   })
+ 
+-  const data = await res.json()
++  const data = await readJsonResponse(res)
+ 
+   if (!res.ok) {
+     throw new Error(data.detail || `HTTP ${res.status}`)
+diff --git a/frontend/src/api/companyV2.js b/frontend/src/api/companyV2.js
+--- a/frontend/src/api/companyV2.js
++++ b/frontend/src/api/companyV2.js
+@@ -1,3 +1,4 @@
++import { readJsonResponse } from './response.js'
+ import { useAuthStore } from '../stores/auth.js'
+ 
+ const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8000/api/v1'
+@@ -12,8 +13,7 @@
+   if (authStore.token) headers.Authorization = `Bearer ${authStore.token}`
+   // Phase 6T-E: 支持 AbortSignal（股票快速切换时取消旧请求）
+   const res = await fetch(`${API_ROOT}${path}`, { ...options, headers })
+-  const contentType = res.headers.get('content-type') || ''
+-  const data = contentType.includes('application/json') ? await res.json() : { ok: false, error_code: 'RENDER_ERROR', message: await res.text() }
++  const data = await readJsonResponse(res)
+   if (!res.ok) {
+     const err = new Error(data.message || data.detail || `HTTP ${res.status}`)
+     err.status = res.status
+diff --git a/frontend/src/api/http.js b/frontend/src/api/http.js
+--- a/frontend/src/api/http.js
++++ b/frontend/src/api/http.js
+@@ -1,3 +1,4 @@
++import { readJsonResponse } from './response.js'
+ import { useAuthStore } from '../stores/auth.js'
+ 
+ const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8000/api/v1'
+@@ -35,7 +36,7 @@
+   }
+ 
+   if (res.status === 503) {
+-    const data = await res.json().catch(() => ({}))
++    const data = await readJsonResponse(res)
+     const err = new Error(
+       data?.detail?.message || data?.message || '连接暂时不稳定，请重试'
+     )
+@@ -49,7 +50,7 @@
+     return null
+   }
+ 
+-  const data = await res.json()
++  const data = await readJsonResponse(res)
+ 
+   if (!res.ok) {
+     const err = new Error(
+diff --git a/frontend/src/api/response.js b/frontend/src/api/response.js
+new file mode 100644
+--- /dev/null
++++ b/frontend/src/api/response.js
+@@ -0,0 +1,13 @@
++/** Parse API JSON without exposing proxy HTML, plaintext errors, or tracebacks. */
++export async function readJsonResponse(res) {
++  try {
++    return await res.json()
++  } catch {
++    const err = new Error(res.ok
++      ? '服务返回了无法识别的数据，请稍后重试'
++      : `服务暂时不可用（HTTP ${res.status}），请稍后重试`)
++    err.status = res.status
++    err.errorCode = 'INVALID_RESPONSE'
++    throw err
++  }
++}
+diff --git a/frontend/src/components/StockDashboardPanel.vue b/frontend/src/components/StockDashboardPanel.vue
+--- a/frontend/src/components/StockDashboardPanel.vue
++++ b/frontend/src/components/StockDashboardPanel.vue
+@@ -32,6 +32,8 @@
+           <div v-else class="db-price-row">
+             <span class="db-unavail">行情加载中…</span>
+           </div>
++
++          <p v-if="quoteStale" class="db-unavail">过期缓存 · {{ quoteProvider }}（{{ quoteMessage || '实时行情暂不可用' }}）</p>
+ 
+           <!-- Watchlist badge -->
+           <div class="db-watchlist-row">
+@@ -165,6 +167,9 @@
+   quoteChangeText: { type: String,  default: '' },
+   quoteChangeClass: { type: String, default: '' },
+   quoteError:      { type: Boolean, default: false },
++  quoteStale:      { type: Boolean, default: false },
++  quoteProvider:   { type: String, default: '' },
++  quoteMessage:    { type: String, default: '' },
+   technicalInsight: { type: Object, default: null },
+   newsItems:       { type: Array,   default: () => [] },
+   latestReport:    { type: Object,  default: null },
+diff --git a/frontend/src/components/WatchlistStockCard.vue b/frontend/src/components/WatchlistStockCard.vue
+--- a/frontend/src/components/WatchlistStockCard.vue
++++ b/frontend/src/components/WatchlistStockCard.vue
+@@ -30,6 +30,7 @@
+       <!-- Quote -->
+       <div class="wsc-quote">
+         <template v-if="item.quote_status !== 'failed' && item.latest_price != null">
++          <span v-if="item.quote_stale" class="wsc-unavail" :title="item.quote_message">过期缓存 · {{ item.quote_provider }}</span>
+           <span class="wsc-price">{{ fmtPrice(item.latest_price) }}</span>
+           <span v-if="item.change_pct != null" :class="['wsc-chg', changePctClass(item.change_pct)]">
+             {{ fmtChangePct(item.change_pct) }}
+diff --git a/frontend/src/views/StockDetailView.vue b/frontend/src/views/StockDetailView.vue
+--- a/frontend/src/views/StockDetailView.vue
++++ b/frontend/src/views/StockDetailView.vue
+@@ -18,6 +18,9 @@
+         :quote-change-text="quoteChangeText"
+         :quote-change-class="quoteChangeClass"
+         :quote-error="quoteError"
++        :quote-stale="profile?.quote?.stale || quote?.stale || false"
++        :quote-provider="profile?.quote?.provider || quote?.provider || ''"
++        :quote-message="profile?.quote?.message || quote?.message || ''"
+         :technical-insight="technicalInsight"
+         :news-items="newsItems"
+         :latest-report="latestReport"
+diff --git a/backend/tests/test_market_io_resilience.py b/backend/tests/test_market_io_resilience.py
+new file mode 100644
+--- /dev/null
++++ b/backend/tests/test_market_io_resilience.py
+@@ -0,0 +1,341 @@
++"""Hermetic regressions for market I/O, Redis bridging and truthful fallback."""
++import asyncio
++import os
++import threading
++import time
++from types import SimpleNamespace
++from unittest.mock import AsyncMock, MagicMock
++
++import httpx
++import pytest
++from fastapi import FastAPI
++
++# Import settings without relying on a developer's .env or real database.
++os.environ.setdefault('DATABASE_URL', 'postgresql+asyncpg://unit:unit@127.0.0.1:1/unit')
++os.environ.setdefault('SECRET_KEY', 'unit-test-only-market-resilience-key')
++
++import app.services.cache_service as bridge
++from app.services import stock_cache_service as cache
++from app.services.stock_data_service import StockDataService, QuoteResult, KlineResult
++from app.data.providers import eastmoney_provider as em
++
++
++@pytest.fixture(autouse=True)
++def isolated(monkeypatch):
++    monkeypatch.setattr(bridge, '_loop', None)
++    monkeypatch.setattr(bridge, '_cb_fail_count', 0)
++    monkeypatch.setattr(bridge, '_cb_open_until', 0)
++    monkeypatch.setattr(bridge, 'get_redis', lambda: None)
++    monkeypatch.setattr(em, '_OPEN_UNTIL', {})
++    monkeypatch.setattr(em, '_MAX_INFLIGHT', threading.BoundedSemaphore(4))
++    cache.clear_all()
++    yield
++    cache.clear_all()
++
++
++@pytest.mark.parametrize('method,args,expected', [
++    ('sync_get_json', ('k',), {'price': 10}),
++    ('sync_set_json', ('k', {'price': 10}, 60), True),
++    ('sync_exists', ('k',), True),
++])
++async def test_bridge_worker_and_loop_misuse(monkeypatch, method, args, expected):
++    redis = SimpleNamespace(get=AsyncMock(return_value='{"price":10}'),
++                            setex=AsyncMock(), exists=AsyncMock(return_value=1))
++    monkeypatch.setattr(bridge, 'get_redis', lambda: redis)
++    bridge.set_event_loop(asyncio.get_running_loop())
++    call = getattr(bridge.cache_service, method)
++    started = time.monotonic()
++    assert call(*args, timeout=0.5) in (None, False)
++    assert time.monotonic() - started < 0.1
++    assert bridge._cb_fail_count == 0  # misuse is not a Redis outage
++    redis.get.assert_not_awaited()
++    redis.setex.assert_not_awaited()
++    redis.exists.assert_not_awaited()
++    assert await asyncio.to_thread(call, *args) == expected
++
++
++@pytest.mark.parametrize('method,args,async_method,default', [
++    ('sync_get_json', ('k',), 'get_json', None),
++    ('sync_set_json', ('k', {}, 1), 'set_json', False),
++    ('sync_exists', ('k',), 'exists', False),
++])
++async def test_bridge_timeout_cancels_pending_task(monkeypatch, method, args, async_method, default):
++    entered, cleaned = asyncio.Event(), asyncio.Event()
++    async def slow(*_args):
++        entered.set()
++        try:
++            await asyncio.Event().wait()
++        finally:
++            cleaned.set()
++    monkeypatch.setattr(bridge.cache_service, async_method, slow)
++    bridge.set_event_loop(asyncio.get_running_loop())
++    for _ in range(3):
++        entered.clear()
++        cleaned.clear()
++        assert await asyncio.to_thread(getattr(bridge.cache_service, method), *args, timeout=0.03) is default
++        assert entered.is_set()
++        await asyncio.wait_for(cleaned.wait(), 0.5)
++    assert not [t for t in asyncio.all_tasks() if getattr(t.get_coro(), '__name__', '') == 'slow']
++
++
++async def test_bridge_redis_failure_is_optional(monkeypatch):
++    monkeypatch.setattr(bridge, 'get_redis', lambda: SimpleNamespace(get=AsyncMock(side_effect=ConnectionError('offline'))))
++    bridge.set_event_loop(asyncio.get_running_loop())
++    assert await asyncio.to_thread(bridge.cache_service.sync_get_json, 'k') is None
++
++
++@pytest.mark.parametrize('kind', ['quote', 'kline', 'news'])
++async def test_slow_stock_route_does_not_block_other_requests(monkeypatch, kind):
++    from app.routers import stocks
++    from app.dependencies import get_current_user
++    app = FastAPI()
++    app.include_router(stocks.router)
++    app.dependency_overrides[get_current_user] = lambda: object()
++    @app.get('/probe')
++    async def probe():
++        return {'ok': True}
++    entered, release = threading.Event(), threading.Event()
++    def slow(*args):
++        entered.set()
++        assert release.wait(1.5), 'other async request was blocked'
++        if kind == 'quote':
++            return QuoteResult({'price': 10}, 'fake')
++        if kind == 'kline':
++            return KlineResult([{'close': 10}], 'fake')
++        return {'market': 'CN', 'symbol': '600519', 'items': [], 'count': 0, 'data_quality': {}}
++    service = stocks.news_data_service if kind == 'news' else stocks.stock_data_service
++    monkeypatch.setattr(service, 'get_stock_news' if kind == 'news' else f'get_{kind}', slow)
++    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url='http://test') as client:
++        task = asyncio.create_task(client.get(f'/stocks/CN/600519/{kind}'))
++        try:
++            for _ in range(100):
++                if entered.is_set():
++                    break
++                await asyncio.sleep(0.005)
++            assert entered.is_set()
++            assert not task.done()
++            assert (await asyncio.wait_for(client.get('/probe'), 0.3)).json() == {'ok': True}
++        finally:
++            release.set()
++        assert (await task).status_code == 200
++
++
++@pytest.mark.parametrize('kind', ['quote', 'kline'])
++@pytest.mark.parametrize('market', ['CN', 'HK'])
++@pytest.mark.parametrize('outcome', ['backup', 'stale', 'unavailable'])
++def test_provider_fallback_contract(kind, market, outcome):
++    svc = StockDataService()
++    providers = [svc._eastmoney, svc._sina, svc._tencent_quote] if kind == 'quote' and market == 'CN' else (
++        [svc._tencent_quote, svc._akshare] if kind == 'quote' else (
++            [svc._eastmoney_kline, svc._tencent_kline, svc._akshare] if market == 'CN' else [svc._tencent_kline, svc._akshare]))
++    value = {'price': 10} if kind == 'quote' else [{'date': '2026-10-23', 'close': 10}]
++    for p in providers:
++        setattr(p, f'get_{kind}', MagicMock(side_effect=RuntimeError('502 / remote closed')))
++    if outcome == 'backup':
++        setattr(providers[1], f'get_{kind}', MagicMock(return_value=value))
++    if outcome == 'stale':
++        if kind == 'quote':
++            cache.set_quote_cache(market, '600519', value, 'original_source', [])
++        else:
++            cache.set_kline_cache(market, '600519', 'daily', '', 120, value, 'original_source', [])
++        for key, (payload, _) in list(cache._store.items()):
++            cache._store[key] = (payload, 0)
++    r = getattr(svc, f'get_{kind}')(market, '600519')
++    assert r.http_status == (503 if outcome == 'unavailable' else 200)
++    assert r.stale == (outcome == 'stale')
++    assert r.cached == (outcome == 'stale')
++    assert r.provider == ('none' if outcome == 'unavailable' else 'original_source' if outcome == 'stale' else r.provider)
++    assert 'error' in r.fallback_chain[0]
++    if outcome == 'stale':
++        assert r.message and '缓存' in r.message
++    if outcome == 'unavailable':
++        assert r.message
++        assert not (r.data.get('price') if kind == 'quote' else r.bars)
++
++
++def test_shared_cache_hit_remains_available_as_stale(monkeypatch):
++    payload = {'data': {'price': 10}, 'provider': 'sina'}
++    monkeypatch.setattr(bridge.cache_service, 'sync_get_json', lambda _: payload)
++    assert cache.get_quote_cache('CN', '600519') == (payload, True)
++    assert cache.get_quote_stale('CN', '600519') == (payload, True)
++
++
++def test_kline_proxy_has_quote_price_and_non_realtime_label():
++    cache.set_kline_cache('CN', '600519', 'daily', '', 120, [{'close': 10}], 'tencent_kline', [])
++    r = StockDataService()._stale_or_503_quote('CN', '600519', [], [])
++    assert r.data['price'] == 10
++    assert r.stale and r.provider == 'kline_proxy' and r.data['is_realtime'] is False
++
++
++@pytest.mark.parametrize('provider,method,args', [
++    (em.EastmoneyDirectProvider, 'get_quote', ('CN', '600519')),
++    (em.EastmoneyKlineProvider, 'get_kline', ('CN', '600519')),
++])
++def test_eastmoney_one_attempt_cooldown_and_cleanup(monkeypatch, provider, method, args):
++    session, response = MagicMock(), MagicMock()
++    session.__enter__.return_value = session
++    session.get.return_value = response
++    response.raise_for_status.side_effect = httpx.HTTPError('502 Bad Gateway')
++    monkeypatch.setattr(em, '_make_session', lambda: session)
++    with pytest.raises(RuntimeError, match='502'):
++        getattr(provider(), method)(*args)
++    response.close.assert_called_once()
++    session.__exit__.assert_called_once()
++    assert session.get.call_count == 1
++    options = session.get.call_args.kwargs
++    assert options['allow_redirects'] is False
++    assert options['timeout'].total <= 8
++    assert options['timeout'].connect_timeout == 2
++    with pytest.raises(RuntimeError, match='cooldown'):
++        getattr(provider(), method)(*args)
++    assert session.get.call_count == 1
++    monkeypatch.setattr(em.time, 'monotonic', lambda: max(em._OPEN_UNTIL.values()) + 1)
++    with pytest.raises(RuntimeError, match='502'):
++        getattr(provider(), method)(*args)
++    assert session.get.call_count == 2
++
++
++def test_eastmoney_bulkhead_fails_without_queueing(monkeypatch):
++    session = MagicMock()
++    monkeypatch.setattr(em, '_make_session', session)
++    for _ in range(4):
++        assert em._MAX_INFLIGHT.acquire(False)
++    try:
++        with pytest.raises(RuntimeError, match='capacity'):
++            em._fetch_json(em._QUOTE_URL, {}, 6)
++        session.assert_not_called()
++    finally:
++        for _ in range(4):
++            em._MAX_INFLIGHT.release()
++
++
++async def test_redis_pool_has_bounded_io_and_cleans_failed_startup(monkeypatch):
++    from app.core import database
++    redis = SimpleNamespace(ping=AsyncMock(side_effect=ConnectionError('offline')), aclose=AsyncMock())
++    factory = MagicMock(return_value=redis)
++    monkeypatch.setattr(database, 'from_url', factory)
++    monkeypatch.setattr(database, '_redis_client', None)
++    await database.connect_redis()
++    redis.aclose.assert_awaited_once()
++    assert database.get_redis() is None
++    opts = factory.call_args.kwargs
++    assert opts['max_connections'] == 32
++    assert opts['socket_timeout'] == opts['socket_connect_timeout'] == 1.0
++
++
++async def test_profile_preserves_stale_metadata(monkeypatch):
++    from app.routers import stocks
++    result = QuoteResult({'price': 10}, 'sina', cached=True, stale=True, message='过期缓存')
++    monkeypatch.setattr(stocks.stock_data_service, 'get_quote', lambda *_: result)
++    monkeypatch.setattr(stocks.industry_classification_service, 'get_stock_industry', AsyncMock(return_value=None))
++    monkeypatch.setattr(stocks.industry_classification_service, 'search_stocks', AsyncMock(return_value=[]))
++    db = SimpleNamespace(execute=AsyncMock(return_value=MagicMock()))
++    db.execute.return_value.scalar_one_or_none.return_value = None
++    db.execute.return_value.mappings.return_value.first.return_value = None
++    r = await stocks.get_stock_profile('CN', '600519', SimpleNamespace(id='user'), db)
++    assert r.quote.stale and r.quote.cached and r.quote.provider == 'sina'
++    assert r.quote.message == '过期缓存' and r.data_quality.quote_status == 'stale'
++
++
++async def test_watchlist_preserves_stale_metadata(monkeypatch):
++    from datetime import datetime, timezone
++    from uuid import uuid4
++    from app.routers import watchlist
++    result = QuoteResult({'price': 10}, 'sina', cached=True, stale=True, message='过期缓存')
++    monkeypatch.setattr(watchlist._stock_data_svc, 'get_quote', lambda *_: result)
++    row = SimpleNamespace(id=uuid4(), market='CN', symbol='600519', name='test', note=None,
++                          sort_order=0, created_at=datetime.now(timezone.utc), updated_at=datetime.now(timezone.utc))
++    count, listing, reports, industries = (MagicMock() for _ in range(4))
++    count.scalar_one.return_value = 1
++    listing.scalars.return_value.all.return_value = [row]
++    reports.mappings.return_value.all.return_value = []
++    industries.mappings.return_value.all.return_value = []
++    db = SimpleNamespace(execute=AsyncMock(side_effect=[count, listing, reports, industries]))
++    r = await watchlist.get_watchlist_enriched(SimpleNamespace(id=uuid4()), db)
++    assert r.items[0].quote_stale and r.items[0].quote_cached
++    assert r.items[0].quote_provider == 'sina' and r.items[0].quote_message == '过期缓存'
++
++
++@pytest.mark.parametrize('kind', ['quote', 'kline', 'news'])
++async def test_async_chat_tools_offload_sync_io(monkeypatch, kind):
++    from app.agents.chat_tools import stock_tools
++    loop_thread = threading.get_ident()
++    def fake(*args, **kwargs):
++        assert threading.get_ident() != loop_thread
++        if kind == 'quote':
++            return {'price': 10}
++        if kind == 'kline':
++            return [{'close': 10, 'high': 11, 'low': 9}]
++        return {'items': [], 'count': 0}
++    svc = stock_tools.news_data_service if kind == 'news' else stock_tools.stock_data_service
++    attr = {'quote': 'get_quote_optional', 'kline': 'get_kline_for_agent', 'news': 'get_stock_news'}[kind]
++    monkeypatch.setattr(svc, attr, fake)
++    cls = {'quote': stock_tools.GetQuoteTool, 'kline': stock_tools.GetKlineSummaryTool, 'news': stock_tools.GetLatestNewsTool}[kind]
++    assert (await cls().run(None, market='CN', symbol='600519')).ok
++
++
++async def test_unexpected_backend_error_is_safe_json():
++    from app.main import _unexpected_exception_handler
++    app = FastAPI(debug=False)
++    app.add_exception_handler(Exception, _unexpected_exception_handler)
++    @app.get('/broken')
++    async def broken():
++        raise RuntimeError('secret traceback details')
++    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app, raise_app_exceptions=False), base_url='http://test') as client:
++        response = await client.get('/broken')
++    assert response.status_code == 500
++    assert response.json()['error_code'] == 'INTERNAL_ERROR'
++    assert 'secret' not in response.text and 'Traceback' not in response.text
++
++
++async def test_redis_errors_open_bridge_circuit_without_blocking(monkeypatch):
++    redis = SimpleNamespace(get=AsyncMock(side_effect=ConnectionError('offline')))
++    monkeypatch.setattr(bridge, 'get_redis', lambda: redis)
++    bridge.set_event_loop(asyncio.get_running_loop())
++    for _ in range(bridge._CB_FAIL_THRESHOLD + 2):
++        assert await asyncio.to_thread(bridge.cache_service.sync_get_json, 'quote:k') is None
++    assert redis.get.await_count == bridge._CB_FAIL_THRESHOLD
++    assert bridge.cache_status() == 'unavailable'
++
++
++async def test_sync_cache_loader_runs_in_worker():
++    loop_thread = threading.get_ident()
++    def loader():
++        assert threading.get_ident() != loop_thread
++        return {'ok': True}
++    assert await bridge.cache_service.get_or_set_json('k', 1, loader) == {'ok': True}
++
++
++async def test_financial_runtime_quote_offloads_sync_io(monkeypatch):
++    from app.agents.financial_runtime.tool_runtime import FinancialToolRegistry
++    from app.agents.financial_runtime.contracts import ToolRequest, FinancialSessionContext
++    from app.services.stock_data_service import stock_data_service
++    loop_thread = threading.get_ident()
++    def fake(*args):
++        assert threading.get_ident() != loop_thread
++        return {'price': 10}
++    monkeypatch.setattr(stock_data_service, 'get_quote_optional', fake)
++    req = ToolRequest(trace_id='test', parameters={'entity': {'market': 'CN', 'symbol': '600519'}})
++    r = await FinancialToolRegistry().get_quote_snapshot(req, FinancialSessionContext(trace_id='test'))
++    assert r.data['quote']['price'] == 10
++
++
++@pytest.mark.parametrize('kind', ['quote', 'kline'])
++@pytest.mark.parametrize('stale,status', [(False, 200), (True, 200), (False, 503)])
++async def test_market_route_keeps_http_and_json_contract(monkeypatch, kind, stale, status):
++    from app.routers import stocks
++    from app.dependencies import get_current_user
++    result = (QuoteResult({'price': 10} if status == 200 else {'reason_code': 'NETWORK_UNAVAILABLE'}, 'sina' if status == 200 else 'none')
++              if kind == 'quote' else KlineResult([{'close': 10}] if status == 200 else [], 'tencent_kline' if status == 200 else 'none'))
++    result.stale, result.cached, result.http_status = stale, stale, status
++    monkeypatch.setattr(stocks.stock_data_service, f'get_{kind}', lambda *_: result)
++    app = FastAPI()
++    app.include_router(stocks.router)
++    app.dependency_overrides[get_current_user] = lambda: object()
++    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url='http://test') as client:
++        response = await client.get(f'/stocks/CN/600519/{kind}')
++    assert response.status_code == status
++    body = response.json()
++    assert body['stale'] == stale and body['cached'] == stale
++    assert body['provider'] == result.provider
++    assert isinstance(body['data'], dict if kind == 'quote' else list)
+diff --git a/frontend/src/tests/marketApiErrors.test.js b/frontend/src/tests/marketApiErrors.test.js
+new file mode 100644
+--- /dev/null
++++ b/frontend/src/tests/marketApiErrors.test.js
+@@ -0,0 +1,59 @@
++import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest'
++import { readJsonResponse } from '../api/response.js'
++
++const auth = vi.hoisted(() => ({ token: 'test', logout: vi.fn() }))
++vi.mock('../stores/auth.js', () => ({ useAuthStore: () => auth }))
++import { baseFetch } from '../api/http.js'
++import { loginApi, registerApi } from '../api/auth.js'
++import { getCompanyV2FullDebug } from '../api/companyV2.js'
++
++beforeEach(() => vi.stubGlobal('fetch', vi.fn()))
++afterEach(() => { vi.unstubAllGlobals(); vi.clearAllMocks() })
++
++function response(status, body, type = 'text/plain') {
++  return new Response(body, { status, headers: { 'Content-Type': type } })
++}
++
++for (const [name, call] of [
++  ['stocks', () => baseFetch('/stocks/CN/600519/quote')],
++  ['company v2', () => getCompanyV2FullDebug('CN', '600519')],
++  ['login', () => loginApi('test', 'password')],
++  ['register', () => registerApi('test', 'test@example.com', 'password', 'invite')],
++]) {
++  describe(name, () => {
++    it.each([500, 502, 503])('handles non-JSON HTTP %s without parsing errors or body disclosure', async (status) => {
++      fetch.mockResolvedValue(response(status, 'Traceback secret password /private/server.py'))
++      const error = await call().catch(e => e)
++      expect(error).toBeInstanceOf(Error)
++      expect(error).not.toBeInstanceOf(SyntaxError)
++      expect(error.status).toBe(status)
++      expect(error.message).toContain('服务暂时不可用')
++      expect(error.message).not.toMatch(/Traceback|secret|password|server\.py|Unexpected token/)
++    })
++  })
++}
++
++it('handles malformed JSON despite a JSON header', async () => {
++  await expect(readJsonResponse(response(500, 'Traceback secret', 'application/json')))
++    .rejects.toMatchObject({ errorCode: 'INVALID_RESPONSE', status: 500 })
++})
++it('rejects non-JSON success response (proxy login page)', async () => {
++  await expect(readJsonResponse(response(200, '<html>private</html>', 'text/html')))
++    .rejects.toThrow('无法识别的数据')
++})
++it('keeps valid payload and unavailable reason', async () => {
++  fetch.mockResolvedValue(response(503, JSON.stringify({ message: '行情源不可用', error_code: 'DATA_SOURCE_UNAVAILABLE' }), 'application/json'))
++  await expect(baseFetch('/stocks/CN/600519/quote')).rejects.toMatchObject({ status: 503, message: '行情源不可用', errorCode: 'DATA_SOURCE_UNAVAILABLE' })
++})
++it('keeps 401 session handling and 204 contract', async () => {
++  fetch.mockResolvedValueOnce(response(401, 'Traceback secret'))
++  await expect(baseFetch('/watchlist')).rejects.toMatchObject({ status: 401, errorCode: 'AUTH_REQUIRED' })
++  expect(auth.logout).toHaveBeenCalledWith({ expired: true })
++  fetch.mockResolvedValueOnce(new Response(null, { status: 204 }))
++  expect(await baseFetch('/watchlist', { method: 'DELETE' })).toBeNull()
++})
++it('returns valid JSON unmodified', async () => {
++  const payload = { provider: 'sina', stale: true, data: { price: 10 } }
++  fetch.mockResolvedValue(response(200, JSON.stringify(payload), 'application/json'))
++  expect(await baseFetch('/stocks/CN/600519/quote')).toEqual(payload)
++})

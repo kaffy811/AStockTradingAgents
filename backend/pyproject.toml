@@ -35,6 +35,7 @@ dependencies = [
     "httpx>=0.27.0",
     "beautifulsoup4>=4.12.3",
     "pdfminer.six>=20221105",
+    "sentence-transformers>=5.7.0",
 ]
 
 [dependency-groups]

@@ -1,0 +1,75 @@
+{
+  "phase": "6W-R3.3I.2.7.2",
+  "status": "PORTABLE_BOOTSTRAP_NOT_READY",
+  "traffic": "HOLD_1_PERCENT",
+  "branch": "r33i-migration-bootstrap",
+  "worktree": "/private/tmp/tradingagents-r33i2-7-2-bootstrap",
+  "commit_created": false,
+  "draft": {
+    "root_revision": "r3e4f5g6h7i8",
+    "baseline_revision": "4b49004d01a6",
+    "first_analysis_alter": "3a2f8b4c1d9e",
+    "head": "q5r6s7t8u9v0",
+    "legacy_tables": [
+      "app_users",
+      "analysis_reports",
+      "watchlist_items",
+      "industry_master",
+      "stock_industry_map",
+      "industry_hot_stock_snapshot",
+      "company_v2_report_rag_documents",
+      "company_v2_report_rag_chunks"
+    ],
+    "existing_table_policy": "preserve_without_alter_or_replace",
+    "downgrade_policy": "no_op_preserve_legacy_data",
+    "writes_fixture_financial_data": false
+  },
+  "environments": {
+    "standard": {
+      "container_id": "4f6fc858fb12d395dd4e97411784d1001ed15fdb77d0658c15da49c417513fec",
+      "image": "postgres:16-alpine",
+      "database": "bootstrap_standard",
+      "result": "failed",
+      "current": null,
+      "heads": ["q5r6s7t8u9v0"]
+    },
+    "pgvector": {
+      "container_id": "ecd314344a63b26d68ef8b33cc4b27e2f42bfae37fc8bded01ecb0df5bc80e6c",
+      "image": "pgvector/pgvector:pg16",
+      "database": "bootstrap_vector",
+      "result": "passed",
+      "current": "q5r6s7t8u9v0",
+      "heads": ["q5r6s7t8u9v0"],
+      "repeat_upgrade": "passed"
+    },
+    "existing_schema_fixture": {
+      "created_by_revision": "r3e4f5g6h7i8",
+      "result": "passed",
+      "sentinel_preserved": true
+    }
+  },
+  "first_failure": {
+    "revision": "a2c5e8f1b4d7",
+    "database": "standard PostgreSQL",
+    "error": "InFailedSQLTransactionError",
+    "cause": "failed CREATE EXTENSION vector leaves the published migration transaction aborted before TEXT fallback",
+    "bootstrap_related": false,
+    "modified_in_phase": false
+  },
+  "tests": [
+    {"name": "static_bootstrap_contract", "collected": 6, "passed": 6, "failed": 0, "skipped": 0, "duration_seconds": 0.02},
+    {"name": "real_database_contract", "collected": 9, "passed": 8, "failed": 1, "skipped": 0, "duration_seconds": 3.51}
+  ],
+  "safety": {
+    "agent_code_changed": false,
+    "vector_code_changed": false,
+    "dependency_files_changed": false,
+    "docker_changed": false,
+    "production_database_accessed": false,
+    "production_migrations": 0,
+    "pushed": false,
+    "merged": false,
+    "deployed": false,
+    "traffic_expanded": false
+  }
+}

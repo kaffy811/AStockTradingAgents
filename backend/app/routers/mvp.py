@@ -3,15 +3,15 @@ MVP Release Candidate endpoints — Phase MVP-R1.2.
 
 Endpoints
 ---------
-POST /mvp/invites/check     — check invite code validity (public)
-POST /mvp/invites           — create invite code (admin only)
+POST /mvp/invites/check     — retired (410)
+POST /mvp/invites           — retired (410, admin auth retained)
 POST /chat/feedback         — submit answer feedback (auth optional)
 POST /mvp/analytics/event   — record analytics event (internal)
 GET  /mvp/health            — MVP readiness probe
 GET  /mvp/quota/check/{user_id} — check user daily quota (Phase MVP-R1.1)
 GET  /mvp/wave/status       — wave configuration (Phase MVP-R1.1)
 GET  /mvp/admin/invites     — list all invites (admin only)
-DELETE /mvp/admin/invites/{invite_id} — revoke an invite (admin only)
+DELETE /mvp/admin/invites/{invite_id} — retired (410, historical data retained)
 
 Security:
 - POST /mvp/invites requires Bearer token with is_admin=True (MVP-R1.2 fix)
@@ -34,6 +34,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.services.auth_rate_limit import disabled_auth_method
 from app.core.config import settings
 from app.core.database import get_db
 from app.dependencies import get_admin_user
@@ -147,83 +148,16 @@ class AnalyticsEventResponse(BaseModel):
 
 # ── Public endpoints ──────────────────────────────────────────────────────────
 
-@router.post("/mvp/invites/check", response_model=InviteCheckResponse)
-async def check_invite(
-    req: InviteCheckRequest, db: AsyncSession = Depends(get_db)
-):
-    """Check invite code validity without consuming a use."""
-    code_hash = _hash_invite_code(normalize_invite_code(req.invite_code))
-    result = await db.execute(
-        select(MvpInvite).where(MvpInvite.code_hash == code_hash)
-    )
-    invite = result.scalar_one_or_none()
-
-    if not invite:
-        return InviteCheckResponse(valid=False, message="Invalid invite code.")
-
-    if invite.expires_at and invite.expires_at < datetime.utcnow():
-        return InviteCheckResponse(valid=False, message="Invite code has expired.")
-
-    if invite.use_count >= invite.max_uses:
-        return InviteCheckResponse(valid=False, message="Invite code fully redeemed.")
-
-    return InviteCheckResponse(valid=True, message="Invite code is valid.")
+@router.post("/mvp/invites/check", status_code=410, deprecated=True)
+async def check_invite():
+    disabled_auth_method()
 
 
 # ── Admin-only invite management ──────────────────────────────────────────────
 
-@router.post("/mvp/invites", response_model=InviteCreateResponse)
-async def create_invite(
-    req: InviteCreateRequest,
-    db: AsyncSession = Depends(get_db),
-    admin=Depends(get_admin_user),
-):
-    """Create a new invite code. Admin only (is_admin=True Bearer token required).
-
-    The plaintext code is returned ONCE in the response and never stored.
-    The server persists only the HMAC hash and the first 4 chars as code_prefix.
-    """
-    # Try up to 10 times to guard against the astronomically unlikely hash collision
-    for _ in range(10):
-        plaintext_code = generate_invite_code()
-        code_hash = _hash_invite_code(plaintext_code)
-        existing = await db.execute(
-            select(MvpInvite).where(MvpInvite.code_hash == code_hash)
-        )
-        if existing.scalar_one_or_none() is None:
-            break
-    else:
-        raise HTTPException(
-            status_code=500,
-            detail="Failed to generate a unique invite code. Please retry.",
-        )
-
-    # Store only first 4 chars as prefix — never the full 8-char code in DB.
-    code_prefix = plaintext_code[:4]
-
-    invite = MvpInvite(
-        id=uuid.uuid4(),
-        code_hash=code_hash,
-        code_prefix=code_prefix,
-        email=req.email,
-        max_uses=req.max_uses,
-        note=req.note,
-        created_by=str(admin.username),
-        created_at=datetime.utcnow(),
-    )
-    db.add(invite)
-    await db.commit()
-    log.info(
-        "mvp_invite created: prefix=%s email=%s max_uses=%d by=%s",
-        code_prefix, req.email, req.max_uses, admin.username,
-    )
-    return InviteCreateResponse(
-        invite_code=plaintext_code,
-        code_prefix=code_prefix,
-        email=req.email,
-        max_uses=req.max_uses,
-        created_at=invite.created_at.isoformat(),
-    )
+@router.post("/mvp/invites", status_code=410, deprecated=True)
+async def create_invite(admin=Depends(get_admin_user)):
+    disabled_auth_method()
 
 
 @router.get("/mvp/admin/invites", response_model=List[InviteListItem])
@@ -254,28 +188,9 @@ async def list_invites(
     ]
 
 
-@router.delete("/mvp/admin/invites/{invite_id}", status_code=204)
-async def revoke_invite(
-    invite_id: str,
-    db: AsyncSession = Depends(get_db),
-    admin=Depends(get_admin_user),
-):
-    """Revoke (delete) an invite by ID. Admin only."""
-    try:
-        invite_uuid = uuid.UUID(invite_id)
-    except ValueError:
-        raise HTTPException(status_code=400, detail="Invalid invite ID format.")
-
-    result = await db.execute(
-        select(MvpInvite).where(MvpInvite.id == invite_uuid)
-    )
-    invite = result.scalar_one_or_none()
-    if not invite:
-        raise HTTPException(status_code=404, detail="Invite not found.")
-
-    await db.delete(invite)
-    await db.commit()
-    log.info("mvp_invite revoked: id=%s by=%s", invite_id, admin.username)
+@router.delete("/mvp/admin/invites/{invite_id}", status_code=410, deprecated=True)
+async def revoke_invite(invite_id: str, admin=Depends(get_admin_user)):
+    disabled_auth_method()
 
 
 # ── Feedback & analytics ──────────────────────────────────────────────────────
@@ -430,7 +345,7 @@ async def get_wave_status():
             "wave2": settings.mvp_wave2_max_users,
             "wave3": settings.mvp_wave3_max_users,
         },
-        new_invites_enabled=settings.mvp_new_invites_enabled and not settings.mvp_kill_invites,
+        new_invites_enabled=False,
         new_login_enabled=settings.mvp_new_login_enabled and not settings.mvp_kill_login,
         new_chat_enabled=settings.mvp_new_chat_enabled and not settings.mvp_kill_chat,
         kill_switches={
@@ -451,7 +366,7 @@ async def mvp_health():
     return {
         "ok": True,
         "phase": "MVP-R1.2",
-        "mvp_mode": "invite_only",
+        "mvp_mode": "google_only",
         "provider_mode": getattr(settings, "pi_canary_provider_mode", "staging_replay"),
         "real_provider_enabled": getattr(settings, "pi_real_provider_enabled", False),
         "real_provider_kill_switch": getattr(settings, "pi_real_provider_kill_switch", True),

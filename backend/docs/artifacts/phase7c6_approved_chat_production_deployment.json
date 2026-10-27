@@ -1,0 +1,47 @@
+{
+  "phase": "7C6",
+  "recorded_at": "2026-09-03T04:06:38Z",
+  "status": "APPROVED_AI_CHAT_SLICE_DEPLOYMENT_BLOCKED",
+  "target": {
+    "branch": "release/demo-staging",
+    "sha": "5dad7228bb7b54338a946b49daeee5eae58348f9"
+  },
+  "local": {
+    "branch": "release/demo-staging",
+    "head": "5dad7228bb7b54338a946b49daeee5eae58348f9"
+  },
+  "ssh_host_identity": {
+    "algorithm": "ED25519",
+    "fingerprint": "SHA256:AeQr+HV5vMRgKGsKH7cN0hGzQStzDOe44dhFIsgaGsw",
+    "owner_verified_match": true,
+    "strict_host_key_checking": true
+  },
+  "blocker": {
+    "stage": "ssh_authentication",
+    "reason": "No approved server account accepted the available non-interactive public-key credentials",
+    "attempts": [
+      {
+        "account": "kaffy",
+        "authenticated": false,
+        "result": "permission_denied"
+      },
+      {
+        "account": "root",
+        "authenticated": false,
+        "result": "permission_denied"
+      }
+    ]
+  },
+  "remote_precheck_completed": false,
+  "git_fetch_completed": false,
+  "git_fast_forward_completed": false,
+  "backend_built": false,
+  "backend_restarted": false,
+  "frontend_built": false,
+  "frontend_restarted": false,
+  "health_checks_completed": false,
+  "migration_executed": false,
+  "traffic_state": "HOLD_1_PERCENT",
+  "server_state_changed": false,
+  "required_next_action": "Restore approved non-interactive SSH authentication, then restart from the server precheck"
+}

@@ -1,97 +1,48 @@
+import { readJsonResponse } from './response.js'
+
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8000/api/v1'
 
-/**
- * Login API call — uses raw fetch (no auth token needed).
- * Accepts username OR email in the `username` field.
- *
- * @param {string} username  username or email
- * @param {string} password
- * @returns {Promise<{ access_token: string, refresh_token: string }>}
- */
-export async function loginApi(username, password) {
-  const res = await fetch(`${API_BASE}/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password }),
-  })
-
-  const data = await res.json()
-
-  if (!res.ok) {
-    throw new Error(data.detail || `HTTP ${res.status}`)
+async function authFetch(path, options = {}) {
+  let res
+  try {
+    res = await fetch(`${API_BASE}/auth${path}`, { credentials: 'include', ...options })
+  } catch (error) {
+    if (error?.name === 'AbortError') throw error
+    const err = new Error('无法连接登录服务，请检查网络后重试。')
+    err.errorCode = 'AUTH_NETWORK_ERROR'
+    throw err
   }
-
-  return data
-}
-
-/**
- * Register a new user with an invite code.
- *
- * @param {string} username
- * @param {string} email
- * @param {string} password
- * @param {string} inviteCode
- * @returns {Promise<UserPublic>}
- */
-export async function registerApi(username, email, password, inviteCode, emailVerificationCode) {
-  const body = { username, email, password, invite_code: inviteCode }
-  if (emailVerificationCode) body.email_verification_code = emailVerificationCode
-
-  const res = await fetch(`${API_BASE}/auth/register`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  })
-
-  const data = await res.json()
-
+  const data = await readJsonResponse(res)
   if (!res.ok) {
-    throw new Error(data.detail || `HTTP ${res.status}`)
-  }
-
-  return data
-}
-
-/**
- * Request a 6-digit email verification code.
- * Validates the invite code server-side but does NOT consume it.
- *
- * @param {string} email
- * @param {string} inviteCode
- * @returns {Promise<{ ok: boolean, message: string, retry_after: number }>}
- */
-export async function requestEmailVerificationApi(email, inviteCode) {
-  const res = await fetch(`${API_BASE}/auth/email-verification/request`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, invite_code: inviteCode }),
-  })
-  const data = await res.json()
-  if (!res.ok) {
-    throw new Error(data.detail || `HTTP ${res.status}`)
+    const detail = data?.detail
+    const err = new Error((typeof detail === 'string' ? detail : detail?.message) || data?.message || '登录服务暂不可用，请稍后重试。')
+    err.status = res.status
+    err.errorCode = detail?.error_code || data?.error_code || null
+    throw err
   }
   return data
 }
 
-/**
- * Fetch current user info (requires valid access token).
- *
- * @param {string} accessToken
- * @returns {Promise<UserPublic>}  includes is_admin
- */
-export async function meApi(accessToken) {
-  const res = await fetch(`${API_BASE}/auth/me`, {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${accessToken}`,
-    },
+export function meApi(accessToken) {
+  return authFetch('/me', { headers: { Authorization: `Bearer ${accessToken}` } })
+}
+
+export function googleConfigApi(options = {}) {
+  return authFetch('/google/config', { cache: 'no-store', signal: options.signal })
+}
+
+export function googleLoginApi(credential, options = {}) {
+  return authFetch('/google', {
+    method: 'POST', signal: options.signal,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ credential }),
   })
+}
 
-  const data = await res.json()
-
-  if (!res.ok) {
-    throw new Error(data.detail || `HTTP ${res.status}`)
-  }
-
-  return data
+export function refreshApi(refreshToken, options = {}) {
+  return authFetch('/refresh', {
+    method: 'POST', signal: options.signal,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ refresh_token: refreshToken }),
+  })
 }

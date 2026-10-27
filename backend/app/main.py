@@ -64,6 +64,23 @@ async def lifespan(app: FastAPI):
         with open(_snap_path, "w") as _f:
             _json.dump(_shadow_snap, _f, indent=2)
         _log.info("pi_canary_runtime_snapshot written to %s", _snap_path)
+    # Phase R3.2: Pre-warm the Supabase/PgBouncer connection pool at startup.
+    # Supabase free-tier PgBouncer establishes server connections lazily; the first
+    # application query can take 8–15s while PgBouncer opens the PostgreSQL connection.
+    # Running two lightweight queries here pre-establishes those connections so the first
+    # real user request (report-chat fresh RAG) does not hit the cold-start penalty.
+    try:
+        from sqlalchemy import text as _text
+        from app.core.database import async_engine as _db_engine
+        import time as _time
+        _wt0 = _time.monotonic()
+        async with _db_engine.connect() as _wconn:
+            await _wconn.execute(_text("SELECT 1"))
+        async with _db_engine.connect() as _wconn2:
+            await _wconn2.execute(_text("SELECT 1"))
+        _log.info("db_connection_pool_warmed: %.0fms", (_time.monotonic() - _wt0) * 1000)
+    except Exception as _warm_exc:
+        _log.warning("db_connection_pool_warmup_failed (non-fatal): %s", _warm_exc)
     yield
     await close_redis()
 
@@ -71,7 +88,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title=settings.app_title,
     version=settings.app_version,
-    debug=settings.debug,
+    debug=(settings.debug and settings.app_env.lower() in {"dev", "development", "local"}),
     lifespan=lifespan,
 )
 
@@ -109,6 +126,16 @@ async def _http_exception_handler(request, exc: StarletteHTTPException):
         # Router already provided a structured payload — pass through unchanged
         payload = exc.detail
     return JSONResponse(payload, status_code=exc.status_code, headers=exc.headers)
+
+@app.exception_handler(Exception)
+async def _unexpected_exception_handler(request, exc: Exception):
+    import logging
+    logging.getLogger(__name__).error("Unhandled API error", exc_info=exc)
+    return JSONResponse(
+        {"detail": "服务暂时不可用，请稍后重试", "error_code": "INTERNAL_ERROR"},
+        status_code=500,
+    )
+
 
 # ── Phase 6V-P1.25: lightweight health endpoint for container healthcheck ─────
 @app.get("/health", include_in_schema=False)

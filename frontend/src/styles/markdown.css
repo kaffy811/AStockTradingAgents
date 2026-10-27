@@ -25,14 +25,14 @@
   font-size: 15px;
   font-weight: 700;
   margin: 22px 0 10px;
-  color: #a5b4fc;
+  color: var(--text);
 }
 
 .report-markdown h3 {
   font-size: 14px;
   font-weight: 600;
   margin: 14px 0 8px;
-  color: #93c5fd;
+  color: var(--text);
 }
 
 .report-markdown p {
@@ -50,7 +50,7 @@
 }
 
 .report-markdown strong {
-  color: #e2e8f0;
+  color: var(--text);
 }
 
 .report-markdown hr {

@@ -33,6 +33,12 @@
       </div>
       <div class="cv2-hero-right">
         <!-- Phase 6T-E1: 默认年度（上市以来）；季度懒加载（默认最近5年），已缓存不重复请求 -->
+        <label class="cv2-history-window">历史范围
+          <select v-model="historyWindow" @change="load(false)">
+            <option value="recent">近 5 年</option>
+            <option value="full">全部可用历史</option>
+          </select>
+        </label>
         <div class="cv2-period-tabs" data-testid="period-tabs">
           <button
             :class="['cv2-period-tab', periodTab === 'annual' && 'active']"
@@ -56,10 +62,10 @@
       <button class="cv2-retry" @click="load(true)">重试</button>
     </div>
     <template v-else>
-      <p v-if="loading" class="cv2-refreshing">正在刷新数据...</p>
+      <p v-if="loading && !pageTimedOut" class="cv2-refreshing">正在刷新数据...</p>
       <p v-if="refreshWarning" class="cv2-refresh-warning">{{ refreshWarning }}</p>
       <p v-if="pageTimedOut" class="cv2-refresh-warning">
-        加载超时，可重试。
+        部分数据加载超时，已保留已取得的资料；未返回模块可重试。
         <button class="cv2-inline-retry" @click="load(true)">重试</button>
       </p>
       <section v-if="historyUnavailable" class="cv2-module-notice" data-testid="history-unavailable">
@@ -159,6 +165,7 @@
 </template>
 
 <script setup>
+import { formatCompanyFact, historyEnvelope } from '../utils/companyPagePresentation.js'
 import { computed, onActivated, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getCompanyV2Eod, getCompanyV2FullDebug, refreshCompanyV2Debug, getCompanyV2History, getCompanyV2Profile } from '../api/companyV2.js'
@@ -187,6 +194,7 @@ const quoteError = ref('')
 const includeRaw = ref(false)
 // Phase 6T-E1: 默认年度（上市以来）；季度数据懒加载（后端默认最近5年）
 const periodTab = ref('annual')
+const historyWindow = ref('recent')
 const quarterlyHistoryData = ref(null)   // 懒加载缓存：切换股票时清空
 const quarterlyLoading = ref(false)
 const COMPANY_V2_SCHEMA_VERSION = 'phase6u-d3'
@@ -245,15 +253,14 @@ const eodFacts = computed(() => {
     return fact?.value === undefined || fact?.value === null ? [] : [{
       key: `${moduleKey}:${fieldKey}`,
       label,
-      value: fact.value,
-      unit: fact.unit,
+      ...formatCompanyFact(fact.value, fact.unit),
       asOf: fact.as_of,
     }]
   })
 })
 
 function cacheKey(period = periodTab.value || 'annual') {
-  return `${market.value}:${symbol.value}:${period}:${COMPANY_V2_SCHEMA_VERSION}`
+  return `${market.value}:${symbol.value}:${period}:${historyWindow.value}:${COMPANY_V2_SCHEMA_VERSION}`
 }
 
 function restoreCached(period = 'annual') {
@@ -290,11 +297,12 @@ async function switchToQuarterly() {
     return
   }
   quarterlyLoading.value = true
-  const seq = ++_loadSeq
+  const seq = _loadSeq
   const generation = `${market.value}:${symbol.value}:quarterly:${seq}`
   try {
     // 后端默认季度范围为最近 5 年；用户显式扩展时再传 start_year
-    const data = await getCompanyV2History(market.value, symbol.value, { period: 'quarterly' })
+    const data = await getCompanyV2History(market.value, symbol.value, { period: 'quarterly',
+      start_year: historyWindow.value === 'recent' ? new Date().getFullYear() - 4 : undefined })
     if (seq === _loadSeq && generation.startsWith(`${market.value}:${symbol.value}:quarterly:`)) {
       quarterlyHistoryData.value = data || null
       companyV2PageCache.set(cacheKey('quarterly'), {
@@ -334,11 +342,11 @@ const MODULE_ORDER = [
 const moduleEntries = computed(() => {
   const modules = debugData.value.modules || {}
   return MODULE_ORDER
-    .filter(key => key in modules && key !== 'report_rag')
+    .filter(key => (key in modules || key in displayHistoryModules.value) && key !== 'report_rag')
     .map(key => ({
       key,
       title: titles[key] || key,
-      envelope: modules[key],
+      envelope: modules[key] || historyEnvelope(displayHistoryModules.value[key]),
     }))
 })
 
@@ -384,9 +392,20 @@ async function load(force = false) {
   historyError.value = ''
   quoteError.value = ''
   pageTimedOut.value = false
-  _timeoutTimer = setTimeout(() => {
-    if (seq === _loadSeq && loading.value) pageTimedOut.value = true
-  }, 15000)
+  const requestTimeout = setTimeout(() => {
+    if (seq !== _loadSeq || !loading.value) return
+    pageTimedOut.value = true
+    loading.value = false
+    quarterlyLoading.value = false
+    historyError.value = Object.keys(historyData.value?.modules || {}).length ? '' : 'REQUEST_TIMEOUT'
+    companyV2PageCache.set(cacheKey('annual'), {
+      debugData: debugData.value, historyData: historyData.value,
+      stockBasic: stockBasic.value, eodData: eodData.value,
+    })
+    ++_loadSeq // Ignore late results even if an upstream ignores AbortSignal.
+    _abortController?.abort()
+  }, 30000)
+  _timeoutTimer = requestTimeout
   try {
     if (!restored) {
       debugData.value = {}
@@ -406,7 +425,9 @@ async function load(force = false) {
       }
       return data
     })
-    const historyPromise = getCompanyV2History(market.value, symbol.value, { period: 'annual', force_refresh: force, signal }).then(data => {
+    const historyPromise = getCompanyV2History(market.value, symbol.value, { period: 'annual',
+      start_year: historyWindow.value === 'recent' ? new Date().getFullYear() - 4 : undefined,
+      force_refresh: force, signal }).then(data => {
       if (seq === _loadSeq && requestGeneration.startsWith(`${market.value}:${symbol.value}:annual:`)) {
         historyData.value = data || {}
       }
@@ -481,7 +502,7 @@ async function load(force = false) {
     }
     emit('load-error', e)
   } finally {
-    if (_timeoutTimer) clearTimeout(_timeoutTimer)
+    clearTimeout(requestTimeout)
     if (seq === _loadSeq) loading.value = false
   }
 }
@@ -543,7 +564,10 @@ onUnmounted(() => {
 .cv2-price-value { font-size: 22px; font-weight: 700; color: #111827; }
 .cv2-non-realtime { font-size: 11px; color: #f59e0b; background: #fef3c7; padding: 1px 5px; border-radius: 3px; }
 .cv2-price-source { font-size: 11px; color: #9ca3af; }
-.cv2-hero-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.cv2-history-window { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #6b7280; }
+.cv2-history-window select { padding: 5px; border: 1px solid #e5e7eb; border-radius: 6px; background: white; color: #374151; }
+.cv2-hero-right { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 10px; max-width: 100%; }
+@media (max-width: 720px) { .cv2-hero { flex-wrap: wrap; } .cv2-hero-right { justify-content: flex-start; } }
 .cv2-history-range { margin: 4px 0 0; font-size: 12px; color: #6b7280; }
 .cv2-range-truncated { color: #92400e; }
 .cv2-period-tabs { display: inline-flex; border: 1px solid #d1d5db; border-radius: 8px; overflow: clip; }
@@ -575,7 +599,8 @@ onUnmounted(() => {
 .cv2-eod-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)); gap: 10px; }
 .cv2-eod-item { display: grid; gap: 3px; padding: 10px; background: #f9fafb; border-radius: 8px; }
 .cv2-eod-item span, .cv2-eod-item small { color: #6b7280; font-size: 11px; }
-.cv2-eod-item strong { font-size: 16px; color: #111827; }
+.cv2-eod-item strong { font-size: 18px; color: #111827; font-variant-numeric: tabular-nums; }
+.cv2-eod-item strong small { margin-left: 4px; font-weight: 400; }
 .cv2-skeleton-section {
   background: #fff;
   border: 1px solid #e5e7eb;

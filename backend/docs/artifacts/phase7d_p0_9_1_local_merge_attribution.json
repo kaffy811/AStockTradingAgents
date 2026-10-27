@@ -1,0 +1,93 @@
+{
+  "phase": "7D-P0.9.1",
+  "decision": "LOCAL_MERGE_REMEDIATION_READY",
+  "read_only": true,
+  "first_failed_gate": {
+    "name": "STOP_ON_MERGE_CONFLICT",
+    "command": "git merge --no-ff --no-edit -m \"merge(release): integrate company data and stock research\" 4434fc60feb652a7806d286f54c2175b979cbb4b",
+    "exit_code": 1,
+    "error": "Auto-merging backend/app/agents/chat_orchestrator.py\nCONFLICT (content): Merge conflict in backend/app/agents/chat_orchestrator.py\nAutomatic merge failed; fix conflicts and then commit the result.",
+    "conflict_files": ["backend/app/agents/chat_orchestrator.py"]
+  },
+  "identities": {
+    "current_branch": "release/demo-staging",
+    "current_head": "98c111b684cb19de0e0e92cb46e1d675ef3e8d0a",
+    "current_tree": "24a9961639dd7d8388fe8353a6e2e7eb8b955f03",
+    "target_branch": "release/demo-staging",
+    "target_head": "98c111b684cb19de0e0e92cb46e1d675ef3e8d0a",
+    "target_tree": "24a9961639dd7d8388fe8353a6e2e7eb8b955f03",
+    "candidate": "4434fc60feb652a7806d286f54c2175b979cbb4b",
+    "candidate_tree": "24a9961639dd7d8388fe8353a6e2e7eb8b955f03",
+    "current_tree_matches_candidate": true
+  },
+  "candidate_diff": {"files": 23, "insertions": 2153, "deletions": 20, "diff_check": "pass"},
+  "conflict_reproduction": {
+    "command": "git merge-tree --write-tree c4a506c0c2fdcf985d779f005788f4059066605a 4434fc60feb652a7806d286f54c2175b979cbb4b",
+    "exit_code": 1,
+    "conflict_files": ["backend/app/agents/chat_orchestrator.py"],
+    "resolved_in_p0_9_1": false
+  },
+  "worktree_status_before_artifacts": {
+    "tracked_unstaged_count": 6,
+    "tracked_unstaged": [
+      "HKNA/update_report/update_142.md",
+      "backend/Dockerfile",
+      "backend/app/main.py",
+      "backend/app/services/report_embedding_provider.py",
+      "backend/pyproject.toml",
+      "backend/uv.lock"
+    ],
+    "untracked_count": 109,
+    "staged_count": 0,
+    "p0_9_artifacts": [
+      "backend/docs/artifacts/phase7d_p0_9_local_release_integration.md",
+      "backend/docs/artifacts/phase7d_p0_9_local_release_manifest.json",
+      "HKNA/update_report/update_139.md"
+    ],
+    "p0_9_1_artifacts_added_untracked": [
+      "backend/docs/artifacts/phase7d_p0_9_1_local_merge_attribution.md",
+      "backend/docs/artifacts/phase7d_p0_9_1_local_merge_attribution.json",
+      "HKNA/update_report/update_147.md"
+    ]
+  },
+  "isolated_candidate_worktree": {
+    "path": "/private/tmp/phase7d_p0_9_1_candidate",
+    "detached": true,
+    "head": "4434fc60feb652a7806d286f54c2175b979cbb4b",
+    "tree": "24a9961639dd7d8388fe8353a6e2e7eb8b955f03",
+    "clean": true,
+    "branch_pointer_changed": false
+  },
+  "scope_checks": {
+    "docker": false,
+    "dependencies": false,
+    "lockfiles": false,
+    "migrations": false,
+    "credential_values": false,
+    "provider_configuration": false,
+    "tushare_news": false,
+    "public_scraping_provider_calls": false,
+    "global_rag_numeric_validator": false,
+    "scope_pollution": false
+  },
+  "root_cause": "PARALLEL_CONTENT_EQUIVALENT_REPLAY_HISTORY_CONFLICT",
+  "candidate_corrupt": false,
+  "dirty_worktree_caused_conflict": false,
+  "minimal_remediation": {
+    "preferred": "Owner explicitly accepts existing local merge commit 98c111b; no Git mutation required.",
+    "alternative_requires_new_authority": "Repair branch pointer and recreate integration in an isolated clean worktree.",
+    "push_or_deploy_allowed": false
+  },
+  "operations_performed": {
+    "code_change": false,
+    "commit": false,
+    "branch_pointer_change": false,
+    "push": false,
+    "merge": false,
+    "deployment": false,
+    "docker_build": false,
+    "migration": false,
+    "rollout": false,
+    "reset_checkout_clean_stash": false
+  }
+}

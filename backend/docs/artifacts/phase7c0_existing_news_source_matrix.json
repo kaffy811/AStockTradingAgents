@@ -1,0 +1,160 @@
+{
+  "phase": "7C0",
+  "audit_date": "2026-09-01",
+  "mode": "static_read_only",
+  "live_provider_calls": false,
+  "overall_status": "EXISTING_NEWS_SOURCE_APPROVAL_REQUIRED",
+  "sources": [
+    {
+      "source_id": "cninfo_official_announcements_reports",
+      "classification": "approved",
+      "provider": "CNINFO",
+      "upstream_hosts": ["www.cninfo.com.cn", "static.cninfo.com.cn"],
+      "scope": ["official_announcement", "periodic_report"],
+      "requires_symbol": true,
+      "supports_industry_or_topic": false,
+      "persistent_snapshot": true,
+      "snapshot_store": "report_documents",
+      "fields": {
+        "title": true,
+        "published_at": "announcement_date/disclosure_date",
+        "source_name": true,
+        "source_url": true,
+        "match_basis": "symbol/ts_code plus official query",
+        "unique_id": "upstream announcementId; persisted database id",
+        "as_of": false,
+        "terms_status": false
+      },
+      "production_fact_output": true,
+      "restriction": "Official announcement/report facts only; not a general news source",
+      "evidence": [
+        "backend/app/datasource/cninfo_provider.py:270-349",
+        "backend/app/datasource/cninfo_provider.py:373-455",
+        "backend/app/services/report_document_service.py:43-144",
+        "backend/app/models/report_document.py:14-47"
+      ]
+    },
+    {
+      "source_id": "tushare_forecast_express",
+      "classification": "owner_review_required",
+      "provider": "Tushare Pro",
+      "upstream_hosts": [],
+      "scope": ["earnings_forecast", "earnings_express"],
+      "requires_symbol": true,
+      "supports_industry_or_topic": false,
+      "persistent_snapshot": false,
+      "fields": {
+        "title": "partial/type and summary",
+        "published_at": "ann_date",
+        "source_name": true,
+        "source_url": false,
+        "match_basis": "ts_code",
+        "unique_id": false,
+        "as_of": false,
+        "terms_status": false
+      },
+      "production_fact_output": false,
+      "restriction": "Contract or Owner written approval required; cannot replace original announcement",
+      "evidence": [
+        "backend/app/tools/fundamental/announcements.py:18-82",
+        "backend/app/datasource/tushare_client.py:541-559"
+      ]
+    },
+    {
+      "source_id": "akshare_eastmoney_news_search",
+      "classification": "research_only",
+      "provider": "AKShare stock_news_em over Eastmoney public web search",
+      "upstream_hosts": ["search-api-web.eastmoney.com", "finance.eastmoney.com"],
+      "scope": ["stock_keyword_news", "industry_keyword_news", "topic_keyword_news", "market_keyword_news"],
+      "requires_symbol": "stock endpoint yes; keyword tools no",
+      "supports_industry_or_topic": "keyword matching only, not classified coverage",
+      "persistent_snapshot": false,
+      "cache": "stock path Redis/in-memory TTL only; keyword paths live without cache",
+      "fields": {
+        "title": true,
+        "published_at": true,
+        "source_name": true,
+        "source_url": "missing in UniversalMarketSearchTool news mode",
+        "match_basis": "input keyword only; no returned entity/industry evidence",
+        "unique_id": false,
+        "as_of": false,
+        "terms_status": false
+      },
+      "production_fact_output": false,
+      "restriction": "May be used only to discover research leads; never emit as final-user news fact",
+      "entrypoints": [
+        "GET /api/v1/stocks/{market}/{symbol}/news",
+        "POST /api/v1/analysis/news",
+        "POST /api/v1/chat/sessions/{session_id}/messages"
+      ],
+      "evidence": [
+        "backend/app/data/providers/news_provider.py:90-153",
+        "backend/app/services/news_data_service.py:166-260",
+        "backend/app/agents/chat_tools/industry_tools.py:159-240",
+        "backend/app/agents/chat_tools/realtime_search_tools.py:34-202",
+        "backend/.venv/lib/python3.12/site-packages/akshare/news/news_stock.py:15-118"
+      ]
+    },
+    {
+      "source_id": "akshare_eastmoney_market_heat",
+      "classification": "research_only",
+      "provider": "AKShare over Eastmoney public data endpoints",
+      "scope": ["concept_board", "industry_rank", "fund_flow", "hot_stock_rank"],
+      "requires_symbol": false,
+      "supports_industry_or_topic": true,
+      "persistent_snapshot": "industry hot ranking may be persisted separately; not a news snapshot",
+      "production_fact_output": false,
+      "restriction": "Research lead/market heat only; never label as news",
+      "evidence": [
+        "backend/app/agents/chat_tools/realtime_search_tools.py:204-358",
+        "backend/app/models/industry_hot_stock.py:16-64",
+        "backend/app/services/industry_hot_stock_service.py:102-210"
+      ]
+    },
+    {
+      "source_id": "tushare_news",
+      "classification": "disabled",
+      "provider": "Tushare Pro",
+      "scope": ["news"],
+      "implementation_found": false,
+      "current_status": "permission_denied",
+      "production_fact_output": false,
+      "restriction": "Do not purchase or integrate in Phase 7C0"
+    },
+    {
+      "source_id": "finnhub_news",
+      "classification": "disabled",
+      "provider": "Finnhub",
+      "scope": ["news"],
+      "implementation_found": false,
+      "production_fact_output": false,
+      "restriction": "No adapter, contract, provenance fields, or approved runtime chain found"
+    },
+    {
+      "source_id": "sina_tencent_news",
+      "classification": "disabled",
+      "provider": "Sina/Tencent",
+      "scope": ["news"],
+      "implementation_found": false,
+      "production_fact_output": false,
+      "restriction": "Existing Sina/Tencent code is quote/fundamental related, not a news source"
+    },
+    {
+      "source_id": "universal_market_search_news_output",
+      "classification": "disabled",
+      "provider": "AKShare/Eastmoney",
+      "scope": ["keyword_news"],
+      "implementation_found": true,
+      "production_fact_output": false,
+      "restriction": "Drops source URL and lacks id/as_of/terms/match evidence",
+      "evidence": ["backend/app/agents/chat_tools/realtime_search_tools.py:168-202"]
+    }
+  ],
+  "required_runtime_policy": {
+    "stock_news": "unavailable_for_production_facts; research leads only",
+    "industry_news": "unavailable",
+    "topic_supply_chain_research": "unavailable_for_news_facts; keyword co-occurrence is not relationship evidence",
+    "market_news": "unavailable",
+    "official_announcement_event": "available via approved CNINFO only"
+  }
+}

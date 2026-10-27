@@ -1,0 +1,118 @@
+{
+  "phase": "6W-R3.3A",
+  "baseline": {
+    "head": "9c65027eeef5d599ae13083affc926497a4d2432",
+    "branch": "release/demo-staging",
+    "traffic": "HOLD_1_PERCENT",
+    "runtime_representativeness": "NON-RELEASE-REPRESENTATIVE"
+  },
+  "population": {
+    "requests": 14,
+    "token_occurrences": 42,
+    "original_complete_s0_s8": 0,
+    "new_runtime_supplements_attempted_once": 14,
+    "classification_basis": "Original observation retained S8 error tokens but not answer/S3-S7. Supplements are auxiliary and never substituted for original snapshots."
+  },
+  "classification_counts": {
+    "D1_COMPACTOR_OMISSION": 0,
+    "D2_RETRIEVAL_COVERAGE_GAP": 0,
+    "D3_CITATION_METADATA_LEAK": 0,
+    "D4_UNSUPPORTED_FINANCIAL_CLAIM": 0,
+    "D5_DATE_PERIOD_UNIT_OR_FORMAT_MISMATCH": 0,
+    "D6_STRUCTURED_FACTS_EVIDENCE_VERSION_MISMATCH": 0,
+    "D7_OTHER_NON_FINANCIAL_METADATA": 0,
+    "UNCONFIRMED": 42
+  },
+  "common_original_evidence": {
+    "answer_sentence": null,
+    "answer_sentence_reason": "Not persisted by the R3.2D observation runner and not recoverable from backend logs or existing artifacts.",
+    "first_introduced_stage": "UNCONFIRMED",
+    "earliest_preserved_stage": "S8",
+    "user_visible": "UNCONFIRMED",
+    "evidence_coverage": "UNCONFIRMED",
+    "direct_evidence": "R3.2D observation S8 errors contains UNSUPPORTED_NUMBERS; original S3-S7 and answer are absent.",
+    "confidence": "LOW_FOR_PROVENANCE_HIGH_FOR_INVALID_EVENT"
+  },
+  "requests": [
+    {
+      "run": "W2", "observation_request_id": "b1c9e518", "query": "请基于贵州茅台2024年报概括核心经营表现（R3.2D观察基准）。", "selected_report_id": 17, "selected_report_year": 2024, "final_status": "partial_success",
+      "tokens": [
+        {"token":"12","occurrence":1,"classification":"UNCONFIRMED"},{"token":"2","occurrence":1,"classification":"UNCONFIRMED"},{"token":"-1,275.96","occurrence":1,"classification":"UNCONFIRMED"},{"token":"15%","occurrence":1,"classification":"UNCONFIRMED"}
+      ],
+      "supplement": {"request_id":"ca3f33bb","status":"partial_success","unsupported":["2","15%","2"],"d3_prompt_raw_id":false,"d3_answer_raw_id":false,"citation_labels":["E1","E4"]}
+    },
+    {
+      "run": "W5", "observation_request_id": "be143efa", "query": "请基于贵州茅台2024年报概括核心经营表现（R3.2D观察基准）。", "selected_report_id": 17, "selected_report_year": 2024, "final_status": "partial_success",
+      "tokens": [{"token":"2,726.99","occurrence":1,"classification":"UNCONFIRMED"}],
+      "supplement": {"request_id":"e1b7eec2","status":"partial_success","unsupported":[],"d3_prompt_raw_id":false,"d3_answer_raw_id":false,"citation_labels":["E1","E4","E6"]}
+    },
+    {
+      "run": "W6", "observation_request_id": "8d207e5c", "query": "请基于贵州茅台2024年报概括核心经营表现（R3.2D观察基准）。", "selected_report_id": 17, "selected_report_year": 2024, "final_status": "partial_success",
+      "tokens": [{"token":"12","occurrence":1,"classification":"UNCONFIRMED"},{"token":"2","occurrence":1,"classification":"UNCONFIRMED"},{"token":"15%","occurrence":1,"classification":"UNCONFIRMED"}],
+      "supplement": {"request_id":"8ad8dcf2","status":"completed","unsupported":[],"d3_prompt_raw_id":false,"d3_answer_raw_id":false,"citation_labels":["E1","E4"]}
+    },
+    {
+      "run": "C2", "observation_request_id": "3b291b2d", "query": "贵州茅台2024年盈利能力和现金流如何（冷合成样本二）？", "selected_report_id": 17, "selected_report_year": 2024, "final_status": "partial_success",
+      "tokens": [{"token":"12","occurrence":1,"classification":"UNCONFIRMED"},{"token":"31","occurrence":1,"classification":"UNCONFIRMED"}],
+      "supplement": {"request_id":"33f1be00","status":"partial_success","unsupported":[],"termination":"LLM timeout after S6 capture","d3_prompt_raw_id":false,"d3_answer_raw_id":false,"citation_labels":["E3","E5","E6","E6"]}
+    },
+    {
+      "run": "Y3", "observation_request_id": "53d32a61", "query": "贵州茅台2024年年度报告", "selected_report_id": 17, "selected_report_year": 2024, "final_status": "partial_success",
+      "tokens": [{"token":"2","occurrence":1,"classification":"UNCONFIRMED"},{"token":"-1275.96","occurrence":1,"classification":"UNCONFIRMED"},{"token":"15%","occurrence":1,"classification":"UNCONFIRMED"},{"token":"-1275.96","occurrence":2,"classification":"UNCONFIRMED"}],
+      "supplement": {"request_id":"f8ed8fb8","status":"completed","unsupported":[],"d3_prompt_raw_id":false,"d3_answer_raw_id":false,"citation_labels":["E1","E3","E4","E6"]}
+    },
+    {
+      "run": "Y4", "observation_request_id": "9ca90af7", "query": "茅台2025年业绩", "selected_report_id": 2, "selected_report_year": 2025, "final_status": "partial_success",
+      "tokens": [{"token":"1.21%","occurrence":1,"classification":"UNCONFIRMED"},{"token":"4.53%","occurrence":1,"classification":"UNCONFIRMED"},{"token":"4.34%","occurrence":1,"classification":"UNCONFIRMED"},{"token":"33.46%","occurrence":1,"classification":"UNCONFIRMED"}],
+      "supplement": {"request_id":"d38677b7","status":"partial_success","unsupported":["1.21%","4.53%","33.46%","1.21%","4.08%"],"d3_prompt_raw_id":false,"d3_answer_raw_id":false,"citation_labels":["E2","E5"]}
+    },
+    {
+      "run": "R3", "observation_request_id": "a167c86d", "query": "2024年贵州茅台资产负债结构如何？", "selected_report_id": 17, "selected_report_year": 2024, "final_status": "partial_success",
+      "tokens": [{"token":"12","occurrence":1,"classification":"UNCONFIRMED"}],
+      "supplement": {"request_id":"a4195022","status":"completed","unsupported":[],"d3_prompt_raw_id":false,"d3_answer_raw_id":false,"citation_labels":[]}
+    },
+    {
+      "run": "F1", "observation_request_id": "a50ca0bc", "query": "贵州茅台2025年报营收、利润和现金流表现如何？", "selected_report_id": 2, "selected_report_year": 2025, "final_status": "partial_success",
+      "tokens": [{"token":"1.21%","occurrence":1,"classification":"UNCONFIRMED"},{"token":"4.08%","occurrence":1,"classification":"UNCONFIRMED"},{"token":"4.53%","occurrence":1,"classification":"UNCONFIRMED"},{"token":"33.46%","occurrence":1,"classification":"UNCONFIRMED"},{"token":"-01","occurrence":1,"classification":"UNCONFIRMED"}],
+      "supplement": {"request_id":"89d609d9","status":"partial_success","unsupported":["1.21%","4.08%","4.53%","33.46%","4.34%"],"d3_prompt_raw_id":false,"d3_answer_raw_id":false,"citation_labels":["E5"]}
+    },
+    {
+      "run": "G1", "observation_request_id": "ef099d5c", "query": "请基于贵州茅台2024年报概括核心经营表现（R3.2D观察基准）。", "selected_report_id": 17, "selected_report_year": 2024, "final_status": "partial_success",
+      "tokens": [{"token":"6","occurrence":1,"classification":"UNCONFIRMED"},{"token":"2","occurrence":1,"classification":"UNCONFIRMED"}],
+      "supplement": {"request_id":"46ecbee7","status":"partial_success","unsupported":["15%","-0.13","2"],"d3_prompt_raw_id":false,"d3_answer_raw_id":false,"citation_labels":["E1","E3","E4","E6"]}
+    },
+    {
+      "run": "G2", "observation_request_id": "4249ea53", "query": "请基于贵州茅台2024年报概括核心经营表现（R3.2D观察基准）。", "selected_report_id": 17, "selected_report_year": 2024, "final_status": "partial_success",
+      "tokens": [{"token":"12","occurrence":1,"classification":"UNCONFIRMED"},{"token":"2","occurrence":1,"classification":"UNCONFIRMED"},{"token":"2","occurrence":2,"classification":"UNCONFIRMED"}],
+      "supplement": {"request_id":"8cb17144","status":"partial_success","unsupported":[],"termination":"empty LLM response","d3_prompt_raw_id":false,"d3_answer_raw_id":false,"citation_labels":[]}
+    },
+    {
+      "run": "G3", "observation_request_id": "cbde38fc", "query": "请基于贵州茅台2024年报概括核心经营表现（R3.2D观察基准）。", "selected_report_id": 17, "selected_report_year": 2024, "final_status": "partial_success",
+      "tokens": [{"token":"12","occurrence":1,"classification":"UNCONFIRMED"},{"token":"2,726.00","occurrence":1,"classification":"UNCONFIRMED"},{"token":"2","occurrence":1,"classification":"UNCONFIRMED"}],
+      "supplement": {"request_id":"91204159","status":"partial_success","unsupported":[],"termination":"empty LLM response","d3_prompt_raw_id":false,"d3_answer_raw_id":false,"citation_labels":[]}
+    },
+    {
+      "run": "G6", "observation_request_id": "067b2be3", "query": "请基于贵州茅台2024年报概括核心经营表现（R3.2D观察基准）。", "selected_report_id": 17, "selected_report_year": 2024, "final_status": "partial_success",
+      "tokens": [{"token":"1709.0","occurrence":1,"classification":"UNCONFIRMED"},{"token":"862.3","occurrence":1,"classification":"UNCONFIRMED"},{"token":"12","occurrence":1,"classification":"UNCONFIRMED"},{"token":"2","occurrence":1,"classification":"UNCONFIRMED"},{"token":"2726.99","occurrence":1,"classification":"UNCONFIRMED"}],
+      "supplement": {"request_id":"61d2ecd0","status":"partial_success","unsupported":["12","15%"],"d3_prompt_raw_id":false,"d3_answer_raw_id":false,"citation_labels":["E1","E4","E6"]}
+    },
+    {
+      "run": "G7", "observation_request_id": "6a97fbf6", "query": "请基于贵州茅台2024年报概括核心经营表现（R3.2D观察基准）。", "selected_report_id": 17, "selected_report_year": 2024, "final_status": "partial_success",
+      "tokens": [{"token":"-01","occurrence":1,"classification":"UNCONFIRMED"},{"token":"-01","occurrence":2,"classification":"UNCONFIRMED"},{"token":"-0.13","occurrence":1,"classification":"UNCONFIRMED"}],
+      "supplement": {"request_id":"ebf84916","status":"partial_success","unsupported":["2","-1","275.96"],"d3_prompt_raw_id":false,"d3_answer_raw_id":false,"citation_labels":["E1","E4","E6"]}
+    },
+    {
+      "run": "G9", "observation_request_id": "8b761b0d", "query": "请基于贵州茅台2024年报概括核心经营表现（R3.2D观察基准）。", "selected_report_id": 17, "selected_report_year": 2024, "final_status": "partial_success",
+      "tokens": [{"token":"2","occurrence":1,"classification":"UNCONFIRMED"},{"token":"-1,275.96","occurrence":1,"classification":"UNCONFIRMED"}],
+      "supplement": {"request_id":"6c142357","status":"report_selection_failed","unsupported":[],"d3_prompt_raw_id":false,"d3_answer_raw_id":false,"citation_labels":[]}
+    }
+  ],
+  "d3_regression": {
+    "original_observations": "UNCONFIRMED because prompts and answers were not persisted",
+    "new_runtime_supplements": "0 confirmed leaks across 14 one-time attempts",
+    "prompt_internal_field_or_table_hits": 0,
+    "answer_raw_id_with_citation_context_hits": 0,
+    "citation_labels": "E1..En only when emitted",
+    "production_gate_reported_true": 0
+  }
+}

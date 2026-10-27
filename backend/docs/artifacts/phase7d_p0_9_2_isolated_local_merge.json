@@ -1,0 +1,65 @@
+{
+  "phase": "7D-P0.9.2",
+  "decision": "HOLD_WITH_EVIDENCE",
+  "first_failed_gate": {
+    "name": "RELEASE_IS_ANCESTOR_OF_CANDIDATE",
+    "command": "git -C /private/tmp/phase7d_p0_9_2_isolated merge-base --is-ancestor release/demo-staging 4434fc60feb652a7806d286f54c2175b979cbb4b",
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": ""
+  },
+  "authorized_merge_command_executed": false,
+  "identities": {
+    "isolated_worktree": "/private/tmp/phase7d_p0_9_2_isolated",
+    "isolated_worktree_clean": true,
+    "isolated_start_head": "98c111b684cb19de0e0e92cb46e1d675ef3e8d0a",
+    "release_head": "98c111b684cb19de0e0e92cb46e1d675ef3e8d0a",
+    "release_tree": "24a9961639dd7d8388fe8353a6e2e7eb8b955f03",
+    "candidate_head": "4434fc60feb652a7806d286f54c2175b979cbb4b",
+    "candidate_tree": "24a9961639dd7d8388fe8353a6e2e7eb8b955f03"
+  },
+  "ancestry": {
+    "baseline_is_candidate_ancestor": true,
+    "release_is_candidate_ancestor": false,
+    "candidate_is_release_ancestor": true,
+    "candidate_is_direct_second_parent_of_release": true
+  },
+  "content": {
+    "release_tree_matches_candidate": true,
+    "candidate_to_release_file_diff": false,
+    "scope_changed_in_phase": false
+  },
+  "main_worktree_before_artifacts": {
+    "tracked_unstaged_or_mixed": 6,
+    "untracked": 112,
+    "staged": 0
+  },
+  "main_worktree_after_artifacts_expected": {
+    "tracked_unstaged_or_mixed": 6,
+    "untracked": 115,
+    "staged": 0,
+    "note": "The increase is exactly the three required untracked P0.9.2 records; all original 112 untracked files remain."
+  },
+  "operations_performed": {
+    "branch_pointer_change": false,
+    "merge": false,
+    "rebase": false,
+    "cherry_pick": false,
+    "reset": false,
+    "checkout": false,
+    "stash": false,
+    "clean": false,
+    "push": false,
+    "remote_server_connection": false,
+    "deployment": false,
+    "docker_build": false,
+    "migration": false,
+    "traffic_expansion": false,
+    "business_code_change": false,
+    "live_provider_call": false
+  },
+  "owner_decision_required": [
+    "Accept existing local merge commit 98c111b for deploy review",
+    "Or separately authorize a non-fast-forward local branch-pointer repair/recreation"
+  ]
+}

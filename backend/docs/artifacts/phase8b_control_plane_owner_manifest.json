@@ -1,0 +1,110 @@
+{
+  "phase": "8B",
+  "title": "Financial AI OS Control Plane Owner Release Review",
+  "conclusion": "HOLD_WITH_EVIDENCE",
+  "baseline": "dbf2073eb06a4206dea604a7156acae461c6bb35",
+  "candidate": {
+    "sha": "c6f440d252cf6e61a65581807539030189416af1",
+    "parent": "dbf2073eb06a4206dea604a7156acae461c6bb35",
+    "tree": "c8d05243c2f0ace8139263bbda4fa66175b8c680",
+    "worktree_clean": true,
+    "baseline_is_ancestor": true
+  },
+  "diff": {
+    "files": 19,
+    "insertions": 929,
+    "deletions": 22,
+    "diff_check": "passed",
+    "paths": [
+      "HKNA/update_report/update_169.md",
+      "backend/app/agents/chat_orchestrator.py",
+      "backend/app/agents/financial_os_control_plane.py",
+      "backend/app/routers/chat.py",
+      "backend/docs/artifacts/phase8a_control_plane_foundation.md",
+      "backend/docs/artifacts/phase8a_control_plane_runtime.json",
+      "backend/tests/test_c4_orchestrator.py",
+      "backend/tests/test_c5_action_tools.py",
+      "backend/tests/test_c7_orchestrator_integration.py",
+      "backend/tests/test_phase8a_control_plane_foundation.py",
+      "frontend/src/components/chat/ChatConfirmationCard.vue",
+      "frontend/src/locales/en-US.js",
+      "frontend/src/locales/es-ES.js",
+      "frontend/src/locales/ja-JP.js",
+      "frontend/src/locales/ko-KR.js",
+      "frontend/src/locales/zh-CN.js",
+      "frontend/src/locales/zh-TW.js",
+      "frontend/src/tests/phase8aActionStates.test.js",
+      "frontend/src/views/ChatCopilotView.vue"
+    ],
+    "forbidden_scope_changes": []
+  },
+  "first_failure": {
+    "gate": "ACTION_VERIFICATION_TRUST_BINDING",
+    "command": "PYTHONPATH=/private/tmp/phase8a_control_plane.JVkfLE/worktree/backend /Users/kaffy/Documents/TradingAgents/backend/.venv/bin/python /private/tmp/phase8b_control_plane_audit.py",
+    "exit_code": 0,
+    "failure_condition": "A forged actor/workspace plan with arbitrary market and symbol passed verification and returned succeeded in a controlled fake repository.",
+    "observed": {
+      "forged_verification_valid": true,
+      "forged_execution_status": "succeeded",
+      "controlled_repository_add_calls": 1
+    }
+  },
+  "security_matrix": {
+    "unauthenticated_write": "passed_fail_closed",
+    "unknown_capability": "passed",
+    "unconfirmed_write": "passed",
+    "duplicate_idempotency_key": "passed",
+    "cross_workspace_undo": "passed",
+    "forged_identity_binding": "failed",
+    "arbitrary_parameters": "failed",
+    "prompt_injection_exact_case": "failed",
+    "ambiguous_entity_clarification": "failed"
+  },
+  "state_and_observability": {
+    "status_contract": "failed_proposal_vs_proposed_and_cancelled_missing",
+    "explicit_no_data_modified_failure_message": false,
+    "trace_id_end_to_end": false,
+    "plan_id_distinct": false,
+    "masked_actor_workspace_audit": false,
+    "public_secret_leak_observed": false
+  },
+  "recorded_validation": {
+    "backend_new": "16 passed",
+    "backend_related": "112 passed, 1 unrelated pre-existing industry test deselected",
+    "frontend_targeted": "9 passed",
+    "frontend_full": "71 files, 778 passed, maxWorkers=1, no worker timeout",
+    "frontend_production_build": "passed",
+    "python_compile": "passed",
+    "json_validation": "passed",
+    "secret_scan": "passed",
+    "git_diff_check": "passed",
+    "provider_calls": 0,
+    "llm_calls": 0,
+    "coverage_gap": [
+      "exact prompt injection rejection",
+      "trusted actor/workspace binding",
+      "arbitrary parameter rejection",
+      "ambiguous entity clarification"
+    ]
+  },
+  "pure_image": {
+    "status": "missing",
+    "gate": "PURE_IMAGE_IDENTITY_EVIDENCE_MISSING",
+    "linux_amd64_verified": false,
+    "oci_revision_verified": false,
+    "mounts_empty_verified": false,
+    "image_secret_scan_verified": false,
+    "source_hash_verified": false
+  },
+  "operations": {
+    "candidate_code_modified": false,
+    "commit_amended": false,
+    "pushed": false,
+    "merged": false,
+    "deployed": false,
+    "migration": false,
+    "services_restarted": false,
+    "resources_cleaned": false,
+    "traffic_scaled": false
+  }
+}

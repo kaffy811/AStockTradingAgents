@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     app_env: str = "development"
     app_title: str = "TradingAgents API"
     app_version: str = "1.1.0-free-rc1"
-    debug: bool = True
+    debug: bool = False
     cors_origins: list[str] = [
         "http://localhost:3000",
         "http://localhost:3001",
@@ -29,14 +29,31 @@ class Settings(BaseSettings):
         "http://127.0.0.1:5174",
     ]
 
+    # Google Identity Services (Web OAuth client ID; no client secret needed).
+    google_client_id: str = ""
+
+    report_reader_mode: str = "beginner"  # beginner | standard
+
+    # Bound report synthesis independently from per-request SDK timeouts.
+    analysis_synthesis_timeout_seconds: float = Field(default=60.0, gt=0, le=300)
+
+    # Google-only authentication limits: atomic Redis counters, fail closed.
+    auth_google_nonce_per_minute: int = Field(default=20, gt=0, le=10000)
+    auth_google_login_ip_per_minute: int = Field(default=15, gt=0, le=10000)
+    auth_google_login_sub_per_minute: int = Field(default=10, gt=0, le=10000)
+    auth_google_register_ip_per_hour: int = Field(default=5, gt=0, le=10000)
+    auth_refresh_ip_per_minute: int = Field(default=30, gt=0, le=10000)
+    auth_refresh_user_per_minute: int = Field(default=20, gt=0, le=10000)
+
     # LLM
     llm_provider: str = "deepseek"
     deepseek_api_key: str | None = None
+    deepseek_analysis_max_tokens: int = Field(default=4096, ge=128, le=16384)
     deepseek_base_url: str = "https://api.deepseek.com"
-    deepseek_default_model: str = "deepseek-v4-flash"
+    deepseek_default_model: str = "deepseek-flash"
     deepseek_pro_model: str = "deepseek-v4-pro"
-    deepseek_reasoner_model: str = "deepseek-reasoner"  # C32: R1-series reasoning model
-    deepseek_model: str = "deepseek-v4-flash"
+    deepseek_reasoner_model: str = "deepseek-flash"  # C32: R1-series reasoning model
+    deepseek_model: str = "deepseek-flash"
     openai_api_key: str | None = None
     # C32: When True, FinancialAgent uses deepseek-reasoner for streaming responses.
     # The model produces reasoning_content (思维链) which the frontend displays in
@@ -321,7 +338,7 @@ class Settings(BaseSettings):
     mvp_max_concurrent_per_user: int = 1
 
     # Access control
-    mvp_public_registration_enabled: bool = False   # MUST remain False for invite-only
+    mvp_public_registration_enabled: bool = False   # Deprecated: Google-only admission ignores legacy invite flags
     mvp_new_invites_enabled: bool = True
     mvp_new_login_enabled: bool = True
     mvp_new_chat_enabled: bool = True
@@ -342,7 +359,7 @@ class Settings(BaseSettings):
     email_from: str = "noreply@tradingagents.ai"
     email_api_key: str | None = None
     email_verification_ttl_seconds: int = 600   # 10 minutes
-    # Set True in production to require email verification on register
+    # Legacy password registration is retired; retained for rollback/tools.
     email_verification_required: bool = False
     # HMAC-SHA256 secret for verification code hashing.
     # MUST be set to a random 32+ byte value in staging/production.

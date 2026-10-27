@@ -1,0 +1,88 @@
+{
+  "phase": "7D-P0.10",
+  "decision": "OWNER_COMMERCIAL_AUTHORIZATION_REQUIRED",
+  "release": {
+    "branch": "release/demo-staging",
+    "head": "98c111b684cb19de0e0e92cb46e1d675ef3e8d0a",
+    "tree": "24a9961639dd7d8388fe8353a6e2e7eb8b955f03",
+    "local_integration_accepted": true,
+    "push_performed": false,
+    "deployment_performed": false
+  },
+  "technical_gates": {
+    "anonymous_company_history_allowlist": "pass",
+    "company_module_failure_isolation": "pass",
+    "tushare_eod_quote_valuation_financials": "pass",
+    "request_local_numeric_evidence_validation": "pass",
+    "unapproved_theme_news_fail_closed": "pass",
+    "pure_image_q1_q4": "pass_controlled_fixture",
+    "unapproved_news_provider_absent": "pass",
+    "candidate_merge_tree_identity": "pass"
+  },
+  "commercial_authorization": {
+    "written_project_specific_grant_found": false,
+    "public_display_authorized": "not_proven",
+    "server_cache_or_storage_authorized": "not_proven",
+    "redistribution_authorized": "not_proven",
+    "ai_summary_authorized": "not_proven",
+    "attribution_and_trademark_terms_confirmed": "not_proven",
+    "delay_disclaimer_requirements_confirmed": "not_proven",
+    "points_2000_or_2100_prove_endpoint_access_only": true,
+    "points_2000_or_2100_prove_commercial_rights": false,
+    "ordinary_service_terms_signal": "personal_non_transferable_non_commercial_use",
+    "owner_or_legal_confirmation_required": true
+  },
+  "official_sources": [
+    {"title": "Tushare Data Service Agreement", "url": "https://tushare.pro/document/1?doc_id=405", "relevance": "ordinary license terms"},
+    {"title": "Tushare API points and permissions", "url": "https://tushare.pro/document/1?doc_id=108%E3%80%81", "relevance": "points control access, not public redistribution rights"},
+    {"title": "daily_basic documentation", "url": "https://tushare.pro/document/2?doc_id=32", "relevance": "2000-point endpoint threshold"},
+    {"title": "fina_indicator documentation", "url": "https://tushare.pro/document/2?doc_id=79", "relevance": "2000-point endpoint threshold"}
+  ],
+  "deployment_images": {
+    "backend": {"digest": "sha256:2a7984bc6785285249e2d7343c8f86225a54c8eb7302583283419d63d52717b1", "tag": "tradingagents-backend:phase7d-p0-7-4434fc6", "os": "linux", "architecture": "arm64", "size_bytes": 243318099},
+    "frontend": {"digest": "sha256:02dbad039d46b4ae7e632190a83c9c10e0681a2620346bebe771f8c997650228", "tag": "tradingagents-frontend:phase7d-p0-7-4434fc6", "os": "linux", "architecture": "arm64", "size_bytes": 29792320},
+    "oci_revision": "4434fc60feb652a7806d286f54c2175b979cbb4b",
+    "validated_tree": "24a9961639dd7d8388fe8353a6e2e7eb8b955f03",
+    "release_tree_matches_image_tree": true,
+    "server_architecture_unknown": true,
+    "direct_import_allowed_only_if_server_is_arm64": true,
+    "amd64_requires_separately_built_and_validated_images": true
+  },
+  "deployment_sequence": [
+    "record both approvals",
+    "normal fast-forward push of exact 98c111b ref",
+    "server read-only HEAD/status/memory/disk/container/platform preflight",
+    "import verified platform-compatible images",
+    "backend-only update with no build and no migration",
+    "backend health and smoke gate",
+    "frontend-only update with no build",
+    "frontend health and product-state gate"
+  ],
+  "deployment_prohibitions": [
+    "parallel builds or updates",
+    "server-side image build",
+    "migration",
+    "docker compose down",
+    "--remove-orphans",
+    "volume cleanup",
+    "traffic expansion",
+    "destructive Git rollback"
+  ],
+  "rollback": {
+    "method": "restore only affected service to recorded previous known-good image and recreate with --no-build",
+    "git_reset_or_force_update": false,
+    "migration_rollback": false,
+    "volume_or_data_deletion": false
+  },
+  "operations_performed": {
+    "code_change": false,
+    "commit": false,
+    "push": false,
+    "remote_server_connection": false,
+    "deployment": false,
+    "docker_build": false,
+    "migration": false,
+    "traffic_expansion": false,
+    "live_provider_call": false
+  }
+}

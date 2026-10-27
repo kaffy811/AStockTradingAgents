@@ -24,6 +24,8 @@ import logging
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
+from app.agents.reader_report import SPECIALIST_SYSTEM, peers_have_matching_periods
 from app.llm.base import BaseLLMClient
 from app.services.peer_comparison_service import (
     PeerComparisonService,
@@ -209,11 +211,13 @@ class PeerComparisonAnalystAgent:
                 f"peer_comparison_service 返回结构异常 [{market}/{symbol}]"
             )
 
+        if settings.report_reader_mode == "beginner" and not peers_have_matching_periods(snapshot):
+            return ""
         user_content = self._build_user_prompt(market, symbol, snapshot, output_language, question=question)
 
         log.info("PeerComparisonAnalystAgent: calling LLM [%s/%s]", market, symbol)
         messages = [
-            {"role": "system", "content": _SYSTEM_PROMPT},
+            {"role": "system", "content": (SPECIALIST_SYSTEM + "\n本次只分析：同行公司。" if settings.report_reader_mode == "beginner" else _SYSTEM_PROMPT)},
             {"role": "user",   "content": user_content},
         ]
         report = self._llm.chat(messages, temperature=0.3)
@@ -254,11 +258,13 @@ class PeerComparisonAnalystAgent:
                 f"get_peer_fundamentals_dynamic 返回结构异常 [{market}/{symbol}]"
             )
 
+        if settings.report_reader_mode == "beginner" and not peers_have_matching_periods(snapshot):
+            return ""
         user_content = self._build_user_prompt(market, symbol, snapshot, output_language, question=question)
 
         log.info("PeerComparisonAnalystAgent.analyze_async: calling LLM [%s/%s]", market, symbol)
         messages = [
-            {"role": "system", "content": _SYSTEM_PROMPT},
+            {"role": "system", "content": (SPECIALIST_SYSTEM + "\n本次只分析：同行公司。" if settings.report_reader_mode == "beginner" else _SYSTEM_PROMPT)},
             {"role": "user",   "content": user_content},
         ]
         # LLM.chat 是同步方法，在线程池里运行避免阻塞 event loop

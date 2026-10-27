@@ -33,6 +33,8 @@
             <span class="db-unavail">行情加载中…</span>
           </div>
 
+          <p v-if="quoteStale" class="db-unavail">过期缓存 · {{ quoteProvider }}（{{ quoteMessage || '实时行情暂不可用' }}）</p>
+
           <!-- Watchlist badge -->
           <div class="db-watchlist-row">
             <span :class="['db-wl-badge', inWatchlist ? 'db-wl-badge--on' : 'db-wl-badge--off']">
@@ -165,6 +167,9 @@ const props = defineProps({
   quoteChangeText: { type: String,  default: '' },
   quoteChangeClass: { type: String, default: '' },
   quoteError:      { type: Boolean, default: false },
+  quoteStale:      { type: Boolean, default: false },
+  quoteProvider:   { type: String, default: '' },
+  quoteMessage:    { type: String, default: '' },
   technicalInsight: { type: Object, default: null },
   newsItems:       { type: Array,   default: () => [] },
   latestReport:    { type: Object,  default: null },

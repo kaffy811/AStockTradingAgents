@@ -1,0 +1,34 @@
+{
+  "phase": "7D-P0.7-A",
+  "decision": "HOLD_WITH_EVIDENCE",
+  "baseline_sha": "1c675f7fe6b018f3a280973698d9ada10f5c3ddd",
+  "candidate_sha": "4434fc60feb652a7806d286f54c2175b979cbb4b",
+  "candidate_tree": "24a9961639dd7d8388fe8353a6e2e7eb8b955f03",
+  "commit_message": "fix(research-copilot): fail closed unapproved theme queries",
+  "tests": {
+    "backend_theme_company_eod": {"status": "pass", "passed": 68, "warnings": 1},
+    "frontend_full": {"status": "pass", "files": 69, "tests": 764, "worker_timeouts": 0},
+    "python_compile": {"status": "pass"},
+    "git_diff_check": {"status": "pass"}
+  },
+  "pure_images": {
+    "backend": {"status": "built", "manifest": "sha256:2a7984bc6785285249e2d7343c8f86225a54c8eb7302583283419d63d52717b1"},
+    "frontend": {"status": "built", "manifest": "sha256:02dbad039d46b4ae7e632190a83c9c10e0681a2620346bebe771f8c997650228"},
+    "oci_revision": "4434fc60feb652a7806d286f54c2175b979cbb4b"
+  },
+  "serial_queries": {
+    "Q1": {"status": "pass", "attempts": 1, "fulfillment": "fulfilled", "auth_required": false, "profile_nonempty": true},
+    "Q2": {"status": "harness_failed", "attempts": 1, "error": "SyntaxError: ':' expected after dictionary key"},
+    "Q3": {"status": "not_run", "reason": "serial_no_retry_sequence_stopped_after_Q2"},
+    "Q4": {"status": "not_run", "reason": "serial_no_retry_sequence_stopped_after_Q2"}
+  },
+  "hermetic_theme_route_tests": {
+    "exact_q4_covered": true,
+    "variant_count": 12,
+    "llm_calls": 0,
+    "unapproved_market_news_provider_calls": 0,
+    "expected_fulfillment": "unavailable",
+    "expected_reason_code": "NO_APPROVED_INDUSTRY_NEWS_SOURCE"
+  },
+  "live_provider_calls": 0
+}

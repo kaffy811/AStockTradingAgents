@@ -21,18 +21,11 @@
       <RouterLink to="/me" class="nav-link" active-class="nav-link--active">
         {{ t('nav_me') }}
       </RouterLink>
-      <RouterLink
-        v-if="authStore.isAdmin"
-        to="/admin/invites"
-        class="nav-link nav-link--admin"
-        active-class="nav-link--active"
-      >
-        管理后台
-      </RouterLink>
+
     </nav>
 
     <div class="user-badge">
-      <span>{{ displayName }}</span>
+      <span :title="authStore.currentUser">{{ displayName }}</span>
       <button type="button" class="logout-btn" style="margin-left:8px" @click="handleLogout">{{ t('nav_logout') }}</button>
     </div>
   </div>
@@ -51,6 +44,7 @@ const { t }     = useI18n()
 // currentUser is a plain string (username) stored in the auth store
 const displayName = computed(() => {
   const name = authStore.currentUser
+  if (/^google_[a-f0-9]{16,}$/i.test(name || '')) return t('nav_default_user')
   if (name && name !== 'string') return name
   return t('nav_default_user')
 })
@@ -73,6 +67,7 @@ function handleLogout() {
 }
 
 .app-title {
+  flex-shrink: 0;
   font-size: 18px;
   font-weight: 700;
   background: linear-gradient(135deg, var(--accent), var(--accent2));
@@ -86,11 +81,14 @@ function handleLogout() {
   display: flex;
   gap: 4px;
   flex: 1;
+  min-width: 0;
   justify-content: center;
 }
 
 .nav-link {
-  padding: 5px 14px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding: 7px 10px;
   border-radius: 6px;
   font-size: 13px;
   font-weight: 500;
@@ -107,12 +105,20 @@ function handleLogout() {
 }
 
 .user-badge {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  max-width: 190px;
+  min-width: 0;
   font-size: 12px;
   color: var(--muted);
   white-space: nowrap;
 }
 
 .user-badge span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: var(--success);
   font-weight: 600;
 }
@@ -131,6 +137,12 @@ function handleLogout() {
 .nav-link--admin {
   color: var(--accent);
   font-weight: 600;
+}
+
+@media (min-width: 641px) and (max-width: 1100px) {
+  .app-header { flex-wrap: wrap; gap: 12px; }
+  .app-nav { order: 3; flex-basis: 100%; justify-content: flex-start; overflow-x: auto; }
+  .user-badge { margin-left: auto; }
 }
 
 /* ── Mobile ≤640px: BottomTabBar takes over nav, hide .app-nav ── */

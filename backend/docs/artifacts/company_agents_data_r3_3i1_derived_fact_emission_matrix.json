@@ -1,0 +1,215 @@
+{
+  "phase": "6W-R3.3I.1",
+  "objective": "Derived Fact Emission Diagnosis",
+  "traffic_decision": "HOLD_1_PERCENT",
+  "status": "DERIVED_FACT_EMISSION_EXPLAINED",
+  "workspace": {
+    "head": "b055da8495c54bb37625f0b0e0f94b4d4a627de2",
+    "branch": "release/demo-staging",
+    "git_status_short": [
+      "M backend/Dockerfile",
+      "M backend/app/main.py",
+      "M backend/app/services/report_embedding_provider.py",
+      "M backend/pyproject.toml",
+      "M backend/uv.lock",
+      "?? HKNA/docs/suggestion/suggest2.md",
+      "?? HKNA/docs/suggestion/suggest3.md",
+      "?? HKNA/docs/suggestion/suggest4.md",
+      "?? HKNA/docs/suggestion/suggest5.md",
+      "?? HKNA/docs/suggestion/suggest6.md",
+      "?? HKNA/docs/suggestion/suggest7.md",
+      "?? HKNA/update_report/update_96.md",
+      "?? HKNA/update_report/update_99.md",
+      "?? backend/docs/artifacts/company_agents_data_r1_7_production_preflight.md",
+      "?? backend/docs/artifacts/company_agents_data_r1_8_env_audit.md",
+      "?? backend/docs/artifacts/company_agents_data_r1_8_preflight_plan.md",
+      "?? backend/docs/artifacts/company_agents_data_r1_8_production_readiness.md",
+      "?? backend/docs/artifacts/company_agents_data_r1_8_provider_matrix.md",
+      "?? backend/docs/artifacts/company_agents_data_r2_1_embedding_config.md",
+      "?? backend/docs/artifacts/company_agents_data_r2_1_final_go_gate.md",
+      "?? backend/docs/artifacts/company_agents_data_r2_2_database_recovery.md",
+      "?? backend/docs/artifacts/company_agents_data_r2_2_e2e_financial_query.md",
+      "?? backend/docs/artifacts/company_agents_data_r2_2_migration_verification.md",
+      "?? backend/docs/artifacts/company_agents_data_r2_2_production_go_gate.md",
+      "?? backend/docs/artifacts/company_agents_data_r2_2_report_ingestion.md",
+      "?? backend/docs/artifacts/company_agents_data_r2_3_production_security_remediation.md",
+      "?? backend/docs/artifacts/company_agents_data_r2_3_runtime_restart.md",
+      "?? backend/docs/artifacts/company_agents_data_r2_4_final_go_gate.md",
+      "?? backend/docs/artifacts/company_agents_data_r2_5_final_go_gate.md",
+      "?? backend/docs/artifacts/company_agents_data_r2_browser_validation.md",
+      "?? backend/docs/artifacts/company_agents_data_r2_database_readiness.md",
+      "?? backend/docs/artifacts/company_agents_data_r2_env_alignment.md",
+      "?? backend/docs/artifacts/company_agents_data_r2_final_go_gate.md",
+      "?? backend/docs/artifacts/company_agents_data_r2_provider_validation.md",
+      "?? backend/docs/artifacts/company_agents_data_r2_rag_readiness.md",
+      "?? backend/docs/artifacts/company_agents_data_r3_0_production_canary.md",
+      "?? backend/docs/artifacts/company_agents_data_r3_0_release_integrity.md",
+      "?? backend/docs/artifacts/company_agents_data_r3_1_canary_observation.md",
+      "?? backend/docs/artifacts/company_agents_data_r3_2_canary_observation.md",
+      "?? backend/docs/artifacts/company_agents_data_r3_2_dependency_remediation.md",
+      "?? backend/docs/artifacts/company_agents_data_r3_2_fix_decision.md",
+      "?? backend/docs/artifacts/company_agents_data_r3_2_numeric_provenance.md",
+      "?? backend/docs/artifacts/company_agents_data_r3_2_s0_s8_trace.json",
+      "?? backend/docs/artifacts/company_agents_data_r3_2c_q2_runtime_closure.md",
+      "?? backend/docs/artifacts/company_agents_data_r3_2d_rebaseline_observation.md",
+      "?? backend/docs/artifacts/company_agents_data_r3_2d_runtime_causality.md",
+      "?? backend/docs/artifacts/company_agents_data_r3_3_numeric_failure_matrix.json",
+      "?? backend/docs/artifacts/company_agents_data_r3_3_numeric_failure_provenance.md",
+      "?? backend/docs/artifacts/company_agents_data_r3_3c_release_image_provenance.md",
+      "?? backend/docs/artifacts/company_agents_data_r3_3d_candidate_environment.md",
+      "?? backend/docs/artifacts/company_agents_data_r3_3d_candidate_numeric_attribution.md",
+      "?? backend/docs/artifacts/company_agents_data_r3_3d_candidate_numeric_matrix.json",
+      "?? backend/docs/artifacts/company_agents_data_r3_3e_empty_db_bootstrap.md",
+      "?? backend/docs/artifacts/company_agents_data_r3_3f_candidate_numeric_attribution.md",
+      "?? backend/docs/artifacts/company_agents_data_r3_3f_candidate_numeric_matrix.json",
+      "?? memory/project_phase6w_r14_staging_smoke.md"
+    ],
+    "diff_check": "clean",
+    "name_only": [
+      "backend/Dockerfile",
+      "backend/app/main.py",
+      "backend/app/services/report_embedding_provider.py",
+      "backend/pyproject.toml",
+      "backend/uv.lock"
+    ],
+    "boundary": {
+      "historical_dirty_changes_preserved": true,
+      "r3_3i_changes_in_current_workspace": false,
+      "new_diagnostic_files": [
+        "backend/docs/artifacts/company_agents_data_r3_3i1_derived_fact_emission_diagnosis.md",
+        "backend/docs/artifacts/company_agents_data_r3_3i1_derived_fact_emission_matrix.json"
+      ]
+    }
+  },
+  "frozen_case": {
+    "request_id": "a623343f",
+    "trace_id": "fe400124-5cd9-4df2-9cab-8e8fa38b0ea2",
+    "question": "2024年贵州茅台净利率如何？",
+    "selected_report_id": 1,
+    "selected_report_year": 2024,
+    "selected_period": "2024-12-31"
+  },
+  "candidate_emission": [
+    {
+      "metric": "net_margin",
+      "status": "skipped",
+      "reason_code": "NO_STRUCTURED_DATA",
+      "operands": [
+        "revenue",
+        "net_profit"
+      ],
+      "evidence_ids": [],
+      "period": "2024",
+      "value": null,
+      "source_function": "/private/tmp/tradingagents-r33e1.IfXFWV/backend/app/services/report_derived_fact_service.py:build_report_derived_facts",
+      "first_failure": {
+        "function": "/private/tmp/tradingagents-r33e1.IfXFWV/backend/app/services/report_derived_fact_service.py:_structured_facts",
+        "line_range": "98-155",
+        "condition": "structured_financial_data.get('fields') is empty, so no structured operands exist"
+      },
+      "next_guard": {
+        "function": "/private/tmp/tradingagents-r33e1.IfXFWV/backend/app/services/report_derived_fact_service.py:build_report_derived_facts",
+        "line_range": "191-198",
+        "condition": "profit and revenue and unit equality guard fails because profit/revenue are None"
+      }
+    }
+  ],
+  "stage_evidence": {
+    "S1": {
+      "executed": true,
+      "input_exists": true,
+      "output": {
+        "selected_report_id": 1,
+        "selected_report_year": 2024,
+        "selected_period": "2024-12-31",
+        "selection_cache": "miss",
+        "selection_source": "explicit_report_id"
+      }
+    },
+    "S4": {
+      "executed": true,
+      "input_exists": true,
+      "output": {
+        "evidence_chars": 2546,
+        "pre_compaction_numeric_inventory_count": 58,
+        "retrieved_evidence_ids": [
+          182,
+          39,
+          187,
+          190,
+          185,
+          183
+        ]
+      }
+    },
+    "S5": {
+      "executed": true,
+      "input_exists": true,
+      "output": {
+        "derived_facts_count": 0,
+        "structured_fields_present": false,
+        "structured_fields_count": 0,
+        "structured_financial_fields_snapshot": {
+          "cache_status": "empty",
+          "fields_count": 0
+        }
+      }
+    },
+    "S6": {
+      "executed": true,
+      "input_exists": true,
+      "output": {
+        "raw_output_present": true,
+        "raw_output_absent": false,
+        "provider_error_category": null,
+        "timeout_layer": null,
+        "diagnostic_text": "structural fields empty; backend derived facts empty"
+      }
+    },
+    "S7": {
+      "executed": true,
+      "input_exists": true,
+      "output": {
+        "derived_facts_count": 0,
+        "token_contexts_count": 0,
+        "citation_validation_valid": true,
+        "resolved_derived_fact_ids": [],
+        "citation_metadata_leak": false
+      }
+    }
+  },
+  "classification": {
+    "root_cause_class": "INPUT_UNAVAILABLE",
+    "root_cause_letter": "A",
+    "explanation": "The structured financial extractor produced no usable fields for the frozen net-margin request, and the derived-fact builder therefore had no revenue/net_profit operands to emit."
+  },
+  "tests": [
+    {
+      "name": "Isolated unit test suite for derived facts and trace durability",
+      "collected": 64,
+      "passed": 64,
+      "failed": 0,
+      "skipped": 0,
+      "duration_seconds": 0.80,
+      "scope": [
+        "net margin emission",
+        "cashflow difference validation",
+        "asset growth validation",
+        "D5/D7 rejection",
+        "D3 citation containment"
+      ]
+    }
+  ],
+  "runtime_verification": {
+    "control_request_used": false,
+    "reason": "Frozen trace plus persisted S1/S4/S5/S6/S7 were sufficient to explain the first failure; no extra net-margin request was required."
+  },
+  "allowed_next_step": {
+    "can_proceed_to_minimal_fix": false,
+    "why_not": [
+      "The diagnosis explains empty derived facts as input unavailability, not a validator boundary mismatch.",
+      "This turn did not establish a second independent same-root sample for the same emission failure.",
+      "No remediation should be attempted in this diagnosis-only pass."
+    ]
+  }
+}

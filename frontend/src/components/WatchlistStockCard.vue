@@ -30,6 +30,7 @@
       <!-- Quote -->
       <div class="wsc-quote">
         <template v-if="item.quote_status !== 'failed' && item.latest_price != null">
+          <span v-if="item.quote_stale" class="wsc-unavail" :title="item.quote_message">过期缓存 · {{ item.quote_provider }}</span>
           <span class="wsc-price">{{ fmtPrice(item.latest_price) }}</span>
           <span v-if="item.change_pct != null" :class="['wsc-chg', changePctClass(item.change_pct)]">
             {{ fmtChangePct(item.change_pct) }}

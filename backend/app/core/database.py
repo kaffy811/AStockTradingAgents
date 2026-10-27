@@ -2,6 +2,8 @@ from collections.abc import AsyncGenerator
 import logging
 
 from redis.asyncio import Redis, from_url
+from redis.asyncio.retry import Retry
+from redis.backoff import NoBackoff
 from sqlalchemy.engine import make_url
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
@@ -119,11 +121,18 @@ _redis_client: Redis | None = None
 
 async def connect_redis() -> None:
     global _redis_client
+    client = None
     try:
-        client = from_url(settings.redis_url, decode_responses=True)
+        client = from_url(
+            settings.redis_url, decode_responses=True,
+            socket_connect_timeout=1.0, socket_timeout=1.0,
+            max_connections=32, retry=Retry(NoBackoff(), 0),
+        )
         await client.ping()
         _redis_client = client
     except Exception as exc:
+        if client is not None:
+            await client.aclose()
         # Redis is optional — log but don't block startup.
         import logging
         logging.getLogger(__name__).warning("Redis unavailable: %s", exc)

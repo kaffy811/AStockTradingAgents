@@ -1,0 +1,105 @@
+{
+  "schema_version": "1.0",
+  "audit_id": "e0_20260915T013926Z",
+  "observed_at": "2026-09-15T01:39:26Z",
+  "items": [
+    {
+      "id": "E0-P0-001", "priority": "P0", "title": "Chat backend initialization failure activates hardcoded financial mock responses", "classification": "CONFIRMED",
+      "affected_baseline": "current workspace HEAD 98c111b plus working tree", "affected_capability": ["general.qa", "industry.theme", "chat.watchlist.write", "research chat"],
+      "evidence": ["frontend/src/views/ChatCopilotView.vue imports chatMock, sets fallbackMode=true on session initialization failure, and calls _sendMock", "frontend/src/mocks/chatMock.js contains hardcoded prices, news, reports and watchlist success"],
+      "expected": "Backend/auth/session failure displays an error or retry state and never fabricates research data or action success.", "observed": "Static code path routes subsequent messages to hardcoded mock responses.",
+      "user_impact": "Invite users can mistake demo content and simulated writes for real research or account state.", "security_or_data_risk": "High integrity risk; breaks approved-source fail-closed behavior.", "reproduction_status": "STATIC_CONFIRMED_NOT_RUNTIME_REPRODUCED",
+      "suggested_minimal_fix": "Remove production Chat mock fallback/import and render explicit unavailable/retry; retain mocks only in test/dev injection.", "candidate_files": ["frontend/src/views/ChatCopilotView.vue", "frontend/src/mocks/chatMock.js", "frontend/src/tests/new beta failure-state test"],
+      "migration_required": false, "required_authorization": "E1 code change and later browser acceptance", "acceptance_tests": ["session create 5xx/timeout shows failure", "theme query never renders mock news", "watchlist mock never claims success"]
+    },
+    {
+      "id": "E0-P0-002", "priority": "P0", "title": "Current workspace Nginx sends /api/v2 and /health to SPA fallback", "classification": "CONFIRMED",
+      "affected_baseline": "current HEAD 98c111b", "affected_capability": ["company.profile", "company.eod", "company.history"],
+      "evidence": ["frontend/nginx.conf at HEAD proxies only location ^~ /api/v1/ and uses try_files /index.html for location /", "historical phase7e_p1_3 observed public HTML 200"],
+      "expected": "All API paths retain backend status/content type and /health is not SPA HTML.", "observed": "Static current config cannot proxy /api/v2 or /health.",
+      "user_impact": "A build from current workspace would break Company V2 API access.", "security_or_data_risk": "False HTTP 200 and contract confusion.", "reproduction_status": "STATIC_CONFIRMED; historical runtime confirmed on fdcdc264",
+      "suggested_minimal_fix": "Do not reimplement: adopt/review the existing proxy fix from commit 184dcadb.", "candidate_files": ["frontend/nginx.conf", "frontend/tests/nginx_proxy_contract_harness.py"],
+      "migration_required": false, "required_authorization": "release-chain selection and deployment review", "acceptance_tests": ["API v1/v2 JSON passthrough", "backend 4xx/5xx preserved", "SPA routes still work"]
+    },
+    {
+      "id": "E0-P1-001", "priority": "P1", "title": "Working tree is not a releasable baseline and mixes six historical modifications", "classification": "CONFIRMED",
+      "affected_baseline": "current workspace", "affected_capability": ["release integrity", "report RAG"],
+      "evidence": ["6 tracked changes and 141 pre-audit untracked files", "tracked changes include Dockerfile, dependency manifest/lock, startup DB pool warmup and embedding provider"],
+      "expected": "E1 begins from a named clean commit and preserves unrelated work.", "observed": "Current branch HEAD is 98c111b while later candidate objects are separate; working tree contains unrelated edits.",
+      "user_impact": "Accidental scope contamination or unverifiable release artifacts.", "security_or_data_risk": "Supply-chain and migration provenance risk.", "reproduction_status": "STATIC_CONFIRMED",
+      "suggested_minimal_fix": "Create E1 from an explicitly selected clean candidate in a new worktree; do not stage current changes.", "candidate_files": [], "migration_required": false,
+      "required_authorization": "Owner baseline selection; no destructive Git operation", "acceptance_tests": ["clean worktree", "tree identity", "scope diff"]
+    },
+    {
+      "id": "E0-P1-002", "priority": "P1", "title": "Synchronous Chat status completed is not equivalent to research fulfilled", "classification": "CONFIRMED",
+      "affected_baseline": "current HEAD and inspected candidates", "affected_capability": ["research chat", "HTTP/history consistency"],
+      "evidence": ["send_chat_message returns status=completed whenever handler finishes", "research fulfillment is optional metadata", "stored history and SSE use separate status shapes"],
+      "expected": "Public result contract separates execution terminal state from answer fulfillment.", "observed": "The API exposes completed alongside optional/absent fulfillment and reason_code.",
+      "user_impact": "UI may display successful completion for partial/unavailable research unless every path applies separate metadata correctly.", "security_or_data_risk": "Financial-result truthfulness risk.", "reproduction_status": "STATIC_CONFIRMED",
+      "suggested_minimal_fix": "Add a backward-compatible public result adapter shared by sync, SSE terminal event and history serialization.", "candidate_files": ["backend/app/models/chat.py", "backend/app/routers/chat.py", "backend/app/agents/chat_streaming.py", "frontend/src/utils/researchFulfillment.js", "frontend/src/utils/chatEventNormalizer.js"],
+      "migration_required": null, "required_authorization": "E1 contract decision; migration only if historical normalized fields must be persisted", "acceptance_tests": ["completed+unavailable remains unavailable", "sync/SSE/history fixture parity", "request_id parity"]
+    },
+    {
+      "id": "E0-P1-003", "priority": "P1", "title": "Chat send contract has no client_request_id idempotency field", "classification": "CONFIRMED",
+      "affected_baseline": "current HEAD", "affected_capability": ["chat.sessions", "SSE recovery"],
+      "evidence": ["ChatMessageSendRequest only contains content and output_language", "frontend send wrappers send no client_request_id"],
+      "expected": "A retried message can be correlated and deduplicated across HTTP/SSE.", "observed": "No request-level client idempotency contract is present in current message schema.",
+      "user_impact": "Network retries may create duplicate messages or research runs.", "security_or_data_risk": "Duplicate side effects if a write-capable path is involved.", "reproduction_status": "STATIC_CONFIRMED; duplicate runtime not reproduced in E0",
+      "suggested_minimal_fix": "First reproduce retry behavior; then add compatible client_request_id/request_id mapping using existing message metadata or a minimal uniqueness strategy.", "candidate_files": ["backend/app/models/chat.py", "backend/app/services/chat_service.py", "backend/app/routers/chat.py", "frontend/src/api/chat.js", "frontend/src/views/ChatCopilotView.vue"],
+      "migration_required": null, "required_authorization": "E1 reproduction; migration review if DB uniqueness is required", "acceptance_tests": ["same request retry creates one logical turn", "different payload with same key rejected", "SSE fallback does not duplicate"]
+    },
+    {
+      "id": "E0-P1-004", "priority": "P1", "title": "Quarterly history availability is not established", "classification": "HISTORICAL",
+      "affected_baseline": "reported production fdcdc264", "affected_capability": ["company.history.quarterly"],
+      "evidence": ["phase7e_p1_3 reported 000725 quarterly DATA_NOT_AVAILABLE"], "expected": "Quarterly request returns data or a clear limited-coverage state.", "observed": "Historical runtime returned no data for one audited symbol.",
+      "user_impact": "Users cannot rely on quarterly coverage.", "security_or_data_risk": "Low security risk; medium data completeness risk.", "reproduction_status": "HISTORICAL_NOT_REPRODUCED_ON_CURRENT_PRODUCTION",
+      "suggested_minimal_fix": "Keep beta promise limited; reproduce with approved account/data before scheduling backfill.", "candidate_files": ["backend/app/services/company_v2_history_service.py", "frontend/src/views/CompanyV2View.vue"],
+      "migration_required": null, "required_authorization": "runtime reproduction; separate data job approval if backfill", "acceptance_tests": ["annual/quarterly matrix", "empty state", "module isolation"]
+    },
+    {
+      "id": "E0-P1-005", "priority": "P1", "title": "Report RAG runtime and underlying files are not established for beta", "classification": "HISTORICAL",
+      "affected_baseline": "reported production fdcdc264 plus unverified later clues", "affected_capability": ["report.interpretation"],
+      "evidence": ["phase7e_p1_3 reported report_rag=false and embedding provider mock", "six indexed documents/1721 chunks were historical DB facts", "prompt-provided six missing file references could not be located in an authoritative current report during E0"],
+      "expected": "Selected report PDF exists, matches metadata, is parsed/indexed, and citations resolve.", "observed": "Historical runtime disabled; external-file completeness remains unverified.",
+      "user_impact": "Finding a report title can be mistaken for completed filing analysis.", "security_or_data_risk": "Cross-report or unsupported-answer risk if enabled without evidence.", "reproduction_status": "HISTORICAL_AND_PARTLY_UNVERIFIED",
+      "suggested_minimal_fix": "Keep closed; separately inventory report file existence and index/report selection before any UX promise.", "candidate_files": ["backend/app/routers/report_discovery.py", "backend/app/routers/report_rag.py", "backend/app/routers/report_chat.py"],
+      "migration_required": null, "required_authorization": "read-only file/index audit and later controlled runtime test", "acceptance_tests": ["title vs file vs parsed vs indexed states", "report-id isolation", "citation resolution"]
+    },
+    {
+      "id": "E0-P1-006", "priority": "P1", "title": "Phase 8 persistent Chat watchlist action is candidate-only and production prerequisites are absent", "classification": "CONFIRMED",
+      "affected_baseline": "c197e19 and 9d05b077 candidates; not current workspace", "affected_capability": ["chat.watchlist.write"],
+      "evidence": ["candidate introduces s7/t8 migrations and action routes", "Phase8J.1 historical report says production ledger tables absent and feature off", "Phase8K candidate defaults global flag off and allowlist empty"],
+      "expected": "Feature remains unavailable until migrations, least-privilege connection, backup evidence and scoped enablement are independently approved.", "observed": "Local isolated candidate exists; no production-ready evidence is combined into this E0 audit.",
+      "user_impact": "No Chat write action in beta; existing REST watchlist remains separate.", "security_or_data_risk": "High if enabled without role/migration controls.", "reproduction_status": "STATIC_CANDIDATE_CONFIRMED; production facts historical only",
+      "suggested_minimal_fix": "No E1 implementation; keep capability closed and exclude buttons/promises from beta.", "candidate_files": [], "migration_required": true,
+      "required_authorization": "separate code release, backup, role change, migration and feature enablement approvals", "acceptance_tests": ["default off", "empty allowlist deny", "ledger absent returns capability unavailable", "cross-user/session rejection"]
+    },
+    {
+      "id": "E0-P2-001", "priority": "P2", "title": "Production scheduler and freshness evidence is stale or absent", "classification": "HISTORICAL",
+      "affected_baseline": "reported production fdcdc264", "affected_capability": ["company history", "report discovery", "news"],
+      "evidence": ["phase7e_p1_3 reported no application timer/cron and an old coverage snapshot"], "expected": "Each beta data capability has last-success and freshness evidence.", "observed": "Historical audit could not establish an active refresh scheduler.",
+      "user_impact": "Data may be stale despite routes being available.", "security_or_data_risk": "Data freshness risk.", "reproduction_status": "HISTORICAL_NOT_REPRODUCED",
+      "suggested_minimal_fix": "Do not add a scheduler in E1; display as-of and inventory existing jobs before any separate operations phase.", "candidate_files": [], "migration_required": false, "required_authorization": "production read-only scheduler audit", "acceptance_tests": ["last-success evidence", "stale state rendering"]
+    },
+    {
+      "id": "E0-RISK-001", "priority": "P1", "title": "SSE disconnect, sync fallback and session switching may diverge", "classification": "NEEDS_REPRODUCTION",
+      "affected_baseline": "current HEAD", "affected_capability": ["chat.sessions", "SSE recovery"],
+      "evidence": ["frontend falls back from SSE to synchronous POST", "current request has no client_request_id", "session guards exist but E0 did not execute browser tests"],
+      "expected": "One user turn produces one persisted result and old session responses cannot update a new session.", "observed": "No runtime observation in E0.",
+      "user_impact": "Potential duplicates or stale UI after network/session changes.", "security_or_data_risk": "Cross-session UI integrity risk; no cross-user incident established.", "reproduction_status": "NOT_TESTED",
+      "suggested_minimal_fix": "Reproduce with real production page controller and mocked network before deciding schema changes.", "candidate_files": ["frontend/src/views/ChatCopilotView.vue", "frontend/src/api/chat.js", "backend/app/agents/chat_streaming.py"],
+      "migration_required": null, "required_authorization": "local deterministic component/integration test only", "acceptance_tests": ["SSE response lost then sync fallback", "switch session during stream", "logout during response"]
+    },
+    {
+      "id": "E0-RISK-002", "priority": "P1", "title": "Migration portability and extension compatibility require candidate-specific revalidation", "classification": "NEEDS_REPRODUCTION",
+      "affected_baseline": "current HEAD/candidate migration chains", "affected_capability": ["report RAG", "Phase 8 ledger"],
+      "evidence": ["historical artifacts describe earlier pgvector/standard PostgreSQL migration failures and later remediation", "E0 did not run migrations"],
+      "expected": "Selected release chain upgrades from actual production head on the target PostgreSQL capability set.", "observed": "No current migration execution in E0 by design.",
+      "user_impact": "Potential deployment block, not a confirmed runtime product bug.", "security_or_data_risk": "Schema availability and rollback risk.", "reproduction_status": "NOT_TESTED",
+      "suggested_minimal_fix": "Do not change migration in E1 unless the selected clean baseline reproduces the issue; run isolated upgrade matrix in a separately authorized phase.", "candidate_files": ["backend/alembic/versions"],
+      "migration_required": null, "required_authorization": "isolated PostgreSQL migration rehearsal", "acceptance_tests": ["actual-head to target", "standard PostgreSQL", "pgvector-enabled PostgreSQL", "existing-data preservation"]
+    }
+  ],
+  "counts": {"CONFIRMED": 6, "HISTORICAL": 3, "NEEDS_REPRODUCTION": 2},
+  "e0_execution": {"application_started": false, "tests_run": false, "production_access": false, "provider_or_llm_calls": 0}
+}
